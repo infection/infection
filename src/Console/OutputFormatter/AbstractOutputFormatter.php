@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
-use Infection\Process\MutantProcess;
+use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
@@ -54,7 +54,7 @@ abstract class AbstractOutputFormatter implements OutputFormatter
         $this->callsCount = 0;
     }
 
-    public function advance(MutantProcess $mutantProcess, int $mutationCount): void
+    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
     {
         ++$this->callsCount;
     }

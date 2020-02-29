@@ -53,6 +53,9 @@ use ReflectionProperty;
 
 final class NodeTraverserFactoryTest extends TestCase
 {
+    /**
+     * @var ReflectionProperty|null
+     */
     private static $visitorsReflection;
 
     public function test_it_can_create_a_traverser(): void

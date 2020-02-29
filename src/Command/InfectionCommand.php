@@ -175,6 +175,12 @@ final class InfectionCommand extends BaseCommand
                 'Extra php options for the initial test runner. Will be ignored if --coverage option presented.'
             )
             ->addOption(
+                'skip-initial-tests',
+                null,
+                InputOption::VALUE_NONE,
+                'Skips the initial test runs - requires the coverage to be provided via the --coverage option.'
+            )
+            ->addOption(
                 'ignore-msi-with-no-mutations',
                 null,
                 InputOption::VALUE_NONE,
@@ -240,6 +246,10 @@ final class InfectionCommand extends BaseCommand
 
         $coverageChecker = $this->container->getCoverageRequirementChecker();
 
+        if ($coverageChecker->hasSkipInitialTestsWithoutCoverageOption()) {
+            throw CoverageDoesNotExistException::mustAlreadyExist();
+        }
+
         if (!$coverageChecker->hasDebuggerOrCoverageOption()) {
             throw CoverageDoesNotExistException::unableToGenerate();
         }
@@ -296,6 +306,7 @@ final class InfectionCommand extends BaseCommand
             $input->getOption('no-progress'),
             $coverage === '' ? null : $coverage,
             $initialTestsPhpOptions === '' ? null : $initialTestsPhpOptions,
+            (bool) $input->getOption('skip-initial-tests'),
             $input->getOption('ignore-msi-with-no-mutations'),
             $minMsi === null ? null : (float) $minMsi,
             $minCoveredMsi === null ? null : (float) $minCoveredMsi,

@@ -38,9 +38,11 @@ namespace Infection\Tests\Process\Runner\Parallel;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\Mutant;
+use Infection\Mutation\Mutation;
+use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use PHPUnit\Framework\MockObject\MockObject;
+use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -121,86 +123,175 @@ final class ParallelProcessRunnerTest extends TestCase
     private function buildEventDispatcherWithEventCount(int $eventCount)
     {
         $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher->expects($this->exactly($eventCount))
+        $eventDispatcher
+            ->expects($this->exactly($eventCount))
             ->method('dispatch')
-            ->with(new MutantProcessWasFinished($this->createMock(MutantProcess::class)));
+            ->with($this->isInstanceOf(MutantProcessWasFinished::class))
+        ;
 
         return $eventDispatcher;
     }
 
     private function buildUncoveredMutantProcess(): MutantProcess
     {
-        $mutant = $this->createMock(Mutant::class);
-        $mutant->expects($this->once())
+        $processMock = $this->createMock(Process::class);
+        $processMock
+            ->method('getCommandLine')
+            ->willReturn('bin/phpunit path/to/FooTest.php')
+        ;
+        $processMock
+            ->method('getOutput')
+            ->willReturn('')
+        ;
+
+        $mutationMock = $this->createMock(Mutation::class);
+        $mutationMock
+            ->method('getMutatorName')
+            ->willReturn(MutatorName::getName(For_::class))
+        ;
+
+        $mutantMock = $this->createMock(Mutant::class);
+        $mutantMock
+            ->expects($this->once())
             ->method('isCoveredByTest')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
+        $mutantMock
+            ->method('getMutation')
+            ->willReturn($mutationMock)
+        ;
 
-        /** @var MockObject|MutantProcess $mutantProcess */
-        $mutantProcess = $this->createMock(MutantProcess::class);
-        $mutantProcess->expects($this->once())
+        $mutantProcessMock = $this->createMock(MutantProcess::class);
+        $mutantProcessMock
+            ->expects($this->atLeastOnce())
+            ->method('getProcess')
+            ->willReturn($processMock)
+        ;
+        $mutantProcessMock
+            ->expects($this->atLeastOnce())
             ->method('getMutant')
-            ->willReturn($mutant);
+            ->willReturn($mutantMock)
+        ;
 
-        return $mutantProcess;
+        return $mutantProcessMock;
     }
 
     private function buildCoveredMutantProcess(): MutantProcess
     {
-        $process = $this->createMock(Process::class);
-        $process->expects($this->once())
-            ->method('start');
-        $process->expects($this->once())
-            ->method('checkTimeout');
-        $process->expects($this->once())
+        $processMock = $this->createMock(Process::class);
+        $processMock
+            ->expects($this->once())
+            ->method('start')
+        ;
+        $processMock
+            ->expects($this->once())
+            ->method('checkTimeout')
+        ;
+        $processMock
+            ->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
+        $processMock
+            ->method('getCommandLine')
+            ->willReturn('bin/phpunit path/to/FooTest.php')
+        ;
+        $processMock
+            ->method('getOutput')
+            ->willReturn('Failed!')
+        ;
 
-        $mutant = $this->createMock(Mutant::class);
-        $mutant->expects($this->once())
+        $mutationMock = $this->createMock(Mutation::class);
+        $mutationMock
+            ->method('getMutatorName')
+            ->willReturn(MutatorName::getName(For_::class))
+        ;
+
+        $mutantMock = $this->createMock(Mutant::class);
+        $mutantMock
+            ->expects($this->once())
             ->method('isCoveredByTest')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
+        $mutantMock
+            ->method('getMutation')
+            ->willReturn($mutationMock)
+        ;
 
-        /** @var MockObject|MutantProcess $mutantProcess */
-        $mutantProcess = $this->createMock(MutantProcess::class);
-        $mutantProcess->expects($this->exactly(2))
+        $mutantProcessMock = $this->createMock(MutantProcess::class);
+        $mutantProcessMock
+            ->expects($this->atLeastOnce())
             ->method('getProcess')
-            ->willReturn($process);
-        $mutantProcess->expects($this->once())
+            ->willReturn($processMock)
+        ;
+        $mutantProcessMock
+            ->expects($this->atLeastOnce())
             ->method('getMutant')
-            ->willReturn($mutant);
+            ->willReturn($mutantMock)
+        ;
 
-        return $mutantProcess;
+        return $mutantProcessMock;
     }
 
     private function buildCoveredMutantProcessWithTimeout(): MutantProcess
     {
-        $process = $this->createMock(Process::class);
-        $process->expects($this->once())
-            ->method('start');
-        $process->expects($this->once())
+        $processMock = $this->createMock(Process::class);
+        $processMock
+            ->expects($this->once())
+            ->method('start')
+        ;
+        $processMock
+            ->expects($this->once())
             ->method('checkTimeout')
-            ->will($this->throwException(new ProcessTimedOutException($process, 1)));
-        $process->expects($this->once())
+            ->will($this->throwException(new ProcessTimedOutException($processMock, 1)))
+        ;
+        $processMock
+            ->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
+        $processMock
+            ->method('getCommandLine')
+            ->willReturn('bin/phpunit path/to/FooTest.php')
+        ;
+        $processMock
+            ->method('getOutput')
+            ->willReturn('Terminated')
+        ;
 
-        $mutant = $this->createMock(Mutant::class);
-        $mutant->expects($this->once())
+        $mutationMock = $this->createMock(Mutation::class);
+        $mutationMock
+            ->method('getMutatorName')
+            ->willReturn(MutatorName::getName(For_::class))
+        ;
+
+        $mutantMock = $this->createMock(Mutant::class);
+        $mutantMock
+            ->expects($this->once())
             ->method('isCoveredByTest')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
+        $mutantMock
+            ->method('getMutation')
+            ->willReturn($mutationMock)
+        ;
 
-        /** @var MockObject|MutantProcess $mutantProcess */
-        $mutantProcess = $this->createMock(MutantProcess::class);
-        $mutantProcess->expects($this->exactly(2))
+        $mutantProcessMock = $this->createMock(MutantProcess::class);
+        $mutantProcessMock
+            ->expects($this->atLeastOnce())
             ->method('getProcess')
-            ->willReturn($process);
-        $mutantProcess->expects($this->once())
+            ->willReturn($processMock);
+        $mutantProcessMock
+            ->expects($this->atLeastOnce())
             ->method('getMutant')
-            ->willReturn($mutant);
-        $mutantProcess->expects($this->once())
-            ->method('markTimeout');
+            ->willReturn($mutantMock)
+        ;
+        $mutantProcessMock
+            ->expects($this->once())
+            ->method('markTimeout')
+        ;
 
-        return $mutantProcess;
+        return $mutantProcessMock;
     }
 
     private function runWithAllKindsOfProcesses(int $threadCount): void

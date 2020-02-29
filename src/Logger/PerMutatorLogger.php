@@ -76,17 +76,17 @@ final class PerMutatorLogger extends FileLogger
 
     private function setUpPerCalculatorMutator(): void
     {
-        $processes = $this->metricsCalculator->getAllMutantProcesses();
+        $executionResults = $this->metricsCalculator->getAllMutantExecutionResults();
 
         $processPerMutator = [];
 
-        foreach ($processes as $process) {
-            $mutatorName = $process->getMutatorName();
-            $processPerMutator[$mutatorName][] = $process;
+        foreach ($executionResults as $executionResult) {
+            $mutatorName = $executionResult->getMutatorName();
+            $processPerMutator[$mutatorName][] = $executionResult;
         }
 
-        foreach ($processPerMutator as $mutator => $processes) {
-            $this->calculatorPerMutator[$mutator] = MetricsCalculator::createFromArray($processes);
+        foreach ($processPerMutator as $mutator => $executionResults) {
+            $this->calculatorPerMutator[$mutator] = MetricsCalculator::createFromArray($executionResults);
         }
 
         ksort($this->calculatorPerMutator);

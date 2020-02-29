@@ -89,7 +89,6 @@ use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
@@ -178,12 +177,6 @@ final class Container
                     $container->getJUnitFilePath(),
                     $config,
                     GeneratedExtensionsConfig::EXTENSIONS
-                );
-            },
-            XmlConfigurationHelper::class => static function (self $container): XmlConfigurationHelper {
-                return new XmlConfigurationHelper(
-                    $container->getPathReplacer(),
-                    (string) $container->getConfiguration()->getPhpUnit()->getConfigDir()
                 );
             },
             MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
@@ -297,7 +290,8 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new CoverageRequirementChecker(
-                    $config->getCoveragePath() !== '',
+                    $config->shouldSkipCoverage(),
+                    $config->shouldSkipInitialTests(),
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },
@@ -428,6 +422,7 @@ final class Container
         bool $noProgress,
         ?string $existingCoveragePath,
         ?string $initialTestsPhpOptions,
+        bool $skipInitialTests,
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         ?float $minCoveredMsi,
@@ -457,6 +452,7 @@ final class Container
             static function (self $container) use (
                 $existingCoveragePath,
                 $initialTestsPhpOptions,
+                $skipInitialTests,
                 $logVerbosity,
                 $debug,
                 $onlyCovered,
@@ -475,6 +471,7 @@ final class Container
                     $container->getSchemaConfiguration(),
                     $existingCoveragePath,
                     $initialTestsPhpOptions,
+                    $skipInitialTests,
                     $logVerbosity,
                     $debug,
                     $onlyCovered,
@@ -544,11 +541,6 @@ final class Container
     public function getFactory(): Factory
     {
         return $this->get(Factory::class);
-    }
-
-    public function getXmlConfigurationHelper(): XmlConfigurationHelper
-    {
-        return $this->get(XmlConfigurationHelper::class);
     }
 
     public function getMutantCodeFactory(): MutantCodeFactory

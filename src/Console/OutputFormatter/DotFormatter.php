@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use function Safe\sprintf;
 use function str_repeat;
@@ -70,11 +71,11 @@ final class DotFormatter extends AbstractOutputFormatter
         ]);
     }
 
-    public function advance(MutantProcess $mutantProcess, int $mutationCount): void
+    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
     {
-        parent::advance($mutantProcess, $mutationCount);
+        parent::advance($executionResult, $mutationCount);
 
-        switch ($mutantProcess->getResultCode()) {
+        switch ($executionResult->getProcessResultCode()) {
             case MutantProcess::CODE_KILLED:
                 $this->output->write('<killed>.</killed>');
 

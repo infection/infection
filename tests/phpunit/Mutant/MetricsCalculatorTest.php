@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\MetricsCalculator;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -52,11 +53,11 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0, $calculator->getTimedOutCount());
         $this->assertSame(0, $calculator->getNotCoveredByTestsCount());
         $this->assertSame(0, $calculator->getTotalMutantsCount());
-        $this->assertSame([], $calculator->getEscapedMutantProcesses());
-        $this->assertSame([], $calculator->getKilledMutantProcesses());
-        $this->assertSame([], $calculator->getErrorProcesses());
-        $this->assertSame([], $calculator->getTimedOutProcesses());
-        $this->assertSame([], $calculator->getNotCoveredMutantProcesses());
+        $this->assertSame([], $calculator->getEscapedMutantExecutionResults());
+        $this->assertSame([], $calculator->getKilledMutantExecutionResults());
+        $this->assertSame([], $calculator->getErrorMutantExecutionResults());
+        $this->assertSame([], $calculator->getTimedOutMutantExecutionResults());
+        $this->assertSame([], $calculator->getNotCoveredMutantExecutionResults());
 
         $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(0.0, $calculator->getCoverageRate());
@@ -70,19 +71,19 @@ final class MetricsCalculatorTest extends TestCase
 
         $calculator = new MetricsCalculator();
 
-        $this->addMutantProcess($calculator, MutantProcess::CODE_NOT_COVERED);
+        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_NOT_COVERED);
         $this->assertSame(1, $calculator->getNotCoveredByTestsCount());
 
-        $this->addMutantProcess($calculator, MutantProcess::CODE_ESCAPED, 2);
+        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_ESCAPED, 2);
         $this->assertSame(2, $calculator->getEscapedCount());
 
-        $this->addMutantProcess($calculator, MutantProcess::CODE_TIMED_OUT, 2);
+        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_TIMED_OUT, 2);
         $this->assertSame(2, $calculator->getTimedOutCount());
 
-        $this->addMutantProcess($calculator, MutantProcess::CODE_KILLED, 7);
+        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_KILLED, 7);
         $this->assertSame(7, $calculator->getKilledCount());
 
-        $this->addMutantProcess($calculator, MutantProcess::CODE_ERROR, 2);
+        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_ERROR, 2);
         $this->assertSame(2, $calculator->getErrorCount());
 
         $this->assertSame(78.57142857142857, $calculator->getMutationScoreIndicator());
@@ -90,12 +91,17 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(84.61538461538461, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
-    private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void
-    {
-        $mutantProcess = $this->createMock(MutantProcess::class);
-        $mutantProcess->expects($this->exactly($count))
-            ->method('getResultCode')
-            ->willReturn($resultCode);
+    private function addMutantExecutionResult(
+        MetricsCalculator $calculator,
+        int $resultCode,
+        int $count = 1
+    ): void {
+        $mutantProcess = $this->createMock(MutantExecutionResult::class);
+        $mutantProcess
+            ->expects($this->exactly($count))
+            ->method('getProcessResultCode')
+            ->willReturn($resultCode)
+        ;
 
         while ($count--) {
             $calculator->collect($mutantProcess);

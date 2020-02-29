@@ -129,4 +129,13 @@ final class ConsoleOutput
             'It is your responsibility to disable xdebug/phpdbg unless needed.',
         ]);
     }
+
+    public function logSkippingInitialTests(): void
+    {
+        $this->io->warning([
+            'Skipping the initial test run can be very dangerous.',
+            'It is your responsibility to ensure the tests are in a passing state to begin.',
+            'If this is not done then mutations may report as caught when they are not.',
+        ]);
+    }
 }

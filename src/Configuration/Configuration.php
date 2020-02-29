@@ -73,6 +73,7 @@ class Configuration
     private $testFrameworkExtraOptions;
     private $coveragePath;
     private $skipCoverage;
+    private $skipInitialTests;
     private $debug;
     private $onlyCovered;
     private $formatter;
@@ -102,6 +103,7 @@ class Configuration
         string $testFrameworkExtraOptions,
         string $coveragePath,
         bool $skipCoverage,
+        bool $skipInitialTests,
         bool $debug,
         bool $onlyCovered,
         string $formatter,
@@ -134,6 +136,7 @@ class Configuration
         $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
         $this->coveragePath = $coveragePath;
         $this->skipCoverage = $skipCoverage;
+        $this->skipInitialTests = $skipInitialTests;
         $this->debug = $debug;
         $this->onlyCovered = $onlyCovered;
         $this->formatter = $formatter;
@@ -221,6 +224,11 @@ class Configuration
     public function shouldSkipCoverage(): bool
     {
         return $this->skipCoverage;
+    }
+
+    public function shouldSkipInitialTests(): bool
+    {
+        return $this->skipInitialTests;
     }
 
     public function isDebugEnabled(): bool

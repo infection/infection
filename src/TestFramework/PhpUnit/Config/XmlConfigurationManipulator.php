@@ -40,7 +40,6 @@ use DOMXPath;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
 use function implode;
-use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\SafeQuery;
 use const LIBXML_ERR_ERROR;
@@ -56,7 +55,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class XmlConfigurationHelper
+final class XmlConfigurationManipulator
 {
     use SafeQuery;
 
@@ -131,7 +130,7 @@ final class XmlConfigurationHelper
     public function validate(string $configPath, DOMXPath $xPath): bool
     {
         if (self::safeQuery($xPath, '/phpunit')->length === 0) {
-            throw InvalidPhpUnitXmlConfigException::byRootNode($configPath);
+            throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
 
         if (self::safeQuery($xPath, 'namespace::xsi')->length === 0) {
@@ -143,10 +142,8 @@ final class XmlConfigurationHelper
         $original = libxml_use_internal_errors(true);
         $schemaPath = $this->buildSchemaPath($schema[0]->nodeValue);
 
-        // TODO: schemaValidate will throw a weird error if schemaPath is invalid, e.g. ''
-        // check what happens with invalid URL or invalid path
         if ($schema->length && !$xPath->document->schemaValidate($schemaPath)) {
-            throw InvalidPhpUnitXmlConfigException::byXsdSchema(
+            throw InvalidPhpUnitConfiguration::byXsdSchema(
                 $configPath,
                 $this->getXmlErrorsString()
             );
@@ -186,11 +183,19 @@ final class XmlConfigurationHelper
 
     private function buildSchemaPath(string $nodeValue): string
     {
-        if ($this->phpUnitConfigDir === '' || filter_var($nodeValue, FILTER_VALIDATE_URL)) {
+        if (filter_var($nodeValue, FILTER_VALIDATE_URL)) {
             return $nodeValue;
         }
 
-        return sprintf('%s/%s', $this->phpUnitConfigDir, $nodeValue);
+        if ($this->phpUnitConfigDir === '') {
+            $schemaPath = $nodeValue;
+        } else {
+            $schemaPath = sprintf('%s/%s', $this->phpUnitConfigDir, $nodeValue);
+        }
+
+        Assert::fileExists($schemaPath, 'Invalid schema path found %s');
+
+        return $schemaPath;
     }
 
     private function removeAttribute(DOMXPath $xPath, string $name): void

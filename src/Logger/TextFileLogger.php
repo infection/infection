@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function implode;
-use Infection\Process\MutantProcess;
+use Infection\Mutant\MutantExecutionResult;
 use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
@@ -48,41 +48,41 @@ final class TextFileLogger extends FileLogger
 {
     protected function getLogLines(): array
     {
-        $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
-        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timed Out');
+        $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantExecutionResults(), 'Escaped');
+        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutMutantExecutionResults(), 'Timed Out');
 
         if ($this->isDebugVerbosity) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed');
-            $logs[] = $this->getLogParts($this->metricsCalculator->getErrorProcesses(), 'Errors');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantExecutionResults(), 'Killed');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getErrorMutantExecutionResults(), 'Errors');
         }
 
         if (!$this->isOnlyCoveredMode) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not Covered');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantExecutionResults(), 'Not Covered');
         }
 
         return $logs;
     }
 
     /**
-     * @param MutantProcess[] $processes
+     * @param MutantExecutionResult[] $executionResults
      */
-    private function getLogParts(array $processes, string $headlinePrefix): string
+    private function getLogParts(array $executionResults, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
-        $this->sortProcesses($processes);
+        $this->sortProcesses($executionResults);
 
-        foreach ($processes as $index => $mutantProcess) {
-            $isShowFullFormat = $this->isDebugVerbosity && $mutantProcess->getProcess()->isStarted();
+        foreach ($executionResults as $index => $executionResult) {
+            $isShowFullFormat = $this->isDebugVerbosity;
 
             $logParts[] = '';
-            $logParts[] = $this->getMutatorFirstLine($index, $mutantProcess);
+            $logParts[] = $this->getMutatorFirstLine($index, $executionResult);
 
-            $logParts[] = $this->isDebugMode ? $mutantProcess->getProcess()->getCommandLine() : '';
+            $logParts[] = $this->isDebugMode ? $executionResult->getProcessCommandLine() : '';
 
-            $logParts[] = $mutantProcess->getMutant()->getDiff();
+            $logParts[] = $executionResult->getMutantDiff();
 
             if ($isShowFullFormat) {
-                $logParts[] = $mutantProcess->getProcess()->getOutput();
+                $logParts[] = $executionResult->getProcessOutput();
             }
         }
 
@@ -103,7 +103,7 @@ final class TextFileLogger extends FileLogger
         ];
     }
 
-    private function getMutatorFirstLine(int $index, MutantProcess $mutantProcess): string
+    private function getMutatorFirstLine(int $index, MutantExecutionResult $mutantProcess): string
     {
         return sprintf(
             '%d) %s:%d    [M] %s',

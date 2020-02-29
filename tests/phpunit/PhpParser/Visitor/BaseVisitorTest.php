@@ -35,14 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\Container;
+use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
-use PhpParser\NodeDumper;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
-use PhpParser\Parser;
-use PhpParser\PrettyPrinter\Standard;
-use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\sprintf;
@@ -50,34 +46,11 @@ use function Safe\sprintf;
 abstract class BaseVisitorTest extends TestCase
 {
     /**
-     * @var Parser|null
-     */
-    private static $parser;
-
-    /**
-     * @var NodeDumper|null
-     */
-    private static $dumper;
-
-    /**
-     * @var PrettyPrinterAbstract|null
-     */
-    private static $printer;
-
-    /**
      * @return Node[]
      */
     final protected function parseCode(string $code): array
     {
-        return (array) $this->getParser()->parse($code);
-    }
-
-    /**
-     * @param Node[] $nodes
-     */
-    final protected function dumpNodes(array $nodes): string
-    {
-        return $this->getDumper()->dump($nodes);
+        return (array) SingletonContainer::getContainer()->getParser()->parse($code);
     }
 
     /**
@@ -100,40 +73,5 @@ abstract class BaseVisitorTest extends TestCase
     final protected function getFileContent(string $file): string
     {
         return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/%s', $file));
-    }
-
-    /**
-     * @param Node[] $nodes
-     */
-    final protected function print(array $nodes): string
-    {
-        return $this->getPrinter()->prettyPrintFile($nodes);
-    }
-
-    private function getParser(): Parser
-    {
-        if (self::$parser === null) {
-            self::$parser = Container::create()->getParser();
-        }
-
-        return self::$parser;
-    }
-
-    private function getDumper(): NodeDumper
-    {
-        if (self::$dumper === null) {
-            self::$dumper = new NodeDumper();
-        }
-
-        return self::$dumper;
-    }
-
-    private function getPrinter(): PrettyPrinterAbstract
-    {
-        if (self::$printer === null) {
-            self::$printer = new Standard();
-        }
-
-        return self::$printer;
     }
 }

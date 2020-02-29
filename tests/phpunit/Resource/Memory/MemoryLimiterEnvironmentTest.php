@@ -33,38 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Config\Exception;
+namespace Infection\Tests\Resource\Memory;
 
-use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
-use function Infection\Tests\normalizeLineReturn;
+use Composer\XdebugHandler\XdebugHandler;
+use Infection\Resource\Memory\MemoryLimiterEnvironment;
+use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
+use function Safe\ini_get;
 
-final class InvalidPhpUnitXmlConfigExceptionTest extends TestCase
+/**
+ * @group integration Requires some I/O operations
+ */
+final class MemoryLimiterEnvironmentTest extends TestCase
 {
-    public function test_for_root_node(): void
+    public function test_it_recognizes_memory_limit(): void
     {
-        $exception = InvalidPhpUnitXmlConfigException::byRootNode('/path/to/phpunit.xml');
-
-        $this->assertSame(
-            'The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file',
-            $exception->getMessage()
-        );
+        $environment = new MemoryLimiterEnvironment();
+        $this->assertSame(ini_get('memory_limit') !== '-1', $environment->hasMemoryLimitSet());
     }
 
-    public function test_for_xsd_schema(): void
+    public function test_it_detects_phpdbg(): void
     {
-        $exception = InvalidPhpUnitXmlConfigException::byXsdSchema(
-            '/path/to/phpunit.xml',
-            '<lib-xml-errors>'
-        );
+        if (PHP_SAPI !== 'phpdbg') {
+            $this->markTestSkipped('This test requires PHPDBG');
+        }
 
-        $this->assertSame(
-            <<<'TXT'
-The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-<lib-xml-errors>
-TXT
-            ,
-            normalizeLineReturn($exception->getMessage())
-        );
+        $environment = new MemoryLimiterEnvironment();
+        $this->assertTrue($environment->isUsingSystemIni());
+    }
+
+    public function test_it_detects_xdebug_handler(): void
+    {
+        if (PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('This test requires running without PHPDBG');
+        }
+
+        $environment = new MemoryLimiterEnvironment();
+        $this->assertSame(XdebugHandler::getSkippedVersion() === '', $environment->isUsingSystemIni());
     }
 }
