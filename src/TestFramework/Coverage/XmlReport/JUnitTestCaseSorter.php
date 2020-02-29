@@ -35,8 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use function array_map;
-use function in_array;
+use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function Safe\usort;
 use Webmozart\Assert\Assert;
@@ -51,7 +50,7 @@ final class JUnitTestCaseSorter
      *
      * @return string[]
      */
-    public function getUniqueSortedFileNames(array $coverageTestCases): array
+    public function getUniqueSortedFileNames(iterable $coverageTestCases): iterable
     {
         $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
 
@@ -63,15 +62,9 @@ final class JUnitTestCaseSorter
             }
         );
 
-        return array_map(
-            static function (CoverageLineData $coverageLineData): string {
-                $testFilePath = $coverageLineData->testFilePath;
-                Assert::string($testFilePath);
-
-                return $testFilePath;
-            },
-            $uniqueCoverageTests
-        );
+        foreach ($uniqueCoverageTests as $coverageLineData) {
+            yield $coverageLineData->testFilePath;
+        }
     }
 
     /**
@@ -79,15 +72,17 @@ final class JUnitTestCaseSorter
      *
      * @return CoverageLineData[]
      */
-    private function uniqueByTestFile(array $coverageTestCases): array
+    private function uniqueByTestFile(iterable $coverageTestCases): array
     {
         $usedFileNames = [];
         $uniqueTests = [];
 
         foreach ($coverageTestCases as $coverageTestCase) {
-            if (!in_array($coverageTestCase->testFilePath, $usedFileNames, true)) {
+            Assert::string($coverageTestCase->testFilePath);
+
+            if (!array_key_exists($coverageTestCase->testFilePath, $usedFileNames)) {
                 $uniqueTests[] = $coverageTestCase;
-                $usedFileNames[] = $coverageTestCase->testFilePath;
+                $usedFileNames[$coverageTestCase->testFilePath] = true;
             }
         }
 
