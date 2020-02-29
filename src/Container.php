@@ -312,7 +312,7 @@ final class Container
                     $config->showMutations(),
                     $config->isDebugEnabled(),
                     $config->getFormatter(),
-                    $config->showProgress(),
+                    $config->noProgress(),
                     $container->getMetricsCalculator(),
                     $container->getEventDispatcher(),
                     $container->getDiffColorizer(),
