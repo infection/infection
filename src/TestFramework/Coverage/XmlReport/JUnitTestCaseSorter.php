@@ -54,11 +54,13 @@ final class JUnitTestCaseSorter
     public function getUniqueSortedFileNames(array $coverageTestCases): iterable
     {
         if (count($coverageTestCases) === 1) {
-            Assert::string($coverageTestCases[0]->testFilePath);
+            foreach ($coverageTestCases as $coverageLineData) {
+                Assert::string($coverageLineData->testFilePath);
 
-            yield $coverageTestCases[0]->testFilePath;
+                yield $coverageLineData->testFilePath;
 
-            return;
+                return;
+            }
         }
 
         $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
