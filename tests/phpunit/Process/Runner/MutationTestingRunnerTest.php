@@ -40,8 +40,6 @@ use ArrayIterator;
 use function count;
 use function get_class;
 use function implode;
-use Infection\Event\MutantsCreationWasFinished;
-use Infection\Event\MutantsCreationWasStarted;
 use Infection\Event\MutantWasCreated;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
@@ -117,8 +115,6 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreationWasStarted(0),
-                new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(0),
                 new MutationTestingWasFinished(),
             ],
@@ -169,8 +165,6 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreationWasStarted(2),
-                new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(2),
                 new MutantWasCreated(),
                 new MutantWasCreated(),
@@ -232,8 +226,6 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreationWasStarted(0),
-                new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(0),
                 new MutantWasCreated(),
                 new MutantWasCreated(),
@@ -306,8 +298,6 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreationWasStarted(0),
-                new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(0),
                 new MutationTestingWasFinished(),
             ],
@@ -316,17 +306,15 @@ final class MutationTestingRunnerTest extends TestCase
     }
 
     /**
-     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantsCreationWasStarted|MutantWasCreated|MutantsCreationWasFinished> $expectedEvents
-     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantsCreationWasStarted|MutantWasCreated|MutantsCreationWasFinished> $actualEvents
+     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantWasCreated> $expectedEvents
+     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantWasCreated> $actualEvents
      */
     private function assertAreSameEvents(array $expectedEvents, array $actualEvents): void
     {
         $expectedClasses = [
             MutationTestingWasStarted::class,
             MutationTestingWasFinished::class,
-            MutantsCreationWasStarted::class,
             MutantWasCreated::class,
-            MutantsCreationWasFinished::class,
         ];
 
         $assertionErrorMessage = sprintf(
@@ -345,13 +333,6 @@ final class MutationTestingRunnerTest extends TestCase
                 $event,
                 $assertionErrorMessage
             );
-
-            if ($expectedEvent instanceof MutantsCreationWasStarted) {
-                /* @var MutantsCreationWasStarted $event */
-                $this->assertSame($expectedEvent->getMutantCount(), $event->getMutantCount());
-
-                continue;
-            }
 
             if ($expectedEvent instanceof MutationTestingWasStarted) {
                 /* @var MutationTestingWasStarted $event */

@@ -38,8 +38,6 @@ namespace Infection\Process\Runner;
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
-use Infection\Event\MutantsCreationWasFinished;
-use Infection\Event\MutantsCreationWasStarted;
 use Infection\Event\MutantWasCreated;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
@@ -83,8 +81,6 @@ final class MutationTestingRunner
     {
         $numberOfMutants = $this->bufferAndCountIfNeeded($mutations);
 
-        $this->eventDispatcher->dispatch(new MutantsCreationWasStarted($numberOfMutants));
-
         $processes = take($mutations);
         $processes->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
             $mutant = $this->mutantFactory->create($mutation);
@@ -96,7 +92,6 @@ final class MutationTestingRunner
             return $process;
         });
 
-        $this->eventDispatcher->dispatch(new MutantsCreationWasFinished());
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
         // We filter these here because it is beyond responsibilities of a process manager to care about types of processes
