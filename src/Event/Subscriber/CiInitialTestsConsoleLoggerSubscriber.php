@@ -55,11 +55,6 @@ final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
         $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [];
-    }
-
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
         try {

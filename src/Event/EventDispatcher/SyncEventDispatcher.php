@@ -65,11 +65,6 @@ final class SyncEventDispatcher implements EventDispatcher
         foreach ($this->inferSubscribedEvents($eventSubscriber) as $eventName => $listener) {
             $this->listeners[$eventName][] = $listener;
         }
-
-        // Handle explicit event subscriptions
-        foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
-            $this->listeners[$eventName][] = $listener;
-        }
     }
 
     /**
@@ -82,7 +77,7 @@ final class SyncEventDispatcher implements EventDispatcher
 
         foreach ($methods as $method) {
             /** @var ReflectionMethod $method */
-            if (strpos($method->name, 'on') !== 0) {
+            if ($method->isConstructor()) {
                 continue;
             }
 

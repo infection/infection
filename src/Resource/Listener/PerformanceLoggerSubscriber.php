@@ -67,11 +67,6 @@ final class PerformanceLoggerSubscriber implements EventSubscriber
         $this->memoryFormatter = $memoryFormatter;
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [];
-    }
-
     public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
     {
         $this->stopwatch->start();

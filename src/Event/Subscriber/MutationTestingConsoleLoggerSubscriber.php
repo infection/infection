@@ -81,11 +81,6 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->diffColorizer = $diffColorizer;
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [];
-    }
-
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {
         $this->mutationCount = $event->getMutationCount();

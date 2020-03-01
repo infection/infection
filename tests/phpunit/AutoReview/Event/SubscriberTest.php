@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Event;
 
-use Infection\Event\Subscriber\EventSubscriber;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -62,26 +61,10 @@ final class SubscriberTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
-     *
-     * @param class-string $subscriberClass
-     */
-    public function test_the_subscribed_methods_can_all_be_collected(string $subscriberClass): void
-    {
-        /** @var EventSubscriber $subscriber */
-        $subscriber = (new ReflectionClass($subscriberClass))->newInstanceWithoutConstructor();
-
-        $subscriber->getSubscribedEvents();
-
-        $this->addToAssertionCount(1);
-    }
-
     private function isSubscriptionMethod(ReflectionMethod $method): bool
     {
         return !$method->isConstructor()
             && $method->isPublic()
-            && $method->getName() !== 'getSubscribedEvents'
         ;
     }
 

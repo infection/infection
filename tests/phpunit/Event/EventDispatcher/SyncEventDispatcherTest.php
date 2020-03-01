@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\EventDispatcher;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Tests\Fixtures\Event\NullSubscriber;
 use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
 use Infection\Tests\Fixtures\Event\UserEventSubscriber;
@@ -48,46 +47,21 @@ final class SyncEventDispatcherTest extends TestCase
     public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
     {
         $userSubscriber = new UserEventSubscriber();
+        $nullSubscriber = new NullSubscriber(new UserWasCreated());
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber(new NullSubscriber());
+        $dispatcher->addSubscriber($nullSubscriber);
         $dispatcher->addSubscriber(new UnknownEventSubscriber());
 
         // Sanity check
         $this->assertSame(0, $userSubscriber->count);
+        $this->assertSame(1, $nullSubscriber->count);
 
         $dispatcher->dispatch(new UserWasCreated());
         $dispatcher->dispatch(new UserWasCreated());
 
         $this->assertSame(2, $userSubscriber->count);
-    }
-
-    public function test_it_uses_reflection_to_find_methods(): void
-    {
-        $userSubscriber = new class() implements EventSubscriber {
-            public $count = 0;
-
-            public function getSubscribedEvents(): array
-            {
-                return [];
-            }
-
-            public function onUserWasCreated(UserWasCreated $event): void
-            {
-                ++$this->count;
-            }
-        };
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-
-        $this->assertSame(0, $userSubscriber->count);
-
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
-
-        $this->assertSame(3, $userSubscriber->count);
+        $this->assertSame(1, $nullSubscriber->count);
     }
 }

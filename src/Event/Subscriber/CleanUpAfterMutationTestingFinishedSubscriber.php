@@ -52,11 +52,6 @@ final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscr
         $this->tmpDir = $tmpDir;
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [];
-    }
-
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
         $this->filesystem->remove($this->tmpDir);

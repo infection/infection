@@ -8,12 +8,11 @@ use Infection\Event\Subscriber\EventSubscriber;
 
 final class NullSubscriber implements EventSubscriber
 {
+    public $count = 0;
 
-    /**
-     * @return array<string, callable>
-     */
-    public function getSubscribedEvents(): array
+    public function __construct(UserWasCreated $event)
     {
-        return [];
+        $this->count ++;
     }
+
 }

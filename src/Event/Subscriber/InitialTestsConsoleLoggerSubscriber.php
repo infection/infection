@@ -64,11 +64,6 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
         $this->progressBar->setFormat('verbose');
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [];
-    }
-
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
         try {
