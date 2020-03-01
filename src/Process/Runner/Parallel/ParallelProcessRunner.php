@@ -130,7 +130,7 @@ class ParallelProcessRunner
             try {
                 $process->checkTimeout();
             } catch (ProcessTimedOutException $exception) {
-                $processBearer->markTimeout();
+                $processBearer->markAsTimedOut();
             }
 
             if (!$process->isRunning()) {

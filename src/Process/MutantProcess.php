@@ -98,7 +98,7 @@ class MutantProcess implements ProcessBearer
         return $this->mutant;
     }
 
-    public function markTimeout(): void
+    public function markAsTimedOut(): void
     {
         $this->isTimedOut = true;
     }

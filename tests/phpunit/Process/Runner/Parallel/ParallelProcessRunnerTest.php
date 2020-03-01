@@ -155,7 +155,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('getProcess')
             ->willReturn($process);
         $mutantProcess->expects($this->once())
-            ->method('markTimeout');
+            ->method('markAsTimedOut');
 
         return $mutantProcess;
     }
