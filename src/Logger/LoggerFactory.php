@@ -177,11 +177,4 @@ final class LoggerFactory
             $branch
         );
     }
-
-    private function isAllowedToLog(string $logType): bool
-    {
-        return $this->logVerbosity !== LogVerbosity::NONE
-            || in_array($logType, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)
-        ;
-    }
 }
