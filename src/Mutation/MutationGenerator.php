@@ -93,7 +93,7 @@ final class MutationGenerator
      *
      * @throws UnparsableFile
      *
-     * @return Mutation[]
+     * @return iterable<Mutation>
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
