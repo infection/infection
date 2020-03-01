@@ -73,20 +73,20 @@ final class LoggerFactory
     /**
      * @return MutationTestingResultsLogger[]
      */
-    public function createFromLogEntries(Logs $logs, OutputInterface $output): array
+    public function createFromLogEntries(Logs $logConfig, OutputInterface $output): array
     {
         $isDebugVerbosity = $this->logVerbosity === LogVerbosity::DEBUG;
-        $badge = $logs->getBadge();
-        $debug = $logs->getDebugLogFilePath();
-        $perMutator = $logs->getPerMutatorFilePath();
-        $summary = $logs->getSummaryLogFilePath();
-        $text = $logs->getTextLogFilePath();
+        $badge = $logConfig->getBadge();
+        $debug = $logConfig->getDebugLogFilePath();
+        $perMutator = $logConfig->getPerMutatorFilePath();
+        $summary = $logConfig->getSummaryLogFilePath();
+        $text = $logConfig->getTextLogFilePath();
 
         /** @var MutationTestingResultsLogger[] $loggers */
         $loggers = array_filter([
             ResultsLoggerTypes::BADGE => $badge === null
                 ? null
-                : $this->createBadgeLogger($output, $badge->getBranch()),
+                : $this->createBadgeLogger(/*$output*/'', $badge->getBranch()),
             ResultsLoggerTypes::DEBUG_FILE => $debug === null
                 ? null
                 : $this->createDebugLogger($output, $debug, $isDebugVerbosity),
