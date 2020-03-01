@@ -37,6 +37,7 @@ namespace Infection\Tests\Http;
 
 use Generator;
 use Infection\Http\Response;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class ResponseTest extends TestCase
@@ -50,6 +51,20 @@ final class ResponseTest extends TestCase
 
         $this->assertSame($body, $response->getBody());
         $this->assertSame($statusCode, $response->getStatusCode());
+    }
+
+    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_HTTP_status_code(): void
+    {
+        try {
+            new Response('', 102);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected an HTTP status code. Got "102"',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function valueProvider(): Generator

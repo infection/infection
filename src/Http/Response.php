@@ -49,7 +49,12 @@ final class Response
 
     public function __construct(string $body, int $statusCode)
     {
-        Assert::range($statusCode, 200, 599);
+        Assert::range(
+            $statusCode,
+            200,
+            599,
+            'Expected an HTTP status code. Got "%s"'
+        );
 
         $this->body = $body;
         $this->statusCode = $statusCode;
