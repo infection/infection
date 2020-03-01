@@ -47,8 +47,8 @@ class StrykerDashboardClient
 {
     private const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';
 
-    private $logger;
     private $client;
+    private $logger;
 
     public function __construct(JsonClient $client, LoggerInterface $logger)
     {

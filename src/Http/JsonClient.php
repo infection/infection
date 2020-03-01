@@ -59,12 +59,12 @@ class JsonClient
             curl_setopt($handle, CURLOPT_POSTFIELDS, $json);
             curl_setopt($handle, CURLOPT_HEADER, true);
 
-            $response = (string) curl_exec($handle);
-            $responseCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+            $body = (string) curl_exec($handle);
+            $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
         } finally {
             curl_close($handle);
         }
 
-        return new Response($response, $responseCode);
+        return new Response($body, $statusCode);
     }
 }

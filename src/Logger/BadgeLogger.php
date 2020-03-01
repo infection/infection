@@ -53,7 +53,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
     private $output;
     private $buildContextResolver;
     private $strykerApiKeyResolver;
-    private $badgeApiClient;
+    private $strykerDashboardClient;
     private $metricsCalculator;
     private $config;
 
@@ -61,14 +61,14 @@ final class BadgeLogger implements MutationTestingResultsLogger
         OutputInterface $output,
         BuildContextResolver $buildContextResolver,
         StrykerApiKeyResolver $strykerApiKeyResolver,
-        StrykerDashboardClient $badgeApiClient,
+        StrykerDashboardClient $strykerDashboardClient,
         MetricsCalculator $metricsCalculator,
         stdClass $config
     ) {
         $this->output = $output;
         $this->buildContextResolver = $buildContextResolver;
         $this->strykerApiKeyResolver = $strykerApiKeyResolver;
-        $this->badgeApiClient = $badgeApiClient;
+        $this->strykerDashboardClient = $strykerDashboardClient;
         $this->metricsCalculator = $metricsCalculator;
         $this->config = $config;
     }
@@ -104,7 +104,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
         // All clear!
         $this->output->writeln('Sending dashboard report...');
 
-        $this->badgeApiClient->sendReport(
+        $this->strykerDashboardClient->sendReport(
             $apiKey,
             'github.com/' . $buildContext->repositorySlug(),
             $buildContext->branch(),

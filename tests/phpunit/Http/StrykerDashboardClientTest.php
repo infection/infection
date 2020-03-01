@@ -60,14 +60,14 @@ final class StrykerDashboardClientTest extends TestCase
     /**
      * @var StrykerDashboardClient
      */
-    private $dashboadClient;
+    private $dashboardClient;
 
     protected function setUp(): void
     {
         $this->clientMock = $this->createMock(JsonClient::class);
         $this->logger = new DummyLogger();
 
-        $this->dashboadClient = new StrykerDashboardClient(
+        $this->dashboardClient = new StrykerDashboardClient(
             $this->clientMock,
             $this->logger
         );
@@ -93,7 +93,7 @@ JSON
             ->willReturn(new Response('Report received!', 201))
         ;
 
-        $this->dashboadClient->sendReport(
+        $this->dashboardClient->sendReport(
             'foo',
             'infection/infection',
             'master',
@@ -136,7 +136,7 @@ JSON
             ->willReturn(new Response('Report invalid!', 400))
         ;
 
-        $this->dashboadClient->sendReport(
+        $this->dashboardClient->sendReport(
             'foo',
             'infection/infection',
             'master',
