@@ -69,11 +69,14 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 /**
- * @group e2e
- * @group integration
+ * @group integration Requires some I/O operations
  */
 final class E2ETest extends TestCase
 {
+    /**
+     * This group must be excluded from E2E testing to avoid endless recursive testing loop situation.
+     */
+    private const EXCLUDED_GROUP = 'integration';
     private const MAX_FAILING_COMPOSER_INSTALL = 5;
     private const EXPECT_ERROR = 1;
     private const EXPECT_SUCCESS = 0;
@@ -122,16 +125,6 @@ final class E2ETest extends TestCase
     }
 
     /**
-     * Ensure this test belongs to e2e group. We exclude it during E2E testing
-     * from this class to avoid causing endless recursive testing loop.
-     */
-    public function test_it_belongs_to_e2e_group(): void
-    {
-        // Should not match the test itself.
-        $this->assertSame(1, substr_count(file_get_contents(__FILE__), '@group ' . 'e2e'));
-    }
-
-    /**
      * Longest test: runs under about 160-200 sec
      *
      * To be run with:
@@ -151,7 +144,7 @@ final class E2ETest extends TestCase
         }
 
         $output = $this->runInfection(self::EXPECT_SUCCESS, [
-            '--test-framework-options="--exclude-group=e2e"',
+            '--test-framework-options="--exclude-group=' . self::EXCLUDED_GROUP . '"',
         ]);
 
         $this->assertRegExp('/\d+ mutations were generated/', $output);
