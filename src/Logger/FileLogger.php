@@ -50,18 +50,18 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class FileLogger implements MutationTestingResultsLogger
 {
-    private $logFilePath;
+    private $filePath;
     private $fileSystem;
     private $output;
     private $lineLogger;
 
     public function __construct(
         OutputInterface $output,
-        string $logFilePath,
+        string $filePath,
         Filesystem $fileSystem,
         LineMutationTestingResultsLogger $lineLogger
     ) {
-        $this->logFilePath = $logFilePath;
+        $this->filePath = $filePath;
         $this->fileSystem = $fileSystem;
         $this->output = $output;
         $this->lineLogger = $lineLogger;
@@ -72,9 +72,9 @@ final class FileLogger implements MutationTestingResultsLogger
         $content = implode(PHP_EOL, $this->lineLogger->getLogLines());
 
         // If the output should be written to a stream then just write it directly
-        if (strpos($this->logFilePath, 'php://') === 0) {
-            if (in_array($this->logFilePath, ['php://stdout', 'php://stderr'], true)) {
-                file_put_contents($this->logFilePath, $content);
+        if (strpos($this->filePath, 'php://') === 0) {
+            if (in_array($this->filePath, ['php://stdout', 'php://stderr'], true)) {
+                file_put_contents($this->filePath, $content);
             } else {
                 // The Symfony filesystem component doesn't support using streams so provide a
                 // sensible error message
@@ -88,7 +88,7 @@ final class FileLogger implements MutationTestingResultsLogger
         }
 
         try {
-            $this->fileSystem->dumpFile($this->logFilePath, $content);
+            $this->fileSystem->dumpFile($this->filePath, $content);
         } catch (IOException $exception) {
             $this->output->writeln(sprintf(
                 '<error>%s</error>',

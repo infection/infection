@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-final class LineLoggerRegistry implements MutationTestingResultsLogger
+final class LoggerRegistry implements MutationTestingResultsLogger
 {
     /**
      * @var MutationTestingResultsLogger[]
