@@ -93,7 +93,7 @@ class NodeMutationGenerator
     }
 
     /**
-     * @return iterable|Mutation[]
+     * @return Mutation[]
      */
     private function generateForMutator(Node $node, Mutator $mutator): iterable
     {

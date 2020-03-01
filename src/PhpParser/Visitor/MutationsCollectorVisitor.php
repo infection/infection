@@ -72,7 +72,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * @return iterable|Mutation[]
+     * @return Mutation[]
      */
     public function getMutations(): iterable
     {

@@ -118,7 +118,7 @@ final class MutationTestingRunner
     }
 
     /**
-     * @param iterable|mixed[] $subjects
+     * @param mixed[] $subjects
      */
     private function bufferAndCountIfNeeded(iterable &$subjects): int
     {

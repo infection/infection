@@ -169,7 +169,7 @@ class ParallelProcessRunner
     }
 
     /**
-     * @param iterable|ProcessBearer[] $input
+     * @param ProcessBearer[] $input
      *
      * @return Generator|ProcessBearer[]
      */
