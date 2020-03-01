@@ -33,20 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\Process\Runner\Parallel;
 
-use Infection\Event\MutantsCreationWasFinished;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
-final class MutantsCreationWasFinishedTest extends TestCase
+/**
+ * @internal
+ */
+interface ProcessBearer
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_instantiated(): void
-    {
-        $class = new MutantsCreationWasFinished();
+    public function getProcess(): Process;
 
-        $this->assertInstanceOf(MutantsCreationWasFinished::class, $class);
-    }
+    public function markAsTimedOut(): void;
 }

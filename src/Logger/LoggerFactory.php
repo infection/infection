@@ -179,7 +179,7 @@ final class LoggerFactory
                 new ConsoleLogger($output)
             ),
             $this->metricsCalculator,
-            (object) ['branch' => $branch]
+            $branch
         );
     }
 

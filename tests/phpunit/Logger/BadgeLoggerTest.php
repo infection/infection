@@ -108,17 +108,13 @@ final class BadgeLoggerTest extends TestCase
         $this->badgeApiClientMock = $this->createMock(StrykerDashboardClient::class);
         $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
 
-        $config = (object) [
-            'branch' => 'master',
-        ];
-
         $this->badgeLogger = new BadgeLogger(
             $this->outputMock,
             new TravisCiResolver(),
             new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,
-            $config
+            'master'
         );
     }
 

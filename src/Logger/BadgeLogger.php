@@ -42,7 +42,6 @@ use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Mutant\MetricsCalculator;
 use function Safe\sprintf;
-use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -55,7 +54,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
     private $strykerApiKeyResolver;
     private $strykerDashboardClient;
     private $metricsCalculator;
-    private $config;
+    private $branch;
 
     public function __construct(
         OutputInterface $output,
@@ -63,14 +62,14 @@ final class BadgeLogger implements MutationTestingResultsLogger
         StrykerApiKeyResolver $strykerApiKeyResolver,
         StrykerDashboardClient $strykerDashboardClient,
         MetricsCalculator $metricsCalculator,
-        stdClass $config
+        string $branch
     ) {
         $this->output = $output;
         $this->buildContextResolver = $buildContextResolver;
         $this->strykerApiKeyResolver = $strykerApiKeyResolver;
         $this->strykerDashboardClient = $strykerDashboardClient;
         $this->metricsCalculator = $metricsCalculator;
-        $this->config = $config;
+        $this->branch = $branch;
     }
 
     public function log(): void
@@ -83,10 +82,10 @@ final class BadgeLogger implements MutationTestingResultsLogger
             return;
         }
 
-        if ($buildContext->branch() !== $this->config->branch) {
+        if ($buildContext->branch() !== $this->branch) {
             $this->logError(sprintf(
                 'Expected branch "%s", found "%s"',
-                $this->config->branch,
+                $this->branch,
                 $buildContext->branch()
             ));
 

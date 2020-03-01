@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner\Parallel;
 
+use Closure;
+use Generator;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
-use Infection\Mutator\ZeroIteration\For_;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Infection\Tests\Mutator\MutatorName;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -52,21 +52,8 @@ final class ParallelProcessRunnerTest extends TestCase
     public function test_it_does_nothing_when_nothing_to_do(): void
     {
         $eventDispatcher = $this->buildEventDispatcherWithEventCount(0);
-        $runner = new ParallelProcessRunner($eventDispatcher);
+        $runner = new ParallelProcessRunner(self::makeEventAccounter($eventDispatcher));
         $runner->run([], 4, 0);
-    }
-
-    public function test_it_does_not_start_processes_for_uncovered_mutants(): void
-    {
-        $processes = [];
-
-        for ($i = 0; $i < 10; ++$i) {
-            $processes[] = $this->buildUncoveredMutantProcess();
-        }
-
-        $eventDispatcher = $this->buildEventDispatcherWithEventCount(10);
-        $runner = new ParallelProcessRunner($eventDispatcher);
-        $runner->run($processes, 4, 0);
     }
 
     public function test_it_starts_processes_for_covered_mutants(): void
@@ -74,24 +61,24 @@ final class ParallelProcessRunnerTest extends TestCase
         $processes = [];
 
         for ($i = 0; $i < 10; ++$i) {
-            $processes[] = $this->buildCoveredMutantProcess();
+            $processes[] = $this->buildMutantProcess();
         }
 
         $eventDispatcher = $this->buildEventDispatcherWithEventCount(10);
-        $runner = new ParallelProcessRunner($eventDispatcher);
+        $runner = new ParallelProcessRunner(self::makeEventAccounter($eventDispatcher));
         $runner->run($processes, 4, 0);
     }
 
     public function test_it_checks_for_timeout(): void
     {
-        $processes = [];
-
-        for ($i = 0; $i < 10; ++$i) {
-            $processes[] = $this->buildCoveredMutantProcessWithTimeout();
-        }
+        $processes = (function (): Generator {
+            for ($i = 0; $i < 10; ++$i) {
+                yield $this->buildMutantProcessWithTimeout();
+            }
+        })();
 
         $eventDispatcher = $this->buildEventDispatcherWithEventCount(10);
-        $runner = new ParallelProcessRunner($eventDispatcher);
+        $runner = new ParallelProcessRunner(self::makeEventAccounter($eventDispatcher));
         $runner->run($processes, 4, 0);
     }
 
@@ -123,175 +110,54 @@ final class ParallelProcessRunnerTest extends TestCase
     private function buildEventDispatcherWithEventCount(int $eventCount)
     {
         $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher
-            ->expects($this->exactly($eventCount))
+        $eventDispatcher->expects($this->exactly($eventCount))
             ->method('dispatch')
-            ->with($this->isInstanceOf(MutantProcessWasFinished::class))
-        ;
+            ->with(new MutantProcessWasFinished($this->createMock(MutantExecutionResult::class)));
 
         return $eventDispatcher;
     }
 
-    private function buildUncoveredMutantProcess(): MutantProcess
+    private function buildMutantProcess(): MutantProcess
     {
-        $processMock = $this->createMock(Process::class);
-        $processMock
-            ->method('getCommandLine')
-            ->willReturn('bin/phpunit path/to/FooTest.php')
-        ;
-        $processMock
-            ->method('getOutput')
-            ->willReturn('')
-        ;
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())
+            ->method('start');
+        $process->expects($this->once())
+            ->method('checkTimeout');
+        $process->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(false);
 
-        $mutationMock = $this->createMock(Mutation::class);
-        $mutationMock
-            ->method('getMutatorName')
-            ->willReturn(MutatorName::getName(For_::class))
-        ;
-
-        $mutantMock = $this->createMock(Mutant::class);
-        $mutantMock
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(false)
-        ;
-        $mutantMock
-            ->method('getMutation')
-            ->willReturn($mutationMock)
-        ;
-
-        $mutantProcessMock = $this->createMock(MutantProcess::class);
-        $mutantProcessMock
-            ->expects($this->atLeastOnce())
+        /** @var MockObject|MutantProcess $mutantProcess */
+        $mutantProcess = $this->createMock(MutantProcess::class);
+        $mutantProcess->expects($this->exactly(2))
             ->method('getProcess')
-            ->willReturn($processMock)
-        ;
-        $mutantProcessMock
-            ->expects($this->atLeastOnce())
-            ->method('getMutant')
-            ->willReturn($mutantMock)
-        ;
+            ->willReturn($process);
 
-        return $mutantProcessMock;
+        return $mutantProcess;
     }
 
-    private function buildCoveredMutantProcess(): MutantProcess
+    private function buildMutantProcessWithTimeout(): MutantProcess
     {
-        $processMock = $this->createMock(Process::class);
-        $processMock
-            ->expects($this->once())
-            ->method('start')
-        ;
-        $processMock
-            ->expects($this->once())
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())
+            ->method('start');
+        $process->expects($this->once())
             ->method('checkTimeout')
-        ;
-        $processMock
-            ->expects($this->once())
+            ->will($this->throwException(new ProcessTimedOutException($process, 1)));
+        $process->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false)
-        ;
-        $processMock
-            ->method('getCommandLine')
-            ->willReturn('bin/phpunit path/to/FooTest.php')
-        ;
-        $processMock
-            ->method('getOutput')
-            ->willReturn('Failed!')
-        ;
+            ->willReturn(false);
 
-        $mutationMock = $this->createMock(Mutation::class);
-        $mutationMock
-            ->method('getMutatorName')
-            ->willReturn(MutatorName::getName(For_::class))
-        ;
-
-        $mutantMock = $this->createMock(Mutant::class);
-        $mutantMock
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true)
-        ;
-        $mutantMock
-            ->method('getMutation')
-            ->willReturn($mutationMock)
-        ;
-
-        $mutantProcessMock = $this->createMock(MutantProcess::class);
-        $mutantProcessMock
-            ->expects($this->atLeastOnce())
+        /** @var MockObject|MutantProcess $mutantProcess */
+        $mutantProcess = $this->createMock(MutantProcess::class);
+        $mutantProcess->expects($this->exactly(2))
             ->method('getProcess')
-            ->willReturn($processMock)
-        ;
-        $mutantProcessMock
-            ->expects($this->atLeastOnce())
-            ->method('getMutant')
-            ->willReturn($mutantMock)
-        ;
+            ->willReturn($process);
+        $mutantProcess->expects($this->once())
+            ->method('markAsTimedOut');
 
-        return $mutantProcessMock;
-    }
-
-    private function buildCoveredMutantProcessWithTimeout(): MutantProcess
-    {
-        $processMock = $this->createMock(Process::class);
-        $processMock
-            ->expects($this->once())
-            ->method('start')
-        ;
-        $processMock
-            ->expects($this->once())
-            ->method('checkTimeout')
-            ->will($this->throwException(new ProcessTimedOutException($processMock, 1)))
-        ;
-        $processMock
-            ->expects($this->once())
-            ->method('isRunning')
-            ->willReturn(false)
-        ;
-        $processMock
-            ->method('getCommandLine')
-            ->willReturn('bin/phpunit path/to/FooTest.php')
-        ;
-        $processMock
-            ->method('getOutput')
-            ->willReturn('Terminated')
-        ;
-
-        $mutationMock = $this->createMock(Mutation::class);
-        $mutationMock
-            ->method('getMutatorName')
-            ->willReturn(MutatorName::getName(For_::class))
-        ;
-
-        $mutantMock = $this->createMock(Mutant::class);
-        $mutantMock
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true)
-        ;
-        $mutantMock
-            ->method('getMutation')
-            ->willReturn($mutationMock)
-        ;
-
-        $mutantProcessMock = $this->createMock(MutantProcess::class);
-        $mutantProcessMock
-            ->expects($this->atLeastOnce())
-            ->method('getProcess')
-            ->willReturn($processMock);
-        $mutantProcessMock
-            ->expects($this->atLeastOnce())
-            ->method('getMutant')
-            ->willReturn($mutantMock)
-        ;
-        $mutantProcessMock
-            ->expects($this->once())
-            ->method('markTimeout')
-        ;
-
-        return $mutantProcessMock;
+        return $mutantProcess;
     }
 
     private function runWithAllKindsOfProcesses(int $threadCount): void
@@ -299,13 +165,24 @@ final class ParallelProcessRunnerTest extends TestCase
         $processes = [];
 
         for ($i = 0; $i < 4; ++$i) {
-            $processes[] = $this->buildUncoveredMutantProcess();
-            $processes[] = $this->buildCoveredMutantProcess();
-            $processes[] = $this->buildCoveredMutantProcessWithTimeout();
+            $processes[] = $this->buildMutantProcess();
+            $processes[] = $this->buildMutantProcess();
+            $processes[] = $this->buildMutantProcessWithTimeout();
         }
 
         $eventDispatcher = $this->buildEventDispatcherWithEventCount(12);
-        $runner = new ParallelProcessRunner($eventDispatcher);
+
+        $runner = new ParallelProcessRunner(self::makeEventAccounter($eventDispatcher));
         $runner->run($processes, $threadCount, 0);
+    }
+
+    private function makeEventAccounter(EventDispatcher $eventDispatcher): Closure
+    {
+        return function (MutantProcess $mutantProcess) use ($eventDispatcher): void {
+            $eventDispatcher->dispatch(new MutantProcessWasFinished(
+                // We're not testing MutantExecutionResult::createFromProcess() here
+                $this->createMock(MutantExecutionResult::class)
+            ));
+        };
     }
 }

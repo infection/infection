@@ -246,7 +246,7 @@ class Configuration
         return $this->formatter;
     }
 
-    public function showProgress(): bool
+    public function noProgress(): bool
     {
         return $this->noProgress;
     }
