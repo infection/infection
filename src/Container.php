@@ -404,7 +404,7 @@ final class Container
                     $container->getMutantFactory(),
                     $container->getParallelProcessRunner(),
                     $container->getEventDispatcher(),
-                    $container->getConfiguration()->showProgress()
+                    $container->getConfiguration()->noProgress()
                 );
             },
             LineRangeCalculator::class => static function (): LineRangeCalculator {
