@@ -49,7 +49,7 @@ final class JUnitTestCaseSorter
     /**
      * @param CoverageLineData[] $coverageTestCases
      *
-     * @return string[]
+     * @return iterable<string>
      */
     public function getUniqueSortedFileNames(array $coverageTestCases): iterable
     {
