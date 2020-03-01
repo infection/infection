@@ -57,7 +57,6 @@ use Infection\FileSystem\Finder\FilterableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
-use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
@@ -96,7 +95,6 @@ final class ProjectCodeProvider
         PhpProcess::class,
         ComposerExecutableFinder::class,
         BadgeApiClient::class,
-        ResultsLoggerTypes::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
