@@ -67,17 +67,16 @@ final class MutationGenerator
     private $fileMutationGenerator;
 
     /**
-     * @param SplFileInfo[] $sourceFiles
+     * @param iterable<SplFileInfo> $sourceFiles
      * @param Mutator[] $mutators
      */
     public function __construct(
-        array $sourceFiles,
+        iterable $sourceFiles,
         LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcher $eventDispatcher,
         FileMutationGenerator $fileMutationGenerator
     ) {
-        Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
         $this->sourceFiles = $sourceFiles;
