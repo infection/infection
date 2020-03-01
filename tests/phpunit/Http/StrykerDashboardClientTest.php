@@ -91,7 +91,7 @@ final class StrykerDashboardClientTest extends TestCase
 JSON
                 ))
             )
-            ->willReturn(new Response('Report received!', 201))
+            ->willReturn(new Response(201, 'Report received!'))
         ;
 
         $this->dashboardClient->sendReport(
@@ -134,7 +134,7 @@ EOF
 JSON
                 ))
             )
-            ->willReturn(new Response('Report invalid!', 400))
+            ->willReturn(new Response(400, 'Report invalid!'))
         ;
 
         $this->dashboardClient->sendReport(

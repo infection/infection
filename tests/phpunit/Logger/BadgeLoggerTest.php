@@ -205,7 +205,7 @@ final class BadgeLoggerTest extends TestCase
 
         $this->outputMock
             ->method('writeln')
-            ->with('Dashboard report has not been sent: expected branch "master", found "foo"')
+            ->with('Dashboard report has not been sent: Expected branch "master", found "foo"')
         ;
 
         $this->badgeApiClientMock

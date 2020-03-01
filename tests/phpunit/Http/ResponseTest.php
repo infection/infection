@@ -45,18 +45,18 @@ final class ResponseTest extends TestCase
     /**
      * @dataProvider valueProvider
      */
-    public function test_it_can_be_instantiated(string $body, int $statusCode): void
+    public function test_it_can_be_instantiated(int $statusCode, string $body): void
     {
-        $response = new Response($body, $statusCode);
+        $response = new Response($statusCode, $body);
 
-        $this->assertSame($body, $response->getBody());
         $this->assertSame($statusCode, $response->getStatusCode());
+        $this->assertSame($body, $response->getBody());
     }
 
     public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_HTTP_status_code(): void
     {
         try {
-            new Response('', 102);
+            new Response(102, '');
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
@@ -69,8 +69,8 @@ final class ResponseTest extends TestCase
 
     public function valueProvider(): Generator
     {
-        yield 'empty' => ['', 200];
+        yield 'empty' => [200, ''];
 
-        yield 'nominal' => ['body', 200];
+        yield 'nominal' => [200, 'body'];
     }
 }

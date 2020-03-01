@@ -44,10 +44,10 @@ final class Response
 {
     public const CREATED_RESPONSE_CODE = 201;
 
-    private $body;
     private $statusCode;
+    private $body;
 
-    public function __construct(string $body, int $statusCode)
+    public function __construct(int $statusCode, string $body)
     {
         Assert::range(
             $statusCode,
@@ -56,17 +56,17 @@ final class Response
             'Expected an HTTP status code. Got "%s"'
         );
 
-        $this->body = $body;
         $this->statusCode = $statusCode;
-    }
-
-    public function getBody(): string
-    {
-        return $this->body;
+        $this->body = $body;
     }
 
     public function getStatusCode(): int
     {
         return $this->statusCode;
+    }
+
+    public function getBody(): string
+    {
+        return $this->body;
     }
 }

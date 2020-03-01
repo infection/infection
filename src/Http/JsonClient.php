@@ -65,6 +65,6 @@ class JsonClient
             curl_close($handle);
         }
 
-        return new Response($body, $statusCode);
+        return new Response($statusCode, $body);
     }
 }
