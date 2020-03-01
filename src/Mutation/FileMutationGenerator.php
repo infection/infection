@@ -73,7 +73,7 @@ class FileMutationGenerator
      *
      * @throws UnparsableFile
      *
-     * @return Mutation[]
+     * @return iterable<Mutation>
      */
     public function generate(
         SplFileInfo $fileInfo,
@@ -81,7 +81,7 @@ class FileMutationGenerator
         LineCodeCoverage $codeCoverage,
         array $mutators,
         array $nodeIgnorers
-    ): array {
+    ): iterable {
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
@@ -91,7 +91,7 @@ class FileMutationGenerator
         ;
 
         if ($onlyCovered && !$codeCoverage->hasTests($filePath)) {
-            return [];
+            return;
         }
 
         $initialStatements = $this->parser->parse($fileInfo);
@@ -111,6 +111,6 @@ class FileMutationGenerator
 
         $traverser->traverse($initialStatements);
 
-        return $mutationsCollectorVisitor->getMutations();
+        yield from $mutationsCollectorVisitor->getMutations();
     }
 }

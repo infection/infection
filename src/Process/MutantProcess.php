@@ -39,13 +39,14 @@ use function in_array;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
+use Infection\Process\Runner\Parallel\ProcessBearer;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  * @final
  */
-class MutantProcess
+class MutantProcess implements ProcessBearer
 {
     public const CODE_KILLED = 0;
     public const CODE_ESCAPED = 1;
@@ -97,7 +98,7 @@ class MutantProcess
         return $this->mutant;
     }
 
-    public function markTimeout(): void
+    public function markAsTimedOut(): void
     {
         $this->isTimedOut = true;
     }
