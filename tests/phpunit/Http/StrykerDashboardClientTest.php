@@ -39,6 +39,7 @@ use Infection\Http\JsonClient;
 use Infection\Http\Response;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Tests\Logger\DummyLogger;
+use function Infection\Tests\normalizeLineReturn;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
@@ -104,11 +105,11 @@ JSON
             [
                 [
                     LogLevel::NOTICE,
-                    <<<'EOF'
+                    normalizeLineReturn(<<<'EOF'
 Dashboard response:
 Report received!
 EOF
-                    ,
+                    ),
                     [],
                 ],
             ],

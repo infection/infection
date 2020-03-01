@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Http;
 
-use const PHP_EOL;
 use Psr\Log\LoggerInterface;
 use function Safe\json_encode;
 use function Safe\sprintf;
@@ -83,7 +82,7 @@ class StrykerDashboardClient
 
         $this->logger->notice(sprintf(
             'Dashboard response:%s%s',
-            PHP_EOL,
+            "\r\n",
             $response->getBody()
         ));
     }

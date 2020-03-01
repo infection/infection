@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use function Infection\Tests\normalizeLineReturn;
 use Psr\Log\AbstractLogger;
+use Webmozart\Assert\Assert;
 
 final class DummyLogger extends AbstractLogger
 {
@@ -43,7 +45,14 @@ final class DummyLogger extends AbstractLogger
 
     public function log($level, $message, array $context = []): void
     {
-        $this->logs[] = [$level, $message, $context];
+        Assert::string($level);
+        Assert::string($message);
+
+        $this->logs[] = [
+            $level,
+            normalizeLineReturn($message),
+            $context,
+        ];
     }
 
     public function getLogs(): array
