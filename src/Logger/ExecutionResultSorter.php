@@ -41,7 +41,7 @@ use function Safe\usort;
 /**
  * @internal
  */
-final class ProcessSorter
+final class ExecutionResultSorter
 {
     private function __construct()
     {
@@ -53,7 +53,7 @@ final class ProcessSorter
      *
      * @param MutantExecutionResult[] $executionResults
      */
-    public static function sortProcesses(array &$executionResults): void
+    public static function sortResults(array &$executionResults): void
     {
         usort(
             $executionResults,
@@ -64,6 +64,6 @@ final class ProcessSorter
 
                 return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
             }
-            );
+        );
     }
 }

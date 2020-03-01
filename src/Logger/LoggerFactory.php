@@ -135,7 +135,7 @@ final class LoggerFactory
                 $output,
                 $filePath,
                 $this->filesystem,
-                new DebugFileLogger($this->metricsCalculator)
+                new DebugFileLogger($this->metricsCalculator, $this->onlyCoveredCode)
             )
         ;
     }

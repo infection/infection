@@ -38,9 +38,9 @@ namespace Infection\Tests\Logger;
 use Generator;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Tests\FileSystem\FileSystemTestCase;
+use PHPUnit\Framework\TestCase;
 
-final class SummaryFileLoggerTest extends FileSystemTestCase
+final class SummaryFileLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
     use LineLoggerAssertions;

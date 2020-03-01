@@ -33,27 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Tests\Logger;
 
-/**
- * @internal
- */
-final class LoggerRegistry implements MutationTestingResultsLogger
+use Infection\Logger\LoggerRegistry;
+use Infection\Logger\MutationTestingResultsLogger;
+use PHPUnit\Framework\TestCase;
+
+final class LoggerRegistryTest extends TestCase
 {
-    /**
-     * @var MutationTestingResultsLogger[]
-     */
-    private $loggers;
-
-    public function __construct(MutationTestingResultsLogger ...$loggers)
+    public function test_it_logs_with_all_the_registered_loggers(): void
     {
-        $this->loggers = $loggers;
-    }
+        $logger1 = $this->createMock(MutationTestingResultsLogger::class);
+        $logger1
+            ->expects($this->once())
+            ->method('log')
+        ;
 
-    public function log(): void
-    {
-        foreach ($this->loggers as $logger) {
-            $logger->log();
-        }
+        $logger2 = $this->createMock(MutationTestingResultsLogger::class);
+        $logger2
+            ->expects($this->once())
+            ->method('log')
+        ;
+
+        (new LoggerRegistry($logger1, $logger2))->log();
     }
 }
