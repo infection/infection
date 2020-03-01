@@ -86,7 +86,8 @@ class ParallelProcessRunner
          * new processes so that when a process or several finish, we would have
          * additional jobs on hand, without a need to wait for them to be created.
          *
-         * For our purposes we need to make sure we only see one process only once.
+         * For our purposes we need to make sure we only see one process only once. Thus,
+         * we use a generator here which is both non-rewindable, and will fail loudly if tried.
          */
         $generator = self::toGenerator($processes);
 
