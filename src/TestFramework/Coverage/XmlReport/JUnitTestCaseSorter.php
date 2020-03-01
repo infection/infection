@@ -83,7 +83,7 @@ final class JUnitTestCaseSorter
      *
      * @return CoverageLineData[]
      */
-    private function uniqueByTestFile(iterable $coverageTestCases): array
+    private function uniqueByTestFile(array $coverageTestCases): array
     {
         $uniqueTests = [];
 
