@@ -110,7 +110,7 @@ class ParallelProcessRunner
                 } while (!$this->freeTerminatedProcesses());
             }
 
-            // In any case load a least one process to the bucket
+            // In any case load at least one process to the bucket
             self::fillBucket($bucket, $generator, 1);
         }
 
