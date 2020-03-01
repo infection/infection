@@ -56,10 +56,6 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 {
     private const PAD_LENGTH = 8;
 
-    /**
-     * @var MutantExecutionResult[]
-     */
-    private $mutantExecutionResults = [];
     private $output;
     private $outputFormatter;
     private $metricsCalculator;
@@ -103,10 +99,11 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
-        $this->mutantExecutionResults[] = $event->getExecutionResult();
-        $this->metricsCalculator->collect($event->getExecutionResult());
+        $executionResult = $event->getExecutionResult();
 
-        $this->outputFormatter->advance($event->getExecutionResult(), $this->mutationCount);
+        $this->metricsCalculator->collect($executionResult);
+
+        $this->outputFormatter->advance($executionResult, $this->mutationCount);
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
