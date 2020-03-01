@@ -154,7 +154,7 @@ class ParallelProcessRunner
 
     /**
      * @param ProcessBearer[] $bucket
-     * @param Generator|ProcessBearer[] $input
+     * @param Generator<ProcessBearer> $input
      */
     private static function fillBucket(array &$bucket, Generator $input, int $level = self::MUTATOR_TO_PROCESS_RATIO): void
     {
@@ -171,7 +171,7 @@ class ParallelProcessRunner
     /**
      * @param ProcessBearer[] $input
      *
-     * @return Generator|ProcessBearer[]
+     * @return Generator<ProcessBearer>
      */
     private static function toGenerator(iterable &$input): Generator
     {
