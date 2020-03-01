@@ -73,7 +73,7 @@ class FileMutationGenerator
      *
      * @throws UnparsableFile
      *
-     * @return Mutation[]
+     * @return iterable<Mutation>
      */
     public function generate(
         SplFileInfo $fileInfo,

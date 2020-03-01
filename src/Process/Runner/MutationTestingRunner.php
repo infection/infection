@@ -77,7 +77,7 @@ final class MutationTestingRunner
     }
 
     /**
-     * @param Mutation[] $mutations
+     * @param iterable<Mutation> $mutations
      */
     public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
@@ -118,7 +118,7 @@ final class MutationTestingRunner
     }
 
     /**
-     * @param mixed[] $subjects
+     * @param iterable<mixed> $subjects
      */
     private function bufferAndCountIfNeeded(iterable &$subjects): int
     {

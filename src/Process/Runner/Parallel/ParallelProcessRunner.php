@@ -73,7 +73,7 @@ class ParallelProcessRunner
     }
 
     /**
-     * @param ProcessBearer[] $processes
+     * @param iterable<ProcessBearer> $processes
      *
      * @throws RuntimeException
      * @throws LogicException
@@ -169,7 +169,7 @@ class ParallelProcessRunner
     }
 
     /**
-     * @param ProcessBearer[] $input
+     * @param iterable<ProcessBearer> $input
      *
      * @return Generator<ProcessBearer>
      */
