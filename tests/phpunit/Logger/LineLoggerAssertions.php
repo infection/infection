@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\LineMutationTestingResultsLogger;
+use function Infection\Tests\normalizeLineReturn;
 
 trait LineLoggerAssertions
 {
@@ -45,7 +46,7 @@ trait LineLoggerAssertions
     ): void {
         $this->assertSame(
             $expectedContents,
-            implode("\n", $logger->getLogLines())
+            normalizeLineReturn(implode("\n", $logger->getLogLines()))
         );
     }
 }

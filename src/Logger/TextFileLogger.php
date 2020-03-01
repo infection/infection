@@ -38,6 +38,7 @@ namespace Infection\Logger;
 use function implode;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
+use const PHP_EOL;
 use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
