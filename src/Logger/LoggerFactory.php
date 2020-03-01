@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function array_filter;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
@@ -45,8 +46,6 @@ use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use function array_filter;
-use const ARRAY_FILTER_USE_KEY;
 
 /**
  * @internal
@@ -144,8 +143,7 @@ final class LoggerFactory
     private function createPerMutatorLogger(
         OutputInterface $output,
         ?string $filePath
-    ): ?FileLogger 
-    {
+    ): ?FileLogger {
         return $filePath === null
             ? null
             : new FileLogger(

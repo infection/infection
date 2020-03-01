@@ -50,10 +50,12 @@ use function strlen;
 final class DebugFileLogger implements LineMutationTestingResultsLogger
 {
     private $metricsCalculator;
+    private $onlyCoveredMode;
 
-    public function __construct(MetricsCalculator $metricsCalculator)
+    public function __construct(MetricsCalculator $metricsCalculator, bool $onlyCoveredMode)
     {
         $this->metricsCalculator = $metricsCalculator;
+        $this->onlyCoveredMode = $onlyCoveredMode;
     }
 
     public function getLogLines(): array
@@ -61,25 +63,25 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
         $logs = [];
 
         $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
-        $logs[] = $this->converExecutionResult(
+        $logs[] = $this->convertExecutionResult(
             $this->metricsCalculator->getKilledMutantExecutionResults(),
             'Killed'
         );
-        $logs[] = $this->converExecutionResult(
+        $logs[] = $this->convertExecutionResult(
             $this->metricsCalculator->getErrorMutantExecutionResults(),
             'Errors'
         );
-        $logs[] = $this->converExecutionResult(
+        $logs[] = $this->convertExecutionResult(
             $this->metricsCalculator->getEscapedMutantExecutionResults(),
             'Escaped'
         );
-        $logs[] = $this->converExecutionResult(
+        $logs[] = $this->convertExecutionResult(
             $this->metricsCalculator->getTimedOutMutantExecutionResults(),
             'Timed Out'
         );
 
-        if (!$this->isOnlyCoveredMode) {
-            $logs[] = $this->converExecutionResult(
+        if (!$this->onlyCoveredMode) {
+            $logs[] = $this->convertExecutionResult(
                 $this->metricsCalculator->getNotCoveredMutantExecutionResults(),
                 'Not Covered'
             );
@@ -91,10 +93,11 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
     /**
      * @param MutantExecutionResult[] $executionResults
      */
-    private function converExecutionResult(array $executionResults, string $headlinePrefix): string
+    private function convertExecutionResult(array $executionResults, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
-        $this->sortProcesses($executionResults);
+
+        ProcessSorter::sortProcesses($executionResults);
 
         foreach ($executionResults as $executionResult) {
             $logParts[] = '';

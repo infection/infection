@@ -33,32 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger;
 
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Logger\MutationTestingResultsLogger;
+use Infection\Mutant\MutantExecutionResult;
+use function Safe\usort;
 
 /**
  * @internal
  */
-final class MutationTestingResultsLoggerSubscriber implements EventSubscriber
+final class ProcessSorter
 {
-    private $logger;
-
-    public function __construct(MutationTestingResultsLogger $logger)
+    private function __construct()
     {
-        $this->logger = $logger;
     }
 
-    public function getSubscribedEvents(): array
+    /**
+     * TODO: move this call in the metrics calculator otherwise the process is repeated for
+     *  multiple loggers
+     *
+     * @param MutantExecutionResult[] $executionResults
+     */
+    public static function sortProcesses(array &$executionResults): void
     {
-        return [
-            MutationTestingWasFinished::class => [$this, 'onMutationTestingWasFinished'],
-        ];
-    }
+        usort(
+            $executionResults,
+            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
+                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
+                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
+                }
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
-    {
-        $this->logger->log();
+                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
+            }
+            );
     }
 }

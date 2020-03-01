@@ -87,7 +87,8 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     private function getLogParts(array $executionResults, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
-        $this->sortProcesses($executionResults);
+
+        ProcessSorter::sortProcesses($executionResults);
 
         foreach ($executionResults as $index => $executionResult) {
             $isShowFullFormat = $this->debugVerbosity;

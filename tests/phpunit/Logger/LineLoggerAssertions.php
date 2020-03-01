@@ -33,32 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Logger;
 
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Logger\MutationTestingResultsLogger;
+use Infection\Logger\LineMutationTestingResultsLogger;
 
-/**
- * @internal
- */
-final class MutationTestingResultsLoggerSubscriber implements EventSubscriber
+trait LineLoggerAssertions
 {
-    private $logger;
-
-    public function __construct(MutationTestingResultsLogger $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return [
-            MutationTestingWasFinished::class => [$this, 'onMutationTestingWasFinished'],
-        ];
-    }
-
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
-    {
-        $this->logger->log();
+    private function assertLoggedContentIs(
+        string $expectedContents,
+        LineMutationTestingResultsLogger $logger
+    ): void {
+        $this->assertSame(
+            $expectedContents,
+            implode("\n", $logger->getLogLines())
+        );
     }
 }

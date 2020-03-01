@@ -35,28 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Infection\Logger\FileLogger;
-use Infection\Logger\LoggerRegistry;
-use Infection\Logger\MutationTestingResultsLogger;
-use ReflectionClass;
 use function array_map;
-use function current;
 use Generator;
+use function get_class;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
+use Infection\Logger\FileLogger;
 use Infection\Logger\LoggerFactory;
+use Infection\Logger\LoggerRegistry;
+use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use function get_class;
 
 /**
  * @group integration Requires some I/O operations
@@ -131,14 +130,11 @@ final class LoggerFactoryTest extends TestCase
 
     /**
      * @dataProvider logsProvider
-     *
-     * @param string-class[] $expectedLoggerClass
      */
     public function test_it_creates_a_logger_for_log_type_on_normal_verbosity(
         Logs $logs,
         array $expectedLoggerClasses
-    ): void
-    {
+    ): void {
         $factory = $this->createLoggerFactory(
             LogVerbosity::NORMAL,
             true,
@@ -243,8 +239,7 @@ final class LoggerFactoryTest extends TestCase
         string $logVerbosity,
         bool $debugMode,
         bool $onlyCoveredCode
-    ): LoggerFactory
-    {
+    ): LoggerFactory {
         return new LoggerFactory(
             $this->metricsCalculator,
             $this->fileSystemMock,
@@ -254,14 +249,10 @@ final class LoggerFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @param string-class[] $loggerClasses
-     */
     private function assertRegisteredLoggersAre(
         array $expectedLoggerClasses,
         MutationTestingResultsLogger $logger
-    ): void
-    {
+    ): void {
         $this->assertInstanceOf(LoggerRegistry::class, $logger);
 
         $loggersReflection = (new ReflectionClass(LoggerRegistry::class))->getProperty('loggers');
