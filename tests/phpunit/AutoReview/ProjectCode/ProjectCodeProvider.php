@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\Logger\BadgeLoggerFactory;
+use Infection\Logger\DebugFileLoggerFactory;
+use Infection\Logger\PerMutatorLoggerFactory;
+use Infection\Logger\SummaryFileLoggerFactory;
+use Infection\Logger\TextLoggerFactory;
 use const DIRECTORY_SEPARATOR;
 use Generator;
 use function in_array;
@@ -103,6 +108,11 @@ final class ProjectCodeProvider
         FilterableFinder::class,
         Engine::class,
         NonExecutableFinder::class,
+        BadgeLoggerFactory::class,
+        DebugFileLoggerFactory::class,
+        PerMutatorLoggerFactory::class,
+        SummaryFileLoggerFactory::class,
+        TextLoggerFactory::class,
     ];
 
     /**

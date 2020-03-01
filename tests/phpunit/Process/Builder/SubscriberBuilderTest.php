@@ -50,6 +50,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use function sys_get_temp_dir;
 
 /**
  * NOTE:
@@ -100,31 +101,36 @@ final class SubscriberBuilderTest extends TestCase
 
     private function makeSubscriberBuilder(bool $debug, string $formatter, bool $noProgress, int $addSubscriber, int $getLogs = 1): SubscriberBuilder
     {
-        $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcher::class);
-        $dispatcher->expects($this->exactly($addSubscriber))->method('addSubscriber');
-        $diff = $this->createMock(DiffColorizer::class);
-        $config = $this->createMock(Configuration::class);
-        $config->expects($this->exactly($getLogs))->method('getLogs')->willReturn(
-            new Logs(null, null, null, null, null)
-        );
-        $fs = $this->createMock(Filesystem::class);
+        $dispatcher
+            ->expects($this->exactly($addSubscriber))
+            ->method('addSubscriber')
+        ;
+
+        $configMock = $this->createMock(Configuration::class);
+        $configMock
+            ->expects($this->exactly($getLogs))
+            ->method('getLogs')
+            ->willReturn(
+                new Logs(null, null, null, null, null)
+            )
+        ;
 
         return new SubscriberBuilder(
             true,
             $debug,
             $formatter,
             $noProgress,
-            $calculator,
+            new MetricsCalculator(),
             $dispatcher,
-            $diff,
-            $config,
-            $fs,
+            $this->createMock(DiffColorizer::class),
+            $configMock,
+            $this->createMock(Filesystem::class),
             sys_get_temp_dir(),
             new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
-            new LoggerFactory($calculator, $fs, 'all', false, false)
+            $this->createMock(LoggerFactory::class)
         );
     }
 }

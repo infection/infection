@@ -41,11 +41,16 @@ use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
+use Infection\Logger\BadgeLoggerFactory;
 use Infection\Logger\DebugFileLogger;
+use Infection\Logger\DebugFileLoggerFactory;
 use Infection\Logger\LoggerFactory;
 use Infection\Logger\PerMutatorLogger;
+use Infection\Logger\PerMutatorLoggerFactory;
 use Infection\Logger\SummaryFileLogger;
+use Infection\Logger\SummaryFileLoggerFactory;
 use Infection\Logger\TextFileLogger;
+use Infection\Logger\TextLoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -62,16 +67,20 @@ final class LoggerFactoryTest extends TestCase
      */
     private $fileSystemMock;
 
+    /**
+     * @var MetricsCalculator
+     */
+    private $metricsCalculator;
+
     protected function setUp(): void
     {
         $this->fileSystemMock = $this->createMock(Filesystem::class);
+        $this->metricsCalculator = new MetricsCalculator();
     }
 
     public function test_it_does_not_create_any_logger_for_no_verbosity_level(): void
     {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            $this->fileSystemMock,
+        $factory = $this->createLoggerFactory(
             LogVerbosity::NONE,
             true,
             true
@@ -93,9 +102,7 @@ final class LoggerFactoryTest extends TestCase
 
     public function test_it_creates_a_bade_logger_on_low_verbosity(): void
     {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            $this->fileSystemMock,
+        $factory = $this->createLoggerFactory(
             LogVerbosity::NONE,
             true,
             true
@@ -115,9 +122,7 @@ final class LoggerFactoryTest extends TestCase
      */
     public function test_it_creates_a_logger_for_log_type(Logs $logs, string $expectedLoggerClass): void
     {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            $this->fileSystemMock,
+        $factory = $this->createLoggerFactory(
             LogVerbosity::NORMAL,
             true,
             true
@@ -137,9 +142,7 @@ final class LoggerFactoryTest extends TestCase
      */
     public function test_it_creates_multiple_loggers(Logs $logs, int $expectedLoggerCount): void
     {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            $this->fileSystemMock,
+        $factory = $this->createLoggerFactory(
             LogVerbosity::NORMAL,
             true,
             true
@@ -234,5 +237,46 @@ final class LoggerFactoryTest extends TestCase
             ),
             5,
         ];
+    }
+
+    private function createLoggerFactory(
+        string $logVerbosity,
+        bool $debugMode,
+        bool $onlyCoveredMode
+    ): LoggerFactory {
+        $debugVerbosity = $logVerbosity === LogVerbosity::DEBUG;
+
+        return new LoggerFactory(
+            $logVerbosity,
+            new BadgeLoggerFactory($this->metricsCalculator),
+            new DebugFileLoggerFactory(
+                $this->metricsCalculator,
+                $this->fileSystemMock,
+                $debugVerbosity,
+                $debugMode,
+                $onlyCoveredMode
+            ),
+            new PerMutatorLoggerFactory(
+                $this->metricsCalculator,
+                $this->fileSystemMock,
+                $debugVerbosity,
+                $debugMode,
+                $onlyCoveredMode
+            ),
+            new SummaryFileLoggerFactory(
+                $this->metricsCalculator,
+                $this->fileSystemMock,
+                $debugVerbosity,
+                $debugMode,
+                $onlyCoveredMode
+            ),
+            new TextLoggerFactory(
+                $this->metricsCalculator,
+                $this->fileSystemMock,
+                $debugVerbosity,
+                $debugMode,
+                $onlyCoveredMode
+            )
+        );
     }
 }

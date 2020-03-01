@@ -46,6 +46,7 @@ use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
+use Infection\Console\LogVerbosity;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
@@ -57,7 +58,12 @@ use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Logger\BadgeLoggerFactory;
+use Infection\Logger\DebugFileLoggerFactory;
 use Infection\Logger\LoggerFactory;
+use Infection\Logger\PerMutatorLoggerFactory;
+use Infection\Logger\SummaryFileLoggerFactory;
+use Infection\Logger\TextLoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResult;
@@ -348,17 +354,6 @@ final class Container
                     $container->getLineRangeCalculator()
                 );
             },
-            LoggerFactory::class => static function (self $container): LoggerFactory {
-                $config = $container->getConfiguration();
-
-                return new LoggerFactory(
-                    $container->getMetricsCalculator(),
-                    $container->getFileSystem(),
-                    $config->getLogVerbosity(),
-                    $config->isDebugEnabled(),
-                    $config->mutateOnlyCoveredCode()
-                );
-            },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
                 $config = $container->getConfiguration();
 
@@ -415,6 +410,63 @@ final class Container
             },
             TestFrameworkExtraOptionsFilter::class => static function (): TestFrameworkExtraOptionsFilter {
                 return new TestFrameworkExtraOptionsFilter();
+            },
+            BadgeLoggerFactory::class => static function (self $container): BadgeLoggerFactory {
+                return new BadgeLoggerFactory($container->getMetricsCalculator());
+            },
+            DebugFileLoggerFactory::class => static function (self $container): DebugFileLoggerFactory {
+                $config = $container->getConfiguration();
+
+                return new DebugFileLoggerFactory(
+                    $container->getMetricsCalculator(),
+                    $container->getFileSystem(),
+                    $config->getLogVerbosity() === LogVerbosity::DEBUG,
+                    $config->isDebugEnabled(),
+                    $config->mutateOnlyCoveredCode()
+                );
+            },
+            PerMutatorLoggerFactory::class => static function (self $container): PerMutatorLoggerFactory {
+                $config = $container->getConfiguration();
+
+                return new PerMutatorLoggerFactory(
+                    $container->getMetricsCalculator(),
+                    $container->getFileSystem(),
+                    $config->getLogVerbosity() === LogVerbosity::DEBUG,
+                    $config->isDebugEnabled(),
+                    $config->mutateOnlyCoveredCode()
+                );
+            },
+            SummaryFileLoggerFactory::class => static function (self $container): SummaryFileLoggerFactory {
+                $config = $container->getConfiguration();
+
+                return new SummaryFileLoggerFactory(
+                    $container->getMetricsCalculator(),
+                    $container->getFileSystem(),
+                    $config->getLogVerbosity() === LogVerbosity::DEBUG,
+                    $config->isDebugEnabled(),
+                    $config->mutateOnlyCoveredCode()
+                );
+            },
+            TextLoggerFactory::class => static function (self $container): TextLoggerFactory {
+                $config = $container->getConfiguration();
+
+                return new TextLoggerFactory(
+                    $container->getMetricsCalculator(),
+                    $container->getFileSystem(),
+                    $config->getLogVerbosity() === LogVerbosity::DEBUG,
+                    $config->isDebugEnabled(),
+                    $config->mutateOnlyCoveredCode()
+                );
+            },
+            LoggerFactory::class => static function (self $container): LoggerFactory {
+                return new LoggerFactory(
+                    $container->getConfiguration()->getLogVerbosity(),
+                    $container->getBadgeLoggerFactory(),
+                    $container->getDebugFileLoggerFactory(),
+                    $container->getPerMutatorLoggerFactory(),
+                    $container->getSummaryFileLoggerFactory(),
+                    $container->getTextLoggerFactory()
+                );
             },
         ]);
     }
@@ -709,6 +761,31 @@ final class Container
     public function getFileMutationGenerator(): FileMutationGenerator
     {
         return $this->get(FileMutationGenerator::class);
+    }
+
+    public function getBadgeLoggerFactory(): BadgeLoggerFactory
+    {
+        return $this->get(BadgeLoggerFactory::class);
+    }
+
+    public function getDebugFileLoggerFactory(): DebugFileLoggerFactory
+    {
+        return $this->get(DebugFileLoggerFactory::class);
+    }
+
+    public function getPerMutatorLoggerFactory(): PerMutatorLoggerFactory
+    {
+        return $this->get(PerMutatorLoggerFactory::class);
+    }
+
+    public function getSummaryFileLoggerFactory(): SummaryFileLoggerFactory
+    {
+        return $this->get(SummaryFileLoggerFactory::class);
+    }
+
+    public function getTextLoggerFactory(): TextLoggerFactory
+    {
+        return $this->get(TextLoggerFactory::class);
     }
 
     public function getLoggerFactory(): LoggerFactory
