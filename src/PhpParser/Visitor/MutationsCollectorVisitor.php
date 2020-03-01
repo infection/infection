@@ -48,7 +48,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     /**
      * @var iterable[]
      */
-    private $iterators = [];
+    private $mutationChunks = [];
 
     private $mutationGenerator;
 
@@ -59,14 +59,14 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
 
     public function beforeTraverse(array $nodes): ?array
     {
-        $this->iterators = [];
+        $this->mutationChunks = [];
 
         return null;
     }
 
     public function leaveNode(Node $node): ?Node
     {
-        $this->iterators[] = $this->mutationGenerator->generate($node);
+        $this->mutationChunks[] = $this->mutationGenerator->generate($node);
 
         return null;
     }
@@ -76,8 +76,8 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
      */
     public function getMutations(): iterable
     {
-        foreach ($this->iterators as $iterator) {
-            yield from $iterator;
+        foreach ($this->mutationChunks as $mutationChunk) {
+            yield from $mutationChunk;
         }
     }
 }
