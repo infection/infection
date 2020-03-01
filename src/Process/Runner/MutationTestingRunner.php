@@ -80,32 +80,29 @@ final class MutationTestingRunner
     public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
         $numberOfMutants = $this->bufferAndCountIfNeeded($mutations);
-
-        $processes = take($mutations);
-        $processes->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
-            $mutant = $this->mutantFactory->create($mutation);
-
-            $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
-
-            $this->eventDispatcher->dispatch(new MutantWasCreated());
-
-            return $process;
-        });
-
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
-        // We filter these here because it is beyond responsibilities of a process manager to care about types of processes
-        $processes = take($processes)->filter(function (MutantProcess $mutantProcess) {
-            if ($mutantProcess->getMutant()->isCoveredByTest()) {
-                return true;
-            }
+        $processes = take($mutations)
+            ->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
+                $mutant = $this->mutantFactory->create($mutation);
 
-            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                MutantExecutionResult::createFromProcess($mutantProcess)
-            ));
+                $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
-            return false;
-        });
+                $this->eventDispatcher->dispatch(new MutantWasCreated());
+
+                return $process;
+            })
+            ->filter(function (MutantProcess $mutantProcess) {
+                if ($mutantProcess->getMutant()->isCoveredByTest()) {
+                    return true;
+                }
+
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromProcess($mutantProcess)
+                ));
+
+                return false;
+            });
 
         $this->parallelProcessManager->run($processes, $threadCount);
 
