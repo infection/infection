@@ -36,11 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use function array_map;
+use ArrayIterator;
 use function count;
 use function get_class;
 use function implode;
-use Infection\Event\MutantsCreationWasFinished;
-use Infection\Event\MutantsCreationWasStarted;
 use Infection\Event\MutantWasCreated;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
@@ -52,6 +51,7 @@ use Infection\Process\MutantProcess;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Iterator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
@@ -94,7 +94,8 @@ final class MutationTestingRunnerTest extends TestCase
             $this->processBuilderMock,
             $this->mutantFactoryMock,
             $this->parallelProcessRunnerMock,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            false
         );
     }
 
@@ -107,15 +108,13 @@ final class MutationTestingRunnerTest extends TestCase
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with([], $threadCount)
+            ->with($this->emptyIterable(), $threadCount)
         ;
 
         $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreationWasStarted(0),
-                new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(0),
                 new MutationTestingWasFinished(),
             ],
@@ -151,30 +150,126 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutant1, $testFrameworkExtraOptions]
             )
             ->willReturnOnConsecutiveCalls(
-                $process0 = $this->createMock(MutantProcess::class),
-                $process1 = $this->createMock(MutantProcess::class)
+                $process0 = $this->buildCoveredMutantProcess(),
+                $process1 = $this->buildCoveredMutantProcess()
             )
         ;
 
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with([$process0, $process1], $threadCount)
+            ->with($this->iterableContaining([$process0, $process1]), $threadCount)
         ;
 
         $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreationWasStarted(2),
-                new MutantWasCreated(),
-                new MutantWasCreated(),
-                new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(2),
+                new MutantWasCreated(),
+                new MutantWasCreated(),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
         );
+    }
+
+    public function test_it_applies_and_run_the_mutations_when_concurent_execution_requested(): void
+    {
+        $mutations = new ArrayIterator([
+            $mutation0 = $this->createMock(Mutation::class),
+            $mutation1 = $this->createMock(Mutation::class),
+        ]);
+
+        $threadCount = 4;
+        $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
+
+        $this->mutantFactoryMock
+            ->method('create')
+            ->withConsecutive(
+                [$mutation0],
+                [$mutation1]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $mutant0 = new Mutant('/path/to/mutant0', $mutation0, ''),
+                $mutant1 = new Mutant('/path/to/mutant1', $mutation1, '')
+            )
+        ;
+
+        $this->processBuilderMock
+            ->method('createProcessForMutant')
+            ->withConsecutive(
+                [$mutant0, $testFrameworkExtraOptions],
+                [$mutant1, $testFrameworkExtraOptions]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $process0 = $this->buildCoveredMutantProcess(),
+                $process1 = $this->buildCoveredMutantProcess()
+            )
+        ;
+
+        $this->parallelProcessRunnerMock
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->iterableContaining([$process0, $process1]), $threadCount)
+        ;
+
+        $this->runner = new MutationTestingRunner(
+            $this->processBuilderMock,
+            $this->mutantFactoryMock,
+            $this->parallelProcessRunnerMock,
+            $this->eventDispatcher,
+            true
+        );
+
+        $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
+
+        $this->assertAreSameEvents(
+            [
+                new MutationTestingWasStarted(0),
+                new MutantWasCreated(),
+                new MutantWasCreated(),
+                new MutationTestingWasFinished(),
+            ],
+            $this->eventDispatcher->getEvents()
+        );
+    }
+
+    public function test_it_passes_through_iterables_when_concurent_execution_requested(): void
+    {
+        $mutations = $this->createMock(Iterator::class);
+        $mutations
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $threadCount = 4;
+
+        $this->mutantFactoryMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $this->processBuilderMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $this->parallelProcessRunnerMock
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->someIterable(), $threadCount)
+        ;
+
+        $this->runner = new MutationTestingRunner(
+            $this->processBuilderMock,
+            $this->mutantFactoryMock,
+            $this->parallelProcessRunnerMock,
+            $this->eventDispatcher,
+            true
+        );
+
+        $this->runner->run($mutations, $threadCount, '');
     }
 
     public function test_it_dispatches_events_even_when_no_mutations_is_given(): void
@@ -196,15 +291,13 @@ final class MutationTestingRunnerTest extends TestCase
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with([], $threadCount)
+            ->with($this->emptyIterable(), $threadCount)
         ;
 
         $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreationWasStarted(0),
-                new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(0),
                 new MutationTestingWasFinished(),
             ],
@@ -213,17 +306,15 @@ final class MutationTestingRunnerTest extends TestCase
     }
 
     /**
-     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantsCreationWasStarted|MutantWasCreated|MutantsCreationWasFinished> $expectedEvents
-     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantsCreationWasStarted|MutantWasCreated|MutantsCreationWasFinished> $actualEvents
+     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantWasCreated> $expectedEvents
+     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantWasCreated> $actualEvents
      */
     private function assertAreSameEvents(array $expectedEvents, array $actualEvents): void
     {
         $expectedClasses = [
             MutationTestingWasStarted::class,
             MutationTestingWasFinished::class,
-            MutantsCreationWasStarted::class,
             MutantWasCreated::class,
-            MutantsCreationWasFinished::class,
         ];
 
         $assertionErrorMessage = sprintf(
@@ -242,13 +333,6 @@ final class MutationTestingRunnerTest extends TestCase
                 $event,
                 $assertionErrorMessage
             );
-
-            if ($expectedEvent instanceof MutantsCreationWasStarted) {
-                /* @var MutantsCreationWasStarted $event */
-                $this->assertSame($expectedEvent->getMutantCount(), $event->getMutantCount());
-
-                continue;
-            }
 
             if ($expectedEvent instanceof MutationTestingWasStarted) {
                 /* @var MutationTestingWasStarted $event */
@@ -298,5 +382,56 @@ final class MutationTestingRunnerTest extends TestCase
             "\n - ",
             array_map('get_class', $events)
         );
+    }
+
+    private function buildCoveredMutantProcess(): MutantProcess
+    {
+        $mutant = $this->createMock(Mutant::class);
+        $mutant->expects($this->once())
+            ->method('isCoveredByTest')
+            ->willReturn(true);
+
+        /** @var MockObject|MutantProcess $mutantProcess */
+        $mutantProcess = $this->createMock(MutantProcess::class);
+        $mutantProcess->expects($this->once())
+            ->method('getMutant')
+            ->willReturn($mutant);
+
+        return $mutantProcess;
+    }
+
+    private function someIterable(?callable $callback = null)
+    {
+        return $this->callback(static function (iterable $subject) use ($callback) {
+            if ($callback !== null) {
+                return call_user_func($callback, $subject);
+            }
+
+            return true;
+        });
+    }
+
+    private function emptyIterable()
+    {
+        return $this->someIterable(static function (iterable $subject) {
+            foreach ($subject as $value) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    private function iterableContaining(array $expected)
+    {
+        return $this->someIterable(static function (iterable $subject) use ($expected) {
+            $actual = [];
+
+            foreach ($subject as $value) {
+                $actual[] = $value;
+            }
+
+            return $expected === $actual;
+        });
     }
 }

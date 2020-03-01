@@ -38,11 +38,16 @@ namespace Infection\Tests\Console\OutputFormatter;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
+use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
+use function strip_tags;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class DotFormatterTest extends TestCase
 {
+    private const ANY_PRIME_NUMBER = 127;
+
     public function test_start_logs_initial_starting_text(): void
     {
         $output = $this->createMock(OutputInterface::class);
@@ -108,6 +113,58 @@ final class DotFormatterTest extends TestCase
         $dot = new DotFormatter($outputNotcovered);
         $dot->start(10);
         $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_NOT_COVERED)[0], 10);
+    }
+
+    public function test_it_prints_total_number_of_mutations(): void
+    {
+        $totalMutations = self::ANY_PRIME_NUMBER;
+
+        $buffer = new BufferedOutput();
+        $dot = new DotFormatter($buffer);
+        $dot->start($totalMutations);
+
+        for ($i = 0; $i < $totalMutations; ++$i) {
+            $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_KILLED)[0], $totalMutations);
+        }
+
+        $this->assertSame(str_replace("\n", PHP_EOL,
+            <<<'TXT'
+
+.: killed, M: escaped, S: uncovered, E: fatal error, T: timed out
+
+..................................................   ( 50 / 127)
+..................................................   (100 / 127)
+...........................                          (127 / 127)
+TXT
+            ),
+            strip_tags($buffer->fetch())
+        );
+    }
+
+    public function test_it_prints_current_number_of_pending_mutations(): void
+    {
+        $totalMutations = self::ANY_PRIME_NUMBER;
+
+        $buffer = new BufferedOutput();
+        $dot = new DotFormatter($buffer);
+        $dot->start(0);
+
+        for ($i = 0; $i < $totalMutations; ++$i) {
+            $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_KILLED)[0], 0);
+        }
+
+        $this->assertSame(str_replace("\n", PHP_EOL,
+            <<<'TXT'
+
+.: killed, M: escaped, S: uncovered, E: fatal error, T: timed out
+
+..................................................   (   50)
+..................................................   (  100)
+...........................
+TXT
+            ),
+            strip_tags($buffer->fetch())
+        );
     }
 
     private function createMutantExecutionResultsOfType(int $processCode, int $count = 1): array

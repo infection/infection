@@ -33,34 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Process\Runner\Parallel;
 
-use Infection\Event\MutantsCreationWasStarted;
-use function Safe\sprintf;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriber
+interface ProcessBearer
 {
-    private $output;
+    public function getProcess(): Process;
 
-    public function __construct(OutputInterface $output)
-    {
-        $this->output = $output;
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return [];
-    }
-
-    public function onMutantsCreationWasStarted(MutantsCreationWasStarted $event): void
-    {
-        $this->output->writeln([
-            '',
-            sprintf('Creating mutated files and processes: %s', $event->getMutantCount()),
-        ]);
-    }
+    public function markAsTimedOut(): void;
 }
