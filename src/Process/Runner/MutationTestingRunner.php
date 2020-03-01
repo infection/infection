@@ -35,19 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use function array_map;
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutantsCreationWasFinished;
-use Infection\Event\MutantsCreationWasStarted;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutantWasCreated;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
+use function Pipeline\take;
 
 /**
  * @internal
@@ -58,28 +58,32 @@ final class MutationTestingRunner
     private $parallelProcessManager;
     private $eventDispatcher;
     private $processBuilder;
+    private $runConcurrently;
 
     public function __construct(
         MutantProcessBuilder $mutantProcessBuilder,
         MutantFactory $mutantFactory,
         ParallelProcessRunner $parallelProcessManager,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $eventDispatcher,
+        bool $runConcurrently
     ) {
         $this->processBuilder = $mutantProcessBuilder;
         $this->mutantFactory = $mutantFactory;
         $this->parallelProcessManager = $parallelProcessManager;
         $this->eventDispatcher = $eventDispatcher;
+        $this->runConcurrently = $runConcurrently;
     }
 
     /**
-     * @param Mutation[] $mutations
+     * @param iterable<Mutation> $mutations
      */
-    public function run(array $mutations, int $threadCount, string $testFrameworkExtraOptions): void
+    public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $this->eventDispatcher->dispatch(new MutantsCreationWasStarted(count($mutations)));
+        $numberOfMutants = $this->bufferAndCountIfNeeded($mutations);
+        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
-        $processes = array_map(
-            function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
+        $processes = take($mutations)
+            ->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
                 $mutant = $this->mutantFactory->create($mutation);
 
                 $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
@@ -87,16 +91,43 @@ final class MutationTestingRunner
                 $this->eventDispatcher->dispatch(new MutantWasCreated());
 
                 return $process;
-            },
-            $mutations
-        );
+            })
+            ->filter(function (MutantProcess $mutantProcess) {
+                if ($mutantProcess->getMutant()->isCoveredByTest()) {
+                    return true;
+                }
 
-        $this->eventDispatcher->dispatch(new MutantsCreationWasFinished());
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromProcess($mutantProcess)
+                ));
 
-        $this->eventDispatcher->dispatch(new MutationTestingWasStarted(count($processes)));
+                return false;
+            });
 
         $this->parallelProcessManager->run($processes, $threadCount);
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
+    }
+
+    /**
+     * @param iterable<mixed> $subjects
+     */
+    private function bufferAndCountIfNeeded(iterable &$subjects): int
+    {
+        if ($this->runConcurrently) {
+            return 0;
+        }
+
+        $buffer = [];
+
+        // iterator_to_array wants \Traversable, we can have anything else
+        foreach ($subjects as $subject) {
+            $buffer[] = $subject;
+            // TODO in PHP 7.4 use [...$subjects];
+        }
+
+        $subjects = $buffer;
+
+        return count($subjects);
     }
 }
