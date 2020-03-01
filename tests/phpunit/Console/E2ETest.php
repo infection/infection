@@ -122,13 +122,22 @@ final class E2ETest extends TestCase
     }
 
     /**
+     * Ensure this test belongs to e2e group. We exclude it during E2E testing
+     * from this class to avoid causing endless recursive testing loop.
+     */
+    public function test_it_belongs_to_e2e_group(): void
+    {
+        // Should not match the test itself.
+        $this->assertSame(1, substr_count(file_get_contents(__FILE__), '@group ' . 'e2e'));
+    }
+
+    /**
      * Longest test: runs under about 160-200 sec
      *
      * To be run with:
      *
      * php -dmemory_limit=128M vendor/bin/phpunit --group=large
      *
-     * @group e2e
      * @large
      */
     public function test_it_runs_on_itself(): void
@@ -149,9 +158,6 @@ final class E2ETest extends TestCase
         $this->assertRegExp('/\d{2,} mutants were killed/', $output);
     }
 
-    /**
-     * @group e2e
-     */
     public function test_it_runs_configure_command_if_no_configuration(): void
     {
         chdir('tests/e2e/Unconfigured/');
@@ -163,7 +169,6 @@ final class E2ETest extends TestCase
 
     /**
      * @dataProvider e2eTestSuiteDataProvider
-     * @group e2e
      * @runInSeparateProcess
      */
     public function test_it_runs_an_e2e_test_with_success(string $fullPath): void
