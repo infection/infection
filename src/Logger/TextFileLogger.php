@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function implode;
+use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use function Safe\sprintf;
 use function str_repeat;
@@ -44,19 +45,36 @@ use function strlen;
 /**
  * @internal
  */
-final class TextFileLogger extends FileLogger
+final class TextFileLogger implements LineMutationTestingResultsLogger
 {
-    protected function getLogLines(): array
+    private $metricsCalculator;
+    private $debugVerbosity;
+    private $onlyCoveredMode;
+    private $debugMode;
+
+    public function __construct(
+        MetricsCalculator $metricsCalculator,
+        bool $debugVerbosity,
+        bool $onlyCoveredMode,
+        bool $debugMode
+    ) {
+        $this->metricsCalculator = $metricsCalculator;
+        $this->debugVerbosity = $debugVerbosity;
+        $this->onlyCoveredMode = $onlyCoveredMode;
+        $this->debugMode = $debugMode;
+    }
+
+    public function getLogLines(): array
     {
         $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantExecutionResults(), 'Escaped');
         $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutMutantExecutionResults(), 'Timed Out');
 
-        if ($this->isDebugVerbosity) {
+        if ($this->debugVerbosity) {
             $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantExecutionResults(), 'Killed');
             $logs[] = $this->getLogParts($this->metricsCalculator->getErrorMutantExecutionResults(), 'Errors');
         }
 
-        if (!$this->isOnlyCoveredMode) {
+        if (!$this->onlyCoveredMode) {
             $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantExecutionResults(), 'Not Covered');
         }
 
@@ -72,12 +90,12 @@ final class TextFileLogger extends FileLogger
         $this->sortProcesses($executionResults);
 
         foreach ($executionResults as $index => $executionResult) {
-            $isShowFullFormat = $this->isDebugVerbosity;
+            $isShowFullFormat = $this->debugVerbosity;
 
             $logParts[] = '';
             $logParts[] = $this->getMutatorFirstLine($index, $executionResult);
 
-            $logParts[] = $this->isDebugMode ? $executionResult->getProcessCommandLine() : '';
+            $logParts[] = $this->debugMode ? $executionResult->getProcessCommandLine() : '';
 
             $logParts[] = $executionResult->getMutantDiff();
 

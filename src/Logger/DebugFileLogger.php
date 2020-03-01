@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function implode;
+use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use function Safe\sprintf;
+use function str_repeat;
 use function strlen;
 
 /**
@@ -45,9 +47,16 @@ use function strlen;
  *
  * @internal
  */
-final class DebugFileLogger extends FileLogger
+final class DebugFileLogger implements LineMutationTestingResultsLogger
 {
-    protected function getLogLines(): array
+    private $metricsCalculator;
+
+    public function __construct(MetricsCalculator $metricsCalculator)
+    {
+        $this->metricsCalculator = $metricsCalculator;
+    }
+
+    public function getLogLines(): array
     {
         $logs = [];
 
