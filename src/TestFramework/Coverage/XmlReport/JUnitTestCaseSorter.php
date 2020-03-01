@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_key_exists;
 use function count;
+use function current;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function Safe\usort;
 use Webmozart\Assert\Assert;
@@ -54,36 +55,23 @@ final class JUnitTestCaseSorter
     public function getUniqueSortedFileNames(array $coverageTestCases): iterable
     {
         if (count($coverageTestCases) === 1) {
-            foreach ($coverageTestCases as $coverageLineData) {
-                Assert::string($coverageLineData->testFilePath);
+            $coverageLineData = current($coverageTestCases);
+            Assert::string($coverageLineData->testFilePath);
 
-                yield $coverageLineData->testFilePath;
-
-                return;
-            }
+            return [
+                $coverageLineData->testFilePath,
+            ];
         }
 
-        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
-
-        // sort tests to run the fastest first
-        usort(
-            $uniqueCoverageTests,
-            static function (CoverageLineData $a, CoverageLineData $b) {
-                return $a->time <=> $b->time;
-            }
-        );
-
-        foreach ($uniqueCoverageTests as $coverageLineData) {
-            yield $coverageLineData->testFilePath;
-        }
+        return $this->sortedUniqueTestFileNames($coverageTestCases);
     }
 
     /**
      * @param CoverageLineData[] $coverageTestCases
      *
-     * @return CoverageLineData[]
+     * @return iterable<string>
      */
-    private function uniqueByTestFile(array $coverageTestCases): array
+    private function sortedUniqueTestFileNames(array $coverageTestCases): iterable
     {
         $uniqueTests = [];
 
@@ -95,6 +83,16 @@ final class JUnitTestCaseSorter
             }
         }
 
-        return $uniqueTests;
+        // sort tests to run the fastest first
+        usort(
+            $uniqueTests,
+            static function (CoverageLineData $a, CoverageLineData $b) {
+                return $a->time <=> $b->time;
+            }
+        );
+
+        foreach ($uniqueTests as $coverageLineData) {
+            yield $coverageLineData->testFilePath;
+        }
     }
 }
