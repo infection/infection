@@ -33,19 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Process;
 
 use function count;
+use function Pipeline\take;
 
 /**
  * @internal
  */
-trait IterableBuffer
+final class IterableCounter
 {
     /**
      * @param iterable<mixed> $subjects
      */
-    private static function bufferAndCountIfNeeded(iterable &$subjects, bool $runConcurrently): int
+    public static function bufferAndCountIfNeeded(iterable &$subjects, bool $runConcurrently): int
     {
         if ($runConcurrently) {
             // This number is typically fed to ProgressFormatter/ProgressBar or variants.
@@ -53,15 +54,8 @@ trait IterableBuffer
             return 0;
         }
 
-        $buffer = [];
-
-        // iterator_to_array wants \Traversable, we can have anything else
-        foreach ($subjects as $subject) {
-            $buffer[] = $subject;
-            // TODO in PHP 7.4 use [...$subjects];
-        }
-
-        $subjects = $buffer;
+        // TODO in PHP 7.4 use [...$subjects];
+        $subjects = take($subjects)->toArray();
 
         return count($subjects);
     }

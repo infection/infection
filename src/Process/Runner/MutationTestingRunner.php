@@ -43,6 +43,7 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
+use Infection\Process\IterableCounter;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use function Pipeline\take;
@@ -52,8 +53,6 @@ use function Pipeline\take;
  */
 final class MutationTestingRunner
 {
-    use IterableBuffer;
-
     private $mutantFactory;
     private $parallelProcessManager;
     private $eventDispatcher;
@@ -79,7 +78,7 @@ final class MutationTestingRunner
      */
     public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $numberOfMutants = self::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
+        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
         $processes = take($mutations)

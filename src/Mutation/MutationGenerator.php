@@ -42,7 +42,7 @@ use Infection\Event\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\Process\Runner\IterableBuffer;
+use Infection\Process\IterableCounter;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -52,8 +52,6 @@ use Webmozart\Assert\Assert;
  */
 final class MutationGenerator
 {
-    use IterableBuffer;
-
     /**
      * @var iterable<SplFileInfo>
      */
@@ -101,7 +99,7 @@ final class MutationGenerator
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
-        $numberOfFiles = self::bufferAndCountIfNeeded($this->sourceFiles, $this->runConcurrently);
+        $numberOfFiles = IterableCounter::bufferAndCountIfNeeded($this->sourceFiles, $this->runConcurrently);
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
