@@ -372,7 +372,7 @@ final class InfectionCommand extends BaseCommand
 
         $output->writeln([
             '',
-            sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName)
+            sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
         ]);
 
         $adapterInstaller = $container->getAdapterInstaller();
