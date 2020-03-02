@@ -43,6 +43,10 @@ use function Pipeline\take;
  */
 final class IterableCounter
 {
+    private function __construct()
+    {
+    }
+
     /**
      * @param iterable<mixed> $subjects
      */
