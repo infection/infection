@@ -64,7 +64,7 @@ final class IterableCounterTest extends TestCase
     public function test_it_counts_iterator(): void
     {
         $generator = (static function () {
-            yield from [1, 2, 3];
+            yield from [1 => 1, 2, 3];
         })();
 
         $count = IterableCounter::bufferAndCountIfNeeded($generator, false);

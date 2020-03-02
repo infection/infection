@@ -37,6 +37,8 @@ namespace Infection;
 
 use function count;
 use Infection\Console\OutputFormatter\AbstractOutputFormatter;
+use function is_array;
+use function iterator_to_array;
 
 /**
  * @internal
