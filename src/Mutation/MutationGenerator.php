@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileWasProcessed;
 use Infection\Event\MutationGenerationWasFinished;
@@ -43,6 +42,7 @@ use Infection\Event\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\Process\Runner\IterableBuffer;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -52,8 +52,10 @@ use Webmozart\Assert\Assert;
  */
 final class MutationGenerator
 {
+    use IterableBuffer;
+
     /**
-     * @var SplFileInfo[]
+     * @var iterable<SplFileInfo>
      */
     private $sourceFiles;
 
@@ -65,6 +67,7 @@ final class MutationGenerator
     private $codeCoverageData;
     private $eventDispatcher;
     private $fileMutationGenerator;
+    private $runConcurrently;
 
     /**
      * @param iterable<SplFileInfo> $sourceFiles
@@ -75,7 +78,8 @@ final class MutationGenerator
         LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcher $eventDispatcher,
-        FileMutationGenerator $fileMutationGenerator
+        FileMutationGenerator $fileMutationGenerator,
+        bool $runConcurrently
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -84,6 +88,7 @@ final class MutationGenerator
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileMutationGenerator = $fileMutationGenerator;
+        $this->runConcurrently = $runConcurrently;
     }
 
     /**
@@ -96,7 +101,9 @@ final class MutationGenerator
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
-        $this->eventDispatcher->dispatch(new MutationGenerationWasStarted(count($this->sourceFiles)));
+        $numberOfFiles = self::bufferAndCountIfNeeded($this->sourceFiles, $this->runConcurrently);
+
+        $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
         foreach ($this->sourceFiles as $fileInfo) {
             yield from $this->fileMutationGenerator->generate(

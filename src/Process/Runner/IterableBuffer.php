@@ -33,55 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem;
+namespace Infection\Process\Runner;
 
-use function array_filter;
-use function array_map;
-use function explode;
-use Infection\FileSystem\Finder\FilterableFinder;
-use Symfony\Component\Finder\SplFileInfo;
+use function count;
 
 /**
- * @final
- *
  * @internal
  */
-class SourceFileCollector
+trait IterableBuffer
 {
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludeDirectories
-     *
-     * @return iterable<SplFileInfo>
+     * @param iterable<mixed> $subjects
      */
-    public function collectFiles(
-        array $sourceDirectories,
-        array $excludeDirectories,
-        string $filter
-    ): iterable {
-        if ([] === $sourceDirectories) {
-            return [];
+    private static function bufferAndCountIfNeeded(iterable &$subjects, bool $runConcurrently): int
+    {
+        if ($runConcurrently) {
+            // This number is typicaly fed to ProgressFormatter/ProgressBar, or variants.
+            // In progress bar lingo 0 stands for unknown number of steps.
+            return 0;
         }
 
-        $finder = FilterableFinder::create()
-            ->exclude($excludeDirectories)
-            ->in($sourceDirectories)
-            ->files()
-        ;
+        $buffer = [];
 
-        if ($filter === '') {
-            $finder->name('*.php');
-        } else {
-            $finder->filterFiles(
-                array_filter(
-                    array_map(
-                        'trim',
-                        explode(',', $filter)
-                    )
-                )
-            );
+        // iterator_to_array wants \Traversable, we can have anything else
+        foreach ($subjects as $subject) {
+            $buffer[] = $subject;
+            // TODO in PHP 7.4 use [...$subjects];
         }
 
-        return $finder;
+        $subjects = $buffer;
+
+        return count($subjects);
     }
 }

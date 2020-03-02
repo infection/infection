@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutantWasCreated;
@@ -54,6 +53,8 @@ use function Pipeline\take;
  */
 final class MutationTestingRunner
 {
+    use IterableBuffer;
+
     private $mutantFactory;
     private $parallelProcessManager;
     private $eventDispatcher;
@@ -79,7 +80,7 @@ final class MutationTestingRunner
      */
     public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $numberOfMutants = $this->bufferAndCountIfNeeded($mutations);
+        $numberOfMutants = self::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
         $processes = take($mutations)
@@ -107,27 +108,5 @@ final class MutationTestingRunner
         $this->parallelProcessManager->run($processes, $threadCount);
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
-    }
-
-    /**
-     * @param iterable<mixed> $subjects
-     */
-    private function bufferAndCountIfNeeded(iterable &$subjects): int
-    {
-        if ($this->runConcurrently) {
-            return 0;
-        }
-
-        $buffer = [];
-
-        // iterator_to_array wants \Traversable, we can have anything else
-        foreach ($subjects as $subject) {
-            $buffer[] = $subject;
-            // TODO in PHP 7.4 use [...$subjects];
-        }
-
-        $subjects = $buffer;
-
-        return count($subjects);
     }
 }
