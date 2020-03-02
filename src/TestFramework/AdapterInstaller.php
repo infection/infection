@@ -75,7 +75,6 @@ final class AdapterInstaller
 
         $loader = new ClassLoader();
 
-        // todo file exists? if no - config vendor-dir
         $map = require 'vendor/composer/autoload_psr4.php';
 
         foreach ($map as $namespace => $paths) {
