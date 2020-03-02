@@ -35,15 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Event;
 
-use function array_keys;
-use function implode;
-use Infection\Event\Subscriber\EventSubscriber;
-use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
-use function Safe\array_flip;
 use function Safe\sprintf;
 
 final class SubscriberTest extends TestCase
@@ -66,75 +61,10 @@ final class SubscriberTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
-     *
-     * @param class-string $subscriberClass
-     */
-    public function test_the_subscribed_methods_can_all_be_collected(string $subscriberClass): void
-    {
-        /** @var EventSubscriber $subscriber */
-        $subscriber = (new ReflectionClass($subscriberClass))->newInstanceWithoutConstructor();
-
-        $subscriber->getSubscribedEvents();
-
-        $this->addToAssertionCount(1);
-    }
-
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberSubscriptionMethodsProvider
-     *
-     * @param class-string $subscriberClass
-     */
-    public function test_all_subscription_methods_are_listed_by_the_subscriber(
-        string $subscriberClass,
-        array $subscriptionMethodNames
-    ): void {
-        $subscriptionMethodNames = array_flip($subscriptionMethodNames);
-
-        $subscriberMethods = (new ReflectionClass($subscriberClass))->getMethods();
-
-        foreach ($subscriberMethods as $method) {
-            if (!$this->isSubscriptionMethod($method)) {
-                continue;
-            }
-
-            $subscriptionName = $method->getName();
-
-            $this->assertArrayHasKey(
-                $subscriptionName,
-                $subscriptionMethodNames,
-                sprintf(
-                    'Expected the subscription method "%s" to be listed in "%s::%s()"',
-                    $subscriptionName,
-                    $subscriberClass,
-                    'getSubscribedEvents'
-                )
-            );
-
-            unset($subscriptionMethodNames[$subscriptionName]);
-        }
-
-        $this->assertCount(
-            0,
-            $subscriptionMethodNames,
-            sprintf(
-                'Expected to find the following subscription method(s) on "%s": "%s". %s'
-                . 'Either add them or remove them from "%s::%s()"',
-                $subscriberClass,
-                implode('","', array_keys($subscriptionMethodNames)),
-                PHP_EOL,
-                $subscriberClass,
-                'getSubscribedEvents'
-            )
-        );
-    }
-
     private function isSubscriptionMethod(ReflectionMethod $method): bool
     {
         return !$method->isConstructor()
             && $method->isPublic()
-            && $method->getName() !== 'getSubscribedEvents'
         ;
     }
 

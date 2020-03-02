@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Event;
 
 use function array_filter;
-use function array_keys;
-use function array_map;
 use function array_values;
 use Generator;
 use Infection\Event\Subscriber\EventSubscriber;
@@ -45,8 +43,6 @@ use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
 use ReflectionClass;
-use function Safe\sprintf;
-use Webmozart\Assert\Assert;
 
 final class SubscriberProvider
 {
@@ -84,50 +80,8 @@ final class SubscriberProvider
         yield from self::$subscriberClasses;
     }
 
-    public static function provideSubscriberSubscriptionMethods(): Generator
-    {
-        if (self::$subscriberMethods !== null) {
-            yield from self::$subscriberMethods;
-
-            return;
-        }
-
-        self::$subscriberMethods = array_values(array_map(
-            static function (string $subscriberClass): array {
-                /** @var EventSubscriber $subscriber */
-                $subscriber = (new ReflectionClass($subscriberClass))->newInstanceWithoutConstructor();
-
-                return [
-                    $subscriberClass,
-                    array_map(
-                        static function (string $eventClass): string {
-                            Assert::classExists(
-                                $eventClass,
-                                sprintf(
-                                    'Expected "%s" to be a valid event FQCN',
-                                    $eventClass
-                                )
-                            );
-
-                            return 'on' . (new ReflectionClass($eventClass))->getShortName();
-                        },
-                        array_keys($subscriber->getSubscribedEvents())
-                    ),
-                ];
-            },
-            iterator_to_array(self::provideSubscriberClasses(), true)
-        ));
-
-        yield from self::$subscriberMethods;
-    }
-
     public static function subscriberClassesProvider(): Generator
     {
         yield from generator_to_phpunit_data_provider(self::provideSubscriberClasses());
-    }
-
-    public static function subscriberSubscriptionMethodsProvider(): Generator
-    {
-        yield from self::provideSubscriberSubscriptionMethods();
     }
 }
