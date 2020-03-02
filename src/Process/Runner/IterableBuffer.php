@@ -48,8 +48,8 @@ trait IterableBuffer
     private static function bufferAndCountIfNeeded(iterable &$subjects, bool $runConcurrently): int
     {
         if ($runConcurrently) {
-            // This number is typicaly fed to ProgressFormatter/ProgressBar, or variants.
-            // In progress bar lingo 0 stands for unknown number of steps.
+            // This number is typically fed to ProgressFormatter/ProgressBar or variants.
+            // In progress bar lingo 0 stands for an unknown number of steps.
             return 0;
         }
 
