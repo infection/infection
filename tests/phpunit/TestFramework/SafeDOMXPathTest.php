@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework;
 
 use DOMDocument;
 use Infection\TestFramework\SafeDOMXPath;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class SafeDOMXPathTest extends TestCase
@@ -45,6 +46,19 @@ final class SafeDOMXPathTest extends TestCase
     {
         $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
         $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
+    }
+
+    public function test_it_fails_on_invalid_query(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
+        $xPath->query('#');
+    }
+
+    public function test_it_fails_on_invalid_xml(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        SafeDOMXPath::fromString('<?xml version="1.0"?><foo>');
     }
 
     public function test_it_has_document_property(): void

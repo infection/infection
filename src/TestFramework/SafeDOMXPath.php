@@ -62,15 +62,13 @@ final class SafeDOMXPath
 
     public function __get(string $property): DOMDocument
     {
-        Assert::same($property, 'document');
-
         return $this->$property;
     }
 
     public static function fromString(string $content): self
     {
         $document = new DOMDocument();
-        $success = $document->loadXML($content);
+        $success = @$document->loadXML($content);
 
         Assert::true($success);
 
@@ -82,7 +80,7 @@ final class SafeDOMXPath
      */
     public function query(string $query): DOMNodeList
     {
-        $nodes = $this->xPath->query($query);
+        $nodes = @$this->xPath->query($query);
 
         Assert::isInstanceOf($nodes, DOMNodeList::class);
 
