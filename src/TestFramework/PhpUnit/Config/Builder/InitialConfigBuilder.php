@@ -42,7 +42,6 @@ use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
-use Infection\TestFramework\SafeQuery;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
 use function version_compare;
@@ -53,8 +52,6 @@ use Webmozart\Assert\Assert;
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
-    use SafeQuery;
-
     private $tmpDir;
     private $originalXmlConfigContent;
     private $configManipulator;

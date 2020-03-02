@@ -44,7 +44,6 @@ use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
-use Infection\TestFramework\SafeQuery;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
@@ -54,8 +53,6 @@ use Webmozart\Assert\Assert;
  */
 class MutationConfigBuilder extends ConfigBuilder
 {
-    use SafeQuery;
-
     private $tmpDir;
     private $projectDir;
     private $originalXmlConfigContent;

@@ -41,7 +41,6 @@ use function filter_var;
 use function implode;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\SafeDOMXPath;
-use Infection\TestFramework\SafeQuery;
 use const LIBXML_ERR_ERROR;
 use const LIBXML_ERR_FATAL;
 use const LIBXML_ERR_WARNING;
@@ -57,8 +56,6 @@ use Webmozart\Assert\Assert;
  */
 final class XmlConfigurationManipulator
 {
-    use SafeQuery;
-
     private $pathReplacer;
     private $phpUnitConfigDir;
 
