@@ -78,8 +78,7 @@ final class SafeDOMXPath
     }
 
     /**
-     * @return DOMNodeList|DOMElement[]
-     * @phpstan-return DOMNodeList<DOMElement>
+     * @return DOMNodeList<DOMElement>
      */
     public function query(string $query): DOMNodeList
     {
