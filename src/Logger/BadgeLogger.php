@@ -77,13 +77,13 @@ final class BadgeLogger implements MutationTestingResultsLogger
         try {
             $buildContext = $this->buildContextResolver->resolve(getenv());
         } catch (CouldNotResolveBuildContext $exception) {
-            $this->logError($exception->getMessage());
+            $this->logMessage($exception->getMessage());
 
             return;
         }
 
         if ($buildContext->branch() !== $this->branch) {
-            $this->logError(sprintf(
+            $this->logMessage(sprintf(
                 'Expected branch "%s", found "%s"',
                 $this->branch,
                 $buildContext->branch()
@@ -95,7 +95,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
         try {
             $apiKey = $this->strykerApiKeyResolver->resolve(getenv());
         } catch (CouldNotResolveStrykerApiKey $exception) {
-            $this->logError($exception->getMessage());
+            $this->logMessage($exception->getMessage());
 
             return;
         }
@@ -111,7 +111,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
         );
     }
 
-    private function logError(string $message): void
+    private function logMessage(string $message): void
     {
         $this->output->writeln(sprintf('Dashboard report has not been sent: %s', $message));
     }
