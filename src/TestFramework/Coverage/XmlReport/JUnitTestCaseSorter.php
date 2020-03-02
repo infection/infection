@@ -45,13 +45,13 @@ use function Safe\usort;
 final class JUnitTestCaseSorter
 {
     /**
-     * @param CoverageLineData[] $coverageLineDatas
+     * @param CoverageLineData[] $coverageTestCases
      *
      * @return string[]
      */
-    public function getUniqueSortedFileNames(array $coverageLineDatas): iterable
+    public function getUniqueSortedFileNames(array $coverageTestCases): iterable
     {
-        $uniqueCoverageTests = $this->uniqueByTestFile($coverageLineDatas);
+        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
 
         if (count($uniqueCoverageTests) === 1) {
             // Around 5% speed up compared to when without this optimization.
@@ -79,16 +79,16 @@ final class JUnitTestCaseSorter
     }
 
     /**
-     * @param CoverageLineData[] $coverageLineDatas
+     * @param CoverageLineData[] $coverageTestCases
      *
      * @return CoverageLineData[]
      */
-    private function uniqueByTestFile(array $coverageLineDatas): array
+    private function uniqueByTestFile(array $coverageTestCases): array
     {
         $usedFileNames = [];
         $uniqueTests = [];
 
-        foreach ($coverageLineDatas as $coverageLineData) {
+        foreach ($coverageTestCases as $coverageLineData) {
             if (!array_key_exists($coverageLineData->testFilePath, $usedFileNames)) {
                 $uniqueTests[] = $coverageLineData;
                 $usedFileNames[$coverageLineData->testFilePath] = true;
