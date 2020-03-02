@@ -36,10 +36,9 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMDocument;
-use DOMXPath;
 use function file_exists;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\SafeQuery;
+use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;
 use function Safe\sprintf;
 
@@ -48,11 +47,10 @@ use function Safe\sprintf;
  */
 final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
-    use SafeQuery;
     private $jUnitFilePath;
 
     /**
-     * @var DOMXPath|null
+     * @var SafeDOMXPath|null
      */
     private $xPath;
 
@@ -68,15 +66,13 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     {
         $xPath = $this->getXPath();
 
-        $nodes = self::safeQuery(
-            $xPath,
+        $nodes = $xPath->query(
             sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName)
         );
 
         if ($nodes->length === 0) {
             // Try another format where the class name is inside `class` attribute of `testcase` tag
-            $nodes = self::safeQuery(
-                $xPath,
+            $nodes = $xPath->query(
                 sprintf('//testcase[@class="%s"]', $fullyQualifiedClassName)
             );
         }
@@ -84,8 +80,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         if ($nodes->length === 0) {
             $feature = preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
             // try another format where the class name is inside `file` attribute of `testcase` tag
-            $nodes = self::safeQuery(
-                $xPath,
+            $nodes = $xPath->query(
                 sprintf('//testcase[contains(@file, "%s")]', $feature)
             );
         }
@@ -106,7 +101,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     /**
      * @throws CoverageDoesNotExistException
      */
-    private function getXPath(): DOMXPath
+    private function getXPath(): SafeDOMXPath
     {
         if (!$this->xPath) {
             $this->xPath = self::createXPath($this->jUnitFilePath);
@@ -118,7 +113,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     /**
      * @throws CoverageDoesNotExistException
      */
-    private static function createXPath(string $jUnitPath): DOMXPath
+    private static function createXPath(string $jUnitPath): SafeDOMXPath
     {
         if (!file_exists($jUnitPath)) {
             throw CoverageDoesNotExistException::forJunit($jUnitPath);
@@ -127,6 +122,6 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         $dom = new DOMDocument();
         $dom->load($jUnitPath);
 
-        return new DOMXPath($dom);
+        return new SafeDOMXPath($dom);
     }
 }

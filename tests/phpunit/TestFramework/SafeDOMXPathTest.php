@@ -33,32 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\TestFramework;
 
-use DOMElement;
-use DOMNodeList;
-use DOMXPath;
-use Webmozart\Assert\Assert;
+use DOMDocument;
+use Infection\TestFramework\SafeDOMXPath;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * @deprecated
- */
-trait SafeQuery
+final class SafeDOMXPathTest extends TestCase
 {
-    /**
-     * @return DOMNodeList|DOMElement[]
-     * @phpstan-return DOMNodeList<DOMElement>
-     *
-     * @deprecated
-     */
-    private static function safeQuery(DOMXPath $xPath, string $query): DOMNodeList
+    public function test_it_reads_xml(): void
     {
-        $nodes = $xPath->query($query);
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
+        $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
+    }
 
-        Assert::isInstanceOf($nodes, DOMNodeList::class);
-
-        return $nodes;
+    public function test_it_has_document_property(): void
+    {
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><test/>');
+        $this->assertInstanceOf(DOMDocument::class, $xPath->document);
     }
 }
