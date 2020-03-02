@@ -90,7 +90,9 @@ class InitialConfigBuilder implements ConfigBuilder
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
-        $dom->loadXML($this->originalXmlConfigContent);
+        $success = @$dom->loadXML($this->originalXmlConfigContent);
+
+        Assert::true($success);
 
         $xPath = new SafeDOMXPath($dom);
 

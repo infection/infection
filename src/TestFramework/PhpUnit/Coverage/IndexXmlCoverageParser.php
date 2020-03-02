@@ -100,7 +100,7 @@ class IndexXmlCoverageParser
     private static function createXPath(string $coverageContent): SafeDOMXPath
     {
         $document = new DOMDocument();
-        $success = $document->loadXML(self::removeNamespace($coverageContent));
+        $success = @$document->loadXML(self::removeNamespace($coverageContent));
 
         Assert::true($success);
 

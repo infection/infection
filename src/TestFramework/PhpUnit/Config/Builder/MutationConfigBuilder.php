@@ -146,7 +146,9 @@ class MutationConfigBuilder extends ConfigBuilder
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
-        $dom->loadXML($this->originalXmlConfigContent);
+        $success = @$dom->loadXML($this->originalXmlConfigContent);
+
+        Assert::true($success);
 
         return $this->dom = $dom;
     }

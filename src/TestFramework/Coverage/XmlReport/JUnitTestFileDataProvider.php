@@ -41,6 +41,7 @@ use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -120,7 +121,9 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         }
 
         $dom = new DOMDocument();
-        $dom->load($jUnitPath);
+        $success = @$dom->load($jUnitPath);
+
+        Assert::true($success);
 
         return new SafeDOMXPath($dom);
     }
