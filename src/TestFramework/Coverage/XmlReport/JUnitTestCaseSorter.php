@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_key_exists;
-use function array_map;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function Safe\usort;
 
@@ -46,7 +45,7 @@ use function Safe\usort;
 final class JUnitTestCaseSorter
 {
     /**
-     * @param array<int, CoverageLineData> $coverageLineDatas
+     * @param CoverageLineData[] $coverageLineDatas
      *
      * @return string[]
      */
@@ -77,15 +76,6 @@ final class JUnitTestCaseSorter
         foreach ($uniqueCoverageTests as $coverageLineData) {
             yield $coverageLineData->testFilePath;
         }
-
-        /*
-        return array_map(
-            static function (CoverageLineData $coverageLineData): string {
-                return $coverageLineData->testFilePath;
-            },
-            $uniqueCoverageTests
-        );
-        */
     }
 
     /**
