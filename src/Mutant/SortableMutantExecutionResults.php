@@ -33,27 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Mutant;
 
-use Infection\Mutant\MutantExecutionResult;
 use function Safe\usort;
 
 /**
  * @internal
  */
-final class ExecutionResultSorter
+final class SortableMutantExecutionResults
 {
-    private function __construct()
+    private $executionResults = [];
+    private $sorted = false;
+
+    public function add(MutantExecutionResult $executionResult): void
     {
+        $this->executionResults[] = $executionResult;
+        $this->sorted = false;
+    }
+
+    public function getSortedExecutionResults(): array
+    {
+        if (!$this->sorted) {
+            self::sortResults($this->executionResults);
+            $this->sorted = true;
+        }
+
+        return $this->executionResults;
     }
 
     /**
-     * TODO: move this call in the metrics calculator otherwise the process is repeated for
-     *  multiple loggers
-     *
      * @param MutantExecutionResult[] $executionResults
      */
-    public static function sortResults(array &$executionResults): void
+    private static function sortResults(array &$executionResults): void
     {
         usort(
             $executionResults,

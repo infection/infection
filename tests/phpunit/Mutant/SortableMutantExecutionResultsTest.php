@@ -33,17 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger;
+namespace Infection\Tests\Mutant;
 
 use Generator;
-use Infection\Logger\ExecutionResultSorter;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\SortableMutantExecutionResults;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 
-final class ExecutionResultSorterTest extends TestCase
+final class SortableMutantExecutionResultsTest extends TestCase
 {
     /**
      * @dataProvider resultsProvider
@@ -53,16 +53,40 @@ final class ExecutionResultSorterTest extends TestCase
      */
     public function test_it_can_sort_processes(array $executionResults, array $expectedResults): void
     {
-        ExecutionResultSorter::sortResults($executionResults);
+        $sortableResults = new SortableMutantExecutionResults();
 
-        $this->assertSame($expectedResults, $executionResults);
+        foreach ($executionResults as $executionResult) {
+            $sortableResults->add($executionResult);
+        }
+
+        $this->assertSame($expectedResults, $sortableResults->getSortedExecutionResults());
     }
 
     public function resultsProvider(): Generator
     {
         yield 'empty' => [[], []];
 
-        yield 'nominal to order' => (function (): array {
+        yield 'single result' => (function (): array {
+            $results = [$this->createExecutionResult(
+                0,
+                '/path/to/Foo.php',
+                10
+            )];
+
+            return [$results, $results];
+        })();
+
+        yield 'two identical results' => (function (): array {
+            $result0 = $this->createExecutionResult(
+                0,
+                '/path/to/Foo.php',
+                10
+            );
+
+            return [[$result0, $result0], [$result0, $result0]];
+        })();
+
+        yield 'two different unordered results - sort by file path' => (function (): array {
             $result0 = $this->createExecutionResult(
                 0,
                 '/path/to/Foo.php',
@@ -70,73 +94,56 @@ final class ExecutionResultSorterTest extends TestCase
             );
             $result1 = $this->createExecutionResult(
                 1,
+                '/path/to/Bar.php',
+                10
+            );
+
+            return [[$result0, $result1], [$result1, $result0]];
+        })();
+
+        yield 'two different ordered results - sort by file path' => (function (): array {
+            $result0 = $this->createExecutionResult(
+                0,
                 '/path/to/Foo.php',
                 10
             );
-            $result2 = $this->createExecutionResult(
-                2,
+            $result1 = $this->createExecutionResult(
+                1,
+                '/path/to/Bar.php',
+                10
+            );
+
+            return [[$result1, $result0], [$result1, $result0]];
+        })();
+
+        yield 'two different unordered results with same file path - sort by original starting line' => (function (): array {
+            $result0 = $this->createExecutionResult(
+                0,
                 '/path/to/Foo.php',
                 15
             );
-            $result3 = $this->createExecutionResult(
-                3,
-                '/path/to/Bar.php',
+            $result1 = $this->createExecutionResult(
+                1,
+                '/path/to/Foo.php',
                 10
             );
-            $result4 = $this->createExecutionResult(
-                4,
-                '/path/to/Bar.php',
-                13
-            );
 
-            return [
-                [
-                    $result0,
-                    $result1,
-                    $result2,
-                    $result3,
-                    $result4,
-                ],
-                [
-                    $result3,
-                    $result4,
-                    $result0,
-                    $result1,
-                    $result2,
-                ],
-            ];
+            return [[$result0, $result1], [$result1, $result0]];
         })();
 
-        yield 'nominal ordered' => (function (): array {
-            $results = [
-                $this->createExecutionResult(
-                    3,
-                    '/path/to/Bar.php',
-                    10
-                ),
-                $this->createExecutionResult(
-                    4,
-                    '/path/to/Bar.php',
-                    13
-                ),
-                $this->createExecutionResult(
-                    0,
-                    '/path/to/Foo.php',
-                    10
-                ),
-                $this->createExecutionResult(
-                    1,
-                    '/path/to/Foo.php',
-                    10
-                ),
-                $this->createExecutionResult(
-                    2,
-                    '/path/to/Foo.php',
-                    15
-                ),
-            ];
+        yield 'two different ordered results with same file path - sort by original starting line' => (function (): array {
+            $result0 = $this->createExecutionResult(
+                0,
+                '/path/to/Foo.php',
+                15
+            );
+            $result1 = $this->createExecutionResult(
+                1,
+                '/path/to/Foo.php',
+                10
+            );
 
-            return [$results, $results];
+            return [[$result1, $result0], [$result1, $result0]];
         })();
     }
 

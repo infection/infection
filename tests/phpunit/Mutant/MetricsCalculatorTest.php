@@ -51,13 +51,13 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0, $calculator->getKilledCount());
         $this->assertSame(0, $calculator->getErrorCount());
         $this->assertSame(0, $calculator->getTimedOutCount());
-        $this->assertSame(0, $calculator->getNotCoveredByTestsCount());
+        $this->assertSame(0, $calculator->getNotTestedCount());
         $this->assertSame(0, $calculator->getTotalMutantsCount());
-        $this->assertSame([], $calculator->getEscapedMutantExecutionResults());
-        $this->assertSame([], $calculator->getKilledMutantExecutionResults());
-        $this->assertSame([], $calculator->getErrorMutantExecutionResults());
-        $this->assertSame([], $calculator->getTimedOutMutantExecutionResults());
-        $this->assertSame([], $calculator->getNotCoveredMutantExecutionResults());
+        $this->assertSame([], $calculator->getEscapedExecutionResults());
+        $this->assertSame([], $calculator->getKilledExecutionResults());
+        $this->assertSame([], $calculator->getErrorExecutionResults());
+        $this->assertSame([], $calculator->getTimedOutExecutionResults());
+        $this->assertSame([], $calculator->getNotCoveredExecutionResults());
 
         $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(0.0, $calculator->getCoverageRate());
@@ -72,7 +72,7 @@ final class MetricsCalculatorTest extends TestCase
         $calculator = new MetricsCalculator();
 
         $this->addMutantExecutionResult($calculator, MutantProcess::CODE_NOT_COVERED);
-        $this->assertSame(1, $calculator->getNotCoveredByTestsCount());
+        $this->assertSame(1, $calculator->getNotTestedCount());
 
         $this->addMutantExecutionResult($calculator, MutantProcess::CODE_ESCAPED, 2);
         $this->assertSame(2, $calculator->getEscapedCount());
