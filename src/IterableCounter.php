@@ -37,7 +37,6 @@ namespace Infection;
 
 use function count;
 use Infection\Console\OutputFormatter\AbstractOutputFormatter;
-use function Pipeline\take;
 
 /**
  * @internal
@@ -58,8 +57,11 @@ final class IterableCounter
             return AbstractOutputFormatter::UNKNOWN_COUNT;
         }
 
-        // TODO in PHP 7.4 use [...$subjects];
-        $subjects = take($subjects)->toArray();
+        if (is_array($subjects)) {
+            return count($subjects);
+        }
+
+        $subjects = iterator_to_array($subjects, false);
 
         return count($subjects);
     }
