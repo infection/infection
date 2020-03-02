@@ -120,7 +120,7 @@ final class AdapterInstallationDeciderTest extends TestCase
 
         $this->assertTrue($result, 'Adapter should be installed since user answered "yes"');
         $this->assertStringContainsString(
-            'We noticed you are using Test Framework that is supported by external Infection Plugin. Would you like to install infection/phpspec-adapter package? [yes]:',
+            'Would you like to install infection/phpspec-adapter package? [yes]:',
             $output
         );
     }

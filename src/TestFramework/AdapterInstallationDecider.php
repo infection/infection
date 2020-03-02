@@ -70,7 +70,7 @@ final class AdapterInstallationDecider
 
         $question = new ConfirmationQuestion(
             sprintf(
-                'We noticed you are using Test Framework that is supported by external Infection Plugin. Would you like to install <comment>%s</comment> package? [<comment>yes</comment>]: ',
+                "We noticed you are using Test Framework that is supported by external Infection Plugin. \nWould you like to install <comment>%s</comment> package? [<comment>yes</comment>]: ",
                 $composerPackage
             ),
             true
