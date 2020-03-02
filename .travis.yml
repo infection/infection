@@ -80,12 +80,11 @@ jobs:
             phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
           fi
 
-      after_success:
-        - bash <(curl -s https://codecov.io/bash)
-
     - <<: *STANDARD_TEST_JOB
       php: 7.3
       env: DRIVER="pcov"
+      after_success:
+          - bash <(curl -s https://codecov.io/bash)
 
     - <<: *STANDARD_TEST_JOB
       php: 7.3
