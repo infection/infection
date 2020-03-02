@@ -85,6 +85,7 @@ final class JUnitTestCaseSorter
      */
     private function uniqueByTestFile(array $coverageTestCases): array
     {
+        // It is faster to have two arrays, and discard one later.
         $usedFileNames = [];
         $uniqueTests = [];
 
