@@ -37,7 +37,6 @@ namespace Infection\Process\Runner;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
-use Infection\Event\MutantWasCreated;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MutantExecutionResult;
@@ -88,8 +87,6 @@ final class MutationTestingRunner
                 $mutant = $this->mutantFactory->create($mutation);
 
                 $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
-
-                $this->eventDispatcher->dispatch(new MutantWasCreated());
 
                 return $process;
             })
