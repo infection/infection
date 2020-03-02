@@ -66,19 +66,7 @@ final class MetricsCalculatorTest extends TestCase
 
     public function test_it_collects_all_values(): void
     {
-        $process = $this->createMock(Process::class);
-        $process->method('stop');
-
         $calculator = new MetricsCalculator();
-
-        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_NOT_COVERED);
-        $this->assertSame(1, $calculator->getNotTestedCount());
-
-        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_ESCAPED, 2);
-        $this->assertSame(2, $calculator->getEscapedCount());
-
-        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_TIMED_OUT, 2);
-        $this->assertSame(2, $calculator->getTimedOutCount());
 
         $this->addMutantExecutionResult($calculator, MutantProcess::CODE_KILLED, 7);
         $this->assertSame(7, $calculator->getKilledCount());
@@ -86,6 +74,16 @@ final class MetricsCalculatorTest extends TestCase
         $this->addMutantExecutionResult($calculator, MutantProcess::CODE_ERROR, 2);
         $this->assertSame(2, $calculator->getErrorCount());
 
+        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_ESCAPED, 2);
+        $this->assertSame(2, $calculator->getEscapedCount());
+
+        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_TIMED_OUT, 2);
+        $this->assertSame(2, $calculator->getTimedOutCount());
+
+        $this->addMutantExecutionResult($calculator, MutantProcess::CODE_NOT_COVERED);
+        $this->assertSame(1, $calculator->getNotTestedCount());
+
+        $this->assertSame(14, $calculator->getTotalMutantsCount());
         $this->assertSame(78.57142857142857, $calculator->getMutationScoreIndicator());
         $this->assertSame(92.85714285714286, $calculator->getCoverageRate());
         $this->assertSame(84.61538461538461, $calculator->getCoveredCodeMutationScoreIndicator());
