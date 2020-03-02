@@ -9,8 +9,8 @@ use LogicException;
 
 final class UnknownEventSubscriber implements EventSubscriber
 {
-    public function getSubscribedEvents(): array
+    public function onUnknownEventSubscriber(UnknownEventSubscriber $event): void
     {
-        return ['Unknown' => static function () { throw new LogicException();}];
+        throw new LogicException();
     }
 }

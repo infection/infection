@@ -42,8 +42,10 @@ use Infection\Console\LogVerbosity;
 use Infection\Environment\ChainBuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Environment\TravisCiResolver;
-use Infection\Http\BadgeApiClient;
+use Infection\Http\JsonClient;
+use Infection\Http\StrykerDashboardClient;
 use Infection\Mutant\MetricsCalculator;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -163,7 +165,10 @@ final class LoggerFactory
                 $output,
                 new ChainBuildContextResolver(new TravisCiResolver()),
                 new StrykerApiKeyResolver(),
-                new BadgeApiClient($output),
+                new StrykerDashboardClient(
+                    new JsonClient(),
+                    new ConsoleLogger($output)
+                ),
                 $this->metricsCalculator,
                 $badge->getBranch()
             )

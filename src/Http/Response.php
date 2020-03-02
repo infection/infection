@@ -33,35 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Http;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\NullSubscriber;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
-use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
-final class SyncEventDispatcherTest extends TestCase
+/**
+ * @internal
+ */
+final class Response
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    public const CREATED_RESPONSE_CODE = 201;
+
+    private $statusCode;
+    private $body;
+
+    public function __construct(int $statusCode, string $body)
     {
-        $userSubscriber = new UserEventSubscriber();
-        $nullSubscriber = new NullSubscriber(new UserWasCreated());
+        Assert::range(
+            $statusCode,
+            200,
+            599,
+            'Expected an HTTP status code. Got "%s"'
+        );
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($nullSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
+        $this->statusCode = $statusCode;
+        $this->body = $body;
+    }
 
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
+    }
 
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
-
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+    public function getBody(): string
+    {
+        return $this->body;
     }
 }

@@ -33,35 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Tests\Http;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\NullSubscriber;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
+use Generator;
+use Infection\Http\Response;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
-final class SyncEventDispatcherTest extends TestCase
+final class ResponseTest extends TestCase
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    /**
+     * @dataProvider valueProvider
+     */
+    public function test_it_can_be_instantiated(int $statusCode, string $body): void
     {
-        $userSubscriber = new UserEventSubscriber();
-        $nullSubscriber = new NullSubscriber(new UserWasCreated());
+        $response = new Response($statusCode, $body);
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($nullSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
+        $this->assertSame($statusCode, $response->getStatusCode());
+        $this->assertSame($body, $response->getBody());
+    }
 
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_HTTP_status_code(): void
+    {
+        try {
+            new Response(102, '');
 
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected an HTTP status code. Got "102"',
+                $exception->getMessage()
+            );
+        }
+    }
 
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+    public function valueProvider(): Generator
+    {
+        yield 'empty' => [200, ''];
+
+        yield 'nominal' => [200, 'body'];
     }
 }

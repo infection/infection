@@ -33,11 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Tests\Logger;
 
-/**
- * @internal
- */
-final class MutantWasCreated
+use function Infection\Tests\normalizeLineReturn;
+use Psr\Log\AbstractLogger;
+use Webmozart\Assert\Assert;
+
+final class DummyLogger extends AbstractLogger
 {
+    private $logs = [];
+
+    public function log($level, $message, array $context = []): void
+    {
+        Assert::string($level);
+        Assert::string($message);
+
+        $this->logs[] = [
+            $level,
+            normalizeLineReturn($message),
+            $context,
+        ];
+    }
+
+    public function getLogs(): array
+    {
+        return $this->logs;
+    }
 }
