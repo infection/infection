@@ -69,6 +69,7 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 /**
+ * @group e2e
  * @group integration Requires some I/O operations
  */
 final class E2ETest extends TestCase
