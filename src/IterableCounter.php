@@ -33,38 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection;
 
-use Infection\Mutant\MutantExecutionResult;
+use function count;
+use Infection\Console\OutputFormatter\AbstractOutputFormatter;
+use function is_array;
+use function iterator_to_array;
 
 /**
  * @internal
- *
- * Abstract empty class to simplify particular implementations
  */
-abstract class AbstractOutputFormatter implements OutputFormatter
+final class IterableCounter
 {
-    /**
-     * In progress bar lingo 0 stands for an unknown number of steps.
-     */
-    public const UNKNOWN_COUNT = 0;
-
-    /**
-     * @var int
-     */
-    protected $callsCount = 0;
-
-    public function start(int $mutationCount): void
+    private function __construct()
     {
-        $this->callsCount = 0;
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    /**
+     * @param iterable<mixed> $subjects
+     */
+    public static function bufferAndCountIfNeeded(iterable &$subjects, bool $runConcurrently): int
     {
-        ++$this->callsCount;
-    }
+        if ($runConcurrently) {
+            // This number is typically fed to ProgressFormatter/ProgressBar or variants.
+            return AbstractOutputFormatter::UNKNOWN_COUNT;
+        }
 
-    public function finish(): void
-    {
+        if (is_array($subjects)) {
+            return count($subjects);
+        }
+
+        $subjects = iterator_to_array($subjects, false);
+
+        return count($subjects);
     }
 }

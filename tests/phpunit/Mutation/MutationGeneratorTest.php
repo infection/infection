@@ -99,7 +99,8 @@ final class MutationGeneratorTest extends TestCase
             $codeCoverageMock,
             $mutators,
             $eventDispatcherMock,
-            $fileMutationGeneratorProphecy->reveal()
+            $fileMutationGeneratorProphecy->reveal(),
+            false
         );
 
         $mutations = [];
@@ -147,7 +148,53 @@ final class MutationGeneratorTest extends TestCase
             $codeCoverageMock,
             [],
             $eventDispatcherMock,
-            $fileMutationGeneratorMock
+            $fileMutationGeneratorMock,
+            false
+        );
+
+        foreach ($mutationGenerator->generate(false, []) as $_) {
+        }
+    }
+
+    public function test_it_does_not_count_files_in_concurrent_mode(): void
+    {
+        $sourceFiles = (static function () {
+            yield new SplFileInfo('fileA', 'relativePathToFileA', 'relativePathnameToFileA');
+
+            yield new SplFileInfo('fileB', 'relativePathToFileB', 'relativePathnameToFileB');
+        })();
+
+        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
+
+        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
+        $eventDispatcherMock
+            ->expects($this->exactly(4))
+            ->method('dispatch')
+            ->withConsecutive(
+                [new MutationGenerationWasStarted(0)],
+                [new MutableFileWasProcessed()],
+                [new MutableFileWasProcessed()],
+                [new MutationGenerationWasFinished()]
+            )
+        ;
+
+        $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
+        $fileMutationGeneratorMock
+            ->expects($this->exactly(2))
+            ->method('generate')
+            ->willReturnOnConsecutiveCalls(
+                [],
+                []
+            )
+        ;
+
+        $mutationGenerator = new MutationGenerator(
+            $sourceFiles,
+            $codeCoverageMock,
+            [],
+            $eventDispatcherMock,
+            $fileMutationGeneratorMock,
+            true
         );
 
         foreach ($mutationGenerator->generate(false, []) as $_) {

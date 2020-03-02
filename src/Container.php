@@ -395,7 +395,8 @@ final class Container
                     ),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
-                    $container->getFileMutationGenerator()
+                    $container->getFileMutationGenerator(),
+                    $container->getConfiguration()->noProgress()
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {

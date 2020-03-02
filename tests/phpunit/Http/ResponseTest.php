@@ -33,38 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Tests\Http;
 
-use Infection\Mutant\MutantExecutionResult;
+use Generator;
+use Infection\Http\Response;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * Abstract empty class to simplify particular implementations
- */
-abstract class AbstractOutputFormatter implements OutputFormatter
+final class ResponseTest extends TestCase
 {
     /**
-     * In progress bar lingo 0 stands for an unknown number of steps.
+     * @dataProvider valueProvider
      */
-    public const UNKNOWN_COUNT = 0;
-
-    /**
-     * @var int
-     */
-    protected $callsCount = 0;
-
-    public function start(int $mutationCount): void
+    public function test_it_can_be_instantiated(int $statusCode, string $body): void
     {
-        $this->callsCount = 0;
+        $response = new Response($statusCode, $body);
+
+        $this->assertSame($statusCode, $response->getStatusCode());
+        $this->assertSame($body, $response->getBody());
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_HTTP_status_code(): void
     {
-        ++$this->callsCount;
+        try {
+            new Response(102, '');
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected an HTTP status code. Got "102"',
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function finish(): void
+    public function valueProvider(): Generator
     {
+        yield 'empty' => [200, ''];
+
+        yield 'nominal' => [200, 'body'];
     }
 }

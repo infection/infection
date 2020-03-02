@@ -36,65 +36,35 @@ declare(strict_types=1);
 namespace Infection\Http;
 
 use function curl_close;
-use function is_string;
 use function Safe\curl_exec;
 use function Safe\curl_getinfo;
 use function Safe\curl_init;
 use function Safe\curl_setopt;
-use function Safe\json_encode;
-use function Safe\sprintf;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
+ * @final
  */
-class BadgeApiClient
+class JsonClient
 {
-    private const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';
-
-    private const CREATED_RESPONSE_CODE = 201;
-
-    private $output;
-
-    public function __construct(OutputInterface $output)
+    public function request(string $url, string $json): Response
     {
-        $this->output = $output;
-    }
+        $handle = curl_init();
 
-    public function sendReport(
-        string $apiKey,
-        string $repositorySlug,
-        string $branch,
-        float $mutationScore
-    ): void {
-        $json = json_encode([
-            'apiKey' => $apiKey,
-            'repositorySlug' => $repositorySlug,
-            'branch' => $branch,
-            'mutationScore' => $mutationScore,
-        ]);
+        try {
+            curl_setopt($handle, CURLOPT_URL, $url);
+            curl_setopt($handle, CURLOPT_POST, true);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($handle, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($handle, CURLOPT_POSTFIELDS, $json);
+            curl_setopt($handle, CURLOPT_HEADER, true);
 
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, self::STRYKER_DASHBOARD_API_URL);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-
-        $response = curl_exec($ch);
-        $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($responseCode !== self::CREATED_RESPONSE_CODE) {
-            $this->output->writeln(sprintf('Stryker dashboard returned an unexpected response code: %s', $responseCode));
+            $body = (string) curl_exec($handle);
+            $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        } finally {
+            curl_close($handle);
         }
 
-        if (is_string($response)) {
-            $this->output->writeln('Dashboard response:', OutputInterface::VERBOSITY_VERBOSE);
-            $this->output->writeln($response, OutputInterface::VERBOSITY_VERBOSE);
-        }
+        return new Response($statusCode, $body);
     }
 }

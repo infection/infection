@@ -33,28 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Http;
 
-use DOMElement;
-use DOMNodeList;
-use DOMXPath;
-use Webmozart\Assert\Assert;
+use Psr\Log\LoggerInterface;
+use function Safe\json_encode;
+use function Safe\sprintf;
 
 /**
  * @internal
  */
-trait SafeQuery
+class StrykerDashboardClient
 {
-    /**
-     * @return DOMNodeList|DOMElement[]
-     * @phpstan-return DOMNodeList<DOMElement>
-     */
-    private static function safeQuery(DOMXPath $xPath, string $query): DOMNodeList
+    private const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';
+
+    private $client;
+    private $logger;
+
+    public function __construct(JsonClient $client, LoggerInterface $logger)
     {
-        $nodes = $xPath->query($query);
+        $this->client = $client;
+        $this->logger = $logger;
+    }
 
-        Assert::isInstanceOf($nodes, DOMNodeList::class);
+    public function sendReport(
+        string $apiKey,
+        string $repositorySlug,
+        string $branch,
+        float $mutationScore
+    ): void {
+        $response = $this->client->request(
+            self::STRYKER_DASHBOARD_API_URL,
+            json_encode([
+                'apiKey' => $apiKey,
+                'repositorySlug' => $repositorySlug,
+                'branch' => $branch,
+                'mutationScore' => $mutationScore,
+            ])
+        );
 
-        return $nodes;
+        $statusCode = $response->getStatusCode();
+
+        if ($statusCode !== Response::CREATED_RESPONSE_CODE) {
+            $this->logger->warning(sprintf(
+                'Stryker dashboard returned an unexpected response code: %s',
+                $statusCode)
+            );
+        }
+
+        $this->logger->notice(sprintf(
+            'Dashboard response:%s%s',
+            "\r\n",
+            $response->getBody()
+        ));
     }
 }

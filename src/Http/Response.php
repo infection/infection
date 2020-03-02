@@ -33,38 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Http;
 
-use Infection\Mutant\MutantExecutionResult;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
- *
- * Abstract empty class to simplify particular implementations
  */
-abstract class AbstractOutputFormatter implements OutputFormatter
+final class Response
 {
-    /**
-     * In progress bar lingo 0 stands for an unknown number of steps.
-     */
-    public const UNKNOWN_COUNT = 0;
+    public const CREATED_RESPONSE_CODE = 201;
 
-    /**
-     * @var int
-     */
-    protected $callsCount = 0;
+    private $statusCode;
+    private $body;
 
-    public function start(int $mutationCount): void
+    public function __construct(int $statusCode, string $body)
     {
-        $this->callsCount = 0;
+        Assert::range(
+            $statusCode,
+            200,
+            599,
+            'Expected an HTTP status code. Got "%s"'
+        );
+
+        $this->statusCode = $statusCode;
+        $this->body = $body;
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function getStatusCode(): int
     {
-        ++$this->callsCount;
+        return $this->statusCode;
     }
 
-    public function finish(): void
+    public function getBody(): string
     {
+        return $this->body;
     }
 }

@@ -33,38 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Tests\TestFramework;
 
-use Infection\Mutant\MutantExecutionResult;
+use DOMDocument;
+use Infection\TestFramework\SafeDOMXPath;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * Abstract empty class to simplify particular implementations
- */
-abstract class AbstractOutputFormatter implements OutputFormatter
+final class SafeDOMXPathTest extends TestCase
 {
-    /**
-     * In progress bar lingo 0 stands for an unknown number of steps.
-     */
-    public const UNKNOWN_COUNT = 0;
-
-    /**
-     * @var int
-     */
-    protected $callsCount = 0;
-
-    public function start(int $mutationCount): void
+    public function test_it_reads_xml(): void
     {
-        $this->callsCount = 0;
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
+        $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function test_it_fails_on_invalid_query(): void
     {
-        ++$this->callsCount;
+        $this->expectException(InvalidArgumentException::class);
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
+        $xPath->query('#');
     }
 
-    public function finish(): void
+    public function test_it_fails_on_invalid_xml(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        SafeDOMXPath::fromString('<?xml version="1.0"?><foo>');
+    }
+
+    public function test_it_has_document_property(): void
+    {
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><test/>');
+        $this->assertInstanceOf(DOMDocument::class, $xPath->document);
     }
 }

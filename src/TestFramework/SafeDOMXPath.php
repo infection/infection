@@ -33,38 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\TestFramework;
 
-use Infection\Mutant\MutantExecutionResult;
+use DOMDocument;
+use DOMElement;
+use DOMNodeList;
+use DOMXPath;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  *
- * Abstract empty class to simplify particular implementations
+ * @property DOMDocument $document
  */
-abstract class AbstractOutputFormatter implements OutputFormatter
+final class SafeDOMXPath
 {
-    /**
-     * In progress bar lingo 0 stands for an unknown number of steps.
-     */
-    public const UNKNOWN_COUNT = 0;
+    /** @var DOMDocument */
+    private $document;
 
-    /**
-     * @var int
-     */
-    protected $callsCount = 0;
+    /** @var DOMXPath */
+    private $xPath;
 
-    public function start(int $mutationCount): void
+    public function __construct(DOMDocument $document)
     {
-        $this->callsCount = 0;
+        $this->document = $document;
+        $this->xPath = new DOMXPath($document);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function __get(string $property): DOMDocument
     {
-        ++$this->callsCount;
+        return $this->$property;
     }
 
-    public function finish(): void
+    public static function fromString(string $content): self
     {
+        $document = new DOMDocument();
+        $success = @$document->loadXML($content);
+
+        Assert::true($success);
+
+        return new self($document);
+    }
+
+    /**
+     * @return DOMNodeList<DOMElement>
+     */
+    public function query(string $query): DOMNodeList
+    {
+        $nodes = @$this->xPath->query($query);
+
+        Assert::isInstanceOf($nodes, DOMNodeList::class);
+
+        return $nodes;
     }
 }
