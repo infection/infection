@@ -174,7 +174,7 @@ final class LoggerFactory
             new StrykerApiKeyResolver(),
             new BadgeApiClient($output),
             $this->metricsCalculator,
-            (object) ['branch' => $branch]
+            $branch
         );
     }
 
