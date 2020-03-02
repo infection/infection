@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
+use function array_map;
 use function array_key_exists;
-use function count;
-use function current;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function Safe\usort;
 use Webmozart\Assert\Assert;
@@ -50,49 +49,48 @@ final class JUnitTestCaseSorter
     /**
      * @param CoverageLineData[] $coverageTestCases
      *
-     * @return iterable<string>
+     * @return string[]
      */
-    public function getUniqueSortedFileNames(array $coverageTestCases): iterable
+    public function getUniqueSortedFileNames(array $coverageTestCases): array
     {
-        if (count($coverageTestCases) === 1) {
-            $coverageLineData = current($coverageTestCases);
-            Assert::string($coverageLineData->testFilePath);
-
-            return [
-                $coverageLineData->testFilePath,
-            ];
-        }
-
-        return $this->sortedUniqueTestFileNames($coverageTestCases);
-    }
-
-    /**
-     * @param CoverageLineData[] $coverageTestCases
-     *
-     * @return iterable<string>
-     */
-    private function sortedUniqueTestFileNames(array $coverageTestCases): iterable
-    {
-        $uniqueTests = [];
-
-        foreach ($coverageTestCases as $coverageTestCase) {
-            Assert::string($coverageTestCase->testFilePath);
-
-            if (!array_key_exists($coverageTestCase->testFilePath, $uniqueTests)) {
-                $uniqueTests[$coverageTestCase->testFilePath] = $coverageTestCase;
-            }
-        }
+        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
 
         // sort tests to run the fastest first
         usort(
-            $uniqueTests,
+            $uniqueCoverageTests,
             static function (CoverageLineData $a, CoverageLineData $b) {
                 return $a->time <=> $b->time;
             }
         );
 
-        foreach ($uniqueTests as $coverageLineData) {
-            yield $coverageLineData->testFilePath;
+        return array_map(
+            static function (CoverageLineData $coverageLineData): string {
+                $testFilePath = $coverageLineData->testFilePath;
+                Assert::string($testFilePath);
+
+                return $testFilePath;
+            },
+            $uniqueCoverageTests
+        );
+    }
+
+    /**
+     * @param CoverageLineData[] $coverageTestCases
+     *
+     * @return CoverageLineData[]
+     */
+    private function uniqueByTestFile(array $coverageTestCases): array
+    {
+        $usedFileNames = [];
+        $uniqueTests = [];
+
+        foreach ($coverageTestCases as $coverageTestCase) {
+            if (!array_key_exists($coverageTestCase->testFilePath, $usedFileNames)) {
+                $uniqueTests[] = $coverageTestCase;
+                $usedFileNames[$coverageTestCase->testFilePath] = true;
+            }
         }
+
+        return $uniqueTests;
     }
 }
