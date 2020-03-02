@@ -69,9 +69,7 @@ TXT
             )
         );
 
-        if (strpos($phpDoc, '@group integration') === false
-            && strpos($phpDoc, '@group e2e') === false
-        ) {
+        if (strpos($phpDoc, '@group integration') === false) {
             $this->fail(sprintf(
                 <<<'TXT'
 Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been
