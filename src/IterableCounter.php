@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection;
 
 use function count;
+use Infection\Console\OutputFormatter\AbstractOutputFormatter;
 use function Pipeline\take;
 
 /**
@@ -54,8 +55,7 @@ final class IterableCounter
     {
         if ($runConcurrently) {
             // This number is typically fed to ProgressFormatter/ProgressBar or variants.
-            // In progress bar lingo 0 stands for an unknown number of steps.
-            return 0;
+            return AbstractOutputFormatter::UNKNOWN_COUNT;
         }
 
         // TODO in PHP 7.4 use [...$subjects];
