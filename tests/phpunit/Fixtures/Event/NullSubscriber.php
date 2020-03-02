@@ -12,7 +12,7 @@ final class NullSubscriber implements EventSubscriber
 
     public function __construct(UserWasCreated $event)
     {
-        $this->count ++;
+        ++$this->count; // Should never be called more than once
     }
 
 }
