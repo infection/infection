@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection;
 
 use function count;
 use function Pipeline\take;

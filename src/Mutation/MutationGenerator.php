@@ -42,7 +42,7 @@ use Infection\Event\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\Process\IterableCounter;
+use Infection\IterableCounter;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;

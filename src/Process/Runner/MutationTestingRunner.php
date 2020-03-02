@@ -43,7 +43,7 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
-use Infection\Process\IterableCounter;
+use Infection\IterableCounter;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use function Pipeline\take;

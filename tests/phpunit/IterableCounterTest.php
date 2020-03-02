@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process;
+namespace Infection\Tests;
 
-use Infection\Process\IterableCounter;
+use Infection\IterableCounter;
 use Iterator;
 use PHPUnit\Framework\TestCase;
 
