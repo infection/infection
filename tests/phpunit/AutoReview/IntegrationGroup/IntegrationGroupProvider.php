@@ -98,7 +98,6 @@ final class IntegrationGroupProvider
                 $testCaseClass,
                 $testCaseReflection->getFileName(),
             ];
-
         }
 
         yield from self::$ioTestCaseClassesTuple;

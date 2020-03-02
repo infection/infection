@@ -86,5 +86,4 @@ final class IntegrationGroupProviderTest extends TestCase
 
         $this->fail('IntegrationGroupProvider could not find E2ETest, a known test case without a class but with a lot of IO');
     }
-
 }
