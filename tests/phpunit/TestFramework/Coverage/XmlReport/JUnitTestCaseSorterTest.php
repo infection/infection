@@ -53,11 +53,9 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         $sorter = new JUnitTestCaseSorter();
 
-        $uniqueSortedFileNames = [];
-
-        foreach ($sorter->getUniqueSortedFileNames($coverageTestCases) as $fileName) {
-            $uniqueSortedFileNames[] = $fileName;
-        }
+        $uniqueSortedFileNames = iterator_to_array(
+            $sorter->getUniqueSortedFileNames($coverageTestCases)
+        );
 
         $this->assertCount(1, $uniqueSortedFileNames);
         $this->assertSame('/path/to/test-file-1', $uniqueSortedFileNames[0]);
@@ -90,11 +88,9 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         $sorter = new JUnitTestCaseSorter();
 
-        $uniqueSortedFileNames = [];
-
-        foreach ($sorter->getUniqueSortedFileNames($coverageTestCases) as $fileName) {
-            $uniqueSortedFileNames[] = $fileName;
-        }
+        $uniqueSortedFileNames = iterator_to_array(
+            $sorter->getUniqueSortedFileNames($coverageTestCases)
+        );
 
         $this->assertCount(3, $uniqueSortedFileNames);
         $this->assertSame('/path/to/test-file-3', $uniqueSortedFileNames[0]);
