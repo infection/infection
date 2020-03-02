@@ -52,6 +52,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
+use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
@@ -83,6 +84,8 @@ use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\TestFramework\AdapterInstallationDecider;
+use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
@@ -104,6 +107,7 @@ use PhpParser\PrettyPrinterAbstract;
 use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
@@ -415,6 +419,12 @@ final class Container
             },
             TestFrameworkExtraOptionsFilter::class => static function (): TestFrameworkExtraOptionsFilter {
                 return new TestFrameworkExtraOptionsFilter();
+            },
+            AdapterInstallationDecider::class => static function (self $container): AdapterInstallationDecider {
+                return new AdapterInstallationDecider(new QuestionHelper());
+            },
+            AdapterInstaller::class => static function (): AdapterInstaller {
+                return new AdapterInstaller(new ComposerExecutableFinder());
             },
         ]);
     }
@@ -769,6 +779,16 @@ final class Container
     public function getTestFrameworkExtraOptionsFilter(): TestFrameworkExtraOptionsFilter
     {
         return $this->get(TestFrameworkExtraOptionsFilter::class);
+    }
+
+    public function getAdapterInstallationDecider(): AdapterInstallationDecider
+    {
+        return $this->get(AdapterInstallationDecider::class);
+    }
+
+    public function getAdapterInstaller(): AdapterInstaller
+    {
+        return $this->get(AdapterInstaller::class);
     }
 
     /**
