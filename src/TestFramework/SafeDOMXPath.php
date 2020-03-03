@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use DOMXPath;
@@ -42,16 +43,44 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ *
+ * @property DOMDocument $document
  */
-trait SafeQuery
+final class SafeDOMXPath
 {
-    /**
-     * @return DOMNodeList|DOMElement[]
-     * @phpstan-return DOMNodeList<DOMElement>
-     */
-    private static function safeQuery(DOMXPath $xPath, string $query): DOMNodeList
+    /** @var DOMDocument */
+    private $document;
+
+    /** @var DOMXPath */
+    private $xPath;
+
+    public function __construct(DOMDocument $document)
     {
-        $nodes = $xPath->query($query);
+        $this->document = $document;
+        $this->xPath = new DOMXPath($document);
+    }
+
+    public function __get(string $property): DOMDocument
+    {
+        return $this->$property;
+    }
+
+    public static function fromString(string $content): self
+    {
+        $document = new DOMDocument();
+        $success = @$document->loadXML($content);
+
+        Assert::true($success);
+
+        return new self($document);
+    }
+
+    /**
+     * @return DOMNodeList<DOMElement>
+     */
+    public function query(string $query): DOMNodeList
+    {
+        $nodes = @$this->xPath->query($query);
 
         Assert::isInstanceOf($nodes, DOMNodeList::class);
 
