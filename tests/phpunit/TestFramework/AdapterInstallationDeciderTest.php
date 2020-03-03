@@ -128,7 +128,11 @@ final class AdapterInstallationDeciderTest extends TestCase
 
         $this->assertTrue($result, 'Adapter should be installed since user answered "yes"');
         $this->assertStringContainsString(
-            'Would you like to install infection/phpspec-adapter? [yes]:',
+            'Would you like to install',
+            $output
+        );
+        $this->assertStringContainsString(
+            'infection/phpspec-adapter',
             $output
         );
     }
