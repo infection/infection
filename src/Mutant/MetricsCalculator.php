@@ -44,28 +44,40 @@ use function Safe\sprintf;
  */
 class MetricsCalculator
 {
+    /**
+     * @var int
+     */
     private $killedCount = 0;
 
+    /**
+     * @var int
+     */
     private $errorCount = 0;
 
+    /**
+     * @var int
+     */
     private $escapedCount = 0;
 
+    /**
+     * @var int
+     */
     private $timedOutCount = 0;
 
+    /**
+     * @var int
+     */
     private $notCoveredByTestsCount = 0;
 
+    /**
+     * @var int
+     */
     private $totalMutantsCount = 0;
-
     private $killedExecutionResults;
-
     private $errorExecutionResults;
-
     private $escapedExecutionResults;
-
     private $timedOutExecutionResults;
-
     private $notCoveredExecutionResults;
-
     private $allExecutionResults;
 
     /**
@@ -81,24 +93,6 @@ class MetricsCalculator
         $this->timedOutExecutionResults = new SortableMutantExecutionResults();
         $this->notCoveredExecutionResults = new SortableMutantExecutionResults();
         $this->allExecutionResults = new SortableMutantExecutionResults();
-    }
-
-    /**
-     * Build a metric calculator with a sub-set of mutators
-     *
-     * @param MutantExecutionResult[] $executionResults
-     *
-     * @return MetricsCalculator
-     */
-    public static function createFromArray(MutantExecutionResult ...$executionResults): self
-    {
-        $self = new self();
-
-        foreach ($executionResults as $process) {
-            $self->collect($process);
-        }
-
-        return $self;
     }
 
     public function collect(MutantExecutionResult ...$executionResults): void

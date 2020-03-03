@@ -42,7 +42,14 @@ use function Safe\usort;
  */
 final class SortableMutantExecutionResults
 {
+    /**
+     * @var MutantExecutionResult[]
+     */
     private $executionResults = [];
+
+    /**
+     * @var bool
+     */
     private $sorted = false;
 
     public function add(MutantExecutionResult $executionResult): void
@@ -51,6 +58,9 @@ final class SortableMutantExecutionResults
         $this->sorted = false;
     }
 
+    /**
+     * @return MutantExecutionResult[]
+     */
     public function getSortedExecutionResults(): array
     {
         if (!$this->sorted) {

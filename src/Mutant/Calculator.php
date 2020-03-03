@@ -46,8 +46,19 @@ final class Calculator
     private $notTestedCount;
     private $totalCount;
 
+    /**
+     * @var float|null
+     */
     private $mutationScoreIndicator;
+
+    /**
+     * @var float|null
+     */
     private $coverageRate;
+
+    /**
+     * @var float|null
+     */
     private $coveredMutationScoreIndicator;
 
     public function __construct(
@@ -115,6 +126,9 @@ final class Calculator
         return $this->coverageRate = (float) $coveredRate;
     }
 
+    /**
+     * Mutation Score Indicator relative to the covered mutants
+     */
     public function getCoveredCodeMutationScoreIndicator(): float
     {
         if ($this->coveredMutationScoreIndicator !== null) {

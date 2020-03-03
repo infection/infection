@@ -39,7 +39,6 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 final class MetricsCalculatorTest extends TestCase
 {
