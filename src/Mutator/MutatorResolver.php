@@ -112,7 +112,7 @@ final class MutatorResolver
      * @param mixed[]|bool $settings
      * @param array<string, string[]> $globalSettings
      *
-     * @return array<string, string[]>|bool
+     * @return array<string, mixed[]>|bool
      */
     private static function resolveSettings($settings, array $globalSettings)
     {
@@ -128,7 +128,7 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string[]>|bool|bool $settings
+     * @param array<string, mixed[]>|bool $settings
      * @param array<string, array<string, string>> $mutators
      */
     private static function registerFromProfile(
@@ -170,7 +170,7 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string[]>|bool $settings
+     * @param array<string, mixed[]>|bool $settings
      * @param array<string, array<string, string>> $mutators
      */
     private static function registerFromName(
