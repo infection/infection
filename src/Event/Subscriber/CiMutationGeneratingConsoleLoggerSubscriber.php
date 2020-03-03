@@ -51,13 +51,6 @@ final class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscrib
         $this->output = $output;
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [
-            MutationGenerationWasStarted::class => [$this, 'onMutationGenerationWasStarted'],
-        ];
-    }
-
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
         $this->output->writeln([

@@ -57,15 +57,6 @@ final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
         $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [
-            MutationGenerationWasStarted::class => [$this, 'onMutationGenerationWasStarted'],
-            MutableFileWasProcessed::class => [$this, 'onMutableFileWasProcessed'],
-            MutationGenerationWasFinished::class => [$this, 'onMutationGenerationWasFinished'],
-        ];
-    }
-
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
         $this->output->writeln(['', '', 'Generate mutants...', '']);

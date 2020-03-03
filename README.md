@@ -1,5 +1,6 @@
 [![Minimum PHP version: 7.2.9](https://img.shields.io/badge/php-7.2.9%2B-blue.svg)](https://packagist.org/packages/infection/infection)
 [![Latest Stable Version](https://poser.pugx.org/infection/infection/v/stable)](https://packagist.org/packages/infection/infection)
+[![Continuous Integration](https://github.com/infection/infection/workflows/Continuous%20Integration/badge.svg)](https://github.com/infection/infection/actions)
 [![Build Status](https://travis-ci.org/infection/infection.svg?branch=master)](https://travis-ci.org/infection/infection)
 [![Build status](https://ci.appveyor.com/api/projects/status/km29p5r5t6arp404/branch/master?svg=true)](https://ci.appveyor.com/project/borNfreee/infection/branch/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/infection/infection/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/infection/infection/?branch=master)

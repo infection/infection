@@ -67,12 +67,12 @@ $finder = Finder::create()
 return Config::create()
     ->setRiskyAllowed(true)
     ->setRules([
-        '@Symfony' => true,
-        '@Symfony:risky' => true,
         '@PHP71Migration' => true,
         '@PHP71Migration:risky' => true,
         '@PHPUnit60Migration:risky' => true,
         '@PHPUnit75Migration:risky' => true,
+        '@Symfony' => true,
+        '@Symfony:risky' => true,
         'blank_line_before_statement' => [
             'statements' => [
                 'break',
@@ -127,15 +127,12 @@ return Config::create()
         'phpdoc_align' => [
             'align' => 'left',
         ],
-        'phpdoc_no_empty_return' => true,
-        'phpdoc_order' => true,
-        'phpdoc_summary' => false,
-        'php_unit_set_up_tear_down_visibility' => true,
-        'php_unit_strict' => true,
         'php_unit_dedicate_assert' => true,
         'php_unit_method_casing' => [
             'case' => 'snake_case',
         ],
+        'php_unit_set_up_tear_down_visibility' => true,
+        'php_unit_strict' => true,
         'php_unit_ordered_covers' => true,
         'php_unit_test_annotation' => [
             'case' => 'snake',
@@ -144,6 +141,9 @@ return Config::create()
         'php_unit_test_case_static_method_calls' => [
             'call_type' => 'this',
         ],
+        'phpdoc_no_empty_return' => true,
+        'phpdoc_order' => true,
+        'phpdoc_summary' => false,
         'self_static_accessor' => true,
         'single_line_throw' => false,
         'static_lambda' => true,

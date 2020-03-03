@@ -34,47 +34,50 @@
 
 // Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
 
-$autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
+use Infection\Console\Application;
+use Infection\Container;
+use function Safe\getcwd;
 
-if (is_file($autoloaderInWorkingDirectory)) {
-    require_once $autoloaderInWorkingDirectory;
-}
-unset($autoloaderInWorkingDirectory);
-
-$files = [
-    __DIR__ . '/../../../autoload.php',
-    __DIR__ . '/../vendor/autoload.php',
-    __DIR__ . '/vendor/autoload.php',
-];
-
-foreach ($files as $file) {
-    if (file_exists($file)) {
-        break;
-    }
-    unset($file);
-}
-unset($files);
-
-if (!isset($file)) {
-    fwrite(
-        STDERR,
-        'You need to set up the project dependencies using Composer:' . PHP_EOL . PHP_EOL .
-        '    composer install' . PHP_EOL . PHP_EOL .
-        'You can learn all about Composer on https://getcomposer.org/.' . PHP_EOL
-    );
+if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
+    echo PHP_EOL . 'Infection may only be invoked from a command line, got "' . PHP_SAPI . '"' . PHP_EOL;
 
     exit(1);
 }
 
-require $file;
-unset($file);
+// Infection autoloading
+(static function (): void {
+    if (file_exists($autoload = __DIR__ . '/../../../autoload.php')) {
+        // Is installed via Composer
+        include_once $autoload;
 
-if (\PHP_SAPI !== 'cli' && \PHP_SAPI !== 'phpdbg') {
-    echo 'Warning: Infection may only be invoked from a command line', PHP_EOL;
-}
+        return;
+    }
 
-use Infection\Console\Application;
-use Infection\Container;
+    if (file_exists($autoload = __DIR__ . '/../vendor/autoload.php')) {
+        // Is installed locally
+        include_once $autoload;
 
-$application = new Application(Container::create());
-$application->run();
+        return;
+    }
+
+    fwrite(
+        STDERR,
+        <<<'ERROR'
+You need to set up the project dependencies using Composer:
+    $ composer install
+You can learn all about Composer on https://getcomposer.org/.
+
+ERROR
+    );
+
+    throw new RuntimeException('Unable to find the Composer autoloader.');
+})();
+
+// Project (third-party) autoloading
+(static function (): void {
+    if (file_exists($autoload = getcwd() . '/vendor/autoload.php')) {
+        include_once $autoload;
+    }
+})();
+
+(new Application(Container::create()))->run();

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
-use Infection\Process\MutantProcess;
+use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
@@ -44,6 +44,11 @@ use Infection\Process\MutantProcess;
  */
 abstract class AbstractOutputFormatter implements OutputFormatter
 {
+    /**
+     * In progress bar lingo 0 stands for an unknown number of steps.
+     */
+    public const UNKNOWN_COUNT = 0;
+
     /**
      * @var int
      */
@@ -54,7 +59,7 @@ abstract class AbstractOutputFormatter implements OutputFormatter
         $this->callsCount = 0;
     }
 
-    public function advance(MutantProcess $mutantProcess, int $mutationCount): void
+    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
     {
         ++$this->callsCount;
     }

@@ -38,7 +38,7 @@ namespace Infection\Tests\Logger;
 use function getenv;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Environment\TravisCiResolver;
-use Infection\Http\BadgeApiClient;
+use Infection\Http\StrykerDashboardClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -54,7 +54,7 @@ final class BadgeLoggerTest extends TestCase
     private $outputMock;
 
     /**
-     * @var BadgeApiClient|MockObject
+     * @var StrykerDashboardClient|MockObject
      */
     private $badgeApiClientMock;
 
@@ -105,12 +105,8 @@ final class BadgeLoggerTest extends TestCase
     protected function setUp(): void
     {
         $this->outputMock = $this->createMock(OutputInterface::class);
-        $this->badgeApiClientMock = $this->createMock(BadgeApiClient::class);
+        $this->badgeApiClientMock = $this->createMock(StrykerDashboardClient::class);
         $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
-
-        $config = (object) [
-            'branch' => 'master',
-        ];
 
         $this->badgeLogger = new BadgeLogger(
             $this->outputMock,
@@ -118,7 +114,7 @@ final class BadgeLoggerTest extends TestCase
             new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,
-            $config
+            'master'
         );
     }
 
@@ -128,7 +124,7 @@ final class BadgeLoggerTest extends TestCase
 
         $this->outputMock
             ->method('writeln')
-            ->with('Dashboard report has not been sent: it is not a Travis CI')
+            ->with('Dashboard report has not been sent: The current process is not executed in a Travis CI build')
         ;
 
         $this->badgeApiClientMock
@@ -146,7 +142,7 @@ final class BadgeLoggerTest extends TestCase
 
         $this->outputMock
             ->method('writeln')
-            ->with('Dashboard report has not been sent: build is for a pull request (TRAVIS_PULL_REQUEST=123)')
+            ->with('Dashboard report has not been sent: The current process is a pull request build (TRAVIS_PULL_REQUEST=123)')
         ;
 
         $this->badgeApiClientMock
@@ -166,7 +162,7 @@ final class BadgeLoggerTest extends TestCase
 
         $this->outputMock
             ->method('writeln')
-            ->with('Dashboard report has not been sent: repository slug nor current branch were found; not a Travis build?')
+            ->with('Dashboard report has not been sent: Could not find the repository slug (TRAVIS_REPO_SLUG) or branch (TRAVIS_BRANCH)')
         ;
 
         $this->badgeApiClientMock
@@ -185,7 +181,7 @@ final class BadgeLoggerTest extends TestCase
 
         $this->outputMock
             ->method('writeln')
-            ->with('Dashboard report has not been sent: repository slug nor current branch were found; not a Travis build?')
+            ->with('Dashboard report has not been sent: Could not find the repository slug (TRAVIS_REPO_SLUG) or branch (TRAVIS_BRANCH)')
         ;
 
         $this->badgeApiClientMock
@@ -205,7 +201,7 @@ final class BadgeLoggerTest extends TestCase
 
         $this->outputMock
             ->method('writeln')
-            ->with('Dashboard report has not been sent: expected branch "master", found "foo"')
+            ->with('Dashboard report has not been sent: Expected branch "master", found "foo"')
         ;
 
         $this->badgeApiClientMock

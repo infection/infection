@@ -36,28 +36,22 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Generator;
-use Infection\Container;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
 
 final class LineRangeCalculatorTest extends TestCase
 {
     /**
-     * @var Parser|null
-     */
-    private static $parser;
-
-    /**
      * @dataProvider provideCodeAndRangeCases
      */
     public function test_it_can_find_the_outer_most_array(string $code, array $nodeRange): void
     {
-        $nodes = self::getParser()->parse($code);
+        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
 
         $spy = $this->createSpyTraverser();
 
@@ -162,10 +156,5 @@ PHP
                 return null;
             }
         };
-    }
-
-    private static function getParser(): Parser
-    {
-        return self::$parser ?? self::$parser = Container::create()->getParser();
     }
 }

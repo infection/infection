@@ -112,6 +112,13 @@ final class Engine
 
     private function runInitialTestSuite(): void
     {
+        if ($this->config->shouldSkipInitialTests()) {
+            $this->consoleOutput->logSkippingInitialTests();
+            $this->assertCodeCoverageExists($this->config->getTestFramework());
+
+            return;
+        }
+
         $initialTestSuitProcess = $this->initialTestsRunner->run(
             $this->config->getTestFrameworkExtraOptions(),
             $this->config->shouldSkipCoverage(),
@@ -122,7 +129,7 @@ final class Engine
             throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuitProcess, $this->adapter);
         }
 
-        $this->assertCodeCoverageExists($initialTestSuitProcess, $this->config->getTestFramework());
+        $this->assertCodeCoverageProduced($initialTestSuitProcess, $this->config->getTestFramework());
 
         $this->memoryLimitApplier->applyMemoryLimitFromProcess($initialTestSuitProcess, $this->adapter);
     }
@@ -170,7 +177,22 @@ final class Engine
         return true;
     }
 
-    private function assertCodeCoverageExists(Process $initialTestsProcess, string $testFrameworkKey): void
+    private function assertCodeCoverageExists(string $testFrameworkKey): void
+    {
+        $coverageDir = $this->config->getCoveragePath();
+
+        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME;
+
+        if (!file_exists($coverageIndexFilePath)) {
+            throw CoverageDoesNotExistException::with(
+                $coverageIndexFilePath,
+                $testFrameworkKey,
+                dirname($coverageIndexFilePath, 2)
+            );
+        }
+    }
+
+    private function assertCodeCoverageProduced(Process $initialTestsProcess, string $testFrameworkKey): void
     {
         $coverageDir = $this->config->getCoveragePath();
 

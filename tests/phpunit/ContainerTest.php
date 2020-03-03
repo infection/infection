@@ -62,7 +62,7 @@ final class ContainerTest extends TestCase
 
     public function test_it_can_be_instantiated_with_the_project_services(): void
     {
-        $container = Container::create();
+        $container = SingletonContainer::getContainer();
 
         $container->getFileSystem();
 
@@ -71,7 +71,7 @@ final class ContainerTest extends TestCase
 
     public function test_it_can_build_dynamic_services(): void
     {
-        $container = Container::create();
+        $container = SingletonContainer::getContainer();
 
         // Sanity check
         try {
@@ -96,6 +96,7 @@ final class ContainerTest extends TestCase
             false,
             '/path/to/coverage',
             '',
+            false,
             false,
             .0,
             .0,

@@ -350,7 +350,7 @@ Escaped mutants:
 - echo 'original';
 + echo 'escaped#1';
 
-
+process output
 
 2) foo/bar:10    [M] For_
 
@@ -361,7 +361,7 @@ Escaped mutants:
 - echo 'original';
 + echo 'escaped#0';
 
-
+process output
 Timed Out mutants:
 ==================
 
@@ -375,7 +375,7 @@ Timed Out mutants:
 - echo 'original';
 + echo 'timedOut#1';
 
-
+process output
 
 2) foo/bar:10    [M] For_
 
@@ -386,7 +386,7 @@ Timed Out mutants:
 - echo 'original';
 + echo 'timedOut#0';
 
-
+process output
 Killed mutants:
 ===============
 
@@ -400,7 +400,7 @@ Killed mutants:
 - echo 'original';
 + echo 'killed#1';
 
-
+process output
 
 2) foo/bar:10    [M] For_
 
@@ -411,7 +411,7 @@ Killed mutants:
 - echo 'original';
 + echo 'killed#0';
 
-
+process output
 Errors mutants:
 ===============
 
@@ -425,7 +425,7 @@ Errors mutants:
 - echo 'original';
 + echo 'error#1';
 
-
+process output
 
 2) foo/bar:10    [M] For_
 
@@ -436,7 +436,7 @@ Errors mutants:
 - echo 'original';
 + echo 'error#0';
 
-
+process output
 Not Covered mutants:
 ====================
 
@@ -450,7 +450,7 @@ Not Covered mutants:
 - echo 'original';
 + echo 'notCovered#1';
 
-
+process output
 
 2) foo/bar:10    [M] For_
 
@@ -461,7 +461,7 @@ Not Covered mutants:
 - echo 'original';
 + echo 'notCovered#0';
 
-
+process output
 TXT
         ];
 
@@ -558,7 +558,7 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'escaped#1';
 
-
+process output
 
 2) foo/bar:10    [M] For_
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
@@ -569,7 +569,7 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'escaped#0';
 
-
+process output
 Timed Out mutants:
 ==================
 
@@ -583,7 +583,7 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'timedOut#1';
 
-
+process output
 
 2) foo/bar:10    [M] For_
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
@@ -594,7 +594,7 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'timedOut#0';
 
-
+process output
 Killed mutants:
 ===============
 
@@ -608,7 +608,7 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'killed#1';
 
-
+process output
 
 2) foo/bar:10    [M] For_
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
@@ -619,7 +619,7 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'killed#0';
 
-
+process output
 Errors mutants:
 ===============
 
@@ -633,7 +633,7 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'error#1';
 
-
+process output
 
 2) foo/bar:10    [M] For_
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
@@ -644,7 +644,7 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'error#0';
 
-
+process output
 Not Covered mutants:
 ====================
 
@@ -658,7 +658,7 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'notCovered#1';
 
-
+process output
 
 2) foo/bar:10    [M] For_
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
@@ -669,7 +669,7 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'notCovered#0';
 
-
+process output
 TXT
         ];
     }

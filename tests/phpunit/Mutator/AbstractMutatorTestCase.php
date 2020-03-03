@@ -40,20 +40,16 @@ use function count;
 use function escapeshellarg;
 use function exec;
 use function get_class;
-use Infection\Container;
 use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorFactory;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
+use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
 use PhpParser\NodeTraverser;
-use PhpParser\Parser;
-use PhpParser\PrettyPrinter\Standard;
-use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
@@ -64,21 +60,6 @@ abstract class AbstractMutatorTestCase extends TestCase
      * @var Mutator
      */
     protected $mutator;
-
-    /**
-     * @var Parser|null
-     */
-    private static $parser;
-
-    /**
-     * @var PrettyPrinterAbstract|null
-     */
-    private static $printer;
-
-    /**
-     * @var MutatorFactory|null
-     */
-    private static $mutatorFactory;
 
     protected function setUp(): void
     {
@@ -135,9 +116,12 @@ abstract class AbstractMutatorTestCase extends TestCase
         $mutatorClassName = SourceTestClassNameScheme::getSourceClassName(get_class($this));
 
         // TODO: this is a bit ridicule...
-        return self::getMutatorFactory()->create([
-            $mutatorClassName => ['settings' => $settings],
-        ])[MutatorName::getName($mutatorClassName)];
+        return SingletonContainer::getContainer()
+            ->getMutatorFactory()
+            ->create([
+                $mutatorClassName => ['settings' => $settings],
+            ])[MutatorName::getName($mutatorClassName)]
+        ;
     }
 
     /**
@@ -159,7 +143,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
             $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
-            $mutants[] = self::getPrinter()->prettyPrintFile($mutatedStatements);
+            $mutants[] = SingletonContainer::getPrinter()->prettyPrintFile($mutatedStatements);
 
             $traverser->removeVisitor($mutatorVisitor);
         }
@@ -167,39 +151,12 @@ abstract class AbstractMutatorTestCase extends TestCase
         return $mutants;
     }
 
-    private static function getParser(): Parser
-    {
-        if (self::$parser === null) {
-            self::$parser = Container::create()->getParser();
-        }
-
-        return self::$parser;
-    }
-
-    private static function getPrinter(): PrettyPrinterAbstract
-    {
-        if (self::$printer === null) {
-            self::$printer = new Standard();
-        }
-
-        return self::$printer;
-    }
-
-    private static function getMutatorFactory(): MutatorFactory
-    {
-        if (self::$mutatorFactory === null) {
-            self::$mutatorFactory = new MutatorFactory();
-        }
-
-        return self::$mutatorFactory;
-    }
-
     /**
      * @return SimpleMutation[]
      */
     private function getMutationsFromCode(string $code, array $settings): array
     {
-        $nodes = self::getParser()->parse($code);
+        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
 
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor(
             $this->createMutator($settings),

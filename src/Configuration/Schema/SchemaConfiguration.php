@@ -52,6 +52,9 @@ final class SchemaConfiguration
     private $logs;
     private $tmpDir;
     private $phpUnit;
+    private $ignoreMsiWithNoMutations;
+    private $minMsi;
+    private $minCoveredMsi;
     private $mutators;
     private $testFramework;
     private $bootstrap;
@@ -68,6 +71,9 @@ final class SchemaConfiguration
         Logs $logs,
         ?string $tmpDir,
         PhpUnit $phpUnit,
+        ?bool $ignoreMsiWithNoMutations,
+        ?float $minMsi,
+        ?float $minCoveredMsi,
         array $mutators,
         ?string $testFramework,
         ?string $bootstrap,
@@ -83,6 +89,9 @@ final class SchemaConfiguration
         $this->logs = $logs;
         $this->tmpDir = $tmpDir;
         $this->phpUnit = $phpUnit;
+        $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
+        $this->minMsi = $minMsi;
+        $this->minCoveredMsi = $minCoveredMsi;
         $this->mutators = $mutators;
         $this->testFramework = $testFramework;
         $this->bootstrap = $bootstrap;
@@ -118,6 +127,21 @@ final class SchemaConfiguration
     public function getPhpUnit(): PhpUnit
     {
         return $this->phpUnit;
+    }
+
+    public function getIgnoreMsiWithNoMutations(): ?bool
+    {
+        return $this->ignoreMsiWithNoMutations;
+    }
+
+    public function getMinMsi(): ?float
+    {
+        return $this->minMsi;
+    }
+
+    public function getMinCoveredMsi(): ?float
+    {
+        return $this->minCoveredMsi;
     }
 
     /**

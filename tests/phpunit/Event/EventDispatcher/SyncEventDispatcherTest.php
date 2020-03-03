@@ -47,18 +47,21 @@ final class SyncEventDispatcherTest extends TestCase
     public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
     {
         $userSubscriber = new UserEventSubscriber();
+        $nullSubscriber = new NullSubscriber(new UserWasCreated());
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber(new NullSubscriber());
+        $dispatcher->addSubscriber($nullSubscriber);
         $dispatcher->addSubscriber(new UnknownEventSubscriber());
 
         // Sanity check
         $this->assertSame(0, $userSubscriber->count);
+        $this->assertSame(1, $nullSubscriber->count);
 
         $dispatcher->dispatch(new UserWasCreated());
         $dispatcher->dispatch(new UserWasCreated());
 
         $this->assertSame(2, $userSubscriber->count);
+        $this->assertSame(1, $nullSubscriber->count);
     }
 }

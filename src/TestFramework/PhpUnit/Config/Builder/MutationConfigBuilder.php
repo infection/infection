@@ -38,13 +38,12 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 use DOMDocument;
 use DOMNode;
 use DOMNodeList;
-use DOMXPath;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\TestFramework\SafeQuery;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
@@ -54,12 +53,10 @@ use Webmozart\Assert\Assert;
  */
 class MutationConfigBuilder extends ConfigBuilder
 {
-    use SafeQuery;
-
     private $tmpDir;
     private $projectDir;
     private $originalXmlConfigContent;
-    private $xmlConfigurationHelper;
+    private $configManipulator;
     private $jUnitTestCaseSorter;
 
     /**
@@ -75,7 +72,7 @@ class MutationConfigBuilder extends ConfigBuilder
     public function __construct(
         string $tmpDir,
         string $originalXmlConfigContent,
-        XmlConfigurationHelper $xmlConfigurationHelper,
+        XmlConfigurationManipulator $configManipulator,
         string $projectDir,
         JUnitTestCaseSorter $jUnitTestCaseSorter
     ) {
@@ -83,7 +80,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->projectDir = $projectDir;
 
         $this->originalXmlConfigContent = $originalXmlConfigContent;
-        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
+        $this->configManipulator = $configManipulator;
         $this->jUnitTestCaseSorter = $jUnitTestCaseSorter;
     }
 
@@ -97,21 +94,23 @@ class MutationConfigBuilder extends ConfigBuilder
         string $mutationOriginalFilePath
     ): string {
         $dom = $this->getDom();
-        $xPath = new DOMXPath($dom);
+        $xPath = new SafeDOMXPath($dom);
 
-        $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
+        $this->configManipulator->replaceWithAbsolutePaths($xPath);
 
-        if ($this->originalBootstrapFile === null) {
-            $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
+        $originalBootstrapFile = $this->originalBootstrapFile;
+
+        if ($originalBootstrapFile === null) {
+            $originalBootstrapFile = $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
         }
 
-        $this->xmlConfigurationHelper->setStopOnFailure($xPath);
-        $this->xmlConfigurationHelper->deactivateColours($xPath);
-        $this->xmlConfigurationHelper->deactivateResultCaching($xPath);
-        $this->xmlConfigurationHelper->deactivateStderrRedirection($xPath);
-        $this->xmlConfigurationHelper->removeExistingLoggers($xPath);
-        $this->xmlConfigurationHelper->removeExistingPrinters($xPath);
-        $this->xmlConfigurationHelper->removeDefaultTestSuite($xPath);
+        $this->configManipulator->setStopOnFailure($xPath);
+        $this->configManipulator->deactivateColours($xPath);
+        $this->configManipulator->deactivateResultCaching($xPath);
+        $this->configManipulator->deactivateStderrRedirection($xPath);
+        $this->configManipulator->removeExistingLoggers($xPath);
+        $this->configManipulator->removeExistingPrinters($xPath);
+        $this->configManipulator->removeDefaultTestSuite($xPath);
 
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
@@ -121,9 +120,6 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
         $this->setFilteredTestsToRun($coverageTests, $dom, $xPath);
-
-        $originalBootstrapFile = $this->originalBootstrapFile;
-        Assert::string($originalBootstrapFile);
 
         file_put_contents(
             $customAutoloadFilePath,
@@ -150,7 +146,9 @@ class MutationConfigBuilder extends ConfigBuilder
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
-        $dom->loadXML($this->originalXmlConfigContent);
+        $success = @$dom->loadXML($this->originalXmlConfigContent);
+
+        Assert::true($success);
 
         return $this->dom = $dom;
     }
@@ -185,14 +183,14 @@ PHP
         );
     }
 
-    private function setCustomBootstrapPath(string $customAutoloadFilePath, DOMXPath $xPath): void
+    private function setCustomBootstrapPath(string $customAutoloadFilePath, SafeDOMXPath $xPath): void
     {
-        $bootstrap = self::safeQuery($xPath, '/phpunit/@bootstrap');
+        $bootstrap = $xPath->query('/phpunit/@bootstrap');
 
         if ($bootstrap->length) {
             $bootstrap[0]->nodeValue = $customAutoloadFilePath;
         } else {
-            $node = self::safeQuery($xPath, '/phpunit')[0];
+            $node = $xPath->query('/phpunit')[0];
             $node->setAttribute('bootstrap', $customAutoloadFilePath);
         }
     }
@@ -200,22 +198,22 @@ PHP
     /**
      * @param CoverageLineData[] $coverageTests
      */
-    private function setFilteredTestsToRun(array $coverageTests, DOMDocument $dom, DOMXPath $xPath): void
+    private function setFilteredTestsToRun(array $coverageTests, DOMDocument $dom, SafeDOMXPath $xPath): void
     {
         $this->removeExistingTestSuite($xPath);
 
         $this->addTestSuiteWithFilteredTestFiles($coverageTests, $dom, $xPath);
     }
 
-    private function removeExistingTestSuite(DOMXPath $xPath): void
+    private function removeExistingTestSuite(SafeDOMXPath $xPath): void
     {
         $this->removeExistingTestSuiteNodes(
-            self::safeQuery($xPath, '/phpunit/testsuites/testsuite')
+            $xPath->query('/phpunit/testsuites/testsuite')
         );
 
         // Handle situation when test suite is directly inside root node
         $this->removeExistingTestSuiteNodes(
-            self::safeQuery($xPath, '/phpunit/testsuite')
+            $xPath->query('/phpunit/testsuite')
         );
     }
 
@@ -239,15 +237,15 @@ PHP
     private function addTestSuiteWithFilteredTestFiles(
         array $coverageTestCases,
         DOMDocument $dom,
-        DOMXPath $xPath
+        SafeDOMXPath $xPath
     ): void {
-        $testSuites = self::safeQuery($xPath, '/phpunit/testsuites');
+        $testSuites = $xPath->query('/phpunit/testsuites');
 
         $nodeToAppendTestSuite = $testSuites->item(0);
 
         // If there is no `testsuites` node, append to root
         if (!$nodeToAppendTestSuite) {
-            $nodeToAppendTestSuite = $testSuites = self::safeQuery($xPath, '/phpunit')->item(0);
+            $nodeToAppendTestSuite = $testSuites = $xPath->query('/phpunit')->item(0);
         }
 
         $testSuite = $dom->createElement('testsuite');
@@ -266,9 +264,9 @@ PHP
         $nodeToAppendTestSuite->appendChild($testSuite);
     }
 
-    private function getOriginalBootstrapFilePath(DOMXPath $xPath): string
+    private function getOriginalBootstrapFilePath(SafeDOMXPath $xPath): string
     {
-        $bootstrap = self::safeQuery($xPath, '/phpunit/@bootstrap');
+        $bootstrap = $xPath->query('/phpunit/@bootstrap');
 
         if ($bootstrap->length) {
             return $bootstrap[0]->nodeValue;

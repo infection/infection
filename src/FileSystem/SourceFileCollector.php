@@ -39,7 +39,6 @@ use function array_filter;
 use function array_map;
 use function explode;
 use Infection\FileSystem\Finder\FilterableFinder;
-use function iterator_to_array;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -53,13 +52,13 @@ class SourceFileCollector
      * @param string[] $sourceDirectories
      * @param string[] $excludeDirectories
      *
-     * @return SplFileInfo[]
+     * @return iterable<SplFileInfo>
      */
     public function collectFiles(
         array $sourceDirectories,
         array $excludeDirectories,
         string $filter
-    ): array {
+    ): iterable {
         if ([] === $sourceDirectories) {
             return [];
         }
@@ -83,9 +82,6 @@ class SourceFileCollector
             );
         }
 
-        return iterator_to_array(
-            $finder,
-            false
-        );
+        return $finder;
     }
 }
