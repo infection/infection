@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use PHPUnit\Framework\TestCase;
@@ -46,6 +46,7 @@ use function Safe\preg_replace;
 use function Safe\realpath;
 use function Safe\sprintf;
 use function str_replace;
+use Webmozart\PathUtil\Path;
 
 /**
  * @group integration Requires some I/O operations
@@ -343,11 +344,13 @@ XML;
             $this->parser->parse($xml);
 
             $this->fail();
-        } catch (CoverageDoesNotExistException $exception) {
+        } catch (InvalidCoverage $exception) {
             $this->assertSame(
                 sprintf(
-                    'Source file zeroLevel.php was not found at %s/zeroLevel.php',
-                    $incorrectCoverageSrcDir
+                    'Could not find the source file "%s/zeroLevel.php" referred by '
+                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
+                    $incorrectCoverageSrcDir,
+                    Path::canonicalize(self::FIXTURES_COVERAGE_DIR)
                 ),
                 $exception->getMessage()
             );

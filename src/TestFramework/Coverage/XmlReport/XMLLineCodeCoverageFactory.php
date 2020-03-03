@@ -74,7 +74,6 @@ final class XMLLineCodeCoverageFactory
             new PhpUnitXmlCoverageFactory(
                 $this->coverageDir,
                 $this->coverageXmlParser,
-                $testFrameworkKey,
                 $testFileDataProviderService
             )
         );

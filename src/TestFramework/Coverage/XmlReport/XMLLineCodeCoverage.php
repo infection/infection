@@ -39,7 +39,6 @@ use function array_key_exists;
 use function count;
 use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -93,8 +92,6 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return Generator<CoverageLineData>
      */
     private function getTestsForFunctionSignature(string $filePath, NodeLineRangeData $lineRange): Generator
@@ -105,8 +102,6 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return Generator<CoverageLineData>
      */
     private function getTestsForLineRange(string $filePath, NodeLineRangeData $lineRange): Generator
@@ -117,8 +112,6 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return CoverageLineData[]
      */
     private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array
@@ -155,8 +148,6 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return array<string, CoverageFileData>
      */
     private function getCoverage(): array

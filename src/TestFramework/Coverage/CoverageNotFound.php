@@ -33,50 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Event;
+namespace Infection\TestFramework\Coverage;
 
-use function array_filter;
-use function array_values;
-use Generator;
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use function Infection\Tests\generator_to_phpunit_data_provider;
-use function iterator_to_array;
-use ReflectionClass;
+use InvalidArgumentException;
 
-final class SubscriberProvider
+/**
+ * @internal
+ */
+final class CoverageNotFound extends InvalidArgumentException
 {
-    /**
-     * @var string[]|null
-     */
-    private static $subscriberClasses;
-
-    private function __construct()
-    {
-    }
-
-    public static function provideSubscriberClasses(): Generator
-    {
-        if (self::$subscriberClasses !== null) {
-            yield from self::$subscriberClasses;
-
-            return;
-        }
-
-        self::$subscriberClasses = array_values(array_filter(
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
-            static function (string $class): bool {
-                return $class !== EventSubscriber::class
-                    && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class)
-                ;
-            }
-        ));
-
-        yield from self::$subscriberClasses;
-    }
-
-    public static function subscriberClassesProvider(): Generator
-    {
-        yield from generator_to_phpunit_data_provider(self::provideSubscriberClasses());
-    }
 }

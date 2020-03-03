@@ -73,7 +73,6 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
-use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -85,6 +84,7 @@ use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\MemoizedTestFileDataProvider;
@@ -293,13 +293,15 @@ final class Container
             MutatorParser::class => static function (): MutatorParser {
                 return new MutatorParser();
             },
-            CoverageRequirementChecker::class => static function (self $container): CoverageRequirementChecker {
+            CoverageChecker::class => static function (self $container): CoverageChecker {
                 $config = $container->getConfiguration();
 
-                return new CoverageRequirementChecker(
+                return new CoverageChecker(
                     $config->shouldSkipCoverage(),
                     $config->shouldSkipInitialTests(),
-                    $config->getInitialTestsPhpOptions() ?? ''
+                    $config->getInitialTestsPhpOptions() ?? '',
+                    $config->getCoveragePath(),
+                    $container->getJUnitFilePath()
                 );
             },
             TestRunConstraintChecker::class => static function (self $container): TestRunConstraintChecker {
@@ -682,9 +684,9 @@ final class Container
         return $this->get(MutatorParser::class);
     }
 
-    public function getCoverageRequirementChecker(): CoverageRequirementChecker
+    public function getCoverageChecker(): CoverageChecker
     {
-        return $this->get(CoverageRequirementChecker::class);
+        return $this->get(CoverageChecker::class);
     }
 
     public function getTestRunConstraintChecker(): TestRunConstraintChecker

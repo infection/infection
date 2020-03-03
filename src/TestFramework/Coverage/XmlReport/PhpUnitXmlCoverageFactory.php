@@ -35,11 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use function dirname;
 use function explode;
-use function file_exists;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use function Safe\file_get_contents;
@@ -58,38 +55,25 @@ class PhpUnitXmlCoverageFactory
     private $coverageDir;
     private $parser;
     private $testFileDataProvider;
-    private $testFrameworkKey;
 
     public function __construct(
         string $coverageDir,
         IndexXmlCoverageParser $coverageXmlParser,
-        string $testFrameworkKey,
         ?TestFileDataProvider $testFileDataProvider
     ) {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;
         $this->testFileDataProvider = $testFileDataProvider;
-        $this->testFrameworkKey = $testFrameworkKey;
     }
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return array<string, CoverageFileData>
      */
     public function createCoverage(): array
     {
-        $coverageIndexFilePath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
-
-        if (!file_exists($coverageIndexFilePath)) {
-            throw CoverageDoesNotExistException::with(
-                $coverageIndexFilePath,
-                $this->testFrameworkKey,
-                dirname($coverageIndexFilePath, 2)
-            );
-        }
-
-        $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
+        $coverageIndexFileContent = file_get_contents(
+            $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME
+        );
 
         $coverage = $this->parser->parse($coverageIndexFileContent);
 

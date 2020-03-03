@@ -39,13 +39,12 @@ use function array_filter;
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
+use function file_exists;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\SafeDOMXPath;
-use function realpath as native_realpath;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\sprintf;
@@ -53,6 +52,7 @@ use function Safe\substr;
 use function str_replace;
 use function trim;
 use Webmozart\Assert\Assert;
+use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -72,7 +72,6 @@ class IndexXmlCoverageParser
      * contain all the desired data.
      *
      * @throws NoLineExecuted
-     * @throws CoverageDoesNotExistException
      *
      * @return CoverageFileData[]
      */
@@ -138,23 +137,26 @@ class IndexXmlCoverageParser
 
     /**
      * @param array<string, CoverageFileData> $data
-     *
-     * @throws CoverageDoesNotExistException
      */
     private function processCoverageFile(
         string $relativeCoverageFilePath,
         string $projectSource,
         array &$data
     ): void {
-        $xPath = self::createXPath(file_get_contents(
+        $coverageFilePath = Path::canonicalize(
             $this->coverageDir . '/' . $relativeCoverageFilePath
-        ));
+        );
 
-        $sourceFilePath = self::retrieveSourceFilePath($xPath, $relativeCoverageFilePath, $projectSource);
+        $xPath = self::createXPath(file_get_contents($coverageFilePath));
 
-        $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
+        $sourceFilePath = self::retrieveSourceFilePath(
+            $coverageFilePath,
+            $xPath,
+            $relativeCoverageFilePath,
+            $projectSource
+        );
 
-        $percentage = $linesNode->getAttribute('percent');
+        $percentage = $xPath->query('/phpunit/file/totals/lines')[0]->getAttribute('percent');
 
         if (substr($percentage, -1) === '%') {
             // In PHPUnit <6 the percentage value would take the form "0.00%" in _some_ cases.
@@ -197,10 +199,8 @@ class IndexXmlCoverageParser
         );
     }
 
-    /**
-     * @throws CoverageDoesNotExistException
-     */
     private static function retrieveSourceFilePath(
+        string $coverageFilePath,
         SafeDOMXPath $xPath,
         string $relativeCoverageFilePath,
         string $projectSource
@@ -222,18 +222,21 @@ class IndexXmlCoverageParser
             );
         }
 
-        $path = implode(
+        $path = Path::canonicalize(implode(
             '/',
             array_filter([$projectSource, trim($relativeFilePath, '/'), $fileName])
-        );
+        ));
 
-        $realPath = native_realpath($path);
-
-        if ($realPath === false) {
-            throw CoverageDoesNotExistException::forFileAtPath($fileName, $path);
+        if (!file_exists($path)) {
+            throw new InvalidCoverage(sprintf(
+                'Could not find the source file "%s" referred by "%s". Make sure the '
+                . 'coverage used is up to date',
+                $path,
+                $coverageFilePath
+            ));
         }
 
-        return $realPath;
+        return $path;
     }
 
     /**

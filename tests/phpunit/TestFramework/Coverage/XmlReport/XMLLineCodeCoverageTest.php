@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -250,26 +249,6 @@ final class XMLLineCodeCoverageTest extends TestCase
         );
 
         $this->assertCount(6, $tests);
-    }
-
-    public function test_it_throws_an_exception_when_no_coverage_found(): void
-    {
-        $coverageFactoryMock = $this->createMock(PhpUnitXmlCoverageFactory::class);
-        $coverageFactoryMock
-            ->expects($this->once())
-            ->method('createCoverage')
-            ->willThrowException($exception = new CoverageDoesNotExistException())
-        ;
-
-        $coverage = new XMLLineCodeCoverage($coverageFactoryMock);
-
-        try {
-            $coverage->hasTests('/path/to/random-file');
-
-            $this->fail();
-        } catch (CoverageDoesNotExistException $caughtException) {
-            $this->assertSame($exception, $caughtException);
-        }
     }
 
     private function getParsedCodeCoverageData(): array
