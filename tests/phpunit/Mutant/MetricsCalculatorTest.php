@@ -41,7 +41,6 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class MetricsCalculatorTest extends TestCase
@@ -155,7 +154,7 @@ final class MetricsCalculatorTest extends TestCase
     }
 
     /**
-     * @return (MutantExecutionResult|MockObject)[]
+     * @return MutantExecutionResult[]
      */
     private function addMutantExecutionResult(
         MetricsCalculator $calculator,
