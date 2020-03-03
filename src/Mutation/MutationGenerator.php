@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileWasProcessed;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
+use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
@@ -53,7 +53,7 @@ use Webmozart\Assert\Assert;
 final class MutationGenerator
 {
     /**
-     * @var SplFileInfo[]
+     * @var iterable<SplFileInfo>
      */
     private $sourceFiles;
 
@@ -65,19 +65,20 @@ final class MutationGenerator
     private $codeCoverageData;
     private $eventDispatcher;
     private $fileMutationGenerator;
+    private $runConcurrently;
 
     /**
-     * @param SplFileInfo[] $sourceFiles
+     * @param iterable<SplFileInfo> $sourceFiles
      * @param Mutator[] $mutators
      */
     public function __construct(
-        array $sourceFiles,
+        iterable $sourceFiles,
         LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcher $eventDispatcher,
-        FileMutationGenerator $fileMutationGenerator
+        FileMutationGenerator $fileMutationGenerator,
+        bool $runConcurrently
     ) {
-        Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
         $this->sourceFiles = $sourceFiles;
@@ -85,6 +86,7 @@ final class MutationGenerator
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileMutationGenerator = $fileMutationGenerator;
+        $this->runConcurrently = $runConcurrently;
     }
 
     /**
@@ -97,7 +99,9 @@ final class MutationGenerator
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
-        $this->eventDispatcher->dispatch(new MutationGenerationWasStarted(count($this->sourceFiles)));
+        $numberOfFiles = IterableCounter::bufferAndCountIfNeeded($this->sourceFiles, $this->runConcurrently);
+
+        $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
         foreach ($this->sourceFiles as $fileInfo) {
             yield from $this->fileMutationGenerator->generate(

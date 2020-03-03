@@ -33,38 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Tests\Logger;
 
-use Infection\Mutant\MutantExecutionResult;
+use function Infection\Tests\normalizeLineReturn;
+use Psr\Log\AbstractLogger;
+use Webmozart\Assert\Assert;
 
-/**
- * @internal
- *
- * Abstract empty class to simplify particular implementations
- */
-abstract class AbstractOutputFormatter implements OutputFormatter
+final class DummyLogger extends AbstractLogger
 {
-    /**
-     * In progress bar lingo 0 stands for an unknown number of steps.
-     */
-    public const UNKNOWN_COUNT = 0;
+    private $logs = [];
 
-    /**
-     * @var int
-     */
-    protected $callsCount = 0;
-
-    public function start(int $mutationCount): void
+    public function log($level, $message, array $context = []): void
     {
-        $this->callsCount = 0;
+        Assert::string($level);
+        Assert::string($message);
+
+        $this->logs[] = [
+            $level,
+            normalizeLineReturn($message),
+            $context,
+        ];
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function getLogs(): array
     {
-        ++$this->callsCount;
-    }
-
-    public function finish(): void
-    {
+        return $this->logs;
     }
 }

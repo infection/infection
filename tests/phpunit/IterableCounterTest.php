@@ -33,38 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Tests;
 
-use Infection\Mutant\MutantExecutionResult;
+use Infection\IterableCounter;
+use Iterator;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * Abstract empty class to simplify particular implementations
- */
-abstract class AbstractOutputFormatter implements OutputFormatter
+final class IterableCounterTest extends TestCase
 {
-    /**
-     * In progress bar lingo 0 stands for an unknown number of steps.
-     */
-    public const UNKNOWN_COUNT = 0;
-
-    /**
-     * @var int
-     */
-    protected $callsCount = 0;
-
-    public function start(int $mutationCount): void
+    public function test_it_does_not_count_when_not_asked(): void
     {
-        $this->callsCount = 0;
+        $iterator = $this->createMock(Iterator::class);
+
+        $count = IterableCounter::bufferAndCountIfNeeded($iterator, true);
+
+        $this->assertSame(0, $count);
+        $this->assertInstanceOf(Iterator::class, $iterator);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function test_it_counts_array(): void
     {
-        ++$this->callsCount;
+        $array = [1, 2, 3];
+
+        $count = IterableCounter::bufferAndCountIfNeeded($array, false);
+
+        $this->assertSame(3, $count);
+        $this->assertSame([1, 2, 3], $array);
     }
 
-    public function finish(): void
+    public function test_it_counts_iterator(): void
     {
+        $generator = (static function () {
+            yield from [1 => 1, 2, 3];
+        })();
+
+        $count = IterableCounter::bufferAndCountIfNeeded($generator, false);
+
+        $this->assertSame(3, $count);
+        $this->assertIsArray($generator);
+        $this->assertSame([1, 2, 3], $generator);
     }
 }
