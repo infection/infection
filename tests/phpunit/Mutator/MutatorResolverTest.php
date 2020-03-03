@@ -63,7 +63,7 @@ final class MutatorResolverTest extends TestCase
         $this->mutatorResolver = SingletonContainer::getContainer()->getMutatorResolver();
     }
 
-    public function test_it_resolve_no_mutator_if_no_profile_or_mutator_is_passed(): void
+    public function test_it_resolves_no_mutator_if_no_profile_or_mutator_is_passed(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve([]);
 
