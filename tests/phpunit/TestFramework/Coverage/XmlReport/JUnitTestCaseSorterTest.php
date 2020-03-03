@@ -41,6 +41,26 @@ use PHPUnit\Framework\TestCase;
 
 final class JUnitTestCaseSorterTest extends TestCase
 {
+    public function test_it_returns_first_file_name_if_there_is_only_one(): void
+    {
+        $coverageTestCases = [
+            CoverageLineData::with(
+                'testMethod1',
+                '/path/to/test-file-1',
+                0.000234
+            ),
+        ];
+
+        $sorter = new JUnitTestCaseSorter();
+
+        $uniqueSortedFileNames = iterator_to_array(
+            $sorter->getUniqueSortedFileNames($coverageTestCases)
+        );
+
+        $this->assertCount(1, $uniqueSortedFileNames);
+        $this->assertSame('/path/to/test-file-1', $uniqueSortedFileNames[0]);
+    }
+
     public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
     {
         $coverageTestCases = [
@@ -68,7 +88,9 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         $sorter = new JUnitTestCaseSorter();
 
-        $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
+        $uniqueSortedFileNames = iterator_to_array(
+            $sorter->getUniqueSortedFileNames($coverageTestCases)
+        );
 
         $this->assertCount(3, $uniqueSortedFileNames);
         $this->assertSame('/path/to/test-file-3', $uniqueSortedFileNames[0]);
