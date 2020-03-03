@@ -35,113 +35,50 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Generator;
 use Infection\Logger\PerMutatorLogger;
 use Infection\Mutant\MetricsCalculator;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration Requires some I/O operations
- */
 final class PerMutatorLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
-
-    private const LOG_FILE_PATH = '/path/to/text.log';
-
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    use LineLoggerAssertions;
 
     /**
-     * @var OutputInterface|MockObject
+     * @dataProvider metricsProvider
      */
-    private $outputMock;
+    public function test_it_logs_correctly_with_mutations(
+        MetricsCalculator $metricsCalculator,
+        string $expectedContents
+    ): void {
+        $logger = new PerMutatorLogger($metricsCalculator);
 
-    protected function setUp(): void
-    {
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
-        $this->outputMock = $this->createMock(OutputInterface::class);
+        $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function test_it_correctly_build_log_lines(): void
+    public function metricsProvider(): Generator
     {
-        $expectedContent = <<<'TXT'
+        yield 'no mutations' => [
+            new MetricsCalculator(),
+            <<<'TXT'
+# Effects per Mutator
+
+| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |
+| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |
+TXT
+        ];
+
+        yield 'all mutations' => [
+            $this->createCompleteMetricsCalculator(),
+            <<<'TXT'
 # Effects per Mutator
 
 | Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |
 | ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |
 | For_ | 4 | 1 | 1 | 0 | 1 | 50| 66|
 | PregQuote | 4 | 1 | 1 | 0 | 1 | 50| 66|
-TXT;
-
-        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
-
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $expectedContent)
-        ;
-
-        $perMutatorLogger = new PerMutatorLogger(
-            $this->outputMock,
-            self::LOG_FILE_PATH,
-            $this->createCompleteMetricsCalculator(),
-            $this->fileSystemMock,
-            true,
-            true
-        );
-
-        $perMutatorLogger->log();
-    }
-
-    public function test_it_cannot_log_on_invalid_streams(): void
-    {
-        $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with('<error>The only streams supported are php://stdout and php://stderr</error>')
-        ;
-
-        $debugFileLogger = new PerMutatorLogger(
-            $this->outputMock,
-            'php://memory',
-            new MetricsCalculator(),
-            $this->fileSystemMock,
-            false,
-            false
-        );
-
-        $debugFileLogger->log();
-    }
-
-    public function test_it_fails_if_cannot_write_file(): void
-    {
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $this->anything())
-            ->willThrowException(new IOException('Cannot write in directory X'));
-
-        $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with('<error>Cannot write in directory X</error>')
-        ;
-
-        $debugFileLogger = new PerMutatorLogger(
-            $this->outputMock,
-            self::LOG_FILE_PATH,
-            new MetricsCalculator(),
-            $this->fileSystemMock,
-            false,
-            false
-        );
-
-        $debugFileLogger->log();
+TXT
+        ];
     }
 }

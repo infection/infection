@@ -339,10 +339,10 @@ final class InfectionCommand extends BaseCommand
     {
         try {
             $locator->locateOneOf([
-                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
                 SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
+                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
             ]);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [

@@ -35,29 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Mutant\MetricsCalculator;
-
 /**
  * @internal
  */
-final class SummaryFileLogger implements LineMutationTestingResultsLogger
+final class LoggerRegistry implements MutationTestingResultsLogger
 {
-    private $metricsCalculator;
+    /**
+     * @var MutationTestingResultsLogger[]
+     */
+    private $loggers;
 
-    public function __construct(MetricsCalculator $metricsCalculator)
+    public function __construct(MutationTestingResultsLogger ...$loggers)
     {
-        $this->metricsCalculator = $metricsCalculator;
+        $this->loggers = $loggers;
     }
 
-    public function getLogLines(): array
+    public function log(): void
     {
-        return [
-            'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
-            'Killed: ' . $this->metricsCalculator->getKilledCount(),
-            'Errored: ' . $this->metricsCalculator->getErrorCount(),
-            'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
-            'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
-            'Not Covered: ' . $this->metricsCalculator->getNotCoveredByTestsCount(),
-        ];
+        foreach ($this->loggers as $logger) {
+            $logger->log();
+        }
     }
 }

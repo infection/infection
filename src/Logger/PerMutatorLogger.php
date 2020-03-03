@@ -42,14 +42,21 @@ use function Safe\ksort;
 /**
  * @internal
  */
-final class PerMutatorLogger extends FileLogger
+final class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
     /**
      * @var MetricsCalculator[]
      */
     private $calculatorPerMutator = [];
 
-    protected function getLogLines(): array
+    private $metricsCalculator;
+
+    public function __construct(MetricsCalculator $metricsCalculator)
+    {
+        $this->metricsCalculator = $metricsCalculator;
+    }
+
+    public function getLogLines(): array
     {
         $this->setUpPerCalculatorMutator();
 

@@ -33,31 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection;
 
-use Infection\Mutant\MetricsCalculator;
+use function count;
+use Infection\Console\OutputFormatter\AbstractOutputFormatter;
+use function is_array;
+use function iterator_to_array;
 
 /**
  * @internal
  */
-final class SummaryFileLogger implements LineMutationTestingResultsLogger
+final class IterableCounter
 {
-    private $metricsCalculator;
-
-    public function __construct(MetricsCalculator $metricsCalculator)
+    private function __construct()
     {
-        $this->metricsCalculator = $metricsCalculator;
     }
 
-    public function getLogLines(): array
+    /**
+     * @param iterable<mixed> $subjects
+     */
+    public static function bufferAndCountIfNeeded(iterable &$subjects, bool $runConcurrently): int
     {
-        return [
-            'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
-            'Killed: ' . $this->metricsCalculator->getKilledCount(),
-            'Errored: ' . $this->metricsCalculator->getErrorCount(),
-            'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
-            'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
-            'Not Covered: ' . $this->metricsCalculator->getNotCoveredByTestsCount(),
-        ];
+        if ($runConcurrently) {
+            // This number is typically fed to ProgressFormatter/ProgressBar or variants.
+            return AbstractOutputFormatter::UNKNOWN_COUNT;
+        }
+
+        if (is_array($subjects)) {
+            return count($subjects);
+        }
+
+        $subjects = iterator_to_array($subjects, false);
+
+        return count($subjects);
     }
 }

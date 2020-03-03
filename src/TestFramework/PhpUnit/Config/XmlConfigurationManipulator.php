@@ -36,12 +36,11 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config;
 
 use DOMElement;
-use DOMXPath;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
 use function implode;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\SafeQuery;
+use Infection\TestFramework\SafeDOMXPath;
 use const LIBXML_ERR_ERROR;
 use const LIBXML_ERR_FATAL;
 use const LIBXML_ERR_WARNING;
@@ -57,8 +56,6 @@ use Webmozart\Assert\Assert;
  */
 final class XmlConfigurationManipulator
 {
-    use SafeQuery;
-
     private $pathReplacer;
     private $phpUnitConfigDir;
 
@@ -68,7 +65,7 @@ final class XmlConfigurationManipulator
         $this->phpUnitConfigDir = $phpUnitConfigDir;
     }
 
-    public function replaceWithAbsolutePaths(DOMXPath $xPath): void
+    public function replaceWithAbsolutePaths(SafeDOMXPath $xPath): void
     {
         $queries = [
             '/phpunit/@bootstrap',
@@ -77,31 +74,31 @@ final class XmlConfigurationManipulator
             '//file',
         ];
 
-        foreach (self::safeQuery($xPath, implode('|', $queries)) as $node) {
+        foreach ($xPath->query(implode('|', $queries)) as $node) {
             $this->pathReplacer->replaceInNode($node);
         }
     }
 
-    public function removeExistingLoggers(DOMXPath $xPath): void
+    public function removeExistingLoggers(SafeDOMXPath $xPath): void
     {
-        foreach (self::safeQuery($xPath, '/phpunit/logging') as $node) {
+        foreach ($xPath->query('/phpunit/logging') as $node) {
             $document = $xPath->document->documentElement;
             Assert::isInstanceOf($document, DOMElement::class);
             $document->removeChild($node);
         }
     }
 
-    public function deactivateResultCaching(DOMXPath $xPath): void
+    public function deactivateResultCaching(SafeDOMXPath $xPath): void
     {
         $this->setAttributeValue($xPath, 'cacheResult', 'false');
     }
 
-    public function deactivateStderrRedirection(DOMXPath $xPath): void
+    public function deactivateStderrRedirection(SafeDOMXPath $xPath): void
     {
         $this->setAttributeValue($xPath, 'stderr', 'false');
     }
 
-    public function setStopOnFailure(DOMXPath $xPath): void
+    public function setStopOnFailure(SafeDOMXPath $xPath): void
     {
         $this->setAttributeValue(
             $xPath,
@@ -110,7 +107,7 @@ final class XmlConfigurationManipulator
         );
     }
 
-    public function deactivateColours(DOMXPath $xPath): void
+    public function deactivateColours(SafeDOMXPath $xPath): void
     {
         $this->setAttributeValue(
             $xPath,
@@ -119,7 +116,7 @@ final class XmlConfigurationManipulator
         );
     }
 
-    public function removeExistingPrinters(DOMXPath $xPath): void
+    public function removeExistingPrinters(SafeDOMXPath $xPath): void
     {
         $this->removeAttribute(
             $xPath,
@@ -127,17 +124,17 @@ final class XmlConfigurationManipulator
         );
     }
 
-    public function validate(string $configPath, DOMXPath $xPath): bool
+    public function validate(string $configPath, SafeDOMXPath $xPath): bool
     {
-        if (self::safeQuery($xPath, '/phpunit')->length === 0) {
+        if ($xPath->query('/phpunit')->length === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
 
-        if (self::safeQuery($xPath, 'namespace::xsi')->length === 0) {
+        if ($xPath->query('namespace::xsi')->length === 0) {
             return true;
         }
 
-        $schema = self::safeQuery($xPath, '/phpunit/@xsi:noNamespaceSchemaLocation');
+        $schema = $xPath->query('/phpunit/@xsi:noNamespaceSchemaLocation');
 
         $original = libxml_use_internal_errors(true);
         $schemaPath = $this->buildSchemaPath($schema[0]->nodeValue);
@@ -154,7 +151,7 @@ final class XmlConfigurationManipulator
         return true;
     }
 
-    public function removeDefaultTestSuite(DOMXPath $xPath): void
+    public function removeDefaultTestSuite(SafeDOMXPath $xPath): void
     {
         $this->removeAttribute(
             $xPath,
@@ -198,9 +195,9 @@ final class XmlConfigurationManipulator
         return $schemaPath;
     }
 
-    private function removeAttribute(DOMXPath $xPath, string $name): void
+    private function removeAttribute(SafeDOMXPath $xPath, string $name): void
     {
-        $nodeList = self::safeQuery($xPath, sprintf(
+        $nodeList = $xPath->query(sprintf(
             '/phpunit/@%s',
             $name
         ));
@@ -212,9 +209,9 @@ final class XmlConfigurationManipulator
         }
     }
 
-    private function setAttributeValue(DOMXPath $xPath, string $name, string $value): void
+    private function setAttributeValue(SafeDOMXPath $xPath, string $name, string $value): void
     {
-        $nodeList = self::safeQuery($xPath, sprintf(
+        $nodeList = $xPath->query(sprintf(
             '/phpunit/@%s',
             $name
         ));
@@ -222,7 +219,7 @@ final class XmlConfigurationManipulator
         if ($nodeList->length) {
             $nodeList[0]->nodeValue = $value;
         } else {
-            $node = self::safeQuery($xPath, '/phpunit')[0];
+            $node = $xPath->query('/phpunit')[0];
             $node->setAttribute($name, $value);
         }
     }

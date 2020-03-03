@@ -33,31 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Tests;
 
-use Infection\Mutant\MetricsCalculator;
+use Infection\IterableCounter;
+use Iterator;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class SummaryFileLogger implements LineMutationTestingResultsLogger
+final class IterableCounterTest extends TestCase
 {
-    private $metricsCalculator;
-
-    public function __construct(MetricsCalculator $metricsCalculator)
+    public function test_it_does_not_count_when_not_asked(): void
     {
-        $this->metricsCalculator = $metricsCalculator;
+        $iterator = $this->createMock(Iterator::class);
+
+        $count = IterableCounter::bufferAndCountIfNeeded($iterator, true);
+
+        $this->assertSame(0, $count);
+        $this->assertInstanceOf(Iterator::class, $iterator);
     }
 
-    public function getLogLines(): array
+    public function test_it_counts_array(): void
     {
-        return [
-            'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
-            'Killed: ' . $this->metricsCalculator->getKilledCount(),
-            'Errored: ' . $this->metricsCalculator->getErrorCount(),
-            'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
-            'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
-            'Not Covered: ' . $this->metricsCalculator->getNotCoveredByTestsCount(),
-        ];
+        $array = [1, 2, 3];
+
+        $count = IterableCounter::bufferAndCountIfNeeded($array, false);
+
+        $this->assertSame(3, $count);
+        $this->assertSame([1, 2, 3], $array);
+    }
+
+    public function test_it_counts_iterator(): void
+    {
+        $generator = (static function () {
+            yield from [1 => 1, 2, 3];
+        })();
+
+        $count = IterableCounter::bufferAndCountIfNeeded($generator, false);
+
+        $this->assertSame(3, $count);
+        $this->assertIsArray($generator);
+        $this->assertSame([1, 2, 3], $generator);
     }
 }

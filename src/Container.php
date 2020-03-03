@@ -399,7 +399,8 @@ final class Container
                     ),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
-                    $container->getFileMutationGenerator()
+                    $container->getFileMutationGenerator(),
+                    $container->getConfiguration()->noProgress()
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
@@ -457,8 +458,8 @@ final class Container
                     array_filter(
                         [
                             $configFile,
-                            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
                             SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
+                            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
                         ]
                     )
                 );

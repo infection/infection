@@ -36,8 +36,11 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function implode;
+use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
+use const PHP_EOL;
 use function Safe\sprintf;
+use function str_repeat;
 use function strlen;
 
 /**
@@ -45,32 +48,41 @@ use function strlen;
  *
  * @internal
  */
-final class DebugFileLogger extends FileLogger
+final class DebugFileLogger implements LineMutationTestingResultsLogger
 {
-    protected function getLogLines(): array
+    private $metricsCalculator;
+    private $onlyCoveredMode;
+
+    public function __construct(MetricsCalculator $metricsCalculator, bool $onlyCoveredMode)
+    {
+        $this->metricsCalculator = $metricsCalculator;
+        $this->onlyCoveredMode = $onlyCoveredMode;
+    }
+
+    public function getLogLines(): array
     {
         $logs = [];
 
         $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
-        $logs[] = $this->converExecutionResult(
+        $logs[] = $this->convertExecutionResult(
             $this->metricsCalculator->getKilledMutantExecutionResults(),
             'Killed'
         );
-        $logs[] = $this->converExecutionResult(
+        $logs[] = $this->convertExecutionResult(
             $this->metricsCalculator->getErrorMutantExecutionResults(),
             'Errors'
         );
-        $logs[] = $this->converExecutionResult(
+        $logs[] = $this->convertExecutionResult(
             $this->metricsCalculator->getEscapedMutantExecutionResults(),
             'Escaped'
         );
-        $logs[] = $this->converExecutionResult(
+        $logs[] = $this->convertExecutionResult(
             $this->metricsCalculator->getTimedOutMutantExecutionResults(),
             'Timed Out'
         );
 
-        if (!$this->isOnlyCoveredMode) {
-            $logs[] = $this->converExecutionResult(
+        if (!$this->onlyCoveredMode) {
+            $logs[] = $this->convertExecutionResult(
                 $this->metricsCalculator->getNotCoveredMutantExecutionResults(),
                 'Not Covered'
             );
@@ -82,10 +94,11 @@ final class DebugFileLogger extends FileLogger
     /**
      * @param MutantExecutionResult[] $executionResults
      */
-    private function converExecutionResult(array $executionResults, string $headlinePrefix): string
+    private function convertExecutionResult(array $executionResults, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
-        $this->sortProcesses($executionResults);
+
+        ExecutionResultSorter::sortResults($executionResults);
 
         foreach ($executionResults as $executionResult) {
             $logParts[] = '';

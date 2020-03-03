@@ -33,20 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Tests\TestFramework;
 
-/**
- * @internal
- */
-final class ResultsLoggerTypes
+use DOMDocument;
+use Infection\TestFramework\SafeDOMXPath;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+
+final class SafeDOMXPathTest extends TestCase
 {
-    public const TEXT_FILE = 'text';
-    public const SUMMARY_FILE = 'summary';
-    public const DEBUG_FILE = 'debug';
-    public const BADGE = 'badge';
-    public const PER_MUTATOR = 'perMutator';
+    public function test_it_reads_xml(): void
+    {
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
+        $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
+    }
 
-    public const ALLOWED_WITHOUT_LOGGING = [
-        self::BADGE,
-    ];
+    public function test_it_fails_on_invalid_query(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
+        $xPath->query('#');
+    }
+
+    public function test_it_fails_on_invalid_xml(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        SafeDOMXPath::fromString('<?xml version="1.0"?><foo>');
+    }
+
+    public function test_it_has_document_property(): void
+    {
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><test/>');
+        $this->assertInstanceOf(DOMDocument::class, $xPath->document);
+    }
 }

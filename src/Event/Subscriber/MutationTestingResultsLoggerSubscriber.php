@@ -37,29 +37,21 @@ namespace Infection\Event\Subscriber;
 
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Logger\MutationTestingResultsLogger;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class MutationTestingResultsLoggerSubscriber implements EventSubscriber
 {
-    private $loggers;
+    private $logger;
 
-    /**
-     * @param MutationTestingResultsLogger[] $loggers
-     */
-    public function __construct(array $loggers)
+    public function __construct(MutationTestingResultsLogger $logger)
     {
-        Assert::allIsInstanceOf($loggers, MutationTestingResultsLogger::class);
-
-        $this->loggers = $loggers;
+        $this->logger = $logger;
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        foreach ($this->loggers as $logger) {
-            $logger->log();
-        }
+        $this->logger->log();
     }
 }
