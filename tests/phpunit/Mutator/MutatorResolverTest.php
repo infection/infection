@@ -45,6 +45,7 @@ use Infection\Mutator\Boolean\NotIdenticalNotEqual;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\ProfileList;
+use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -62,14 +63,14 @@ final class MutatorResolverTest extends TestCase
         $this->mutatorResolver = SingletonContainer::getContainer()->getMutatorResolver();
     }
 
-    public function test_it_resolves_no_mutator_if_no_profile_or_mutator_is_passed(): void
+    public function test_it_resolve_no_mutator_if_no_profile_or_mutator_is_passed(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve([]);
 
         $this->assertCount(0, $resolvedMutators);
     }
 
-    public function test_it_can_resolves_the_mutators_for_a_given_profile(): void
+    public function test_it_can_resolve_the_mutators_for_a_given_profile(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve(['@boolean' => true]);
 
@@ -79,7 +80,7 @@ final class MutatorResolverTest extends TestCase
         );
     }
 
-    public function test_it_can_resolves_the_mutators_with_empty_settings_for_a_given_profile(): void
+    public function test_it_can_resolve_the_mutators_with_empty_settings_for_a_given_profile(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve(['@boolean' => []]);
 
@@ -89,7 +90,7 @@ final class MutatorResolverTest extends TestCase
         );
     }
 
-    public function test_it_can_resolves_the_profile_mutators_with_the_given_settings(): void
+    public function test_it_can_resolve_the_profile_mutators_with_the_given_settings(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve([
             '@default' => true,
@@ -239,6 +240,43 @@ final class MutatorResolverTest extends TestCase
             ProfileList::EQUAL_PROFILE,
             $resolvedMutators
         );
+    }
+
+    public function test_it_can_resolve_mutators_with_global_settings(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            'ignore' => ['A::B'],
+            MutatorName::getName(Plus::class) => true,
+            MutatorName::getName(For_::class) => false,
+            MutatorName::getName(IdenticalEqual::class) => [
+                'ignore' => ['B::C'],
+            ],
+        ]);
+
+        $this->assertSameMutatorsByClass(
+            [
+                Plus::class,
+                IdenticalEqual::class,
+            ],
+            $resolvedMutators
+        );
+
+        $this->assertSame(['ignore' => ['A::B']], $resolvedMutators[Plus::class]);
+        $this->assertSame(['ignore' => ['A::B', 'B::C']], $resolvedMutators[IdenticalEqual::class]);
+    }
+
+    public function test_it_always_enrich_global_settings_for_a_mutator_regardless_of_the_order(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            MutatorName::getName(Plus::class) => [
+                'ignore' => ['B::C'],
+            ],
+            'ignore' => ['A::B'],
+        ]);
+
+        $this->assertSameMutatorsByClass([Plus::class], $resolvedMutators);
+
+        $this->assertSame(['ignore' => ['A::B', 'B::C']], $resolvedMutators[Plus::class]);
     }
 
     public function test_it_cannot_resolve_mutators_for_unknown_profiles(): void

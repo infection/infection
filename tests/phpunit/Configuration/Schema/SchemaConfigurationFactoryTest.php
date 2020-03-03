@@ -851,6 +851,66 @@ JSON
             ]),
         ];
 
+        yield '[mutators][global ignore] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ignore": ["A::B"]
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'ignore' => ['A::B'],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][global ignore] empty & untrimmed ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ignore": [" file ", " "]
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'ignore' => [' file ', ' '],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][global ignore] empty' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ignore": []
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'ignore' => [],
+                ],
+            ]),
+        ];
+
         yield '[mutators][TrueValue] true' => [
             <<<'JSON'
 {

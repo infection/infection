@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use function array_key_exists;
+use function array_merge_recursive;
 use function class_exists;
+use function count;
 use InvalidArgumentException;
 use function Safe\sprintf;
 use stdClass;
@@ -59,7 +61,20 @@ final class MutatorResolver
     {
         $mutators = [];
 
+        $globalSettings = [];
+
         foreach ($mutatorSettings as $mutatorOrProfile => $setting) {
+            if ($mutatorOrProfile === 'ignore') {
+                $globalSettings = ['ignore' => $setting];
+                unset($mutatorSettings['ignore']);
+
+                break;
+            }
+        }
+
+        foreach ($mutatorSettings as $mutatorOrProfile => $setting) {
+            $setting = self::resolveSettings($setting, $globalSettings);
+
             if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
                 self::registerFromProfile(
                     $mutatorOrProfile,
@@ -87,6 +102,25 @@ final class MutatorResolver
         }
 
         return $mutators;
+    }
+
+    /**
+     * @param array<string, string>|bool $settings
+     * @param array<string, string> $globalSettings
+     *
+     * @return array<string, string>|bool
+     */
+    private static function resolveSettings($settings, array $globalSettings)
+    {
+        if ($settings === false || count($globalSettings) === 0) {
+            return $settings;
+        }
+
+        if ($settings === true) {
+            return $globalSettings;
+        }
+
+        return array_merge_recursive($globalSettings, (array) $settings);
     }
 
     /**
@@ -166,7 +200,7 @@ final class MutatorResolver
         if ($settings === false) {
             unset($mutators[$mutatorClassName]);
         } else {
-            $mutators[$mutatorClassName] = $settings === true ? [] : (array) $settings;
+            $mutators[$mutatorClassName] = (array) $settings;
         }
     }
 }
