@@ -76,8 +76,8 @@ TXT
 
 | Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |
 | ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |
-| For_ | 4 | 1 | 1 | 0 | 1 | 50| 66|
-| PregQuote | 4 | 1 | 1 | 0 | 1 | 50| 66|
+| For_ | 5 | 1 | 1 | 1 | 1 | 60| 75|
+| PregQuote | 5 | 1 | 1 | 1 | 1 | 60| 75|
 TXT
         ];
     }

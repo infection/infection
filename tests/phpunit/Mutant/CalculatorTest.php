@@ -38,10 +38,14 @@ namespace Infection\Tests\Mutant;
 use function array_sum;
 use Generator;
 use Infection\Mutant\Calculator;
+use Infection\Mutant\MetricsCalculator;
+use Infection\Tests\Logger\CreateMetricsCalculator;
 use PHPUnit\Framework\TestCase;
 
 final class CalculatorTest extends TestCase
 {
+    use CreateMetricsCalculator;
+
     /**
      * @dataProvider metricsProvider
      */
@@ -72,6 +76,27 @@ final class CalculatorTest extends TestCase
         $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
         $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
         $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
+
+        // The calls are idempotent
+        $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
+        $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
+        $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
+    }
+
+    /**
+     * @dataProvider metricsCalculatorProvider
+     */
+    public function test_it_can_be_created_from_a_metrics_calculator(
+        MetricsCalculator $metricsCalculator,
+        float $expectedMsi,
+        float $expectedCoverageRate,
+        float $expectedCoveredMsi
+    ): void {
+        $calculator = Calculator::fromMetrics($metricsCalculator);
+
+        $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
+        $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
+        $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
     public function metricsProvider(): Generator
@@ -85,6 +110,17 @@ final class CalculatorTest extends TestCase
             0.,
             0.,
             0.,
+        ];
+
+        yield 'int scores' => [
+            1,
+            0,
+            9,
+            0,
+            0,
+            10.,
+            100.0,
+            10.0,
         ];
 
         yield 'nominal' => [
@@ -107,6 +143,23 @@ final class CalculatorTest extends TestCase
             84.61538461538461,
             100,
             84.61538461538461,
+        ];
+    }
+
+    public function metricsCalculatorProvider(): Generator
+    {
+        yield 'empty' => [
+            new MetricsCalculator(),
+            0.,
+            0.,
+            0.,
+        ];
+
+        yield 'nominal' => [
+            $this->createCompleteMetricsCalculator(),
+            60.,
+            80.0,
+            75.0,
         ];
     }
 }

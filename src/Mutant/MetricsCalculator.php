@@ -245,6 +245,6 @@ class MetricsCalculator
 
     private function getCalculator(): Calculator
     {
-        return $this->calculator ?? Calculator::createMetrics($this);
+        return $this->calculator ?? Calculator::fromMetrics($this);
     }
 }

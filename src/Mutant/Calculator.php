@@ -75,7 +75,7 @@ final class Calculator
         $this->totalCount = $totalCount;
     }
 
-    public static function createMetrics(MetricsCalculator $calculator): self
+    public static function fromMetrics(MetricsCalculator $calculator): self
     {
         return new self(
             $calculator->getKilledCount(),
@@ -103,7 +103,7 @@ final class Calculator
             $score = 100 * $coveredTotal / $totalCount;
         }
 
-        return $this->mutationScoreIndicator = (float) $score;
+        return $this->mutationScoreIndicator = $score;
     }
 
     /**
@@ -123,7 +123,7 @@ final class Calculator
             $coveredRate = 100 * $testedTotal / $totalCount;
         }
 
-        return $this->coverageRate = (float) $coveredRate;
+        return $this->coverageRate = $coveredRate;
     }
 
     /**
@@ -143,6 +143,6 @@ final class Calculator
             $score = 100 * $coveredTotal / $testedTotal;
         }
 
-        return $this->coveredMutationScoreIndicator = (float) $score;
+        return $this->coveredMutationScoreIndicator = $score;
     }
 }

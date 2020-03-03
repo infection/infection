@@ -51,7 +51,7 @@ final class SortableMutantExecutionResultsTest extends TestCase
      * @param MutantExecutionResult[] $executionResults
      * @param MutantExecutionResult[] $expectedResults
      */
-    public function test_it_can_sort_processes(array $executionResults, array $expectedResults): void
+    public function test_it_can_sort_results(array $executionResults, array $expectedResults): void
     {
         $sortableResults = new SortableMutantExecutionResults();
 
@@ -60,6 +60,42 @@ final class SortableMutantExecutionResultsTest extends TestCase
         }
 
         $this->assertSame($expectedResults, $sortableResults->getSortedExecutionResults());
+    }
+
+    public function test_it_keeps_results_sorted_as_they_are_added(): void
+    {
+        $sortableResults = new SortableMutantExecutionResults();
+
+        $result0 = $this->createExecutionResult(
+            0,
+            '/path/to/Foo.php',
+            10
+        );
+        $result1 = $this->createExecutionResult(
+            1,
+            '/path/to/Bar.php',
+            10
+        );
+        $result2 = $this->createExecutionResult(
+            2,
+            '/path/to/Bar.php',
+            13
+        );
+
+        $sortableResults->add($result0);
+        $sortableResults->add($result1);
+
+        $this->assertSame(
+            [$result1, $result0],
+            $sortableResults->getSortedExecutionResults()
+        );
+
+        $sortableResults->add($result2);
+
+        $this->assertSame(
+            [$result1, $result2, $result0],
+            $sortableResults->getSortedExecutionResults()
+        );
     }
 
     public function resultsProvider(): Generator
