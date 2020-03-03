@@ -38,15 +38,10 @@ namespace Infection\Logger;
 /**
  * @internal
  */
-final class ResultsLoggerTypes
+interface LineMutationTestingResultsLogger
 {
-    public const TEXT_FILE = 'text';
-    public const SUMMARY_FILE = 'summary';
-    public const DEBUG_FILE = 'debug';
-    public const BADGE = 'badge';
-    public const PER_MUTATOR = 'perMutator';
-
-    public const ALLOWED_WITHOUT_LOGGING = [
-        self::BADGE,
-    ];
+    /**
+     * @return string[]
+     */
+    public function getLogLines(): array;
 }

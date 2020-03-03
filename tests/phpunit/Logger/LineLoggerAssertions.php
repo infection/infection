@@ -33,31 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Tests\Logger;
 
-use Infection\Mutant\MetricsCalculator;
+use Infection\Logger\LineMutationTestingResultsLogger;
+use function Infection\Tests\normalizeLineReturn;
 
-/**
- * @internal
- */
-final class SummaryFileLogger implements LineMutationTestingResultsLogger
+trait LineLoggerAssertions
 {
-    private $metricsCalculator;
-
-    public function __construct(MetricsCalculator $metricsCalculator)
-    {
-        $this->metricsCalculator = $metricsCalculator;
-    }
-
-    public function getLogLines(): array
-    {
-        return [
-            'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
-            'Killed: ' . $this->metricsCalculator->getKilledCount(),
-            'Errored: ' . $this->metricsCalculator->getErrorCount(),
-            'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
-            'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
-            'Not Covered: ' . $this->metricsCalculator->getNotCoveredByTestsCount(),
-        ];
+    private function assertLoggedContentIs(
+        string $expectedContents,
+        LineMutationTestingResultsLogger $logger
+    ): void {
+        $this->assertSame(
+            $expectedContents,
+            normalizeLineReturn(implode("\n", $logger->getLogLines()))
+        );
     }
 }

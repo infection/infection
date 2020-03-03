@@ -35,29 +35,35 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutant\MutantExecutionResult;
+use function Safe\usort;
 
 /**
  * @internal
  */
-final class SummaryFileLogger implements LineMutationTestingResultsLogger
+final class ExecutionResultSorter
 {
-    private $metricsCalculator;
-
-    public function __construct(MetricsCalculator $metricsCalculator)
+    private function __construct()
     {
-        $this->metricsCalculator = $metricsCalculator;
     }
 
-    public function getLogLines(): array
+    /**
+     * TODO: move this call in the metrics calculator otherwise the process is repeated for
+     *  multiple loggers
+     *
+     * @param MutantExecutionResult[] $executionResults
+     */
+    public static function sortResults(array &$executionResults): void
     {
-        return [
-            'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
-            'Killed: ' . $this->metricsCalculator->getKilledCount(),
-            'Errored: ' . $this->metricsCalculator->getErrorCount(),
-            'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
-            'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
-            'Not Covered: ' . $this->metricsCalculator->getNotCoveredByTestsCount(),
-        ];
+        usort(
+            $executionResults,
+            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
+                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
+                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
+                }
+
+                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
+            }
+        );
     }
 }

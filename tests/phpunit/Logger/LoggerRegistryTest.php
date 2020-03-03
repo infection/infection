@@ -33,31 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Tests\Logger;
 
-use Infection\Mutant\MetricsCalculator;
+use Infection\Logger\LoggerRegistry;
+use Infection\Logger\MutationTestingResultsLogger;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class SummaryFileLogger implements LineMutationTestingResultsLogger
+final class LoggerRegistryTest extends TestCase
 {
-    private $metricsCalculator;
-
-    public function __construct(MetricsCalculator $metricsCalculator)
+    public function test_it_logs_with_all_the_registered_loggers(): void
     {
-        $this->metricsCalculator = $metricsCalculator;
-    }
+        $logger1 = $this->createMock(MutationTestingResultsLogger::class);
+        $logger1
+            ->expects($this->once())
+            ->method('log')
+        ;
 
-    public function getLogLines(): array
-    {
-        return [
-            'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
-            'Killed: ' . $this->metricsCalculator->getKilledCount(),
-            'Errored: ' . $this->metricsCalculator->getErrorCount(),
-            'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
-            'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
-            'Not Covered: ' . $this->metricsCalculator->getNotCoveredByTestsCount(),
-        ];
+        $logger2 = $this->createMock(MutationTestingResultsLogger::class);
+        $logger2
+            ->expects($this->once())
+            ->method('log')
+        ;
+
+        (new LoggerRegistry($logger1, $logger2))->log();
     }
 }

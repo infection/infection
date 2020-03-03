@@ -58,7 +58,6 @@ use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Http\JsonClient;
 use Infection\Http\StrykerDashboardClient;
-use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
@@ -97,7 +96,6 @@ final class ProjectCodeProvider
         PhpProcess::class,
         ComposerExecutableFinder::class,
         JsonClient::class,
-        ResultsLoggerTypes::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
