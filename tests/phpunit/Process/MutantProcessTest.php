@@ -93,7 +93,7 @@ final class MutantProcessTest extends TestCase
             ->method('isCoveredByTest')
             ->willReturn(true);
 
-        $this->mutantProcess->markTimeout();
+        $this->mutantProcess->markAsTimedOut();
 
         $this->assertSame(MutantProcess::CODE_TIMED_OUT, $this->mutantProcess->getResultCode());
     }

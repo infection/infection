@@ -33,22 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Http;
+
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class MutantsCreationWasStarted
+final class Response
 {
-    private $mutantCount;
+    public const CREATED_RESPONSE_CODE = 201;
 
-    public function __construct(int $mutantCount)
+    private $statusCode;
+    private $body;
+
+    public function __construct(int $statusCode, string $body)
     {
-        $this->mutantCount = $mutantCount;
+        Assert::range(
+            $statusCode,
+            200,
+            599,
+            'Expected an HTTP status code. Got "%s"'
+        );
+
+        $this->statusCode = $statusCode;
+        $this->body = $body;
     }
 
-    public function getMutantCount(): int
+    public function getStatusCode(): int
     {
-        return $this->mutantCount;
+        return $this->statusCode;
+    }
+
+    public function getBody(): string
+    {
+        return $this->body;
     }
 }

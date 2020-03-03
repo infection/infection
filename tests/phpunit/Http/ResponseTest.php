@@ -33,11 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Tests\Http;
 
-/**
- * @internal
- */
-final class MutantsCreationWasFinished
+use Generator;
+use Infection\Http\Response;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+
+final class ResponseTest extends TestCase
 {
+    /**
+     * @dataProvider valueProvider
+     */
+    public function test_it_can_be_instantiated(int $statusCode, string $body): void
+    {
+        $response = new Response($statusCode, $body);
+
+        $this->assertSame($statusCode, $response->getStatusCode());
+        $this->assertSame($body, $response->getBody());
+    }
+
+    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_HTTP_status_code(): void
+    {
+        try {
+            new Response(102, '');
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected an HTTP status code. Got "102"',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function valueProvider(): Generator
+    {
+        yield 'empty' => [200, ''];
+
+        yield 'nominal' => [200, 'body'];
+    }
 }

@@ -102,6 +102,8 @@ final class FileMutationGeneratorTest extends TestCase
             []
         );
 
+        $mutations = iterator_to_array($mutations, false);
+
         foreach ($mutations as $mutation) {
             $this->assertInstanceOf(Mutation::class, $mutation);
         }
@@ -161,6 +163,8 @@ final class FileMutationGeneratorTest extends TestCase
             $nodeIgnorers
         );
 
+        $mutations = iterator_to_array($mutations, false);
+
         $this->assertSame([], $mutations);
     }
 
@@ -197,6 +201,8 @@ final class FileMutationGeneratorTest extends TestCase
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             []
         );
+
+        $mutations = iterator_to_array($mutations, false);
 
         $this->assertSame([], $mutations);
     }

@@ -33,41 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Process\Runner\Parallel;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutantsCreationWasStarted;
-use Infection\Event\Subscriber\CiMutantCreatingConsoleLoggerSubscriber;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 
-final class CiMutantCreatingConsoleLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+interface ProcessBearer
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    public function getProcess(): Process;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->output = $this->createMock(OutputInterface::class);
-    }
-
-    public function test_it_reacts_on_mutants_creating_event(): void
-    {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Creating mutated files and processes: 123',
-            ]);
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiMutantCreatingConsoleLoggerSubscriber($this->output));
-
-        $dispatcher->dispatch(new MutantsCreationWasStarted(123));
-    }
+    public function markAsTimedOut(): void;
 }

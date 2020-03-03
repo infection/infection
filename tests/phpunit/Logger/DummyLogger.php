@@ -33,20 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\Tests\Logger;
 
-use Infection\Event\MutantsCreationWasFinished;
-use PHPUnit\Framework\TestCase;
+use function Infection\Tests\normalizeLineReturn;
+use Psr\Log\AbstractLogger;
+use Webmozart\Assert\Assert;
 
-final class MutantsCreationWasFinishedTest extends TestCase
+final class DummyLogger extends AbstractLogger
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_instantiated(): void
-    {
-        $class = new MutantsCreationWasFinished();
+    private $logs = [];
 
-        $this->assertInstanceOf(MutantsCreationWasFinished::class, $class);
+    public function log($level, $message, array $context = []): void
+    {
+        Assert::string($level);
+        Assert::string($message);
+
+        $this->logs[] = [
+            $level,
+            normalizeLineReturn($message),
+            $context,
+        ];
+    }
+
+    public function getLogs(): array
+    {
+        return $this->logs;
     }
 }

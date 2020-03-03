@@ -33,20 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\Http;
 
-use Infection\Event\MutantWasCreated;
-use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use function Safe\json_encode;
+use function Safe\sprintf;
 
-final class MutantWasCreatedTest extends TestCase
+/**
+ * @internal
+ */
+class StrykerDashboardClient
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_instantiated(): void
-    {
-        $class = new MutantWasCreated();
+    private const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';
 
-        $this->assertInstanceOf(MutantWasCreated::class, $class);
+    private $client;
+    private $logger;
+
+    public function __construct(JsonClient $client, LoggerInterface $logger)
+    {
+        $this->client = $client;
+        $this->logger = $logger;
+    }
+
+    public function sendReport(
+        string $apiKey,
+        string $repositorySlug,
+        string $branch,
+        float $mutationScore
+    ): void {
+        $response = $this->client->request(
+            self::STRYKER_DASHBOARD_API_URL,
+            json_encode([
+                'apiKey' => $apiKey,
+                'repositorySlug' => $repositorySlug,
+                'branch' => $branch,
+                'mutationScore' => $mutationScore,
+            ])
+        );
+
+        $statusCode = $response->getStatusCode();
+
+        if ($statusCode !== Response::CREATED_RESPONSE_CODE) {
+            $this->logger->warning(sprintf(
+                'Stryker dashboard returned an unexpected response code: %s',
+                $statusCode)
+            );
+        }
+
+        $this->logger->notice(sprintf(
+            'Dashboard response:%s%s',
+            "\r\n",
+            $response->getBody()
+        ));
     }
 }

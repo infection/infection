@@ -40,8 +40,4 @@ namespace Infection\Event\Subscriber;
  */
 interface EventSubscriber
 {
-    /**
-     * @return array<string, callable>
-     */
-    public function getSubscribedEvents(): array;
 }
