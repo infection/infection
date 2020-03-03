@@ -92,8 +92,6 @@ final class AdapterInstallationDeciderTest extends TestCase
 
     public function test_it_should_not_install_when_user_answers_no(): void
     {
-        $installationDecider = new AdapterInstallationDecider(new QuestionHelper());
-
         $result = $this->installationDecider->shouldBeInstalled(
             TestFrameworkTypes::PHPSPEC,
             $this->createStreamableInputInterfaceMock($this->getInputStream("no\n")),
@@ -105,8 +103,6 @@ final class AdapterInstallationDeciderTest extends TestCase
 
     public function test_it_should_install_with_non_interactive_mode(): void
     {
-        $installationDecider = new AdapterInstallationDecider(new QuestionHelper());
-
         $result = $this->installationDecider->shouldBeInstalled(
             TestFrameworkTypes::PHPSPEC,
             $this->createStreamableInputInterfaceMock($this->getInputStream("no\n"), false),
@@ -118,8 +114,6 @@ final class AdapterInstallationDeciderTest extends TestCase
 
     public function test_it_should_install_when_user_answers_yes(): void
     {
-        $installationDecider = new AdapterInstallationDecider(new QuestionHelper());
-
         $streamOutput = $this->createMemoryStreamOutput();
 
         $result = $this->installationDecider->shouldBeInstalled(
