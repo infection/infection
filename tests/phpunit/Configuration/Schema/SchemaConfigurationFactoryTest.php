@@ -858,7 +858,7 @@ JSON
         "directories": ["src"]
     },
     "mutators": {
-        "ignore": ["A::B"]
+        "global-ignore": ["A::B"]
     }
 }
 JSON
@@ -866,7 +866,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
-                    'ignore' => ['A::B'],
+                    'global-ignore' => ['A::B'],
                 ],
             ]),
         ];
@@ -878,7 +878,7 @@ JSON
         "directories": ["src"]
     },
     "mutators": {
-        "ignore": [" file ", " "]
+        "global-ignore": [" file ", " "]
     }
 }
 JSON
@@ -886,7 +886,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
-                    'ignore' => [' file ', ' '],
+                    'global-ignore' => [' file ', ' '],
                 ],
             ]),
         ];
@@ -898,7 +898,7 @@ JSON
         "directories": ["src"]
     },
     "mutators": {
-        "ignore": []
+        "global-ignore": []
     }
 }
 JSON
@@ -906,7 +906,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
-                    'ignore' => [],
+                    'global-ignore' => [],
                 ],
             ]),
         ];
