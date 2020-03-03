@@ -37,7 +37,6 @@ namespace Infection\TestFramework;
 
 use Composer\Autoload\ClassLoader;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
-use function Safe\sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 
@@ -46,9 +45,12 @@ use Webmozart\Assert\Assert;
  */
 final class AdapterInstaller
 {
-    private const OFFICIAL_ADAPTERS = ['codeception', 'phpspec'];
+    private const OFFICIAL_ADAPTERS_MAP = [
+        TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
+        TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
+    ];
 
-    private const TIMEOUT = 180.0; // 3 minutes
+    private const TIMEOUT = 120.0; // 2 minutes
 
     private $composerExecutableFinder;
 
@@ -59,14 +61,12 @@ final class AdapterInstaller
 
     public function install(string $adapterName): void
     {
-        Assert::oneOf($adapterName, self::OFFICIAL_ADAPTERS);
-
-        $adapterComposerPackageName = sprintf('infection/%s-adapter', $adapterName);
+        Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
 
         $process = new Process([
             $this->composerExecutableFinder->find(),
             'require',
-            $adapterComposerPackageName,
+            self::OFFICIAL_ADAPTERS_MAP[$adapterName],
         ]);
 
         $process->setTimeout(self::TIMEOUT);
@@ -75,6 +75,7 @@ final class AdapterInstaller
 
         $loader = new ClassLoader();
 
+        /** @var array<string, string[]> $map */
         $map = require 'vendor/composer/autoload_psr4.php';
 
         foreach ($map as $namespace => $paths) {

@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\TestFramework\AdapterInstallationDecider;
+use Infection\TestFramework\TestFrameworkTypes;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\fopen;
 use function Safe\fwrite;
@@ -44,33 +46,45 @@ use function Safe\stream_get_contents;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StreamableInputInterface;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Terminal;
+use function trim;
 
 /**
  * @group integration
  */
 final class AdapterInstallationDeciderTest extends TestCase
 {
-    protected static $stty;
+    /**
+     * @var bool
+     */
+    private static $hasSttyAvailable;
+
+    /**
+     * @var AdapterInstallationDecider
+     */
+    private $installationDecider;
 
     protected function setUp(): void
     {
-        parent::setUp();
+        if (self::$hasSttyAvailable === null) {
+            self::$hasSttyAvailable = Terminal::hasSttyAvailable();
+        }
 
-        if (!$this->hasSttyAvailable()) {
+        if (!self::$hasSttyAvailable) {
             $this->markTestSkipped('Stty is not available');
         }
+
+        $this->installationDecider = new AdapterInstallationDecider(new QuestionHelper());
     }
 
     public function test_it_should_not_install_phpunit(): void
     {
-        $installationDecider = new AdapterInstallationDecider(new QuestionHelper());
-
-        $result = $installationDecider->shouldBeInstalled(
-            'phpunit',
+        $result = $this->installationDecider->shouldBeInstalled(
+            TestFrameworkTypes::PHPUNIT,
             $this->createMock(InputInterface::class),
-            $this->createMock(Output::class)
+            $this->createMock(OutputInterface::class)
         );
 
         $this->assertFalse($result, 'PHPUnit adapter should not be installed');
@@ -80,10 +94,10 @@ final class AdapterInstallationDeciderTest extends TestCase
     {
         $installationDecider = new AdapterInstallationDecider(new QuestionHelper());
 
-        $result = $installationDecider->shouldBeInstalled(
-            'phpspec',
+        $result = $this->installationDecider->shouldBeInstalled(
+            TestFrameworkTypes::PHPSPEC,
             $this->createStreamableInputInterfaceMock($this->getInputStream("no\n")),
-            $this->createOutputInterface()
+            $this->createMemoryStreamOutput()
         );
 
         $this->assertFalse($result, 'Adapter should not be installed since user answered "no"');
@@ -93,10 +107,10 @@ final class AdapterInstallationDeciderTest extends TestCase
     {
         $installationDecider = new AdapterInstallationDecider(new QuestionHelper());
 
-        $result = $installationDecider->shouldBeInstalled(
-            'phpspec',
+        $result = $this->installationDecider->shouldBeInstalled(
+            TestFrameworkTypes::PHPSPEC,
             $this->createStreamableInputInterfaceMock($this->getInputStream("no\n"), false),
-            $this->createOutputInterface()
+            $this->createMemoryStreamOutput()
         );
 
         $this->assertTrue($result, 'Adapter should be installed in non-interactive mode');
@@ -106,10 +120,10 @@ final class AdapterInstallationDeciderTest extends TestCase
     {
         $installationDecider = new AdapterInstallationDecider(new QuestionHelper());
 
-        $streamOutput = $this->createOutputInterface();
+        $streamOutput = $this->createMemoryStreamOutput();
 
-        $result = $installationDecider->shouldBeInstalled(
-            'phpspec',
+        $result = $this->installationDecider->shouldBeInstalled(
+            TestFrameworkTypes::PHPSPEC,
             $this->createStreamableInputInterfaceMock($this->getInputStream("yes\n")),
             $streamOutput
         );
@@ -120,12 +134,15 @@ final class AdapterInstallationDeciderTest extends TestCase
 
         $this->assertTrue($result, 'Adapter should be installed since user answered "yes"');
         $this->assertStringContainsString(
-            'Would you like to install infection/phpspec-adapter package? [yes]:',
+            'Would you like to install infection/phpspec-adapter? [yes]:',
             $output
         );
     }
 
-    protected function getInputStream(string $input)
+    /**
+     * @return resource
+     */
+    private function getInputStream(string $input)
     {
         $stream = fopen('php://memory', 'r+', false);
         fwrite($stream, $input);
@@ -134,28 +151,20 @@ final class AdapterInstallationDeciderTest extends TestCase
         return $stream;
     }
 
-    protected function createOutputInterface(): StreamOutput
+    private function createMemoryStreamOutput(): StreamOutput
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));
     }
 
-    protected function createStreamableInputInterfaceMock($stream, $interactive = true)
+    /**
+     * @return StreamableInputInterface|MockObject
+     */
+    private function createStreamableInputInterfaceMock($stream, $interactive = true)
     {
         $mock = $this->createMock(StreamableInputInterface::class);
         $mock->method('isInteractive')->willReturn($interactive);
         $mock->method('getStream')->willReturn($stream);
 
         return $mock;
-    }
-
-    protected function hasSttyAvailable(): bool
-    {
-        if (self::$stty !== null) {
-            return self::$stty;
-        }
-
-        exec('stty 2>&1', $output, $exitcode);
-
-        return self::$stty = $exitcode === 0;
     }
 }

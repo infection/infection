@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function array_key_exists;
+use function class_exists;
 use function Safe\sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,8 +49,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 final class AdapterInstallationDecider
 {
     private const ADAPTER_NAME_TO_CLASS_MAP = [
-        'codeception' => 'Infection\TestFramework\Codeception\CodeceptionAdapter',
-        'phpspec' => 'Infection\TestFramework\PhpSpec\PhpSpecAdapter',
+        TestFrameworkTypes::CODECEPTION => 'Infection\TestFramework\Codeception\CodeceptionAdapter',
+        TestFrameworkTypes::PHPSPEC => 'Infection\TestFramework\PhpSpec\PhpSpecAdapter',
     ];
 
     private $questionHelper;
@@ -60,7 +62,8 @@ final class AdapterInstallationDecider
 
     public function shouldBeInstalled(string $adapterName, InputInterface $input, OutputInterface $output): bool
     {
-        if (!array_key_exists($adapterName, self::ADAPTER_NAME_TO_CLASS_MAP) || class_exists(self::ADAPTER_NAME_TO_CLASS_MAP[$adapterName])) {
+        if (!array_key_exists($adapterName, self::ADAPTER_NAME_TO_CLASS_MAP)
+            || class_exists(self::ADAPTER_NAME_TO_CLASS_MAP[$adapterName])) {
             return false;
         }
 
@@ -70,7 +73,11 @@ final class AdapterInstallationDecider
 
         $question = new ConfirmationQuestion(
             sprintf(
-                "We noticed you are using Test Framework that is supported by external Infection Plugin. \nWould you like to install <comment>%s</comment> package? [<comment>yes</comment>]: ",
+                <<<TEXT
+We noticed you are using a test framework supported by an external Infection plugin.
+Would you like to install <comment>%s</comment>? [<comment>yes</comment>]:
+TEXT
+                ,
                 $composerPackage
             ),
             true
