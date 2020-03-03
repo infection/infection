@@ -112,7 +112,7 @@
             "additionalProperties": false,
             "description": "Contains the settings for different mutations and profiles",
             "properties": {
-                "ignore": {
+                "global-ignore": {
                     "type": "array",
                     "items": {
                         "type": "string"

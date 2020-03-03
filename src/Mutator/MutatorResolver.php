@@ -41,13 +41,14 @@ use function class_exists;
 use function count;
 use InvalidArgumentException;
 use function Safe\sprintf;
-use stdClass;
 
 /**
  * @internal
  */
 final class MutatorResolver
 {
+    private const GLOBAL_IGNORE_SETTING = 'global-ignore';
+
     /**
      * Resolves the given hashmap of enabled, disabled or configured mutators
      * and profiles into a hashmap of mutator raw settings by their mutator
@@ -63,10 +64,13 @@ final class MutatorResolver
 
         $globalSettings = [];
 
-        foreach ($mutatorSettings as $mutatorOrProfile => $setting) {
-            if ($mutatorOrProfile === 'ignore') {
-                $globalSettings = ['ignore' => $setting];
-                unset($mutatorSettings['ignore']);
+        foreach ($mutatorSettings as $mutatorOrProfileOrGlobalSettingKey => $setting) {
+            if ($mutatorOrProfileOrGlobalSettingKey === self::GLOBAL_IGNORE_SETTING) {
+                /** @var string[] $globalSetting */
+                $globalSetting = $setting;
+
+                $globalSettings = ['ignore' => $globalSetting];
+                unset($mutatorSettings[self::GLOBAL_IGNORE_SETTING]);
 
                 break;
             }
@@ -105,10 +109,10 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string>|bool $settings
-     * @param array<string, string> $globalSettings
+     * @param mixed[]|bool $settings
+     * @param array<string, string[]> $globalSettings
      *
-     * @return array<string, string>|bool
+     * @return array<string, string[]>|bool
      */
     private static function resolveSettings($settings, array $globalSettings)
     {
@@ -124,7 +128,7 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string>|bool $settings
+     * @param array<string, string[]>|bool|bool $settings
      * @param array<string, array<string, string>> $mutators
      */
     private static function registerFromProfile(
@@ -166,7 +170,7 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string>|bool $settings
+     * @param array<string, string[]>|bool $settings
      * @param array<string, array<string, string>> $mutators
      */
     private static function registerFromName(
@@ -189,8 +193,8 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string>|bool|stdClass $settings
-     * @param array<string, array<string, string>> $mutators
+     * @param array<string, string[]>|bool $settings
+     * @param array<string, string[]> $mutators
      */
     private static function registerFromClass(
         string $mutatorClassName,

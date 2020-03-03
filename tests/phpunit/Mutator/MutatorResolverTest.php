@@ -245,7 +245,7 @@ final class MutatorResolverTest extends TestCase
     public function test_it_can_resolve_mutators_with_global_settings(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve([
-            'ignore' => ['A::B'],
+            'global-ignore' => ['A::B'],
             MutatorName::getName(Plus::class) => true,
             MutatorName::getName(For_::class) => false,
             MutatorName::getName(IdenticalEqual::class) => [
@@ -271,7 +271,7 @@ final class MutatorResolverTest extends TestCase
             MutatorName::getName(Plus::class) => [
                 'ignore' => ['B::C'],
             ],
-            'ignore' => ['A::B'],
+            'global-ignore' => ['A::B'],
         ]);
 
         $this->assertSameMutatorsByClass([Plus::class], $resolvedMutators);
