@@ -48,7 +48,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Console\Terminal;
 use function trim;
 
 /**
@@ -57,25 +56,12 @@ use function trim;
 final class AdapterInstallationDeciderTest extends TestCase
 {
     /**
-     * @var bool
-     */
-    private static $hasSttyAvailable;
-
-    /**
      * @var AdapterInstallationDecider
      */
     private $installationDecider;
 
     protected function setUp(): void
     {
-        if (self::$hasSttyAvailable === null) {
-            self::$hasSttyAvailable = Terminal::hasSttyAvailable();
-        }
-
-        if (!self::$hasSttyAvailable) {
-            $this->markTestSkipped('Stty is not available');
-        }
-
         $this->installationDecider = new AdapterInstallationDecider(new QuestionHelper());
     }
 
