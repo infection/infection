@@ -56,7 +56,8 @@ use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\FilterableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Http\BadgeApiClient;
+use Infection\Http\JsonClient;
+use Infection\Http\StrykerDashboardClient;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
@@ -94,7 +95,7 @@ final class ProjectCodeProvider
         ProgressFormatter::class,
         PhpProcess::class,
         ComposerExecutableFinder::class,
-        BadgeApiClient::class,
+        JsonClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
@@ -111,7 +112,7 @@ final class ProjectCodeProvider
         ConsoleHelper::class,
         SourceDirGuesser::class,
         TestFrameworkFinder::class,
-        BadgeApiClient::class,
+        StrykerDashboardClient::class,
         MetricsCalculator::class,
         InitialTestRunProcessBuilder::class,
         PhpSpecInitalConfigBuilder::class,

@@ -70,9 +70,14 @@ use Symfony\Component\Process\Process;
 
 /**
  * @group e2e
+ * @group integration Requires some I/O operations
  */
 final class E2ETest extends TestCase
 {
+    /**
+     * This group must be excluded from E2E testing to avoid endless recursive testing loop situation.
+     */
+    private const EXCLUDED_GROUP = 'integration';
     private const MAX_FAILING_COMPOSER_INSTALL = 5;
     private const EXPECT_ERROR = 1;
     private const EXPECT_SUCCESS = 0;
@@ -127,7 +132,6 @@ final class E2ETest extends TestCase
      *
      * php -dmemory_limit=128M vendor/bin/phpunit --group=large
      *
-     * @group e2e
      * @large
      */
     public function test_it_runs_on_itself(): void
@@ -141,16 +145,13 @@ final class E2ETest extends TestCase
         }
 
         $output = $this->runInfection(self::EXPECT_SUCCESS, [
-            '--test-framework-options="--exclude-group=e2e"',
+            '--test-framework-options="--exclude-group=' . self::EXCLUDED_GROUP . '"',
         ]);
 
         $this->assertRegExp('/\d+ mutations were generated/', $output);
         $this->assertRegExp('/\d{2,} mutants were killed/', $output);
     }
 
-    /**
-     * @group e2e
-     */
     public function test_it_runs_configure_command_if_no_configuration(): void
     {
         chdir('tests/e2e/Unconfigured/');
@@ -162,7 +163,6 @@ final class E2ETest extends TestCase
 
     /**
      * @dataProvider e2eTestSuiteDataProvider
-     * @group e2e
      * @runInSeparateProcess
      */
     public function test_it_runs_an_e2e_test_with_success(string $fullPath): void

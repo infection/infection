@@ -50,13 +50,6 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriber
         $this->logger = $logger;
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [
-            MutationTestingWasFinished::class => [$this, 'onMutationTestingWasFinished'],
-        ];
-    }
-
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
         $this->logger->log();

@@ -33,35 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Tests;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\NullSubscriber;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
+use Infection\IterableCounter;
+use Iterator;
 use PHPUnit\Framework\TestCase;
 
-final class SyncEventDispatcherTest extends TestCase
+final class IterableCounterTest extends TestCase
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    public function test_it_does_not_count_when_not_asked(): void
     {
-        $userSubscriber = new UserEventSubscriber();
-        $nullSubscriber = new NullSubscriber(new UserWasCreated());
+        $iterator = $this->createMock(Iterator::class);
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($nullSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
+        $count = IterableCounter::bufferAndCountIfNeeded($iterator, true);
 
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+        $this->assertSame(0, $count);
+        $this->assertInstanceOf(Iterator::class, $iterator);
+    }
 
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
+    public function test_it_counts_array(): void
+    {
+        $array = [1, 2, 3];
 
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+        $count = IterableCounter::bufferAndCountIfNeeded($array, false);
+
+        $this->assertSame(3, $count);
+        $this->assertSame([1, 2, 3], $array);
+    }
+
+    public function test_it_counts_iterator(): void
+    {
+        $generator = (static function () {
+            yield from [1 => 1, 2, 3];
+        })();
+
+        $count = IterableCounter::bufferAndCountIfNeeded($generator, false);
+
+        $this->assertSame(3, $count);
+        $this->assertIsArray($generator);
+        $this->assertSame([1, 2, 3], $generator);
     }
 }

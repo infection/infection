@@ -39,17 +39,15 @@ use function array_filter;
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
-use DOMXPath;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\SafeQuery;
+use Infection\TestFramework\SafeDOMXPath;
 use function realpath as native_realpath;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
-use function Safe\realpath;
 use function Safe\sprintf;
 use function Safe\substr;
 use function str_replace;
@@ -61,8 +59,6 @@ use Webmozart\Assert\Assert;
  */
 class IndexXmlCoverageParser
 {
-    use SafeQuery;
-
     private $coverageDir;
 
     public function __construct(string $coverageDir)
@@ -86,7 +82,7 @@ class IndexXmlCoverageParser
 
         self::assertHasCoverage($xPath);
 
-        $nodes = self::safeQuery($xPath, '//file');
+        $nodes = $xPath->query('//file');
 
         $projectSource = self::getProjectSource($xPath);
 
@@ -101,12 +97,14 @@ class IndexXmlCoverageParser
         return $data;
     }
 
-    private static function createXPath(string $coverageContent): DOMXPath
+    private static function createXPath(string $coverageContent): SafeDOMXPath
     {
-        $dom = new DOMDocument();
-        $dom->loadXML(self::removeNamespace($coverageContent));
+        $document = new DOMDocument();
+        $success = @$document->loadXML(self::removeNamespace($coverageContent));
 
-        return new DOMXPath($dom);
+        Assert::true($success);
+
+        return new SafeDOMXPath($document);
     }
 
     /**
@@ -125,9 +123,9 @@ class IndexXmlCoverageParser
     /**
      * @throws NoLineExecuted
      */
-    private static function assertHasCoverage(DOMXPath $xPath): void
+    private static function assertHasCoverage(SafeDOMXPath $xPath): void
     {
-        $lineCoverage = self::safeQuery($xPath, '/phpunit/project/directory[1]/totals/lines')->item(0);
+        $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
 
         if (
             !($lineCoverage instanceof DOMElement)
@@ -149,12 +147,12 @@ class IndexXmlCoverageParser
         array &$data
     ): void {
         $xPath = self::createXPath(file_get_contents(
-            realpath($this->coverageDir . '/' . $relativeCoverageFilePath)
+            $this->coverageDir . '/' . $relativeCoverageFilePath
         ));
 
         $sourceFilePath = self::retrieveSourceFilePath($xPath, $relativeCoverageFilePath, $projectSource);
 
-        $linesNode = self::safeQuery($xPath, '/phpunit/file/totals/lines')[0];
+        $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
 
         $percentage = $linesNode->getAttribute('percent');
 
@@ -179,7 +177,7 @@ class IndexXmlCoverageParser
             return;
         }
 
-        $coveredLineNodes = self::safeQuery($xPath, '/phpunit/file/coverage/line');
+        $coveredLineNodes = $xPath->query('/phpunit/file/coverage/line');
 
         if ($coveredLineNodes->length === 0) {
             $data[$sourceFilePath] = new CoverageFileData();
@@ -187,10 +185,10 @@ class IndexXmlCoverageParser
             return;
         }
 
-        $coveredMethodNodes = self::safeQuery($xPath, '/phpunit/file/class/method');
+        $coveredMethodNodes = $xPath->query('/phpunit/file/class/method');
 
         if ($coveredMethodNodes->length === 0) {
-            $coveredMethodNodes = self::safeQuery($xPath, '/phpunit/file/trait/method');
+            $coveredMethodNodes = $xPath->query('/phpunit/file/trait/method');
         }
 
         $data[$sourceFilePath] = new CoverageFileData(
@@ -203,11 +201,13 @@ class IndexXmlCoverageParser
      * @throws CoverageDoesNotExistException
      */
     private static function retrieveSourceFilePath(
-        DOMXPath $xPath,
+        SafeDOMXPath $xPath,
         string $relativeCoverageFilePath,
         string $projectSource
     ): string {
-        $fileNode = self::safeQuery($xPath, '/phpunit/file')[0];
+        $fileNode = $xPath->query('/phpunit/file')[0];
+
+        Assert::notNull($fileNode);
 
         $fileName = $fileNode->getAttribute('name');
         $relativeFilePath = $fileNode->getAttribute('path');
@@ -298,16 +298,16 @@ class IndexXmlCoverageParser
         return $methodsCoverage;
     }
 
-    private static function getProjectSource(DOMXPath $xPath): string
+    private static function getProjectSource(SafeDOMXPath $xPath): string
     {
         // PHPUnit >= 6
-        $sourceNodes = self::safeQuery($xPath, '//project/@source');
+        $sourceNodes = $xPath->query('//project/@source');
 
         if ($sourceNodes->length > 0) {
             return $sourceNodes[0]->nodeValue;
         }
 
         // PHPUnit < 6
-        return self::safeQuery($xPath, '//project/@name')[0]->nodeValue;
+        return $xPath->query('//project/@name')[0]->nodeValue;
     }
 }

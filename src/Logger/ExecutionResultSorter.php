@@ -33,35 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Logger;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\NullSubscriber;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
-use PHPUnit\Framework\TestCase;
+use Infection\Mutant\MutantExecutionResult;
+use function Safe\usort;
 
-final class SyncEventDispatcherTest extends TestCase
+/**
+ * @internal
+ */
+final class ExecutionResultSorter
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    private function __construct()
     {
-        $userSubscriber = new UserEventSubscriber();
-        $nullSubscriber = new NullSubscriber(new UserWasCreated());
+    }
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($nullSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
+    /**
+     * TODO: move this call in the metrics calculator otherwise the process is repeated for
+     *  multiple loggers
+     *
+     * @param MutantExecutionResult[] $executionResults
+     */
+    public static function sortResults(array &$executionResults): void
+    {
+        usort(
+            $executionResults,
+            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
+                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
+                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
+                }
 
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
-
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
-
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
+            }
+        );
     }
 }

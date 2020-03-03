@@ -33,35 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\NullSubscriber;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
-use PHPUnit\Framework\TestCase;
+use function count;
+use Infection\Console\OutputFormatter\AbstractOutputFormatter;
+use function is_array;
+use function iterator_to_array;
 
-final class SyncEventDispatcherTest extends TestCase
+/**
+ * @internal
+ */
+final class IterableCounter
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    private function __construct()
     {
-        $userSubscriber = new UserEventSubscriber();
-        $nullSubscriber = new NullSubscriber(new UserWasCreated());
+    }
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($nullSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
+    /**
+     * @param iterable<mixed> $subjects
+     */
+    public static function bufferAndCountIfNeeded(iterable &$subjects, bool $runConcurrently): int
+    {
+        if ($runConcurrently) {
+            // This number is typically fed to ProgressFormatter/ProgressBar or variants.
+            return AbstractOutputFormatter::UNKNOWN_COUNT;
+        }
 
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+        if (is_array($subjects)) {
+            return count($subjects);
+        }
 
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
+        $subjects = iterator_to_array($subjects, false);
 
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+        return count($subjects);
     }
 }

@@ -33,20 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\TestFramework;
 
-use Infection\Event\MutantWasCreated;
-use PHPUnit\Framework\TestCase;
+use DOMDocument;
+use DOMElement;
+use DOMNodeList;
+use DOMXPath;
+use Webmozart\Assert\Assert;
 
-final class MutantWasCreatedTest extends TestCase
+/**
+ * @internal
+ *
+ * @property DOMDocument $document
+ */
+final class SafeDOMXPath
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_instantiated(): void
-    {
-        $class = new MutantWasCreated();
+    /** @var DOMDocument */
+    private $document;
 
-        $this->assertInstanceOf(MutantWasCreated::class, $class);
+    /** @var DOMXPath */
+    private $xPath;
+
+    public function __construct(DOMDocument $document)
+    {
+        $this->document = $document;
+        $this->xPath = new DOMXPath($document);
+    }
+
+    public function __get(string $property): DOMDocument
+    {
+        return $this->$property;
+    }
+
+    public static function fromString(string $content): self
+    {
+        $document = new DOMDocument();
+        $success = @$document->loadXML($content);
+
+        Assert::true($success);
+
+        return new self($document);
+    }
+
+    /**
+     * @return DOMNodeList<DOMElement>
+     */
+    public function query(string $query): DOMNodeList
+    {
+        $nodes = @$this->xPath->query($query);
+
+        Assert::isInstanceOf($nodes, DOMNodeList::class);
+
+        return $nodes;
     }
 }

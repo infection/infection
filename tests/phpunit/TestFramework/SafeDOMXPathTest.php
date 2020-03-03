@@ -33,35 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Tests\TestFramework;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\NullSubscriber;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
+use DOMDocument;
+use Infection\TestFramework\SafeDOMXPath;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
-final class SyncEventDispatcherTest extends TestCase
+final class SafeDOMXPathTest extends TestCase
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    public function test_it_reads_xml(): void
     {
-        $userSubscriber = new UserEventSubscriber();
-        $nullSubscriber = new NullSubscriber(new UserWasCreated());
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
+        $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
+    }
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($nullSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
+    public function test_it_fails_on_invalid_query(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
+        $xPath->query('#');
+    }
 
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+    public function test_it_fails_on_invalid_xml(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        SafeDOMXPath::fromString('<?xml version="1.0"?><foo>');
+    }
 
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
-
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $nullSubscriber->count);
+    public function test_it_has_document_property(): void
+    {
+        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><test/>');
+        $this->assertInstanceOf(DOMDocument::class, $xPath->document);
     }
 }

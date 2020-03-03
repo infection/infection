@@ -107,7 +107,7 @@ final class DotFormatter extends AbstractOutputFormatter
         }
 
         if ($lastDot || $endOfRow) {
-            if ($mutationCount === 0) {
+            if ($mutationCount === self::UNKNOWN_COUNT) {
                 $this->output->write(sprintf('   (%5d)', $this->callsCount)); // 5 because folks with over 10k mutations have more important problems
             } else {
                 $length = strlen((string) $mutationCount);
