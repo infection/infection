@@ -45,7 +45,7 @@ use Webmozart\Assert\Assert;
  */
 final class AdapterInstaller
 {
-    private const OFFICIAL_ADAPTERS_MAP = [
+    public const OFFICIAL_ADAPTERS_MAP = [
         TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
         TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
     ];

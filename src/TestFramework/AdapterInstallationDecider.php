@@ -67,8 +67,6 @@ final class AdapterInstallationDecider
             return false;
         }
 
-        $composerPackage = sprintf('infection/%s-adapter', $adapterName);
-
         $output->writeln(['']);
 
         $question = new ConfirmationQuestion(
@@ -78,7 +76,7 @@ We noticed you are using a test framework supported by an external Infection plu
 Would you like to install <comment>%s</comment>? [<comment>yes</comment>]:
 TEXT
                 ,
-                $composerPackage
+                AdapterInstaller::OFFICIAL_ADAPTERS_MAP[$adapterName]
             ),
             true
         );
