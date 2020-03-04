@@ -273,7 +273,7 @@ XML;
             file_get_contents(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml/index.xml')
         ));
 
-        $middlewarePath = realpath(self::FIXTURES_OLD_COVERAGE_DIR . '/src/Middleware/ReleaseRecordedEventsMiddleware.php');
+        $middlewarePath = Path::canonicalize(self::FIXTURES_OLD_COVERAGE_DIR . '/src/Middleware/ReleaseRecordedEventsMiddleware.php');
 
         $this->assertSame(
             [
@@ -332,7 +332,7 @@ XML;
 
     public function test_it_errors_when_the_source_file_could_not_be_found(): void
     {
-        $incorrectCoverageSrcDir = realpath(self::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
+        $incorrectCoverageSrcDir = Path::canonicalize(self::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
 
         // Replaces dummy source path with the real path
         $xml = preg_replace(
@@ -348,10 +348,10 @@ XML;
         } catch (InvalidCoverage $exception) {
             $this->assertSame(
                 sprintf(
-                    'Could not find the source file "%szeroLevel.php" referred by '
-                    . '"%szeroLevel.php.xml". Make sure the coverage used is up to date',
-                    $incorrectCoverageSrcDir . DIRECTORY_SEPARATOR,
-                    Path::canonicalize(self::FIXTURES_COVERAGE_DIR) . DIRECTORY_SEPARATOR
+                    'Could not find the source file "%s/zeroLevel.php" referred by '
+                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
+                    $incorrectCoverageSrcDir,
+                    Path::canonicalize(self::FIXTURES_COVERAGE_DIR)
                 ),
                 $exception->getMessage()
             );
