@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function array_map;
+use function explode;
 use function implode;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Str;
 use const PHP_EOL;
 use function Safe\sprintf;
 use function str_repeat;
@@ -67,16 +70,42 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
 
     public function getLogLines(): array
     {
-        $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedExecutionResults(), 'Escaped');
-        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutExecutionResults(), 'Timed Out');
+        $separateSections = false;
+
+        $logs[] = $this->getResultLines(
+            $this->metricsCalculator->getEscapedExecutionResults(),
+            'Escaped',
+            $separateSections
+        );
+        $logs[] = $this->getResultLines(
+            $this->metricsCalculator->getTimedOutExecutionResults(),
+            'Timed Out',
+            $separateSections
+        );
 
         if ($this->debugVerbosity) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getKilledExecutionResults(), 'Killed');
-            $logs[] = $this->getLogParts($this->metricsCalculator->getErrorExecutionResults(), 'Errors');
+            $logs[] = $this->getResultLines(
+                $this->metricsCalculator->getKilledExecutionResults(),
+                'Killed',
+                $separateSections
+            );
+            $logs[] = $this->getResultLines(
+                $this->metricsCalculator->getErrorExecutionResults(),
+                'Errors',
+                $separateSections
+            );
         }
 
         if (!$this->onlyCoveredMode) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredExecutionResults(), 'Not Covered');
+            $logs[] = $this->getResultLines(
+                $this->metricsCalculator->getNotCoveredExecutionResults(),
+                'Not Covered',
+                $separateSections
+            );
+        }
+
+        if ($separateSections) {
+            $logs[] = '';
         }
 
         return $logs;
@@ -85,43 +114,66 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     /**
      * @param MutantExecutionResult[] $executionResults
      */
-    private function getLogParts(array $executionResults, string $headlinePrefix): string
-    {
-        $logParts = $this->getHeadlineParts($headlinePrefix);
+    private function getResultLines(
+        array $executionResults,
+        string $headlinePrefix,
+        bool &$separateSections
+    ): string {
+        $lines = [];
 
-        foreach ($executionResults as $index => $executionResult) {
-            $isShowFullFormat = $this->debugVerbosity;
-
-            $logParts[] = '';
-            $logParts[] = $this->getMutatorFirstLine($index, $executionResult);
-
-            $logParts[] = $this->debugMode ? $executionResult->getProcessCommandLine() : '';
-
-            $logParts[] = $executionResult->getMutantDiff();
-
-            if ($isShowFullFormat) {
-                $logParts[] = $executionResult->getProcessOutput();
-            }
+        if ($separateSections) {
+            $lines[] = '';
+            $lines[] = '';
         }
 
-        return implode(PHP_EOL, $logParts);
+        $lines[] = self::getHeadlineLines($headlinePrefix);
+
+        $separateSections = false;
+
+        foreach ($executionResults as $index => $executionResult) {
+            if ($separateSections) {
+                $lines[] = '';
+                $lines[] = '';
+            }
+
+            $lines[] = self::getMutatorLine($index, $executionResult);
+            $lines[] = '';
+            $lines[] = Str::trimLineReturns($executionResult->getMutantDiff());
+
+            if ($this->debugMode) {
+                $lines[] = '';
+                $lines[] = '$ ' . $executionResult->getProcessCommandLine();
+            }
+
+            if ($this->debugVerbosity) {
+                if (!$this->debugMode) {
+                    $lines[] = '';
+                }
+
+                $lines[] = self::getProcessOutputLine($executionResult->getProcessOutput());
+            }
+
+            $separateSections = true;
+        }
+
+        return implode(PHP_EOL, $lines);
     }
 
-    /**
-     * @return string[]
-     */
-    private function getHeadlineParts(string $headlinePrefix): array
+    private static function getHeadlineLines(string $headlinePrefix): string
     {
         $headline = sprintf('%s mutants:', $headlinePrefix);
 
-        return [
-            $headline,
-            str_repeat('=', strlen($headline)),
-            '',
-        ];
+        return implode(
+            PHP_EOL,
+            [
+                $headline,
+                str_repeat('=', strlen($headline)),
+                '',
+            ]
+        );
     }
 
-    private function getMutatorFirstLine(int $index, MutantExecutionResult $mutantProcess): string
+    private static function getMutatorLine(int $index, MutantExecutionResult $mutantProcess): string
     {
         return sprintf(
             '%d) %s:%d    [M] %s',
@@ -129,6 +181,19 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
             $mutantProcess->getOriginalFilePath(),
             $mutantProcess->getOriginalStartingLine(),
             $mutantProcess->getMutatorName()
+        );
+    }
+
+    private static function getProcessOutputLine(string $value): string
+    {
+        return implode(
+            PHP_EOL,
+            array_map(
+                static function (string $line): string {
+                    return '  ' . $line;
+                },
+                explode(PHP_EOL, Str::trimLineReturns($value))
+            )
         );
     }
 }

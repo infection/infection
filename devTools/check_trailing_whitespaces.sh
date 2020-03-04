@@ -35,6 +35,7 @@ files_with_trailing_whitespaces=$(
         -not -path "./tests/e2e/*" \
         -not -path "./tests/phpunit/Fixtures/Files/phpunit/format-whitespace/original-phpunit.xml" \
         -not -path "./tests/phpunit/StringNormalizerTest.php" \
+        -not -path "./tests/phpunit/StrTest.php" \
         -exec grep -EIHn "\\s$" {} \;
 )
 
