@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
+use const DIRECTORY_SEPARATOR;
 use Generator;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
@@ -347,10 +348,10 @@ XML;
         } catch (InvalidCoverage $exception) {
             $this->assertSame(
                 sprintf(
-                    'Could not find the source file "%s/zeroLevel.php" referred by '
-                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
-                    $incorrectCoverageSrcDir,
-                    Path::canonicalize(self::FIXTURES_COVERAGE_DIR)
+                    'Could not find the source file "%szeroLevel.php" referred by '
+                    . '"%szeroLevel.php.xml". Make sure the coverage used is up to date',
+                    $incorrectCoverageSrcDir . DIRECTORY_SEPARATOR,
+                    Path::canonicalize(self::FIXTURES_COVERAGE_DIR) . DIRECTORY_SEPARATOR
                 ),
                 $exception->getMessage()
             );

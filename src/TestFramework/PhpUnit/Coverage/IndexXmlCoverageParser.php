@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use function array_filter;
+use const DIRECTORY_SEPARATOR;
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
@@ -144,7 +145,7 @@ class IndexXmlCoverageParser
         array &$data
     ): void {
         $coverageFilePath = Path::canonicalize(
-            $this->coverageDir . '/' . $relativeCoverageFilePath
+            $this->coverageDir . DIRECTORY_SEPARATOR . $relativeCoverageFilePath
         );
 
         $xPath = self::createXPath(file_get_contents($coverageFilePath));
