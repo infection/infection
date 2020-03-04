@@ -66,7 +66,7 @@ final class CoverageCheckerTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$coveragePath = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/coverage');
+        self::$coveragePath = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/coverage/coverage-xml');
         self::$jUnit = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/junit.xml');
     }
 
@@ -144,9 +144,9 @@ TXT
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
-            'Could not find the file "/nowhere/coverage-xml/index.xml". Please ensure that the XML '
-            . 'coverage report has been properly generated at the right place. If using PHPUnit for '
-            . 'example, the option for the path given is "--coverage-xml=/nowhere/coverage-xml"'
+            'Could not find the file "/nowhere/index.xml". Please ensure that the XML coverage '
+            . 'report has been properly generated at the right place. If using PHPUnit for example, '
+            . 'the option for the path given is "--coverage-xml=/nowhere/coverage-xml"'
         );
 
         $checker->checkCoverageExists();
@@ -212,7 +212,7 @@ Ok!
 ```
 
 Issue(s):
-- The file "/nowhere/coverage-xml/index.xml" could not be found
+- The file "/nowhere/index.xml" could not be found
 TXT
         );
 

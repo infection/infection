@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
 use function count;
+use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
 use function file_exists;
 use function implode;
@@ -97,7 +98,7 @@ TXT
     public function checkCoverageExists(): void
     {
         $coverageIndexFilePath = Path::canonicalize(
-            $this->coveragePath . '/coverage-xml/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME
+            $this->coveragePath . DIRECTORY_SEPARATOR . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME
         );
 
         if (!file_exists($coverageIndexFilePath)) {
@@ -128,7 +129,7 @@ TXT
         $errors = [];
 
         $coverageIndexFilePath = Path::canonicalize(
-            $this->coveragePath . '/coverage-xml/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME
+            $this->coveragePath . DIRECTORY_SEPARATOR . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME
         );
 
         if (!file_exists($coverageIndexFilePath)) {
