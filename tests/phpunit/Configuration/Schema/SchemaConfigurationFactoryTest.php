@@ -311,6 +311,31 @@ JSON
             ]),
         ];
 
+        yield '[logs][sarb] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "sarb": "sarb.json"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    'sarb.json',
+                    null
+                ),
+            ]),
+        ];
+
         yield '[logs][badge] nominal' => [
             <<<'JSON'
 {
@@ -349,6 +374,7 @@ JSON
         "summary": "summary.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
+        "sarb": "sarb.json",
         "badge": {
             "branch": "master"
         }
@@ -411,6 +437,7 @@ JSON
         "summary": " summary.log ",
         "debug": " debug.log ",
         "perMutator": " perMutator.log ",
+        "sarb": " sarb.json ",
         "badge": {
             "branch": " master "
         }
@@ -1952,6 +1979,7 @@ JSON
         "summary": "summary.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
+        "sarb": "sarb.json",
         "badge": {
             "branch": "master"
         }

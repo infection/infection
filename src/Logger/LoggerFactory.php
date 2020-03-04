@@ -83,8 +83,8 @@ final class LoggerFactory
                     $this->createSummaryLogger($output, $logConfig->getSummaryLogFilePath()),
                     $this->createDebugLogger($output, $logConfig->getDebugLogFilePath()),
                     $this->createPerMutatorLogger($output, $logConfig->getPerMutatorFilePath()),
-                    $this->createBadgeLogger($output, $logConfig->getBadge()),
                     $this->createSarbLogger($output, $logConfig->getSarbFilePath()),
+                    $this->createBadgeLogger($output, $logConfig->getBadge()),
                 ],
                 function (?MutationTestingResultsLogger $logger): bool {
                     return $logger !== null && $this->isAllowedToLog($logger);
@@ -158,6 +158,21 @@ final class LoggerFactory
         ;
     }
 
+    private function createSarbLogger(
+        OutputInterface $output,
+        ?string $filePath
+    ): ?FileLogger {
+        return $filePath === null
+            ? null
+            : new FileLogger(
+                $output,
+                $filePath,
+                $this->filesystem,
+                new SarbLogger($this->metricsCalculator)
+            )
+            ;
+    }
+
     private function createBadgeLogger(OutputInterface $output, ?Badge $badge): ?BadgeLogger
     {
         return $badge === null
@@ -174,21 +189,6 @@ final class LoggerFactory
                 $badge->getBranch()
             )
         ;
-    }
-
-    private function createSarbLogger(
-        OutputInterface $output,
-        string $location,
-        bool $isDebugVerbosity
-    ): SarbLogger {
-        return new SarbLogger(
-            $output,
-            $location,
-            $this->metricsCalculator,
-            $this->filesystem,
-            $isDebugVerbosity,
-            $this->debugMode
-        );
     }
 
     private function isAllowedToLog(MutationTestingResultsLogger $logger): bool

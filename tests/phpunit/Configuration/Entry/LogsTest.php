@@ -83,6 +83,7 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
         ];
 
         yield 'complete' => [

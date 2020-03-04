@@ -118,7 +118,14 @@ final class SubscriberBuilderTest extends TestCase
         $config
             ->expects($this->exactly($getLogs))
             ->method('getLogs')->willReturn(
-                new Logs(null, null, null, null, null)
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                )
             )
         ;
 

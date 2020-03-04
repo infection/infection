@@ -37,68 +37,48 @@ namespace Infection\Tests\Logger;
 
 use Generator;
 use Infection\Logger\SarbLogger;
-use PHPUnit\Framework\MockObject\MockObject;
+use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 final class SarbLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
-
-    private const LOG_FILE_PATH = '/path/to/text.log';
-
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    use LineLoggerAssertions;
 
     /**
-     * @var OutputInterface|MockObject
+     * @dataProvider metricsProvider
      */
-    private $outputMock;
-
-    protected function setUp(): void
-    {
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
-        $this->outputMock = $this->createMock(OutputInterface::class);
-    }
-
-    /**
-     * @dataProvider completeMetricsProvider
-     */
-    public function test_it_logs_results_in_a_text_file_when_there_are_mutations(
-        string $expectedContent
+    public function test_it_logs_correctly_with_mutations(
+        MetricsCalculator $metricsCalculator,
+        string $expectedContents
     ): void {
-        $expectedContent = str_replace('', PHP_EOL, $expectedContent);
+        $logger = new SarbLogger($metricsCalculator);
 
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $expectedContent)
-        ;
-
-        $logger = new SarbLogger(
-            $this->outputMock,
-            self::LOG_FILE_PATH,
-            $this->createCompleteMetricsCalculator(),
-            $this->fileSystemMock,
-            true,
-            true
-        );
-
-        $logger->log();
+        $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function completeMetricsProvider(): Generator
+    public function metricsProvider(): Generator
     {
-        yield 'some basics' => [
-            <<<'TXT'
+        yield 'no mutations' => [
+            new MetricsCalculator(),
+            <<<'JSON'
+[]
+JSON
+        ];
+
+        yield 'all mutations' => [
+            $this->createCompleteMetricsCalculator(),
+            <<<'JSON'
 [
     {
         "file": "foo\/bar",
         "line": 9,
         "type": "PregQuote|Escaped"
+    },
+    {
+        "file": "foo\/bar",
+        "line": 10,
+        "type": "For_|Escaped"
     },
     {
         "file": "foo\/bar",
@@ -108,15 +88,10 @@ final class SarbLoggerTest extends TestCase
     {
         "file": "foo\/bar",
         "line": 10,
-        "type": "For_|Escaped"
-    },
-    {
-        "file": "foo\/bar",
-        "line": 10,
         "type": "For_|Not Covered"
     }
 ]
-TXT
+JSON
         ];
     }
 }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Infection\Logger\SarbLogger;
 use function array_map;
 use Generator;
 use function get_class;
@@ -49,6 +48,7 @@ use Infection\Logger\LoggerFactory;
 use Infection\Logger\LoggerRegistry;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\PerMutatorLogger;
+use Infection\Logger\SarbLogger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
@@ -122,8 +122,8 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                new Badge('master'),
-                null
+                null,
+                new Badge('master')
             ),
             $this->outputMock
         );
@@ -161,7 +161,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null,
+                null
             ),
             [],
         ];
@@ -173,7 +173,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null,
+                null
             ),
             [TextFileLogger::class],
         ];
@@ -185,7 +185,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null,
+                null
             ),
             [SummaryFileLogger::class],
         ];
@@ -197,7 +197,7 @@ final class LoggerFactoryTest extends TestCase
                 'debug_file',
                 null,
                 null,
-                null,
+                null
             ),
             [DebugFileLogger::class],
         ];
@@ -209,9 +209,21 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 'per_muator',
                 null,
-                null,
+                null
             ),
             [PerMutatorLogger::class],
+        ];
+
+        yield 'sarb logger' => [
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                'sarb',
+                null
+            ),
+            [SarbLogger::class],
         ];
 
         yield 'badge logger' => [
@@ -220,8 +232,8 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                new Badge('foo'),
                 null,
+                new Badge('foo')
             ),
             [BadgeLogger::class],
         ];
@@ -232,16 +244,16 @@ final class LoggerFactoryTest extends TestCase
                 'summary',
                 'debug',
                 'per_mutator',
-                new Badge('branch'),
-                'sarb'
+                'sarb',
+                new Badge('branch')
             ),
             [
                 TextFileLogger::class,
                 SummaryFileLogger::class,
                 DebugFileLogger::class,
                 PerMutatorLogger::class,
-                BadgeLogger::class,
                 SarbLogger::class,
+                BadgeLogger::class,
             ],
         ];
     }

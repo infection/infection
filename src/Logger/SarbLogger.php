@@ -35,31 +35,47 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function array_map;
+use function array_merge;
+use Infection\Mutant\MetricsCalculator;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use function Safe\json_encode;
+use function Safe\sprintf;
 
 /**
  * @internal
  */
-final class SarbLogger extends FileLogger
+final class SarbLogger implements LineMutationTestingResultsLogger
 {
-    protected function getLogLines(): array
+    private $metricsCalculator;
+
+    public function __construct(MetricsCalculator $metricsCalculator)
     {
-        $processes = array_merge(
-            $this->metricsCalculator->getEscapedMutantProcesses(),
-            $this->metricsCalculator->getNotCoveredMutantProcesses()
+        $this->metricsCalculator = $metricsCalculator;
+    }
+
+    public function getLogLines(): array
+    {
+        $results = array_merge(
+            $this->metricsCalculator->getEscapedExecutionResults(),
+            $this->metricsCalculator->getNotCoveredExecutionResults()
         );
 
-        $this->sortProcesses($processes);
-
-        $output = array_map(static function (MutantProcess $process): array {
-            return [
-                'file' => $process->getOriginalFilePath(),
-                'line' => $process->getOriginalStartingLine(),
-                'type' => $process->getMutatorName()
-                    . '|' . MutantProcess::RESULT_TO_STRING_MAP[$process->getResultCode()],
-            ];
-        }, $processes);
+        $output = array_map(
+            static function (MutantExecutionResult $result): array {
+                return [
+                    'file' => $result->getOriginalFilePath(),
+                    'line' => $result->getOriginalStartingLine(),
+                    'type' => sprintf(
+                        '%s|%s',
+                        $result->getMutatorName(),
+                        MutantProcess::RESULT_TO_STRING_MAP[$result->getProcessResultCode()]
+                    ),
+                ];
+            },
+            $results
+        );
 
         return [json_encode($output, JSON_PRETTY_PRINT)];
     }

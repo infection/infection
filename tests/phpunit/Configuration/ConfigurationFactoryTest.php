@@ -684,7 +684,7 @@ final class ConfigurationFactoryTest extends TestCase
                     'summary.log',
                     'debug.log',
                     'mutator.log',
-                    'foo.json',
+                    'sarb.json',
                     new Badge('master')
                 ),
                 'config/tmp',
@@ -1087,6 +1087,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -1120,6 +1121,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -1163,6 +1165,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -1196,6 +1199,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -1239,6 +1243,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -1272,6 +1277,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,

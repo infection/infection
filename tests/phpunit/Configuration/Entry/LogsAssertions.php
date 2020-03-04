@@ -55,7 +55,7 @@ trait LogsAssertions
         $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
         $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
         $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
-        $this->assertSame($expectedSarbFilePath, $logs->getPerMutatorFilePath());
+        $this->assertSame($expectedSarbFilePath, $logs->getSarbFilePath());
 
         $badge = $logs->getBadge();
 
