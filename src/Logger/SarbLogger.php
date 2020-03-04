@@ -45,6 +45,7 @@ use function Safe\sprintf;
 
 /**
  * @internal
+ * @see https://github.com/DaveLiddament/sarb
  */
 final class SarbLogger implements LineMutationTestingResultsLogger
 {
