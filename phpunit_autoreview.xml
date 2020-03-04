@@ -5,6 +5,8 @@
          colors="true"
          executionOrder="random"
          stopOnFailure="true"
+         failOnWarning="true"
+         failOnRisky="true"
          verbose="true"
 >
 
