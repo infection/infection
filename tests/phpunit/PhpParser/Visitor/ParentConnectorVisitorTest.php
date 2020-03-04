@@ -41,7 +41,7 @@ use function is_array;
 use PhpParser\Node;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class ParentConnectorVisitorTest extends BaseVisitorTest
 {

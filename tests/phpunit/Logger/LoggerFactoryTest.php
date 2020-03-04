@@ -58,7 +58,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class LoggerFactoryTest extends TestCase
 {

@@ -44,7 +44,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use stdClass;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MutationsCollectorVisitorTest extends BaseVisitorTest
 {

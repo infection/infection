@@ -44,7 +44,7 @@ use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class PathReplacerTest extends TestCase
 {
