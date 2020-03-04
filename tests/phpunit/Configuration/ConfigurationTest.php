@@ -143,13 +143,7 @@ final class ConfigurationTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             '',
             new PhpUnit(null, null),
