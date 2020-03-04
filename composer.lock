@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1e28483625437c80b129ad905b842591",
+    "content-hash": "4aff19736ec20fc85e4f1834e753312f",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -84,55 +84,6 @@
             "time": "2020-01-16T21:29:02+00:00"
         },
         {
-            "name": "infection/codeception-adapter",
-            "version": "0.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/infection/codeception-adapter.git",
-                "reference": "6ba9944830a510d10bad9f95e2a1e04d91b9e2a5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/infection/codeception-adapter/zipball/6ba9944830a510d10bad9f95e2a1e04d91b9e2a5",
-                "reference": "6ba9944830a510d10bad9f95e2a1e04d91b9e2a5",
-                "shasum": ""
-            },
-            "require": {
-                "infection/abstract-testframework-adapter": "^0.2.3",
-                "infection/include-interceptor": "^0.2.0",
-                "symfony/filesystem": "^3.4.29 || ^4.0 || ^5.0",
-                "symfony/process": "^3.4.29 || ^4.0 || ^5.0",
-                "symfony/yaml": "^3.4.29 || ^4.0 || ^5.0",
-                "thecodingmachine/safe": "^1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^8.5"
-            },
-            "type": "infection-extension",
-            "extra": {
-                "infection": {
-                    "class": "Infection\\TestFramework\\Codeception\\CodeceptionAdapterFactory"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Infection\\TestFramework\\Codeception\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Maks Rafalko",
-                    "email": "maks.rafalko@gmail.com"
-                }
-            ],
-            "description": "Codeception Test Framework Adapter for Infection",
-            "time": "2020-01-19T20:11:57+00:00"
-        },
-        {
             "name": "infection/extension-installer",
             "version": "0.1.0",
             "source": {
@@ -210,64 +161,6 @@
             ],
             "description": "Stream Wrapper: Include Interceptor. Allows to replace included (autoloaded) file with another one.",
             "time": "2020-01-27T10:28:21+00:00"
-        },
-        {
-            "name": "infection/phpspec-adapter",
-            "version": "0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/infection/phpspec-adapter.git",
-                "reference": "b859bd80d3349bdcb17dae7016f081ca296267bc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/infection/phpspec-adapter/zipball/b859bd80d3349bdcb17dae7016f081ca296267bc",
-                "reference": "b859bd80d3349bdcb17dae7016f081ca296267bc",
-                "shasum": ""
-            },
-            "require": {
-                "infection/abstract-testframework-adapter": "^0.2.3",
-                "infection/include-interceptor": "^0.2.3",
-                "symfony/filesystem": "^3.4.29 || ^4.0 || ^5.0",
-                "symfony/process": "^3.4.29 || ^4.0 || ^5.0",
-                "symfony/yaml": "^3.4.29 || ^4.0 || ^5.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.16",
-                "infection/infection": "^0.15.2",
-                "php-coveralls/php-coveralls": "^2.2",
-                "phpstan/extension-installer": "^1.0",
-                "phpstan/phpstan": "^0.12.10",
-                "phpstan/phpstan-phpunit": "^0.12.6",
-                "phpstan/phpstan-strict-rules": "^0.12.2",
-                "phpstan/phpstan-webmozart-assert": "^0.12.2",
-                "phpunit/phpunit": "^8.5",
-                "thecodingmachine/safe": "^0.1.16",
-                "vimeo/psalm": "^3.8"
-            },
-            "type": "infection-extension",
-            "extra": {
-                "infection": {
-                    "class": "Infection\\TestFramework\\PhpSpec\\PhpSpecAdapterFactory"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Infection\\TestFramework\\PhpSpec\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Maks Rafalko",
-                    "email": "maks.rafalko@gmail.com"
-                }
-            ],
-            "description": "PHPSpec Test Framework Adapter for Infection",
-            "time": "2020-02-16T12:44:11+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -1152,65 +1045,6 @@
             "time": "2019-11-18T17:27:11+00:00"
         },
         {
-            "name": "symfony/yaml",
-            "version": "v5.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "69b44e3b8f90949aee2eb3aa9b86ceeb01cbf62a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/69b44e3b8f90949aee2eb3aa9b86ceeb01cbf62a",
-                "reference": "69b44e3b8f90949aee2eb3aa9b86ceeb01cbf62a",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2.5",
-                "symfony/polyfill-ctype": "~1.8"
-            },
-            "conflict": {
-                "symfony/console": "<4.4"
-            },
-            "require-dev": {
-                "symfony/console": "^4.4|^5.0"
-            },
-            "suggest": {
-                "symfony/console": "For validating YAML files using the lint command"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "5.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Yaml\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Yaml Component",
-            "homepage": "https://symfony.com",
-            "time": "2020-01-21T11:12:28+00:00"
-        },
-        {
             "name": "thecodingmachine/safe",
             "version": "v1.0.3",
             "source": {
@@ -1344,16 +1178,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.7.0",
+            "version": "1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozart/assert.git",
-                "reference": "aed98a490f9a8f78468232db345ab9cf606cf598"
+                "reference": "573381c0a64f155a0d9a23f4b0c797194805b925"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/aed98a490f9a8f78468232db345ab9cf606cf598",
-                "reference": "aed98a490f9a8f78468232db345ab9cf606cf598",
+                "url": "https://api.github.com/repos/webmozart/assert/zipball/573381c0a64f155a0d9a23f4b0c797194805b925",
+                "reference": "573381c0a64f155a0d9a23f4b0c797194805b925",
                 "shasum": ""
             },
             "require": {
@@ -1388,7 +1222,7 @@
                 "check",
                 "validate"
             ],
-            "time": "2020-02-14T12:15:55+00:00"
+            "time": "2019-11-24T13:36:37+00:00"
         },
         {
             "name": "webmozart/path-util",
@@ -1783,16 +1617,16 @@
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "5.1.0",
+            "version": "5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "cd72d394ca794d3466a3b2fc09d5a6c1dc86b47e"
+                "reference": "a48807183a4b819072f26e347bbd0b5199a9d15f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/cd72d394ca794d3466a3b2fc09d5a6c1dc86b47e",
-                "reference": "cd72d394ca794d3466a3b2fc09d5a6c1dc86b47e",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/a48807183a4b819072f26e347bbd0b5199a9d15f",
+                "reference": "a48807183a4b819072f26e347bbd0b5199a9d15f",
                 "shasum": ""
             },
             "require": {
@@ -1832,7 +1666,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2020-02-22T12:28:44+00:00"
+            "time": "2020-02-09T09:16:15+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
@@ -1990,16 +1824,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.11",
+            "version": "0.12.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "ca5f2b7cf81c6d8fba74f9576970399c5817e03b"
+                "reference": "39004edc7fc308752f625b89b70ad1710708f45e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/ca5f2b7cf81c6d8fba74f9576970399c5817e03b",
-                "reference": "ca5f2b7cf81c6d8fba74f9576970399c5817e03b",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/39004edc7fc308752f625b89b70ad1710708f45e",
+                "reference": "39004edc7fc308752f625b89b70ad1710708f45e",
                 "shasum": ""
             },
             "require": {
@@ -2025,7 +1859,7 @@
                 "MIT"
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
-            "time": "2020-02-16T14:00:29+00:00"
+            "time": "2020-02-12T22:03:42+00:00"
         },
         {
             "name": "phpstan/phpstan-phpunit",
@@ -3094,6 +2928,65 @@
             "description": "Symfony PHPUnit Bridge",
             "homepage": "https://symfony.com",
             "time": "2020-01-31T09:56:42+00:00"
+        },
+        {
+            "name": "symfony/yaml",
+            "version": "v5.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "a4b613d7e44f62941adff5a802cff70adee57d3f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/a4b613d7e44f62941adff5a802cff70adee57d3f",
+                "reference": "a4b613d7e44f62941adff5a802cff70adee57d3f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2.5",
+                "symfony/polyfill-ctype": "~1.8"
+            },
+            "conflict": {
+                "symfony/console": "<4.4"
+            },
+            "require-dev": {
+                "symfony/console": "^4.4|^5.0"
+            },
+            "suggest": {
+                "symfony/console": "For validating YAML files using the lint command"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Yaml Component",
+            "homepage": "https://symfony.com",
+            "time": "2020-02-03T13:51:17+00:00"
         },
         {
             "name": "thecodingmachine/phpstan-safe-rule",

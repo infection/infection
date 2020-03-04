@@ -1,0 +1,17 @@
+#!/usr/bin/env expect
+set timeout 5
+eval spawn $env(INFECTION)
+
+proc answerNoTo {input} {
+    expect $input {
+        send "no\r"
+    } timeout {
+        send_user "Test failed\n"
+        exit 1
+    }
+}
+
+answerNoTo "Would you like to install"
+
+send_user "Test succeeded!\n"
+exit 0

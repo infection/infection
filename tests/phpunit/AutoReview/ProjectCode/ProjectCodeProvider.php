@@ -62,12 +62,11 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
+use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
-use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitalConfigBuilder;
-use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
@@ -102,6 +101,7 @@ final class ProjectCodeProvider
         FilterableFinder::class,
         Engine::class,
         NonExecutableFinder::class,
+        AdapterInstaller::class,
     ];
 
     /**
@@ -115,9 +115,7 @@ final class ProjectCodeProvider
         StrykerDashboardClient::class,
         MetricsCalculator::class,
         InitialTestRunProcessBuilder::class,
-        PhpSpecInitalConfigBuilder::class,
         PhpUnitInitalConfigBuilder::class,
-        PhpSpecMutationConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
         IndexXmlCoverageParser::class,
         MemoryLimiterEnvironment::class,
