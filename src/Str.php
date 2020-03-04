@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection;
 
 use function array_values;
+use function str_replace;
 
 /**
  * @internal
@@ -48,7 +49,10 @@ final class Str
 
     public static function trimLineReturns(string $string): string
     {
-        $lines = explode(PHP_EOL, $string);
+        $lines = explode(
+            "\n",
+            str_replace("\r\n", "\n", $string)
+        );
         $linesCount = count($lines);
 
         // Trim leading empty lines
