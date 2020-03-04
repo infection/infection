@@ -220,7 +220,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                'sarb',
+                'sarb.json',
                 null
             ),
             [SarbLogger::class],
@@ -244,7 +244,7 @@ final class LoggerFactoryTest extends TestCase
                 'summary',
                 'debug',
                 'per_mutator',
-                'sarb',
+                'sarb.json',
                 new Badge('branch')
             ),
             [
