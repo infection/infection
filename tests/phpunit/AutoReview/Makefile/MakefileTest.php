@@ -51,7 +51,7 @@ use function substr_count;
 /**
  * @coversNothing
  *
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MakefileTest extends TestCase
 {

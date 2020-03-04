@@ -48,7 +48,7 @@ use function Safe\sprintf;
 use function str_replace;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class IndexXmlCoverageParserTest extends TestCase
 {

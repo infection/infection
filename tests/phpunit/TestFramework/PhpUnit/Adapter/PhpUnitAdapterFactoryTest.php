@@ -39,7 +39,7 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class PhpUnitAdapterFactoryTest extends TestCase
 {

@@ -41,7 +41,7 @@ use function Safe\file_get_contents;
 use function Safe\sprintf;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class FunctionCallTest extends AbstractMutatorTestCase
 {

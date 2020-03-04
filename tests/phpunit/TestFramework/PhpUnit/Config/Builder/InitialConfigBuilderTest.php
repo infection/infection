@@ -53,7 +53,7 @@ use function simplexml_load_string;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class InitialConfigBuilderTest extends FileSystemTestCase
 {

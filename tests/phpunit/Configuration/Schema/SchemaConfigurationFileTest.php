@@ -46,7 +46,7 @@ use function Safe\sprintf;
 use Seld\JsonLint\ParsingException;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class SchemaConfigurationFileTest extends TestCase
 {
