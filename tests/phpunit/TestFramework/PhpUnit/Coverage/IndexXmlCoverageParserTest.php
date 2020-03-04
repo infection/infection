@@ -110,11 +110,11 @@ final class IndexXmlCoverageParserTest extends TestCase
             self::getXml()
         ));
 
-        $zeroLevelPath = realpath(self::FIXTURES_SRC_DIR . '/zeroLevel.php');
-        $noPercentagePath = realpath(self::FIXTURES_SRC_DIR . '/noPercentage.php');
-        $firstLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/firstLevel.php');
-        $secondLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
-        $secondLevelTraitPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
+        $zeroLevelPath = Path::canonicalize(self::FIXTURES_SRC_DIR . '/zeroLevel.php');
+        $noPercentagePath = Path::canonicalize(self::FIXTURES_SRC_DIR . '/noPercentage.php');
+        $firstLevelPath = Path::canonicalize(self::FIXTURES_SRC_DIR . '/FirstLevel/firstLevel.php');
+        $secondLevelPath = Path::canonicalize(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
+        $secondLevelTraitPath = Path::canonicalize(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
 
         $this->assertSame(
             [
