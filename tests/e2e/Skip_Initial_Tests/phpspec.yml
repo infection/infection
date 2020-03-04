@@ -1,7 +1,0 @@
-suites:
-  source_suite:
-    namespace: ProvideExistingCoverage
-    psr4_prefix: ProvideExistingCoverage
-
-extensions:
-  LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension: ~

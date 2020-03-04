@@ -1,7 +1,0 @@
-suites:
-  source_suite:
-    namespace: ConfigFramework
-    psr4_prefix: ConfigFramework
-
-extensions:
-  LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension: ~

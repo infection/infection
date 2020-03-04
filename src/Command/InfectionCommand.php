@@ -227,6 +227,8 @@ final class InfectionCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
+        $this->installTestFrameworkIfNeeded($input, $output);
+
         $this->initContainer($input);
 
         $locator = $this->container->getRootsFileOrDirectoryLocator();
@@ -347,5 +349,24 @@ final class InfectionCommand extends BaseCommand
                 throw ConfigurationException::configurationAborted();
             }
         }
+    }
+
+    private function installTestFrameworkIfNeeded(InputInterface $input, OutputInterface $output): void
+    {
+        $container = $this->getApplication()->getContainer();
+
+        $installationDecider = $container->getAdapterInstallationDecider();
+        $adapterName = trim((string) $this->input->getOption('test-framework'));
+
+        if (!$installationDecider->shouldBeInstalled($adapterName, $input, $output)) {
+            return;
+        }
+
+        $output->writeln([
+            '',
+            sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
+        ]);
+
+        $container->getAdapterInstaller()->install($adapterName);
     }
 }
