@@ -4,6 +4,8 @@
          bootstrap="./vendor/autoload.php"
          colors="true"
          executionOrder="random"
+         failOnWarning="true"
+         failOnRisky="true"
          verbose="true"
 >
 
@@ -25,12 +27,6 @@
             <directory>src</directory>
         </whitelist>
     </filter>
-
-    <groups>
-        <exclude>
-            <group>large</group>
-        </exclude>
-    </groups>
 
     <listeners>
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />

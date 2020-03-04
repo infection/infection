@@ -125,22 +125,13 @@ final class E2ETest extends TestCase
         chdir($this->cwd);
     }
 
-    /**
-     * Longest test: runs under about 160-200 sec
-     *
-     * To be run with:
-     *
-     * php -dmemory_limit=128M vendor/bin/phpunit --group=large
-     *
-     * @large
-     */
     public function test_it_runs_on_itself(): void
     {
         if (ini_get('memory_limit') === '-1') {
             $this->markTestSkipped(implode("\n", [
                 'Refusing to run Infection on itself with no memory limit set: it is dangerous.',
                 'To run this test with a memory limit set please use:',
-                'php -dmemory_limit=128M vendor/bin/phpunit --group=large',
+                'php -dmemory_limit=128M vendor/bin/phpunit --group=e2e',
             ]));
         }
 
