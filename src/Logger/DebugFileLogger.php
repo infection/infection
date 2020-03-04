@@ -65,25 +65,25 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
 
         $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
         $logs[] = $this->convertExecutionResult(
-            $this->metricsCalculator->getKilledMutantExecutionResults(),
+            $this->metricsCalculator->getKilledExecutionResults(),
             'Killed'
         );
         $logs[] = $this->convertExecutionResult(
-            $this->metricsCalculator->getErrorMutantExecutionResults(),
+            $this->metricsCalculator->getErrorExecutionResults(),
             'Errors'
         );
         $logs[] = $this->convertExecutionResult(
-            $this->metricsCalculator->getEscapedMutantExecutionResults(),
+            $this->metricsCalculator->getEscapedExecutionResults(),
             'Escaped'
         );
         $logs[] = $this->convertExecutionResult(
-            $this->metricsCalculator->getTimedOutMutantExecutionResults(),
+            $this->metricsCalculator->getTimedOutExecutionResults(),
             'Timed Out'
         );
 
         if (!$this->onlyCoveredMode) {
             $logs[] = $this->convertExecutionResult(
-                $this->metricsCalculator->getNotCoveredMutantExecutionResults(),
+                $this->metricsCalculator->getNotCoveredExecutionResults(),
                 'Not Covered'
             );
         }
@@ -97,8 +97,6 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
     private function convertExecutionResult(array $executionResults, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
-
-        ExecutionResultSorter::sortResults($executionResults);
 
         foreach ($executionResults as $executionResult) {
             $logParts[] = '';
