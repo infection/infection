@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use InvalidArgumentException;
+use LogicException;
 
 /**
  * @internal
  */
-final class CoverageNotFound extends InvalidArgumentException
+final class CoverageNotFound extends LogicException
 {
 }

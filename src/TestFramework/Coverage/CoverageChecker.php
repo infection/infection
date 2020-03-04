@@ -45,6 +45,7 @@ use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\preg_match;
 use function Safe\sprintf;
+use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -95,7 +96,9 @@ TXT
 
     public function checkCoverageExists(): void
     {
-        $coverageIndexFilePath = $this->coveragePath . '/coverage-xml/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexFilePath = Path::canonicalize(
+            $this->coveragePath . '/coverage-xml/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME
+        );
 
         if (!file_exists($coverageIndexFilePath)) {
             throw new CoverageNotFound(sprintf(
@@ -124,7 +127,9 @@ TXT
     ): void {
         $errors = [];
 
-        $coverageIndexFilePath = $this->coveragePath . '/coverage-xml/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexFilePath = Path::canonicalize(
+            $this->coveragePath . '/coverage-xml/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME
+        );
 
         if (!file_exists($coverageIndexFilePath)) {
             $errors[] = sprintf('- The file "%s" could not be found', $coverageIndexFilePath);

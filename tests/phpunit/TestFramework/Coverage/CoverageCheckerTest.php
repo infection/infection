@@ -54,8 +54,21 @@ use Webmozart\PathUtil\Path;
  */
 final class CoverageCheckerTest extends TestCase
 {
-    private const COVERAGE_PATH = __DIR__ . '/../Fixtures/Files/phpunit/coverage';
-    private const JUNIT = __DIR__ . '/../Fixtures/Files/phpunit/junit.xml';
+    /**
+     * @var string
+     */
+    private static $coveragePath;
+
+    /**
+     * @var string
+     */
+    private static $jUnit;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$coveragePath = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/coverage');
+        self::$jUnit = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/junit.xml');
+    }
 
     public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped(): void
     {
@@ -110,8 +123,8 @@ TXT
             false,
             false,
             '',
-            self::COVERAGE_PATH,
-            self::JUNIT
+            self::$coveragePath,
+            self::$jUnit
         );
 
         $checker->checkCoverageExists();
@@ -126,7 +139,7 @@ TXT
             false,
             '',
             '/nowhere',
-            self::JUNIT
+            self::$jUnit
         );
 
         $this->expectException(CoverageNotFound::class);
@@ -141,13 +154,11 @@ TXT
 
     public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing(): void
     {
-        $coveragePath = Path::canonicalize(self::COVERAGE_PATH);
-
         $checker = new CoverageChecker(
             false,
             false,
             '',
-            $coveragePath,
+            self::$coveragePath,
             '/invalid/path/to/junit.xml'
         );
 
@@ -156,7 +167,7 @@ TXT
             'Could not find the file "/invalid/path/to/junit.xml". Please ensure that the JUnit '
             . 'coverage report has been properly generated at the right place. If using PHPUnit for '
             . 'example, the option  for the path given is "--log-junit=%s/junit.xml"',
-            $coveragePath
+            self::$coveragePath
         ));
 
         $checker->checkCoverageExists();
@@ -168,8 +179,8 @@ TXT
             false,
             false,
             '',
-            self::COVERAGE_PATH,
-            self::JUNIT
+            self::$coveragePath,
+            self::$jUnit
         );
 
         $checker->checkCoverageHasBeenGenerated(
@@ -187,7 +198,7 @@ TXT
             false,
             '',
             '/nowhere',
-            self::JUNIT
+            self::$jUnit
         );
 
         $this->expectException(CoverageNotFound::class);
@@ -213,7 +224,7 @@ TXT
 
     public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_after_tests_run(): void
     {
-        $coveragePath = Path::canonicalize(self::COVERAGE_PATH);
+        $coveragePath = Path::canonicalize(self::$coveragePath);
 
         $checker = new CoverageChecker(
             false,
