@@ -97,7 +97,7 @@ final class E2ETest extends TestCase
     protected function setUp(): void
     {
         if (PHP_SAPI === 'phpdbg') {
-            $this->markTestSkipped('Running this test on PHPDBG causes failures on Travis, see https://github.com/infection/infection/pull/622.');
+            $this->markTestSkipped('Running this test with PHPDBG causes failures due to segmentation faults, which are due to bugs beyond our control.');
         }
 
         if (getenv('DEPS') === 'LOW') {
@@ -126,11 +126,11 @@ final class E2ETest extends TestCase
     }
 
     /**
-     * Longest test: runs under about 160-200 sec
+     * Longest test: takes in range of several minutes to run.
      *
      * To be run with:
      *
-     * php -dmemory_limit=128M vendor/bin/phpunit --group=large
+     * php -dmemory_limit=512M vendor/bin/phpunit --group=large
      *
      * @large
      */
@@ -140,12 +140,12 @@ final class E2ETest extends TestCase
             $this->markTestSkipped(implode("\n", [
                 'Refusing to run Infection on itself with no memory limit set: it is dangerous.',
                 'To run this test with a memory limit set please use:',
-                'php -dmemory_limit=128M vendor/bin/phpunit --group=large',
+                'php -dmemory_limit=512M vendor/bin/phpunit --group=large',
             ]));
         }
 
         $output = $this->runInfection(self::EXPECT_SUCCESS, [
-            '--test-framework-options="--exclude-group=' . self::EXCLUDED_GROUP . '"',
+            sprintf('--test-framework-options=--exclude-group=%s', self::EXCLUDED_GROUP),
         ]);
 
         $this->assertRegExp('/\d+ mutations were generated/', $output);
@@ -327,8 +327,8 @@ final class E2ETest extends TestCase
 
     private function runInfection(int $expectedExitCode, array $argvExtra = []): string
     {
-        if (!extension_loaded('xdebug') && PHP_SAPI !== 'phpdbg') {
-            $this->markTestSkipped("Infection from within PHPUnit won't run without xdebug or phpdbg");
+        if (!extension_loaded('xdebug') && PHP_SAPI !== 'phpdbg' && !extension_loaded('pcov')) {
+            $this->markTestSkipped("Infection from within PHPUnit won't run without a coverage driver (pcov, xdebug, or phpdbg)");
         }
 
         /*
@@ -344,6 +344,7 @@ final class E2ETest extends TestCase
             'run',
             '--verbose',
             '--no-interaction',
+            '--no-progress',
         ], $argvExtra));
 
         $output = new BufferedOutput();
