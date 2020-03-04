@@ -46,7 +46,10 @@ final class StrTest extends TestCase
      */
     public function test_it_can_trim_string_of_line_returns(string $value, string $expected): void
     {
-        $this->assertSame($expected, Str::trimLineReturns($value));
+        $this->assertSame(
+            $expected,
+            normalizeLineReturn(Str::trimLineReturns($value))
+        );
     }
 
     public function stringProvider(): Generator
