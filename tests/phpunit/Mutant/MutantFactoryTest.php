@@ -52,7 +52,7 @@ use function Safe\file_put_contents;
 use function Safe\sprintf;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MutantFactoryTest extends FileSystemTestCase
 {

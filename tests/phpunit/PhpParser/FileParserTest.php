@@ -49,7 +49,7 @@ use function Safe\sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class FileParserTest extends TestCase
 {

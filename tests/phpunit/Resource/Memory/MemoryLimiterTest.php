@@ -49,7 +49,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MemoryLimiterTest extends FileSystemTestCase
 {

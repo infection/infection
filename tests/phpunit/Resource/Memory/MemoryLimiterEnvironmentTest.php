@@ -42,7 +42,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\ini_get;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MemoryLimiterEnvironmentTest extends TestCase
 {
