@@ -76,6 +76,18 @@ final class AdapterInstallationDeciderTest extends TestCase
         $this->assertFalse($result, 'PHPUnit adapter should not be installed');
     }
 
+    public function test_it_adds_empty_line_to_make_output_more_readable(): void
+    {
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock->expects($this->once())->method('writeln')->with(['']);
+
+        $this->installationDecider->shouldBeInstalled(
+            TestFrameworkTypes::PHPSPEC,
+            $this->createMock(InputInterface::class),
+            $outputMock
+        );
+    }
+
     public function test_it_should_not_install_when_user_answers_no(): void
     {
         $result = $this->installationDecider->shouldBeInstalled(
