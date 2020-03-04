@@ -9,9 +9,6 @@ parameters:
         - '#expects .*, array<string>\|bool\|string\|null given#'
         - '#cast array<string>\|bool\|string\|null to#'
         -
-            path: '../src/Process/Runner/Parallel/ParallelProcessRunner.php'
-            message: '#Left side of [\&]{2} is always true#'
-        -
             path: '../src/PhpParser/FileParser.php'
             message: '#Method Infection\\PhpParser\\FileParser::parse\(\) should return array<PhpParser\\Node> but returns array<PhpParser\\Node\\Stmt>\|null\.#'
             count: 1
@@ -30,6 +27,10 @@ parameters:
         -
             path: '../src/Container.php'
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
+            count: 1
+        -
+            path: '../src/TestFramework/Coverage/XmlReport/JUnitTestCaseSorter.php'
+            message: '#array_key_exists expects int\|string, string\|null given#'
             count: 1
     level: max
     paths:

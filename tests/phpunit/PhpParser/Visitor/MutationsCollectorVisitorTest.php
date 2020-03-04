@@ -44,7 +44,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use stdClass;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MutationsCollectorVisitorTest extends BaseVisitorTest
 {
@@ -71,7 +71,7 @@ PHP;
             [$visitor]
         );
 
-        $this->assertSame([$mutation, $mutation], $visitor->getMutations());
+        $this->assertSame([$mutation, $mutation], iterator_to_array($visitor->getMutations(), false));
     }
 
     public function test_it_resets_its_state_between_two_traverse(): void
@@ -108,14 +108,14 @@ PHP;
             [$visitor]
         );
 
-        $this->assertSame([$mutation0], $visitor->getMutations());
+        $this->assertSame([$mutation0], iterator_to_array($visitor->getMutations(), false));
 
         $this->traverse(
             [$node2, $node3],
             [$visitor]
         );
 
-        $this->assertSame([$mutation2, $mutation3], $visitor->getMutations());
+        $this->assertSame([$mutation2, $mutation3], iterator_to_array($visitor->getMutations(), false));
     }
 
     private static function createExactArgument(object $value): TokenInterface

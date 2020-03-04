@@ -73,6 +73,7 @@ class Configuration
     private $testFrameworkExtraOptions;
     private $coveragePath;
     private $skipCoverage;
+    private $skipInitialTests;
     private $debug;
     private $onlyCovered;
     private $formatter;
@@ -84,13 +85,13 @@ class Configuration
 
     /**
      * @param string[] $sourceDirectories
-     * @param SplFileInfo[] $sourceFiles
+     * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator> $mutators
      */
     public function __construct(
         int $timeout,
         array $sourceDirectories,
-        array $sourceFiles,
+        iterable $sourceFiles,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -102,6 +103,7 @@ class Configuration
         string $testFrameworkExtraOptions,
         string $coveragePath,
         bool $skipCoverage,
+        bool $skipInitialTests,
         bool $debug,
         bool $onlyCovered,
         string $formatter,
@@ -134,6 +136,7 @@ class Configuration
         $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
         $this->coveragePath = $coveragePath;
         $this->skipCoverage = $skipCoverage;
+        $this->skipInitialTests = $skipInitialTests;
         $this->debug = $debug;
         $this->onlyCovered = $onlyCovered;
         $this->formatter = $formatter;
@@ -158,9 +161,9 @@ class Configuration
     }
 
     /**
-     * @return SplFileInfo[]
+     * @return iterable<SplFileInfo>
      */
-    public function getSourceFiles(): array
+    public function getSourceFiles(): iterable
     {
         return $this->sourceFiles;
     }
@@ -223,6 +226,11 @@ class Configuration
         return $this->skipCoverage;
     }
 
+    public function shouldSkipInitialTests(): bool
+    {
+        return $this->skipInitialTests;
+    }
+
     public function isDebugEnabled(): bool
     {
         return $this->debug;
@@ -238,7 +246,7 @@ class Configuration
         return $this->formatter;
     }
 
-    public function showProgress(): bool
+    public function noProgress(): bool
     {
         return $this->noProgress;
     }

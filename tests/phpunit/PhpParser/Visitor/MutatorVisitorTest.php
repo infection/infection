@@ -41,6 +41,7 @@ use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Tests\Mutator\MutatorName;
+use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
 use PhpParser\Lexer;
 use PhpParser\Node;
@@ -49,7 +50,7 @@ use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MutatorVisitorTest extends BaseVisitorTest
 {
@@ -68,7 +69,7 @@ final class MutatorVisitorTest extends BaseVisitorTest
             [new MutatorVisitor($mutation)]
         );
 
-        $output = $this->print($nodes);
+        $output = SingletonContainer::getPrinter()->prettyPrintFile($nodes);
 
         $this->assertSame($expectedCodeOutput, StringNormalizer::normalizeString($output));
     }

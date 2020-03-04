@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use function Safe\sprintf;
 use function str_repeat;
@@ -70,11 +71,11 @@ final class DotFormatter extends AbstractOutputFormatter
         ]);
     }
 
-    public function advance(MutantProcess $mutantProcess, int $mutationCount): void
+    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
     {
-        parent::advance($mutantProcess, $mutationCount);
+        parent::advance($executionResult, $mutationCount);
 
-        switch ($mutantProcess->getResultCode()) {
+        switch ($executionResult->getProcessResultCode()) {
             case MutantProcess::CODE_KILLED:
                 $this->output->write('<killed>.</killed>');
 
@@ -106,10 +107,14 @@ final class DotFormatter extends AbstractOutputFormatter
         }
 
         if ($lastDot || $endOfRow) {
-            $length = strlen((string) $mutationCount);
-            $format = sprintf('   (%%%dd / %%%dd)', $length, $length);
+            if ($mutationCount === self::UNKNOWN_COUNT) {
+                $this->output->write(sprintf('   (%5d)', $this->callsCount)); // 5 because folks with over 10k mutations have more important problems
+            } else {
+                $length = strlen((string) $mutationCount);
+                $format = sprintf('   (%%%dd / %%%dd)', $length, $length);
 
-            $this->output->write(sprintf($format, $this->callsCount, $mutationCount));
+                $this->output->write(sprintf($format, $this->callsCount, $mutationCount));
+            }
 
             if ($this->callsCount !== $mutationCount) {
                 $this->output->writeln('');

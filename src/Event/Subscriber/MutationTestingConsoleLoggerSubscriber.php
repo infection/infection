@@ -42,7 +42,7 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Process\MutantProcess;
+use Infection\Mutant\MutantExecutionResult;
 use function Safe\sprintf;
 use function str_pad;
 use function str_repeat;
@@ -56,10 +56,6 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 {
     private const PAD_LENGTH = 8;
 
-    /**
-     * @var MutantProcess[]
-     */
-    private $mutantProcesses = [];
     private $output;
     private $outputFormatter;
     private $metricsCalculator;
@@ -85,15 +81,6 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->diffColorizer = $diffColorizer;
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [
-            MutationTestingWasStarted::class => [$this, 'onMutationTestingWasStarted'],
-            MutationTestingWasFinished::class => [$this, 'onMutationTestingWasFinished'],
-            MutantProcessWasFinished::class => [$this, 'onMutantProcessWasFinished'],
-        ];
-    }
-
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {
         $this->mutationCount = $event->getMutationCount();
@@ -103,10 +90,11 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
-        $this->mutantProcesses[] = $event->getMutantProcess();
-        $this->metricsCalculator->collect($event->getMutantProcess());
+        $executionResult = $event->getExecutionResult();
 
-        $this->outputFormatter->advance($event->getMutantProcess(), $this->mutationCount);
+        $this->metricsCalculator->collect($executionResult);
+
+        $this->outputFormatter->advance($executionResult, $this->mutationCount);
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
@@ -114,10 +102,10 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->outputFormatter->finish();
 
         if ($this->showMutations) {
-            $this->showMutations($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
+            $this->showMutations($this->metricsCalculator->getEscapedExecutionResults(), 'Escaped');
 
             if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-                $this->showMutations($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
+                $this->showMutations($this->metricsCalculator->getNotCoveredExecutionResults(), 'Not covered');
             }
         }
 
@@ -125,9 +113,9 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     }
 
     /**
-     * @param MutantProcess[] $processes
+     * @param MutantExecutionResult[] $executionResults
      */
-    private function showMutations(array $processes, string $headlinePrefix): void
+    private function showMutations(array $executionResults, string $headlinePrefix): void
     {
         $headline = sprintf('%s mutants:', $headlinePrefix);
 
@@ -138,21 +126,19 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
             '',
         ]);
 
-        foreach ($processes as $index => $mutantProcess) {
-            $mutation = $mutantProcess->getMutant()->getMutation();
-
+        foreach ($executionResults as $index => $executionResult) {
             $this->output->writeln([
                 '',
                 sprintf(
                     '%d) %s:%d    [M] %s',
                     $index + 1,
-                    $mutation->getOriginalFilePath(),
-                    (int) $mutation->getAttributes()['startLine'],
-                    $mutation->getMutatorName()
+                    $executionResult->getOriginalFilePath(),
+                    $executionResult->getOriginalStartingLine(),
+                    $executionResult->getMutatorName()
                 ),
             ]);
 
-            $this->output->writeln($this->diffColorizer->colorize($mutantProcess->getMutant()->getDiff()));
+            $this->output->writeln($this->diffColorizer->colorize($executionResult->getMutantDiff()));
         }
     }
 
@@ -161,7 +147,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->output->writeln(['', '']);
         $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotCoveredByTestsCount()) . '</options=bold> mutants were not covered by tests');
+        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotTestedCount()) . '</options=bold> mutants were not covered by tests');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getErrorCount()) . '</options=bold> errors were encountered');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');

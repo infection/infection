@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function implode;
-use Infection\Process\MutantProcess;
+use Infection\Mutant\MetricsCalculator;
+use Infection\Mutant\MutantExecutionResult;
+use const PHP_EOL;
 use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
@@ -44,45 +46,61 @@ use function strlen;
 /**
  * @internal
  */
-final class TextFileLogger extends FileLogger
+final class TextFileLogger implements LineMutationTestingResultsLogger
 {
-    protected function getLogLines(): array
-    {
-        $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
-        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timed Out');
+    private $metricsCalculator;
+    private $debugVerbosity;
+    private $onlyCoveredMode;
+    private $debugMode;
 
-        if ($this->isDebugVerbosity) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed');
-            $logs[] = $this->getLogParts($this->metricsCalculator->getErrorProcesses(), 'Errors');
+    public function __construct(
+        MetricsCalculator $metricsCalculator,
+        bool $debugVerbosity,
+        bool $onlyCoveredMode,
+        bool $debugMode
+    ) {
+        $this->metricsCalculator = $metricsCalculator;
+        $this->debugVerbosity = $debugVerbosity;
+        $this->onlyCoveredMode = $onlyCoveredMode;
+        $this->debugMode = $debugMode;
+    }
+
+    public function getLogLines(): array
+    {
+        $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedExecutionResults(), 'Escaped');
+        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutExecutionResults(), 'Timed Out');
+
+        if ($this->debugVerbosity) {
+            $logs[] = $this->getLogParts($this->metricsCalculator->getKilledExecutionResults(), 'Killed');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getErrorExecutionResults(), 'Errors');
         }
 
-        if (!$this->isOnlyCoveredMode) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not Covered');
+        if (!$this->onlyCoveredMode) {
+            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredExecutionResults(), 'Not Covered');
         }
 
         return $logs;
     }
 
     /**
-     * @param MutantProcess[] $processes
+     * @param MutantExecutionResult[] $executionResults
      */
-    private function getLogParts(array $processes, string $headlinePrefix): string
+    private function getLogParts(array $executionResults, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
-        $this->sortProcesses($processes);
 
-        foreach ($processes as $index => $mutantProcess) {
-            $isShowFullFormat = $this->isDebugVerbosity && $mutantProcess->getProcess()->isStarted();
+        foreach ($executionResults as $index => $executionResult) {
+            $isShowFullFormat = $this->debugVerbosity;
 
             $logParts[] = '';
-            $logParts[] = $this->getMutatorFirstLine($index, $mutantProcess);
+            $logParts[] = $this->getMutatorFirstLine($index, $executionResult);
 
-            $logParts[] = $this->isDebugMode ? $mutantProcess->getProcess()->getCommandLine() : '';
+            $logParts[] = $this->debugMode ? $executionResult->getProcessCommandLine() : '';
 
-            $logParts[] = $mutantProcess->getMutant()->getDiff();
+            $logParts[] = $executionResult->getMutantDiff();
 
             if ($isShowFullFormat) {
-                $logParts[] = $mutantProcess->getProcess()->getOutput();
+                $logParts[] = $executionResult->getProcessOutput();
             }
         }
 
@@ -103,7 +121,7 @@ final class TextFileLogger extends FileLogger
         ];
     }
 
-    private function getMutatorFirstLine(int $index, MutantProcess $mutantProcess): string
+    private function getMutatorFirstLine(int $index, MutantExecutionResult $mutantProcess): string
     {
         return sprintf(
             '%d) %s:%d    [M] %s',

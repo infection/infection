@@ -40,6 +40,7 @@ use function array_values;
 use Generator;
 use Infection\FileSystem\SourceFileCollector;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use function Safe\natcasesort;
 use Webmozart\PathUtil\Path;
 
@@ -59,6 +60,8 @@ final class SourceFileCollectorTest extends TestCase
         $root = self::FIXTURES;
 
         $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles, $filter);
+
+        $files = take($files)->toArray(); // PHP 7.4 [...$files]
 
         $this->assertSame(
             $expected,

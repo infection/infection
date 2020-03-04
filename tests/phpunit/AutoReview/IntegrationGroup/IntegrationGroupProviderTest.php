@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
 use function class_exists;
+use Infection\Tests\Console\E2ETest;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\sprintf;
@@ -71,5 +72,18 @@ final class IntegrationGroupProviderTest extends TestCase
         );
 
         $this->assertFileExists($fileWithIoOperations);
+    }
+
+    public function test_it_finds_e2e_test(): void
+    {
+        foreach (IntegrationGroupProvider::ioTestCaseTupleProvider() as $tuple) {
+            if ($tuple[0] === E2ETest::class) {
+                $this->addToAssertionCount(1);
+
+                return;
+            }
+        }
+
+        $this->fail('IntegrationGroupProvider could not find E2ETest, a known test case without a class but with a lot of IO');
     }
 }

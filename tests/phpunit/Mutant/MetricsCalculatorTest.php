@@ -35,28 +35,35 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
+use function array_merge;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
+use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 final class MetricsCalculatorTest extends TestCase
 {
+    private $id = 0;
+
     public function test_it_shows_zero_values_by_default(): void
     {
         $calculator = new MetricsCalculator();
 
-        $this->assertSame(0, $calculator->getEscapedCount());
         $this->assertSame(0, $calculator->getKilledCount());
         $this->assertSame(0, $calculator->getErrorCount());
+        $this->assertSame(0, $calculator->getEscapedCount());
         $this->assertSame(0, $calculator->getTimedOutCount());
-        $this->assertSame(0, $calculator->getNotCoveredByTestsCount());
+        $this->assertSame(0, $calculator->getNotTestedCount());
         $this->assertSame(0, $calculator->getTotalMutantsCount());
-        $this->assertSame([], $calculator->getEscapedMutantProcesses());
-        $this->assertSame([], $calculator->getKilledMutantProcesses());
-        $this->assertSame([], $calculator->getErrorProcesses());
-        $this->assertSame([], $calculator->getTimedOutProcesses());
-        $this->assertSame([], $calculator->getNotCoveredMutantProcesses());
+
+        $this->assertSame([], $calculator->getKilledExecutionResults());
+        $this->assertSame([], $calculator->getErrorExecutionResults());
+        $this->assertSame([], $calculator->getEscapedExecutionResults());
+        $this->assertSame([], $calculator->getTimedOutExecutionResults());
+        $this->assertSame([], $calculator->getNotCoveredExecutionResults());
+        $this->assertSame([], $calculator->getAllExecutionResults());
 
         $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(0.0, $calculator->getCoverageRate());
@@ -65,40 +72,131 @@ final class MetricsCalculatorTest extends TestCase
 
     public function test_it_collects_all_values(): void
     {
-        $process = $this->createMock(Process::class);
-        $process->method('stop');
-
         $calculator = new MetricsCalculator();
 
-        $this->addMutantProcess($calculator, MutantProcess::CODE_NOT_COVERED);
-        $this->assertSame(1, $calculator->getNotCoveredByTestsCount());
+        $expectedKilledResults = $this->addMutantExecutionResult(
+            $calculator,
+            MutantProcess::CODE_KILLED,
+            7
+        );
+        $expectedErrorResults = $this->addMutantExecutionResult(
+            $calculator,
+            MutantProcess::CODE_ERROR,
+            2
+        );
+        $expectedEscapedResults = $this->addMutantExecutionResult(
+            $calculator,
+            MutantProcess::CODE_ESCAPED,
+            2
+        );
+        $expectedTimedOutResults = $this->addMutantExecutionResult(
+            $calculator,
+            MutantProcess::CODE_TIMED_OUT,
+            2
+        );
+        $expectedNotCoveredResults = $this->addMutantExecutionResult(
+            $calculator,
+            MutantProcess::CODE_NOT_COVERED,
+            1
+        );
 
-        $this->addMutantProcess($calculator, MutantProcess::CODE_ESCAPED, 2);
-        $this->assertSame(2, $calculator->getEscapedCount());
-
-        $this->addMutantProcess($calculator, MutantProcess::CODE_TIMED_OUT, 2);
-        $this->assertSame(2, $calculator->getTimedOutCount());
-
-        $this->addMutantProcess($calculator, MutantProcess::CODE_KILLED, 7);
         $this->assertSame(7, $calculator->getKilledCount());
-
-        $this->addMutantProcess($calculator, MutantProcess::CODE_ERROR, 2);
         $this->assertSame(2, $calculator->getErrorCount());
+        $this->assertSame(2, $calculator->getEscapedCount());
+        $this->assertSame(2, $calculator->getTimedOutCount());
+        $this->assertSame(1, $calculator->getNotTestedCount());
 
+        $this->assertSame($expectedKilledResults, $calculator->getKilledExecutionResults());
+        $this->assertSame($expectedErrorResults, $calculator->getErrorExecutionResults());
+        $this->assertSame($expectedEscapedResults, $calculator->getEscapedExecutionResults());
+        $this->assertSame($expectedTimedOutResults, $calculator->getTimedOutExecutionResults());
+        $this->assertSame($expectedNotCoveredResults, $calculator->getNotCoveredExecutionResults());
+        $this->assertSame(
+            array_merge(
+                $expectedKilledResults,
+                $expectedErrorResults,
+                $expectedEscapedResults,
+                $expectedTimedOutResults,
+                $expectedNotCoveredResults
+            ),
+            $calculator->getAllExecutionResults()
+        );
+
+        $this->assertSame(14, $calculator->getTotalMutantsCount());
         $this->assertSame(78.57142857142857, $calculator->getMutationScoreIndicator());
         $this->assertSame(92.85714285714286, $calculator->getCoverageRate());
         $this->assertSame(84.61538461538461, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
-    private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void
+    public function test_its_metrics_are_properly_updated_when_adding_a_new_process(): void
     {
-        $mutantProcess = $this->createMock(MutantProcess::class);
-        $mutantProcess->expects($this->exactly($count))
-            ->method('getResultCode')
-            ->willReturn($resultCode);
+        $calculator = new MetricsCalculator();
 
-        while ($count--) {
-            $calculator->collect($mutantProcess);
+        $this->assertSame(0, $calculator->getKilledCount());
+        $this->assertSame([], $calculator->getKilledExecutionResults());
+
+        $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
+        $this->assertSame(0.0, $calculator->getCoverageRate());
+        $this->assertSame(0.0, $calculator->getCoveredCodeMutationScoreIndicator());
+
+        $expectedKilledResults = $this->addMutantExecutionResult(
+            $calculator,
+            MutantProcess::CODE_KILLED,
+            1
+        );
+
+        $this->assertSame(1, $calculator->getKilledCount());
+        $this->assertSame($expectedKilledResults, $calculator->getKilledExecutionResults());
+
+        $this->assertSame(100.0, $calculator->getMutationScoreIndicator());
+        $this->assertSame(100.0, $calculator->getCoverageRate());
+        $this->assertSame(100.0, $calculator->getCoveredCodeMutationScoreIndicator());
+    }
+
+    /**
+     * @return MutantExecutionResult[]
+     */
+    private function addMutantExecutionResult(
+        MetricsCalculator $calculator,
+        int $resultCode,
+        int $count
+    ): array {
+        $executionResults = [];
+
+        for ($i = 0; $i < $count; ++$i) {
+            $executionResults[] = $this->createMutantExecutionResult($resultCode);
         }
+
+        $calculator->collect(...$executionResults);
+
+        return $executionResults;
+    }
+
+    private function createMutantExecutionResult(int $resultCode): MutantExecutionResult
+    {
+        $id = $this->id;
+        ++$this->id;
+
+        return new MutantExecutionResult(
+            'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
+            'process output',
+            $resultCode,
+            str_replace(
+                "\n",
+                PHP_EOL,
+                <<<DIFF
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'mutated';
+
+DIFF
+            ),
+            MutatorName::getName(For_::class),
+            'foo/bar',
+            $id
+        );
     }
 }

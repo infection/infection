@@ -46,7 +46,7 @@ use function Safe\realpath;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
 {

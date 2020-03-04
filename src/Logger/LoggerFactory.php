@@ -35,13 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function array_filter;
+use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Environment\ChainBuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Environment\TravisCiResolver;
-use Infection\Http\BadgeApiClient;
+use Infection\Http\JsonClient;
+use Infection\Http\StrykerDashboardClient;
 use Infection\Mutant\MetricsCalculator;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -70,104 +74,106 @@ final class LoggerFactory
         $this->onlyCoveredCode = $onlyCoveredCode;
     }
 
-    /**
-     * @return MutationTestingResultsLogger[]
-     */
-    public function createFromLogEntries(Logs $logs, OutputInterface $output): array
+    public function createFromLogEntries(Logs $logConfig, OutputInterface $output): MutationTestingResultsLogger
     {
-        $isDebugVerbosity = $this->logVerbosity === LogVerbosity::DEBUG;
-        $badge = $logs->getBadge();
-        $debug = $logs->getDebugLogFilePath();
-        $perMutator = $logs->getPerMutatorFilePath();
-        $summary = $logs->getSummaryLogFilePath();
-        $text = $logs->getTextLogFilePath();
-        $sarb = $logs->getSarbFilePath();
-
-        /** @var MutationTestingResultsLogger[] $loggers */
-        $loggers = array_filter([
-            ResultsLoggerTypes::BADGE => $badge === null
-                ? null
-                : $this->createBadgeLogger($output, $badge->getBranch()),
-            ResultsLoggerTypes::DEBUG_FILE => $debug === null
-                ? null
-                : $this->createDebugLogger($output, $debug, $isDebugVerbosity),
-            ResultsLoggerTypes::PER_MUTATOR => $perMutator === null
-                ? null
-                : $this->createPerMutatorLogger($output, $perMutator, $isDebugVerbosity),
-            ResultsLoggerTypes::SUMMARY_FILE => $summary === null
-                ? null
-                : $this->createSummaryLogger($output, $summary, $isDebugVerbosity),
-            ResultsLoggerTypes::TEXT_FILE => $text === null
-                ? null
-                : $this->createTextLogger($output, $text, $isDebugVerbosity),
-            ResultsLoggerTypes::SARB => $sarb === null
-                ? null
-                : $this->createSarbLogger($output, $sarb, $isDebugVerbosity),
-        ]);
-
-        return array_filter($loggers, [$this, 'isAllowedToLog'], ARRAY_FILTER_USE_KEY);
+        return new LoggerRegistry(
+            ...array_filter(
+                [
+                    $this->createTextLogger($output, $logConfig->getTextLogFilePath()),
+                    $this->createSummaryLogger($output, $logConfig->getSummaryLogFilePath()),
+                    $this->createDebugLogger($output, $logConfig->getDebugLogFilePath()),
+                    $this->createPerMutatorLogger($output, $logConfig->getPerMutatorFilePath()),
+                    $this->createBadgeLogger($output, $logConfig->getBadge()),
+                    $this->createSarbLogger($output, $logConfig->getSarbFilePath()),
+                ],
+                function (?MutationTestingResultsLogger $logger): bool {
+                    return $logger !== null && $this->isAllowedToLog($logger);
+                }
+            )
+        );
     }
 
     private function createTextLogger(
         OutputInterface $output,
-        string $location,
-        bool $isDebugVerbosity
-    ): TextFileLogger {
-        return new TextFileLogger(
-            $output,
-            $location,
-            $this->metricsCalculator,
-            $this->filesystem,
-            $isDebugVerbosity,
-            $this->debugMode,
-            $this->onlyCoveredCode
-        );
+        ?string $filePath
+    ): ?FileLogger {
+        return $filePath === null
+            ? null
+            : new FileLogger(
+                $output,
+                $filePath,
+                $this->filesystem,
+                new TextFileLogger(
+                    $this->metricsCalculator,
+                    $this->logVerbosity === LogVerbosity::DEBUG,
+                    $this->onlyCoveredCode,
+                    $this->debugMode
+                )
+            )
+        ;
     }
 
     private function createSummaryLogger(
         OutputInterface $output,
-        string $location,
-        bool $isDebugVerbosity
-    ): SummaryFileLogger {
-        return new SummaryFileLogger(
-            $output,
-            $location,
-            $this->metricsCalculator,
-            $this->filesystem,
-            $isDebugVerbosity,
-            $this->debugMode
-        );
+        ?string $filePath
+    ): ?FileLogger {
+        return $filePath === null
+            ? null
+            : new FileLogger(
+                $output,
+                $filePath,
+                $this->filesystem,
+                new SummaryFileLogger($this->metricsCalculator)
+            )
+        ;
     }
 
     private function createDebugLogger(
         OutputInterface $output,
-        string $location,
-        bool $isDebugVerbosity
-    ): DebugFileLogger {
-        return new DebugFileLogger(
-            $output,
-            $location,
-            $this->metricsCalculator,
-            $this->filesystem,
-            $isDebugVerbosity,
-            $this->debugMode,
-            $this->onlyCoveredCode
-        );
+        ?string $filePath
+    ): ?FileLogger {
+        return $filePath === null
+            ? null
+            : new FileLogger(
+                $output,
+                $filePath,
+                $this->filesystem,
+                new DebugFileLogger($this->metricsCalculator, $this->onlyCoveredCode)
+            )
+        ;
     }
 
     private function createPerMutatorLogger(
         OutputInterface $output,
-        string $location,
-        bool $isDebugVerbosity
-    ): PerMutatorLogger {
-        return new PerMutatorLogger(
-            $output,
-            $location,
-            $this->metricsCalculator,
-            $this->filesystem,
-            $isDebugVerbosity,
-            $this->debugMode
-        );
+        ?string $filePath
+    ): ?FileLogger {
+        return $filePath === null
+            ? null
+            : new FileLogger(
+                $output,
+                $filePath,
+                $this->filesystem,
+                new PerMutatorLogger($this->metricsCalculator)
+            )
+        ;
+    }
+
+    private function createBadgeLogger(OutputInterface $output, ?Badge $badge): ?BadgeLogger
+    {
+        return $badge === null
+            ? null
+            : new BadgeLogger(
+                $output,
+                new ChainBuildContextResolver(new TravisCiResolver()),
+                new StrykerApiKeyResolver(),
+                new StrykerDashboardClient(
+                    new JsonClient(),
+                    new ConsoleLogger($output)
+                ),
+                $this->metricsCalculator,
+                $badge->getBranch()
+            )
+        ;
     }
 
     private function createSarbLogger(
@@ -185,22 +191,8 @@ final class LoggerFactory
         );
     }
 
-    private function createBadgeLogger(OutputInterface $output, string $branch): BadgeLogger
+    private function isAllowedToLog(MutationTestingResultsLogger $logger): bool
     {
-        return new BadgeLogger(
-            $output,
-            new ChainBuildContextResolver(new TravisCiResolver()),
-            new StrykerApiKeyResolver(),
-            new BadgeApiClient($output),
-            $this->metricsCalculator,
-            (object) ['branch' => $branch]
-        );
-    }
-
-    private function isAllowedToLog(string $logType): bool
-    {
-        return $this->logVerbosity !== LogVerbosity::NONE
-            || in_array($logType, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)
-        ;
+        return $this->logVerbosity !== LogVerbosity::NONE || $logger instanceof BadgeLogger;
     }
 }

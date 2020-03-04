@@ -39,13 +39,13 @@ use Infection\TestFramework\CommandLineBuilder;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class CommandLineBuilderTest extends TestCase
 {
     private const PHP_EXTRA_ARGS = ['-d zend_extension=xdebug.so'];
 
-    private const TEST_FRAMEWORK_ARGS = ['--filter XYZ', '--exclude-group=e2e'];
+    private const TEST_FRAMEWORK_ARGS = ['--filter XYZ', '--exclude-group=integration'];
 
     /**
      * @var CommandLineBuilder
@@ -65,7 +65,7 @@ final class CommandLineBuilderTest extends TestCase
 
         $this->assertContains('phpunit.bat', $commandLine);
         $this->assertContains('--filter XYZ', $commandLine);
-        $this->assertContains('--exclude-group=e2e', $commandLine);
+        $this->assertContains('--exclude-group=integration', $commandLine);
     }
 
     public function test_it_builds_command_line_with_empty_php_args(): void
@@ -74,6 +74,6 @@ final class CommandLineBuilderTest extends TestCase
 
         $this->assertContains('vendor/bin/phpunit', $commandLine);
         $this->assertContains('--filter XYZ', $commandLine);
-        $this->assertContains('--exclude-group=e2e', $commandLine);
+        $this->assertContains('--exclude-group=integration', $commandLine);
     }
 }

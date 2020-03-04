@@ -40,8 +40,8 @@ use function array_key_exists;
 use function array_map;
 use function in_array;
 use Infection\StreamWrapper\IncludeInterceptor;
-use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
+use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
@@ -59,21 +59,6 @@ use function Safe\sprintf;
  */
 final class ProjectCodeTest extends TestCase
 {
-    /**
-     * @var PHPDocParser|null
-     */
-    private static $phpDocParser;
-
-    public static function setUpBeforeClass(): void
-    {
-        self::$phpDocParser = new PHPDocParser();
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        self::$phpDocParser = null;
-    }
-
     /**
      * @requires OSFAMILY Windows Cannot check if the file is executable on Windows
      */
@@ -178,7 +163,11 @@ final class ProjectCodeTest extends TestCase
     {
         $reflectionClass = new ReflectionClass($className);
 
-        $tagsAsKeys = array_flip(self::$phpDocParser->parse((string) $reflectionClass->getDocComment()));
+        $tagsAsKeys = array_flip(
+            SingletonContainer::getPHPDocParser()->parse(
+                (string) $reflectionClass->getDocComment()
+            )
+        );
 
         $pass = $reflectionClass->isTrait()
             || $reflectionClass->isInterface()

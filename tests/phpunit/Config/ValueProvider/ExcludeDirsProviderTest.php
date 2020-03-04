@@ -45,7 +45,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 {

@@ -46,7 +46,7 @@ use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
@@ -56,7 +56,7 @@ use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
@@ -583,7 +583,7 @@ PHP
         return new MutationConfigBuilder(
             $this->tmp,
             file_get_contents($phpunitXmlPath),
-            new XmlConfigurationHelper($replacer, ''),
+            new XmlConfigurationManipulator($replacer, ''),
             'project/dir',
             new JUnitTestCaseSorter()
         );

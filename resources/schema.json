@@ -95,11 +95,34 @@
                 }
             }
         },
+        "ignoreMsiWithNoMutations": {
+            "type": "boolean",
+            "description": "Ignore MSI violations with zero mutations."
+        },
+        "minMsi": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Minimum Mutation Score Indicator (MSI) percentage value. Should be used in CI server."
+        },
+        "minCoveredMsi": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Minimum Covered Code Mutation Score Indicator (MSI) percentage value. Should be used in CI server."
+        },
         "mutators": {
             "type": "object",
             "additionalProperties": false,
             "description": "Contains the settings for different mutations and profiles",
             "properties": {
+                "global-ignore": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+
                 "@arithmetic": { "$ref": "#/definitions/default-mutator-config" },
                 "@boolean": { "$ref": "#/definitions/default-mutator-config" },
                 "@conditional_boundary": { "$ref": "#/definitions/default-mutator-config" },
@@ -117,7 +140,9 @@
                 "@cast": { "$ref": "#/definitions/default-mutator-config" },
                 "@unwrap": { "$ref": "#/definitions/default-mutator-config" },
                 "@extensions": { "$ref": "#/definitions/default-mutator-config" },
+
                 "@default": { "$ref": "#/definitions/default-mutator-config" },
+
                 "Assignment": { "$ref": "#/definitions/default-mutator-config" },
                 "AssignmentEqual": { "$ref": "#/definitions/default-mutator-config" },
                 "BitwiseAnd": { "$ref": "#/definitions/default-mutator-config" },

@@ -47,10 +47,11 @@ use function getenv;
 use function implode;
 use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
-use Infection\Container;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Tests\SingletonContainer;
 use function is_readable;
+use const PHP_EOL;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
@@ -69,9 +70,14 @@ use Symfony\Component\Process\Process;
 
 /**
  * @group e2e
+ * @group integration
  */
 final class E2ETest extends TestCase
 {
+    /**
+     * This group must be excluded from E2E testing to avoid endless recursive testing loop situation.
+     */
+    private const EXCLUDED_GROUP = 'integration';
     private const MAX_FAILING_COMPOSER_INSTALL = 5;
     private const EXPECT_ERROR = 1;
     private const EXPECT_SUCCESS = 0;
@@ -126,7 +132,6 @@ final class E2ETest extends TestCase
      *
      * php -dmemory_limit=128M vendor/bin/phpunit --group=large
      *
-     * @group e2e
      * @large
      */
     public function test_it_runs_on_itself(): void
@@ -140,16 +145,13 @@ final class E2ETest extends TestCase
         }
 
         $output = $this->runInfection(self::EXPECT_SUCCESS, [
-            '--test-framework-options="--exclude-group=e2e"',
+            '--test-framework-options="--exclude-group=' . self::EXCLUDED_GROUP . '"',
         ]);
 
         $this->assertRegExp('/\d+ mutations were generated/', $output);
         $this->assertRegExp('/\d{2,} mutants were killed/', $output);
     }
 
-    /**
-     * @group e2e
-     */
     public function test_it_runs_configure_command_if_no_configuration(): void
     {
         chdir('tests/e2e/Unconfigured/');
@@ -161,7 +163,6 @@ final class E2ETest extends TestCase
 
     /**
      * @dataProvider e2eTestSuiteDataProvider
-     * @group e2e
      * @runInSeparateProcess
      */
     public function test_it_runs_an_e2e_test_with_success(string $fullPath): void
@@ -337,7 +338,7 @@ final class E2ETest extends TestCase
             $this->markTestIncomplete('This build of PHPDBG does not support code coverage');
         }
 
-        $container = Container::create();
+        $container = SingletonContainer::getContainer();
         $input = new ArgvInput(array_merge([
             'bin/infection',
             'run',
@@ -357,7 +358,13 @@ final class E2ETest extends TestCase
         $this->assertSame(
             $expectedExitCode,
             $exitCode,
-            'Unexpected exit code. Command output was' . $outputText
+            <<<EOF
+Unexpected exit code. Command output was:
+---
+$outputText
+--- end of output
+
+EOF
         );
 
         return $outputText;

@@ -36,12 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\CloneVisitor;
+use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class CloneVisitorTest extends BaseVisitorTest
 {
@@ -60,11 +61,11 @@ PHP;
     {
         $originalNodes = $this->parseCode(self::CODE);
 
-        $originalDump = $this->dumpNodes($originalNodes);
+        $originalDump = SingletonContainer::getNodeDumper()->dump($originalNodes);
 
         $traversedNodes = $this->traverse($originalNodes, [$this->createMutateStringValueVisitor()]);
 
-        $newDump = $this->dumpNodes($traversedNodes);
+        $newDump = SingletonContainer::getNodeDumper()->dump($traversedNodes);
 
         $this->assertSame($originalNodes, $traversedNodes, 'Expected the nodes to be identical');
         $this->assertNotSame($originalDump, $newDump, 'Expected the new nodes to have been mutated');
@@ -74,7 +75,7 @@ PHP;
     {
         $originalNodes = $this->parseCode(self::CODE);
 
-        $originalDump = $this->dumpNodes($originalNodes);
+        $originalDump = SingletonContainer::getNodeDumper()->dump($originalNodes);
 
         $traversedNodes = $this->traverse(
             $originalNodes,
@@ -84,7 +85,7 @@ PHP;
             ]
         );
 
-        $newDump = $this->dumpNodes($traversedNodes);
+        $newDump = SingletonContainer::getNodeDumper()->dump($traversedNodes);
 
         $this->assertNotSame($originalNodes, $traversedNodes, 'Expected the nodes to be identical');
         $this->assertNotSame($originalDump, $newDump, 'Expected the new nodes to have been mutated');

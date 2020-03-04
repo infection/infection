@@ -36,13 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use Generator;
-use Infection\Container;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\UnparsableFile;
+use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
 use PhpParser\Error;
 use PhpParser\Node;
-use PhpParser\NodeDumper;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
@@ -50,7 +49,7 @@ use function Safe\sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class FileParserTest extends TestCase
 {
@@ -78,13 +77,13 @@ final class FileParserTest extends TestCase
      */
     public function test_it_can_parse_a_file(SplFileInfo $fileInfo, string $expectedPrintedParsedContents): void
     {
-        $statements = Container::create()->getFileParser()->parse($fileInfo);
+        $statements = SingletonContainer::getContainer()->getFileParser()->parse($fileInfo);
 
         foreach ($statements as $statement) {
             $this->assertInstanceOf(Node::class, $statement);
         }
 
-        $actualPrintedParsedContents = (new NodeDumper())->dump($statements);
+        $actualPrintedParsedContents = SingletonContainer::getNodeDumper()->dump($statements);
 
         $this->assertSame(
             $expectedPrintedParsedContents,
@@ -94,7 +93,7 @@ final class FileParserTest extends TestCase
 
     public function test_it_throws_upon_failure(): void
     {
-        $parser = Container::create()->getFileParser();
+        $parser = SingletonContainer::getContainer()->getFileParser();
 
         try {
             $parser->parse(self::createFileInfo('/unknown', '<?php use foo as self;'));

@@ -38,31 +38,27 @@ namespace Infection\Tests\AutoReview\IntegrationGroup;
 use function array_filter;
 use function array_map;
 use function array_values;
+use function class_exists;
 use Generator;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
+use Infection\Tests\Console\E2ETest;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use ReflectionException;
 use function Safe\file_get_contents;
 use Webmozart\Assert\Assert;
 
 final class IntegrationGroupProvider
 {
-    private const IO_STATEMENTS = [
-        'file_get_contents',
-        'file_put_contents',
-        'file_exists',
-        'rmdir',
-        'rename(',
-        'fopen',
-        'getcwd',
-        'realpath',
-        'use Symfony\Component\Filesystem\Filesystem',
-        'STDIN',
-        'STDOUT',
+    /**
+     * List of known integrational tests that must be treated as such.
+     *
+     * A better solution would be to find all tests that do not have corresponding class.
+     */
+    private const KNOWN_INTEGRATIONAL_TESTS = [
+        E2ETest::class,
     ];
 
     /**
@@ -88,9 +84,21 @@ final class IntegrationGroupProvider
         }
 
         self::$ioTestCaseClassesTuple = array_values(array_filter(array_map(
-            [self::class, 'checkIoOperations'],
+            static function (string $className): ?array {
+                return self::ioTestCaseTuple($className);
+            },
             iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true)
         )));
+
+        foreach (self::KNOWN_INTEGRATIONAL_TESTS as $testCaseClass) {
+            $testCaseReflection = new ReflectionClass($testCaseClass);
+            Assert::isInstanceOf($testCaseReflection, ReflectionClass::class);
+
+            self::$ioTestCaseClassesTuple[] = [
+                $testCaseClass,
+                $testCaseReflection->getFileName(),
+            ];
+        }
 
         yield from self::$ioTestCaseClassesTuple;
     }
@@ -101,29 +109,47 @@ final class IntegrationGroupProvider
     }
 
     /**
-     * @return string[]|null
+     * @return ?array{0: string, 1: string}
      */
-    private static function checkIoOperations(string $className): ?array
+    private static function ioTestCaseTuple(string $className): ?array
     {
-        $classReflection = new ReflectionClass($className);
-
         $testCaseClass = SourceTestClassNameScheme::getTestClassName($className);
 
-        try {
-            $testCaseReflection = new ReflectionClass($testCaseClass);
-        } catch (ReflectionException $exception) {
+        if (!class_exists($testCaseClass)) {
             // No test case could be find for this source file
             return null;
         }
 
-        //
-        // Check the test cases code
-        //
+        foreach ([
+            self::checkTestCaseForIoOperations($testCaseClass),
+            self::checkTestedClassForIoOperations($className),
+        ] as $classFileNameWithIoOperations) {
+            if ($classFileNameWithIoOperations === null) {
+                continue;
+            }
+
+            return [
+                $testCaseClass,
+                $classFileNameWithIoOperations,
+            ];
+        }
+
+        return null;
+    }
+
+    /**
+     * Check the test cases code.
+     */
+    private static function checkTestCaseForIoOperations(string $testCaseClass): ?string
+    {
+        $testCaseReflection = new ReflectionClass($testCaseClass);
+        Assert::isInstanceOf($testCaseReflection, ReflectionClass::class);
+
         $testCaseFileName = $testCaseReflection->getFileName();
         $testCaseCode = file_get_contents($testCaseFileName);
 
         if (IoCodeDetector::codeContainsIoOperations($testCaseCode)) {
-            return [$testCaseClass, $testCaseFileName];
+            return $testCaseFileName;
         }
 
         $parentTestCaseClassReflection = $testCaseReflection->getParentClass();
@@ -132,7 +158,7 @@ final class IntegrationGroupProvider
 
         while ($parentTestCaseClassReflection->getName() !== TestCase::class) {
             if ($parentTestCaseClassReflection->getName() === FileSystemTestCase::class) {
-                return [$testCaseClass, $parentTestCaseClassReflection->getFileName()];
+                return $parentTestCaseClassReflection->getFileName();
             }
 
             $parentTestCaseFileName = $parentTestCaseClassReflection->getFileName();
@@ -140,7 +166,7 @@ final class IntegrationGroupProvider
             $testCaseCode = file_get_contents($parentTestCaseFileName);
 
             if (IoCodeDetector::codeContainsIoOperations($testCaseCode)) {
-                return [$testCaseClass, $parentTestCaseFileName];
+                return $parentTestCaseFileName;
             }
 
             $parentTestCaseClassReflection = $parentTestCaseClassReflection->getParentClass();
@@ -148,14 +174,21 @@ final class IntegrationGroupProvider
             Assert::isInstanceOf($parentTestCaseClassReflection, ReflectionClass::class);
         }
 
-        //
-        // Check the source class code
-        //
+        return null;
+    }
+
+    /**
+     * Check the source class code.
+     */
+    private static function checkTestedClassForIoOperations(string $className): ?string
+    {
+        $classReflection = new ReflectionClass($className);
+
         $classFileName = $classReflection->getFileName();
         $classCode = file_get_contents($classFileName);
 
         if (IoCodeDetector::codeContainsIoOperations($classCode)) {
-            return [$testCaseClass, $classFileName];
+            return $classFileName;
         }
 
         $parentClassReflection = $classReflection->getParentClass();
@@ -170,7 +203,7 @@ final class IntegrationGroupProvider
             $parentClassCode = file_get_contents($parentClassFileName);
 
             if (IoCodeDetector::codeContainsIoOperations($parentClassCode)) {
-                return [$testCaseClass, $parentClassFileName];
+                return $parentClassFileName;
             }
 
             $parentClassReflection = $parentClassReflection->getParentClass();

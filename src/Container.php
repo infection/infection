@@ -50,7 +50,9 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
+use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
@@ -59,6 +61,7 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCodeFactory;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
@@ -72,6 +75,7 @@ use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
+use Infection\Process\MutantProcess;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
@@ -80,6 +84,8 @@ use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\TestFramework\AdapterInstallationDecider;
+use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
@@ -89,7 +95,6 @@ use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
@@ -102,6 +107,7 @@ use PhpParser\PrettyPrinterAbstract;
 use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
@@ -180,12 +186,6 @@ final class Container
                     GeneratedExtensionsConfig::EXTENSIONS
                 );
             },
-            XmlConfigurationHelper::class => static function (self $container): XmlConfigurationHelper {
-                return new XmlConfigurationHelper(
-                    $container->getPathReplacer(),
-                    (string) $container->getConfiguration()->getPhpUnit()->getConfigDir()
-                );
-            },
             MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
                 return new MutantCodeFactory($container->getPrinter());
             },
@@ -204,7 +204,11 @@ final class Container
                 return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
-                return new ParallelProcessRunner($container->getEventDispatcher());
+                return new ParallelProcessRunner(static function (MutantProcess $mutantProcess) use ($container): void {
+                    $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished(
+                        MutantExecutionResult::createFromProcess($mutantProcess)
+                    ));
+                });
             },
             TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {
                 return new TestFrameworkConfigLocator(
@@ -297,7 +301,8 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new CoverageRequirementChecker(
-                    $config->getCoveragePath() !== '',
+                    $config->shouldSkipCoverage(),
+                    $config->shouldSkipInitialTests(),
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },
@@ -318,7 +323,7 @@ final class Container
                     $config->showMutations(),
                     $config->isDebugEnabled(),
                     $config->getFormatter(),
-                    $config->showProgress(),
+                    $config->noProgress(),
                     $container->getMetricsCalculator(),
                     $container->getEventDispatcher(),
                     $container->getDiffColorizer(),
@@ -394,7 +399,8 @@ final class Container
                     ),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
-                    $container->getFileMutationGenerator()
+                    $container->getFileMutationGenerator(),
+                    $container->getConfiguration()->noProgress()
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
@@ -402,7 +408,8 @@ final class Container
                     $container->getMutantProcessBuilder(),
                     $container->getMutantFactory(),
                     $container->getParallelProcessRunner(),
-                    $container->getEventDispatcher()
+                    $container->getEventDispatcher(),
+                    $container->getConfiguration()->noProgress()
                 );
             },
             LineRangeCalculator::class => static function (): LineRangeCalculator {
@@ -413,6 +420,12 @@ final class Container
             },
             TestFrameworkExtraOptionsFilter::class => static function (): TestFrameworkExtraOptionsFilter {
                 return new TestFrameworkExtraOptionsFilter();
+            },
+            AdapterInstallationDecider::class => static function (self $container): AdapterInstallationDecider {
+                return new AdapterInstallationDecider(new QuestionHelper());
+            },
+            AdapterInstaller::class => static function (): AdapterInstaller {
+                return new AdapterInstaller(new ComposerExecutableFinder());
             },
         ]);
     }
@@ -428,6 +441,7 @@ final class Container
         bool $noProgress,
         ?string $existingCoveragePath,
         ?string $initialTestsPhpOptions,
+        bool $skipInitialTests,
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         ?float $minCoveredMsi,
@@ -444,8 +458,8 @@ final class Container
                     array_filter(
                         [
                             $configFile,
-                            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
                             SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
+                            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
                         ]
                     )
                 );
@@ -457,6 +471,7 @@ final class Container
             static function (self $container) use (
                 $existingCoveragePath,
                 $initialTestsPhpOptions,
+                $skipInitialTests,
                 $logVerbosity,
                 $debug,
                 $onlyCovered,
@@ -475,6 +490,7 @@ final class Container
                     $container->getSchemaConfiguration(),
                     $existingCoveragePath,
                     $initialTestsPhpOptions,
+                    $skipInitialTests,
                     $logVerbosity,
                     $debug,
                     $onlyCovered,
@@ -544,11 +560,6 @@ final class Container
     public function getFactory(): Factory
     {
         return $this->get(Factory::class);
-    }
-
-    public function getXmlConfigurationHelper(): XmlConfigurationHelper
-    {
-        return $this->get(XmlConfigurationHelper::class);
     }
 
     public function getMutantCodeFactory(): MutantCodeFactory
@@ -769,6 +780,16 @@ final class Container
     public function getTestFrameworkExtraOptionsFilter(): TestFrameworkExtraOptionsFilter
     {
         return $this->get(TestFrameworkExtraOptionsFilter::class);
+    }
+
+    public function getAdapterInstallationDecider(): AdapterInstallationDecider
+    {
+        return $this->get(AdapterInstallationDecider::class);
+    }
+
+    public function getAdapterInstaller(): AdapterInstaller
+    {
+        return $this->get(AdapterInstaller::class);
     }
 
     /**

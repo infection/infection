@@ -42,14 +42,21 @@ use function Safe\ksort;
 /**
  * @internal
  */
-final class PerMutatorLogger extends FileLogger
+final class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
     /**
      * @var MetricsCalculator[]
      */
     private $calculatorPerMutator = [];
 
-    protected function getLogLines(): array
+    private $metricsCalculator;
+
+    public function __construct(MetricsCalculator $metricsCalculator)
+    {
+        $this->metricsCalculator = $metricsCalculator;
+    }
+
+    public function getLogLines(): array
     {
         $this->setUpPerCalculatorMutator();
 
@@ -76,17 +83,20 @@ final class PerMutatorLogger extends FileLogger
 
     private function setUpPerCalculatorMutator(): void
     {
-        $processes = $this->metricsCalculator->getAllMutantProcesses();
+        $executionResults = $this->metricsCalculator->getAllExecutionResults();
 
         $processPerMutator = [];
 
-        foreach ($processes as $process) {
-            $mutatorName = $process->getMutatorName();
-            $processPerMutator[$mutatorName][] = $process;
+        foreach ($executionResults as $executionResult) {
+            $mutatorName = $executionResult->getMutatorName();
+            $processPerMutator[$mutatorName][] = $executionResult;
         }
 
-        foreach ($processPerMutator as $mutator => $processes) {
-            $this->calculatorPerMutator[$mutator] = MetricsCalculator::createFromArray($processes);
+        foreach ($processPerMutator as $mutator => $executionResults) {
+            $calculator = new MetricsCalculator();
+            $calculator->collect(...$executionResults);
+
+            $this->calculatorPerMutator[$mutator] = $calculator;
         }
 
         ksort($this->calculatorPerMutator);

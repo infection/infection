@@ -83,7 +83,6 @@ final class MutatorFactory
             } else {
                 $mutator = new $mutatorClassName();
             }
-            /* @var Mutator $mutator */
 
             $mutators[(string) $mutator->getName()] = new IgnoreMutator(
                 new IgnoreConfig($ignored),

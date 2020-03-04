@@ -36,17 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\Event;
 
 use Infection\Event\MutantProcessWasFinished;
-use Infection\Process\MutantProcess;
+use Infection\Mutant\MutantExecutionResult;
 use PHPUnit\Framework\TestCase;
 
 final class MutantProcessWasFinishedTest extends TestCase
 {
     public function test_it_exposes_its_mutant_process(): void
     {
-        $processMock = $this->createMock(MutantProcess::class);
+        $executionResultMock = $this->createMock(MutantExecutionResult::class);
 
-        $event = new MutantProcessWasFinished($processMock);
+        $event = new MutantProcessWasFinished($executionResultMock);
 
-        $this->assertSame($processMock, $event->getMutantProcess());
+        $this->assertSame($executionResultMock, $event->getExecutionResult());
     }
 }

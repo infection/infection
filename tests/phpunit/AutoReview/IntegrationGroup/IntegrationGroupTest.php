@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
+use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\array_flip;
@@ -44,21 +44,6 @@ use function strpos;
 
 final class IntegrationGroupTest extends TestCase
 {
-    /**
-     * @var PHPDocParser|null
-     */
-    private static $phpDocParser;
-
-    public static function setUpBeforeClass(): void
-    {
-        self::$phpDocParser = new PHPDocParser();
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        self::$phpDocParser = null;
-    }
-
     /**
      * @dataProvider \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::ioTestCaseTupleProvider
      */
@@ -72,7 +57,7 @@ final class IntegrationGroupTest extends TestCase
 
         $this->assertArrayHasKey(
             '@group',
-            array_flip(self::$phpDocParser->parse($phpDoc)),
+            array_flip(SingletonContainer::getPHPDocParser()->parse($phpDoc)),
             sprintf(
                 <<<'TXT'
 Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been
@@ -84,9 +69,7 @@ TXT
             )
         );
 
-        if (strpos($phpDoc, '@group integration') === false
-            && strpos($phpDoc, '@group e2e') === false
-        ) {
+        if (strpos($phpDoc, '@group integration') === false) {
             $this->fail(sprintf(
                 <<<'TXT'
 Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been

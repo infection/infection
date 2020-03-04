@@ -50,7 +50,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class PhpUnitXmlCoverageFactoryTest extends TestCase
 {
@@ -95,6 +95,61 @@ final class PhpUnitXmlCoverageFactoryTest extends TestCase
                             [
                                 'testMethod' => 'Acme\FooTest::test_it_can_be_instantiated',
                                 'testFilePath' => '/path/to/acme/FooTest.php',
+                                'time' => 0.000234,
+                            ],
+                        ],
+                    ],
+                    'byMethod' => [
+                        '__construct' => [
+                            'startLine' => 19,
+                            'endLine' => 22,
+                        ],
+                    ],
+                ],
+            ],
+            CoverageHelper::convertToArray($coverage)
+        );
+    }
+
+    public function test_it_can_parse_codeception_cest_coverage(): void
+    {
+        $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
+        $coverageXmlParserMock
+            ->expects($this->once())
+            ->method('parse')
+            ->willReturn($this->getParsedCodeCoverageData('Acme\FooCest:test_it_can_be_instantiated'))
+        ;
+
+        $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
+        $testFileDataProvider
+            ->expects($this->any())
+            ->method('getTestFileInfo')
+            ->with('Acme\FooCest')
+            ->willReturn(
+                new TestFileTimeData(
+                    '/path/to/acme/FooCest.php',
+                    0.000234
+                )
+            )
+        ;
+
+        $coverageFactory = new PhpUnitXmlCoverageFactory(
+            realpath(self::COVERAGE_DIR),
+            $coverageXmlParserMock,
+            TestFrameworkTypes::PHPUNIT,
+            $testFileDataProvider
+        );
+
+        $coverage = $coverageFactory->createCoverage();
+
+        $this->assertSame(
+            [
+                '/path/to/acme/Foo.php' => [
+                    'byLine' => [
+                        11 => [
+                            [
+                                'testMethod' => 'Acme\FooCest:test_it_can_be_instantiated',
+                                'testFilePath' => '/path/to/acme/FooCest.php',
                                 'time' => 0.000234,
                             ],
                         ],
@@ -189,13 +244,13 @@ TXT
         );
     }
 
-    private function getParsedCodeCoverageData(): array
+    private function getParsedCodeCoverageData(string $testMethod = 'Acme\FooTest::test_it_can_be_instantiated'): array
     {
         return [
             '/path/to/acme/Foo.php' => new CoverageFileData(
                 [
                     11 => [
-                        CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
+                        CoverageLineData::withTestMethod($testMethod),
                     ],
                 ],
                 [

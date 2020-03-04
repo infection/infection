@@ -24,18 +24,3 @@ then
     echo "Infection should not generate coverage-xml if path with existing files has been provided"
     exit 1;
 fi
-
-if [ "$DRIVER" = "phpdbg" ]
-then
-    phpdbg -qrr $INFECTION --test-framework=phpspec
-else
-    php $INFECTION --test-framework=phpspec
-fi
-
-diff expected-output_phpspec.txt infection.log
-
-if [ -d "infection-cache/infection/phpspec-coverage-xml" ]
-then
-    echo "Infection should not generate phpspec-coverage-xml if path with existing files has been provided"
-    exit 1;
-fi
