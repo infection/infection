@@ -212,13 +212,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -249,13 +243,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -602,13 +590,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source(['src/'], ['vendor/']),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -642,13 +624,7 @@ final class ConfigurationFactoryTest extends TestCase
                 new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                 new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
             ],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -766,13 +742,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 $schemaTimeout,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -803,13 +773,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedTimeOut,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -841,13 +805,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 $configTmpDir,
                 new PhpUnit(null, null),
                 null,
@@ -878,13 +836,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             $expectedTmpDir,
             new PhpUnit('/path/to', null),
@@ -917,13 +869,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -954,13 +900,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -992,13 +932,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit($phpUnitConfigDir, null),
                 null,
@@ -1029,13 +963,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit($expectedPhpUnitConfigDir, null),
@@ -1068,13 +996,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit('/path/to', null),
                 $ignoreMsiWithNoMutationsFromSchemaConfiguration,
@@ -1105,13 +1027,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1144,13 +1060,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit('/path/to', null),
                 null,
@@ -1181,13 +1091,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1220,13 +1124,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit('/path/to', null),
                 null,
@@ -1257,13 +1155,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1298,13 +1190,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -1335,13 +1221,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1374,13 +1254,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -1411,13 +1285,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1452,13 +1320,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -1489,13 +1351,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1529,13 +1385,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -1566,13 +1416,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1608,13 +1452,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 null,
                 new PhpUnit(null, null),
                 null,
@@ -1645,13 +1483,7 @@ final class ConfigurationFactoryTest extends TestCase
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
