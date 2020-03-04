@@ -67,16 +67,16 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
 
     public function getLogLines(): array
     {
-        $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantExecutionResults(), 'Escaped');
-        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutMutantExecutionResults(), 'Timed Out');
+        $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedExecutionResults(), 'Escaped');
+        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutExecutionResults(), 'Timed Out');
 
         if ($this->debugVerbosity) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantExecutionResults(), 'Killed');
-            $logs[] = $this->getLogParts($this->metricsCalculator->getErrorMutantExecutionResults(), 'Errors');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getKilledExecutionResults(), 'Killed');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getErrorExecutionResults(), 'Errors');
         }
 
         if (!$this->onlyCoveredMode) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantExecutionResults(), 'Not Covered');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredExecutionResults(), 'Not Covered');
         }
 
         return $logs;
@@ -88,8 +88,6 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     private function getLogParts(array $executionResults, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
-
-        ExecutionResultSorter::sortResults($executionResults);
 
         foreach ($executionResults as $index => $executionResult) {
             $isShowFullFormat = $this->debugVerbosity;

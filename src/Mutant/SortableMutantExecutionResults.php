@@ -33,31 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Mutant;
 
-use Infection\Mutant\MetricsCalculator;
+use function Safe\usort;
 
 /**
  * @internal
  */
-final class SummaryFileLogger implements LineMutationTestingResultsLogger
+final class SortableMutantExecutionResults
 {
-    private $metricsCalculator;
+    /**
+     * @var MutantExecutionResult[]
+     */
+    private $executionResults = [];
 
-    public function __construct(MetricsCalculator $metricsCalculator)
+    /**
+     * @var bool
+     */
+    private $sorted = false;
+
+    public function add(MutantExecutionResult $executionResult): void
     {
-        $this->metricsCalculator = $metricsCalculator;
+        $this->executionResults[] = $executionResult;
+        $this->sorted = false;
     }
 
-    public function getLogLines(): array
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getSortedExecutionResults(): array
     {
-        return [
-            'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
-            'Killed: ' . $this->metricsCalculator->getKilledCount(),
-            'Errored: ' . $this->metricsCalculator->getErrorCount(),
-            'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
-            'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
-            'Not Covered: ' . $this->metricsCalculator->getNotTestedCount(),
-        ];
+        if (!$this->sorted) {
+            self::sortResults($this->executionResults);
+            $this->sorted = true;
+        }
+
+        return $this->executionResults;
+    }
+
+    /**
+     * @param MutantExecutionResult[] $executionResults
+     */
+    private static function sortResults(array &$executionResults): void
+    {
+        usort(
+            $executionResults,
+            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
+                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
+                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
+                }
+
+                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
+            }
+        );
     }
 }

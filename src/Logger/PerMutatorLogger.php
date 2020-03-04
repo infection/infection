@@ -83,7 +83,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
 
     private function setUpPerCalculatorMutator(): void
     {
-        $executionResults = $this->metricsCalculator->getAllMutantExecutionResults();
+        $executionResults = $this->metricsCalculator->getAllExecutionResults();
 
         $processPerMutator = [];
 
@@ -93,7 +93,10 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
         }
 
         foreach ($processPerMutator as $mutator => $executionResults) {
-            $this->calculatorPerMutator[$mutator] = MetricsCalculator::createFromArray($executionResults);
+            $calculator = new MetricsCalculator();
+            $calculator->collect(...$executionResults);
+
+            $this->calculatorPerMutator[$mutator] = $calculator;
         }
 
         ksort($this->calculatorPerMutator);
