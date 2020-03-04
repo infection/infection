@@ -36,16 +36,19 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use function array_key_exists;
+use function array_merge_recursive;
 use function class_exists;
+use function count;
 use InvalidArgumentException;
 use function Safe\sprintf;
-use stdClass;
 
 /**
  * @internal
  */
 final class MutatorResolver
 {
+    private const GLOBAL_IGNORE_SETTING = 'global-ignore';
+
     /**
      * Resolves the given hashmap of enabled, disabled or configured mutators
      * and profiles into a hashmap of mutator raw settings by their mutator
@@ -59,7 +62,23 @@ final class MutatorResolver
     {
         $mutators = [];
 
+        $globalSettings = [];
+
+        foreach ($mutatorSettings as $mutatorOrProfileOrGlobalSettingKey => $setting) {
+            if ($mutatorOrProfileOrGlobalSettingKey === self::GLOBAL_IGNORE_SETTING) {
+                /** @var string[] $globalSetting */
+                $globalSetting = $setting;
+
+                $globalSettings = ['ignore' => $globalSetting];
+                unset($mutatorSettings[self::GLOBAL_IGNORE_SETTING]);
+
+                break;
+            }
+        }
+
         foreach ($mutatorSettings as $mutatorOrProfile => $setting) {
+            $setting = self::resolveSettings($setting, $globalSettings);
+
             if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
                 self::registerFromProfile(
                     $mutatorOrProfile,
@@ -90,7 +109,26 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string>|bool $settings
+     * @param mixed[]|bool $settings
+     * @param array<string, string[]> $globalSettings
+     *
+     * @return array<string, mixed[]>|bool
+     */
+    private static function resolveSettings($settings, array $globalSettings)
+    {
+        if ($settings === false || count($globalSettings) === 0) {
+            return $settings;
+        }
+
+        if ($settings === true) {
+            return $globalSettings;
+        }
+
+        return array_merge_recursive($globalSettings, (array) $settings);
+    }
+
+    /**
+     * @param array<string, mixed[]>|bool $settings
      * @param array<string, array<string, string>> $mutators
      */
     private static function registerFromProfile(
@@ -132,7 +170,7 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string>|bool $settings
+     * @param array<string, mixed[]>|bool $settings
      * @param array<string, array<string, string>> $mutators
      */
     private static function registerFromName(
@@ -155,8 +193,8 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string>|bool|stdClass $settings
-     * @param array<string, array<string, string>> $mutators
+     * @param array<string, string[]>|bool $settings
+     * @param array<string, string[]> $mutators
      */
     private static function registerFromClass(
         string $mutatorClassName,
@@ -166,7 +204,7 @@ final class MutatorResolver
         if ($settings === false) {
             unset($mutators[$mutatorClassName]);
         } else {
-            $mutators[$mutatorClassName] = $settings === true ? [] : (array) $settings;
+            $mutators[$mutatorClassName] = (array) $settings;
         }
     }
 }
