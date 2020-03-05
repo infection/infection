@@ -39,13 +39,13 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverage;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverage;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use Traversable;
 
-final class XMLLineCodeCoverageTest extends TestCase
+final class FileCodeCoverageTest extends TestCase
 {
     public function test_it_correctly_sets_coverage_information_for_method_body(): void
     {
@@ -300,14 +300,14 @@ final class XMLLineCodeCoverageTest extends TestCase
         ];
     }
 
-    private function createCodeCoverageData(string $filePath): XMLLineCodeCoverage
+    private function createCodeCoverageData(string $filePath): FileCodeCoverage
     {
         $parsedData = $this->getParsedCodeCoverageData();
 
         if (!array_key_exists($filePath, $parsedData)) {
-            return new XMLLineCodeCoverage(new CoverageFileData());
+            return new FileCodeCoverage(new CoverageFileData());
         }
 
-        return new XMLLineCodeCoverage($parsedData[$filePath]);
+        return new FileCodeCoverage($parsedData[$filePath]);
     }
 }

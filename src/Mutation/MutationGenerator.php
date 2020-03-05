@@ -43,7 +43,7 @@ use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageProvider;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -73,7 +73,7 @@ final class MutationGenerator
      */
     public function __construct(
         iterable $sourceFiles,
-        XMLLineCodeCoverageProvider $coverageProvider,
+        FileCodeCoverageProvider $coverageProvider,
         array $mutators,
         EventDispatcher $eventDispatcher,
         FileMutationGenerator $fileMutationGenerator,

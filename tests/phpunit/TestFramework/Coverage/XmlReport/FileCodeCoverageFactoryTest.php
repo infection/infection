@@ -33,44 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\CoverageFileData;
-use Symfony\Component\Finder\SplFileInfo;
+use Generator;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageFactory;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\TestFrameworkTypes;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class XMLLineCodeCoverageProvider
+final class FileCodeCoverageFactoryTest extends TestCase
 {
     /**
-     * @var array<string, CoverageFileData>|null
+     * @dataProvider valueProvider
      */
-    private $coverage;
-
-    private $coverageFactory;
-
-    public function __construct(PhpUnitXmlCoverageFactory $coverageFactory)
-    {
-        $this->coverageFactory = $coverageFactory;
-    }
-
-    public function createFor(SplFileInfo $fileInfo): XMLLineCodeCoverage
-    {
-        if ($this->coverage === null) {
-            $this->coverage = $this->coverageFactory->createCoverage();
-        }
-
-        $filePath = $fileInfo->getRealPath() === false
-            ? $fileInfo->getPathname()
-            : $fileInfo->getRealPath()
+    public function test_it_can_create_an_XMLLine_code_coverage_instance(
+        string $frameworkKey,
+        bool $jUnitReport
+    ): void {
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('hasJUnitReport')
+            ->willReturn($jUnitReport)
         ;
 
-        if (!array_key_exists($filePath, $this->coverage)) {
-            return new XMLLineCodeCoverage(new CoverageFileData());
-        }
+        // We cannot test much of the generated instance here since it does not exposes any state.
+        // We can only ensure that an instance is created in all scenarios
+        (new FileCodeCoverageFactory(
+            '/path/to/coverage/dir',
+            $this->createMock(IndexXmlCoverageParser::class),
+            $this->createMock(TestFileDataProvider::class)
+        ))->create($frameworkKey, $adapter);
 
-        return new XMLLineCodeCoverage($this->coverage[$filePath]);
+        $this->addToAssertionCount(1);
+    }
+
+    public function valueProvider(): Generator
+    {
+        foreach (TestFrameworkTypes::TYPES as $frameworkKey) {
+            foreach ([true, false] as $jUnitReport) {
+                yield [$frameworkKey, $jUnitReport];
+            }
+        }
     }
 }

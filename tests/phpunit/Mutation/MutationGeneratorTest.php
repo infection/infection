@@ -44,8 +44,8 @@ use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
-use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverage;
-use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageProvider;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverage;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use PHPUnit\Framework\TestCase;
@@ -61,7 +61,7 @@ final class MutationGeneratorTest extends TestCase
             $fileInfoB = new SplFileInfo('fileB', 'relativePathToFileB', 'relativePathnameToFileB'),
         ];
 
-        $codeCoverageMock = $this->createMock(XMLLineCodeCoverage::class);
+        $codeCoverageMock = $this->createMock(FileCodeCoverage::class);
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $onlyCovered = true;
@@ -88,7 +88,7 @@ final class MutationGeneratorTest extends TestCase
             ])
         ;
 
-        $providerMock = $this->createMock(XMLLineCodeCoverageProvider::class);
+        $providerMock = $this->createMock(FileCodeCoverageProvider::class);
         $providerMock
             ->expects($this->exactly(2))
             ->method('createFor')
@@ -149,7 +149,7 @@ final class MutationGeneratorTest extends TestCase
             )
         ;
 
-        $providerMock = $this->createMock(XMLLineCodeCoverageProvider::class);
+        $providerMock = $this->createMock(FileCodeCoverageProvider::class);
 
         $mutationGenerator = new MutationGenerator(
             $sourceFiles,
@@ -194,7 +194,7 @@ final class MutationGeneratorTest extends TestCase
             )
         ;
 
-        $providerMock = $this->createMock(XMLLineCodeCoverageProvider::class);
+        $providerMock = $this->createMock(FileCodeCoverageProvider::class);
 
         $mutationGenerator = new MutationGenerator(
             $sourceFiles,

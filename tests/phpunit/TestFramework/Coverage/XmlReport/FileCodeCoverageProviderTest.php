@@ -40,11 +40,11 @@ use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
-use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageProvider;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
-final class XMLLineCodeCoverageProviderTest extends TestCase
+final class FileCodeCoverageProviderTest extends TestCase
 {
     public function test_it_determines_file_is_not_covered_for_unknown_path(): void
     {
@@ -81,7 +81,7 @@ final class XMLLineCodeCoverageProviderTest extends TestCase
             ->method('getRealPath')
         ;
 
-        $codeCoverageDataProvider = new XMLLineCodeCoverageProvider($coverageFactoryMock);
+        $codeCoverageDataProvider = new FileCodeCoverageProvider($coverageFactoryMock);
 
         try {
             $codeCoverageDataProvider->createFor($splFileInfoMock);
@@ -163,7 +163,7 @@ final class XMLLineCodeCoverageProviderTest extends TestCase
         return $splFileInfoMock;
     }
 
-    private function createCodeCoverageDataProvider(): XMLLineCodeCoverageProvider
+    private function createCodeCoverageDataProvider(): FileCodeCoverageProvider
     {
         $coverageFactoryMock = $this->createMock(PhpUnitXmlCoverageFactory::class);
         $coverageFactoryMock
@@ -172,6 +172,6 @@ final class XMLLineCodeCoverageProviderTest extends TestCase
             ->willReturn($this->getParsedCodeCoverageData())
         ;
 
-        return new XMLLineCodeCoverageProvider($coverageFactoryMock);
+        return new FileCodeCoverageProvider($coverageFactoryMock);
     }
 }

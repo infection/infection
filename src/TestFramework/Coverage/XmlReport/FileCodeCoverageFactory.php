@@ -43,7 +43,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class XMLLineCodeCoverageFactory
+final class FileCodeCoverageFactory
 {
     private $coverageDir;
     private $coverageXmlParser;
@@ -62,7 +62,7 @@ final class XMLLineCodeCoverageFactory
     public function create(
         string $testFrameworkKey,
         TestFrameworkAdapter $adapter
-    ): XMLLineCodeCoverageProvider {
+    ): FileCodeCoverageProvider {
         Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
 
         $testFileDataProviderService = $adapter->hasJUnitReport()
@@ -70,7 +70,7 @@ final class XMLLineCodeCoverageFactory
             : null
         ;
 
-        return new XMLLineCodeCoverageProvider(
+        return new FileCodeCoverageProvider(
             new PhpUnitXmlCoverageFactory(
                 $this->coverageDir,
                 $this->coverageXmlParser,
