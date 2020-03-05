@@ -39,217 +39,31 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
-use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverage;
-use Infection\Tests\TestFramework\Coverage\CoverageHelper;
+use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class XMLLineCodeCoverageProviderTest extends TestCase
 {
-    public function test_it_correctly_sets_coverage_information_for_method_body(): void
-    {
-        $codeCoverageData = $this->createCodeCoverageData();
-        $filePath = '/path/to/acme/Foo.php';
-
-        $tests = $codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(34, 34),
-            false
-        );
-
-        $this->assertSame(
-            [
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.123,
-                ],
-            ],
-            CoverageHelper::convertToArray($tests)
-        );
-    }
-
-    public function test_it_correctly_sets_coverage_information_for_method_signature(): void
-    {
-        $codeCoverageData = $this->createCodeCoverageData();
-        $filePath = '/path/to/acme/Foo.php';
-
-        $tests = $codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(24, 24),
-            true
-        );
-
-        $this->assertSame(
-            [
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.123,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.456,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.123,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.456,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.456,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.123,
-                ],
-            ],
-            CoverageHelper::convertToArray($tests)
-        );
-    }
-
-    public function test_it_determines_method_was_not_executed_from_coverage_report(): void
-    {
-        $codeCoverageData = $this->createCodeCoverageData();
-        $filePath = '/path/to/acme/Foo.php';
-
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(19, 19),
-            true
-        ));
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(21, 21),
-            false
-        ));
-    }
-
-    public function test_it_determines_line_was_not_executed_from_coverage_report(): void
-    {
-        $codeCoverageData = $this->createCodeCoverageData();
-        $filePath = '/path/to/acme/Foo.php';
-
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(27, 27),
-            false
-        ));
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
-            $filePath, new NodeLineRangeData(32, 32), false
-        ));
-    }
-
     public function test_it_determines_file_is_not_covered_for_unknown_path(): void
     {
-        $codeCoverageData = $this->createCodeCoverageData();
         $filePath = '/path/to/unknown-file';
 
-        $this->assertFalse($codeCoverageData->hasTests($filePath));
+        $codeCoverageDataProvider = $this->createCodeCoverageDataProvider();
+        $codeCoverageData = $codeCoverageDataProvider->createFor($this->createSplFileInfo($filePath));
+
+        $this->assertFalse($codeCoverageData->hasTests());
     }
 
     public function test_it_determines_file_is_covered(): void
     {
-        $codeCoverageData = $this->createCodeCoverageData();
         $filePath = '/path/to/acme/Foo.php';
 
-        $this->assertTrue($codeCoverageData->hasTests($filePath));
-    }
+        $codeCoverageDataProvider = $this->createCodeCoverageDataProvider();
+        $codeCoverageData = $codeCoverageDataProvider->createFor($this->createSplFileInfo($filePath));
 
-    public function test_it_determines_file_does_not_have_tests_on_line_for_unknown_file(): void
-    {
-        $codeCoverageData = $this->createCodeCoverageData();
-        $filePath = '/path/to/unknown-file';
-
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(34, 34),
-            true
-        ));
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(34, 34),
-            false
-        ));
-    }
-
-    public function test_it_determines_file_does_not_have_tests_for_line(): void
-    {
-        $codeCoverageData = $this->createCodeCoverageData();
-        $filePath = '/path/to/acme/Foo.php';
-
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(1, 1),
-            true
-        ));
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(1, 1),
-            false
-        ));
-    }
-
-    public function test_it_returns_zero_tests_for_not_covered_function_body_mutator(): void
-    {
-        $codeCoverageData = $this->createCodeCoverageData();
-        $filePath = '/path/to/acme/Foo.php';
-
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation($filePath,
-            new NodeLineRangeData(1, 1),
-            false
-        ));
-    }
-
-    public function test_it_returns_tests_for_covered_function_body_mutator(): void
-    {
-        $codeCoverageData = $this->createCodeCoverageData();
-        $filePath = '/path/to/acme/Foo.php';
-
-        $tests = $codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(26, 26),
-            false
-        );
-
-        $this->assertCount(2, $tests);
-        $this->assertSame('/path/to/acme/FooTest.php', $tests[0]->testFilePath);
-        $this->assertSame(0.123, $tests[0]->time);
-    }
-
-    public function test_it_returns_zero_tests_for_not_covered_function_signature_mutator(): void
-    {
-        $codeCoverageData = $this->createCodeCoverageData();
-        $filePath = '/path/to/acme/Foo.php';
-
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(1, 1), true
-        ));
-    }
-
-    public function test_it_returns_tests_for_covered_function_signature_mutator(): void
-    {
-        $codeCoverageData = $this->createCodeCoverageData();
-        $filePath = '/path/to/acme/Foo.php';
-
-        $tests = $codeCoverageData->getAllTestsForMutation(
-            $filePath,
-            new NodeLineRangeData(24, 24),
-            true
-        );
-
-        $this->assertCount(6, $tests);
+        $this->assertTrue($codeCoverageData->hasTests());
     }
 
     public function test_it_throws_an_exception_when_no_coverage_found(): void
@@ -261,10 +75,16 @@ final class XMLLineCodeCoverageProviderTest extends TestCase
             ->willThrowException($exception = new CoverageDoesNotExistException())
         ;
 
-        $coverage = new XMLLineCodeCoverage($coverageFactoryMock);
+        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+        $splFileInfoMock
+            ->expects($this->never())
+            ->method('getRealPath')
+        ;
+
+        $codeCoverageDataProvider = new XMLLineCodeCoverageProvider($coverageFactoryMock);
 
         try {
-            $coverage->hasTests('/path/to/random-file');
+            $codeCoverageDataProvider->createFor($splFileInfoMock);
 
             $this->fail();
         } catch (CoverageDoesNotExistException $caughtException) {
@@ -325,7 +145,25 @@ final class XMLLineCodeCoverageProviderTest extends TestCase
         ];
     }
 
-    private function createCodeCoverageData(): XMLLineCodeCoverage
+    private function createSplFileInfo(string $filePath): SplFileInfo
+    {
+        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+        $splFileInfoMock
+            ->expects($this->once())
+            ->method('getRealPath')
+            ->willReturn(false)
+        ;
+
+        $splFileInfoMock
+            ->expects($this->once())
+            ->method('getPathname')
+            ->willReturn($filePath)
+        ;
+
+        return $splFileInfoMock;
+    }
+
+    private function createCodeCoverageDataProvider(): XMLLineCodeCoverageProvider
     {
         $coverageFactoryMock = $this->createMock(PhpUnitXmlCoverageFactory::class);
         $coverageFactoryMock
@@ -334,6 +172,6 @@ final class XMLLineCodeCoverageProviderTest extends TestCase
             ->willReturn($this->getParsedCodeCoverageData())
         ;
 
-        return new XMLLineCodeCoverage($coverageFactoryMock);
+        return new XMLLineCodeCoverageProvider($coverageFactoryMock);
     }
 }
