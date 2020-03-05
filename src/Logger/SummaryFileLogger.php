@@ -38,6 +38,9 @@ namespace Infection\Logger;
 use Infection\Mutant\MetricsCalculator;
 
 /**
+ * Simple loggers recorded the result counts. This is mostly intended for internal purposes e.g.
+ * some end-to-end tests.
+ *
  * @internal
  */
 final class SummaryFileLogger implements LineMutationTestingResultsLogger

@@ -56,11 +56,6 @@ use function strlen;
  */
 final class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
-    /**
-     * @var MetricsCalculator[]
-     */
-    private $calculatorPerMutator = [];
-
     private $metricsCalculator;
 
     public function __construct(MetricsCalculator $metricsCalculator)
@@ -71,11 +66,6 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
     public function getLogLines(): array
     {
         $calculatorPerMutator = $this->createMetricsPerMutators();
-
-        $logs = [
-            '# Effects per Mutator',
-            '',
-        ];
 
         $table = [
             ['Mutator', 'Mutations', 'Killed', 'Escaped', 'Errors', 'Timed Out', 'MSI (%s)', 'Covered MSI (%s)'],
