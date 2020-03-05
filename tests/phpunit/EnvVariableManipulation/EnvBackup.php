@@ -67,20 +67,20 @@ final class EnvBackup
         $snapshot = $this->environmentVariables;
 
         foreach (getenv() as $name => $value) {
-            if (array_key_exists($name, $snapshot)) {
-                $snapshotValue = $snapshot[$name];
-                unset($snapshot[$name]);
-
-                if ($snapshotValue === $value) {
-                    continue;
-                }
-
-                putenv(sprintf('%s=%s', $name, $snapshotValue));
+            if (!array_key_exists($name, $snapshot)) {
+                putenv($name);
 
                 continue;
             }
 
-            putenv($name);
+            $snapshotValue = $snapshot[$name];
+            unset($snapshot[$name]);
+
+            if ($snapshotValue === $value) {
+                continue;
+            }
+
+            putenv(sprintf('%s=%s', $name, $snapshotValue));
         }
 
         foreach ($snapshot as $name => $value) {

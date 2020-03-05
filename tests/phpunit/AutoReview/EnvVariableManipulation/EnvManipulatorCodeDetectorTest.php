@@ -46,7 +46,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
     /**
      * @dataProvider codeProvider
      */
-    public function test_it_can_detect_IO_operations(string $code, bool $expected): void
+    public function test_it_can_detect_environment_variable_manipulations(string $code, bool $expected): void
     {
         $actual = EnvManipulatorCodeDetector::codeManipulatesEnvVariables($code);
 
