@@ -38,10 +38,13 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\TestFileNameNotFoundException;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function Safe\tempnam;
+use function Safe\unlink;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class JUnitTestFileDataProviderTest extends TestCase
 {
@@ -53,10 +56,17 @@ final class JUnitTestFileDataProviderTest extends TestCase
      * @var JUnitTestFileDataProvider
      */
     private $provider;
+    private $tempfile;
 
     protected function setUp(): void
     {
         $this->provider = new JUnitTestFileDataProvider(self::JUNIT);
+        $this->tempfile = tempnam('', '');
+    }
+
+    protected function tearDown(): void
+    {
+        unlink($this->tempfile);
     }
 
     public function test_it_returns_time_and_path(): void
@@ -88,6 +98,15 @@ final class JUnitTestFileDataProviderTest extends TestCase
         $provider = new JUnitTestFileDataProvider('foo/bar/fake-file');
 
         $this->expectException(CoverageDoesNotExistException::class);
+
+        $provider->getTestFileInfo('Foo\BarTest');
+    }
+
+    public function test_it_throws_an_exception_if_the_junit_file_is_invalid_xml(): void
+    {
+        $provider = new JUnitTestFileDataProvider($this->tempfile);
+
+        $this->expectException(InvalidArgumentException::class);
 
         $provider->getTestFileInfo('Foo\BarTest');
     }

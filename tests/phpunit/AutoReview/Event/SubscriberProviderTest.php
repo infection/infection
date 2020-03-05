@@ -62,19 +62,4 @@ final class SubscriberProviderTest extends TestCase
             )
         );
     }
-
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberSubscriptionMethodsProvider()
-     *
-     * @param class-string $className
-     * @param string[] $subscriptionMethods
-     */
-    public function test_subscriber_subscription_methods_provider_is_valid(
-        string $className,
-        array $subscriptionMethods
-    ): void {
-        foreach ($subscriptionMethods as $subscriptionMethod) {
-            $this->assertIsString($subscriptionMethod);
-        }
-    }
 }

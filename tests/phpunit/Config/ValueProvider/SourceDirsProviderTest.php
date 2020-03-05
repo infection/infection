@@ -42,7 +42,7 @@ use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class SourceDirsProviderTest extends AbstractBaseProviderTest
 {

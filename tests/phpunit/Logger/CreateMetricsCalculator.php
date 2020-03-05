@@ -54,79 +54,57 @@ trait CreateMetricsCalculator
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
-                MutantProcess::CODE_ESCAPED,
-                'escaped#0'
-            )
-        );
-        $calculator->collect(
-            $this->createMutantExecutionResult(
-                1,
-                PregQuote::class,
-                MutantProcess::CODE_ESCAPED,
-                'escaped#1'
-            )
-        );
-
-        $calculator->collect(
-            $this->createMutantExecutionResult(
-                0,
-                For_::class,
-                MutantProcess::CODE_TIMED_OUT,
-                'timedOut#0'
-            )
-        );
-        $calculator->collect(
-            $this->createMutantExecutionResult(
-                1,
-                PregQuote::class,
-                MutantProcess::CODE_TIMED_OUT,
-                'timedOut#1'
-            )
-        );
-
-        $calculator->collect(
-            $this->createMutantExecutionResult(
-                0,
-                For_::class,
                 MutantProcess::CODE_KILLED,
                 'killed#0'
-            )
-        );
-        $calculator->collect(
+            ),
             $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 MutantProcess::CODE_KILLED,
                 'killed#1'
-            )
-        );
-
-        $calculator->collect(
+            ),
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
                 MutantProcess::CODE_ERROR,
                 'error#0'
-            )
-        );
-        $calculator->collect(
+            ),
             $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 MutantProcess::CODE_ERROR,
                 'error#1'
-            )
-        );
-
-        $calculator->collect(
+            ),
+            $this->createMutantExecutionResult(
+                0,
+                For_::class,
+                MutantProcess::CODE_ESCAPED,
+                'escaped#0'
+            ),
+            $this->createMutantExecutionResult(
+                1,
+                PregQuote::class,
+                MutantProcess::CODE_ESCAPED,
+                'escaped#1'
+            ),
+            $this->createMutantExecutionResult(
+                0,
+                For_::class,
+                MutantProcess::CODE_TIMED_OUT,
+                'timedOut#0'
+            ),
+            $this->createMutantExecutionResult(
+                1,
+                PregQuote::class,
+                MutantProcess::CODE_TIMED_OUT,
+                'timedOut#1'
+            ),
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
                 MutantProcess::CODE_NOT_COVERED,
                 'notCovered#0'
-            )
-        );
-        $calculator->collect(
+            ),
             $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,

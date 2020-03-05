@@ -37,12 +37,12 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Closure;
 use DOMDocument;
-use DOMXPath;
 use const E_ALL;
 use Generator;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\SafeDOMXPath;
 use function Infection\Tests\normalizeLineReturn;
 use InvalidArgumentException;
 use const PHP_OS_FAMILY;
@@ -55,7 +55,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class XmlConfigurationManipulatorTest extends TestCase
 {
@@ -75,7 +75,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
     public function test_it_replaces_with_absolute_paths(): void
     {
         $this->assertItChangesStandardConfiguration(
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->replaceWithAbsolutePaths($xPath);
             },
             <<<'XML'
@@ -114,7 +114,7 @@ XML
     public function test_it_removes_existing_loggers(): void
     {
         $this->assertItChangesStandardConfiguration(
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->removeExistingLoggers($xPath);
             },
             <<<'XML'
@@ -150,7 +150,7 @@ XML
     public function test_it_sets_set_stop_on_failure(): void
     {
         $this->assertItChangesStandardConfiguration(
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->setStopOnFailure($xPath);
             },
             <<<'XML'
@@ -207,7 +207,7 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->setStopOnFailure($xPath);
             },
             <<<'XML'
@@ -233,7 +233,7 @@ XML
     public function test_it_deactivates_colors(): void
     {
         $this->assertItChangesStandardConfiguration(
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateColours($xPath);
             },
             <<<'XML'
@@ -288,7 +288,7 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateColours($xPath);
             },
             <<<'XML'
@@ -332,7 +332,7 @@ XML
 
 XML
             ,
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateResultCaching($xPath);
             },
             <<<'XML'
@@ -374,7 +374,7 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateResultCaching($xPath);
             },
             <<<'XML'
@@ -408,7 +408,7 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateStderrRedirection($xPath);
             },
             <<<'XML'
@@ -432,7 +432,7 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateStderrRedirection($xPath);
             },
             <<<'XML'
@@ -465,7 +465,7 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->removeExistingPrinters($xPath);
             },
             <<<'XML'
@@ -653,7 +653,7 @@ XML
 
 XML
             ,
-            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->removeDefaultTestSuite($xPath);
             },
             <<<'XML'
@@ -758,13 +758,13 @@ XML
         $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
     }
 
-    private function createXPath(string $xml): DOMXPath
+    private function createXPath(string $xml): SafeDOMXPath
     {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML($xml);
 
-        return new DOMXPath($dom);
+        return new SafeDOMXPath($dom);
     }
 }

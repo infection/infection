@@ -383,13 +383,7 @@ JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'logs' => new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                'logs' => Logs::createEmpty(),
             ]),
         ];
 
@@ -848,6 +842,66 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'testFrameworkOptions' => '--debug',
+            ]),
+        ];
+
+        yield '[mutators][global ignore] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "global-ignore": ["A::B"]
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'global-ignore' => ['A::B'],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][global ignore] empty & untrimmed ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "global-ignore": [" file ", " "]
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'global-ignore' => [' file ', ' '],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][global ignore] empty' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "global-ignore": []
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'global-ignore' => [],
+                ],
             ]),
         ];
 
@@ -2329,13 +2383,7 @@ JSON
             'path' => '/path/to/config',
             'timeout' => null,
             'source' => new Source([], []),
-            'logs' => new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            'logs' => Logs::createEmpty(),
             'tmpDir' => null,
             'phpunit' => new PhpUnit(null, null),
             'ignoreMsiWithNoMutations' => null,

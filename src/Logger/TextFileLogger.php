@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function implode;
+use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
+use const PHP_EOL;
 use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
@@ -44,20 +46,37 @@ use function strlen;
 /**
  * @internal
  */
-final class TextFileLogger extends FileLogger
+final class TextFileLogger implements LineMutationTestingResultsLogger
 {
-    protected function getLogLines(): array
-    {
-        $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantExecutionResults(), 'Escaped');
-        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutMutantExecutionResults(), 'Timed Out');
+    private $metricsCalculator;
+    private $debugVerbosity;
+    private $onlyCoveredMode;
+    private $debugMode;
 
-        if ($this->isDebugVerbosity) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantExecutionResults(), 'Killed');
-            $logs[] = $this->getLogParts($this->metricsCalculator->getErrorMutantExecutionResults(), 'Errors');
+    public function __construct(
+        MetricsCalculator $metricsCalculator,
+        bool $debugVerbosity,
+        bool $onlyCoveredMode,
+        bool $debugMode
+    ) {
+        $this->metricsCalculator = $metricsCalculator;
+        $this->debugVerbosity = $debugVerbosity;
+        $this->onlyCoveredMode = $onlyCoveredMode;
+        $this->debugMode = $debugMode;
+    }
+
+    public function getLogLines(): array
+    {
+        $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedExecutionResults(), 'Escaped');
+        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutExecutionResults(), 'Timed Out');
+
+        if ($this->debugVerbosity) {
+            $logs[] = $this->getLogParts($this->metricsCalculator->getKilledExecutionResults(), 'Killed');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getErrorExecutionResults(), 'Errors');
         }
 
-        if (!$this->isOnlyCoveredMode) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantExecutionResults(), 'Not Covered');
+        if (!$this->onlyCoveredMode) {
+            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredExecutionResults(), 'Not Covered');
         }
 
         return $logs;
@@ -69,15 +88,14 @@ final class TextFileLogger extends FileLogger
     private function getLogParts(array $executionResults, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
-        $this->sortProcesses($executionResults);
 
         foreach ($executionResults as $index => $executionResult) {
-            $isShowFullFormat = $this->isDebugVerbosity;
+            $isShowFullFormat = $this->debugVerbosity;
 
             $logParts[] = '';
             $logParts[] = $this->getMutatorFirstLine($index, $executionResult);
 
-            $logParts[] = $this->isDebugMode ? $executionResult->getProcessCommandLine() : '';
+            $logParts[] = $this->debugMode ? $executionResult->getProcessCommandLine() : '';
 
             $logParts[] = $executionResult->getMutantDiff();
 

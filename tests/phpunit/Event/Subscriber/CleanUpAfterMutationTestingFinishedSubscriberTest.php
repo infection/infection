@@ -41,7 +41,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
 {

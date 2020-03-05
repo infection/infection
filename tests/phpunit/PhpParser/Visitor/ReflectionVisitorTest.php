@@ -53,7 +53,7 @@ use PhpParser\NodeVisitorAbstract;
 use ReflectionClass;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class ReflectionVisitorTest extends BaseVisitorTest
 {

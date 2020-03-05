@@ -56,7 +56,7 @@ use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {

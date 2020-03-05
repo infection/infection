@@ -50,13 +50,14 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use function sys_get_temp_dir;
 
 /**
  * NOTE:
  * InputInterfaces should be mocked here so that the 'getOption' method with paramater 'no-progress'
  * should return true. Otherwise you will see different results based on wheter its running in CI or not.
  *
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class SubscriberBuilderTest extends TestCase
 {
@@ -98,17 +99,30 @@ final class SubscriberBuilderTest extends TestCase
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
 
-    private function makeSubscriberBuilder(bool $debug, string $formatter, bool $noProgress, int $addSubscriber, int $getLogs = 1): SubscriberBuilder
-    {
+    private function makeSubscriberBuilder(
+        bool $debug,
+        string $formatter,
+        bool $noProgress,
+        int $addSubscriber,
+        int $getLogs = 1
+    ): SubscriberBuilder {
         $calculator = new MetricsCalculator();
+
         $dispatcher = $this->createMock(EventDispatcher::class);
-        $dispatcher->expects($this->exactly($addSubscriber))->method('addSubscriber');
-        $diff = $this->createMock(DiffColorizer::class);
+        $dispatcher
+            ->expects($this->exactly($addSubscriber))
+            ->method('addSubscriber')
+        ;
+
         $config = $this->createMock(Configuration::class);
-        $config->expects($this->exactly($getLogs))->method('getLogs')->willReturn(
-            new Logs(null, null, null, null, null)
-        );
-        $fs = $this->createMock(Filesystem::class);
+        $config
+            ->expects($this->exactly($getLogs))
+            ->method('getLogs')->willReturn(
+                new Logs(null, null, null, null, null)
+            )
+        ;
+
+        $fileSystemMock = $this->createMock(Filesystem::class);
 
         return new SubscriberBuilder(
             true,
@@ -117,14 +131,20 @@ final class SubscriberBuilderTest extends TestCase
             $noProgress,
             $calculator,
             $dispatcher,
-            $diff,
+            $this->createMock(DiffColorizer::class),
             $config,
-            $fs,
+            $fileSystemMock,
             sys_get_temp_dir(),
             new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
-            new LoggerFactory($calculator, $fs, 'all', false, false)
+            new LoggerFactory(
+                $calculator,
+                $fileSystemMock,
+                'all',
+                false,
+                false
+            )
         );
     }
 }

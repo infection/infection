@@ -35,11 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use function array_map;
-use function in_array;
+use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function Safe\usort;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -51,9 +49,21 @@ final class JUnitTestCaseSorter
      *
      * @return string[]
      */
-    public function getUniqueSortedFileNames(array $coverageTestCases): array
+    public function getUniqueSortedFileNames(array $coverageTestCases): iterable
     {
         $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
+
+        if (count($uniqueCoverageTests) === 1) {
+            // Around 5% speed up compared to when without this optimization.
+            yield current($uniqueCoverageTests)->testFilePath;
+
+            return;
+        }
+
+        /*
+         * Two tests per file are also very frequent. Yet it doesn't make sense
+         * to sort them by hand: apparently usort does that just as good.
+         */
 
         // sort tests to run the fastest first
         usort(
@@ -63,15 +73,9 @@ final class JUnitTestCaseSorter
             }
         );
 
-        return array_map(
-            static function (CoverageLineData $coverageLineData): string {
-                $testFilePath = $coverageLineData->testFilePath;
-                Assert::string($testFilePath);
-
-                return $testFilePath;
-            },
-            $uniqueCoverageTests
-        );
+        foreach ($uniqueCoverageTests as $coverageLineData) {
+            yield $coverageLineData->testFilePath;
+        }
     }
 
     /**
@@ -81,13 +85,14 @@ final class JUnitTestCaseSorter
      */
     private function uniqueByTestFile(array $coverageTestCases): array
     {
+        // It is faster to have two arrays, and discard one later.
         $usedFileNames = [];
         $uniqueTests = [];
 
-        foreach ($coverageTestCases as $coverageTestCase) {
-            if (!in_array($coverageTestCase->testFilePath, $usedFileNames, true)) {
-                $uniqueTests[] = $coverageTestCase;
-                $usedFileNames[] = $coverageTestCase->testFilePath;
+        foreach ($coverageTestCases as $coverageLineData) {
+            if (!array_key_exists($coverageLineData->testFilePath, $usedFileNames)) {
+                $uniqueTests[] = $coverageLineData;
+                $usedFileNames[$coverageLineData->testFilePath] = true;
             }
         }
 

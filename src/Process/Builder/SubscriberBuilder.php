@@ -123,7 +123,7 @@ final class SubscriberBuilder
     }
 
     /**
-     * @return EventSubscriber[]
+     * @return iterable<EventSubscriber>
      */
     private function getSubscribers(
         TestFrameworkAdapter $testFrameworkAdapter,
