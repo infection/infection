@@ -152,13 +152,7 @@ final class LoggerFactoryTest extends TestCase
     public function logsProvider(): Generator
     {
         yield 'no logger' => [
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             [],
         ];
 
