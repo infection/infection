@@ -72,24 +72,24 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     {
         $separateSections = false;
 
-        $logs[] = $this->getResultLines(
+        $logs[] = $this->getResultsLine(
             $this->metricsCalculator->getEscapedExecutionResults(),
             'Escaped',
             $separateSections
         );
-        $logs[] = $this->getResultLines(
+        $logs[] = $this->getResultsLine(
             $this->metricsCalculator->getTimedOutExecutionResults(),
             'Timed Out',
             $separateSections
         );
 
         if ($this->debugVerbosity) {
-            $logs[] = $this->getResultLines(
+            $logs[] = $this->getResultsLine(
                 $this->metricsCalculator->getKilledExecutionResults(),
                 'Killed',
                 $separateSections
             );
-            $logs[] = $this->getResultLines(
+            $logs[] = $this->getResultsLine(
                 $this->metricsCalculator->getErrorExecutionResults(),
                 'Errors',
                 $separateSections
@@ -97,7 +97,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
         }
 
         if (!$this->onlyCoveredMode) {
-            $logs[] = $this->getResultLines(
+            $logs[] = $this->getResultsLine(
                 $this->metricsCalculator->getNotCoveredExecutionResults(),
                 'Not Covered',
                 $separateSections
@@ -114,7 +114,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     /**
      * @param MutantExecutionResult[] $executionResults
      */
-    private function getResultLines(
+    private function getResultsLine(
         array $executionResults,
         string $headlinePrefix,
         bool &$separateSections
