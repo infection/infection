@@ -53,6 +53,7 @@ final class SummaryFileLogger implements LineMutationTestingResultsLogger
     {
         return [
             'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
+            '',
             'Killed: ' . $this->metricsCalculator->getKilledCount(),
             'Errored: ' . $this->metricsCalculator->getErrorCount(),
             'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
