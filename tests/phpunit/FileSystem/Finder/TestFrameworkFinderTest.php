@@ -35,18 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Env\BackupEnvVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath;
 use function Safe\putenv;
 use function Safe\realpath;
 use function Safe\sprintf;
 use function strlen;
-use const DIRECTORY_SEPARATOR;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group integration Requires I/O read & writes via the MockVendor

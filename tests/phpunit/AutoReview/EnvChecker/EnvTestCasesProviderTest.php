@@ -33,31 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Env;
+namespace Infection\Tests\AutoReview\EnvChecker;
 
-use Webmozart\Assert\Assert;
+use function class_exists;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use function Safe\sprintf;
 
-trait BackupEnvVariables
+/**
+ * @covers \Infection\Tests\AutoReview\EnvChecker\EnvTestCasesProvider
+ */
+final class EnvTestCasesProviderTest extends TestCase
 {
     /**
-     * @var EnvBackup
+     * @dataProvider \Infection\Tests\AutoReview\EnvChecker\EnvTestCasesProvider::envTestCaseTupleProvider
      */
-    private $snapshot;
-
-    private function createEnvBackup(): void
+    public function test_env_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
     {
-        $this->snapshot = EnvBackup::createSnapshot();
-    }
-
-    private function restoreEnvBackup(): void
-    {
-        $value = $this->snapshot;
-
-        Assert::notNull(
-            $value,
-            'Attempted to restore a backup but no backup has been created'
+        $this->assertTrue(
+            class_exists($testCaseClassName, true),
+            sprintf('Expected "%s" to be a class.', $testCaseClassName)
         );
 
-        $value->restore();
+        $testCaseReflection = new ReflectionClass($testCaseClassName);
+
+        $this->assertInstanceOf(
+            TestCase::class,
+            $testCaseReflection->newInstanceWithoutConstructor()
+        );
+
+        $this->assertFalse(
+            $testCaseReflection->isAbstract(),
+            sprintf(
+                'Expected "%s" to be an actual test case, not a base (abstract) one.',
+                $testCaseClassName
+            )
+        );
+
+        $this->assertFileExists($fileWithIoOperations);
     }
 }

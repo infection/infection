@@ -33,31 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Env;
+namespace Infection\Tests\AutoReview\EnvChecker;
 
-use Webmozart\Assert\Assert;
+use Infection\Tests\Env\BackupEnvVariables;
+use PHPUnit\Framework\TestCase;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
+use function strpos;
 
-trait BackupEnvVariables
+final class EnvManipulatorsTest extends TestCase
 {
     /**
-     * @var EnvBackup
+     * @dataProvider \Infection\Tests\AutoReview\EnvChecker\EnvTestCasesProvider::envTestCaseTupleProvider
      */
-    private $snapshot;
-
-    private function createEnvBackup(): void
-    {
-        $this->snapshot = EnvBackup::createSnapshot();
-    }
-
-    private function restoreEnvBackup(): void
-    {
-        $value = $this->snapshot;
-
-        Assert::notNull(
-            $value,
-            'Attempted to restore a backup but no backup has been created'
+    public function test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait(
+        string $testCaseClassName,
+        string $fileWithEnvManipulations
+    ): void {
+        $this->assertNotFalse(
+            strpos(
+                file_get_contents($fileWithEnvManipulations),
+                'use BackupEnvVariables;'
+            ),
+            sprintf(
+                <<<'TXT'
+Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have 
+been found in the file "%s".
+TXT
+                ,
+                $testCaseClassName,
+                BackupEnvVariables::class,
+                $fileWithEnvManipulations
+            )
         );
-
-        $value->restore();
     }
 }

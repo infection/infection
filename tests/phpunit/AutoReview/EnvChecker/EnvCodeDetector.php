@@ -33,31 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Env;
+namespace Infection\Tests\AutoReview\EnvChecker;
 
-use Webmozart\Assert\Assert;
+use function Safe\sprintf;
+use function strpos;
 
-trait BackupEnvVariables
+final class EnvCodeDetector
 {
-    /**
-     * @var EnvBackup
-     */
-    private $snapshot;
+    private const FUNCTIONS = [
+        'putenv',
+        'Safe\putenv',
+    ];
 
-    private function createEnvBackup(): void
+    /**
+     * @var string[]|null
+     */
+    private static $statements;
+
+    private function __construct()
     {
-        $this->snapshot = EnvBackup::createSnapshot();
     }
 
-    private function restoreEnvBackup(): void
+    public static function codeContainsEnvManipulation(string $code): bool
     {
-        $value = $this->snapshot;
+        foreach (self::getStatements() as $statement) {
+            if (strpos($code, $statement) !== false) {
+                return true;
+            }
+        }
 
-        Assert::notNull(
-            $value,
-            'Attempted to restore a backup but no backup has been created'
-        );
+        return false;
+    }
 
-        $value->restore();
+    /**
+     * @return string[]
+     */
+    private static function getStatements(): array
+    {
+        if (self::$statements !== null) {
+            return self::$statements;
+        }
+
+        foreach (self::FUNCTIONS as $safeFunctionName) {
+            self::$statements[] = sprintf('use function %s', $safeFunctionName);
+            self::$statements[] = sprintf('\\%s(', $safeFunctionName);
+        }
+
+        return self::$statements;
     }
 }

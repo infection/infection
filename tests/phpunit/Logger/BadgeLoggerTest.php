@@ -43,8 +43,8 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Tests\Env\BackupEnvVariables;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
 use function Safe\putenv;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class BadgeLoggerTest extends TestCase
 {
