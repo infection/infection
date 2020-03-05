@@ -33,66 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Entry;
+namespace Infection;
+
+use function array_values;
+use function str_replace;
 
 /**
  * @internal
  */
-final class Logs
+final class Str
 {
-    private $textLogFilePath;
-    private $summaryLogFilePath;
-    private $debugLogFilePath;
-    private $perMutatorFilePath;
-    private $badge;
-
-    public function __construct(
-        ?string $textLogFilePath,
-        ?string $summaryLogFilePath,
-        ?string $debugLogFilePath,
-        ?string $perMutatorFilePath,
-        ?Badge $badge
-    ) {
-        $this->textLogFilePath = $textLogFilePath;
-        $this->summaryLogFilePath = $summaryLogFilePath;
-        $this->debugLogFilePath = $debugLogFilePath;
-        $this->perMutatorFilePath = $perMutatorFilePath;
-        $this->badge = $badge;
+    private function __construct()
+    {
     }
 
-    public static function createEmpty(): self
+    public static function trimLineReturns(string $string): string
     {
-        return new self(
-            null,
-            null,
-            null,
-            null,
-            null
+        $lines = explode(
+            "\n",
+            str_replace("\r\n", "\n", $string)
         );
-    }
+        $linesCount = count($lines);
 
-    public function getTextLogFilePath(): ?string
-    {
-        return $this->textLogFilePath;
-    }
+        // Trim leading empty lines
+        for ($i = 0; $i < $linesCount; ++$i) {
+            $line = $lines[$i];
 
-    public function getSummaryLogFilePath(): ?string
-    {
-        return $this->summaryLogFilePath;
-    }
+            if (trim($line) === '') {
+                unset($lines[$i]);
 
-    public function getDebugLogFilePath(): ?string
-    {
-        return $this->debugLogFilePath;
-    }
+                continue;
+            }
 
-    public function getPerMutatorFilePath(): ?string
-    {
-        return $this->perMutatorFilePath;
-    }
+            break;
+        }
 
-    public function getBadge(): ?Badge
-    {
-        return $this->badge;
+        $lines = array_values($lines);
+        $linesCount = count($lines);
+
+        // Trim trailing empty lines
+        for ($i = $linesCount - 1; $i >= 0; --$i) {
+            $line = $lines[$i];
+
+            if (trim($line) === '') {
+                unset($lines[$i]);
+
+                continue;
+            }
+
+            break;
+        }
+
+        return implode(PHP_EOL, $lines);
     }
 }

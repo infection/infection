@@ -103,13 +103,7 @@ final class SchemaConfigurationTest extends TestCase
             '',
             null,
             new Source([], []),
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             null,
             new PhpUnit(null, null),
             null,

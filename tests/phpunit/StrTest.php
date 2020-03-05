@@ -33,66 +33,108 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Entry;
+namespace Infection\Tests;
 
-/**
- * @internal
- */
-final class Logs
+use Generator;
+use Infection\Str;
+use PHPUnit\Framework\TestCase;
+
+final class StrTest extends TestCase
 {
-    private $textLogFilePath;
-    private $summaryLogFilePath;
-    private $debugLogFilePath;
-    private $perMutatorFilePath;
-    private $badge;
-
-    public function __construct(
-        ?string $textLogFilePath,
-        ?string $summaryLogFilePath,
-        ?string $debugLogFilePath,
-        ?string $perMutatorFilePath,
-        ?Badge $badge
-    ) {
-        $this->textLogFilePath = $textLogFilePath;
-        $this->summaryLogFilePath = $summaryLogFilePath;
-        $this->debugLogFilePath = $debugLogFilePath;
-        $this->perMutatorFilePath = $perMutatorFilePath;
-        $this->badge = $badge;
-    }
-
-    public static function createEmpty(): self
+    /**
+     * @dataProvider stringProvider
+     */
+    public function test_it_can_trim_string_of_line_returns(string $value, string $expected): void
     {
-        return new self(
-            null,
-            null,
-            null,
-            null,
-            null
+        $this->assertSame(
+            $expected,
+            normalizeLineReturn(Str::trimLineReturns($value))
         );
     }
 
-    public function getTextLogFilePath(): ?string
+    public function stringProvider(): Generator
     {
-        return $this->textLogFilePath;
-    }
+        yield 'empty' => [
+            '',
+            '',
+        ];
 
-    public function getSummaryLogFilePath(): ?string
-    {
-        return $this->summaryLogFilePath;
-    }
+        yield 'string with untrimmed spaces' => [
+            '  ',
+            '',
+        ];
 
-    public function getDebugLogFilePath(): ?string
-    {
-        return $this->debugLogFilePath;
-    }
+        yield 'string without line return' => [
+            'Hello!',
+            'Hello!',
+        ];
 
-    public function getPerMutatorFilePath(): ?string
-    {
-        return $this->perMutatorFilePath;
-    }
+        yield 'string with leading line returns' => [
+            <<<'TXT'
 
-    public function getBadge(): ?Badge
-    {
-        return $this->badge;
+
+Hello!
+TXT
+            ,
+            'Hello!',
+        ];
+
+        yield 'string with trailing line returns' => [
+            <<<'TXT'
+Hello!
+
+
+TXT
+            ,
+            'Hello!',
+        ];
+
+        yield 'string with leading & trailing line returns' => [
+            <<<'TXT'
+
+
+Hello!
+
+
+TXT
+            ,
+            'Hello!',
+        ];
+
+        yield 'string with leading, trailing & in-between line returns' => [
+            <<<'TXT'
+
+
+Hello...
+
+...World!
+
+
+TXT
+            ,
+            <<<'TXT'
+Hello...
+
+...World!
+TXT
+        ];
+
+        yield 'string with leading, trailing & in-between line returns & dirty empty strings' => [
+            <<<'TXT'
+  
+
+  Hello...
+    
+ ...World!
+  
+
+TXT
+            ,
+            <<<'TXT'
+  Hello...
+    
+ ...World!
+TXT
+        ];
     }
 }

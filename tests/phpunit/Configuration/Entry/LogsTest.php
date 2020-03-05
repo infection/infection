@@ -72,6 +72,20 @@ final class LogsTest extends TestCase
         );
     }
 
+    public function test_it_can_be_instantiated_without_any_values(): void
+    {
+        $logs = Logs::createEmpty();
+
+        $this->assertLogsStateIs(
+            $logs,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+    }
+
     public function valuesProvider(): Generator
     {
         yield 'minimal' => [
