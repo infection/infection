@@ -45,12 +45,12 @@ interface LineCodeCoverage
     /**
      * @throws CoverageDoesNotExistException
      */
-    public function hasTests(string $filePath): bool;
+    public function hasTests(): bool;
 
     /**
      * @throws CoverageDoesNotExistException
      *
      * @return CoverageLineData[]
      */
-    public function getAllTestsForMutation(string $filePath, NodeLineRangeData $lineRange, bool $isOnFunctionSignature): array;
+    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
 }

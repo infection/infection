@@ -45,6 +45,7 @@ use Infection\TestFramework\Coverage\LineRangeCalculator;
 use PhpParser\Node;
 use function Pipeline\take;
 use Throwable;
+use Traversable;
 use Webmozart\Assert\Assert;
 
 /**
@@ -118,16 +119,21 @@ class NodeMutationGenerator
         }
 
         $tests = $this->codeCoverageData->getAllTestsForMutation(
-            $this->filePath,
             $this->lineRangeCalculator->calculateRange($node),
             $isOnFunctionSignature
         );
+
+        if ($tests instanceof Traversable) {
+            $tests = iterator_to_array($tests);
+        }
 
         if ($this->onlyCovered && count($tests) === 0) {
             return;
         }
 
         $mutationByMutatorIndex = 0;
+
+        Assert::fileExists($this->filePath);
 
         foreach ($mutator->mutate($node) as $mutatedNode) {
             yield new Mutation(
