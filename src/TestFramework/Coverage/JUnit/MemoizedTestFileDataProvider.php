@@ -33,18 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Coverage\JUnit;
 
-use Exception;
-use function Safe\sprintf;
+use function array_key_exists;
 
 /**
  * @internal
  */
-final class TestFileNameNotFoundException extends Exception
+final class MemoizedTestFileDataProvider implements TestFileDataProvider
 {
-    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
+    private $provider;
+
+    /**
+     * @var array<string, TestFileTimeData>
+     */
+    private $cache = [];
+
+    public function __construct(TestFileDataProvider $decoratedProvider)
     {
-        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
+        $this->provider = $decoratedProvider;
+    }
+
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    {
+        if (!array_key_exists($fullyQualifiedClassName, $this->cache)) {
+            $this->cache[$fullyQualifiedClassName] = $this->provider->getTestFileInfo($fullyQualifiedClassName);
+        }
+
+        return $this->cache[$fullyQualifiedClassName];
     }
 }
