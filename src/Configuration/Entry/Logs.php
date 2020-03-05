@@ -63,6 +63,17 @@ final class Logs
         $this->badge = $badge;
     }
 
+    public static function createEmpty(): self
+    {
+        return new self(
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+    }
+
     public function getTextLogFilePath(): ?string
     {
         return $this->textLogFilePath;

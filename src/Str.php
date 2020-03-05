@@ -33,80 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection;
 
-use Generator;
-use Infection\Configuration\Entry\Badge;
-use Infection\Configuration\Entry\Logs;
-use PHPUnit\Framework\TestCase;
+use function array_values;
+use function str_replace;
 
-final class LogsTest extends TestCase
+/**
+ * @internal
+ */
+final class Str
 {
-    use LogsAssertions;
-
-    /**
-     * @dataProvider valuesProvider
-     */
-    public function test_it_can_be_instantiated(
-        ?string $textLogFilePath,
-        ?string $summaryLogFilePath,
-        ?string $debugLogFilePath,
-        ?string $perMutatorFilePath,
-        ?string $sarbFilePath,
-        ?Badge $badge
-    ): void {
-        $logs = new Logs(
-            $textLogFilePath,
-            $summaryLogFilePath,
-            $debugLogFilePath,
-            $perMutatorFilePath,
-            $sarbFilePath,
-            $badge
-        );
-
-        $this->assertLogsStateIs(
-            $logs,
-            $textLogFilePath,
-            $summaryLogFilePath,
-            $debugLogFilePath,
-            $perMutatorFilePath,
-            $sarbFilePath,
-            $badge
-        );
+    private function __construct()
+    {
     }
 
-    public function test_it_can_be_instantiated_without_any_values(): void
+    public static function trimLineReturns(string $string): string
     {
-        $logs = Logs::createEmpty();
-
-        $this->assertLogsStateIs(
-            $logs,
-            null,
-            null,
-            null,
-            null,
-            null
+        $lines = explode(
+            "\n",
+            str_replace("\r\n", "\n", $string)
         );
-    }
+        $linesCount = count($lines);
 
-    public function valuesProvider(): Generator
-    {
-        yield 'minimal' => [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-        ];
+        // Trim leading empty lines
+        for ($i = 0; $i < $linesCount; ++$i) {
+            $line = $lines[$i];
 
-        yield 'complete' => [
-            'text.log',
-            'summary.log',
-            'debug.log',
-            'perMutator.log',
-            'sarb.json',
-            new Badge('master'),
-        ];
+            if (trim($line) === '') {
+                unset($lines[$i]);
+
+                continue;
+            }
+
+            break;
+        }
+
+        $lines = array_values($lines);
+        $linesCount = count($lines);
+
+        // Trim trailing empty lines
+        for ($i = $linesCount - 1; $i >= 0; --$i) {
+            $line = $lines[$i];
+
+            if (trim($line) === '') {
+                unset($lines[$i]);
+
+                continue;
+            }
+
+            break;
+        }
+
+        return implode(PHP_EOL, $lines);
     }
 }

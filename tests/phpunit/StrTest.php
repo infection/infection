@@ -33,80 +33,108 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Tests;
 
 use Generator;
-use Infection\Configuration\Entry\Badge;
-use Infection\Configuration\Entry\Logs;
+use Infection\Str;
 use PHPUnit\Framework\TestCase;
 
-final class LogsTest extends TestCase
+final class StrTest extends TestCase
 {
-    use LogsAssertions;
-
     /**
-     * @dataProvider valuesProvider
+     * @dataProvider stringProvider
      */
-    public function test_it_can_be_instantiated(
-        ?string $textLogFilePath,
-        ?string $summaryLogFilePath,
-        ?string $debugLogFilePath,
-        ?string $perMutatorFilePath,
-        ?string $sarbFilePath,
-        ?Badge $badge
-    ): void {
-        $logs = new Logs(
-            $textLogFilePath,
-            $summaryLogFilePath,
-            $debugLogFilePath,
-            $perMutatorFilePath,
-            $sarbFilePath,
-            $badge
-        );
-
-        $this->assertLogsStateIs(
-            $logs,
-            $textLogFilePath,
-            $summaryLogFilePath,
-            $debugLogFilePath,
-            $perMutatorFilePath,
-            $sarbFilePath,
-            $badge
+    public function test_it_can_trim_string_of_line_returns(string $value, string $expected): void
+    {
+        $this->assertSame(
+            $expected,
+            normalizeLineReturn(Str::trimLineReturns($value))
         );
     }
 
-    public function test_it_can_be_instantiated_without_any_values(): void
+    public function stringProvider(): Generator
     {
-        $logs = Logs::createEmpty();
-
-        $this->assertLogsStateIs(
-            $logs,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
-    }
-
-    public function valuesProvider(): Generator
-    {
-        yield 'minimal' => [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
+        yield 'empty' => [
+            '',
+            '',
         ];
 
-        yield 'complete' => [
-            'text.log',
-            'summary.log',
-            'debug.log',
-            'perMutator.log',
-            'sarb.json',
-            new Badge('master'),
+        yield 'string with untrimmed spaces' => [
+            '  ',
+            '',
+        ];
+
+        yield 'string without line return' => [
+            'Hello!',
+            'Hello!',
+        ];
+
+        yield 'string with leading line returns' => [
+            <<<'TXT'
+
+
+Hello!
+TXT
+            ,
+            'Hello!',
+        ];
+
+        yield 'string with trailing line returns' => [
+            <<<'TXT'
+Hello!
+
+
+TXT
+            ,
+            'Hello!',
+        ];
+
+        yield 'string with leading & trailing line returns' => [
+            <<<'TXT'
+
+
+Hello!
+
+
+TXT
+            ,
+            'Hello!',
+        ];
+
+        yield 'string with leading, trailing & in-between line returns' => [
+            <<<'TXT'
+
+
+Hello...
+
+...World!
+
+
+TXT
+            ,
+            <<<'TXT'
+Hello...
+
+...World!
+TXT
+        ];
+
+        yield 'string with leading, trailing & in-between line returns & dirty empty strings' => [
+            <<<'TXT'
+  
+
+  Hello...
+    
+ ...World!
+  
+
+TXT
+            ,
+            <<<'TXT'
+  Hello...
+    
+ ...World!
+TXT
         ];
     }
 }

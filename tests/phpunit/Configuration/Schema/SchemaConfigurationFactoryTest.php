@@ -415,14 +415,7 @@ JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'logs' => new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                'logs' => Logs::createEmpty(),
             ]),
         ];
 
@@ -2426,14 +2419,7 @@ JSON
             'path' => '/path/to/config',
             'timeout' => null,
             'source' => new Source([], []),
-            'logs' => new Logs(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            'logs' => Logs::createEmpty(),
             'tmpDir' => null,
             'phpunit' => new PhpUnit(null, null),
             'ignoreMsiWithNoMutations' => null,
