@@ -48,7 +48,7 @@ use ReflectionClass;
 use function Safe\realpath;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class SchemaConfigurationFileLoaderTest extends TestCase
 {

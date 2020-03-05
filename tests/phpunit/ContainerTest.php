@@ -40,7 +40,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class ContainerTest extends TestCase
 {

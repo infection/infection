@@ -39,7 +39,7 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class TextLogFileProviderTest extends AbstractBaseProviderTest
 {

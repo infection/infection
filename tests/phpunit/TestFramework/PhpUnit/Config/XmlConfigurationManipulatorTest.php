@@ -55,7 +55,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class XmlConfigurationManipulatorTest extends TestCase
 {

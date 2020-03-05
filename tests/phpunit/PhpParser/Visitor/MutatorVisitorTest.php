@@ -50,7 +50,7 @@ use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MutatorVisitorTest extends BaseVisitorTest
 {

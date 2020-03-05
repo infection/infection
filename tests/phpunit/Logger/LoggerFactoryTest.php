@@ -58,7 +58,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class LoggerFactoryTest extends TestCase
 {
@@ -152,13 +152,7 @@ final class LoggerFactoryTest extends TestCase
     public function logsProvider(): Generator
     {
         yield 'no logger' => [
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             [],
         ];
 

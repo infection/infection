@@ -57,7 +57,7 @@ use function sys_get_temp_dir;
  * InputInterfaces should be mocked here so that the 'getOption' method with paramater 'no-progress'
  * should return true. Otherwise you will see different results based on wheter its running in CI or not.
  *
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class SubscriberBuilderTest extends TestCase
 {

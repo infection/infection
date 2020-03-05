@@ -42,7 +42,7 @@ use function Safe\tempnam;
 use function Safe\unlink;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class JUnitTestFileDataProviderTest extends TestCase
 {

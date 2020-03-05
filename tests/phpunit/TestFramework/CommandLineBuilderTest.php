@@ -39,7 +39,7 @@ use Infection\TestFramework\CommandLineBuilder;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class CommandLineBuilderTest extends TestCase
 {

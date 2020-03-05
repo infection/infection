@@ -33,73 +33,108 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Generator;
+use Infection\Str;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- */
-final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTest
+final class StrTest extends TestCase
 {
-    private $spyVisitor;
-
-    protected function setUp(): void
+    /**
+     * @dataProvider stringProvider
+     */
+    public function test_it_can_trim_string_of_line_returns(string $value, string $expected): void
     {
-        $this->spyVisitor = $this->getSpyVisitor();
-    }
-
-    public function test_it_does_not_traverse_after_ignore(): void
-    {
-        $this->parseAndTraverse(<<<'PHP'
-<?php
-
-class Foo
-{
-    public function bar(): void
-    {
-    }
-}
-PHP
+        $this->assertSame(
+            $expected,
+            normalizeLineReturn(Str::trimLineReturns($value))
         );
-        $this->assertSame(0, $this->spyVisitor->getNumberOfNodesVisited());
     }
 
-    private function getSpyVisitor()
+    public function stringProvider(): Generator
     {
-        return new class() extends NodeVisitorAbstract {
-            private $nodesVisitedCount = 0;
+        yield 'empty' => [
+            '',
+            '',
+        ];
 
-            public function leaveNode(Node $node): void
-            {
-                ++$this->nodesVisitedCount;
-            }
+        yield 'string with untrimmed spaces' => [
+            '  ',
+            '',
+        ];
 
-            public function getNumberOfNodesVisited(): int
-            {
-                return $this->nodesVisitedCount;
-            }
-        };
-    }
+        yield 'string without line return' => [
+            'Hello!',
+            'Hello!',
+        ];
 
-    private function parseAndTraverse(string $code): void
-    {
-        $nodes = $this->parseCode($code);
+        yield 'string with leading line returns' => [
+            <<<'TXT'
 
-        $this->traverse(
-            $nodes,
-            [
-                new NonMutableNodesIgnorerVisitor([new class() implements NodeIgnorer {
-                    public function ignores(Node $node): bool
-                    {
-                        return true;
-                    }
-                }]),
-                $this->spyVisitor,
-            ]
-        );
+
+Hello!
+TXT
+            ,
+            'Hello!',
+        ];
+
+        yield 'string with trailing line returns' => [
+            <<<'TXT'
+Hello!
+
+
+TXT
+            ,
+            'Hello!',
+        ];
+
+        yield 'string with leading & trailing line returns' => [
+            <<<'TXT'
+
+
+Hello!
+
+
+TXT
+            ,
+            'Hello!',
+        ];
+
+        yield 'string with leading, trailing & in-between line returns' => [
+            <<<'TXT'
+
+
+Hello...
+
+...World!
+
+
+TXT
+            ,
+            <<<'TXT'
+Hello...
+
+...World!
+TXT
+        ];
+
+        yield 'string with leading, trailing & in-between line returns & dirty empty strings' => [
+            <<<'TXT'
+  
+
+  Hello...
+    
+ ...World!
+  
+
+TXT
+            ,
+            <<<'TXT'
+  Hello...
+    
+ ...World!
+TXT
+        ];
     }
 }

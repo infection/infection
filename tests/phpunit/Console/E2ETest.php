@@ -70,7 +70,7 @@ use Symfony\Component\Process\Process;
 
 /**
  * @group e2e
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class E2ETest extends TestCase
 {

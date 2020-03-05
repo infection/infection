@@ -33,73 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use function array_values;
+use function str_replace;
 
 /**
- * @group integration
+ * @internal
  */
-final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTest
+final class Str
 {
-    private $spyVisitor;
-
-    protected function setUp(): void
+    private function __construct()
     {
-        $this->spyVisitor = $this->getSpyVisitor();
     }
 
-    public function test_it_does_not_traverse_after_ignore(): void
+    public static function trimLineReturns(string $string): string
     {
-        $this->parseAndTraverse(<<<'PHP'
-<?php
-
-class Foo
-{
-    public function bar(): void
-    {
-    }
-}
-PHP
+        $lines = explode(
+            "\n",
+            str_replace("\r\n", "\n", $string)
         );
-        $this->assertSame(0, $this->spyVisitor->getNumberOfNodesVisited());
-    }
+        $linesCount = count($lines);
 
-    private function getSpyVisitor()
-    {
-        return new class() extends NodeVisitorAbstract {
-            private $nodesVisitedCount = 0;
+        // Trim leading empty lines
+        for ($i = 0; $i < $linesCount; ++$i) {
+            $line = $lines[$i];
 
-            public function leaveNode(Node $node): void
-            {
-                ++$this->nodesVisitedCount;
+            if (trim($line) === '') {
+                unset($lines[$i]);
+
+                continue;
             }
 
-            public function getNumberOfNodesVisited(): int
-            {
-                return $this->nodesVisitedCount;
+            break;
+        }
+
+        $lines = array_values($lines);
+        $linesCount = count($lines);
+
+        // Trim trailing empty lines
+        for ($i = $linesCount - 1; $i >= 0; --$i) {
+            $line = $lines[$i];
+
+            if (trim($line) === '') {
+                unset($lines[$i]);
+
+                continue;
             }
-        };
-    }
 
-    private function parseAndTraverse(string $code): void
-    {
-        $nodes = $this->parseCode($code);
+            break;
+        }
 
-        $this->traverse(
-            $nodes,
-            [
-                new NonMutableNodesIgnorerVisitor([new class() implements NodeIgnorer {
-                    public function ignores(Node $node): bool
-                    {
-                        return true;
-                    }
-                }]),
-                $this->spyVisitor,
-            ]
-        );
+        return implode(PHP_EOL, $lines);
     }
 }

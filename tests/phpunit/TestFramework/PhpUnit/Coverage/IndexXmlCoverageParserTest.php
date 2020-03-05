@@ -49,7 +49,7 @@ use function str_replace;
 use Webmozart\PathUtil\Path;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class IndexXmlCoverageParserTest extends TestCase
 {
