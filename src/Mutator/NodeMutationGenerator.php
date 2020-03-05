@@ -42,6 +42,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use function iterator_to_array;
 use PhpParser\Node;
 use function Pipeline\take;
 use Throwable;
@@ -124,7 +125,7 @@ class NodeMutationGenerator
         );
 
         if ($tests instanceof Traversable) {
-            $tests = iterator_to_array($tests);
+            $tests = iterator_to_array($tests, false);
         }
 
         if ($this->onlyCovered && count($tests) === 0) {
@@ -132,8 +133,6 @@ class NodeMutationGenerator
         }
 
         $mutationByMutatorIndex = 0;
-
-        Assert::fileExists($this->filePath);
 
         foreach ($mutator->mutate($node) as $mutatedNode) {
             yield new Mutation(

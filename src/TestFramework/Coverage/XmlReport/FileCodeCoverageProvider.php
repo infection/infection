@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
+use array_key_exists;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Symfony\Component\Finder\SplFileInfo;
 

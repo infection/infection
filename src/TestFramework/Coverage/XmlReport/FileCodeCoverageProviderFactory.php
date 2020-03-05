@@ -43,7 +43,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class FileCodeCoverageFactory
+final class FileCodeCoverageProviderFactory
 {
     private $coverageDir;
     private $coverageXmlParser;

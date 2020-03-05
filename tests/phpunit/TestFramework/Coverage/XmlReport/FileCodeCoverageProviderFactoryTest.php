@@ -37,13 +37,13 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Generator;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageFactory;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
 use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
 
-final class FileCodeCoverageFactoryTest extends TestCase
+final class FileCodeCoverageProviderFactoryTest extends TestCase
 {
     /**
      * @dataProvider valueProvider
@@ -61,7 +61,7 @@ final class FileCodeCoverageFactoryTest extends TestCase
 
         // We cannot test much of the generated instance here since it does not exposes any state.
         // We can only ensure that an instance is created in all scenarios
-        (new FileCodeCoverageFactory(
+        (new FileCodeCoverageProviderFactory(
             '/path/to/coverage/dir',
             $this->createMock(IndexXmlCoverageParser::class),
             $this->createMock(TestFileDataProvider::class)

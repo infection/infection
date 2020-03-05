@@ -89,7 +89,7 @@ use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageFactory;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
@@ -154,8 +154,8 @@ final class Container
             IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
                 return new IndexXmlCoverageParser($container->getConfiguration()->getCoveragePath());
             },
-            FileCodeCoverageFactory::class => static function (self $container): FileCodeCoverageFactory {
-                return new FileCodeCoverageFactory(
+            FileCodeCoverageProviderFactory::class => static function (self $container): FileCodeCoverageProviderFactory {
+                return new FileCodeCoverageProviderFactory(
                     $container->getConfiguration()->getCoveragePath(),
                     $container->getIndexXmlCoverageParser(),
                     $container->getMemoizedTestFileDataProvider()
@@ -393,7 +393,7 @@ final class Container
 
                 return new MutationGenerator(
                     $config->getSourceFiles(),
-                    $container->getFileCodeCoverageFactory()->create(
+                    $container->getFileCodeCoverageProviderFactory()->create(
                         $config->getTestFramework(),
                         $container->getTestFrameworkAdapter()
                     ),
@@ -542,9 +542,9 @@ final class Container
         return $this->get(IndexXmlCoverageParser::class);
     }
 
-    public function getFileCodeCoverageFactory(): FileCodeCoverageFactory
+    public function getFileCodeCoverageProviderFactory(): FileCodeCoverageProviderFactory
     {
-        return $this->get(FileCodeCoverageFactory::class);
+        return $this->get(FileCodeCoverageProviderFactory::class);
     }
 
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
