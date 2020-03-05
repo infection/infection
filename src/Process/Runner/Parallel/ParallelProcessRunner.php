@@ -52,14 +52,6 @@ use function usleep;
  */
 class ParallelProcessRunner
 {
-    /**
-     * If it takes 100000 ms for a process to finish, and 5000 ms to make it,
-     * then we can make as much as 20 processes while we wait. But let's not
-     * get greedy and settle on a smaller number to make sure we're not stuck
-     * making processes where we should be starting them.
-     */
-    private const MUTATOR_TO_PROCESS_RATIO = 10;
-
     private $processHandler;
 
     /**
@@ -95,7 +87,7 @@ class ParallelProcessRunner
         $bucket = [];
 
         // Load the first process from the queue to buy us some time.
-        self::fillBucket($bucket, $generator, 1);
+        self::fillBucketOnce($bucket, $generator, 1);
 
         $threadCount = max(1, $threadCount);
 
@@ -105,14 +97,14 @@ class ParallelProcessRunner
 
             if (count($this->runningProcesses) >= $threadCount) {
                 do {
-                    // Now fill the bucket up to the top
-                    self::fillBucket($bucket, $generator);
-                    usleep($poll);
+                    // While we wait, try fetch a good amount of next processes from the queue,
+                    // reducing the poll delay with each loaded process
+                    usleep(max(0, $poll - self::fillBucketOnce($bucket, $generator, $threadCount)));
                 } while (!$this->freeTerminatedProcesses());
             }
 
-            // In any case load at least one process to the bucket
-            self::fillBucket($bucket, $generator, 1);
+            // In any case try to load at least one process to the bucket
+            self::fillBucketOnce($bucket, $generator, 1);
         }
 
         do {
@@ -157,16 +149,20 @@ class ParallelProcessRunner
      * @param ProcessBearer[] $bucket
      * @param Generator<ProcessBearer> $input
      */
-    private static function fillBucket(array &$bucket, Generator $input, int $level = self::MUTATOR_TO_PROCESS_RATIO): void
+    private static function fillBucketOnce(array &$bucket, Generator $input, int $threadCount): int
     {
-        if (count($bucket) >= $level) {
-            return;
+        if (count($bucket) >= $threadCount || !$input->valid()) {
+            return 0;
         }
 
-        while ($input->valid() && count($bucket) < $level) {
+        $start = microtime(true);
+
+        if ($input->valid()) {
             $bucket[] = $input->current();
             $input->next();
         }
+
+        return (int) (microtime(true) - $start) * 1000000; // ns to ms
     }
 
     /**

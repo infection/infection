@@ -42,7 +42,7 @@ install:
     - cd c:\projects\workspace
     - php -r "readfile('http://getcomposer.org/installer');" | php
     - IF %dependencies%==current appveyor-retry php composer.phar install %COMPOSER_FLAGS%
-    - IF %dependencies%==highest appveyor-retry php composer.phar update --ignore-platform-reqs %COMPOSER_FLAGS%
+    - IF %dependencies%==highest appveyor-retry php composer.phar update %COMPOSER_FLAGS%
     # Install Xdebug for code coverage
     - ps: .ci\appveyor_install_xdebug.ps1
 
