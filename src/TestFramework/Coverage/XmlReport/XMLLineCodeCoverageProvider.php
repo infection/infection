@@ -35,48 +35,41 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
  */
-final class XMLLineCodeCoverageFactory
+final class XMLLineCodeCoverageProvider
 {
-    private $coverageDir;
-    private $coverageXmlParser;
-    private $testFileDataProvider;
+    /**
+     * @var array<string, CoverageFileData>|null
+     */
+    private $coverage;
 
-    public function __construct(
-        string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser,
-        TestFileDataProvider $testFileDataProvider
-    ) {
-        $this->coverageDir = $coverageDir;
-        $this->coverageXmlParser = $coverageXmlParser;
-        $this->testFileDataProvider = $testFileDataProvider;
+    private $coverageFactory;
+
+    public function __construct(PhpUnitXmlCoverageFactory $coverageFactory)
+    {
+        $this->coverageFactory = $coverageFactory;
     }
 
-    public function create(
-        string $testFrameworkKey,
-        TestFrameworkAdapter $adapter
-    ): XMLLineCodeCoverageProvider {
-        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
+    public function createFor(SplFileInfo $fileInfo): XMLLineCodeCoverage
+    {
+        if ($this->coverage === null) {
+            $this->coverage = $this->coverageFactory->createCoverage();
+        }
 
-        $testFileDataProviderService = $adapter->hasJUnitReport()
-            ? $this->testFileDataProvider
-            : null
+        $filePath = $fileInfo->getRealPath() === false
+            ? $fileInfo->getPathname()
+            : $fileInfo->getRealPath()
         ;
 
-        return new XMLLineCodeCoverageProvider(
-            new PhpUnitXmlCoverageFactory(
-                $this->coverageDir,
-                $this->coverageXmlParser,
-                $testFrameworkKey,
-                $testFileDataProviderService
-            )
-        );
+        if (!array_key_exists($filePath, $this->coverage)) {
+            return new XMLLineCodeCoverage(new CoverageFileData());
+        }
+
+        return new XMLLineCodeCoverage($this->coverage[$filePath]);
     }
 }
