@@ -162,6 +162,8 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
     }
 
     /**
+     * @param int[] $columnSizes
+     *
      * @var int[]
      */
     private static function createSeparatorRow(array $columnSizes): string
