@@ -51,7 +51,7 @@ class XMLLineCodeCoverageProvider
 
     private $coverageFactory;
 
-    public function __construct(PhpUnitXmlCoverageFactory $coverageFactory)
+    public function __construct(PhpUnitXmlCoveredFileDataFactory $coverageFactory)
     {
         $this->coverageFactory = $coverageFactory;
     }

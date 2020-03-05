@@ -39,7 +39,7 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataFactory;
 use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
@@ -68,7 +68,7 @@ final class XMLLineCodeCoverageProviderTest extends TestCase
 
     public function test_it_throws_an_exception_when_no_coverage_found(): void
     {
-        $coverageFactoryMock = $this->createMock(PhpUnitXmlCoverageFactory::class);
+        $coverageFactoryMock = $this->createMock(PhpUnitXmlCoveredFileDataFactory::class);
         $coverageFactoryMock
             ->expects($this->once())
             ->method('createCoverage')
@@ -165,7 +165,7 @@ final class XMLLineCodeCoverageProviderTest extends TestCase
 
     private function createCodeCoverageDataProvider(): XMLLineCodeCoverageProvider
     {
-        $coverageFactoryMock = $this->createMock(PhpUnitXmlCoverageFactory::class);
+        $coverageFactoryMock = $this->createMock(PhpUnitXmlCoveredFileDataFactory::class);
         $coverageFactoryMock
             ->expects($this->once())
             ->method('createCoverage')
