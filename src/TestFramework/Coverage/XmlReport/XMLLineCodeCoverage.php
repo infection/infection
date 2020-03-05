@@ -44,8 +44,9 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 
 /**
  * @internal
+ * @final
  */
-final class XMLLineCodeCoverage implements LineCodeCoverage
+class XMLLineCodeCoverage implements LineCodeCoverage
 {
     /**
      * @var CoverageFileData

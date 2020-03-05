@@ -44,7 +44,8 @@ use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverage;
+use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageProvider;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use PHPUnit\Framework\TestCase;
@@ -60,7 +61,7 @@ final class MutationGeneratorTest extends TestCase
             $fileInfoB = new SplFileInfo('fileB', 'relativePathToFileB', 'relativePathnameToFileB'),
         ];
 
-        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
+        $codeCoverageMock = $this->createMock(XMLLineCodeCoverage::class);
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $onlyCovered = true;
@@ -87,6 +88,13 @@ final class MutationGeneratorTest extends TestCase
             ])
         ;
 
+        $providerMock = $this->createMock(XMLLineCodeCoverageProvider::class);
+        $providerMock
+            ->expects($this->exactly(2))
+            ->method('createFor')
+            ->willReturn($codeCoverageMock)
+        ;
+
         $expectedMutations = [
             $mutation0,
             $mutation1,
@@ -96,7 +104,7 @@ final class MutationGeneratorTest extends TestCase
 
         $mutationGenerator = new MutationGenerator(
             $sourceFiles,
-            $codeCoverageMock,
+            $providerMock,
             $mutators,
             $eventDispatcherMock,
             $fileMutationGeneratorProphecy->reveal(),
@@ -118,8 +126,6 @@ final class MutationGeneratorTest extends TestCase
             new SplFileInfo('fileA', 'relativePathToFileA', 'relativePathnameToFileA'),
             new SplFileInfo('fileB', 'relativePathToFileB', 'relativePathnameToFileB'),
         ];
-
-        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $eventDispatcherMock
@@ -143,9 +149,11 @@ final class MutationGeneratorTest extends TestCase
             )
         ;
 
+        $providerMock = $this->createMock(XMLLineCodeCoverageProvider::class);
+
         $mutationGenerator = new MutationGenerator(
             $sourceFiles,
-            $codeCoverageMock,
+            $providerMock,
             [],
             $eventDispatcherMock,
             $fileMutationGeneratorMock,
@@ -163,8 +171,6 @@ final class MutationGeneratorTest extends TestCase
 
             yield new SplFileInfo('fileB', 'relativePathToFileB', 'relativePathnameToFileB');
         })();
-
-        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $eventDispatcherMock
@@ -188,9 +194,11 @@ final class MutationGeneratorTest extends TestCase
             )
         ;
 
+        $providerMock = $this->createMock(XMLLineCodeCoverageProvider::class);
+
         $mutationGenerator = new MutationGenerator(
             $sourceFiles,
-            $codeCoverageMock,
+            $providerMock,
             [],
             $eventDispatcherMock,
             $fileMutationGeneratorMock,

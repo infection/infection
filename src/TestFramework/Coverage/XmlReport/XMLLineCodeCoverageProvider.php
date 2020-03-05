@@ -40,8 +40,9 @@ use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
+ * @final
  */
-final class XMLLineCodeCoverageProvider
+class XMLLineCodeCoverageProvider
 {
     /**
      * @var array<string, CoverageFileData>|null
