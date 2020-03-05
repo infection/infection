@@ -70,6 +70,7 @@ final class Logs
             null,
             null,
             null,
+            null,
             null
         );
     }

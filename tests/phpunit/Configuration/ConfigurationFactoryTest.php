@@ -656,6 +656,7 @@ final class ConfigurationFactoryTest extends TestCase
                     'summary.log',
                     'debug.log',
                     'mutator.log',
+                    'sarb.json',
                     new Badge('master')
                 ),
                 'config/tmp',
@@ -699,6 +700,7 @@ final class ConfigurationFactoryTest extends TestCase
                 'summary.log',
                 'debug.log',
                 'mutator.log',
+                'sarb.json',
                 new Badge('master')
             ),
             'none',

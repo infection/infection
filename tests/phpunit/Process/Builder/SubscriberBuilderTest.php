@@ -117,16 +117,7 @@ final class SubscriberBuilderTest extends TestCase
         $config = $this->createMock(Configuration::class);
         $config
             ->expects($this->exactly($getLogs))
-            ->method('getLogs')->willReturn(
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                )
-            )
+            ->method('getLogs')->willReturn(Logs::createEmpty())
         ;
 
         $fileSystemMock = $this->createMock(Filesystem::class);
