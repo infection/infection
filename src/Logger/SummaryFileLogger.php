@@ -38,7 +38,7 @@ namespace Infection\Logger;
 use Infection\Mutant\MetricsCalculator;
 
 /**
- * Simple loggers recording the mutation result counts. This is mostly intended for internal 
+ * Simple loggers recording the mutation result counts. This is mostly intended for internal
  * purposes e.g. some end-to-end tests.
  *
  * @internal
