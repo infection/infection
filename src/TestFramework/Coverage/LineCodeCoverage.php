@@ -50,7 +50,7 @@ interface LineCodeCoverage
     /**
      * @throws CoverageDoesNotExistException
      *
-     * @return CoverageLineData[]
+     * @return iterable<CoverageLineData>
      */
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
 }

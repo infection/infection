@@ -51,16 +51,16 @@ class XMLLineCodeCoverage implements LineCodeCoverage
     /**
      * @var CoverageFileData
      */
-    private $fileCoverage;
+    private $coverageFileData;
 
-    public function __construct(CoverageFileData $fileCoverage)
+    public function __construct(CoverageFileData $coverageFileData)
     {
-        $this->fileCoverage = $fileCoverage;
+        $this->coverageFileData = $coverageFileData;
     }
 
     public function hasTests(): bool
     {
-        foreach ($this->fileCoverage->byLine as $testMethods) {
+        foreach ($this->coverageFileData->byLine as $testMethods) {
             if ($testMethods !== []) {
                 return true;
             }
@@ -100,8 +100,8 @@ class XMLLineCodeCoverage implements LineCodeCoverage
     private function getTestsForLineRange(NodeLineRangeData $lineRange): iterable
     {
         foreach ($lineRange->range as $line) {
-            if (array_key_exists($line, $this->fileCoverage->byLine)) {
-                yield from $this->fileCoverage->byLine[$line];
+            if (array_key_exists($line, $this->coverageFileData->byLine)) {
+                yield from $this->coverageFileData->byLine[$line];
             }
         }
     }
@@ -113,7 +113,7 @@ class XMLLineCodeCoverage implements LineCodeCoverage
      */
     private function getTestsForExecutedMethodOnLine(int $line): iterable
     {
-        foreach ($this->fileCoverage->byMethod as $coverageMethodData) {
+        foreach ($this->coverageFileData->byMethod as $coverageMethodData) {
             if (
                 $line >= $coverageMethodData->startLine
                 && $line <= $coverageMethodData->endLine
