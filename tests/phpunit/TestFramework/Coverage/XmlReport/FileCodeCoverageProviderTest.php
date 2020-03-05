@@ -39,8 +39,8 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
