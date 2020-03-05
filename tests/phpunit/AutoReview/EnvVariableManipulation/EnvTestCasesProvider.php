@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvChecker;
+namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
 use function array_filter;
 use function array_map;
@@ -127,7 +127,7 @@ final class EnvTestCasesProvider
         $testCaseFileName = $testCaseReflection->getFileName();
         $testCaseCode = file_get_contents($testCaseFileName);
 
-        if (EnvCodeDetector::codeContainsEnvManipulation($testCaseCode)) {
+        if (EnvManipulatorCodeDetector::codeManipulatesEnvVariables($testCaseCode)) {
             return $testCaseFileName;
         }
 
@@ -140,7 +140,7 @@ final class EnvTestCasesProvider
 
             $testCaseCode = file_get_contents($parentTestCaseFileName);
 
-            if (EnvCodeDetector::codeContainsEnvManipulation($testCaseCode)) {
+            if (EnvManipulatorCodeDetector::codeManipulatesEnvVariables($testCaseCode)) {
                 return $parentTestCaseFileName;
             }
 
@@ -162,7 +162,7 @@ final class EnvTestCasesProvider
         $classFileName = $classReflection->getFileName();
         $classCode = file_get_contents($classFileName);
 
-        if (EnvCodeDetector::codeContainsEnvManipulation($classCode)) {
+        if (EnvManipulatorCodeDetector::codeManipulatesEnvVariables($classCode)) {
             return $classFileName;
         }
 
@@ -177,7 +177,7 @@ final class EnvTestCasesProvider
 
             $parentClassCode = file_get_contents($parentClassFileName);
 
-            if (EnvCodeDetector::codeContainsEnvManipulation($parentClassCode)) {
+            if (EnvManipulatorCodeDetector::codeManipulatesEnvVariables($parentClassCode)) {
                 return $parentClassFileName;
             }
 

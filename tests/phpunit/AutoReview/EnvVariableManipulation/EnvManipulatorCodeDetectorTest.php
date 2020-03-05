@@ -33,22 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvChecker;
+namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Infection\Tests\AutoReview\EnvChecker\EnvCodeDetector
+ * @covers \Infection\Tests\AutoReview\EnvVariableManipulation\EnvManipulatorCodeDetector
  */
-final class EnvCodeDetectorTest extends TestCase
+final class EnvManipulatorCodeDetectorTest extends TestCase
 {
     /**
      * @dataProvider codeProvider
      */
     public function test_it_can_detect_IO_operations(string $code, bool $expected): void
     {
-        $actual = EnvCodeDetector::codeContainsEnvManipulation($code);
+        $actual = EnvManipulatorCodeDetector::codeManipulatesEnvVariables($code);
 
         $this->assertSame($expected, $actual);
     }

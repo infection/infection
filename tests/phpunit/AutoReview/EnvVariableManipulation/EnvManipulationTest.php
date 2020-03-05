@@ -33,43 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvChecker;
+namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
-use function class_exists;
+use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
+use function Safe\file_get_contents;
 use function Safe\sprintf;
 
-/**
- * @covers \Infection\Tests\AutoReview\EnvChecker\EnvTestCasesProvider
- */
-final class EnvTestCasesProviderTest extends TestCase
+final class EnvManipulationTest extends TestCase
 {
     /**
-     * @dataProvider \Infection\Tests\AutoReview\EnvChecker\EnvTestCasesProvider::envTestCaseTupleProvider
+     * @dataProvider \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::envTestCaseTupleProvider
      */
-    public function test_env_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
-    {
-        $this->assertTrue(
-            class_exists($testCaseClassName, true),
-            sprintf('Expected "%s" to be a class.', $testCaseClassName)
+    public function test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait(
+        string $testCaseClassName,
+        string $fileWithEnvManipulations
+    ): void {
+        $import = sprintf(
+            'use %s;',
+            BacksUpEnvironmentVariables::class
         );
 
-        $testCaseReflection = new ReflectionClass($testCaseClassName);
-
-        $this->assertInstanceOf(
-            TestCase::class,
-            $testCaseReflection->newInstanceWithoutConstructor()
-        );
-
-        $this->assertFalse(
-            $testCaseReflection->isAbstract(),
+        $this->assertStringContainsString(
+            $import,
+            file_get_contents($fileWithEnvManipulations),
             sprintf(
-                'Expected "%s" to be an actual test case, not a base (abstract) one.',
-                $testCaseClassName
+                <<<'TXT'
+    Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have
+    been found in the file "%s".
+TXT
+                ,
+                $testCaseClassName,
+                BacksUpEnvironmentVariables::class,
+                $fileWithEnvManipulations
             )
         );
-
-        $this->assertFileExists($fileWithIoOperations);
     }
 }

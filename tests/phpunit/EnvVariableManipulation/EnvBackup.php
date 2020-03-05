@@ -33,52 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvChecker;
+namespace Infection\Tests\EnvVariableManipulation;
 
+use function array_key_exists;
+use function getenv;
+use function Safe\putenv;
 use function Safe\sprintf;
-use function strpos;
+use Webmozart\Assert\Assert;
 
-final class EnvCodeDetector
+final class EnvBackup
 {
-    private const FUNCTIONS = [
-        'putenv',
-        'Safe\putenv',
-    ];
+    private $environmentVariables;
 
     /**
-     * @var string[]|null
+     * @param array<string, string> $environmentVariables
      */
-    private static $statements;
-
-    private function __construct()
+    private function __construct(array $environmentVariables)
     {
+        $this->environmentVariables = $environmentVariables;
     }
 
-    public static function codeContainsEnvManipulation(string $code): bool
+    public static function createSnapshot(): self
     {
-        foreach (self::getStatements() as $statement) {
-            if (strpos($code, $statement) !== false) {
-                return true;
+        $environmentVariables = getenv();
+
+        Assert::allString($environmentVariables);
+
+        return new self($environmentVariables);
+    }
+
+    public function restore(): void
+    {
+        $snapshot = $this->environmentVariables;
+
+        foreach (getenv() as $name => $value) {
+            if (array_key_exists($name, $snapshot)) {
+                $snapshotValue = $snapshot[$name];
+                unset($snapshot[$name]);
+
+                if ($snapshotValue === $value) {
+                    continue;
+                }
+
+                putenv(sprintf('%s=%s', $name, $snapshotValue));
+
+                continue;
             }
+
+            putenv($name);
         }
 
-        return false;
-    }
-
-    /**
-     * @return string[]
-     */
-    private static function getStatements(): array
-    {
-        if (self::$statements !== null) {
-            return self::$statements;
+        foreach ($snapshot as $name => $value) {
+            putenv(sprintf('%s=%s', $name, $value));
         }
-
-        foreach (self::FUNCTIONS as $safeFunctionName) {
-            self::$statements[] = sprintf('use function %s', $safeFunctionName);
-            self::$statements[] = sprintf('\\%s(', $safeFunctionName);
-        }
-
-        return self::$statements;
     }
 }

@@ -40,7 +40,7 @@ use Infection\Environment\TravisCiResolver;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Tests\Env\BackupEnvVariables;
+use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\putenv;
@@ -48,7 +48,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class BadgeLoggerTest extends TestCase
 {
-    use BackupEnvVariables;
+    use BacksUpEnvironmentVariables;
 
     /**
      * @var OutputInterface|MockObject
@@ -72,7 +72,7 @@ final class BadgeLoggerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->createEnvBackup();
+        $this->backupEnvironmentVariables();
 
         $this->outputMock = $this->createMock(OutputInterface::class);
         $this->badgeApiClientMock = $this->createMock(StrykerDashboardClient::class);
@@ -90,7 +90,7 @@ final class BadgeLoggerTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->restoreEnvBackup();
+        $this->restoreEnvironmentVariables();
     }
 
     public function test_it_skips_logging_when_it_is_not_travis(): void

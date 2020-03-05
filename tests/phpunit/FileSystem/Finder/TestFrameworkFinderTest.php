@@ -39,7 +39,7 @@ use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\Env\BackupEnvVariables;
+use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
 use function Safe\putenv;
@@ -55,7 +55,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class TestFrameworkFinderTest extends FileSystemTestCase
 {
-    use BackupEnvVariables;
+    use BacksUpEnvironmentVariables;
 
     /**
      * @var string
@@ -83,7 +83,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     protected function setUp(): void
     {
-        $this->createEnvBackup();
+        $this->backupEnvironmentVariables();
 
         parent::setUp();
 
@@ -94,7 +94,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         parent::tearDown();
 
-        $this->restoreEnvBackup();
+        $this->restoreEnvironmentVariables();
     }
 
     public function test_it_can_load_a_custom_path(): void

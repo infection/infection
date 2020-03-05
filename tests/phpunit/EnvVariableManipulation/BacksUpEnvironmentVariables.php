@@ -33,58 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Env;
+namespace Infection\Tests\EnvVariableManipulation;
 
-use function array_key_exists;
-use function getenv;
-use function Safe\putenv;
-use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
-final class EnvBackup
+trait BacksUpEnvironmentVariables
 {
-    private $environmentVariables;
-
     /**
-     * @param array<string, string> $environmentVariables
+     * @var EnvBackup
      */
-    private function __construct(array $environmentVariables)
+    private $snapshot;
+
+    private function backupEnvironmentVariables(): void
     {
-        $this->environmentVariables = $environmentVariables;
+        $this->snapshot = EnvBackup::createSnapshot();
     }
 
-    public static function createSnapshot(): self
+    private function restoreEnvironmentVariables(): void
     {
-        $environmentVariables = getenv();
+        $value = $this->snapshot;
 
-        Assert::allString($environmentVariables);
+        Assert::notNull(
+            $value,
+            'Attempted to restore a backup but no backup has been created'
+        );
 
-        return new self($environmentVariables);
-    }
-
-    public function restore(): void
-    {
-        $snapshot = $this->environmentVariables;
-
-        foreach (getenv() as $name => $value) {
-            if (array_key_exists($name, $snapshot)) {
-                $snapshotValue = $snapshot[$name];
-                unset($snapshot[$name]);
-
-                if ($snapshotValue === $value) {
-                    continue;
-                }
-
-                putenv(sprintf('%s=%s', $name, $snapshotValue));
-
-                continue;
-            }
-
-            putenv($name);
-        }
-
-        foreach ($snapshot as $name => $value) {
-            putenv(sprintf('%s=%s', $name, $value));
-        }
+        $value->restore();
     }
 }

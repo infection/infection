@@ -33,31 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Env;
+namespace Infection\Tests\EnvVariableManipulation;
 
-use Webmozart\Assert\Assert;
+use function getenv;
+use PHPUnit\Framework\TestCase;
+use function Safe\putenv;
 
-trait BackupEnvVariables
+final class EnvBackupTest extends TestCase
 {
-    /**
-     * @var EnvBackup
-     */
-    private $snapshot;
-
-    private function createEnvBackup(): void
+    public function test_it_can_backup_and_restore_environment_variables(): void
     {
-        $this->snapshot = EnvBackup::createSnapshot();
-    }
+        putenv('BEFORE_SNAPSHOT_0=initialValue0');
+        putenv('BEFORE_SNAPSHOT_1=initialValue1');
+        putenv('BEFORE_SNAPSHOT_2=initialValue2');
 
-    private function restoreEnvBackup(): void
-    {
-        $value = $this->snapshot;
+        $initialEnvironmentVariables = getenv();
 
-        Assert::notNull(
-            $value,
-            'Attempted to restore a backup but no backup has been created'
-        );
+        $snapshot = EnvBackup::createSnapshot();
 
-        $value->restore();
+        putenv('BEFORE_SNAPSHOT_0=newValue0');
+        putenv('BEFORE_SNAPSHOT_1=');
+        putenv('BEFORE_SNAPSHOT_2');
+        putenv('AFTER_SNAPSHOT=value');
+
+        $snapshot->restore();
+
+        $this->assertSame('initialValue0', getenv('BEFORE_SNAPSHOT_0'));
+        $this->assertSame('initialValue1', getenv('BEFORE_SNAPSHOT_1'));
+        $this->assertSame('initialValue2', getenv('BEFORE_SNAPSHOT_2'));
+        $this->assertFalse(getenv('AFTER_SNAPSHOT'));
+        $this->assertSame($initialEnvironmentVariables, getenv());
     }
 }

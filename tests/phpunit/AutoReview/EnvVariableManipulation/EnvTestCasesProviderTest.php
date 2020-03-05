@@ -33,35 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Env;
+namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
-use function getenv;
+use function class_exists;
 use PHPUnit\Framework\TestCase;
-use function Safe\putenv;
+use ReflectionClass;
+use function Safe\sprintf;
 
-final class EnvBackupTest extends TestCase
+/**
+ * @covers \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider
+ */
+final class EnvTestCasesProviderTest extends TestCase
 {
-    public function test_it_can_backup_and_restore_environment_variables(): void
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::envTestCaseTupleProvider
+     */
+    public function test_env_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
     {
-        putenv('BEFORE_SNAPSHOT_0=initialValue0');
-        putenv('BEFORE_SNAPSHOT_1=initialValue1');
-        putenv('BEFORE_SNAPSHOT_2=initialValue2');
+        $this->assertTrue(
+            class_exists($testCaseClassName, true),
+            sprintf('Expected "%s" to be a class.', $testCaseClassName)
+        );
 
-        $initialEnvironmentVariables = getenv();
+        $testCaseReflection = new ReflectionClass($testCaseClassName);
 
-        $snapshot = EnvBackup::createSnapshot();
+        $this->assertInstanceOf(
+            TestCase::class,
+            $testCaseReflection->newInstanceWithoutConstructor()
+        );
 
-        putenv('BEFORE_SNAPSHOT_0=newValue0');
-        putenv('BEFORE_SNAPSHOT_1=');
-        putenv('BEFORE_SNAPSHOT_2');
-        putenv('AFTER_SNAPSHOT=value');
+        $this->assertFalse(
+            $testCaseReflection->isAbstract(),
+            sprintf(
+                'Expected "%s" to be an actual test case, not a base (abstract) one.',
+                $testCaseClassName
+            )
+        );
 
-        $snapshot->restore();
-
-        $this->assertSame('initialValue0', getenv('BEFORE_SNAPSHOT_0'));
-        $this->assertSame('initialValue1', getenv('BEFORE_SNAPSHOT_1'));
-        $this->assertSame('initialValue2', getenv('BEFORE_SNAPSHOT_2'));
-        $this->assertFalse(getenv('AFTER_SNAPSHOT'));
-        $this->assertSame($initialEnvironmentVariables, getenv());
+        $this->assertFileExists($fileWithIoOperations);
     }
 }

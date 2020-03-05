@@ -33,38 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvChecker;
+namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
-use Infection\Tests\Env\BackupEnvVariables;
-use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
 use function Safe\sprintf;
 use function strpos;
 
-final class EnvManipulatorsTest extends TestCase
+final class EnvManipulatorCodeDetector
 {
+    private const FUNCTIONS = [
+        'putenv',
+        'Safe\putenv',
+    ];
+
     /**
-     * @dataProvider \Infection\Tests\AutoReview\EnvChecker\EnvTestCasesProvider::envTestCaseTupleProvider
+     * @var string[]|null
      */
-    public function test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait(
-        string $testCaseClassName,
-        string $fileWithEnvManipulations
-    ): void {
-        $this->assertNotFalse(
-            strpos(
-                file_get_contents($fileWithEnvManipulations),
-                'use BackupEnvVariables;'
-            ),
-            sprintf(
-                <<<'TXT'
-Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have 
-been found in the file "%s".
-TXT
-                ,
-                $testCaseClassName,
-                BackupEnvVariables::class,
-                $fileWithEnvManipulations
-            )
-        );
+    private static $statements;
+
+    private function __construct()
+    {
+    }
+
+    public static function codeManipulatesEnvVariables(string $code): bool
+    {
+        foreach (self::getStatements() as $statement) {
+            if (strpos($code, $statement) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function getStatements(): array
+    {
+        if (self::$statements !== null) {
+            return self::$statements;
+        }
+
+        foreach (self::FUNCTIONS as $safeFunctionName) {
+            self::$statements[] = sprintf('use function %s', $safeFunctionName);
+            self::$statements[] = sprintf('\\%s(', $safeFunctionName);
+        }
+
+        return self::$statements;
     }
 }
