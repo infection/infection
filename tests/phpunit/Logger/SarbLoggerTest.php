@@ -33,81 +33,65 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Tests\Logger;
 
 use Generator;
-use Infection\Configuration\Entry\Badge;
-use Infection\Configuration\Entry\Logs;
+use Infection\Logger\SarbLogger;
+use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
 
-final class LogsTest extends TestCase
+final class SarbLoggerTest extends TestCase
 {
-    use LogsAssertions;
+    use CreateMetricsCalculator;
+    use LineLoggerAssertions;
 
     /**
-     * @dataProvider valuesProvider
+     * @dataProvider metricsProvider
      */
-    public function test_it_can_be_instantiated(
-        ?string $textLogFilePath,
-        ?string $summaryLogFilePath,
-        ?string $debugLogFilePath,
-        ?string $perMutatorFilePath,
-        ?string $sarbFilePath,
-        ?Badge $badge
+    public function test_it_logs_correctly_with_mutations(
+        MetricsCalculator $metricsCalculator,
+        string $expectedContents
     ): void {
-        $logs = new Logs(
-            $textLogFilePath,
-            $summaryLogFilePath,
-            $debugLogFilePath,
-            $perMutatorFilePath,
-            $sarbFilePath,
-            $badge
-        );
+        $logger = new SarbLogger($metricsCalculator);
 
-        $this->assertLogsStateIs(
-            $logs,
-            $textLogFilePath,
-            $summaryLogFilePath,
-            $debugLogFilePath,
-            $perMutatorFilePath,
-            $sarbFilePath,
-            $badge
-        );
+        $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function test_it_can_be_instantiated_without_any_values(): void
+    public function metricsProvider(): Generator
     {
-        $logs = Logs::createEmpty();
-
-        $this->assertLogsStateIs(
-            $logs,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
-    }
-
-    public function valuesProvider(): Generator
-    {
-        yield 'minimal' => [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
+        yield 'no mutations' => [
+            new MetricsCalculator(),
+            <<<'JSON'
+[]
+JSON
         ];
 
-        yield 'complete' => [
-            'text.log',
-            'summary.log',
-            'debug.log',
-            'perMutator.log',
-            'sarb.json',
-            new Badge('master'),
+        yield 'all mutations' => [
+            $this->createCompleteMetricsCalculator(),
+            <<<'JSON'
+[
+    {
+        "file": "foo\/bar",
+        "line": 9,
+        "type": "PregQuote|Escaped"
+    },
+    {
+        "file": "foo\/bar",
+        "line": 10,
+        "type": "For_|Escaped"
+    },
+    {
+        "file": "foo\/bar",
+        "line": 9,
+        "type": "PregQuote|Not Covered"
+    },
+    {
+        "file": "foo\/bar",
+        "line": 10,
+        "type": "For_|Not Covered"
+    }
+]
+JSON
         ];
     }
 }

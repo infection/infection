@@ -230,6 +230,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
             ]),
@@ -252,6 +253,7 @@ JSON
                 'logs' => new Logs(
                     null,
                     'summary.log',
+                    null,
                     null,
                     null,
                     null
@@ -278,6 +280,7 @@ JSON
                     null,
                     'debug.log',
                     null,
+                    null,
                     null
                 ),
             ]),
@@ -302,6 +305,32 @@ JSON
                     null,
                     null,
                     'perMutator.log',
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][sarb] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "sarb": "sarb.json"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    'sarb.json',
                     null
                 ),
             ]),
@@ -328,6 +357,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     new Badge('master')
                 ),
             ]),
@@ -344,6 +374,7 @@ JSON
         "summary": "summary.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
+        "sarb": "sarb.json",
         "badge": {
             "branch": "master"
         }
@@ -358,6 +389,7 @@ JSON
                     'summary.log',
                     'debug.log',
                     'perMutator.log',
+                    'sarb.json',
                     new Badge('master')
                 ),
             ]),
@@ -398,6 +430,7 @@ JSON
         "summary": " summary.log ",
         "debug": " debug.log ",
         "perMutator": " perMutator.log ",
+        "sarb": " sarb.json ",
         "badge": {
             "branch": " master "
         }
@@ -412,6 +445,7 @@ JSON
                     'summary.log',
                     'debug.log',
                     'perMutator.log',
+                    'sarb.json',
                     new Badge('master')
                 ),
             ]),
@@ -1938,6 +1972,7 @@ JSON
         "summary": "summary.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
+        "sarb": "sarb.json",
         "badge": {
             "branch": "master"
         }
@@ -2175,6 +2210,7 @@ JSON
                     'summary.log',
                     'debug.log',
                     'perMutator.log',
+                    'sarb.json',
                     new Badge('master')
                 ),
                 'tmpDir' => 'custom-tmp',

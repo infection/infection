@@ -59,6 +59,10 @@
                     "type": "string",
                     "description": "Markdown file which will give a break-down of the effectiveness of each mutator."
                 },
+                "sarb": {
+                    "type": "string",
+                    "description": "Json file which can be used with the sarb tool"
+                },
                 "badge": {
                     "type": "object",
                     "additionalProperties": false,

@@ -90,6 +90,7 @@ trait ConfigurationAssertions
             $expectedLogs->getSummaryLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
+            $expectedLogs->getSarbFilePath(),
             $expectedLogs->getBadge()
         );
         $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity());

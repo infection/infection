@@ -83,6 +83,7 @@ final class LoggerFactory
                     $this->createSummaryLogger($output, $logConfig->getSummaryLogFilePath()),
                     $this->createDebugLogger($output, $logConfig->getDebugLogFilePath()),
                     $this->createPerMutatorLogger($output, $logConfig->getPerMutatorFilePath()),
+                    $this->createSarbLogger($output, $logConfig->getSarbFilePath()),
                     $this->createBadgeLogger($output, $logConfig->getBadge()),
                 ],
                 function (?MutationTestingResultsLogger $logger): bool {
@@ -155,6 +156,21 @@ final class LoggerFactory
                 new PerMutatorLogger($this->metricsCalculator)
             )
         ;
+    }
+
+    private function createSarbLogger(
+        OutputInterface $output,
+        ?string $filePath
+    ): ?FileLogger {
+        return $filePath === null
+            ? null
+            : new FileLogger(
+                $output,
+                $filePath,
+                $this->filesystem,
+                new SarbLogger($this->metricsCalculator)
+            )
+            ;
     }
 
     private function createBadgeLogger(OutputInterface $output, ?Badge $badge): ?BadgeLogger

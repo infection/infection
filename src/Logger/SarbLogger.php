@@ -33,81 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Logger;
 
-use Generator;
-use Infection\Configuration\Entry\Badge;
-use Infection\Configuration\Entry\Logs;
-use PHPUnit\Framework\TestCase;
+use function array_map;
+use function array_merge;
+use Infection\Mutant\MetricsCalculator;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\MutantProcess;
+use function Safe\json_encode;
+use function Safe\sprintf;
 
-final class LogsTest extends TestCase
+/**
+ * @internal
+ *
+ * @see https://github.com/DaveLiddament/sarb
+ */
+final class SarbLogger implements LineMutationTestingResultsLogger
 {
-    use LogsAssertions;
+    private $metricsCalculator;
 
-    /**
-     * @dataProvider valuesProvider
-     */
-    public function test_it_can_be_instantiated(
-        ?string $textLogFilePath,
-        ?string $summaryLogFilePath,
-        ?string $debugLogFilePath,
-        ?string $perMutatorFilePath,
-        ?string $sarbFilePath,
-        ?Badge $badge
-    ): void {
-        $logs = new Logs(
-            $textLogFilePath,
-            $summaryLogFilePath,
-            $debugLogFilePath,
-            $perMutatorFilePath,
-            $sarbFilePath,
-            $badge
-        );
-
-        $this->assertLogsStateIs(
-            $logs,
-            $textLogFilePath,
-            $summaryLogFilePath,
-            $debugLogFilePath,
-            $perMutatorFilePath,
-            $sarbFilePath,
-            $badge
-        );
+    public function __construct(MetricsCalculator $metricsCalculator)
+    {
+        $this->metricsCalculator = $metricsCalculator;
     }
 
-    public function test_it_can_be_instantiated_without_any_values(): void
+    public function getLogLines(): array
     {
-        $logs = Logs::createEmpty();
-
-        $this->assertLogsStateIs(
-            $logs,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
+        $results = array_merge(
+            $this->metricsCalculator->getEscapedExecutionResults(),
+            $this->metricsCalculator->getNotCoveredExecutionResults()
         );
-    }
 
-    public function valuesProvider(): Generator
-    {
-        yield 'minimal' => [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-        ];
+        $output = array_map(
+            static function (MutantExecutionResult $result): array {
+                return [
+                    'file' => $result->getOriginalFilePath(),
+                    'line' => $result->getOriginalStartingLine(),
+                    'type' => sprintf(
+                        '%s|%s',
+                        $result->getMutatorName(),
+                        MutantProcess::RESULT_TO_STRING_MAP[$result->getProcessResultCode()]
+                    ),
+                ];
+            },
+            $results
+        );
 
-        yield 'complete' => [
-            'text.log',
-            'summary.log',
-            'debug.log',
-            'perMutator.log',
-            'sarb.json',
-            new Badge('master'),
-        ];
+        return [json_encode($output, JSON_PRETTY_PRINT)];
     }
 }

@@ -44,6 +44,7 @@ final class Logs
     private $summaryLogFilePath;
     private $debugLogFilePath;
     private $perMutatorFilePath;
+    private $sarbFilePath;
     private $badge;
 
     public function __construct(
@@ -51,18 +52,21 @@ final class Logs
         ?string $summaryLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
+        ?string $sarbFilePath,
         ?Badge $badge
     ) {
         $this->textLogFilePath = $textLogFilePath;
         $this->summaryLogFilePath = $summaryLogFilePath;
         $this->debugLogFilePath = $debugLogFilePath;
         $this->perMutatorFilePath = $perMutatorFilePath;
+        $this->sarbFilePath = $sarbFilePath;
         $this->badge = $badge;
     }
 
     public static function createEmpty(): self
     {
         return new self(
+            null,
             null,
             null,
             null,
@@ -89,6 +93,11 @@ final class Logs
     public function getPerMutatorFilePath(): ?string
     {
         return $this->perMutatorFilePath;
+    }
+
+    public function getSarbFilePath(): ?string
+    {
+        return $this->sarbFilePath;
     }
 
     public function getBadge(): ?Badge

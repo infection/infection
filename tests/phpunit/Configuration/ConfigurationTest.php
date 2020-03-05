@@ -177,6 +177,7 @@ final class ConfigurationTest extends TestCase
                 'summary.log',
                 'debug.log',
                 'mutator.log',
+                'sarb.json',
                 new Badge('master')
             ),
             'default',
