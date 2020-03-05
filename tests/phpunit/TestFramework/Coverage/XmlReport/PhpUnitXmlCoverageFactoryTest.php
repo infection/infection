@@ -40,7 +40,7 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataFactory;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
 use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
@@ -52,7 +52,7 @@ use function Safe\realpath;
 /**
  * @group integration
  */
-final class PhpUnitXmlCoveredFileDataFactoryTest extends TestCase
+final class PhpUnitXmlCoverageFactoryTest extends TestCase
 {
     private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
 
@@ -78,7 +78,7 @@ final class PhpUnitXmlCoveredFileDataFactoryTest extends TestCase
             )
         ;
 
-        $coverageFactory = new PhpUnitXmlCoveredFileDataFactory(
+        $coverageFactory = new PhpUnitXmlCoverageFactory(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,
@@ -133,7 +133,7 @@ final class PhpUnitXmlCoveredFileDataFactoryTest extends TestCase
             )
         ;
 
-        $coverageFactory = new PhpUnitXmlCoveredFileDataFactory(
+        $coverageFactory = new PhpUnitXmlCoverageFactory(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,
@@ -171,7 +171,7 @@ final class PhpUnitXmlCoveredFileDataFactoryTest extends TestCase
         $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
 
-        $coverageFactory = new PhpUnitXmlCoveredFileDataFactory(
+        $coverageFactory = new PhpUnitXmlCoverageFactory(
             '/nowhere',
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,
@@ -211,7 +211,7 @@ TXT
             ->willReturn($this->getParsedCodeCoverageData())
         ;
 
-        $coverageFactory = new PhpUnitXmlCoveredFileDataFactory(
+        $coverageFactory = new PhpUnitXmlCoverageFactory(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,

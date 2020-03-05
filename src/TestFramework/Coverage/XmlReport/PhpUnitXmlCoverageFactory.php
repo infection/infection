@@ -48,7 +48,7 @@ use function Safe\file_get_contents;
  * @internal
  * @final
  */
-class PhpUnitXmlCoveredFileDataFactory
+class PhpUnitXmlCoverageFactory
 {
     /**
      * TODO: make this constant private
