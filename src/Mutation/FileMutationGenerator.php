@@ -90,7 +90,7 @@ class FileMutationGenerator
             : $fileInfo->getRealPath()
         ;
 
-        if ($onlyCovered && !$codeCoverage->hasTests($filePath)) {
+        if ($onlyCovered && !$codeCoverage->hasTests()) {
             return;
         }
 
