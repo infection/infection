@@ -6,7 +6,7 @@
         ]
     },
     "logs": {
-        "text": "infection.log"
+        "debug": "infection.log"
     },
     "tmpDir": "."
 }

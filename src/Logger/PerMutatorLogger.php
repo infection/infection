@@ -35,20 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use function floor;
+use function array_fill;
+use function array_unshift;
+use function count;
+use function implode;
 use Infection\Mutant\MetricsCalculator;
+use function max;
+use const PHP_ROUND_HALF_UP;
+use function round;
 use function Safe\ksort;
+use function Safe\sprintf;
+use function str_pad;
+use const STR_PAD_LEFT;
+use const STR_PAD_RIGHT;
+use function str_repeat;
+use function strlen;
 
 /**
  * @internal
  */
 final class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
-    /**
-     * @var MetricsCalculator[]
-     */
-    private $calculatorPerMutator = [];
-
     private $metricsCalculator;
 
     public function __construct(MetricsCalculator $metricsCalculator)
@@ -58,30 +65,112 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
 
     public function getLogLines(): array
     {
-        $this->setUpPerCalculatorMutator();
+        $calculatorPerMutator = $this->createMetricsPerMutators();
 
-        $logs = [];
+        $table = [
+            ['Mutator', 'Mutations', 'Killed', 'Escaped', 'Errors', 'Timed Out', 'MSI (%s)', 'Covered MSI (%s)'],
+        ];
 
-        $logs[] = '# Effects per Mutator' . PHP_EOL;
-
-        $logs[] = '| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |';
-        $logs[] = '| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |';
-
-        foreach ($this->calculatorPerMutator as $mutator => $calculator) {
-            $logs[] = '| ' . $mutator . ' | ' .
-                $calculator->getTotalMutantsCount() . ' | ' .
-                $calculator->getKilledCount() . ' | ' .
-                $calculator->getEscapedCount() . ' | ' .
-                $calculator->getErrorCount() . ' | ' .
-                $calculator->getTimedOutCount() . ' | ' .
-                floor($calculator->getMutationScoreIndicator()) . '| ' .
-                floor($calculator->getCoveredCodeMutationScoreIndicator()) . '|';
+        foreach ($calculatorPerMutator as $mutatorName => $calculator) {
+            /* @var string $mutatorName */
+            /* @var MetricsCalculator $calculator */
+            $table[] = [
+                $mutatorName,
+                (string) $calculator->getTotalMutantsCount(),
+                (string) $calculator->getKilledCount(),
+                (string) $calculator->getEscapedCount(),
+                (string) $calculator->getErrorCount(),
+                (string) $calculator->getTimedOutCount(),
+                self::formatScore($calculator->getMutationScoreIndicator()),
+                self::formatScore($calculator->getCoveredCodeMutationScoreIndicator()),
+            ];
         }
+
+        $logs = self::formatTable($table);
+        $logs[] = '';
+
+        array_unshift($logs, '# Effects per Mutator', '');
 
         return $logs;
     }
 
-    private function setUpPerCalculatorMutator(): void
+    private static function formatScore(float $score): string
+    {
+        return sprintf(
+            '%0.2f',
+            round($score, 2, PHP_ROUND_HALF_UP)
+        );
+    }
+
+    /**
+     * @param string[][] $table
+     *
+     * @return string[];
+     */
+    private static function formatTable(array $table): array
+    {
+        $columnSizes = self::calculateColumnSizes($table);
+
+        $formattedTable = [];
+
+        foreach ($table as $index => $row) {
+            foreach ($columnSizes as $i => $columnSize) {
+                $row[$i] = self::padCell($row[$i], $columnSize, $i !== 0);
+            }
+
+            $formattedTable[] = '| ' . implode(' | ', $row) . ' |';
+
+            if ($index === 0) {
+                $formattedTable[] = self::createSeparatorRow($columnSizes);
+            }
+        }
+
+        return $formattedTable;
+    }
+
+    /**
+     * @param string[][] $table
+     *
+     * @return int[]
+     */
+    private static function calculateColumnSizes(array $table): array
+    {
+        $sizes = array_fill(0, count($table[0]), 0);
+
+        foreach ($table as $row) {
+            foreach ($row as $columnNumber => $cell) {
+                $sizes[$columnNumber] = (int) max($sizes[$columnNumber], strlen($cell));
+            }
+        }
+
+        return $sizes;
+    }
+
+    private static function padCell(string $value, int $size, bool $toLeft): string
+    {
+        return str_pad($value, $size, ' ', $toLeft ? STR_PAD_LEFT : STR_PAD_RIGHT);
+    }
+
+    /**
+     * @param int[] $columnSizes
+     *
+     * @var int[]
+     */
+    private static function createSeparatorRow(array $columnSizes): string
+    {
+        $separatorRow = [];
+
+        foreach ($columnSizes as $columnSize) {
+            $separatorRow[] = str_repeat('-', $columnSize);
+        }
+
+        return '| ' . implode(' | ', $separatorRow) . ' |';
+    }
+
+    /**
+     * @return array<string, MetricsCalculator>
+     */
+    private function createMetricsPerMutators(): array
     {
         $executionResults = $this->metricsCalculator->getAllExecutionResults();
 
@@ -92,13 +181,17 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
             $processPerMutator[$mutatorName][] = $executionResult;
         }
 
+        $calculatorPerMutator = [];
+
         foreach ($processPerMutator as $mutator => $executionResults) {
             $calculator = new MetricsCalculator();
             $calculator->collect(...$executionResults);
 
-            $this->calculatorPerMutator[$mutator] = $calculator;
+            $calculatorPerMutator[$mutator] = $calculator;
         }
 
-        ksort($this->calculatorPerMutator);
+        ksort($calculatorPerMutator);
+
+        return $calculatorPerMutator;
     }
 }

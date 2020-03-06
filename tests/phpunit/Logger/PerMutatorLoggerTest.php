@@ -64,8 +64,9 @@ final class PerMutatorLoggerTest extends TestCase
             <<<'TXT'
 # Effects per Mutator
 
-| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |
-| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |
+| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI (%s) | Covered MSI (%s) |
+| ------- | --------- | ------ | ------- | ------ | --------- | -------- | ---------------- |
+
 TXT
         ];
 
@@ -74,10 +75,11 @@ TXT
             <<<'TXT'
 # Effects per Mutator
 
-| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |
-| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |
-| For_ | 5 | 1 | 1 | 1 | 1 | 60| 75|
-| PregQuote | 5 | 1 | 1 | 1 | 1 | 60| 75|
+| Mutator   | Mutations | Killed | Escaped | Errors | Timed Out | MSI (%s) | Covered MSI (%s) |
+| --------- | --------- | ------ | ------- | ------ | --------- | -------- | ---------------- |
+| For_      |         5 |      1 |       1 |      1 |         1 |    60.00 |            75.00 |
+| PregQuote |         5 |      1 |       1 |      1 |         1 |    60.00 |            75.00 |
+
 TXT
         ];
     }
