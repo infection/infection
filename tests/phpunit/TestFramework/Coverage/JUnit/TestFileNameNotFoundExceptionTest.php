@@ -33,21 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
+use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use PHPUnit\Framework\TestCase;
 
-final class TestFileTimeDataTest extends TestCase
+final class TestFileNameNotFoundExceptionTest extends TestCase
 {
-    public function test_it_creates_self_object_with_named_constructor(): void
+    public function test_from_fqn(): void
     {
-        $testFileTimeData = new TestFileTimeData(
-            '/path/to/Test.php',
-            2.345
-        );
+        $exception = TestFileNameNotFoundException::notFoundFromFQN('Foo\Bar', '/path/to/junit/xml');
 
-        $this->assertSame('/path/to/Test.php', $testFileTimeData->path);
-        $this->assertSame(2.345, $testFileTimeData->time);
+        $this->assertInstanceOf(TestFileNameNotFoundException::class, $exception);
+        $this->assertSame('For FQCN: Foo\Bar. Junit report: /path/to/junit/xml', $exception->getMessage());
     }
 }

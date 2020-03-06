@@ -33,26 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Coverage\JUnit;
+
+use Exception;
+use function Safe\sprintf;
 
 /**
  * @internal
  */
-final class TestFileTimeData
+final class TestFileNameNotFoundException extends Exception
 {
-    /**
-     * @var string
-     */
-    public $path;
-
-    /**
-     * @var float
-     */
-    public $time;
-
-    public function __construct(string $path, float $time)
+    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
     {
-        $this->path = $path;
-        $this->time = $time;
+        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
     }
 }
