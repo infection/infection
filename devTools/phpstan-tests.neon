@@ -25,14 +25,6 @@ parameters:
             path: '../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php'
             message: '#Function simplexml_load_string is unsafe to use#'
             count: 1
-        -
-            path: '../tests/phpunit/TestFramework/Coverage/CoverageCheckerTest.php'
-            message: '#Instantiated class Infection\\TestFramework\\Codeception\\CodeceptionAdapter not found#'
-            count: 1
-        -
-            path: '../tests/phpunit/TestFramework/Coverage/CoverageCheckerTest.php'
-            message: '#Class Infection\\TestFramework\\Codeception\\CodeceptionAdapter was not found while trying to analyse it - autoloading is probably not configured properly\.#'
-            count: 1
     level: 4
     paths:
         - ../tests/phpunit

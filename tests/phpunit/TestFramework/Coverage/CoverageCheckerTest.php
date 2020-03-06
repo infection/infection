@@ -37,7 +37,6 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use function extension_loaded;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Codeception\CodeceptionAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageNotFound;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
@@ -194,7 +193,7 @@ TXT
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
             'Could not find the file "/nowhere/index.xml". Please ensure that the XML coverage '
-            .'report has been properly generated at the right place.'
+            . 'report has been properly generated at the right place.'
         );
 
         $checker->checkCoverageExists();
@@ -214,8 +213,8 @@ TXT
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
             'Could not find the file "/nowhere/index.xml". Please ensure that the XML coverage '
-            .'report has been properly generated at the right place. The PHPUnit option for the '
-            .'path given is "--coverage-xml=/nowhere/coverage-xml"'
+            . 'report has been properly generated at the right place. The PHPUnit option for the '
+            . 'path given is "--coverage-xml=/nowhere/coverage-xml"'
         );
 
         $checker->checkCoverageExists();
@@ -235,8 +234,8 @@ TXT
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
             'Could not find the file "/nowhere/index.xml". Please ensure that the XML coverage '
-            .'report has been properly generated at the right place. The Codeception option for the'
-            .' path given is "--coverage-phpunit=/nowhere/coverage-xml"'
+            . 'report has been properly generated at the right place. The Codeception option for the'
+            . ' path given is "--coverage-phpunit=/nowhere/coverage-xml"'
         );
 
         $checker->checkCoverageExists();

@@ -28,10 +28,6 @@ parameters:
             path: '../src/TestFramework/Coverage/JUnit/JUnitTestCaseSorter.php'
             message: '#array_key_exists expects int\|string, string\|null given#'
             count: 1
-        -
-            path: '../src/TestFramework/Coverage/CoverageChecker.php'
-            message: '#Class Infection\\TestFramework\\Codeception\\CodeceptionAdapter not found.#'
-            count: 1
     level: max
     paths:
         - ../src

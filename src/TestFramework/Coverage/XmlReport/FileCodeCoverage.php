@@ -37,7 +37,6 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -81,8 +80,6 @@ class FileCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return iterable<CoverageLineData>
      */
     private function getTestsForFunctionSignature(NodeLineRangeData $lineRange): iterable
@@ -93,8 +90,6 @@ class FileCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return iterable<CoverageLineData>
      */
     private function getTestsForLineRange(NodeLineRangeData $lineRange): iterable
@@ -107,8 +102,6 @@ class FileCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return iterable<CoverageLineData>
      */
     private function getTestsForExecutedMethodOnLine(int $line): iterable

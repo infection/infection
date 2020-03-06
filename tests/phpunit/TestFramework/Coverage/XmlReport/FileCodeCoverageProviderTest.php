@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
@@ -50,8 +49,8 @@ final class FileCodeCoverageProviderTest extends TestCase
     {
         $filePath = '/path/to/unknown-file';
 
-        $codeCoverageDataProvider = $this->createCodeCoverageDataProvider();
-        $codeCoverageData = $codeCoverageDataProvider->createFor($this->createSplFileInfo($filePath));
+        $provider = $this->createCodeCoverageDataProvider();
+        $codeCoverageData = $provider->provideFor($this->createSplFileInfo($filePath));
 
         $this->assertFalse($codeCoverageData->hasTests());
     }
@@ -60,36 +59,10 @@ final class FileCodeCoverageProviderTest extends TestCase
     {
         $filePath = '/path/to/acme/Foo.php';
 
-        $codeCoverageDataProvider = $this->createCodeCoverageDataProvider();
-        $codeCoverageData = $codeCoverageDataProvider->createFor($this->createSplFileInfo($filePath));
+        $provider = $this->createCodeCoverageDataProvider();
+        $codeCoverageData = $provider->provideFor($this->createSplFileInfo($filePath));
 
         $this->assertTrue($codeCoverageData->hasTests());
-    }
-
-    public function test_it_throws_an_exception_when_no_coverage_found(): void
-    {
-        $coverageFactoryMock = $this->createMock(PhpUnitXmlCoverageFactory::class);
-        $coverageFactoryMock
-            ->expects($this->once())
-            ->method('createCoverage')
-            ->willThrowException($exception = new CoverageDoesNotExistException())
-        ;
-
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $splFileInfoMock
-            ->expects($this->never())
-            ->method('getRealPath')
-        ;
-
-        $codeCoverageDataProvider = new FileCodeCoverageProvider($coverageFactoryMock);
-
-        try {
-            $codeCoverageDataProvider->createFor($splFileInfoMock);
-
-            $this->fail();
-        } catch (CoverageDoesNotExistException $caughtException) {
-            $this->assertSame($exception, $caughtException);
-        }
     }
 
     private function getParsedCodeCoverageData(): array
