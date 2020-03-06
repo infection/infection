@@ -46,9 +46,9 @@ use function str_replace;
 
 trait CreateMetricsCalculator
 {
-    private function createCompleteMetricsCalculator(): MetricsCalculator
+    private function createCompleteMetricsCalculator(bool $timeoutAsEscape = false): MetricsCalculator
     {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator($timeoutAsEscape);
 
         $calculator->collect(
             $this->createMutantExecutionResult(

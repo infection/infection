@@ -85,7 +85,12 @@ class MetricsCalculator
      */
     private $calculator;
 
-    public function __construct()
+    /**
+     * @var bool
+     */
+    private $treatTimeoutsAsEscapes = false;
+
+    public function __construct(bool $treatTimeoutsAsEscapes = false)
     {
         $this->killedExecutionResults = new SortableMutantExecutionResults();
         $this->errorExecutionResults = new SortableMutantExecutionResults();
@@ -93,6 +98,7 @@ class MetricsCalculator
         $this->timedOutExecutionResults = new SortableMutantExecutionResults();
         $this->notCoveredExecutionResults = new SortableMutantExecutionResults();
         $this->allExecutionResults = new SortableMutantExecutionResults();
+        $this->treatTimeoutsAsEscapes = $treatTimeoutsAsEscapes;
     }
 
     public function collect(MutantExecutionResult ...$executionResults): void
@@ -246,5 +252,15 @@ class MetricsCalculator
     private function getCalculator(): Calculator
     {
         return $this->calculator ?? Calculator::fromMetrics($this);
+    }
+
+    /**
+     * Are mutaiton timeouts treated as escapes?
+     *
+     * @return bool
+     */
+    public function getTreatTimeoutsAsEscapes(): bool
+    {
+        return $this->treatTimeoutsAsEscapes;
     }
 }
