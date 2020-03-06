@@ -33,49 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Generator;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
-use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
-final class XMLLineCodeCoverageFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final class FileCodeCoverageProviderFactory
 {
-    /**
-     * @dataProvider valueProvider
-     */
-    public function test_it_can_create_an_XMLLine_code_coverage_instance(
-        string $frameworkKey,
-        bool $jUnitReport
-    ): void {
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
-        $adapter
-            ->expects($this->once())
-            ->method('hasJUnitReport')
-            ->willReturn($jUnitReport)
-        ;
+    private $coverageDir;
+    private $coverageXmlParser;
+    private $testFileDataProvider;
 
-        // We cannot test much of the generated instance here since it does not exposes any state.
-        // We can only ensure that an instance is created in all scenarios
-        (new XMLLineCodeCoverageFactory(
-            '/path/to/coverage/dir',
-            $this->createMock(IndexXmlCoverageParser::class),
-            $this->createMock(TestFileDataProvider::class)
-        ))->create($frameworkKey, $adapter);
-
-        $this->addToAssertionCount(1);
+    public function __construct(
+        string $coverageDir,
+        IndexXmlCoverageParser $coverageXmlParser,
+        TestFileDataProvider $testFileDataProvider
+    ) {
+        $this->coverageDir = $coverageDir;
+        $this->coverageXmlParser = $coverageXmlParser;
+        $this->testFileDataProvider = $testFileDataProvider;
     }
 
-    public function valueProvider(): Generator
-    {
-        foreach (TestFrameworkTypes::TYPES as $frameworkKey) {
-            foreach ([true, false] as $jUnitReport) {
-                yield [$frameworkKey, $jUnitReport];
-            }
-        }
+    public function create(
+        string $testFrameworkKey,
+        TestFrameworkAdapter $adapter
+    ): FileCodeCoverageProvider {
+        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
+
+        $testFileDataProviderService = $adapter->hasJUnitReport()
+            ? $this->testFileDataProvider
+            : null
+        ;
+
+        return new FileCodeCoverageProvider(
+            new PhpUnitXmlCoverageFactory(
+                $this->coverageDir,
+                $this->coverageXmlParser,
+                $testFrameworkKey,
+                $testFileDataProviderService
+            )
+        );
     }
 }

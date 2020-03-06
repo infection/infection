@@ -38,6 +38,8 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use function is_array;
 use function is_scalar;
+use function iterator_to_array;
+use Traversable;
 
 final class CoverageHelper
 {
@@ -50,8 +52,12 @@ final class CoverageHelper
      *
      * @return array<string, mixed>
      */
-    public static function convertToArray(array $coverage): array
+    public static function convertToArray(iterable $coverage): array
     {
+        if ($coverage instanceof Traversable) {
+            $coverage = iterator_to_array($coverage, false);
+        }
+
         return self::serializeValue($coverage);
     }
 
