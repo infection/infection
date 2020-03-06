@@ -33,18 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\EnvVariableManipulation;
 
-use Exception;
-use function Safe\sprintf;
+use function getenv;
+use PHPUnit\Framework\TestCase;
+use function Safe\putenv;
 
-/**
- * @internal
- */
-final class TestFileNameNotFoundException extends Exception
+final class EnvBackupTest extends TestCase
 {
-    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
+    public function test_it_can_backup_and_restore_environment_variables(): void
     {
-        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
+        putenv('BEFORE_SNAPSHOT_0=initialValue0');
+        putenv('BEFORE_SNAPSHOT_1=initialValue1');
+        putenv('BEFORE_SNAPSHOT_2=initialValue2');
+
+        $initialEnvironmentVariables = getenv();
+
+        $snapshot = EnvBackup::createSnapshot();
+
+        putenv('BEFORE_SNAPSHOT_0=newValue0');
+        putenv('BEFORE_SNAPSHOT_1=');
+        putenv('BEFORE_SNAPSHOT_2');
+        putenv('AFTER_SNAPSHOT=value');
+
+        $snapshot->restore();
+
+        $this->assertSame('initialValue0', getenv('BEFORE_SNAPSHOT_0'));
+        $this->assertSame('initialValue1', getenv('BEFORE_SNAPSHOT_1'));
+        $this->assertSame('initialValue2', getenv('BEFORE_SNAPSHOT_2'));
+        $this->assertFalse(getenv('AFTER_SNAPSHOT'));
+        $this->assertSame($initialEnvironmentVariables, getenv());
     }
 }

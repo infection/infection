@@ -33,49 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
-use Generator;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
+use function class_exists;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use function Safe\sprintf;
 
-final class FileCodeCoverageProviderFactoryTest extends TestCase
+/**
+ * @covers \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider
+ */
+final class EnvTestCasesProviderTest extends TestCase
 {
     /**
-     * @dataProvider valueProvider
+     * @dataProvider \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::envTestCaseTupleProvider
      */
-    public function test_it_can_create_an_XMLLine_code_coverage_instance(
-        string $frameworkKey,
-        bool $jUnitReport
-    ): void {
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
-        $adapter
-            ->expects($this->once())
-            ->method('hasJUnitReport')
-            ->willReturn($jUnitReport)
-        ;
-
-        // We cannot test much of the generated instance here since it does not exposes any state.
-        // We can only ensure that an instance is created in all scenarios
-        (new FileCodeCoverageProviderFactory(
-            '/path/to/coverage/dir',
-            $this->createMock(IndexXmlCoverageParser::class),
-            $this->createMock(TestFileDataProvider::class)
-        ))->create($frameworkKey, $adapter);
-
-        $this->addToAssertionCount(1);
-    }
-
-    public function valueProvider(): Generator
+    public function test_env_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
     {
-        foreach (TestFrameworkTypes::TYPES as $frameworkKey) {
-            foreach ([true, false] as $jUnitReport) {
-                yield [$frameworkKey, $jUnitReport];
-            }
-        }
+        $this->assertTrue(
+            class_exists($testCaseClassName, true),
+            sprintf('Expected "%s" to be a class.', $testCaseClassName)
+        );
+
+        $testCaseReflection = new ReflectionClass($testCaseClassName);
+
+        $this->assertInstanceOf(
+            TestCase::class,
+            $testCaseReflection->newInstanceWithoutConstructor()
+        );
+
+        $this->assertFalse(
+            $testCaseReflection->isAbstract(),
+            sprintf(
+                'Expected "%s" to be an actual test case, not a base (abstract) one.',
+                $testCaseClassName
+            )
+        );
+
+        $this->assertFileExists($fileWithIoOperations);
     }
 }

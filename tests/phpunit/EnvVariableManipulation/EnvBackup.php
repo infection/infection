@@ -33,49 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\EnvVariableManipulation;
 
-use Generator;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
-use PHPUnit\Framework\TestCase;
+use function array_key_exists;
+use function getenv;
+use function Safe\putenv;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
-final class FileCodeCoverageProviderFactoryTest extends TestCase
+final class EnvBackup
 {
+    private $environmentVariables;
+
     /**
-     * @dataProvider valueProvider
+     * @param array<string, string> $environmentVariables
      */
-    public function test_it_can_create_an_XMLLine_code_coverage_instance(
-        string $frameworkKey,
-        bool $jUnitReport
-    ): void {
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
-        $adapter
-            ->expects($this->once())
-            ->method('hasJUnitReport')
-            ->willReturn($jUnitReport)
-        ;
-
-        // We cannot test much of the generated instance here since it does not exposes any state.
-        // We can only ensure that an instance is created in all scenarios
-        (new FileCodeCoverageProviderFactory(
-            '/path/to/coverage/dir',
-            $this->createMock(IndexXmlCoverageParser::class),
-            $this->createMock(TestFileDataProvider::class)
-        ))->create($frameworkKey, $adapter);
-
-        $this->addToAssertionCount(1);
+    private function __construct(array $environmentVariables)
+    {
+        $this->environmentVariables = $environmentVariables;
     }
 
-    public function valueProvider(): Generator
+    public static function createSnapshot(): self
     {
-        foreach (TestFrameworkTypes::TYPES as $frameworkKey) {
-            foreach ([true, false] as $jUnitReport) {
-                yield [$frameworkKey, $jUnitReport];
+        $environmentVariables = getenv();
+
+        Assert::allString($environmentVariables);
+
+        return new self($environmentVariables);
+    }
+
+    public function restore(): void
+    {
+        $snapshot = $this->environmentVariables;
+
+        foreach (getenv() as $name => $value) {
+            if (!array_key_exists($name, $snapshot)) {
+                putenv($name);
+
+                continue;
             }
+
+            $snapshotValue = $snapshot[$name];
+            unset($snapshot[$name]);
+
+            if ($snapshotValue === $value) {
+                continue;
+            }
+
+            putenv(sprintf('%s=%s', $name, $snapshotValue));
+        }
+
+        foreach ($snapshot as $name => $value) {
+            putenv(sprintf('%s=%s', $name, $value));
         }
     }
 }
