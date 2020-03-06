@@ -43,7 +43,7 @@ use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -62,7 +62,7 @@ final class MutationGenerator
      */
     private $mutators;
 
-    private $codeCoverageData;
+    private $coverageProvider;
     private $eventDispatcher;
     private $fileMutationGenerator;
     private $runConcurrently;
@@ -73,7 +73,7 @@ final class MutationGenerator
      */
     public function __construct(
         iterable $sourceFiles,
-        LineCodeCoverage $codeCoverageData,
+        FileCodeCoverageProvider $coverageProvider,
         array $mutators,
         EventDispatcher $eventDispatcher,
         FileMutationGenerator $fileMutationGenerator,
@@ -82,7 +82,7 @@ final class MutationGenerator
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
         $this->sourceFiles = $sourceFiles;
-        $this->codeCoverageData = $codeCoverageData;
+        $this->coverageProvider = $coverageProvider;
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileMutationGenerator = $fileMutationGenerator;
@@ -107,7 +107,7 @@ final class MutationGenerator
             yield from $this->fileMutationGenerator->generate(
                 $fileInfo,
                 $onlyCovered,
-                $this->codeCoverageData,
+                $this->coverageProvider->createFor($fileInfo),
                 $this->mutators,
                 $nodeIgnorers
             );

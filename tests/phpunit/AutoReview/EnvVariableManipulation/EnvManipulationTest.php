@@ -33,18 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
-use Infection\TestFramework\Coverage\XmlReport\TestFileNameNotFoundException;
+use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use PHPUnit\Framework\TestCase;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
 
-final class TestFileNameNotFoundExceptionTest extends TestCase
+final class EnvManipulationTest extends TestCase
 {
-    public function test_from_fqn(): void
-    {
-        $exception = TestFileNameNotFoundException::notFoundFromFQN('Foo\Bar', '/path/to/junit/xml');
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::envTestCaseTupleProvider
+     */
+    public function test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait(
+        string $testCaseClassName,
+        string $fileWithEnvManipulations
+    ): void {
+        $import = sprintf(
+            'use %s;',
+            BacksUpEnvironmentVariables::class
+        );
 
-        $this->assertInstanceOf(TestFileNameNotFoundException::class, $exception);
-        $this->assertSame('For FQCN: Foo\Bar. Junit report: /path/to/junit/xml', $exception->getMessage());
+        $this->assertStringContainsString(
+            $import,
+            file_get_contents($fileWithEnvManipulations),
+            sprintf(
+                <<<'TXT'
+    Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have
+    been found in the file "%s".
+TXT
+                ,
+                $testCaseClassName,
+                BacksUpEnvironmentVariables::class,
+                $fileWithEnvManipulations
+            )
+        );
     }
 }

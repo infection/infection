@@ -33,24 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
-
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+namespace Infection\TestFramework\Coverage\JUnit;
 
 /**
  * @internal
  */
-interface LineCodeCoverage
+interface TestFileDataProvider
 {
     /**
-     * @throws CoverageDoesNotExistException
-     */
-    public function hasTests(): bool;
-
-    /**
-     * @throws CoverageDoesNotExistException
+     * Provides 1) file name of the test file that contains passed as a parameter test class
+     *          2) Time test was executed with
      *
-     * @return iterable<CoverageLineData>
+     * Example for file name:
+     *      param:  '\NameSpace\Sub\TestClass'
+     *      return: '/path/to/NameSpace/Sub/TestClass.php'
+     *
+     * @return TestFileTimeData file path and time
      */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;
 }

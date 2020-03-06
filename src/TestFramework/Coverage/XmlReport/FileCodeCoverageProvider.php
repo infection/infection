@@ -33,24 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use array_key_exists;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
+ * @final
  */
-interface LineCodeCoverage
+class FileCodeCoverageProvider
 {
     /**
-     * @throws CoverageDoesNotExistException
+     * @var array<string, CoverageFileData>|null
      */
-    public function hasTests(): bool;
+    private $coverage;
 
-    /**
-     * @throws CoverageDoesNotExistException
-     *
-     * @return iterable<CoverageLineData>
-     */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+    private $coverageFactory;
+
+    public function __construct(PhpUnitXmlCoverageFactory $coverageFactory)
+    {
+        $this->coverageFactory = $coverageFactory;
+    }
+
+    public function createFor(SplFileInfo $fileInfo): FileCodeCoverage
+    {
+        if ($this->coverage === null) {
+            $this->coverage = $this->coverageFactory->createCoverage();
+        }
+
+        $filePath = $fileInfo->getRealPath() === false
+            ? $fileInfo->getPathname()
+            : $fileInfo->getRealPath()
+        ;
+
+        if (!array_key_exists($filePath, $this->coverage)) {
+            return new FileCodeCoverage(new CoverageFileData());
+        }
+
+        return new FileCodeCoverage($this->coverage[$filePath]);
+    }
 }

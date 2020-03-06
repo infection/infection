@@ -88,11 +88,11 @@ use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
+use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\MemoizedTestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageFactory;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
@@ -154,8 +154,8 @@ final class Container
             IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
                 return new IndexXmlCoverageParser($container->getConfiguration()->getCoveragePath());
             },
-            XMLLineCodeCoverageFactory::class => static function (self $container): XMLLineCodeCoverageFactory {
-                return new XMLLineCodeCoverageFactory(
+            FileCodeCoverageProviderFactory::class => static function (self $container): FileCodeCoverageProviderFactory {
+                return new FileCodeCoverageProviderFactory(
                     $container->getConfiguration()->getCoveragePath(),
                     $container->getIndexXmlCoverageParser(),
                     $container->getMemoizedTestFileDataProvider()
@@ -393,7 +393,7 @@ final class Container
 
                 return new MutationGenerator(
                     $config->getSourceFiles(),
-                    $container->getXMLLineCodeCoverageFactory()->create(
+                    $container->getFileCodeCoverageProviderFactory()->create(
                         $config->getTestFramework(),
                         $container->getTestFrameworkAdapter()
                     ),
@@ -542,9 +542,9 @@ final class Container
         return $this->get(IndexXmlCoverageParser::class);
     }
 
-    public function getXMLLineCodeCoverageFactory(): XMLLineCodeCoverageFactory
+    public function getFileCodeCoverageProviderFactory(): FileCodeCoverageProviderFactory
     {
-        return $this->get(XMLLineCodeCoverageFactory::class);
+        return $this->get(FileCodeCoverageProviderFactory::class);
     }
 
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator

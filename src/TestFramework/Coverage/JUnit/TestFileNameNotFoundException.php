@@ -33,24 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\JUnit;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Exception;
+use function Safe\sprintf;
 
 /**
  * @internal
  */
-interface LineCodeCoverage
+final class TestFileNameNotFoundException extends Exception
 {
-    /**
-     * @throws CoverageDoesNotExistException
-     */
-    public function hasTests(): bool;
-
-    /**
-     * @throws CoverageDoesNotExistException
-     *
-     * @return iterable<CoverageLineData>
-     */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
+    {
+        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
+    }
 }

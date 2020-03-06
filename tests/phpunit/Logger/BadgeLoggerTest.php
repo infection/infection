@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use function getenv;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Environment\TravisCiResolver;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\putenv;
@@ -48,6 +48,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class BadgeLoggerTest extends TestCase
 {
+    use BacksUpEnvironmentVariables;
+
     /**
      * @var OutputInterface|MockObject
      */
@@ -68,42 +70,10 @@ final class BadgeLoggerTest extends TestCase
      */
     private $badgeLogger;
 
-    /**
-     * @var array<string|bool>
-     */
-    private static $env = [];
-
-    public static function setUpBeforeClass(): void
-    {
-        // Save current env state
-        $names = [
-            'TRAVIS',
-            'TRAVIS_BRANCH',
-            'TRAVIS_REPO_SLUG',
-            'TRAVIS_PULL_REQUEST',
-            'INFECTION_BADGE_API_KEY',
-            'STRYKER_DASHBOARD_API_KEY',
-        ];
-
-        foreach ($names as $name) {
-            self::$env[$name] = getenv($name);
-        }
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        // Restore original env state
-        foreach (self::$env as $name => $value) {
-            if ($value !== false) {
-                putenv($name . '=' . $value);
-            } else {
-                putenv($name);
-            }
-        }
-    }
-
     protected function setUp(): void
     {
+        $this->backupEnvironmentVariables();
+
         $this->outputMock = $this->createMock(OutputInterface::class);
         $this->badgeApiClientMock = $this->createMock(StrykerDashboardClient::class);
         $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
@@ -116,6 +86,11 @@ final class BadgeLoggerTest extends TestCase
             $this->metricsCalculatorMock,
             'master'
         );
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreEnvironmentVariables();
     }
 
     public function test_it_skips_logging_when_it_is_not_travis(): void

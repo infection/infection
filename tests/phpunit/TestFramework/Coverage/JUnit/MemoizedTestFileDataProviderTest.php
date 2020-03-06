@@ -33,22 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-/**
- * @internal
- */
-interface TestFileDataProvider
+use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
+use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
+use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use PHPUnit\Framework\TestCase;
+
+final class MemoizedTestFileDataProviderTest extends TestCase
 {
-    /**
-     * Provides 1) file name of the test file that contains passed as a parameter test class
-     *          2) Time test was executed with
-     *
-     * Example for file name:
-     *      param:  '\NameSpace\Sub\TestClass'
-     *      return: '/path/to/NameSpace/Sub/TestClass.php'
-     *
-     * @return TestFileTimeData file path and time
-     */
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;
+    public function test_it_memoize_get_test_file_info_calls(): void
+    {
+        $class = 'Test\Class';
+        $expectedTestInfo = new TestFileTimeData('path/to/Test.php', 4.567);
+
+        $providerMock = $this->createMock(TestFileDataProvider::class);
+        $providerMock
+            ->expects($this->once())
+            ->method('getTestFileInfo')
+            ->with($class)
+            ->willReturn($expectedTestInfo)
+        ;
+
+        $infoProvider = new MemoizedTestFileDataProvider($providerMock);
+
+        $testInfo0 = $infoProvider->getTestFileInfo($class);
+        $testInfo1 = $infoProvider->getTestFileInfo($class);
+
+        $this->assertSame($expectedTestInfo, $testInfo0);
+        $this->assertSame($expectedTestInfo, $testInfo1);
+    }
 }
