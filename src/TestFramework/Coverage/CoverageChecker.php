@@ -36,15 +36,15 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Codeception\CodeceptionAdapter;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use function count;
 use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
 use function file_exists;
 use function implode;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Codeception\CodeceptionAdapter;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\preg_match;
@@ -84,7 +84,7 @@ final class CoverageChecker
         if ($this->skipInitialTests && !$this->skipCoverage) {
             throw new CoverageNotFound(sprintf(
                 'The initial test suite run is being skipped. The XML %sreports need to be '
-                .'provided with the "--coverage" option',
+                . 'provided with the "--coverage" option',
                 $this->testFrameworkAdapter->hasJUnitReport() ?
                     'and JUnit coverage '
                     : ''
@@ -123,7 +123,7 @@ TXT
         if ($this->testFrameworkAdapter->hasJUnitReport() && !file_exists($this->jUnitPath)) {
             $message = sprintf(
                 'Could not find the file "%s". Please ensure that the JUnit coverage report '
-                .'has been properly generated at the right place.',
+                . 'has been properly generated at the right place.',
                 $this->jUnitPath
             );
 

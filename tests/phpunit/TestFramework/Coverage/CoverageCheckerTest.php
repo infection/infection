@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use Infection\TestFramework\Codeception\CodeceptionAdapter;
-use PHPUnit\Framework\MockObject\MockObject;
 use function extension_loaded;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Codeception\CodeceptionAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageNotFound;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use const PHP_SAPI;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 use Webmozart\PathUtil\Path;
@@ -100,7 +100,7 @@ final class CoverageCheckerTest extends TestCase
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
             'The initial test suite run is being skipped. The XML reports need to be provided with '
-            .'the "--coverage" option'
+            . 'the "--coverage" option'
         );
 
         $checker->checkCoverageRequirements();
@@ -248,7 +248,7 @@ TXT
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not find the file "/invalid/path/to/junit.xml". Please ensure that the '
-            .'JUnit coverage report has been properly generated at the right place.',
+            . 'JUnit coverage report has been properly generated at the right place.',
             self::$coveragePath
         ));
 
@@ -272,8 +272,8 @@ TXT
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not find the file "/invalid/path/to/junit.xml". Please ensure that the '
-            .'JUnit coverage report has been properly generated at the right place. The PHPUnit '
-            .'option for the path given is "--log-junit=%s/junit.xml"',
+            . 'JUnit coverage report has been properly generated at the right place. The PHPUnit '
+            . 'option for the path given is "--log-junit=%s/junit.xml"',
             self::$coveragePath
         ));
 
@@ -293,8 +293,8 @@ TXT
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage('Could not find the file "/invalid/path/to/junit.xml". Please'
-            .' ensure that the JUnit coverage report has been properly generated at the right '
-            .'place. The Codeception option for the path given is "--xml"'
+            . ' ensure that the JUnit coverage report has been properly generated at the right '
+            . 'place. The Codeception option for the path given is "--xml"'
         );
 
         $checker->checkCoverageExists();
@@ -461,7 +461,6 @@ use LogicException;
 
 class CodeceptionAdapter implements TestFrameworkAdapter
 {
-
     public function getName(): string
     {
         throw new LogicException('Fake');
