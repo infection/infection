@@ -110,11 +110,11 @@ final class IndexXmlCoverageParserTest extends TestCase
             self::getXml()
         ));
 
-        $zeroLevelPath = Path::canonicalize(self::FIXTURES_SRC_DIR . '/zeroLevel.php');
-        $noPercentagePath = Path::canonicalize(self::FIXTURES_SRC_DIR . '/noPercentage.php');
-        $firstLevelPath = Path::canonicalize(self::FIXTURES_SRC_DIR . '/FirstLevel/firstLevel.php');
-        $secondLevelPath = Path::canonicalize(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
-        $secondLevelTraitPath = Path::canonicalize(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
+        $zeroLevelPath = realpath(self::FIXTURES_SRC_DIR . '/zeroLevel.php');
+        $noPercentagePath = realpath(self::FIXTURES_SRC_DIR . '/noPercentage.php');
+        $firstLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/firstLevel.php');
+        $secondLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
+        $secondLevelTraitPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
 
         $this->assertSame(
             [
@@ -272,7 +272,7 @@ XML;
             file_get_contents(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml/index.xml')
         ));
 
-        $middlewarePath = Path::canonicalize(self::FIXTURES_OLD_COVERAGE_DIR . '/src/Middleware/ReleaseRecordedEventsMiddleware.php');
+        $middlewarePath = realpath(self::FIXTURES_OLD_COVERAGE_DIR . '/src/Middleware/ReleaseRecordedEventsMiddleware.php');
 
         $this->assertSame(
             [
