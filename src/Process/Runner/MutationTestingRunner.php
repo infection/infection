@@ -40,6 +40,7 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
+use Infection\Mutant\MutantDumper;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
@@ -53,21 +54,24 @@ use function Pipeline\take;
  */
 final class MutationTestingRunner
 {
+    private $processBuilder;
     private $mutantFactory;
+    private $mutantDumper;
     private $parallelProcessManager;
     private $eventDispatcher;
-    private $processBuilder;
     private $runConcurrently;
 
     public function __construct(
         MutantProcessBuilder $mutantProcessBuilder,
         MutantFactory $mutantFactory,
+        MutantDumper $mutantDumper,
         ParallelProcessRunner $parallelProcessManager,
         EventDispatcher $eventDispatcher,
         bool $runConcurrently
     ) {
         $this->processBuilder = $mutantProcessBuilder;
         $this->mutantFactory = $mutantFactory;
+        $this->mutantDumper = $mutantDumper;
         $this->parallelProcessManager = $parallelProcessManager;
         $this->eventDispatcher = $eventDispatcher;
         $this->runConcurrently = $runConcurrently;
@@ -84,6 +88,8 @@ final class MutationTestingRunner
         $processes = take($mutations)
             ->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
                 $mutant = $this->mutantFactory->create($mutation);
+
+                $this->mutantDumper->dump($mutant);
 
                 $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 

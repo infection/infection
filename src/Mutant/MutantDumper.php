@@ -33,29 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
+use function Safe\file_put_contents;
 
-trait MutantAssertions
+final class MutantDumper
 {
-    /**
-     * @param CoverageLineData[] $expectedTests
-     */
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedDiff,
-        bool $expectedCoveredByTests,
-        array $expectedTests
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertSame($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedDiff, $mutant->getDiff());
-        $this->assertSame($expectedCoveredByTests, $mutant->isCoveredByTest());
-        $this->assertSame($expectedTests, $mutant->getTests());
+    public function dump(Mutant $mutant): void
+    {
+        file_put_contents($mutant->getFilePath(), $mutant->getCode());
     }
 }
