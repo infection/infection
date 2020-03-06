@@ -65,7 +65,7 @@ function xdebug_enable() {
 #   String
 #######################################
 function get_infection_pr_flags() {
-    local flags="";
+    local flags="--no-progress";
     local changed_files;
     local min_msi;
 
@@ -79,7 +79,7 @@ function get_infection_pr_flags() {
         >&2 echo "Assumed minimal MSI: $min_msi%"
 
         if [ -n "$changed_files" ]; then
-            flags="--filter=${changed_files} --ignore-msi-with-no-mutations --only-covered --min-msi=${min_msi} --show-mutations";
+            flags="--filter=${changed_files} --ignore-msi-with-no-mutations --only-covered --min-msi=${min_msi} --show-mutations $flags";
         fi
     fi
 
