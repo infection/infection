@@ -33,24 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use function class_exists;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use function Safe\sprintf;
 
 /**
- * @internal
+ * @covers \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider
  */
-interface LineCodeCoverage
+final class EnvTestCasesProviderTest extends TestCase
 {
     /**
-     * @throws CoverageDoesNotExistException
+     * @dataProvider \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::envTestCaseTupleProvider
      */
-    public function hasTests(): bool;
+    public function test_env_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
+    {
+        $this->assertTrue(
+            class_exists($testCaseClassName, true),
+            sprintf('Expected "%s" to be a class.', $testCaseClassName)
+        );
 
-    /**
-     * @throws CoverageDoesNotExistException
-     *
-     * @return iterable<CoverageLineData>
-     */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+        $testCaseReflection = new ReflectionClass($testCaseClassName);
+
+        $this->assertInstanceOf(
+            TestCase::class,
+            $testCaseReflection->newInstanceWithoutConstructor()
+        );
+
+        $this->assertFalse(
+            $testCaseReflection->isAbstract(),
+            sprintf(
+                'Expected "%s" to be an actual test case, not a base (abstract) one.',
+                $testCaseClassName
+            )
+        );
+
+        $this->assertFileExists($fileWithIoOperations);
+    }
 }

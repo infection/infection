@@ -33,24 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\EnvVariableManipulation;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
-interface LineCodeCoverage
+trait BacksUpEnvironmentVariables
 {
     /**
-     * @throws CoverageDoesNotExistException
+     * @var EnvBackup
      */
-    public function hasTests(): bool;
+    private $snapshot;
 
-    /**
-     * @throws CoverageDoesNotExistException
-     *
-     * @return iterable<CoverageLineData>
-     */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+    private function backupEnvironmentVariables(): void
+    {
+        $this->snapshot = EnvBackup::createSnapshot();
+    }
+
+    private function restoreEnvironmentVariables(): void
+    {
+        $value = $this->snapshot;
+
+        Assert::notNull(
+            $value,
+            'Attempted to restore a backup but no backup has been created'
+        );
+
+        $value->restore();
+    }
 }

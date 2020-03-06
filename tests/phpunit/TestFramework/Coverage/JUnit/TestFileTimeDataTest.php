@@ -33,26 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-/**
- * @internal
- */
-final class TestFileTimeData
+use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use PHPUnit\Framework\TestCase;
+
+final class TestFileTimeDataTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    public $path;
-
-    /**
-     * @var float
-     */
-    public $time;
-
-    public function __construct(string $path, float $time)
+    public function test_it_creates_self_object_with_named_constructor(): void
     {
-        $this->path = $path;
-        $this->time = $time;
+        $testFileTimeData = new TestFileTimeData(
+            '/path/to/Test.php',
+            2.345
+        );
+
+        $this->assertSame('/path/to/Test.php', $testFileTimeData->path);
+        $this->assertSame(2.345, $testFileTimeData->time);
     }
 }

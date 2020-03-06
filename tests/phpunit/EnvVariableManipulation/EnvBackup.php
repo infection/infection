@@ -33,24 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\EnvVariableManipulation;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use function array_key_exists;
+use function getenv;
+use function Safe\putenv;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
-interface LineCodeCoverage
+final class EnvBackup
 {
-    /**
-     * @throws CoverageDoesNotExistException
-     */
-    public function hasTests(): bool;
+    private $environmentVariables;
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
-     * @return iterable<CoverageLineData>
+     * @param array<string, string> $environmentVariables
      */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+    private function __construct(array $environmentVariables)
+    {
+        $this->environmentVariables = $environmentVariables;
+    }
+
+    public static function createSnapshot(): self
+    {
+        $environmentVariables = getenv();
+
+        Assert::allString($environmentVariables);
+
+        return new self($environmentVariables);
+    }
+
+    public function restore(): void
+    {
+        $snapshot = $this->environmentVariables;
+
+        foreach (getenv() as $name => $value) {
+            if (!array_key_exists($name, $snapshot)) {
+                putenv($name);
+
+                continue;
+            }
+
+            $snapshotValue = $snapshot[$name];
+            unset($snapshot[$name]);
+
+            if ($snapshotValue === $value) {
+                continue;
+            }
+
+            putenv(sprintf('%s=%s', $name, $snapshotValue));
+        }
+
+        foreach ($snapshot as $name => $value) {
+            putenv(sprintf('%s=%s', $name, $value));
+        }
+    }
 }

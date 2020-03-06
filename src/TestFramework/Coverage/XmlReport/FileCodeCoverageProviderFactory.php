@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;
@@ -43,7 +44,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class XMLLineCodeCoverageFactory
+final class FileCodeCoverageProviderFactory
 {
     private $coverageDir;
     private $coverageXmlParser;
@@ -62,7 +63,7 @@ final class XMLLineCodeCoverageFactory
     public function create(
         string $testFrameworkKey,
         TestFrameworkAdapter $adapter
-    ): XMLLineCodeCoverage {
+    ): FileCodeCoverageProvider {
         Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
 
         $testFileDataProviderService = $adapter->hasJUnitReport()
@@ -70,7 +71,7 @@ final class XMLLineCodeCoverageFactory
             : null
         ;
 
-        return new XMLLineCodeCoverage(
+        return new FileCodeCoverageProvider(
             new PhpUnitXmlCoverageFactory(
                 $this->coverageDir,
                 $this->coverageXmlParser,

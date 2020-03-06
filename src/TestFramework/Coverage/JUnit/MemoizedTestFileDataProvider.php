@@ -33,24 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\JUnit;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use function array_key_exists;
 
 /**
  * @internal
  */
-interface LineCodeCoverage
+final class MemoizedTestFileDataProvider implements TestFileDataProvider
 {
-    /**
-     * @throws CoverageDoesNotExistException
-     */
-    public function hasTests(): bool;
+    private $provider;
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
-     * @return iterable<CoverageLineData>
+     * @var array<string, TestFileTimeData>
      */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+    private $cache = [];
+
+    public function __construct(TestFileDataProvider $decoratedProvider)
+    {
+        $this->provider = $decoratedProvider;
+    }
+
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    {
+        if (!array_key_exists($fullyQualifiedClassName, $this->cache)) {
+            $this->cache[$fullyQualifiedClassName] = $this->provider->getTestFileInfo($fullyQualifiedClassName);
+        }
+
+        return $this->cache[$fullyQualifiedClassName];
+    }
 }
