@@ -92,6 +92,17 @@ final class FileMutationGeneratorTest extends TestCase
     {
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
+        $codeCoverageMock
+            ->expects($this->once())
+            ->method('getAllTestsForMutation')
+            ->willReturn([])
+        ;
+
+        $codeCoverageMock
+            ->expects($this->never())
+            ->method('hasTests')
+        ;
+
         $mutationGenerator = SingletonContainer::getContainer()->getFileMutationGenerator();
 
         $mutations = $mutationGenerator->generate(
@@ -195,7 +206,6 @@ final class FileMutationGeneratorTest extends TestCase
             $fileInfo,
             true,
             $this->createCodeCoverageMock(
-                $expectedFilePath,
                 false
             ),
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
@@ -219,7 +229,6 @@ final class FileMutationGeneratorTest extends TestCase
                 new SplFileInfo('/path/to/file', 'relativePath', 'relativePathName'),
                 false,
                 $this->createCodeCoverageMock(
-                    '/path/to/file',
                     true
                 ),
                 '/path/to/file',
@@ -236,7 +245,6 @@ final class FileMutationGeneratorTest extends TestCase
                 new SplFileInfo(__FILE__, 'relativePath', 'relativePathName'),
                 false,
                 $this->createCodeCoverageMock(
-                    __FILE__,
                     true
                 ),
                 __FILE__,
@@ -247,7 +255,6 @@ final class FileMutationGeneratorTest extends TestCase
             new SplFileInfo('/path/to/file', 'relativePath', 'relativePathName'),
             true,
             $this->createCodeCoverageMock(
-                '/path/to/file',
                 true
             ),
             '/path/to/file',
@@ -257,7 +264,6 @@ final class FileMutationGeneratorTest extends TestCase
             new SplFileInfo(__FILE__, 'relativePath', 'relativePathName'),
             true,
             $this->createCodeCoverageMock(
-                __FILE__,
                 true
             ),
             __FILE__,
@@ -285,12 +291,11 @@ final class FileMutationGeneratorTest extends TestCase
     /**
      * @return LineCodeCoverage|MockObject
      */
-    private function createCodeCoverageMock(string $expectedPath, bool $tests)
+    private function createCodeCoverageMock(bool $tests)
     {
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
         $codeCoverageMock
             ->method('hasTests')
-            ->with($expectedPath)
             ->willReturn($tests)
         ;
 
