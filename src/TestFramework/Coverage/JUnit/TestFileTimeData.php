@@ -33,33 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
-
-use function array_key_exists;
+namespace Infection\TestFramework\Coverage\JUnit;
 
 /**
  * @internal
  */
-final class MemoizedTestFileDataProvider implements TestFileDataProvider
+final class TestFileTimeData
 {
-    private $provider;
+    /**
+     * @var string
+     */
+    public $path;
 
     /**
-     * @var array<string, TestFileTimeData>
+     * @var float
      */
-    private $cache = [];
+    public $time;
 
-    public function __construct(TestFileDataProvider $decoratedProvider)
+    public function __construct(string $path, float $time)
     {
-        $this->provider = $decoratedProvider;
-    }
-
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        if (!array_key_exists($fullyQualifiedClassName, $this->cache)) {
-            $this->cache[$fullyQualifiedClassName] = $this->provider->getTestFileInfo($fullyQualifiedClassName);
-        }
-
-        return $this->cache[$fullyQualifiedClassName];
+        $this->path = $path;
+        $this->time = $time;
     }
 }

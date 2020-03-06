@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Coverage\JUnit;
 
 use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;

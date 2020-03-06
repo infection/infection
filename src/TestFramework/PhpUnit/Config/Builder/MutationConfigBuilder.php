@@ -41,7 +41,7 @@ use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
