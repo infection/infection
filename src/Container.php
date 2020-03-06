@@ -88,8 +88,11 @@ use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Coverage\CoveredFileDataFactory;
+use Infection\TestFramework\Coverage\CoveredFileNameFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
+use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
@@ -154,11 +157,31 @@ final class Container
             IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
                 return new IndexXmlCoverageParser($container->getConfiguration()->getCoveragePath());
             },
+            CoveredFileDataFactory::class => static function (self $container): CoveredFileDataFactory {
+                return new CoveredFileDataFactory(
+                    $container->getFileCodeCoverageProviderFactory()->create(
+                        $container->getConfiguration()->getTestFramework()
+                    ),
+                    $container->getTestFileDataAdder(),
+                    $container->getCoveredFileNameFilter(),
+                    $container->getConfiguration()->getSourceFiles()
+                );
+            },
+            CoveredFileNameFilter::class => static function (self $container): CoveredFileNameFilter {
+                return new CoveredFileNameFilter(
+                    $container->getConfiguration()->getSourceFileFilter()
+                );
+            },
+            TestFileDataAdder::class => static function (self $container): TestFileDataAdder {
+                return new TestFileDataAdder(
+                    $container->getTestFrameworkAdapter(),
+                    $container->getMemoizedTestFileDataProvider()
+                );
+            },
             FileCodeCoverageProviderFactory::class => static function (self $container): FileCodeCoverageProviderFactory {
                 return new FileCodeCoverageProviderFactory(
                     $container->getConfiguration()->getCoveragePath(),
-                    $container->getIndexXmlCoverageParser(),
-                    $container->getMemoizedTestFileDataProvider()
+                    $container->getIndexXmlCoverageParser()
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
@@ -392,11 +415,7 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new MutationGenerator(
-                    $config->getSourceFiles(),
-                    $container->getFileCodeCoverageProviderFactory()->create(
-                        $config->getTestFramework(),
-                        $container->getTestFrameworkAdapter()
-                    ),
+                    $container->getCoveredFileDataFactory(),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
@@ -540,6 +559,21 @@ final class Container
     public function getIndexXmlCoverageParser(): IndexXmlCoverageParser
     {
         return $this->get(IndexXmlCoverageParser::class);
+    }
+
+    public function getCoveredFileDataFactory(): CoveredFileDataFactory
+    {
+        return $this->get(CoveredFileDataFactory::class);
+    }
+
+    public function getCoveredFileNameFilter(): CoveredFileNameFilter
+    {
+        return $this->get(CoveredFileNameFilter::class);
+    }
+
+    public function getTestFileDataAdder(): TestFileDataAdder
+    {
+        return $this->get(TestFileDataAdder::class);
     }
 
     public function getFileCodeCoverageProviderFactory(): FileCodeCoverageProviderFactory

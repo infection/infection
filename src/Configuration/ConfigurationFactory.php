@@ -41,6 +41,7 @@ use function dirname;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
+use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
@@ -122,14 +123,19 @@ class ConfigurationFactory
             $namespacedTmpDir
         );
 
+        $sourceFileFilter = new SourceFileFilter(
+            $filter
+        );
+
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
             $this->sourceFileCollector->collectFiles(
                 $schema->getSource()->getDirectories(),
                 $schema->getSource()->getExcludes(),
-                $filter
+                $sourceFileFilter->getFilters()
             ),
+            $sourceFileFilter,
             $schema->getLogs(),
             $logVerbosity,
             $namespacedTmpDir,

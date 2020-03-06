@@ -35,23 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
-use function array_filter;
 use DOMDocument;
 use DOMElement;
-use DOMNodeList;
-use function implode;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
-use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\SafeDOMXPath;
-use function realpath as native_realpath;
-use function Safe\file_get_contents;
+use function Pipeline\take;
 use function Safe\preg_replace;
-use function Safe\sprintf;
-use function Safe\substr;
-use function str_replace;
-use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -74,30 +65,33 @@ class IndexXmlCoverageParser
      * @throws NoLineExecuted
      * @throws CoverageDoesNotExistException
      *
-     * @return CoverageFileData[]
+     * @return iterable<CoveredFileData>
      */
-    public function parse(string $coverageXmlContent): array
+    public function parseLazy(string $coverageXmlContent): iterable
     {
         $xPath = self::createXPath($coverageXmlContent);
 
         self::assertHasCoverage($xPath);
 
-        $nodes = $xPath->query('//file');
-
-        $projectSource = self::getProjectSource($xPath);
-
-        $data = [];
-
-        foreach ($nodes as $node) {
-            $relativeFilePath = $node->getAttribute('href');
-
-            $this->processCoverageFile($relativeFilePath, $projectSource, $data);
-        }
-
-        return $data;
+        return $this->parseNodes($xPath);
     }
 
-    private static function createXPath(string $coverageContent): SafeDOMXPath
+    /**
+     * @deprecated in favor of parseLazy
+     *
+     * @return array<string, CoverageFileData>
+     */
+    public function parse(string $coverageXmlContent): array
+    {
+        $coverage = take($this->parseLazy($coverageXmlContent))
+            ->map(static function (CoveredFileData $data) {
+                yield $data->getSplFileInfo()->getRealPath() => $data->retrieveCoverageFileData();
+            });
+
+        return iterator_to_array($coverage, true);
+    }
+
+    public static function createXPath(string $coverageContent): SafeDOMXPath
     {
         $document = new DOMDocument();
         $success = @$document->loadXML(self::removeNamespace($coverageContent));
@@ -105,6 +99,24 @@ class IndexXmlCoverageParser
         Assert::true($success);
 
         return new SafeDOMXPath($document);
+    }
+
+    /**
+     * @return iterable<CoveredFileData>
+     */
+    private function parseNodes(SafeDOMXPath $xPath): iterable
+    {
+        $projectSource = self::getProjectSource($xPath);
+
+        $nodes = $xPath->query('//file');
+
+        foreach ($nodes as $node) {
+            $relativeCoverageFilePath = $node->getAttribute('href');
+
+            $parser = new XmlCoverageParser($this->coverageDir, $relativeCoverageFilePath, $projectSource);
+
+            yield $parser->parse();
+        }
     }
 
     /**
@@ -134,168 +146,6 @@ class IndexXmlCoverageParser
         ) {
             throw NoLineExecuted::create();
         }
-    }
-
-    /**
-     * @param array<string, CoverageFileData> $data
-     *
-     * @throws CoverageDoesNotExistException
-     */
-    private function processCoverageFile(
-        string $relativeCoverageFilePath,
-        string $projectSource,
-        array &$data
-    ): void {
-        $xPath = self::createXPath(file_get_contents(
-            $this->coverageDir . '/' . $relativeCoverageFilePath
-        ));
-
-        $sourceFilePath = self::retrieveSourceFilePath($xPath, $relativeCoverageFilePath, $projectSource);
-
-        $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
-
-        $percentage = $linesNode->getAttribute('percent');
-
-        if (substr($percentage, -1) === '%') {
-            // In PHPUnit <6 the percentage value would take the form "0.00%" in _some_ cases.
-            // For example could find both with percentage and without in
-            // https://github.com/maks-rafalko/tactician-domain-events/tree/1eb23434d3a833dedb6180ead75ff983ef09a2e9
-            $percentage = substr($percentage, 0, -1);
-        }
-
-        if ($percentage === '') {
-            $percentage = .0;
-        } else {
-            Assert::numeric($percentage);
-
-            $percentage = (float) $percentage;
-        }
-
-        if ($percentage === .0) {
-            $data[$sourceFilePath] = new CoverageFileData();
-
-            return;
-        }
-
-        $coveredLineNodes = $xPath->query('/phpunit/file/coverage/line');
-
-        if ($coveredLineNodes->length === 0) {
-            $data[$sourceFilePath] = new CoverageFileData();
-
-            return;
-        }
-
-        $coveredMethodNodes = $xPath->query('/phpunit/file/class/method');
-
-        if ($coveredMethodNodes->length === 0) {
-            $coveredMethodNodes = $xPath->query('/phpunit/file/trait/method');
-        }
-
-        $data[$sourceFilePath] = new CoverageFileData(
-            self::collectCoveredLinesData($coveredLineNodes),
-            self::collectMethodsCoverageData($coveredMethodNodes)
-        );
-    }
-
-    /**
-     * @throws CoverageDoesNotExistException
-     */
-    private static function retrieveSourceFilePath(
-        SafeDOMXPath $xPath,
-        string $relativeCoverageFilePath,
-        string $projectSource
-    ): string {
-        $fileNode = $xPath->query('/phpunit/file')[0];
-
-        Assert::notNull($fileNode);
-
-        $fileName = $fileNode->getAttribute('name');
-        $relativeFilePath = $fileNode->getAttribute('path');
-
-        if ($relativeFilePath === '') {
-            // The relative path is not present for old versions of PHPUnit. As a result we parse
-            // the relative path from the source file path and the XML coverage file
-            $relativeFilePath = str_replace(
-                sprintf('%s.xml', $fileName),
-                '',
-                $relativeCoverageFilePath
-            );
-        }
-
-        $path = implode(
-            '/',
-            array_filter([$projectSource, trim($relativeFilePath, '/'), $fileName])
-        );
-
-        $realPath = native_realpath($path);
-
-        if ($realPath === false) {
-            throw CoverageDoesNotExistException::forFileAtPath($fileName, $path);
-        }
-
-        return $realPath;
-    }
-
-    /**
-     * @param DOMNodeList|DOMElement[] $coveredLineNodes
-     * @phpstan-param DOMNodeList<DOMElement> $coveredLineNodes
-     *
-     * @return array<int, array<int, CoverageLineData>>
-     */
-    private static function collectCoveredLinesData(DOMNodeList $coveredLineNodes): array
-    {
-        $data = [];
-
-        foreach ($coveredLineNodes as $lineNode) {
-            $lineNumber = $lineNode->getAttribute('nr');
-
-            Assert::integerish($lineNumber);
-
-            $lineNumber = (int) $lineNumber;
-
-            /** @phpstan-var DOMNodeList<DOMElement> $coveredNodes */
-            $coveredNodes = $lineNode->childNodes;
-
-            foreach ($coveredNodes as $coveredNode) {
-                if ($coveredNode->nodeName !== 'covered') {
-                    continue;
-                }
-
-                $data[$lineNumber][] = CoverageLineData::withTestMethod(
-                    $coveredNode->getAttribute('by')
-                );
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param DOMNodeList|DOMElement[] $methodsCoverageNodes
-     * @phpstan-param DOMNodeList<DOMElement> $methodsCoverageNodes
-     *
-     * @return MethodLocationData[]
-     */
-    private static function collectMethodsCoverageData(DOMNodeList $methodsCoverageNodes): array
-    {
-        $methodsCoverage = [];
-
-        foreach ($methodsCoverageNodes as $methodsCoverageNode) {
-            $methodName = $methodsCoverageNode->getAttribute('name');
-
-            $start = $methodsCoverageNode->getAttribute('start');
-            $end = $methodsCoverageNode->getAttribute('end');
-
-            Assert::integerish($start);
-            Assert::integerish($end);
-
-            $methodsCoverage[$methodName] = new MethodLocationData(
-                (int) $start,
-                (int) $end
-            );
-        }
-
-        return $methodsCoverage;
     }
 
     private static function getProjectSource(SafeDOMXPath $xPath): string

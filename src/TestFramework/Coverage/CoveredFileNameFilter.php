@@ -33,39 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\CoveredFileDataProvider;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+use Infection\FileSystem\SourceFileFilter;
 
 /**
- * @internal
- *
  * @see CoveredFileDataFactory
+ *
+ * @internal
  */
-final class FileCodeCoverageProviderFactory
+final class CoveredFileNameFilter
 {
-    private $coverageDir;
-    private $coverageXmlParser;
+    private $filter;
 
-    public function __construct(
-        string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser
-    ) {
-        $this->coverageDir = $coverageDir;
-        $this->coverageXmlParser = $coverageXmlParser;
+    public function __construct(SourceFileFilter $filter)
+    {
+        $this->filter = $filter;
     }
 
-    public function create(string $testFrameworkKey): CoveredFileDataProvider
+    /**
+     * @param iterable<CoveredFileData> $input
+     *
+     * @return iterable<CoveredFileData>
+     */
+    public function filter(iterable $input): iterable
     {
-        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
-
-        return new PhpUnitXmlCoveredFileDataFactory(
-            $this->coverageDir,
-            $this->coverageXmlParser,
-            $testFrameworkKey
-        );
+        return $this->filter->filter($input);
     }
 }

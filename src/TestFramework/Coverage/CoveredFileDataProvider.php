@@ -33,39 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
-
-use Infection\TestFramework\Coverage\CoveredFileDataProvider;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+namespace Infection\TestFramework\Coverage;
 
 /**
  * @internal
- *
- * @see CoveredFileDataFactory
  */
-final class FileCodeCoverageProviderFactory
+interface CoveredFileDataProvider
 {
-    private $coverageDir;
-    private $coverageXmlParser;
-
-    public function __construct(
-        string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser
-    ) {
-        $this->coverageDir = $coverageDir;
-        $this->coverageXmlParser = $coverageXmlParser;
-    }
-
-    public function create(string $testFrameworkKey): CoveredFileDataProvider
-    {
-        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
-
-        return new PhpUnitXmlCoveredFileDataFactory(
-            $this->coverageDir,
-            $this->coverageXmlParser,
-            $testFrameworkKey
-        );
-    }
+    /**
+     * @throws CoverageDoesNotExistException
+     *
+     * @return iterable<CoveredFileData>
+     */
+    public function provideFiles(): iterable;
 }

@@ -42,9 +42,9 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
+use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -76,7 +76,7 @@ class FileMutationGenerator
      * @return iterable<Mutation>
      */
     public function generate(
-        SplFileInfo $fileInfo,
+        CoveredFileData $fileData,
         bool $onlyCovered,
         LineCodeCoverage $codeCoverage,
         array $mutators,
@@ -85,21 +85,18 @@ class FileMutationGenerator
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
-        $filePath = $fileInfo->getRealPath() === false
-            ? $fileInfo->getPathname()
-            : $fileInfo->getRealPath()
-        ;
-
         if ($onlyCovered && !$codeCoverage->hasTests()) {
             return;
         }
 
-        $initialStatements = $this->parser->parse($fileInfo);
+        $sourceFilePath = $fileData->getSplFileInfo()->getPathname();
+
+        $initialStatements = $this->parser->parse($fileData->getSplFileInfo());
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
             new NodeMutationGenerator(
                 $mutators,
-                $filePath,
+                $sourceFilePath,
                 $initialStatements,
                 $codeCoverage,
                 $onlyCovered,

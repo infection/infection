@@ -37,6 +37,7 @@ namespace Infection\Configuration;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\FileSystem\SourceFileFilter;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Finder\SplFileInfo;
@@ -62,6 +63,7 @@ class Configuration
     private $timeout;
     private $sourceDirectories;
     private $sourceFiles;
+    private $sourceFileFilter;
     private $logs;
     private $logVerbosity;
     private $tmpDir;
@@ -92,6 +94,7 @@ class Configuration
         int $timeout,
         array $sourceDirectories,
         iterable $sourceFiles,
+        SourceFileFilter $sourceFileFilter,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -125,6 +128,7 @@ class Configuration
         $this->timeout = $timeout;
         $this->sourceDirectories = $sourceDirectories;
         $this->sourceFiles = $sourceFiles;
+        $this->sourceFileFilter = $sourceFileFilter;
         $this->logs = $logs;
         $this->logVerbosity = $logVerbosity;
         $this->tmpDir = $tmpDir;
@@ -165,7 +169,16 @@ class Configuration
      */
     public function getSourceFiles(): iterable
     {
+        if ($this->onlyCovered) {
+            return [];
+        }
+
         return $this->sourceFiles;
+    }
+
+    public function getSourceFileFilter(): SourceFileFilter
+    {
+        return $this->sourceFileFilter;
     }
 
     public function getLogs(): Logs

@@ -33,45 +33,79 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\FileSystem;
 
-use array_key_exists;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use function explode;
+use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Infection\TestFramework\Coverage\CoveredFileData;
+use Iterator;
+use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
- * @final
  */
-class FileCodeCoverageProvider
+final class SourceFileFilter
 {
     /**
-     * @var array<string, CoverageFileData>|null
+     * @var string[]
      */
-    private $coverage;
+    private $filters;
 
-    private $coverageFactory;
-
-    public function __construct(PhpUnitXmlCoverageFactory $coverageFactory)
+    /**
+     * @return iterable<SplFileInfo>
+     */
+    public function __construct(string $filter)
     {
-        $this->coverageFactory = $coverageFactory;
+        $this->filters = take(explode(',', $filter))
+            ->map('trim')
+            ->filter()
+            ->toArray();
     }
 
-    public function createFor(SplFileInfo $fileInfo): FileCodeCoverage
+    /**
+     * @return string[]
+     *
+     * @see SourceFileCollector
+     */
+    public function getFilters(): array
     {
-        if ($this->coverage === null) {
-            $this->coverage = $this->coverageFactory->createCoverage();
+        return $this->filters;
+    }
+
+    /**
+     * @param iterable<SplFileInfo&CoveredFileData> $input
+     *
+     * @return iterable<SplFileInfo&CoveredFileData>
+     */
+    public function filter(iterable $input): iterable
+    {
+        if ($this->filters === []) {
+            return $input;
         }
 
-        $filePath = $fileInfo->getRealPath() === false
-            ? $fileInfo->getPathname()
-            : $fileInfo->getRealPath()
-        ;
+        return new RealPathFilterIterator(
+            $this->iterableToIterator($input),
+            $this->filters,
+            []
+        );
+    }
 
-        if (!array_key_exists($filePath, $this->coverage)) {
-            return new FileCodeCoverage(new CoverageFileData());
+    /**
+     * @param iterable<SplFileInfo&CoveredFileData> $input
+     *
+     * @return Iterator<SplFileInfo&CoveredFileData>
+     */
+    private function iterableToIterator(iterable $input)
+    {
+        if ($input instanceof Iterator) {
+            // Generator is an iterator, means most of the time we're done right here.
+            return $input;
         }
 
-        return new FileCodeCoverage($this->coverage[$filePath]);
+        // Clause for all other cases, e.g. when testing
+        return (static function () use ($input): Iterator {
+            yield from $input;
+        })();
     }
 }
