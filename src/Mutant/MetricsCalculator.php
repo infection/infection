@@ -249,18 +249,16 @@ class MetricsCalculator
         return $this->getCalculator()->getCoveredCodeMutationScoreIndicator();
     }
 
-    private function getCalculator(): Calculator
-    {
-        return $this->calculator ?? Calculator::fromMetrics($this);
-    }
-
     /**
-     * Are mutaiton timeouts treated as escapes?
-     *
-     * @return bool
+     * Are mutation timeouts treated as escapes?
      */
     public function getTreatTimeoutsAsEscapes(): bool
     {
         return $this->treatTimeoutsAsEscapes;
+    }
+
+    private function getCalculator(): Calculator
+    {
+        return $this->calculator ?? Calculator::fromMetrics($this);
     }
 }

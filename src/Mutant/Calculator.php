@@ -105,6 +105,7 @@ final class Calculator
 
         $score = 0.;
         $coveredTotal = $this->killedCount + $this->errorCount;
+
         if (!$this->treatTimeoutsAsEscapes) {
             $coveredTotal += $this->timedOutCount;
         }
@@ -149,6 +150,7 @@ final class Calculator
         $score = 0.;
         $testedTotal = $this->totalCount - $this->notTestedCount;
         $coveredTotal = $this->killedCount + $this->errorCount;
+
         if (!$this->treatTimeoutsAsEscapes) {
             $coveredTotal += $this->timedOutCount;
         }
