@@ -305,7 +305,8 @@ final class Container
                     $config->shouldSkipInitialTests(),
                     $config->getInitialTestsPhpOptions() ?? '',
                     $config->getCoveragePath(),
-                    $container->getJUnitFilePath()
+                    $container->getJUnitFilePath(),
+                    $container->getTestFrameworkAdapter()
                 );
             },
             TestRunConstraintChecker::class => static function (self $container): TestRunConstraintChecker {

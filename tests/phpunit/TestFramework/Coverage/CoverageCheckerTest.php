@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\Codeception\CodeceptionAdapter;
+use PHPUnit\Framework\MockObject\MockObject;
 use function extension_loaded;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageNotFound;
@@ -64,21 +68,56 @@ final class CoverageCheckerTest extends TestCase
      */
     private static $jUnit;
 
+    /**
+     * @var TestFrameworkAdapter|MockObject
+     */
+    private $testFrameworkAdapterMock;
+
     public static function setUpBeforeClass(): void
     {
         self::$coveragePath = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/coverage/coverage-xml');
         self::$jUnit = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/junit.xml');
     }
 
-    public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped(): void
+    protected function setUp(): void
+    {
+        $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
+    }
+
+    public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_without_JUnit_report(): void
     {
         $checker = new CoverageChecker(
             false,
             true,
             '',
             '',
-            ''
+            '',
+            $this->testFrameworkAdapterMock
         );
+
+        $this->testFrameworkAdapterMock->method('hasJUnitReport')->willReturn(false);
+
+        $this->expectException(CoverageNotFound::class);
+        $this->expectExceptionMessage(
+            'The initial test suite run is being skipped. The XML reports need to be provided with '
+            .'the "--coverage" option'
+        );
+
+        $checker->checkCoverageRequirements();
+    }
+
+    public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_with_JUnit_report(): void
+    {
+        $checker = new CoverageChecker(
+            false,
+            true,
+            '',
+            '',
+            '',
+            $this->testFrameworkAdapterMock
+        );
+
+        $this->testFrameworkAdapterMock->method('hasJUnitReport')->willReturn(true);
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
@@ -100,7 +139,8 @@ final class CoverageCheckerTest extends TestCase
             false,
             '',
             '',
-            ''
+            '',
+            $this->testFrameworkAdapterMock
         );
 
         $this->expectException(CoverageNotFound::class);
@@ -117,15 +157,36 @@ TXT
         $checker->checkCoverageRequirements();
     }
 
-    public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found(): void
+    public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found_with_JUnit_report(): void
     {
         $checker = new CoverageChecker(
             false,
             false,
             '',
             self::$coveragePath,
-            self::$jUnit
+            self::$jUnit,
+            $this->testFrameworkAdapterMock
         );
+
+        $this->testFrameworkAdapterMock->method('hasJUnitReport')->willReturn(true);
+
+        $checker->checkCoverageExists();
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found_without_JUnit_report(): void
+    {
+        $checker = new CoverageChecker(
+            false,
+            false,
+            '',
+            self::$coveragePath,
+            self::$jUnit,
+            $this->testFrameworkAdapterMock
+        );
+
+        $this->testFrameworkAdapterMock->method('hasJUnitReport')->willReturn(false);
 
         $checker->checkCoverageExists();
 
@@ -139,7 +200,8 @@ TXT
             false,
             '',
             '/nowhere',
-            self::$jUnit
+            self::$jUnit,
+            $this->testFrameworkAdapterMock
         );
 
         $this->expectException(CoverageNotFound::class);
@@ -152,36 +214,125 @@ TXT
         $checker->checkCoverageExists();
     }
 
-    public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing(): void
+    public function test_it_passes_existence_check_if_XML_index_is_present_and_JUnit_file_is_missing_without_JUnit_report(): void
     {
         $checker = new CoverageChecker(
             false,
             false,
             '',
             self::$coveragePath,
-            '/invalid/path/to/junit.xml'
+            '/invalid/path/to/junit.xml',
+            $this->testFrameworkAdapterMock
         );
+
+        $this->testFrameworkAdapterMock->method('hasJUnitReport')->willReturn(false);
+
+        $checker->checkCoverageExists();
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_with_JUnit_report_with_lambda_test_framework_adapter(): void
+    {
+        $checker = new CoverageChecker(
+            false,
+            false,
+            '',
+            self::$coveragePath,
+            '/invalid/path/to/junit.xml',
+            $this->testFrameworkAdapterMock
+        );
+
+        $this->testFrameworkAdapterMock->method('hasJUnitReport')->willReturn(true);
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(sprintf(
-            'Could not find the file "/invalid/path/to/junit.xml". Please ensure that the JUnit '
-            . 'coverage report has been properly generated at the right place. If using PHPUnit for '
-            . 'example, the option  for the path given is "--log-junit=%s/junit.xml"',
+            'Could not find the file "/invalid/path/to/junit.xml". Please ensure that the '
+            .'JUnit coverage report has been properly generated at the right place.',
             self::$coveragePath
         ));
 
         $checker->checkCoverageExists();
     }
 
-    public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found_after_tests_run(): void
+    public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_with_JUnit_report_with_PHPUnit_test_framework_adapter(): void
+    {
+        $phpUnitAdapterMock = $this->createMock(PhpUnitAdapter::class);
+        $phpUnitAdapterMock->method('hasJUnitReport')->willReturn(true);
+
+        $checker = new CoverageChecker(
+            false,
+            false,
+            '',
+            self::$coveragePath,
+            '/invalid/path/to/junit.xml',
+            $phpUnitAdapterMock
+        );
+
+        $this->expectException(CoverageNotFound::class);
+        $this->expectExceptionMessage(sprintf(
+            'Could not find the file "/invalid/path/to/junit.xml". Please ensure that the '
+            .'JUnit coverage report has been properly generated at the right place. The PHPUnit '
+            .'option for the path given is "--log-junit=%s/junit.xml"',
+            self::$coveragePath
+        ));
+
+        $checker->checkCoverageExists();
+    }
+
+    public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_with_JUnit_report_with_Codeception_test_framework_adapter(): void
     {
         $checker = new CoverageChecker(
             false,
             false,
             '',
             self::$coveragePath,
-            self::$jUnit
+            '/invalid/path/to/junit.xml',
+            new CodeceptionAdapter()
         );
+
+        $this->expectException(CoverageNotFound::class);
+        $this->expectExceptionMessage('Could not find the file "/invalid/path/to/junit.xml". Please'
+            .' ensure that the JUnit coverage report has been properly generated at the right '
+            .'place. The Codeception option for the path given is "--xml"'
+        );
+
+        $checker->checkCoverageExists();
+    }
+
+    public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found_after_tests_run_with_JUnit_report(): void
+    {
+        $checker = new CoverageChecker(
+            false,
+            false,
+            '',
+            self::$coveragePath,
+            self::$jUnit,
+            $this->testFrameworkAdapterMock
+        );
+
+        $this->testFrameworkAdapterMock->method('hasJUnitReport')->willReturn(true);
+
+        $checker->checkCoverageHasBeenGenerated(
+            'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
+            'Ok!'
+        );
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found_after_tests_run_without_JUnit_report(): void
+    {
+        $checker = new CoverageChecker(
+            false,
+            false,
+            '',
+            self::$coveragePath,
+            self::$jUnit,
+            $this->testFrameworkAdapterMock
+        );
+
+        $this->testFrameworkAdapterMock->method('hasJUnitReport')->willReturn(false);
 
         $checker->checkCoverageHasBeenGenerated(
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
@@ -198,7 +349,8 @@ TXT
             false,
             '',
             '/nowhere',
-            self::$jUnit
+            self::$jUnit,
+            $this->testFrameworkAdapterMock
         );
 
         $this->expectException(CoverageNotFound::class);
@@ -222,7 +374,7 @@ TXT
         );
     }
 
-    public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_after_tests_run(): void
+    public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_after_tests_run_with_JUnit_report(): void
     {
         $coveragePath = Path::canonicalize(self::$coveragePath);
 
@@ -231,8 +383,11 @@ TXT
             false,
             '',
             $coveragePath,
-            '/invalid/path/to/junit.xml'
+            '/invalid/path/to/junit.xml',
+            $this->testFrameworkAdapterMock
         );
+
+        $this->testFrameworkAdapterMock->method('hasJUnitReport')->willReturn(true);
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(<<<'TXT'
@@ -255,6 +410,27 @@ TXT
         );
     }
 
+    public function test_it_passes_existence_check_if_XML_index_is_found_and_JUnit_file_is_missing_after_tests_run_without_JUnit_report(): void
+    {
+        $checker = new CoverageChecker(
+            false,
+            false,
+            '',
+            self::$coveragePath,
+            '/invalid/path/to/junit.xml',
+            $this->testFrameworkAdapterMock
+        );
+
+        $this->testFrameworkAdapterMock->method('hasJUnitReport')->willReturn(false);
+
+        $checker->checkCoverageHasBeenGenerated(
+            'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
+            'Ok!'
+        );
+
+        $this->addToAssertionCount(1);
+    }
+
     private function requireNoPhpDbg(): void
     {
         if (PHP_SAPI === 'phpdbg') {
@@ -274,5 +450,68 @@ TXT
         if (extension_loaded('pcov')) {
             $this->markTestSkipped('Test requires pcov to be disabled to run.');
         }
+    }
+}
+
+namespace Infection\TestFramework\Codeception;
+
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use LogicException;
+
+class CodeceptionAdapter implements TestFrameworkAdapter
+{
+
+    public function getName(): string
+    {
+        throw new LogicException('Fake');
+    }
+
+    public function testsPass(string $output): bool
+    {
+        throw new LogicException('Fake');
+    }
+
+    public function hasJUnitReport(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param string[] $phpExtraArgs
+     *
+     * @return string[]
+     */
+    public function getInitialTestRunCommandLine(
+        string $extraOptions,
+        array $phpExtraArgs,
+        bool $skipCoverage
+    ): array {
+        throw new LogicException('Fake');
+    }
+
+    /**
+     * @param CoverageLineData[] $coverageTests
+     *
+     * @return string[]
+     */
+    public function getMutantCommandLine(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions
+    ): array {
+        throw new LogicException('Fake');
+    }
+
+    public function getVersion(): string
+    {
+        throw new LogicException('Fake');
+    }
+
+    public function getInitialTestsFailRecommendations(string $commandLine): string
+    {
+        throw new LogicException('Fake');
     }
 }
