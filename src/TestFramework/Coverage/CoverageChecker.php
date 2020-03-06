@@ -37,19 +37,16 @@ namespace Infection\TestFramework\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
 use function count;
-use function strtolower;
 use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
 use function file_exists;
 use function implode;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Codeception\CodeceptionAdapter;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\preg_match;
 use function Safe\sprintf;
+use function strtolower;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -57,8 +54,8 @@ use Webmozart\PathUtil\Path;
  */
 final class CoverageChecker
 {
-    private const PHPUNIT_ADAPTER_NAME = 'phpunit';
-    private const CODECEPTION_ADAPTER_NAME = 'codeception';
+    private const PHPUNIT = 'phpunit';
+    private const CODECEPTION = 'codeception';
 
     private $skipCoverage;
     private $skipInitialTests;
@@ -121,12 +118,12 @@ TXT
                 $coverageIndexFilePath
             );
 
-            if ($this->frameworkAdapterName === self::PHPUNIT_ADAPTER_NAME) {
+            if ($this->frameworkAdapterName === self::PHPUNIT) {
                 $message .= sprintf(
                     ' The PHPUnit option for the path given is "--coverage-xml=%s"',
                     $this->coveragePath . '/coverage-xml'
                 );
-            } elseif ($this->frameworkAdapterName === self::CODECEPTION_ADAPTER_NAME) {
+            } elseif ($this->frameworkAdapterName === self::CODECEPTION) {
                 $message .= sprintf(
                     ' The Codeception option for the path given is "--coverage-phpunit=%s"',
                     $this->coveragePath . '/coverage-xml'
@@ -143,12 +140,12 @@ TXT
                 $this->jUnitPath
             );
 
-            if ($this->frameworkAdapterName === self::PHPUNIT_ADAPTER_NAME) {
+            if ($this->frameworkAdapterName === self::PHPUNIT) {
                 $message .= sprintf(
                     ' The PHPUnit option for the path given is "--log-junit=%s/junit.xml"',
                     $this->coveragePath
                 );
-            } elseif ($this->frameworkAdapterName === self::CODECEPTION_ADAPTER_NAME) {
+            } elseif ($this->frameworkAdapterName === self::CODECEPTION) {
                 $message .= ' The Codeception option for the path given is "--xml"';
             }
 
