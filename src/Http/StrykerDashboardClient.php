@@ -47,7 +47,7 @@ class StrykerDashboardClient
     private $client;
     private $logger;
 
-    public function __construct(CurlClient $client, LoggerInterface $logger)
+    public function __construct(StrykerCurlClient $client, LoggerInterface $logger)
     {
         $this->client = $client;
         $this->logger = $logger;

@@ -56,7 +56,7 @@ use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\FilterableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Http\CurlClient;
+use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
@@ -94,7 +94,7 @@ final class ProjectCodeProvider
         ProgressFormatter::class,
         PhpProcess::class,
         ComposerExecutableFinder::class,
-        CurlClient::class,
+        StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,

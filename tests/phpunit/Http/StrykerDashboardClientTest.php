@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Http;
 
-use Infection\Http\CurlClient;
 use Infection\Http\Response;
+use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Tests\Logger\DummyLogger;
 use function Infection\Tests\normalizeLineReturn;
@@ -51,7 +51,7 @@ final class StrykerDashboardClientTest extends TestCase
     private const API_KEY = '0e137d38-7611-4157-897b-54791cc1ef97';
 
     /**
-     * @var CurlClient|MockObject
+     * @var StrykerCurlClient|MockObject
      */
     private $clientMock;
 
@@ -67,7 +67,7 @@ final class StrykerDashboardClientTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->clientMock = $this->createMock(CurlClient::class);
+        $this->clientMock = $this->createMock(StrykerCurlClient::class);
         $this->logger = new DummyLogger();
 
         $this->dashboardClient = new StrykerDashboardClient(
