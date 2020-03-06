@@ -63,11 +63,13 @@ final class SummaryFileLoggerTest extends TestCase
             new MetricsCalculator(),
             <<<'TXT'
 Total: 0
+
 Killed: 0
 Errored: 0
 Escaped: 0
 Timed Out: 0
 Not Covered: 0
+
 TXT
         ];
 
@@ -75,11 +77,13 @@ TXT
             $this->createCompleteMetricsCalculator(),
             <<<'TXT'
 Total: 10
+
 Killed: 2
 Errored: 2
 Escaped: 2
 Timed Out: 2
 Not Covered: 2
+
 TXT
         ];
     }
