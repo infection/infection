@@ -69,6 +69,7 @@ Errored: 0
 Escaped: 0
 Timed Out: 0
 Not Covered: 0
+
 TXT
         ];
 
@@ -82,6 +83,7 @@ Errored: 2
 Escaped: 2
 Timed Out: 2
 Not Covered: 2
+
 TXT
         ];
     }
