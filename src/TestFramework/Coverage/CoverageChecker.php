@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
 use function count;
+use function strtolower;
 use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
 use function file_exists;
@@ -56,27 +57,30 @@ use Webmozart\PathUtil\Path;
  */
 final class CoverageChecker
 {
+    private const PHPUNIT_ADAPTER_NAME = 'phpunit';
+    private const CODECEPTION_ADAPTER_NAME = 'codeception';
+
     private $skipCoverage;
     private $skipInitialTests;
     private $initialTestPhpOptions;
     private $coveragePath;
     private $jUnitPath;
-    private $testFrameworkAdapter;
+    private $frameworkAdapterName;
 
     public function __construct(
         bool $skipCoverage,
         bool $skipInitialTests,
         string $initialTestPhpOptions,
         string $coveragePath,
-        string $jUnitPath,
-        TestFrameworkAdapter $testFrameworkAdapter
+        ?string $jUnitPath,
+        string $testFrameworkAdapterName
     ) {
         $this->skipCoverage = $skipCoverage;
         $this->skipInitialTests = $skipInitialTests;
         $this->initialTestPhpOptions = $initialTestPhpOptions;
         $this->coveragePath = $coveragePath;
         $this->jUnitPath = $jUnitPath;
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
+        $this->frameworkAdapterName = strtolower($testFrameworkAdapterName);
     }
 
     public function checkCoverageRequirements(): void
@@ -85,7 +89,7 @@ final class CoverageChecker
             throw new CoverageNotFound(sprintf(
                 'The initial test suite run is being skipped. The XML %sreports need to be '
                 . 'provided with the "--coverage" option',
-                $this->testFrameworkAdapter->hasJUnitReport() ?
+                $this->jUnitPath !== null ?
                     'and JUnit coverage '
                     : ''
             ));
@@ -111,28 +115,40 @@ TXT
         );
 
         if (!file_exists($coverageIndexFilePath)) {
-            throw new CoverageNotFound(sprintf(
-                'Could not find the file "%s". Please ensure that the XML coverage report has been '
-                . 'properly generated at the right place. If using PHPUnit for example, the option '
-                . 'for the path given is "--coverage-xml=%s"',
-                $coverageIndexFilePath,
-                $this->coveragePath . '/coverage-xml'
-            ));
+            $message = sprintf(
+                'Could not find the file "%s". Please ensure that the XML coverage report '
+                . 'has been properly generated at the right place.',
+                $coverageIndexFilePath
+            );
+
+            if ($this->frameworkAdapterName === self::PHPUNIT_ADAPTER_NAME) {
+                $message .= sprintf(
+                    ' The PHPUnit option for the path given is "--coverage-xml=%s"',
+                    $this->coveragePath . '/coverage-xml'
+                );
+            } elseif ($this->frameworkAdapterName === self::CODECEPTION_ADAPTER_NAME) {
+                $message .= sprintf(
+                    ' The Codeception option for the path given is "--coverage-phpunit=%s"',
+                    $this->coveragePath . '/coverage-xml'
+                );
+            }
+
+            throw new CoverageNotFound($message);
         }
 
-        if ($this->testFrameworkAdapter->hasJUnitReport() && !file_exists($this->jUnitPath)) {
+        if ($this->jUnitPath !== null && !file_exists($this->jUnitPath)) {
             $message = sprintf(
                 'Could not find the file "%s". Please ensure that the JUnit coverage report '
                 . 'has been properly generated at the right place.',
                 $this->jUnitPath
             );
 
-            if ($this->testFrameworkAdapter instanceof PhpUnitAdapter) {
+            if ($this->frameworkAdapterName === self::PHPUNIT_ADAPTER_NAME) {
                 $message .= sprintf(
                     ' The PHPUnit option for the path given is "--log-junit=%s/junit.xml"',
                     $this->coveragePath
                 );
-            } elseif ($this->testFrameworkAdapter instanceof CodeceptionAdapter) {
+            } elseif ($this->frameworkAdapterName === self::CODECEPTION_ADAPTER_NAME) {
                 $message .= ' The Codeception option for the path given is "--xml"';
             }
 
@@ -154,7 +170,7 @@ TXT
             $errors[] = sprintf('- The file "%s" could not be found', $coverageIndexFilePath);
         }
 
-        if ($this->testFrameworkAdapter->hasJUnitReport() && !file_exists($this->jUnitPath)) {
+        if ($this->jUnitPath !== null && !file_exists($this->jUnitPath)) {
             $errors[] = sprintf('- The file "%s" could not be found', $this->jUnitPath);
         }
 

@@ -299,14 +299,17 @@ final class Container
             },
             CoverageChecker::class => static function (self $container): CoverageChecker {
                 $config = $container->getConfiguration();
+                $testFrameworkAdapter = $container->getTestFrameworkAdapter();
 
                 return new CoverageChecker(
                     $config->shouldSkipCoverage(),
                     $config->shouldSkipInitialTests(),
                     $config->getInitialTestsPhpOptions() ?? '',
                     $config->getCoveragePath(),
-                    $container->getJUnitFilePath(),
-                    $container->getTestFrameworkAdapter()
+                    $testFrameworkAdapter->hasJUnitReport()
+                        ? $container->getJUnitFilePath()
+                        : null,
+                    $testFrameworkAdapter->getName()
                 );
             },
             TestRunConstraintChecker::class => static function (self $container): TestRunConstraintChecker {
