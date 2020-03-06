@@ -40,23 +40,48 @@ use function Safe\curl_exec;
 use function Safe\curl_getinfo;
 use function Safe\curl_init;
 use function Safe\curl_setopt;
+use function Safe\sprintf;
 
 /**
+ * Sends a CURL request to the Stryker dashboard API.
+ *
  * @internal
  * @final
+ *
+ * @see https://github.com/stryker-mutator/stryker-handbook/blob/master/dashboard.md#send-a-report-via-curl
+ * @see https://github.com/stryker-mutator/mutation-testing-elements/tree/master/packages/mutation-testing-report-schema
  */
-class JsonClient
+class StrykerCurlClient
 {
-    public function request(string $url, string $json): Response
-    {
+    private const STRYKER_DASHBOARD_API_BASE_URL = 'https://dashboard.stryker-mutator.io/api/reports';
+
+    public function request(
+        string $repositorySlug,
+        string $version,
+        string $apiKey,
+        string $reportJson
+    ): Response {
+        $url = sprintf(
+            '%s/%s/%s',
+            self::STRYKER_DASHBOARD_API_BASE_URL,
+            $repositorySlug,
+            $version
+        );
+
+        $headers = [
+            'Content-Type: application/json',
+            'Host: dashboard.stryker-mutator.io',
+            sprintf('X-Api-Key: %s', $apiKey),
+        ];
+
         $handle = curl_init();
 
         try {
             curl_setopt($handle, CURLOPT_URL, $url);
-            curl_setopt($handle, CURLOPT_POST, true);
+            curl_setopt($handle, CURLOPT_CUSTOMREQUEST, 'PUT');
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($handle, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-            curl_setopt($handle, CURLOPT_POSTFIELDS, $json);
+            curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($handle, CURLOPT_POSTFIELDS, $reportJson);
             curl_setopt($handle, CURLOPT_HEADER, true);
 
             $body = (string) curl_exec($handle);
