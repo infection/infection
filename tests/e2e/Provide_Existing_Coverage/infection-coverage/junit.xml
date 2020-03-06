@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Test Suite" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.015839">
-    <testsuite name="ProvideExistingCoverage\Test\SourceClassTest" file="/Users/tfidry/Project/Humbug/infection/tests/e2e/Provide_Existing_Coverage/tests/SourceClassTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.015839">
-      <testcase name="test_it_adds" class="ProvideExistingCoverage\Test\SourceClassTest" classname="ProvideExistingCoverage.Test.SourceClassTest" file="/Users/tfidry/Project/Humbug/infection/tests/e2e/Provide_Existing_Coverage/tests/SourceClassTest.php" line="10" assertions="1" time="0.013310"/>
-      <testcase name="test_it_returns_true" class="ProvideExistingCoverage\Test\SourceClassTest" classname="ProvideExistingCoverage.Test.SourceClassTest" file="/Users/tfidry/Project/Humbug/infection/tests/e2e/Provide_Existing_Coverage/tests/SourceClassTest.php" line="16" assertions="1" time="0.002529"/>
+  <testsuite name="Test Suite" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.010499">
+    <testsuite name="Namespace_\Test\SourceClassTest" file="tests/SourceClassTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.010499">
+      <testcase name="test_it_adds" class="Namespace_\Test\SourceClassTest" classname="Namespace_.Test.SourceClassTest" file="tests/SourceClassTest.php" line="10" assertions="1" time="0.007975"/>
+      <testcase name="test_it_returns_true" class="Namespace_\Test\SourceClassTest" classname="Namespace_.Test.SourceClassTest" file="tests/SourceClassTest.php" line="16" assertions="1" time="0.002524"/>
     </testsuite>
   </testsuite>
 </testsuites>

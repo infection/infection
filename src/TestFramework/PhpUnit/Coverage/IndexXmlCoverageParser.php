@@ -40,12 +40,12 @@ use const DIRECTORY_SEPARATOR;
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
-use function file_exists;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\SafeDOMXPath;
+use function realpath as native_realpath;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\sprintf;
@@ -223,12 +223,14 @@ class IndexXmlCoverageParser
             );
         }
 
-        $path = Path::canonicalize(implode(
+        $path = implode(
             '/',
             array_filter([$projectSource, trim($relativeFilePath, '/'), $fileName])
-        ));
+        );
 
-        if (!file_exists($path)) {
+        $realPath = native_realpath($path);
+
+        if ($realPath === false) {
             throw new InvalidCoverage(sprintf(
                 'Could not find the source file "%s" referred by "%s". Make sure the '
                 . 'coverage used is up to date',

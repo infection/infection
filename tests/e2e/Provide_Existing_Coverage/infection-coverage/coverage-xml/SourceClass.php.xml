@@ -8,21 +8,21 @@
       <classes count="1" tested="0" percent="0.00"/>
       <traits count="0" tested="0" percent="0"/>
     </totals>
-    <class name="ProvideExistingCoverage\SourceClass" start="5" executable="4" executed="3" crap="3.14">
+    <class name="Namespace_\SourceClass" start="5" executable="4" executed="3" crap="3.14">
       <package full="" name="" sub="" category=""/>
-      <namespace name="ProvideExistingCoverage"/>
+      <namespace name="Namespace_"/>
       <method name="add" signature="add($num1, $num2)" start="7" end="10" crap="1" executable="1" executed="1" coverage="100"/>
       <method name="isTrue" signature="isTrue($value = true)" start="12" end="18" crap="2.15" executable="3" executed="2" coverage="66.666666666667"/>
     </class>
     <coverage>
       <line nr="9">
-        <covered by="ProvideExistingCoverage\Test\SourceClassTest::test_it_adds"/>
+        <covered by="Namespace_\Test\SourceClassTest::test_it_adds"/>
       </line>
       <line nr="14">
-        <covered by="ProvideExistingCoverage\Test\SourceClassTest::test_it_returns_true"/>
+        <covered by="Namespace_\Test\SourceClassTest::test_it_returns_true"/>
       </line>
       <line nr="15">
-        <covered by="ProvideExistingCoverage\Test\SourceClassTest::test_it_returns_true"/>
+        <covered by="Namespace_\Test\SourceClassTest::test_it_returns_true"/>
       </line>
     </coverage>
     <source>
@@ -33,7 +33,7 @@
       <line no="3">
         <token name="T_NAMESPACE">namespace</token>
         <token name="T_WHITESPACE"> </token>
-        <token name="T_STRING">ProvideExistingCoverage</token>
+        <token name="T_STRING">Namespace_</token>
         <token name="T_SEMICOLON">;</token>
       </line>
       <line no="4"/>

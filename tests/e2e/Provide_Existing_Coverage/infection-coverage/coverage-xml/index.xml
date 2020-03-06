@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-  <build time="Thu Mar 5 10:28:33 GMT+0000 2020" phpunit="6.5.14" coverage="5.3.2">
-    <runtime name="PHP" version="7.2.18" url="https://secure.php.net/"/>
-    <driver name="xdebug" version="2.9.0"/>
+  <build time="Sat Feb 10 17:56:09 GMT+0000 2018" phpunit="6.5.6" coverage="5.3.0">
+    <runtime name="PHP" version="7.1.7" url="https://secure.php.net/"/>
+    <driver name="xdebug" version="2.6.0RC2"/>
   </build>
-  <project source="/Users/tfidry/Project/Humbug/infection/tests/e2e/Provide_Existing_Coverage/src">
+  <project source="src">
     <tests>
-      <test name="ProvideExistingCoverage\Test\SourceClassTest::test_it_adds" size="unknown" result="0" status="PASSED"/>
-      <test name="ProvideExistingCoverage\Test\SourceClassTest::test_it_returns_true" size="unknown" result="0" status="PASSED"/>
+      <test name="Namespace_\Test\SourceClassTest::test_it_adds" size="unknown" result="0" status="PASSED"/>
+      <test name="Namespace_\Test\SourceClassTest::test_it_returns_true" size="unknown" result="0" status="PASSED"/>
     </tests>
     <directory name="/">
       <totals>
