@@ -84,6 +84,44 @@ final class CalculatorTest extends TestCase
     }
 
     /**
+     * @dataProvider metricsWithTimeoutProvider
+     */
+    public function test_it_can_calculate_the_scores_while_counting_timeouts_as_escapes(
+        int $killedCount,
+        int $errorCount,
+        int $escapedCount,
+        int $timedOutCount,
+        int $notTestedCount,
+        float $expectedMsi,
+        float $expectedCoverageRate,
+        float $expectedCoveredMsi
+    ): void {
+        $calculator = new Calculator(
+            $killedCount,
+            $errorCount,
+            $timedOutCount,
+            $notTestedCount,
+            array_sum([
+                $killedCount,
+                $errorCount,
+                $escapedCount,
+                $timedOutCount,
+                $notTestedCount,
+            ]),
+            true
+        );
+
+        $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
+        $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
+        $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
+
+        // The calls are idempotent
+        $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
+        $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
+        $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
+    }
+
+    /**
      * @dataProvider metricsCalculatorProvider
      */
     public function test_it_can_be_created_from_a_metrics_calculator(
@@ -143,6 +181,53 @@ final class CalculatorTest extends TestCase
             84.61538461538461,
             100,
             84.61538461538461,
+        ];
+    }
+
+    public function metricsWithTimeoutProvider(): Generator
+    {
+        yield 'empty' => [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.,
+            0.,
+            0.,
+        ];
+
+        yield 'int scores' => [
+            1,
+            0,
+            9,
+            0,
+            0,
+            10.,
+            100.0,
+            10.0,
+        ];
+
+        yield 'nominal' => [
+            7,
+            2,
+            2,
+            2,
+            1,
+            64.285714285714292,
+            92.85714285714286,
+            69.230769230769226,
+        ];
+
+        yield 'nominal no non-tested' => [
+            7,
+            2,
+            2,
+            2,
+            0,
+            69.230769230769226,
+            100,
+            69.230769230769226,
         ];
     }
 
