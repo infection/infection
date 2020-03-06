@@ -14,7 +14,7 @@ parameters:
             message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
             count: 2
         -
-            path: '../tests/phpunit/TestFramework/Coverage/XmlReport/XMLLineCodeCoverageTest.php'
+            path: '../tests/phpunit/TestFramework/Coverage/XmlReport/FileCodeCoverageTest.php'
             message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
             count: 2
         -

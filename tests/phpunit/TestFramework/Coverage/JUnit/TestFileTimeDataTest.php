@@ -33,49 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class XMLLineCodeCoverageFactory
+final class TestFileTimeDataTest extends TestCase
 {
-    private $coverageDir;
-    private $coverageXmlParser;
-    private $testFileDataProvider;
-
-    public function __construct(
-        string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser,
-        TestFileDataProvider $testFileDataProvider
-    ) {
-        $this->coverageDir = $coverageDir;
-        $this->coverageXmlParser = $coverageXmlParser;
-        $this->testFileDataProvider = $testFileDataProvider;
-    }
-
-    public function create(
-        string $testFrameworkKey,
-        TestFrameworkAdapter $adapter
-    ): XMLLineCodeCoverage {
-        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
-
-        $testFileDataProviderService = $adapter->hasJUnitReport()
-            ? $this->testFileDataProvider
-            : null
-        ;
-
-        return new XMLLineCodeCoverage(
-            new PhpUnitXmlCoverageFactory(
-                $this->coverageDir,
-                $this->coverageXmlParser,
-                $testFileDataProviderService
-            )
+    public function test_it_creates_self_object_with_named_constructor(): void
+    {
+        $testFileTimeData = new TestFileTimeData(
+            '/path/to/Test.php',
+            2.345
         );
+
+        $this->assertSame('/path/to/Test.php', $testFileTimeData->path);
+        $this->assertSame(2.345, $testFileTimeData->time);
     }
 }

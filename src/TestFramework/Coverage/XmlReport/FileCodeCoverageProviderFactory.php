@@ -35,81 +35,48 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use function explode;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use function Safe\file_get_contents;
+use Infection\TestFramework\TestFrameworkTypes;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class PhpUnitXmlCoverageFactory
+final class FileCodeCoverageProviderFactory
 {
-    /**
-     * TODO: make this constant private
-     */
-    public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
-
     private $coverageDir;
-    private $parser;
+    private $coverageXmlParser;
     private $testFileDataProvider;
 
     public function __construct(
         string $coverageDir,
         IndexXmlCoverageParser $coverageXmlParser,
-        ?TestFileDataProvider $testFileDataProvider
+        TestFileDataProvider $testFileDataProvider
     ) {
         $this->coverageDir = $coverageDir;
-        $this->parser = $coverageXmlParser;
+        $this->coverageXmlParser = $coverageXmlParser;
         $this->testFileDataProvider = $testFileDataProvider;
     }
 
-    /**
-     * @return array<string, CoverageFileData>
-     */
-    public function createCoverage(): array
-    {
-        $coverageIndexFileContent = file_get_contents(
-            $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME
+    public function create(
+        string $testFrameworkKey,
+        TestFrameworkAdapter $adapter
+    ): FileCodeCoverageProvider {
+        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
+
+        $testFileDataProviderService = $adapter->hasJUnitReport()
+            ? $this->testFileDataProvider
+            : null
+        ;
+
+        return new FileCodeCoverageProvider(
+            new PhpUnitXmlCoverageFactory(
+                $this->coverageDir,
+                $this->coverageXmlParser,
+                $testFileDataProviderService
+            )
         );
-
-        $coverage = $this->parser->parse($coverageIndexFileContent);
-
-        $this->addTestExecutionInfo($coverage);
-
-        return $coverage;
-    }
-
-    /**
-     * @param CoverageFileData[] $coverage
-     */
-    private function addTestExecutionInfo(array $coverage): void
-    {
-        if ($this->testFileDataProvider === null) {
-            return;
-        }
-
-        foreach ($coverage as $sourceFilePath => $fileCoverageData) {
-            foreach ($fileCoverageData->byLine as $line => $linesCoverageData) {
-                foreach ($linesCoverageData as $test) {
-                    self::updateTestExecutionInfo($test, $this->testFileDataProvider);
-                }
-            }
-        }
-    }
-
-    private static function updateTestExecutionInfo(
-        CoverageLineData $test,
-        TestFileDataProvider $testFileDataProvider
-    ): void {
-        $class = explode(':', $test->testMethod, 2)[0];
-
-        $testFileData = $testFileDataProvider->getTestFileInfo($class);
-
-        $test->testFilePath = $testFileData->path;
-        $test->time = $testFileData->time;
     }
 }

@@ -33,54 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\CoverageFileData;
-use function is_array;
-use function is_scalar;
-use function iterator_to_array;
-use Traversable;
-
-final class CoverageHelper
+/**
+ * @internal
+ */
+interface TestFileDataProvider
 {
-    private function __construct()
-    {
-    }
-
     /**
-     * @param array<string, CoverageFileData> $coverage
+     * Provides 1) file name of the test file that contains passed as a parameter test class
+     *          2) Time test was executed with
      *
-     * @return array<string, mixed>
+     * Example for file name:
+     *      param:  '\NameSpace\Sub\TestClass'
+     *      return: '/path/to/NameSpace/Sub/TestClass.php'
+     *
+     * @return TestFileTimeData file path and time
      */
-    public static function convertToArray(iterable $coverage): array
-    {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
-        }
-
-        return self::serializeValue($coverage);
-    }
-
-    private static function serializeValue($mixed)
-    {
-        if ($mixed === null) {
-            return null;
-        }
-
-        if (is_scalar($mixed)) {
-            return $mixed;
-        }
-
-        if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
-        }
-
-        return self::serializeValue((array) $mixed);
-    }
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;
 }

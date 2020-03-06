@@ -33,54 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
+use array_key_exists;
 use Infection\TestFramework\Coverage\CoverageFileData;
-use function is_array;
-use function is_scalar;
-use function iterator_to_array;
-use Traversable;
+use Symfony\Component\Finder\SplFileInfo;
 
-final class CoverageHelper
+/**
+ * @internal
+ * @final
+ */
+class FileCodeCoverageProvider
 {
-    private function __construct()
-    {
-    }
-
     /**
-     * @param array<string, CoverageFileData> $coverage
-     *
-     * @return array<string, mixed>
+     * @var array<string, CoverageFileData>|null
      */
-    public static function convertToArray(iterable $coverage): array
-    {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
-        }
+    private $coverage;
 
-        return self::serializeValue($coverage);
+    private $coverageFactory;
+
+    public function __construct(PhpUnitXmlCoverageFactory $coverageFactory)
+    {
+        $this->coverageFactory = $coverageFactory;
     }
 
-    private static function serializeValue($mixed)
+    public function createFor(SplFileInfo $fileInfo): FileCodeCoverage
     {
-        if ($mixed === null) {
-            return null;
+        if ($this->coverage === null) {
+            $this->coverage = $this->coverageFactory->createCoverage();
         }
 
-        if (is_scalar($mixed)) {
-            return $mixed;
+        $filePath = $fileInfo->getRealPath() === false
+            ? $fileInfo->getPathname()
+            : $fileInfo->getRealPath()
+        ;
+
+        if (!array_key_exists($filePath, $this->coverage)) {
+            return new FileCodeCoverage(new CoverageFileData());
         }
 
-        if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
-        }
-
-        return self::serializeValue((array) $mixed);
+        return new FileCodeCoverage($this->coverage[$filePath]);
     }
 }

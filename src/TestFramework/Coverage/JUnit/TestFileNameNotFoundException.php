@@ -33,34 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\XmlReport\MemoizedTestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
-use PHPUnit\Framework\TestCase;
+use Exception;
+use function Safe\sprintf;
 
-final class MemoizedTestFileDataProviderTest extends TestCase
+/**
+ * @internal
+ */
+final class TestFileNameNotFoundException extends Exception
 {
-    public function test_it_memoize_get_test_file_info_calls(): void
+    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
     {
-        $class = 'Test\Class';
-        $expectedTestInfo = new TestFileTimeData('path/to/Test.php', 4.567);
-
-        $providerMock = $this->createMock(TestFileDataProvider::class);
-        $providerMock
-            ->expects($this->once())
-            ->method('getTestFileInfo')
-            ->with($class)
-            ->willReturn($expectedTestInfo)
-        ;
-
-        $infoProvider = new MemoizedTestFileDataProvider($providerMock);
-
-        $testInfo0 = $infoProvider->getTestFileInfo($class);
-        $testInfo1 = $infoProvider->getTestFileInfo($class);
-
-        $this->assertSame($expectedTestInfo, $testInfo0);
-        $this->assertSame($expectedTestInfo, $testInfo1);
+        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
     }
 }

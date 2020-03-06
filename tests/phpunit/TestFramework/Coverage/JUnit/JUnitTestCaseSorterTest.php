@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use PHPUnit\Framework\TestCase;
 
 final class JUnitTestCaseSorterTest extends TestCase

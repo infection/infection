@@ -33,54 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
-use Infection\TestFramework\Coverage\CoverageFileData;
-use function is_array;
-use function is_scalar;
-use function iterator_to_array;
-use Traversable;
+use function class_exists;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use function Safe\sprintf;
 
-final class CoverageHelper
+/**
+ * @covers \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider
+ */
+final class EnvTestCasesProviderTest extends TestCase
 {
-    private function __construct()
-    {
-    }
-
     /**
-     * @param array<string, CoverageFileData> $coverage
-     *
-     * @return array<string, mixed>
+     * @dataProvider \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::envTestCaseTupleProvider
      */
-    public static function convertToArray(iterable $coverage): array
+    public function test_env_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
     {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
-        }
+        $this->assertTrue(
+            class_exists($testCaseClassName, true),
+            sprintf('Expected "%s" to be a class.', $testCaseClassName)
+        );
 
-        return self::serializeValue($coverage);
-    }
+        $testCaseReflection = new ReflectionClass($testCaseClassName);
 
-    private static function serializeValue($mixed)
-    {
-        if ($mixed === null) {
-            return null;
-        }
+        $this->assertInstanceOf(
+            TestCase::class,
+            $testCaseReflection->newInstanceWithoutConstructor()
+        );
 
-        if (is_scalar($mixed)) {
-            return $mixed;
-        }
+        $this->assertFalse(
+            $testCaseReflection->isAbstract(),
+            sprintf(
+                'Expected "%s" to be an actual test case, not a base (abstract) one.',
+                $testCaseClassName
+            )
+        );
 
-        if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
-        }
-
-        return self::serializeValue((array) $mixed);
+        $this->assertFileExists($fileWithIoOperations);
     }
 }

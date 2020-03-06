@@ -33,54 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\EnvVariableManipulation;
 
-use Infection\TestFramework\Coverage\CoverageFileData;
-use function is_array;
-use function is_scalar;
-use function iterator_to_array;
-use Traversable;
+use Webmozart\Assert\Assert;
 
-final class CoverageHelper
+trait BacksUpEnvironmentVariables
 {
-    private function __construct()
-    {
-    }
-
     /**
-     * @param array<string, CoverageFileData> $coverage
-     *
-     * @return array<string, mixed>
+     * @var EnvBackup
      */
-    public static function convertToArray(iterable $coverage): array
-    {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
-        }
+    private $snapshot;
 
-        return self::serializeValue($coverage);
+    private function backupEnvironmentVariables(): void
+    {
+        $this->snapshot = EnvBackup::createSnapshot();
     }
 
-    private static function serializeValue($mixed)
+    private function restoreEnvironmentVariables(): void
     {
-        if ($mixed === null) {
-            return null;
-        }
+        $value = $this->snapshot;
 
-        if (is_scalar($mixed)) {
-            return $mixed;
-        }
+        Assert::notNull(
+            $value,
+            'Attempted to restore a backup but no backup has been created'
+        );
 
-        if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
-        }
-
-        return self::serializeValue((array) $mixed);
+        $value->restore();
     }
 }

@@ -33,9 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use function Safe\tempnam;

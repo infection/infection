@@ -33,54 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\EnvVariableManipulation;
 
-use Infection\TestFramework\Coverage\CoverageFileData;
-use function is_array;
-use function is_scalar;
-use function iterator_to_array;
-use Traversable;
+use function array_key_exists;
+use function getenv;
+use function Safe\putenv;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
-final class CoverageHelper
+final class EnvBackup
 {
-    private function __construct()
-    {
-    }
+    private $environmentVariables;
 
     /**
-     * @param array<string, CoverageFileData> $coverage
-     *
-     * @return array<string, mixed>
+     * @param array<string, string> $environmentVariables
      */
-    public static function convertToArray(iterable $coverage): array
+    private function __construct(array $environmentVariables)
     {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
-        }
-
-        return self::serializeValue($coverage);
+        $this->environmentVariables = $environmentVariables;
     }
 
-    private static function serializeValue($mixed)
+    public static function createSnapshot(): self
     {
-        if ($mixed === null) {
-            return null;
-        }
+        $environmentVariables = getenv();
 
-        if (is_scalar($mixed)) {
-            return $mixed;
-        }
+        Assert::allString($environmentVariables);
 
-        if (is_array($mixed)) {
-            $convertedArray = [];
+        return new self($environmentVariables);
+    }
 
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
+    public function restore(): void
+    {
+        $snapshot = $this->environmentVariables;
+
+        foreach (getenv() as $name => $value) {
+            if (!array_key_exists($name, $snapshot)) {
+                putenv($name);
+
+                continue;
             }
 
-            return $convertedArray;
+            $snapshotValue = $snapshot[$name];
+            unset($snapshot[$name]);
+
+            if ($snapshotValue === $value) {
+                continue;
+            }
+
+            putenv(sprintf('%s=%s', $name, $snapshotValue));
         }
 
-        return self::serializeValue((array) $mixed);
+        foreach ($snapshot as $name => $value) {
+            putenv(sprintf('%s=%s', $name, $value));
+        }
     }
 }

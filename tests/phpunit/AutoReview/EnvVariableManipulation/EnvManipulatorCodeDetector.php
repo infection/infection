@@ -33,21 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
-use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
-use PHPUnit\Framework\TestCase;
+use function Safe\sprintf;
+use function strpos;
 
-final class TestFileTimeDataTest extends TestCase
+final class EnvManipulatorCodeDetector
 {
-    public function test_it_creates_self_object_with_named_constructor(): void
-    {
-        $testFileTimeData = new TestFileTimeData(
-            '/path/to/Test.php',
-            2.345
-        );
+    private const FUNCTIONS = [
+        'putenv',
+        'Safe\putenv',
+    ];
 
-        $this->assertSame('/path/to/Test.php', $testFileTimeData->path);
-        $this->assertSame(2.345, $testFileTimeData->time);
+    /**
+     * @var string[]|null
+     */
+    private static $statements;
+
+    private function __construct()
+    {
+    }
+
+    public static function codeManipulatesEnvVariables(string $code): bool
+    {
+        foreach (self::getStatements() as $statement) {
+            if (strpos($code, $statement) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function getStatements(): array
+    {
+        if (self::$statements !== null) {
+            return self::$statements;
+        }
+
+        foreach (self::FUNCTIONS as $safeFunctionName) {
+            self::$statements[] = sprintf('use function %s', $safeFunctionName);
+            self::$statements[] = sprintf('\\%s(', $safeFunctionName);
+        }
+
+        return self::$statements;
     }
 }
