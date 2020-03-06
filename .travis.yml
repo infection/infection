@@ -160,8 +160,4 @@ jobs:
     - php: nightly
       env: DRIVER="phpdbg"
     - php: 7.4
-      env: DRIVER="xdebug"
-    - php: 7.4
-      env: DRIVER="pcov"
-    - php: 7.4
       env: DRIVER="phpdbg"
