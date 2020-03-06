@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Http;
 
-use Infection\Http\JsonClient;
+use Infection\Http\CurlClient;
 use Infection\Http\Response;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Tests\Logger\DummyLogger;
@@ -48,8 +48,10 @@ use function Safe\json_encode;
 
 final class StrykerDashboardClientTest extends TestCase
 {
+    private const API_KEY = '0e137d38-7611-4157-897b-54791cc1ef97';
+
     /**
-     * @var JsonClient|MockObject
+     * @var CurlClient|MockObject
      */
     private $clientMock;
 
@@ -65,7 +67,7 @@ final class StrykerDashboardClientTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->clientMock = $this->createMock(JsonClient::class);
+        $this->clientMock = $this->createMock(CurlClient::class);
         $this->logger = new DummyLogger();
 
         $this->dashboardClient = new StrykerDashboardClient(
@@ -80,12 +82,11 @@ final class StrykerDashboardClientTest extends TestCase
             ->expects($this->once())
             ->method('request')
             ->with(
-                'https://dashboard.stryker-mutator.io/api/reports',
+                'infection/infection',
+                'master',
+                self::API_KEY,
                 json_encode(json_decode(<<<'JSON'
 {
-    "apiKey": "foo",
-    "repositorySlug": "infection/infection",
-    "branch": "master",
     "mutationScore": 80.31
 }
 JSON
@@ -95,9 +96,9 @@ JSON
         ;
 
         $this->dashboardClient->sendReport(
-            'foo',
             'infection/infection',
             'master',
+            self::API_KEY,
             80.31
         );
 
@@ -123,12 +124,11 @@ EOF
             ->expects($this->once())
             ->method('request')
             ->with(
-                'https://dashboard.stryker-mutator.io/api/reports',
+                'infection/infection',
+                'master',
+                self::API_KEY,
                 json_encode(json_decode(<<<'JSON'
 {
-    "apiKey": "foo",
-    "repositorySlug": "infection/infection",
-    "branch": "master",
     "mutationScore": 80.31
 }
 JSON
@@ -138,9 +138,9 @@ JSON
         ;
 
         $this->dashboardClient->sendReport(
-            'foo',
             'infection/infection',
             'master',
+            self::API_KEY,
             80.31
         );
 

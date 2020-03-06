@@ -104,9 +104,9 @@ final class BadgeLogger implements MutationTestingResultsLogger
         $this->output->writeln('Sending dashboard report...');
 
         $this->strykerDashboardClient->sendReport(
-            $apiKey,
             'github.com/' . $buildContext->repositorySlug(),
             $buildContext->branch(),
+            $apiKey,
             $this->metricsCalculator->getMutationScoreIndicator()
         );
     }
