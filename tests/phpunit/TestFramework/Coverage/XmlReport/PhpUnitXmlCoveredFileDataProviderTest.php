@@ -42,7 +42,7 @@ use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataFactory;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
@@ -54,7 +54,7 @@ use function Safe\realpath;
 /**
  * @group integration
  */
-final class PhpUnitXmlCoveredFileDataFactoryTest extends TestCase
+final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
 {
     private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
 
@@ -80,14 +80,14 @@ final class PhpUnitXmlCoveredFileDataFactoryTest extends TestCase
             )
         ;
 
-        $coverageFactory = new PhpUnitXmlCoveredFileDataFactory(
+        $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,
             $testFileDataProvider
         );
 
-        $coverage = $coverageFactory->provideFiles();
+        $coverage = $coverageProvider->provideFiles();
 
         $this->assertSame(
             [
@@ -135,14 +135,14 @@ final class PhpUnitXmlCoveredFileDataFactoryTest extends TestCase
             )
         ;
 
-        $coverageFactory = new PhpUnitXmlCoveredFileDataFactory(
+        $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,
             $testFileDataProvider
         );
 
-        $coverage = $coverageFactory->provideFiles();
+        $coverage = $coverageProvider->provideFiles();
 
         $this->assertSame(
             [
@@ -173,7 +173,7 @@ final class PhpUnitXmlCoveredFileDataFactoryTest extends TestCase
         $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
 
-        $coverageFactory = new PhpUnitXmlCoveredFileDataFactory(
+        $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
             '/nowhere',
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,
@@ -181,7 +181,7 @@ final class PhpUnitXmlCoveredFileDataFactoryTest extends TestCase
         );
 
         try {
-            $coverageFactory->provideFiles();
+            $coverageProvider->provideFiles();
 
             $this->fail();
         } catch (CoverageDoesNotExistException $exception) {
@@ -213,14 +213,14 @@ TXT
             ->willReturn($this->getParsedCodeCoverageData())
         ;
 
-        $coverageFactory = new PhpUnitXmlCoveredFileDataFactory(
+        $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,
             null
         );
 
-        $coverage = $coverageFactory->provideFiles();
+        $coverage = $coverageProvider->provideFiles();
 
         $this->assertSame(
             [

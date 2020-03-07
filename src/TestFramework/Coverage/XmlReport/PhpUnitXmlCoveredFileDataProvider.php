@@ -51,7 +51,7 @@ use function Safe\file_get_contents;
  * @internal
  * @final
  */
-class PhpUnitXmlCoveredFileDataFactory implements CoveredFileDataProvider
+class PhpUnitXmlCoveredFileDataProvider implements CoveredFileDataProvider
 {
     /**
      * TODO: make this constant private

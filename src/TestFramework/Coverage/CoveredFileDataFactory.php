@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Coverage;
 
 use Infection\Mutation\MutationGenerator;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataFactory;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -45,13 +45,13 @@ use Webmozart\Assert\Assert;
  * Assembles a ready feed of CoveredFileData from different sources. Feeds data into MutationGenerator. Does not known about differences between adapters and what not.
  *
  * @see MutationGenerator
- * @see PhpUnitXmlCoveredFileDataFactory
+ * @see PhpUnitXmlCoveredFileDataProvider
  *
  * @internal
  */
 final class CoveredFileDataFactory implements CoveredFileDataProvider
 {
-    /** @var CoveredFileDataProvider|PhpUnitXmlCoveredFileDataFactory */
+    /** @var CoveredFileDataProvider|PhpUnitXmlCoveredFileDataProvider */
     private $primaryCoverageProvider;
 
     /** @var iterable<SplFileInfo> */

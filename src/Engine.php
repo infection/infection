@@ -51,7 +51,7 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataFactory;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -181,7 +181,7 @@ final class Engine
     {
         $coverageDir = $this->config->getCoveragePath();
 
-        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoveredFileDataFactory::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoveredFileDataProvider::COVERAGE_INDEX_FILE_NAME;
 
         if (!file_exists($coverageIndexFilePath)) {
             throw CoverageDoesNotExistException::with(
@@ -196,7 +196,7 @@ final class Engine
     {
         $coverageDir = $this->config->getCoveragePath();
 
-        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoveredFileDataFactory::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoveredFileDataProvider::COVERAGE_INDEX_FILE_NAME;
 
         $processInfo = sprintf(
             '%sCommand line: %s%sProcess Output: %s',

@@ -62,7 +62,7 @@ final class FileCodeCoverageProviderFactory
     {
         Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
 
-        return new PhpUnitXmlCoveredFileDataFactory(
+        return new PhpUnitXmlCoveredFileDataProvider(
             $this->coverageDir,
             $this->coverageXmlParser,
             $testFrameworkKey
