@@ -54,7 +54,11 @@ use Iterator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration
+ */
 final class MutationTestingRunnerTest extends TestCase
 {
     /**
@@ -78,6 +82,11 @@ final class MutationTestingRunnerTest extends TestCase
     private $eventDispatcher;
 
     /**
+     * @var Filesystem|MockObject
+     */
+    private $fileSystemMock;
+
+    /**
      * @var MutationTestingRunner
      */
     private $runner;
@@ -88,12 +97,14 @@ final class MutationTestingRunnerTest extends TestCase
         $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
         $this->parallelProcessRunnerMock = $this->createMock(ParallelProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
+        $this->fileSystemMock = $this->createMock(Filesystem::class);
 
         $this->runner = new MutationTestingRunner(
             $this->processBuilderMock,
             $this->mutantFactoryMock,
             $this->parallelProcessRunnerMock,
             $this->eventDispatcher,
+            $this->fileSystemMock,
             false
         );
     }
@@ -137,8 +148,27 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation1]
             )
             ->willReturnOnConsecutiveCalls(
-                $mutant0 = new Mutant('/path/to/mutant0', $mutation0, ''),
-                $mutant1 = new Mutant('/path/to/mutant1', $mutation1, '')
+                $mutant0 = new Mutant(
+                    '/path/to/mutant0',
+                    $mutation0,
+                    'mutated code 0',
+                    'diff0'
+                ),
+                $mutant1 = new Mutant(
+                    '/path/to/mutant1',
+                    $mutation1,
+                    'mutated code 1',
+                    'diff1'
+                )
+            )
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->exactly(2))
+            ->method('dumpFile')
+            ->withConsecutive(
+                ['/path/to/mutant0', 'mutated code 0'],
+                ['/path/to/mutant1', 'mutated code 1']
             )
         ;
 
@@ -171,7 +201,7 @@ final class MutationTestingRunnerTest extends TestCase
         );
     }
 
-    public function test_it_applies_and_run_the_mutations_when_concurent_execution_requested(): void
+    public function test_it_applies_and_run_the_mutations_when_concurrent_execution_requested(): void
     {
         $mutations = new ArrayIterator([
             $mutation0 = $this->createMock(Mutation::class),
@@ -188,8 +218,27 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation1]
             )
             ->willReturnOnConsecutiveCalls(
-                $mutant0 = new Mutant('/path/to/mutant0', $mutation0, ''),
-                $mutant1 = new Mutant('/path/to/mutant1', $mutation1, '')
+                $mutant0 = new Mutant(
+                    '/path/to/mutant0',
+                    $mutation0,
+                    'mutated code 0',
+                    'diff0'
+                ),
+                $mutant1 = new Mutant(
+                    '/path/to/mutant1',
+                    $mutation1,
+                    'mutated code 1',
+                    'diff1'
+                )
+            )
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->exactly(2))
+            ->method('dumpFile')
+            ->withConsecutive(
+                ['/path/to/mutant0', 'mutated code 0'],
+                ['/path/to/mutant1', 'mutated code 1']
             )
         ;
 
@@ -216,6 +265,7 @@ final class MutationTestingRunnerTest extends TestCase
             $this->mutantFactoryMock,
             $this->parallelProcessRunnerMock,
             $this->eventDispatcher,
+            $this->fileSystemMock,
             true
         );
 
@@ -230,7 +280,7 @@ final class MutationTestingRunnerTest extends TestCase
         );
     }
 
-    public function test_it_passes_through_iterables_when_concurent_execution_requested(): void
+    public function test_it_passes_through_iterables_when_concurrent_execution_requested(): void
     {
         $mutations = $this->createMock(Iterator::class);
         $mutations
@@ -261,6 +311,7 @@ final class MutationTestingRunnerTest extends TestCase
             $this->mutantFactoryMock,
             $this->parallelProcessRunnerMock,
             $this->eventDispatcher,
+            $this->fileSystemMock,
             true
         );
 
