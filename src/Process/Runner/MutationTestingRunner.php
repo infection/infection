@@ -40,6 +40,7 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
@@ -86,26 +87,28 @@ final class MutationTestingRunner
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
         $processes = take($mutations)
-            ->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
-                $mutant = $this->mutantFactory->create($mutation);
+            ->map(function (Mutation $mutation): Mutant {
+                return $this->mutantFactory->create($mutation);
+            })
+            ->filter(function (Mutant $mutant) {
+                if ($mutant->isCoveredByTest()) {
+                    return true;
+                }
 
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromNonCoveredMutant($mutant)
+                ));
+
+                return false;
+            })
+            ->map(function (Mutant $mutant) use ($testFrameworkExtraOptions): MutantProcess {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode());
 
                 $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
                 return $process;
             })
-            ->filter(function (MutantProcess $mutantProcess) {
-                if ($mutantProcess->getMutant()->isCoveredByTest()) {
-                    return true;
-                }
-
-                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromProcess($mutantProcess)
-                ));
-
-                return false;
-            });
+        ;
 
         $this->parallelProcessManager->run($processes, $threadCount);
 

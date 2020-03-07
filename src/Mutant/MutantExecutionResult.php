@@ -75,6 +75,22 @@ class MutantExecutionResult
         $this->originalStartingLine = $originalStartingLine;
     }
 
+    public static function createFromNonCoveredMutant(Mutant $mutant): self
+    {
+        $mutation = $mutant->getMutation();
+
+        return new self(
+            '',
+            '',
+            MutantProcess::CODE_NOT_COVERED,
+            $mutant->getDiff(),
+            $mutant->getMutation()->getMutatorName(),
+            $mutation->getOriginalFilePath(),
+            // TODO: move this in Mutation?
+            (int) $mutation->getAttributes()['startLine']
+        );
+    }
+
     public static function createFromProcess(MutantProcess $mutantProcess): self
     {
         $process = $mutantProcess->getProcess();
