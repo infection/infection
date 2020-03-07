@@ -57,7 +57,7 @@ class FileCodeCoverageProvider
         $this->coverageFactory = $coverageFactory;
     }
 
-    public function createFor(SplFileInfo $fileInfo): FileCodeCoverage
+    public function provideFor(SplFileInfo $fileInfo): FileCodeCoverage
     {
         if ($this->coverage === null) {
             $this->coverage = $this->coverageFactory->createCoverage();

@@ -91,7 +91,7 @@ final class MutationGeneratorTest extends TestCase
         $providerMock = $this->createMock(FileCodeCoverageProvider::class);
         $providerMock
             ->expects($this->exactly(2))
-            ->method('createFor')
+            ->method('provideFor')
             ->willReturn($codeCoverageMock)
         ;
 

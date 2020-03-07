@@ -107,7 +107,7 @@ final class MutationGenerator
             yield from $this->fileMutationGenerator->generate(
                 $fileInfo,
                 $onlyCovered,
-                $this->coverageProvider->createFor($fileInfo),
+                $this->coverageProvider->provideFor($fileInfo),
                 $this->mutators,
                 $nodeIgnorers
             );
