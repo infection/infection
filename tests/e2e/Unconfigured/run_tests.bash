@@ -15,7 +15,7 @@ run () {
 }
 
 test -x $(which tput) && tput setaf 2 # green
-if run "../../../bin/infection" "" < /dev/null 2>&1 | grep -s 'Infection config generator requires an interactive mode.'; then
+if run "../../../bin/infection" "" < /dev/null 2>&1 | grep -sE '(Aborted.|Infection config generator requires an interactive mode.)'; then
 	exit 0;
 fi
 

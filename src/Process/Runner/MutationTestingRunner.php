@@ -47,16 +47,18 @@ use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use function Pipeline\take;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
 final class MutationTestingRunner
 {
+    private $processBuilder;
     private $mutantFactory;
     private $parallelProcessManager;
     private $eventDispatcher;
-    private $processBuilder;
+    private $fileSystem;
     private $runConcurrently;
 
     public function __construct(
@@ -64,12 +66,14 @@ final class MutationTestingRunner
         MutantFactory $mutantFactory,
         ParallelProcessRunner $parallelProcessManager,
         EventDispatcher $eventDispatcher,
+        Filesystem $fileSystem,
         bool $runConcurrently
     ) {
         $this->processBuilder = $mutantProcessBuilder;
         $this->mutantFactory = $mutantFactory;
         $this->parallelProcessManager = $parallelProcessManager;
         $this->eventDispatcher = $eventDispatcher;
+        $this->fileSystem = $fileSystem;
         $this->runConcurrently = $runConcurrently;
     }
 
@@ -84,6 +88,8 @@ final class MutationTestingRunner
         $processes = take($mutations)
             ->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
                 $mutant = $this->mutantFactory->create($mutation);
+
+                $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode());
 
                 $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 

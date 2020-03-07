@@ -57,16 +57,18 @@ final class MutantTest extends TestCase
     public function test_it_can_be_instantiated(
         string $filePath,
         Mutation $mutation,
+        string $mutatedCode,
         string $diff,
         bool $expectedCoveredByTests,
         array $expectedTests
     ): void {
-        $mutant = new Mutant($filePath, $mutation, $diff);
+        $mutant = new Mutant($filePath, $mutation, $mutatedCode, $diff);
 
         $this->assertMutantStateIs(
             $mutant,
             $filePath,
             $mutation,
+            $mutatedCode,
             $diff,
             $expectedCoveredByTests,
             $expectedTests
@@ -107,6 +109,7 @@ final class MutantTest extends TestCase
                 0,
                 $tests
             ),
+            'mutated code',
             'diff value',
             true,
             $tests,
@@ -127,6 +130,7 @@ final class MutantTest extends TestCase
                 0,
                 []
             ),
+            'mutated code',
             'diff value',
             false,
             [],
