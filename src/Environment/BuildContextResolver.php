@@ -41,9 +41,7 @@ namespace Infection\Environment;
 interface BuildContextResolver
 {
     /**
-     * @param array<string, string> $environment
-     *
      * @throws CouldNotResolveBuildContext
      */
-    public function resolve(array $environment): BuildContext;
+    public function resolve(): BuildContext;
 }

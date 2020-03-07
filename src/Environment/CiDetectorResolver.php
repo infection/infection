@@ -47,7 +47,7 @@ final class CiDetectorResolver implements BuildContextResolver
         $this->ciDetector = $ciDetector;
     }
 
-    public function resolve(array $environment): BuildContext
+    public function resolve(): BuildContext
     {
         try {
             $ci = $this->ciDetector->detect();

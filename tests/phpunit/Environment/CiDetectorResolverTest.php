@@ -59,7 +59,7 @@ final class CiDetectorResolverTest extends TestCase
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The current process is not executed in a CI build');
 
-        $buildContextResolver->resolve([]);
+        $buildContextResolver->resolve();
     }
 
     public function test_resolve_throws_when_ci_is_in_pull_request_context(): void
@@ -81,7 +81,7 @@ final class CiDetectorResolverTest extends TestCase
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The current process is a pull request build');
 
-        $buildContextResolver->resolve([]);
+        $buildContextResolver->resolve();
     }
 
     public function test_resolve_throws_when_ci_is_maybe_in_pull_request_context(): void
@@ -103,7 +103,7 @@ final class CiDetectorResolverTest extends TestCase
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The current process is maybe a pull request build');
 
-        $buildContextResolver->resolve([]);
+        $buildContextResolver->resolve();
     }
 
     /**
@@ -138,7 +138,7 @@ final class CiDetectorResolverTest extends TestCase
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The repository name could not be determined for the current process');
 
-        $buildContextResolver->resolve([]);
+        $buildContextResolver->resolve();
     }
 
     /**
@@ -173,7 +173,7 @@ final class CiDetectorResolverTest extends TestCase
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The branch name could not be determined for the current process');
 
-        $buildContextResolver->resolve([]);
+        $buildContextResolver->resolve();
     }
 
     public function provideBlankOrEmptyString(): Generator
@@ -210,7 +210,7 @@ final class CiDetectorResolverTest extends TestCase
 
         $buildContextResolver = new CiDetectorResolver($ciDetector->reveal());
 
-        $buildContext = $buildContextResolver->resolve([]);
+        $buildContext = $buildContextResolver->resolve();
 
         $this->assertSame($repositoryName, $buildContext->repositorySlug());
         $this->assertSame($gitBranch, $buildContext->branch());

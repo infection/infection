@@ -75,7 +75,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
     public function log(): void
     {
         try {
-            $buildContext = $this->buildContextResolver->resolve(getenv());
+            $buildContext = $this->buildContextResolver->resolve();
         } catch (CouldNotResolveBuildContext $exception) {
             $this->logMessage($exception->getMessage());
 
