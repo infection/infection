@@ -428,6 +428,7 @@ final class Container
                     $container->getMutantFactory(),
                     $container->getParallelProcessRunner(),
                     $container->getEventDispatcher(),
+                    $container->getFileSystem(),
                     $container->getConfiguration()->noProgress()
                 );
             },

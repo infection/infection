@@ -49,11 +49,11 @@
                 },
                 "summary": {
                     "type": "string",
-                    "definition": "Summary log file, which display the amount of mutants per category, (Killed, Errored, Escaped, Timed Out & Not Covered)."
+                    "definition": "Summary log file, which display the amount of mutants per category, (Killed, Errored, Escaped, Timed Out & Not Covered). More intended for internal purposes."
                 },
                 "debug": {
                     "type": "string",
-                    "description": "Debug log file, which displays what mutations were found on what line, per category."
+                    "description": "Debug log file, which displays what mutations were found on what line, per category. More intended for internal purposes."
                 },
                 "perMutator": {
                     "type": "string",
