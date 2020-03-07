@@ -65,25 +65,21 @@ final class DebugFileLoggerTest extends TestCase
             false,
             <<<'TXT'
 Total: 0
+
 Killed mutants:
 ===============
-
 
 Errors mutants:
 ===============
 
-
 Escaped mutants:
 ================
-
 
 Timed Out mutants:
 ==================
 
-
 Not Covered mutants:
 ====================
-
 
 TXT
         ];
@@ -93,49 +89,49 @@ TXT
             false,
             <<<'TXT'
 Total: 10
+
 Killed mutants:
 ===============
-
 
 Mutator: PregQuote
 Line 9
 
 Mutator: For_
 Line 10
+
 
 Errors mutants:
 ===============
 
-
 Mutator: PregQuote
 Line 9
 
 Mutator: For_
 Line 10
+
 
 Escaped mutants:
 ================
 
-
 Mutator: PregQuote
 Line 9
 
 Mutator: For_
 Line 10
+
 
 Timed Out mutants:
 ==================
 
-
 Mutator: PregQuote
 Line 9
 
 Mutator: For_
 Line 10
 
+
 Not Covered mutants:
 ====================
-
 
 Mutator: PregQuote
 Line 9
@@ -151,39 +147,39 @@ TXT
             true,
             <<<'TXT'
 Total: 10
+
 Killed mutants:
 ===============
-
 
 Mutator: PregQuote
 Line 9
 
 Mutator: For_
 Line 10
+
 
 Errors mutants:
 ===============
 
-
 Mutator: PregQuote
 Line 9
 
 Mutator: For_
 Line 10
+
 
 Escaped mutants:
 ================
 
-
 Mutator: PregQuote
 Line 9
 
 Mutator: For_
 Line 10
 
+
 Timed Out mutants:
 ==================
-
 
 Mutator: PregQuote
 Line 9

@@ -61,7 +61,7 @@ class MutantProcessBuilder
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
                 $mutant->getTests(),
-                $mutant->getMutantFilePath(),
+                $mutant->getFilePath(),
                 $mutant->getMutation()->getHash(),
                 $mutant->getMutation()->getOriginalFilePath(),
                 $testFrameworkExtraOptions

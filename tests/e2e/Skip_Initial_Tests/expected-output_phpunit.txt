@@ -1,7 +1,7 @@
 Total: 8
+
 Killed mutants:
 ===============
-
 
 Mutator: PublicVisibility
 Line 7
@@ -24,21 +24,18 @@ Line 14
 Mutator: TrueValue
 Line 15
 
+
 Errors mutants:
 ===============
-
 
 Escaped mutants:
 ================
 
-
 Timed Out mutants:
 ==================
 
-
 Not Covered mutants:
 ====================
-
 
 Mutator: FalseValue
 Line 18

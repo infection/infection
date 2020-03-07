@@ -31,7 +31,7 @@ before_install:
 jobs:
   include:
     - stage: Static Code Analysis
-      php: 7.2
+      php: 7.3
       install:
         - composer install $COMPOSER_FLAGS
       script:
@@ -40,7 +40,7 @@ jobs:
 
     - &STANDARD_TEST_JOB
       stage: Test
-      php: 7.2
+      php: 7.3
       env: DRIVER="xdebug"
       install:
         - |
@@ -97,11 +97,6 @@ jobs:
     -
       <<: *STANDARD_TEST_JOB
       php: 7.3
-      env: DRIVER="xdebug"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.3
       env: DEPS="LOW" DRIVER="xdebug"
 
     -
@@ -134,7 +129,7 @@ jobs:
           phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
 
     - stage: Deploy
-      php: 7.2
+      php: 7.3
       install:
         - composer install --no-dev $COMPOSER_FLAGS
       script:
