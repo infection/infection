@@ -185,6 +185,7 @@ $(PHP_CS_FIXER): Makefile
 $(PHPSTAN): vendor
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
+	composer require infection/codeception-adapter infection/phpspec-adapter
 	$(BOX) validate
 	$(BOX) compile
 	touch -c $@
