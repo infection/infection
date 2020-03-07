@@ -95,6 +95,7 @@ use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -183,6 +184,9 @@ final class Container
                     $container->getConfiguration()->getCoveragePath(),
                     $container->getIndexXmlCoverageParser()
                 );
+            },
+            FileCodeCoverageProvider::class => static function (self $container): FileCodeCoverageProvider {
+                return new FileCodeCoverageProvider();
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
                 return new RootsFileOrDirectoryLocator(
@@ -416,6 +420,7 @@ final class Container
 
                 return new MutationGenerator(
                     $container->getCoveredFileDataFactory(),
+                    $container->getFileCodeCoverageProvider(),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
@@ -580,6 +585,11 @@ final class Container
     public function getFileCodeCoverageProviderFactory(): FileCodeCoverageProviderFactory
     {
         return $this->get(FileCodeCoverageProviderFactory::class);
+    }
+
+    public function getFileCodeCoverageProvider(): FileCodeCoverageProvider
+    {
+        return $this->get(FileCodeCoverageProvider::class);
     }
 
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator

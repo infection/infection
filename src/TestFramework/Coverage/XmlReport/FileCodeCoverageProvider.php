@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use array_key_exists;
-use Infection\TestFramework\Coverage\CoverageFileData;
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\TestFramework\Coverage\CoveredFileData;
 
 /**
  * @internal
@@ -45,33 +43,8 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class FileCodeCoverageProvider
 {
-    /**
-     * @var array<string, CoverageFileData>|null
-     */
-    private $coverage;
-
-    private $coverageFactory;
-
-    public function __construct(PhpUnitXmlCoverageFactory $coverageFactory)
+    public function provideFor(CoveredFileData $fileData): FileCodeCoverage
     {
-        $this->coverageFactory = $coverageFactory;
-    }
-
-    public function provideFor(SplFileInfo $fileInfo): FileCodeCoverage
-    {
-        if ($this->coverage === null) {
-            $this->coverage = $this->coverageFactory->createCoverage();
-        }
-
-        $filePath = $fileInfo->getRealPath() === false
-            ? $fileInfo->getPathname()
-            : $fileInfo->getRealPath()
-        ;
-
-        if (!array_key_exists($filePath, $this->coverage)) {
-            return new FileCodeCoverage(new CoverageFileData());
-        }
-
-        return new FileCodeCoverage($this->coverage[$filePath]);
+        return new FileCodeCoverage($fileData->retrieveCoverageFileData());
     }
 }
