@@ -36,15 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use const DIRECTORY_SEPARATOR;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
