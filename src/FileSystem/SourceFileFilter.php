@@ -44,8 +44,9 @@ use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
+ * @final
  */
-final class SourceFileFilter
+class SourceFileFilter
 {
     /**
      * @var string[]

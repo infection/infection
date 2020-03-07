@@ -54,12 +54,14 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
     /** @var CoveredFileDataProvider|PhpUnitXmlCoveredFileDataProvider */
     private $primaryCoverageProvider;
 
-    /** @var iterable<SplFileInfo> */
-    private $sourceFiles;
+    private $testFileDataAdder;
 
     private $filter;
 
-    private $testFileDataAdder;
+    /** @var iterable<SplFileInfo> */
+    private $sourceFiles;
+
+    private $onlyCovered;
 
     /**
      * @param iterable<SplFileInfo> $sourceFiles
@@ -68,12 +70,14 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
         CoveredFileDataProvider $primaryCoverageProvider,
         TestFileDataAdder $testFileDataAdder,
         CoveredFileNameFilter $filter,
-        iterable $sourceFiles
+        iterable $sourceFiles,
+        bool $onlyCovered
     ) {
         $this->primaryCoverageProvider = $primaryCoverageProvider;
         $this->testFileDataAdder = $testFileDataAdder;
         $this->filter = $filter;
         $this->sourceFiles = $sourceFiles;
+        $this->onlyCovered = $onlyCovered;
     }
 
     /**
@@ -87,7 +91,7 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
 
         $readyCoverageFeed = $this->testFileDataAdder->addTestExecutionInfo($filteredCoverageFeed);
 
-        if (is_array($this->sourceFiles) && $this->sourceFiles === []) {
+        if ($this->onlyCovered === true) {
             // The case where only covered files are considered
             return $readyCoverageFeed;
         }

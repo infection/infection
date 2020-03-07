@@ -39,6 +39,7 @@ use function array_map;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\FileSystem\SourceFileFilter;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
 use Symfony\Component\Finder\SplFileInfo;
@@ -57,6 +58,7 @@ trait ConfigurationAssertions
         ?int $expectedTimeout,
         array $expectedSourceDirectories,
         array $expectedSourceFiles,
+        SourceFileFilter $sourceFileFilter,
         Logs $expectedLogs,
         string $expectedLogVerbosity,
         string $expectedTmpDir,
@@ -84,6 +86,7 @@ trait ConfigurationAssertions
             self::normalizePaths($expectedSourceFiles),
             self::normalizePaths($configuration->getSourceFiles())
         );
+        $this->assertSame($sourceFileFilter, $configuration->getSourceFileFilter());
         $this->assertLogsStateIs(
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),

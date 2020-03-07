@@ -165,7 +165,8 @@ final class Container
                     ),
                     $container->getTestFileDataAdder(),
                     $container->getCoveredFileNameFilter(),
-                    $container->getConfiguration()->getSourceFiles()
+                    $container->getConfiguration()->getSourceFiles(),
+                    $container->getConfiguration()->mutateOnlyCoveredCode()
                 );
             },
             CoveredFileNameFilter::class => static function (self $container): CoveredFileNameFilter {

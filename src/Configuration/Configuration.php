@@ -169,10 +169,6 @@ class Configuration
      */
     public function getSourceFiles(): iterable
     {
-        if ($this->onlyCovered) {
-            return [];
-        }
-
         return $this->sourceFiles;
     }
 
