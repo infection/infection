@@ -102,6 +102,7 @@ class MutantFactory
      */
     private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): string
     {
+        // The same file may be mutated multiple times hence we can memoize that call
         return $this->printedFileCache[$originalFilePath]
             ?? $this->printedFileCache[$originalFilePath] = $this->printer->prettyPrintFile($originalStatements);
     }

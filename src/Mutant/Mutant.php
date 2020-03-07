@@ -46,18 +46,18 @@ class Mutant
 {
     private $mutantFilePath;
     private $mutation;
-    private $code;
+    private $mutatedCode;
     private $diff;
 
     public function __construct(
         string $mutantFilePath,
         Mutation $mutation,
-        string $code,
+        string $mutatedCode,
         string $diff
     ) {
         $this->mutantFilePath = $mutantFilePath;
         $this->mutation = $mutation;
-        $this->code = $code;
+        $this->mutatedCode = $mutatedCode;
         $this->diff = $diff;
     }
 
@@ -71,9 +71,9 @@ class Mutant
         return $this->mutation;
     }
 
-    public function getCode(): string
+    public function getMutatedCode(): string
     {
-        return $this->code;
+        return $this->mutatedCode;
     }
 
     public function getDiff(): string
