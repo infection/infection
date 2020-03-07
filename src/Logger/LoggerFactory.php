@@ -42,7 +42,7 @@ use Infection\Console\LogVerbosity;
 use Infection\Environment\ChainBuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Environment\TravisCiResolver;
-use Infection\Http\JsonClient;
+use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -166,7 +166,7 @@ final class LoggerFactory
                 new ChainBuildContextResolver(new TravisCiResolver()),
                 new StrykerApiKeyResolver(),
                 new StrykerDashboardClient(
-                    new JsonClient(),
+                    new StrykerCurlClient(),
                     new ConsoleLogger($output)
                 ),
                 $this->metricsCalculator,

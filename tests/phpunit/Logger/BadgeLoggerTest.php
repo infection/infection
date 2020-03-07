@@ -225,7 +225,7 @@ final class BadgeLoggerTest extends TestCase
         $this->badgeApiClientMock
             ->expects($this->once())
             ->method('sendReport')
-            ->with('abc', 'github.com/a/b', 'master', 33.3)
+            ->with('github.com/a/b', 'master', 'abc', 33.3)
         ;
 
         $this->metricsCalculatorMock
@@ -252,7 +252,7 @@ final class BadgeLoggerTest extends TestCase
         $this->badgeApiClientMock
             ->expects($this->once())
             ->method('sendReport')
-            ->with('abc', 'github.com/a/b', 'master', 33.3)
+            ->with('github.com/a/b', 'master', 'abc', 33.3)
         ;
 
         $this->metricsCalculatorMock
