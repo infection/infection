@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use function array_filter;
+use function array_map;
+use function explode;
 use Infection\FileSystem\Finder\FilterableFinder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -48,14 +51,13 @@ class SourceFileCollector
     /**
      * @param string[] $sourceDirectories
      * @param string[] $excludeDirectories
-     * @param string[] $filter
      *
      * @return iterable<SplFileInfo>
      */
     public function collectFiles(
         array $sourceDirectories,
         array $excludeDirectories,
-        array $filter
+        string $filter
     ): iterable {
         if ([] === $sourceDirectories) {
             return [];
@@ -67,10 +69,17 @@ class SourceFileCollector
             ->files()
         ;
 
-        if ($filter === []) {
+        if ($filter === '') {
             $finder->name('*.php');
         } else {
-            $finder->filterFiles($filter);
+            $finder->filterFiles(
+                array_filter(
+                    array_map(
+                        'trim',
+                        explode(',', $filter)
+                    )
+                )
+            );
         }
 
         return $finder;

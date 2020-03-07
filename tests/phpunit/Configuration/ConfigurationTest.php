@@ -40,7 +40,6 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\FileSystem\SourceFileFilter;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
@@ -63,7 +62,7 @@ final class ConfigurationTest extends TestCase
         int $timeout,
         array $sourceDirectories,
         array $sourceFiles,
-        SourceFileFilter $sourceFileFilter,
+        string $sourceFileFilter,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -147,7 +146,7 @@ final class ConfigurationTest extends TestCase
             10,
             [],
             [],
-            $this->createMock(SourceFileFilter::class),
+            '',
             Logs::createEmpty(),
             'none',
             '',
@@ -177,7 +176,7 @@ final class ConfigurationTest extends TestCase
                 new SplFileInfo('Foo.php', 'Foo.php', 'Foo.php'),
                 new SplFileInfo('Bar.php', 'Bar.php', 'Bar.php'),
             ],
-            $this->createMock(SourceFileFilter::class),
+            'src/Foo.php,src/Bar.php',
             new Logs(
                 'text.log',
                 'summary.log',
