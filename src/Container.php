@@ -57,6 +57,7 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
+use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
@@ -115,7 +116,6 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
-use Infection\FileSystem\SourceFileFilter;
 
 /**
  * @internal

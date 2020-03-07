@@ -36,10 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use const DIRECTORY_SEPARATOR;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
@@ -60,28 +59,14 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
         $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $coverageXmlParserMock
             ->expects($this->once())
-            ->method('parse')
+            ->method('parseLazy')
             ->willReturn($this->getParsedCodeCoverageData())
-        ;
-
-        $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
-        $testFileDataProvider
-            ->expects($this->any())
-            ->method('getTestFileInfo')
-            ->with('Acme\FooTest')
-            ->willReturn(
-                new TestFileTimeData(
-                    '/path/to/acme/FooTest.php',
-                    0.000234
-                )
-            )
         ;
 
         $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,
-            $testFileDataProvider
         );
 
         $coverage = $coverageProvider->provideFiles();
@@ -93,8 +78,8 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
                         11 => [
                             [
                                 'testMethod' => 'Acme\FooTest::test_it_can_be_instantiated',
-                                'testFilePath' => '/path/to/acme/FooTest.php',
-                                'time' => 0.000234,
+                                'testFilePath' => null,
+                                'time' => null,
                             ],
                         ],
                     ],
@@ -115,28 +100,14 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
         $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $coverageXmlParserMock
             ->expects($this->once())
-            ->method('parse')
+            ->method('parseLazy')
             ->willReturn($this->getParsedCodeCoverageData('Acme\FooCest:test_it_can_be_instantiated'))
-        ;
-
-        $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
-        $testFileDataProvider
-            ->expects($this->any())
-            ->method('getTestFileInfo')
-            ->with('Acme\FooCest')
-            ->willReturn(
-                new TestFileTimeData(
-                    '/path/to/acme/FooCest.php',
-                    0.000234
-                )
-            )
         ;
 
         $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,
-            $testFileDataProvider
         );
 
         $coverage = $coverageProvider->provideFiles();
@@ -148,8 +119,8 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
                         11 => [
                             [
                                 'testMethod' => 'Acme\FooCest:test_it_can_be_instantiated',
-                                'testFilePath' => '/path/to/acme/FooCest.php',
-                                'time' => 0.000234,
+                                'testFilePath' => null,
+                                'time' => null,
                             ],
                         ],
                     ],
@@ -168,13 +139,11 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
     public function test_it_cannot_create_coverage_if_cannot_locate_the_coverage_index_file(): void
     {
         $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
-        $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
 
         $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
             '/nowhere',
             $coverageXmlParserMock,
-            TestFrameworkTypes::PHPUNIT,
-            $testFileDataProvider
+            TestFrameworkTypes::PHPUNIT
         );
 
         try {
@@ -206,15 +175,14 @@ TXT
         $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $coverageXmlParserMock
             ->expects($this->once())
-            ->method('parse')
+            ->method('parseLazy')
             ->willReturn($this->getParsedCodeCoverageData())
         ;
 
         $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
-            TestFrameworkTypes::PHPUNIT,
-            null
+            TestFrameworkTypes::PHPUNIT
         );
 
         $coverage = $coverageProvider->provideFiles();
