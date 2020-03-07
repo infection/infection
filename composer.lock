@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c51752167680ca484a4c6e6d26d4e384",
+    "content-hash": "eb783898f59950bf4a621da543a73244",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -1476,6 +1476,66 @@
             ],
             "description": "PHPUnit assertions for JSON documents",
             "time": "2019-03-22T17:46:24+00:00"
+        },
+        {
+            "name": "jangregor/phpstan-prophecy",
+            "version": "0.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Jan0707/phpstan-prophecy.git",
+                "reference": "9f3422fa720d3dbd28ffba40f06aeba1edfecef9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Jan0707/phpstan-prophecy/zipball/9f3422fa720d3dbd28ffba40f06aeba1edfecef9",
+                "reference": "9f3422fa720d3dbd28ffba40f06aeba1edfecef9",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1",
+                "phpstan/phpstan": "^0.12.0"
+            },
+            "conflict": {
+                "phpspec/prophecy": "<1.7,>=2.0",
+                "phpunit/phpunit": "<6.0,>=10.0"
+            },
+            "require-dev": {
+                "ergebnis/composer-normalize": "^2.1.1",
+                "ergebnis/license": "~0.1.0",
+                "ergebnis/php-cs-fixer-config": "~1.1.2",
+                "phpspec/prophecy": "^1.7",
+                "phpunit/phpunit": "^6.0 || ^7.0"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "src/extension.neon"
+                    ]
+                },
+                "violinist": {
+                    "allow_updates_beyond_constraint": 0,
+                    "one_pull_request_per_package": 1,
+                    "update_with_dependencies": 1
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JanGregor\\Prophecy\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Gregor Emge-Triebel",
+                    "email": "jan@jangregor.me"
+                }
+            ],
+            "description": "Provides a phpstan/phpstan extension for phpspec/prophecy",
+            "time": "2020-02-17T16:55:34+00:00"
         },
         {
             "name": "myclabs/deep-copy",
