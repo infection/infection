@@ -39,7 +39,7 @@ use function array_filter;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
-use Infection\Environment\CiDetectorResolver;
+use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
@@ -163,7 +163,7 @@ final class LoggerFactory
             ? null
             : new BadgeLogger(
                 $output,
-                new CiDetectorResolver(new CiDetector()),
+                new BuildContextResolver(new CiDetector()),
                 new StrykerApiKeyResolver(),
                 new StrykerDashboardClient(
                     new StrykerCurlClient(),

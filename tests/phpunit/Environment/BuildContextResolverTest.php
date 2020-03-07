@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Environment;
 
 use Generator;
-use Infection\Environment\CiDetectorResolver;
+use Infection\Environment\BuildContextResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\CiDetector;
@@ -44,7 +44,7 @@ use OndraM\CiDetector\Exception\CiNotDetectedException;
 use OndraM\CiDetector\TrinaryLogic;
 use PHPUnit\Framework\TestCase;
 
-final class CiDetectorResolverTest extends TestCase
+final class BuildContextResolverTest extends TestCase
 {
     public function test_resolve_throws_when_ci_could_not_be_detected(): void
     {
@@ -54,7 +54,7 @@ final class CiDetectorResolverTest extends TestCase
             ->detect()
             ->willThrow(new CiNotDetectedException());
 
-        $buildContextResolver = new CiDetectorResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
 
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The current process is not executed in a CI build');
@@ -76,7 +76,7 @@ final class CiDetectorResolverTest extends TestCase
             ->detect()
             ->willReturn($ci->reveal());
 
-        $buildContextResolver = new CiDetectorResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
 
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The current process is a pull request build');
@@ -98,7 +98,7 @@ final class CiDetectorResolverTest extends TestCase
             ->detect()
             ->willReturn($ci->reveal());
 
-        $buildContextResolver = new CiDetectorResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
 
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The current process is maybe a pull request build');
@@ -133,7 +133,7 @@ final class CiDetectorResolverTest extends TestCase
             ->detect()
             ->willReturn($ci->reveal());
 
-        $buildContextResolver = new CiDetectorResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
 
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The repository name could not be determined for the current process');
@@ -168,7 +168,7 @@ final class CiDetectorResolverTest extends TestCase
             ->detect()
             ->willReturn($ci->reveal());
 
-        $buildContextResolver = new CiDetectorResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
 
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The branch name could not be determined for the current process');
@@ -208,7 +208,7 @@ final class CiDetectorResolverTest extends TestCase
             ->detect()
             ->willReturn($ci->reveal());
 
-        $buildContextResolver = new CiDetectorResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
 
         $buildContext = $buildContextResolver->resolve();
 

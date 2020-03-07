@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Infection\Environment\CiDetectorResolver;
+use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Logger\BadgeLogger;
@@ -81,7 +81,7 @@ final class BadgeLoggerTest extends TestCase
 
         $this->badgeLogger = new BadgeLogger(
             $this->outputMock,
-            new CiDetectorResolver(new CiDetector()),
+            new BuildContextResolver(new CiDetector()),
             new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,

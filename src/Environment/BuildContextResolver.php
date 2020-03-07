@@ -38,7 +38,7 @@ namespace Infection\Environment;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 
-final class CiDetectorResolver
+final class BuildContextResolver
 {
     private $ciDetector;
 
