@@ -188,6 +188,7 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	composer require infection/codeception-adapter infection/phpspec-adapter
 	$(BOX) validate
 	$(BOX) compile
+	compoer remove infection/codeception-adapter infection/phpspec-adapter
 	touch -c $@
 
 vendor: composer.lock
