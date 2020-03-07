@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Environment\BuildContextResolver;
+use Infection\Environment\CiDetectorResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
 use Infection\Environment\StrykerApiKeyResolver;
@@ -58,7 +58,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
     public function __construct(
         OutputInterface $output,
-        BuildContextResolver $buildContextResolver,
+        CiDetectorResolver $buildContextResolver,
         StrykerApiKeyResolver $strykerApiKeyResolver,
         StrykerDashboardClient $strykerDashboardClient,
         MetricsCalculator $metricsCalculator,
