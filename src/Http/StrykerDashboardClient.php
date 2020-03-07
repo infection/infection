@@ -44,31 +44,26 @@ use function Safe\sprintf;
  */
 class StrykerDashboardClient
 {
-    private const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';
-
     private $client;
     private $logger;
 
-    public function __construct(JsonClient $client, LoggerInterface $logger)
+    public function __construct(StrykerCurlClient $client, LoggerInterface $logger)
     {
         $this->client = $client;
         $this->logger = $logger;
     }
 
     public function sendReport(
-        string $apiKey,
         string $repositorySlug,
         string $branch,
+        string $apiKey,
         float $mutationScore
     ): void {
         $response = $this->client->request(
-            self::STRYKER_DASHBOARD_API_URL,
-            json_encode([
-                'apiKey' => $apiKey,
-                'repositorySlug' => $repositorySlug,
-                'branch' => $branch,
-                'mutationScore' => $mutationScore,
-            ])
+            $repositorySlug,
+            $branch,
+            $apiKey,
+            json_encode(['mutationScore' => $mutationScore])
         );
 
         $statusCode = $response->getStatusCode();
