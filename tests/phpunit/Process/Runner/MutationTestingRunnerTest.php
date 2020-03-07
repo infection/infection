@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Symfony\Component\Filesystem\Filesystem;
 use function array_map;
 use ArrayIterator;
 use function count;
@@ -55,6 +54,7 @@ use Iterator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 
 final class MutationTestingRunnerTest extends TestCase
 {

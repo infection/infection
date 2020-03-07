@@ -145,6 +145,7 @@ DIFF;
                         ),
                     ]
                 ),
+                'notCovered#0',
                 $mutantDiff = <<<'DIFF'
 --- Original
 +++ New
@@ -224,6 +225,7 @@ DIFF
                         ),
                     ]
                 ),
+                'notCovered#0',
                 $mutantDiff = <<<'DIFF'
 --- Original
 +++ New

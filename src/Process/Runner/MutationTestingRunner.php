@@ -40,16 +40,14 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
-use Infection\Mutant\MutantDumper;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Symfony\Component\Filesystem\Filesystem;
 use function Pipeline\take;
-use function Safe\file_put_contents;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal

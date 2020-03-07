@@ -47,8 +47,6 @@ use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\MockObject\MockObject;
-use function Safe\file_get_contents;
-use function Safe\file_put_contents;
 use function Safe\sprintf;
 
 final class MutantFactoryTest extends FileSystemTestCase
