@@ -91,6 +91,57 @@ DIFF;
         );
     }
 
+    public function test_it_can_be_instantiated_from_a_non_covered_mutant(): void
+    {
+        $mutant = new Mutant(
+            '/path/to/mutant',
+            new Mutation(
+                $originalFilePath = 'path/to/Foo.php',
+                [],
+                $mutatorName = MutatorName::getName(For_::class),
+                [
+                    'startLine' => $originalStartingLine = 10,
+                    'endLine' => 15,
+                    'startTokenPos' => 0,
+                    'endTokenPos' => 8,
+                    'startFilePos' => 2,
+                    'endFilePos' => 4,
+                ],
+                'Unknown',
+                MutatedNode::wrap(new Nop()),
+                0,
+                [
+                    CoverageLineData::with(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01
+                    ),
+                ]
+            ),
+            'notCovered#0',
+            $mutantDiff = <<<'DIFF'
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'notCovered#0';
+
+DIFF
+        );
+
+        $this->assertResultStateIs(
+            MutantExecutionResult::createFromNonCoveredMutant($mutant),
+            '',
+            '',
+            MutantProcess::CODE_NOT_COVERED,
+            $mutantDiff,
+            $mutatorName,
+            $originalFilePath,
+            $originalStartingLine
+        );
+    }
+
     public function test_it_can_be_instantiated_from_a_mutant_process(): void
     {
         $processMock = $this->createMock(Process::class);
