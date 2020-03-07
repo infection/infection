@@ -56,6 +56,9 @@ use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration
+ */
 final class MutationTestingRunnerTest extends TestCase
 {
     /**
@@ -277,7 +280,7 @@ final class MutationTestingRunnerTest extends TestCase
         );
     }
 
-    public function test_it_passes_through_iterables_when_concurent_execution_requested(): void
+    public function test_it_passes_through_iterables_when_concurrent_execution_requested(): void
     {
         $mutations = $this->createMock(Iterator::class);
         $mutations
@@ -308,6 +311,7 @@ final class MutationTestingRunnerTest extends TestCase
             $this->mutantFactoryMock,
             $this->parallelProcessRunnerMock,
             $this->eventDispatcher,
+            $this->fileSystemMock,
             true
         );
 

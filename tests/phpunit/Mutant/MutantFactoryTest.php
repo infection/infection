@@ -42,14 +42,14 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 
-final class MutantFactoryTest extends FileSystemTestCase
+final class MutantFactoryTest extends TestCase
 {
     use MutantAssertions;
 
@@ -84,7 +84,7 @@ final class MutantFactoryTest extends FileSystemTestCase
         $this->differMock = $this->createMock(Differ::class);
 
         $this->mutantFactory = new MutantFactory(
-            $this->tmp,
+            '/path/to/tmp',
             $this->differMock,
             $this->printerMock,
             $this->codeFactoryMock
@@ -108,8 +108,7 @@ final class MutantFactoryTest extends FileSystemTestCase
         );
 
         $expectedMutantFilePath = sprintf(
-            '%s/mutant.%s.infection.php',
-            $this->tmp,
+            '/path/to/tmp/mutant.%s.infection.php',
             $mutation->getHash()
         );
 
