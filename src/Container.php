@@ -115,6 +115,7 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
+use Infection\FileSystem\SourceFileFilter;
 
 /**
  * @internal
@@ -171,7 +172,12 @@ final class Container
             },
             CoveredFileNameFilter::class => static function (self $container): CoveredFileNameFilter {
                 return new CoveredFileNameFilter(
-                    $container->getConfiguration()->getSourceFileFilter()
+                    $container->getSourceFileFilter()
+                );
+            },
+            SourceFileFilter::class => static function (self $container): SourceFileFilter {
+                return new SourceFileFilter(
+                    $container->getConfiguration()->getFilter()
                 );
             },
             TestFileDataAdder::class => static function (self $container): TestFileDataAdder {
@@ -576,6 +582,11 @@ final class Container
     public function getCoveredFileNameFilter(): CoveredFileNameFilter
     {
         return $this->get(CoveredFileNameFilter::class);
+    }
+
+    public function getSourceFileFilter(): SourceFileFilter
+    {
+        return $this->get(SourceFileFilter::class);
     }
 
     public function getTestFileDataAdder(): TestFileDataAdder
