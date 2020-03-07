@@ -239,7 +239,7 @@ class IndexXmlCoverageParser
             ));
         }
 
-        return $path;
+        return $realPath;
     }
 
     /**
