@@ -45,8 +45,9 @@ use Webmozart\Assert\Assert;
  * Workhorse AKA envelope for all things coverage-related in regard of mutators.
  *
  * @internal
+ * @final
  */
-final class CoveredFileData implements LineCodeCoverage
+class CoveredFileData implements LineCodeCoverage
 {
     /**
      * @var SplFileInfo
