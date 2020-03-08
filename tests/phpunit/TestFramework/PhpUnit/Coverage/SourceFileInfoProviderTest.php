@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
+use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
 use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
 use Infection\TestFramework\SafeDOMXPath;
 use PHPUnit\Framework\TestCase;
+use function Safe\sprintf;
+use Webmozart\PathUtil\Path;
 
 /**
  * @group integration
@@ -80,5 +83,34 @@ final class SourceFileInfoProviderTest extends TestCase
         $xPathAgain = $provider->provideXPath();
 
         $this->assertSame($xPath, $xPathAgain);
+    }
+
+    public function test_it_errors_when_the_source_file_could_not_be_found(): void
+    {
+        $incorrectCoverageSrcDir = Path::canonicalize(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
+
+        $provider = new SourceFileInfoProvider(
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
+            'zeroLevel.php.xml',
+            $incorrectCoverageSrcDir
+        );
+
+        try {
+            $provider->provideFileInfo();
+
+            $this->fail();
+        } catch (InvalidCoverage $exception) {
+            $this->assertSame(
+                sprintf(
+                    'Could not find the source file "%s/zeroLevel.php" referred by '
+                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
+                    $incorrectCoverageSrcDir,
+                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR)
+                ),
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
     }
 }

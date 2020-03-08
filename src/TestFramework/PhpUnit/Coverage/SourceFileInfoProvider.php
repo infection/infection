@@ -45,6 +45,7 @@ use function str_replace;
 use Symfony\Component\Finder\SplFileInfo;
 use function trim;
 use Webmozart\Assert\Assert;
+use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -75,7 +76,7 @@ class SourceFileInfoProvider
      */
     public function provideFileInfo(): SplFileInfo
     {
-        return self::retrieveSourceFileInfo($this->provideXPath(), $this->relativeCoverageFilePath, $this->projectSource);
+        return $this->retrieveSourceFileInfo($this->provideXPath());
     }
 
     public function provideXPath(): SafeDOMXPath
@@ -89,11 +90,8 @@ class SourceFileInfoProvider
         return $this->xPath;
     }
 
-    private static function retrieveSourceFileInfo(
-        SafeDOMXPath $xPath,
-        string $relativeCoverageFilePath,
-        string $projectSource
-    ): SplFileInfo {
+    private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo
+    {
         $fileNode = $xPath->query('/phpunit/file')[0];
 
         Assert::notNull($fileNode);
@@ -107,14 +105,14 @@ class SourceFileInfoProvider
             $relativeFilePath = str_replace(
                 sprintf('%s.xml', $fileName),
                 '',
-                $relativeCoverageFilePath
+                $this->relativeCoverageFilePath
             );
         }
 
         $path = implode(
             '/',
             array_filter([
-                $projectSource,
+                $this->projectSource,
                 trim($relativeFilePath, '/'),
                 $fileName,
             ])
@@ -123,11 +121,15 @@ class SourceFileInfoProvider
         $realPath = native_realpath($path);
 
         if ($realPath === false) {
+            $coverageFilePath = Path::canonicalize(
+                $this->coverageDir . DIRECTORY_SEPARATOR . $this->relativeCoverageFilePath
+            );
+
             throw new InvalidCoverage(sprintf(
                 'Could not find the source file "%s" referred by "%s". Make sure the '
                 . 'coverage used is up to date',
                 $path,
-                $relativeFilePath
+                $coverageFilePath
             ));
         }
 

@@ -50,7 +50,7 @@ final class CoverageHelper
     /**
      * @param array<string, CoverageFileData> $coverage
      *
-     * @return array<string, mixed>
+     * @return array<string|int, mixed>
      */
     public static function convertToArray(iterable $coverage): array
     {

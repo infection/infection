@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 use Generator;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
 use Infection\Tests\Fixtures\TestFramework\LegacyXmlCoverageParserAdapter;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
@@ -232,6 +233,36 @@ XML
 </phpunit>
 XML
         ];
+    }
+
+    public function test_it_errors_when_the_source_file_could_not_be_found(): void
+    {
+        $incorrectCoverageSrcDir = Path::canonicalize(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
+
+        // Replaces dummy source path with the real path
+        $xml = preg_replace(
+            '/(source=\").*?(\")/',
+            sprintf('$1%s$2', $incorrectCoverageSrcDir),
+            file_get_contents(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/coverage-xml/index.xml')
+        );
+
+        try {
+            $this->parser->parse($xml);
+
+            $this->fail();
+        } catch (InvalidCoverage $exception) {
+            $this->assertSame(
+                sprintf(
+                    'Could not find the source file "%s/zeroLevel.php" referred by '
+                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
+                    $incorrectCoverageSrcDir,
+                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR)
+                ),
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
     }
 
     /**

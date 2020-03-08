@@ -63,10 +63,12 @@ final class XmlCoverageParserTest extends TestCase
 
     /**
      * @dataProvider sourceFileInfoProviderProvider
+     *
+     * @param array<string, mixed> $expectedCoverage
      */
     public function test_it_reads_every_type_of_data(
         SourceFileInfoProvider $provider,
-        iterable $expectedCoverage,
+        array $expectedCoverage,
         string $sourceFilePath
     ): void {
         $parser = new XmlCoverageParser($provider);
@@ -77,8 +79,8 @@ final class XmlCoverageParserTest extends TestCase
         $coverageData = $fileData->retrieveCoverageFileData();
 
         $this->assertSame(
-            [$expectedCoverage],
-            CoverageHelper::convertToArray([$coverageData])
+            $expectedCoverage,
+            CoverageHelper::convertToArray([$coverageData])[0]
         );
     }
 }
