@@ -72,6 +72,11 @@ final class XmlCoverageParser
      */
     private static function lazilyRetrieveCoverageFileData(SafeDOMXPath $xPath): iterable
     {
+        yield self::retrieveCoverageFileData($xPath);
+    }
+
+    private static function retrieveCoverageFileData(SafeDOMXPath $xPath): CoverageFileData
+    {
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
 
         $percentage = $linesNode->getAttribute('percent');
@@ -92,17 +97,13 @@ final class XmlCoverageParser
         }
 
         if ($percentage === .0) {
-            yield new CoverageFileData();
-
-            return;
+            return new CoverageFileData();
         }
 
         $coveredLineNodes = $xPath->query('/phpunit/file/coverage/line');
 
         if ($coveredLineNodes->length === 0) {
-            yield new CoverageFileData();
-
-            return;
+            return new CoverageFileData();
         }
 
         $coveredMethodNodes = $xPath->query('/phpunit/file/class/method');
@@ -111,7 +112,7 @@ final class XmlCoverageParser
             $coveredMethodNodes = $xPath->query('/phpunit/file/trait/method');
         }
 
-        yield new CoverageFileData(
+        return new CoverageFileData(
             self::collectCoveredLinesData($coveredLineNodes),
             self::collectMethodsCoverageData($coveredMethodNodes)
         );
