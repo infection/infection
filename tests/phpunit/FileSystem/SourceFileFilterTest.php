@@ -35,8 +35,106 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use Generator;
+use Infection\FileSystem\SourceFileFilter;
+use IteratorIterator;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
+use Symfony\Component\Finder\SplFileInfo;
+use Traversable;
 
+/**
+ * @covers \Infection\FileSystem\SourceFileFilter
+ */
 final class SourceFileFilterTest extends TestCase
 {
+    public function test_it_parses_empty_filters(): void
+    {
+        $fileFilter = new SourceFileFilter('');
+        $this->assertSame([], $fileFilter->getFilters());
+    }
+
+    public function test_it_parses_filters(): void
+    {
+        $fileFilter = new SourceFileFilter('src/Foo.php,src/Bar.php');
+        $this->assertSame([
+            'src/Foo.php',
+            'src/Bar.php',
+        ], $fileFilter->getFilters());
+    }
+
+    /**
+     * @dataProvider fileListProvider
+     */
+    public function test_it_filters_traversable(string $filter, array $input, array $expected): void
+    {
+        $input = self::arrayToSplFileInfoTraversable($input);
+
+        $this->assertFilter($filter, $input, $expected);
+    }
+
+    /**
+     * @dataProvider fileListProvider
+     */
+    public function test_it_filters_iterator(string $filter, array $input, array $expected): void
+    {
+        $input = self::arrayToSplFileInfoTraversable($input);
+
+        $input = new IteratorIterator($input);
+
+        $this->assertFilter($filter, $input, $expected);
+    }
+
+    public static function fileListProvider(): Generator
+    {
+        yield ['src/Example', ['src/Example/Test.php'], ['src/Example/Test.php']];
+
+        yield ['src/Foo', ['src/Example/Test.php'], []];
+
+        yield ['', [
+            'src/Foo/Test.php',
+            'src/Bar/Baz.php',
+            'src/Example/Test.php',
+        ], [
+            'src/Foo/Test.php',
+            'src/Bar/Baz.php',
+            'src/Example/Test.php',
+        ]];
+
+        yield ['src/Foo,src/Bar', [
+            'src/Foo/Test.php',
+            'src/Bar/Baz.php',
+            'src/Example/Test.php',
+        ], [
+            'src/Foo/Test.php',
+            'src/Bar/Baz.php',
+        ]];
+    }
+
+    private function assertFilter(string $filter, iterable $input, array $expected): void
+    {
+        $fileFilter = new SourceFileFilter($filter);
+        $actual = $fileFilter->filter($input);
+
+        $actual = take($actual)
+            ->map(static function (SplFileInfo $fileInfo) {
+                return $fileInfo->getRealPath();
+            })
+            ->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    private function arrayToSplFileInfoTraversable(array $input): Traversable
+    {
+        return take($input)
+            ->map(function (string $filename) {
+                $splFileInfoMock = $this->createMock(SplFileInfo::class);
+                $splFileInfoMock
+                    ->method('getRealPath')
+                    ->willReturn($filename);
+
+                return $splFileInfoMock;
+            });
+    }
 }

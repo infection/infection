@@ -52,9 +52,6 @@ class SourceFileFilter
      */
     private $filters;
 
-    /**
-     * @return iterable<SplFileInfo>
-     */
     public function __construct(string $filter)
     {
         $this->filters = array_filter(array_map(
