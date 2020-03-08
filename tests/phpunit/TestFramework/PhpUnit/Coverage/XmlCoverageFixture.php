@@ -39,17 +39,26 @@ use function Safe\realpath;
 
 final class XmlCoverageFixture
 {
-    public $xmlPath;
+    public $coverageDir;
+    public $relativeCoverageFilePath;
+    public $projectSource;
     public $sourceFilePath;
     public $serializedCoverage;
 
     /**
      * @param array<string, mixed> $serializedCoverage
      */
-    public function __construct(string $xmlPath, string $sourceFilePath, array $serializedCoverage)
-    {
-        $this->xmlPath = realpath($xmlPath);
-        $this->sourceFilePath = realpath($sourceFilePath);
+    public function __construct(
+        string $coverageDir,
+        string $relativeCoverageFilePath,
+        string $projectSource,
+        string $sourceFilePath,
+        array $serializedCoverage
+    ) {
+        $this->coverageDir = $coverageDir;
+        $this->relativeCoverageFilePath = $relativeCoverageFilePath;
+        $this->projectSource = $projectSource;
+        $this->sourceFilePath = realpath($projectSource . DIRECTORY_SEPARATOR . $sourceFilePath);
         $this->serializedCoverage = $serializedCoverage;
     }
 }

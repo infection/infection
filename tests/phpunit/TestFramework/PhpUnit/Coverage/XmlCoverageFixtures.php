@@ -43,24 +43,16 @@ final class XmlCoverageFixtures
     public const FIXTURES_OLD_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/old-coverage/coverage-xml';
     public const FIXTURES_OLD_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/old-coverage/src';
 
-    /*
-        phpunit/coverage/coverage-xml/FirstLevel/SecondLevel/secondLevel.php.xml
-        phpunit/coverage/coverage-xml/FirstLevel/SecondLevel/secondLevelTrait.php.xml
-        phpunit/coverage/coverage-xml/FirstLevel/firstLevel.php.xml
-        phpunit/coverage/coverage-xml/FirstLevel/firstLevelNotCovered.php.xml
-        phpunit/coverage/coverage-xml/index.xml
-        phpunit/coverage/coverage-xml/noPercentage.php.xml
-
-     */
-
     /**
      * @return iterable<XmlCoverageFixture>
      */
     public static function provideFixtures(): iterable
     {
         yield new XmlCoverageFixture(
-            self::FIXTURES_COVERAGE_DIR . '/FirstLevel/firstLevel.php.xml',
-            self::FIXTURES_SRC_DIR . '/FirstLevel/firstLevel.php',
+            self::FIXTURES_COVERAGE_DIR,
+            '/FirstLevel/firstLevel.php.xml',
+            self::FIXTURES_SRC_DIR,
+            '/FirstLevel/firstLevel.php',
             [
                 'byLine' => [
                     26 => [
@@ -116,8 +108,10 @@ final class XmlCoverageFixtures
         );
 
         yield new XmlCoverageFixture(
-            self::FIXTURES_COVERAGE_DIR . '/FirstLevel/SecondLevel/secondLevel.php.xml',
-            self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevel.php',
+            self::FIXTURES_COVERAGE_DIR,
+            '/FirstLevel/SecondLevel/secondLevel.php.xml',
+            self::FIXTURES_SRC_DIR,
+            '/FirstLevel/SecondLevel/secondLevel.php',
             [
                 'byLine' => [
                     11 => [
@@ -147,8 +141,10 @@ final class XmlCoverageFixtures
         );
 
         yield new XmlCoverageFixture(
-            self::FIXTURES_COVERAGE_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php.xml',
-            self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php',
+            self::FIXTURES_COVERAGE_DIR,
+            '/FirstLevel/SecondLevel/secondLevelTrait.php.xml',
+            self::FIXTURES_SRC_DIR,
+            '/FirstLevel/SecondLevel/secondLevelTrait.php',
             [
                 'byLine' => [
                     11 => [
@@ -178,8 +174,10 @@ final class XmlCoverageFixtures
         );
 
         yield new XmlCoverageFixture(
-            self::FIXTURES_COVERAGE_DIR . '/zeroLevel.php.xml',
-            self::FIXTURES_SRC_DIR . '/zeroLevel.php',
+            self::FIXTURES_COVERAGE_DIR,
+            '/zeroLevel.php.xml',
+            self::FIXTURES_SRC_DIR,
+            '/zeroLevel.php',
             [
                 'byLine' => [],
                 'byMethod' => [],
@@ -187,8 +185,10 @@ final class XmlCoverageFixtures
         );
 
         yield new XmlCoverageFixture(
-            self::FIXTURES_COVERAGE_DIR . '/noPercentage.php.xml',
-            self::FIXTURES_SRC_DIR . '/noPercentage.php',
+            self::FIXTURES_COVERAGE_DIR,
+            '/noPercentage.php.xml',
+            self::FIXTURES_SRC_DIR,
+            '/noPercentage.php',
             [
                 'byLine' => [],
                 'byMethod' => [],
@@ -202,8 +202,10 @@ final class XmlCoverageFixtures
     public static function provideLegacyFormatFixtures(): iterable
     {
         yield new XmlCoverageFixture(
-            self::FIXTURES_OLD_COVERAGE_DIR . '/Middleware/ReleaseRecordedEventsMiddleware.php.xml',
-            self::FIXTURES_OLD_SRC_DIR . '/Middleware/ReleaseRecordedEventsMiddleware.php',
+            self::FIXTURES_OLD_COVERAGE_DIR,
+            '/Middleware/ReleaseRecordedEventsMiddleware.php.xml',
+            self::FIXTURES_OLD_SRC_DIR,
+            '/Middleware/ReleaseRecordedEventsMiddleware.php',
             [
                 'byLine' => [
                     29 => [
