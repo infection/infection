@@ -44,11 +44,15 @@ use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoveredFileData;
+use Infection\TestFramework\Coverage\CoveredFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverage;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -56,10 +60,11 @@ final class MutationGeneratorTest extends TestCase
 {
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
-        $sourceFiles = [
-            $fileInfoA = new SplFileInfo('fileA', 'relativePathToFileA', 'relativePathnameToFileA'),
-            $fileInfoB = new SplFileInfo('fileB', 'relativePathToFileB', 'relativePathnameToFileB'),
-        ];
+        $fileInfo = $this->createMock(SplFileInfo::class);
+
+        // Prophecy compares arguments on equality, therefore these have to be somewhat unique
+        $fileInfoA = new CoveredFileData($fileInfo, [1]);
+        $fileInfoB = new CoveredFileData($fileInfo, [2]);
 
         $codeCoverageMock = $this->createMock(FileCodeCoverage::class);
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
@@ -75,13 +80,16 @@ final class MutationGeneratorTest extends TestCase
         $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
         $fileMutationGeneratorProphecy
             ->generate($fileInfoA, $onlyCovered, $codeCoverageMock, $mutators, $nodeIgnorers)
+            ->shouldBeCalledTimes(1)
             ->willReturn([
                 $mutation0,
                 $mutation1,
             ])
         ;
+
         $fileMutationGeneratorProphecy
             ->generate($fileInfoB, $onlyCovered, $codeCoverageMock, $mutators, $nodeIgnorers)
+            ->shouldBeCalledTimes(1)
             ->willReturn([
                 $mutation1,
                 $mutation2,
@@ -92,6 +100,10 @@ final class MutationGeneratorTest extends TestCase
         $providerMock
             ->expects($this->exactly(2))
             ->method('provideFor')
+            ->withConsecutive(
+                [$fileInfoA],
+                [$fileInfoB]
+             )
             ->willReturn($codeCoverageMock)
         ;
 
@@ -102,8 +114,18 @@ final class MutationGeneratorTest extends TestCase
             $mutation2,
         ];
 
+        $fileDataProviderMock = $this->createMock(CoveredFileDataProvider::class);
+        $fileDataProviderMock
+            ->expects($this->exactly(1))
+            ->method('provideFiles')
+            ->willReturn([
+                $fileInfoA,
+                $fileInfoB,
+            ])
+        ;
+
         $mutationGenerator = new MutationGenerator(
-            $sourceFiles,
+            $fileDataProviderMock,
             $providerMock,
             $mutators,
             $eventDispatcherMock,
@@ -152,7 +174,7 @@ final class MutationGeneratorTest extends TestCase
         $providerMock = $this->createMock(FileCodeCoverageProvider::class);
 
         $mutationGenerator = new MutationGenerator(
-            $sourceFiles,
+            $this->createCoveredFileDataProviderMock($sourceFiles),
             $providerMock,
             [],
             $eventDispatcherMock,
@@ -197,7 +219,7 @@ final class MutationGeneratorTest extends TestCase
         $providerMock = $this->createMock(FileCodeCoverageProvider::class);
 
         $mutationGenerator = new MutationGenerator(
-            $sourceFiles,
+            $this->createCoveredFileDataProviderMock($sourceFiles),
             $providerMock,
             [],
             $eventDispatcherMock,
@@ -207,5 +229,18 @@ final class MutationGeneratorTest extends TestCase
 
         foreach ($mutationGenerator->generate(false, []) as $_) {
         }
+    }
+
+    private function createCoveredFileDataProviderMock(iterable $files): CoveredFileDataProvider
+    {
+        $providerMock = $this->createMock(CoveredFileDataProvider::class);
+        $providerMock
+            ->method('provideFiles')
+            ->willReturn(take($files)->map(static function (SplFileInfo $fileInfo) {
+                return new CoveredFileData($fileInfo, [new CoverageFileData()]);
+            }))
+        ;
+
+        return $providerMock;
     }
 }

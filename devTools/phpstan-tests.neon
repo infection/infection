@@ -7,7 +7,7 @@ parameters:
     inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
         - '#Return type \(void\) of method .*(Visitor|Traverser).* should be compatible with return type .* of method PhpParser\\Node.*#'
-        - '#^Cannot call method willReturn\(\) on iterable<Infection\\Mutation\\Mutation>\.$#'
+        - '#^Cannot call method (willReturn|shouldBeCalledTimes)\(\) on iterable<Infection\\Mutation\\Mutation>\.$#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
         -
             path: '../tests/phpunit/PhpParser/Visitor/MutationsCollectorVisitorTest.php'
