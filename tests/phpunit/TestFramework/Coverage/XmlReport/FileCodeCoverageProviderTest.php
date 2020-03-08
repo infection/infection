@@ -37,32 +37,20 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
-use Infection\TestFramework\Coverage\CoveredFileData;
 
 final class FileCodeCoverageProviderTest extends TestCase
 {
-    public function test_it_determines_file_is_not_covered_for_unknown_path(): void
-    {
-        $filePath = '/path/to/unknown-file';
-
-        $provider = $this->createCodeCoverageDataProvider();
-        $codeCoverageData = $provider->provideFor($this->createSplFileInfo($filePath));
-
-        $this->assertFalse($codeCoverageData->hasTests());
-    }
-
     public function test_it_determines_file_is_covered(): void
     {
         $filePath = '/path/to/acme/Foo.php';
 
         $provider = $this->createCodeCoverageDataProvider();
-        $codeCoverageData = $provider->provideFor($this->createSplFileInfo($filePath));
+        $codeCoverageData = $provider->provideFor($this->createCoveredFileData($filePath));
 
         $this->assertTrue($codeCoverageData->hasTests());
     }
@@ -118,19 +106,25 @@ final class FileCodeCoverageProviderTest extends TestCase
         );
     }
 
+    private function createCoveredFileData(string $filePath): CoveredFileData
+    {
+        return new CoveredFileData(
+            $this->createSplFileInfo($filePath),
+            [$this->getParsedCodeCoverageData()]
+        );
+    }
+
     private function createSplFileInfo(string $filePath): SplFileInfo
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
         $splFileInfoMock
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('getRealPath')
-            ->willReturn(false)
         ;
 
         $splFileInfoMock
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('getPathname')
-            ->willReturn($filePath)
         ;
 
         return $splFileInfoMock;
