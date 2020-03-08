@@ -105,7 +105,9 @@ class CoveredFileData implements LineCodeCoverage
         }
 
         foreach ($this->lazyCoverageFileData as $coverageFileData) {
-            $this->coverageFileData = $coverageFileData; // is a Generator with one yield, thus it'll only trigger here (or an array with one element)
+            // is a Generator with one yield, thus it'll only trigger here
+            // (or this can be an array with one element)
+            $this->coverageFileData = $coverageFileData;
 
             break;
         }
