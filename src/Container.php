@@ -74,7 +74,6 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
-use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -88,6 +87,7 @@ use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
@@ -297,13 +297,19 @@ final class Container
             MutatorParser::class => static function (): MutatorParser {
                 return new MutatorParser();
             },
-            CoverageRequirementChecker::class => static function (self $container): CoverageRequirementChecker {
+            CoverageChecker::class => static function (self $container): CoverageChecker {
                 $config = $container->getConfiguration();
+                $testFrameworkAdapter = $container->getTestFrameworkAdapter();
 
-                return new CoverageRequirementChecker(
+                return new CoverageChecker(
                     $config->shouldSkipCoverage(),
                     $config->shouldSkipInitialTests(),
-                    $config->getInitialTestsPhpOptions() ?? ''
+                    $config->getInitialTestsPhpOptions() ?? '',
+                    $config->getCoveragePath(),
+                    $testFrameworkAdapter->hasJUnitReport()
+                        ? $container->getJUnitFilePath()
+                        : null,
+                    $testFrameworkAdapter->getName()
                 );
             },
             TestRunConstraintChecker::class => static function (self $container): TestRunConstraintChecker {
@@ -693,9 +699,9 @@ final class Container
         return $this->get(MutatorParser::class);
     }
 
-    public function getCoverageRequirementChecker(): CoverageRequirementChecker
+    public function getCoverageChecker(): CoverageChecker
     {
-        return $this->get(CoverageRequirementChecker::class);
+        return $this->get(CoverageChecker::class);
     }
 
     public function getTestRunConstraintChecker(): TestRunConstraintChecker

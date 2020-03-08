@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use function Safe\tempnam;
@@ -84,22 +82,6 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
         $this->assertSame($testFileInfo0->path, $testFileInfo1->path);
         $this->assertSame($testFileInfo0->time, $testFileInfo1->time);
-    }
-
-    public function test_it_throws_an_exception_if_class_is_not_found(): void
-    {
-        $this->expectException(TestFileNameNotFoundException::class);
-
-        $this->provider->getTestFileInfo('abc');
-    }
-
-    public function test_it_throws_an_exception_if_the_junit_file_does_not_exist(): void
-    {
-        $provider = new JUnitTestFileDataProvider('foo/bar/fake-file');
-
-        $this->expectException(CoverageDoesNotExistException::class);
-
-        $provider->getTestFileInfo('Foo\BarTest');
     }
 
     public function test_it_throws_an_exception_if_the_junit_file_is_invalid_xml(): void

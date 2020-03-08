@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use DOMDocument;
-use function file_exists;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;
 use function Safe\sprintf;
@@ -99,9 +97,6 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         );
     }
 
-    /**
-     * @throws CoverageDoesNotExistException
-     */
     private function getXPath(): SafeDOMXPath
     {
         if (!$this->xPath) {
@@ -111,14 +106,9 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         return $this->xPath;
     }
 
-    /**
-     * @throws CoverageDoesNotExistException
-     */
     private static function createXPath(string $jUnitPath): SafeDOMXPath
     {
-        if (!file_exists($jUnitPath)) {
-            throw CoverageDoesNotExistException::forJunit($jUnitPath);
-        }
+        Assert::fileExists($jUnitPath);
 
         $dom = new DOMDocument();
         $success = @$dom->load($jUnitPath);
