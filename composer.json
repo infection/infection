@@ -71,7 +71,6 @@
     "require-dev": {
         "ext-simplexml": "*",
         "helmich/phpunit-json-assert": "^3.0",
-        "jangregor/phpstan-prophecy": "^0.6.2",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan": "^0.12.8",
         "phpstan/phpstan-phpunit": "^0.12.6",
