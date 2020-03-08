@@ -48,13 +48,13 @@ final class BuildContextResolverTest extends TestCase
 {
     public function test_resolve_throws_when_ci_could_not_be_detected(): void
     {
-        $ciDetector = $this->prophesize(CiDetector::class);
+        $ciDetector = $this->createMock(CiDetector::class);
 
         $ciDetector
-            ->detect()
-            ->willThrow(new CiNotDetectedException());
+            ->method('detect')
+            ->willThrowException(new CiNotDetectedException());
 
-        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector);
 
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The current process is not executed in a CI build');
@@ -64,19 +64,19 @@ final class BuildContextResolverTest extends TestCase
 
     public function test_resolve_throws_when_ci_is_in_pull_request_context(): void
     {
-        $ci = $this->prophesize(CiInterface::class);
+        $ci = $this->createMock(CiInterface::class);
 
         $ci
-            ->isPullRequest()
+            ->method('isPullRequest')
             ->willReturn(TrinaryLogic::createFromBoolean(true));
 
-        $ciDetector = $this->prophesize(CiDetector::class);
+        $ciDetector = $this->createMock(CiDetector::class);
 
         $ciDetector
-            ->detect()
-            ->willReturn($ci->reveal());
+            ->method('detect')
+            ->willReturn($ci);
 
-        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector);
 
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The current process is a pull request build');
@@ -86,19 +86,19 @@ final class BuildContextResolverTest extends TestCase
 
     public function test_resolve_throws_when_ci_is_maybe_in_pull_request_context(): void
     {
-        $ci = $this->prophesize(CiInterface::class);
+        $ci = $this->createMock(CiInterface::class);
 
         $ci
-            ->isPullRequest()
+            ->method('isPullRequest')
             ->willReturn(TrinaryLogic::createMaybe());
 
-        $ciDetector = $this->prophesize(CiDetector::class);
+        $ciDetector = $this->createMock(CiDetector::class);
 
         $ciDetector
-            ->detect()
-            ->willReturn($ci->reveal());
+            ->method('detect')
+            ->willReturn($ci);
 
-        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector);
 
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The current process is maybe a pull request build');
@@ -113,27 +113,27 @@ final class BuildContextResolverTest extends TestCase
     {
         $gitBranch = 'fix/this';
 
-        $ci = $this->prophesize(CiInterface::class);
+        $ci = $this->createMock(CiInterface::class);
 
         $ci
-            ->isPullRequest()
+            ->method('isPullRequest')
             ->willReturn(TrinaryLogic::createFromBoolean(false));
 
         $ci
-            ->getRepositoryName()
+            ->method('getRepositoryName')
             ->willReturn($repositoryName);
 
         $ci
-            ->getGitBranch()
+            ->method('getGitBranch')
             ->willReturn($gitBranch);
 
-        $ciDetector = $this->prophesize(CiDetector::class);
+        $ciDetector = $this->createMock(CiDetector::class);
 
         $ciDetector
-            ->detect()
-            ->willReturn($ci->reveal());
+            ->method('detect')
+            ->willReturn($ci);
 
-        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector);
 
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The repository name could not be determined for the current process');
@@ -148,27 +148,27 @@ final class BuildContextResolverTest extends TestCase
     {
         $repositoryName = 'foo/bar';
 
-        $ci = $this->prophesize(CiInterface::class);
+        $ci = $this->createMock(CiInterface::class);
 
         $ci
-            ->isPullRequest()
+            ->method('isPullRequest')
             ->willReturn(TrinaryLogic::createFromBoolean(false));
 
         $ci
-            ->getRepositoryName()
+            ->method('getRepositoryName')
             ->willReturn($repositoryName);
 
         $ci
-            ->getGitBranch()
+            ->method('getGitBranch')
             ->willReturn($gitBranch);
 
-        $ciDetector = $this->prophesize(CiDetector::class);
+        $ciDetector = $this->createMock(CiDetector::class);
 
         $ciDetector
-            ->detect()
-            ->willReturn($ci->reveal());
+            ->method('detect')
+            ->willReturn($ci);
 
-        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector);
 
         $this->expectException(CouldNotResolveBuildContext::class);
         $this->expectExceptionMessage('The branch name could not be determined for the current process');
@@ -188,27 +188,27 @@ final class BuildContextResolverTest extends TestCase
         $repositoryName = 'foo/bar';
         $gitBranch = 'fix/this';
 
-        $ci = $this->prophesize(CiInterface::class);
+        $ci = $this->createMock(CiInterface::class);
 
         $ci
-            ->isPullRequest()
+            ->method('isPullRequest')
             ->willReturn(TrinaryLogic::createFromBoolean(false));
 
         $ci
-            ->getRepositoryName()
+            ->method('getRepositoryName')
             ->willReturn($repositoryName);
 
         $ci
-            ->getGitBranch()
+            ->method('getGitBranch')
             ->willReturn($gitBranch);
 
-        $ciDetector = $this->prophesize(CiDetector::class);
+        $ciDetector = $this->createMock(CiDetector::class);
 
         $ciDetector
-            ->detect()
-            ->willReturn($ci->reveal());
+            ->method('detect')
+            ->willReturn($ci);
 
-        $buildContextResolver = new BuildContextResolver($ciDetector->reveal());
+        $buildContextResolver = new BuildContextResolver($ciDetector);
 
         $buildContext = $buildContextResolver->resolve();
 
