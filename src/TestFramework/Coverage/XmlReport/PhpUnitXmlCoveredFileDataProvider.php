@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\CoveredFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
@@ -71,8 +70,6 @@ class PhpUnitXmlCoveredFileDataProvider implements CoveredFileDataProvider
     }
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return iterable<CoveredFileData>
      */
     public function provideFiles(): iterable

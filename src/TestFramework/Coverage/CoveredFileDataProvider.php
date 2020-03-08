@@ -41,8 +41,6 @@ namespace Infection\TestFramework\Coverage;
 interface CoveredFileDataProvider
 {
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return iterable<CoveredFileData>
      */
     public function provideFiles(): iterable;

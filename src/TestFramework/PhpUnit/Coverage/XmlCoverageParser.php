@@ -40,13 +40,12 @@ use DOMElement;
 use DOMNodeList;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\SafeDOMXPath;
-use function realpath as native_realpath;
 use function Safe\file_get_contents;
+use function Safe\realpath;
 use function Safe\sprintf;
 use function Safe\substr;
 use function str_replace;
@@ -79,7 +78,6 @@ final class XmlCoverageParser
      * contain all the desired data.
      *
      * @throws NoLineExecuted
-     * @throws CoverageDoesNotExistException
      */
     public function parse(): CoveredFileData
     {
@@ -140,9 +138,6 @@ final class XmlCoverageParser
         );
     }
 
-    /**
-     * @throws CoverageDoesNotExistException
-     */
     private static function retrieveSourceFileInfo(
         SafeDOMXPath $xPath,
         string $relativeCoverageFilePath,
@@ -170,11 +165,7 @@ final class XmlCoverageParser
             array_filter([$projectSource, trim($relativeFilePath, '/'), $fileName])
         );
 
-        $realPath = native_realpath($path);
-
-        if ($realPath === false) {
-            throw CoverageDoesNotExistException::forFileAtPath($fileName, $path);
-        }
+        $realPath = realpath($path);
 
         return new SplFileInfo($realPath, $relativeFilePath, $path);
     }

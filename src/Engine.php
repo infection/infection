@@ -48,8 +48,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryLimiter;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -176,44 +175,5 @@ final class Engine
         $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
 
         return true;
-    }
-
-    private function assertCodeCoverageExists(string $testFrameworkKey): void
-    {
-        $coverageDir = $this->config->getCoveragePath();
-
-        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoveredFileDataProvider::COVERAGE_INDEX_FILE_NAME;
-
-        if (!file_exists($coverageIndexFilePath)) {
-            throw CoverageDoesNotExistException::with(
-                $coverageIndexFilePath,
-                $testFrameworkKey,
-                dirname($coverageIndexFilePath, 2)
-            );
-        }
-    }
-
-    private function assertCodeCoverageProduced(Process $initialTestsProcess, string $testFrameworkKey): void
-    {
-        $coverageDir = $this->config->getCoveragePath();
-
-        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoveredFileDataProvider::COVERAGE_INDEX_FILE_NAME;
-
-        $processInfo = sprintf(
-            '%sCommand line: %s%sProcess Output: %s',
-            PHP_EOL,
-            $initialTestsProcess->getCommandLine(),
-            PHP_EOL,
-            $initialTestsProcess->getOutput()
-        );
-
-        if (!file_exists($coverageIndexFilePath)) {
-            throw CoverageDoesNotExistException::with(
-                $coverageIndexFilePath,
-                $testFrameworkKey,
-                dirname($coverageIndexFilePath, 2),
-                $processInfo
-            );
-        }
     }
 }

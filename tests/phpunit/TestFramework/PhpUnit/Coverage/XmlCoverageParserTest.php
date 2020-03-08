@@ -37,6 +37,9 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group integration
+ */
 final class XmlCoverageParserTest extends TestCase
 {
     // TODO

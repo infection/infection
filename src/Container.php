@@ -88,6 +88,7 @@ use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoveredFileDataFactory;
 use Infection\TestFramework\Coverage\CoveredFileNameFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;

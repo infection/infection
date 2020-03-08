@@ -21,10 +21,6 @@ parameters:
             message: '#Parameter \#1 \$argument of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object\, string given\.#'
             count: 1
         -
-            path: '../src/TestFramework/PhpUnit/Coverage/XmlCoverageParser.php'
-            message: '#Function realpath is unsafe to use\.#'
-            count: 1
-        -
             path: '../src/Container.php'
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
             count: 1
