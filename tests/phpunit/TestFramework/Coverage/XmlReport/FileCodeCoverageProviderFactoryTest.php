@@ -53,7 +53,7 @@ final class FileCodeCoverageProviderFactoryTest extends TestCase
         // We can only ensure that an instance is created in all scenarios
         (new FileCodeCoverageProviderFactory(
             '/path/to/coverage/dir',
-            $this->createMock(IndexXmlCoverageParser::class),
+            $this->createMock(IndexXmlCoverageParser::class)
         ))->create($frameworkKey);
 
         $this->addToAssertionCount(1);

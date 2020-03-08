@@ -64,7 +64,7 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
         $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
-            TestFrameworkTypes::PHPUNIT,
+            TestFrameworkTypes::PHPUNIT
         );
 
         $coverage = $coverageProvider->provideFiles();
@@ -105,7 +105,7 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
         $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
             realpath(self::COVERAGE_DIR),
             $coverageXmlParserMock,
-            TestFrameworkTypes::PHPUNIT,
+            TestFrameworkTypes::PHPUNIT
         );
 
         $coverage = $coverageProvider->provideFiles();
