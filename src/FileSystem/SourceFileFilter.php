@@ -58,10 +58,10 @@ class SourceFileFilter
      */
     public function __construct(string $filter)
     {
-        $this->filters = take(explode(',', $filter))
-            ->map('trim')
-            ->filter()
-            ->toArray();
+        $this->filters = array_filter(array_map(
+            'trim',
+            explode(',', $filter)
+        ));
     }
 
     /**
