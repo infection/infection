@@ -42,7 +42,8 @@ use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
- * Assembles a ready feed of CoveredFileData from different sources. Feeds data into MutationGenerator. Does not known about differences between adapters and what not.
+ * Assembles a ready feed of CoveredFileData from different sources. Feeds data into MutationGenerator.
+ * Does not known about differences between adapters and what not.
  *
  * @see MutationGenerator
  * @see PhpUnitXmlCoveredFileDataProvider
