@@ -80,7 +80,7 @@ final class CoveredFileDataTest extends TestCase
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
         $coverageFileData = new CoverageFileData();
 
-        $coveredFileData = new CoveredFileData($splFileInfoMock, [$coverageFileData]);
+        $coveredFileData = new CoveredFileData($splFileInfoMock, [$coverageFileData, null]);
 
         $actual = $coveredFileData->retrieveCoverageFileData();
         $this->assertSame($coverageFileData, $actual);

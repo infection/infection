@@ -51,6 +51,8 @@ use Webmozart\Assert\Assert;
  */
 final class CoveredFileDataFactory implements CoveredFileDataProvider
 {
+    private const SEEN = true;
+
     /** @var CoveredFileDataProvider|PhpUnitXmlCoveredFileDataProvider */
     private $primaryCoverageProvider;
 
@@ -110,7 +112,7 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
 
         /** @var CoveredFileData $data */
         foreach ($coverage as $data) {
-            $seenFiles[$data->getSplFileInfo()->getRealPath()] = true;
+            $seenFiles[$data->getSplFileInfo()->getRealPath()] = self::SEEN;
 
             yield $data;
         }

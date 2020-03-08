@@ -56,7 +56,7 @@ final class SourceFileFilterTest extends TestCase
 
     public function test_it_parses_filters(): void
     {
-        $fileFilter = new SourceFileFilter('src/Foo.php,src/Bar.php');
+        $fileFilter = new SourceFileFilter('src/Foo.php, src/Bar.php');
         $this->assertSame([
             'src/Foo.php',
             'src/Bar.php',

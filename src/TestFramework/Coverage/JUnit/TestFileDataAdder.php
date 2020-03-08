@@ -39,6 +39,7 @@ use function explode;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CoveredFileData;
+use function Safe\substr;
 
 /**
  * Adds test execution info to selected covered file data object.
@@ -97,7 +98,8 @@ class TestFileDataAdder
         CoverageLineData $test,
         TestFileDataProvider $testFileDataProvider
     ): void {
-        $class = explode(':', $test->testMethod, 2)[0];
+        $pos = strpos($test->testMethod, ':');
+        $class = substr($test->testMethod, 0, $pos === false ? null : $pos);
 
         $testFileData = $testFileDataProvider->getTestFileInfo($class);
 
