@@ -59,10 +59,14 @@ class CoveredFileData implements LineCodeCoverage
      */
     private $coverageFileData;
 
-    /** @var iterable<CoverageFileData> */
+    /**
+     * @var iterable<CoverageFileData>
+     */
     private $lazyCoverageFileData;
 
-    /** @var ?FileCodeCoverage */
+    /**
+     * @var ?FileCodeCoverage
+     */
     private $lineCodeCoverage;
 
     /**

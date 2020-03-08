@@ -53,14 +53,18 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
 {
     private const SEEN = true;
 
-    /** @var CoveredFileDataProvider|PhpUnitXmlCoveredFileDataProvider */
+    /**
+     * @var CoveredFileDataProvider|PhpUnitXmlCoveredFileDataProvider
+     */
     private $primaryCoverageProvider;
 
     private $testFileDataAdder;
 
     private $filter;
 
-    /** @var iterable<SplFileInfo> */
+    /**
+     * @var iterable<SplFileInfo>
+     */
     private $sourceFiles;
 
     private $onlyCovered;
@@ -110,7 +114,6 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
     {
         $seenFiles = [];
 
-        /** @var CoveredFileData $data */
         foreach ($coverage as $data) {
             $seenFiles[$data->getSplFileInfo()->getRealPath()] = self::SEEN;
 
