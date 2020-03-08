@@ -37,7 +37,6 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use DOMDocument;
 use DOMElement;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\SafeDOMXPath;
@@ -63,7 +62,6 @@ class IndexXmlCoverageParser
      * contain all the desired data.
      *
      * @throws NoLineExecuted
-     * @throws CoverageDoesNotExistException
      *
      * @return iterable<CoveredFileData>
      */

@@ -35,14 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use const DIRECTORY_SEPARATOR;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
@@ -134,40 +131,6 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
             ],
             CoverageHelper::convertToArray($coverage)
         );
-    }
-
-    public function test_it_cannot_create_coverage_if_cannot_locate_the_coverage_index_file(): void
-    {
-        $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
-
-        $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
-            '/nowhere',
-            $coverageXmlParserMock,
-            TestFrameworkTypes::PHPUNIT
-        );
-
-        try {
-            $coverageProvider->provideFiles();
-
-            $this->fail();
-        } catch (CoverageDoesNotExistException $exception) {
-            $directionSeprator = DIRECTORY_SEPARATOR;
-
-            $this->assertSame(
-                <<<TXT
-Code Coverage does not exist. File /nowhere/index.xml is not found. Check phpunit version Infection was run with and generated config files inside ${directionSeprator}. Make sure to either:
-- Enable xdebug and run infection again
-- Use phpdbg: phpdbg -qrr infection
-- Enable pcov and run infection again
-- Use --coverage option with path to the existing coverage report
-- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters
-TXT
-                ,
-                $exception->getMessage()
-            );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
-        }
     }
 
     public function test_it_does_not_add_test_file_info_if_not_provider_is_given(): void

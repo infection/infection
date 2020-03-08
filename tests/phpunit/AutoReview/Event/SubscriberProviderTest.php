@@ -47,7 +47,7 @@ use function Safe\sprintf;
 final class SubscriberProviderTest extends TestCase
 {
     /**
-     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider()
+     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
      */
     public function test_subscriber_class_provider_is_valid(string $className): void
     {

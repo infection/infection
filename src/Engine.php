@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use function dirname;
 use function explode;
-use function file_exists;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
@@ -55,9 +53,6 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use const PHP_EOL;
-use function Safe\sprintf;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -66,6 +61,7 @@ final class Engine
 {
     private $config;
     private $adapter;
+    private $coverageChecker;
     private $eventDispatcher;
     private $initialTestsRunner;
     private $memoryLimitApplier;
@@ -79,6 +75,7 @@ final class Engine
     public function __construct(
         Configuration $config,
         TestFrameworkAdapter $adapter,
+        CoverageChecker $coverageChecker,
         EventDispatcher $eventDispatcher,
         InitialTestsRunner $initialTestsRunner,
         MemoryLimiter $memoryLimitApplier,
@@ -91,6 +88,7 @@ final class Engine
     ) {
         $this->config = $config;
         $this->adapter = $adapter;
+        $this->coverageChecker = $coverageChecker;
         $this->eventDispatcher = $eventDispatcher;
         $this->initialTestsRunner = $initialTestsRunner;
         $this->memoryLimitApplier = $memoryLimitApplier;
@@ -114,7 +112,7 @@ final class Engine
     {
         if ($this->config->shouldSkipInitialTests()) {
             $this->consoleOutput->logSkippingInitialTests();
-            $this->assertCodeCoverageExists($this->config->getTestFramework());
+            $this->coverageChecker->checkCoverageExists();
 
             return;
         }
@@ -129,7 +127,10 @@ final class Engine
             throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuitProcess, $this->adapter);
         }
 
-        $this->assertCodeCoverageProduced($initialTestSuitProcess, $this->config->getTestFramework());
+        $this->coverageChecker->checkCoverageHasBeenGenerated(
+            $initialTestSuitProcess->getCommandLine(),
+            $initialTestSuitProcess->getOutput()
+        );
 
         $this->memoryLimitApplier->applyMemoryLimitFromProcess($initialTestSuitProcess, $this->adapter);
     }

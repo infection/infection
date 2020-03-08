@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use function dirname;
-use function file_exists;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\CoveredFileDataProvider;
@@ -79,17 +77,9 @@ class PhpUnitXmlCoveredFileDataProvider implements CoveredFileDataProvider
      */
     public function provideFiles(): iterable
     {
-        $coverageIndexFilePath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
-
-        if (!file_exists($coverageIndexFilePath)) {
-            throw CoverageDoesNotExistException::with(
-                $coverageIndexFilePath,
-                $this->testFrameworkKey,
-                dirname($coverageIndexFilePath, 2)
-            );
-        }
-
-        $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
+        $coverageIndexFileContent = file_get_contents(
+            $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME
+        );
 
         return $this->parser->parseLazy($coverageIndexFileContent);
     }
