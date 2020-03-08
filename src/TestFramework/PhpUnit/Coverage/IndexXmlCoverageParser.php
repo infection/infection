@@ -37,10 +37,8 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use DOMDocument;
 use DOMElement;
-use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\SafeDOMXPath;
-use function Pipeline\take;
 use function Safe\preg_replace;
 use Webmozart\Assert\Assert;
 
@@ -65,28 +63,13 @@ class IndexXmlCoverageParser
      *
      * @return iterable<CoveredFileData>
      */
-    public function parseLazy(string $coverageXmlContent): iterable
+    public function parse(string $coverageXmlContent): iterable
     {
         $xPath = self::createXPath($coverageXmlContent);
 
         self::assertHasCoverage($xPath);
 
         return $this->parseNodes($xPath);
-    }
-
-    /**
-     * @deprecated in favor of parseLazy
-     *
-     * @return array<string, CoverageFileData>
-     */
-    public function parse(string $coverageXmlContent): array
-    {
-        $coverage = take($this->parseLazy($coverageXmlContent))
-            ->map(static function (CoveredFileData $data) {
-                yield $data->getSplFileInfo()->getRealPath() => $data->retrieveCoverageFileData();
-            });
-
-        return iterator_to_array($coverage, true);
     }
 
     public static function createXPath(string $coverageContent): SafeDOMXPath

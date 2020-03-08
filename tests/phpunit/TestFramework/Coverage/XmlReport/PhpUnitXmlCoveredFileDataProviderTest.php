@@ -57,7 +57,7 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
         $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $coverageXmlParserMock
             ->expects($this->once())
-            ->method('parseLazy')
+            ->method('parse')
             ->willReturn($this->getParsedCodeCoverageData())
         ;
 
@@ -98,7 +98,7 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
         $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $coverageXmlParserMock
             ->expects($this->once())
-            ->method('parseLazy')
+            ->method('parse')
             ->willReturn($this->getParsedCodeCoverageData('Acme\FooCest:test_it_can_be_instantiated'))
         ;
 
@@ -139,7 +139,7 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
         $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $coverageXmlParserMock
             ->expects($this->once())
-            ->method('parseLazy')
+            ->method('parse')
             ->willReturn($this->getParsedCodeCoverageData())
         ;
 

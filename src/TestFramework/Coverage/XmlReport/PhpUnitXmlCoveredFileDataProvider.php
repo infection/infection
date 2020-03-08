@@ -78,6 +78,6 @@ class PhpUnitXmlCoveredFileDataProvider implements CoveredFileDataProvider
             $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME
         );
 
-        return $this->parser->parseLazy($coverageIndexFileContent);
+        return $this->parser->parse($coverageIndexFileContent);
     }
 }

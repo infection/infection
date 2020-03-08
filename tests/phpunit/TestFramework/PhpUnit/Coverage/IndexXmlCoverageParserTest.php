@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 use Generator;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
+use Infection\Tests\Fixtures\TestFramework\LegacyXmlCoverageParser;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
@@ -63,13 +64,15 @@ final class IndexXmlCoverageParserTest extends TestCase
     private static $xml;
 
     /**
-     * @var IndexXmlCoverageParser
+     * @var LegacyXmlCoverageParser
      */
     private $parser;
 
     protected function setUp(): void
     {
-        $this->parser = new IndexXmlCoverageParser(self::FIXTURES_COVERAGE_DIR);
+        $this->parser = new LegacyXmlCoverageParser(
+            new IndexXmlCoverageParser(self::FIXTURES_COVERAGE_DIR)
+        );
     }
 
     public static function getXml(): string
@@ -265,7 +268,9 @@ XML;
 
     public function test_it_has_correct_coverage_data_for_each_file_for_old_phpunit_versions(): void
     {
-        $coverage = (new IndexXmlCoverageParser(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml'))->parse(str_replace(
+        $coverage = (new LegacyXmlCoverageParser(
+            new IndexXmlCoverageParser(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml')
+        ))->parse(str_replace(
             '/path/to/src',
             realpath(self::FIXTURES_OLD_COVERAGE_DIR . '/src'),
             file_get_contents(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml/index.xml')
