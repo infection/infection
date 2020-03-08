@@ -104,7 +104,7 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_skips_logging_when_it_is_not_travis(): void
     {
-        $this->ciDetectorEnv->configure([
+        $this->ciDetectorEnv->setVariables([
             'TRAVIS' => false,
         ]);
 
@@ -123,7 +123,7 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_skips_logging_when_it_is_pull_request(): void
     {
-        $this->ciDetectorEnv->configure([
+        $this->ciDetectorEnv->setVariables([
             'TRAVIS' => 'true',
             'TRAVIS_PULL_REQUEST' => '123',
         ]);
@@ -143,7 +143,7 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_skips_logging_when_branch_not_found(): void
     {
-        $this->ciDetectorEnv->configure([
+        $this->ciDetectorEnv->setVariables([
             'TRAVIS' => 'true',
             'TRAVIS_PULL_REQUEST' => 'false',
             'TRAVIS_REPO_SLUG' => 'a/b',
@@ -164,7 +164,7 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_skips_logging_when_repo_slug_not_found(): void
     {
-        $this->ciDetectorEnv->configure([
+        $this->ciDetectorEnv->setVariables([
             'TRAVIS' => 'true',
             'TRAVIS_PULL_REQUEST' => 'false',
             'TRAVIS_REPO_SLUG' => false,
@@ -186,7 +186,7 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_skips_logging_when_it_is_branch_not_from_config(): void
     {
-        $this->ciDetectorEnv->configure([
+        $this->ciDetectorEnv->setVariables([
             'TRAVIS' => 'true',
             'TRAVIS_PULL_REQUEST' => 'false',
             'TRAVIS_REPO_SLUG' => 'a/b',
@@ -208,7 +208,7 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_sends_report_missing_our_api_key(): void
     {
-        $this->ciDetectorEnv->configure([
+        $this->ciDetectorEnv->setVariables([
             'TRAVIS' => 'true',
             'TRAVIS_PULL_REQUEST' => 'false',
             'TRAVIS_REPO_SLUG' => 'a/b',
@@ -233,7 +233,7 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_sends_report_when_everything_is_ok_with_stryker_key(): void
     {
-        $this->ciDetectorEnv->configure([
+        $this->ciDetectorEnv->setVariables([
             'TRAVIS' => 'true',
             'TRAVIS_PULL_REQUEST' => 'false',
             'TRAVIS_REPO_SLUG' => 'a/b',
@@ -263,7 +263,7 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_sends_report_when_everything_is_ok_with_our_key(): void
     {
-        $this->ciDetectorEnv->configure([
+        $this->ciDetectorEnv->setVariables([
             'TRAVIS' => 'true',
             'TRAVIS_PULL_REQUEST' => 'false',
             'TRAVIS_REPO_SLUG' => 'a/b',

@@ -44,7 +44,7 @@ final class ConfigurableEnv extends Env
     /**
      * @param array<string, string|false> $variables
      */
-    public function configure(array $variables): void
+    public function setVariables(array $variables): void
     {
         $this->variables = $variables;
     }
