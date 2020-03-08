@@ -40,7 +40,8 @@ final class XmlCoverageFixtures
     public const FIXTURES_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/src';
     public const FIXTURES_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
     public const FIXTURES_INCORRECT_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-incomplete';
-    public const FIXTURES_OLD_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/old-coverage';
+    public const FIXTURES_OLD_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/old-coverage/coverage-xml';
+    public const FIXTURES_OLD_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/old-coverage/src';
 
     /*
         phpunit/coverage/coverage-xml/FirstLevel/SecondLevel/secondLevel.php.xml
@@ -52,6 +53,9 @@ final class XmlCoverageFixtures
 
      */
 
+    /**
+     * @return iterable<XmlCoverageFixture>
+     */
     public static function provideFixtures(): iterable
     {
         yield new XmlCoverageFixture(
@@ -192,11 +196,14 @@ final class XmlCoverageFixtures
         );
     }
 
+    /**
+     * @return iterable<XmlCoverageFixture>
+     */
     public static function provideLegacyFormatFixtures(): iterable
     {
         yield new XmlCoverageFixture(
-            self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml/Middleware/ReleaseRecordedEventsMiddleware.php.xml',
-            self::FIXTURES_OLD_COVERAGE_DIR . '/src/Middleware/ReleaseRecordedEventsMiddleware.php',
+            self::FIXTURES_OLD_COVERAGE_DIR . '/Middleware/ReleaseRecordedEventsMiddleware.php.xml',
+            self::FIXTURES_OLD_SRC_DIR . '/Middleware/ReleaseRecordedEventsMiddleware.php',
             [
                 'byLine' => [
                     29 => [

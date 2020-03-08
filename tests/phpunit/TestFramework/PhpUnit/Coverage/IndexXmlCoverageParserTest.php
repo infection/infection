@@ -150,11 +150,11 @@ XML;
     public function test_it_has_correct_coverage_data_for_each_file_for_old_phpunit_versions(): void
     {
         $coverage = (new LegacyXmlCoverageParserAdapter(
-            new IndexXmlCoverageParser(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml')
+            new IndexXmlCoverageParser(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR)
         ))->parse(str_replace(
             '/path/to/src',
-            realpath(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/src'),
-            file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml/index.xml')
+            realpath(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
+            file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml')
         ));
 
         $this->assertCoverageReportSame(
