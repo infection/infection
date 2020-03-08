@@ -39,7 +39,6 @@ use function explode;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Iterator;
-use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
