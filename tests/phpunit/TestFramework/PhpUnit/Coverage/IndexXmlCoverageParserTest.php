@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
+use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
 use Infection\Tests\Fixtures\TestFramework\LegacyXmlCoverageParserAdapter;
@@ -48,7 +49,6 @@ use function Safe\realpath;
 use function Safe\sprintf;
 use function str_replace;
 use Webmozart\PathUtil\Path;
-use Infection\TestFramework\Coverage\CoverageFileData;
 
 /**
  * @group integration
