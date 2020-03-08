@@ -39,12 +39,12 @@ use function array_filter;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
-use Infection\Environment\ChainBuildContextResolver;
+use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
-use Infection\Environment\TravisCiResolver;
 use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Mutant\MetricsCalculator;
+use OndraM\CiDetector\CiDetector;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -163,7 +163,7 @@ final class LoggerFactory
             ? null
             : new BadgeLogger(
                 $output,
-                new ChainBuildContextResolver(new TravisCiResolver()),
+                new BuildContextResolver(new CiDetector()),
                 new StrykerApiKeyResolver(),
                 new StrykerDashboardClient(
                     new StrykerCurlClient(),

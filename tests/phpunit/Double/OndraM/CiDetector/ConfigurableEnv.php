@@ -33,49 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Environment;
+namespace Infection\Tests\Double\OndraM\CiDetector;
 
-use function array_key_exists;
-use function Safe\sprintf;
+use OndraM\CiDetector\Env;
 
-/**
- * @internal
- *
- * @see https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
- */
-final class TravisCiResolver implements BuildContextResolver
+final class ConfigurableEnv extends Env
 {
-    public function resolve(array $environment): BuildContext
+    private $variables = [];
+
+    /**
+     * @param array<string, string|false> $variables
+     */
+    public function setVariables(array $variables): void
     {
-        if (
-            !array_key_exists('TRAVIS', $environment)
-            || !array_key_exists('TRAVIS_PULL_REQUEST', $environment)
-            || $environment['TRAVIS'] !== 'true'
-        ) {
-            throw new CouldNotResolveBuildContext(
-                'The current process is not executed in a Travis CI build'
-            );
+        $this->variables = $variables;
+    }
+
+    public function get(string $name)
+    {
+        if (!array_key_exists($name, $this->variables)) {
+            return false;
         }
 
-        if ($environment['TRAVIS_PULL_REQUEST'] !== 'false') {
-            throw new CouldNotResolveBuildContext(sprintf(
-                'The current process is a pull request build (TRAVIS_PULL_REQUEST=%s)',
-                $environment['TRAVIS_PULL_REQUEST']
-            ));
-        }
-
-        if (
-            !array_key_exists('TRAVIS_REPO_SLUG', $environment)
-            || !array_key_exists('TRAVIS_BRANCH', $environment)
-        ) {
-            throw new CouldNotResolveBuildContext(
-                'Could not find the repository slug (TRAVIS_REPO_SLUG) or branch (TRAVIS_BRANCH)'
-            );
-        }
-
-        return new BuildContext(
-            $environment['TRAVIS_REPO_SLUG'],
-            $environment['TRAVIS_BRANCH']
-        );
+        return $this->variables[$name];
     }
 }
