@@ -35,15 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
-use DOMDocument;
 use DOMElement;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\SafeDOMXPath;
-use function Safe\preg_replace;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
 class IndexXmlCoverageParser
 {
@@ -65,21 +63,11 @@ class IndexXmlCoverageParser
      */
     public function parse(string $coverageXmlContent): iterable
     {
-        $xPath = self::createXPath($coverageXmlContent);
+        $xPath = XPathFactory::createXPath($coverageXmlContent);
 
         self::assertHasCoverage($xPath);
 
         return $this->parseNodes($xPath);
-    }
-
-    public static function createXPath(string $coverageContent): SafeDOMXPath
-    {
-        $document = new DOMDocument();
-        $success = @$document->loadXML(self::removeNamespace($coverageContent));
-
-        Assert::true($success);
-
-        return new SafeDOMXPath($document);
     }
 
     /**
@@ -100,19 +88,6 @@ class IndexXmlCoverageParser
 
             yield $parser->parse();
         }
-    }
-
-    /**
-     * Remove namespace to work with xPath without a headache
-     */
-    private static function removeNamespace(string $xml): string
-    {
-        /** @var string $cleanedXml */
-        $cleanedXml = preg_replace('/xmlns=\".*?\"/', '', $xml);
-
-        Assert::string($cleanedXml);
-
-        return $cleanedXml;
     }
 
     /**

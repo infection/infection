@@ -82,7 +82,7 @@ class SourceFileInfoProvider
     public function provideXPath(): SafeDOMXPath
     {
         if ($this->xPath === null) {
-            $this->xPath = IndexXmlCoverageParser::createXPath(file_get_contents(
+            $this->xPath = XPathFactory::createXPath(file_get_contents(
                 $this->coverageDir . '/' . $this->relativeCoverageFilePath
             ));
         }
