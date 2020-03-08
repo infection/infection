@@ -180,7 +180,7 @@ final class BuildContextResolverTest extends TestCase
     {
         yield 'string-blank' => [' '];
 
-        yield 'string-empty' => [' '];
+        yield 'string-empty' => [''];
     }
 
     public function test_resolve_returns_build_context_when_ci_is_detected_and_build_is_not_for_pull_request(): void
