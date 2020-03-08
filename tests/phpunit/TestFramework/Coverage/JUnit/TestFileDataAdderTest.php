@@ -35,8 +35,96 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoveredFileData;
+use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
+use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
+use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \Infection\TestFramework\Coverage\JUnit\TestFileDataAdder
+ */
 final class TestFileDataAdderTest extends TestCase
 {
+    public function test_it_does_not_add_if_junit_is_not_provided(): void
+    {
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('hasJUnitReport')
+            ->willReturn(false)
+        ;
+
+        $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
+        $testFileDataProvider
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $adder = new TestFileDataAdder($adapter, $testFileDataProvider);
+
+        $expected = [1, 2, 3];
+
+        /** @var array $actual */
+        $actual = $adder->addTestExecutionInfo($expected);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_adds_if_junit_is_provided(): void
+    {
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('hasJUnitReport')
+            ->willReturn(true)
+        ;
+
+        $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
+        $testFileDataProvider
+            ->expects($this->once())
+            ->method('getTestFileInfo')
+            ->with('Acme\FooTest')
+            ->willReturn(new TestFileTimeData(
+                '/path/to/acme/FooTest.php',
+                0.000234
+            ))
+        ;
+
+        $adder = new TestFileDataAdder($adapter, $testFileDataProvider);
+
+        $lineData = CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated');
+
+        $fileData = new CoverageFileData();
+        $fileData->byLine = [
+            11 => [
+                $lineData,
+            ],
+        ];
+
+        $coveredFileDataMock = $this->createMock(CoveredFileData::class);
+        $coveredFileDataMock
+            ->expects($this->once())
+            ->method('retrieveCoverageFileData')
+            ->willReturn($fileData)
+        ;
+
+        $expected = [
+            $coveredFileDataMock,
+        ];
+
+        $actual = $adder->addTestExecutionInfo($expected);
+        $actual = iterator_to_array($actual, false);
+
+        $this->assertSame($expected, $actual);
+
+        $this->assertSame('Acme\FooTest::test_it_can_be_instantiated', $lineData->testMethod);
+        $this->assertSame('/path/to/acme/FooTest.php', $lineData->testFilePath);
+        $this->assertSame(0.000234, $lineData->time);
+
+        $this->assertSame($lineData, $fileData->byLine[11][0]);
+    }
 }
