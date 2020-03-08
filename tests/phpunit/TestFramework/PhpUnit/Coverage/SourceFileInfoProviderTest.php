@@ -38,8 +38,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
 use Infection\TestFramework\SafeDOMXPath;
 use PHPUnit\Framework\TestCase;
-use function Safe\realpath;
-use function str_replace;
+use function Pipeline\map;
 
 /**
  * @group integration
@@ -49,31 +48,17 @@ final class SourceFileInfoProviderTest extends TestCase
 {
     public static function filePairsProvider(): iterable
     {
-        foreach (XmlCoverageFixtures::provideFixtures() as $fixture) {
-            yield [
-                XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
-                str_replace(
-                    realpath(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR) . DIRECTORY_SEPARATOR,
-                    '',
-                    $fixture->xmlPath
-                ),
-                XmlCoverageFixtures::FIXTURES_SRC_DIR,
+        return map(static function () {
+            yield from XmlCoverageFixtures::provideFixtures();
+            yield from XmlCoverageFixtures::provideLegacyFormatFixtures();
+        })->map(static function (XmlCoverageFixture $fixture) {
+            return [
+                $fixture->coverageDir,
+                $fixture->relativeCoverageFilePath,
+                $fixture->projectSource,
                 $fixture->sourceFilePath,
             ];
-        }
-
-        foreach (XmlCoverageFixtures::provideLegacyFormatFixtures() as $fixture) {
-            yield [
-                XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
-                str_replace(
-                    realpath(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR) . DIRECTORY_SEPARATOR,
-                    '',
-                    $fixture->xmlPath
-                ),
-                XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR,
-                $fixture->sourceFilePath,
-            ];
-        }
+        });
     }
 
     /**

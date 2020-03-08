@@ -50,7 +50,7 @@ final class XmlCoverageFixtures
     {
         yield new XmlCoverageFixture(
             self::FIXTURES_COVERAGE_DIR,
-            '/FirstLevel/firstLevel.php.xml',
+            'FirstLevel/firstLevel.php.xml',
             self::FIXTURES_SRC_DIR,
             '/FirstLevel/firstLevel.php',
             [
@@ -109,7 +109,7 @@ final class XmlCoverageFixtures
 
         yield new XmlCoverageFixture(
             self::FIXTURES_COVERAGE_DIR,
-            '/FirstLevel/SecondLevel/secondLevel.php.xml',
+            'FirstLevel/SecondLevel/secondLevel.php.xml',
             self::FIXTURES_SRC_DIR,
             '/FirstLevel/SecondLevel/secondLevel.php',
             [
@@ -142,7 +142,7 @@ final class XmlCoverageFixtures
 
         yield new XmlCoverageFixture(
             self::FIXTURES_COVERAGE_DIR,
-            '/FirstLevel/SecondLevel/secondLevelTrait.php.xml',
+            'FirstLevel/SecondLevel/secondLevelTrait.php.xml',
             self::FIXTURES_SRC_DIR,
             '/FirstLevel/SecondLevel/secondLevelTrait.php',
             [
@@ -175,7 +175,7 @@ final class XmlCoverageFixtures
 
         yield new XmlCoverageFixture(
             self::FIXTURES_COVERAGE_DIR,
-            '/zeroLevel.php.xml',
+            'zeroLevel.php.xml',
             self::FIXTURES_SRC_DIR,
             '/zeroLevel.php',
             [
@@ -186,7 +186,7 @@ final class XmlCoverageFixtures
 
         yield new XmlCoverageFixture(
             self::FIXTURES_COVERAGE_DIR,
-            '/noPercentage.php.xml',
+            'noPercentage.php.xml',
             self::FIXTURES_SRC_DIR,
             '/noPercentage.php',
             [
@@ -203,7 +203,7 @@ final class XmlCoverageFixtures
     {
         yield new XmlCoverageFixture(
             self::FIXTURES_OLD_COVERAGE_DIR,
-            '/Middleware/ReleaseRecordedEventsMiddleware.php.xml',
+            'Middleware/ReleaseRecordedEventsMiddleware.php.xml',
             self::FIXTURES_OLD_SRC_DIR,
             '/Middleware/ReleaseRecordedEventsMiddleware.php',
             [
