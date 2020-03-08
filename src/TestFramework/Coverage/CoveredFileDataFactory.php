@@ -40,6 +40,7 @@ use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
+use function array_key_exists;
 
 /**
  * Assembles a ready feed of CoveredFileData from different sources. Feeds data into MutationGenerator.
