@@ -43,8 +43,6 @@ use function Safe\file_get_contents;
 /**
  * Source of primary coverage data. Used by CoveredFileDataFactory.
  *
- * @see CoveredFileDataFactory
- *
  * @internal
  * @final
  */

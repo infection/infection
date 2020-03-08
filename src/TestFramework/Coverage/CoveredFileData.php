@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverage;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -85,9 +83,6 @@ class CoveredFileData implements LineCodeCoverage
         return $this->sourceFile;
     }
 
-    /**
-     * @see RealPathFilterIterator
-     */
     public function getRealPath(): string
     {
         $realPath = $this->sourceFile->getRealPath();
@@ -99,8 +94,6 @@ class CoveredFileData implements LineCodeCoverage
 
     /**
      * Accessor used to update CoverageFileData with TestFileTimeData.
-     *
-     * @see TestFileDataAdder
      */
     public function retrieveCoverageFileData(): CoverageFileData
     {

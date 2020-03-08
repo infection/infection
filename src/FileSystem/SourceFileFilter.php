@@ -62,8 +62,6 @@ class SourceFileFilter
 
     /**
      * @return string[]
-     *
-     * @see SourceFileCollector
      */
     public function getFilters(): array
     {

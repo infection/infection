@@ -42,8 +42,6 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
- *
- * @see CoveredFileDataFactory
  */
 final class FileCodeCoverageProviderFactory
 {

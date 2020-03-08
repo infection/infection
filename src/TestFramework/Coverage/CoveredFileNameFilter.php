@@ -38,8 +38,6 @@ namespace Infection\TestFramework\Coverage;
 use Infection\FileSystem\SourceFileFilter;
 
 /**
- * @see CoveredFileDataFactory
- *
  * @internal
  * @final
  */
