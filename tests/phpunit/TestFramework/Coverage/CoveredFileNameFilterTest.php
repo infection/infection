@@ -35,9 +35,52 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use ArrayIterator;
+use Infection\FileSystem\SourceFileFilter;
+use Infection\TestFramework\Coverage\CoveredFileNameFilter;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \Infection\TestFramework\Coverage\CoveredFileNameFilter
+ */
 final class CoveredFileNameFilterTest extends TestCase
 {
-    // TODO
+    public function test_it_filters_array(): void
+    {
+        $expected = [3, 2, 1];
+
+        $filter = $this->createMock(SourceFileFilter::class);
+        $filter
+            ->expects($this->once())
+            ->method('filter')
+            ->with([1, 2, 3])
+            ->willReturn($expected)
+        ;
+
+        $fileNameFilter = new CoveredFileNameFilter($filter);
+
+        /** @var array $actual */
+        $actual = $fileNameFilter->filter([1, 2, 3]);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_filters_iterable(): void
+    {
+        $iterator = new ArrayIterator();
+
+        $filter = $this->createMock(SourceFileFilter::class);
+        $filter
+            ->expects($this->once())
+            ->method('filter')
+            ->with($iterator)
+            ->willReturn($iterator)
+        ;
+
+        $fileNameFilter = new CoveredFileNameFilter($filter);
+
+        $actual = $fileNameFilter->filter($iterator);
+
+        $this->assertSame($iterator, $actual);
+    }
 }
