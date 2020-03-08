@@ -9,7 +9,7 @@ use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use function Pipeline\take;
 
-final class LegacyXmlCoverageParser
+final class LegacyXmlCoverageParserAdapter
 {
     private $parser;
 

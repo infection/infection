@@ -35,22 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
-use function array_filter;
 use DOMElement;
 use DOMNodeList;
-use function implode;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\SafeDOMXPath;
-use function realpath as native_realpath;
-use function Safe\file_get_contents;
-use function Safe\sprintf;
 use function Safe\substr;
-use function str_replace;
-use Symfony\Component\Finder\SplFileInfo;
-use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -58,40 +50,27 @@ use Webmozart\Assert\Assert;
  */
 final class XmlCoverageParser
 {
-    private $coverageDir;
-    private $relativeCoverageFilePath;
-    private $projectSource;
+    private $provider;
 
-    public function __construct(
-        string $coverageDir,
-        string $relativeCoverageFilePath,
-        string $projectSource
-    ) {
-        $this->coverageDir = $coverageDir;
-        $this->relativeCoverageFilePath = $relativeCoverageFilePath;
-        $this->projectSource = $projectSource;
+    public function __construct(SourceFileInfoProvider $provider)
+    {
+        $this->provider = $provider;
+    }
+
+    public function parse(): CoveredFileData
+    {
+        return new CoveredFileData(
+            $this->provider->provideFileInfo(),
+            $this->lazilyRetrieveCoverageFileData(
+                $this->provider->provideXPath()
+            )
+        );
     }
 
     /**
-     * Parses the given PHPUnit XML coverage index report (index.xml) to collect the general
-     * coverage data. Note that this data is likely incomplete an will need to be enriched to
-     * contain all the desired data.
-     *
-     * @throws NoLineExecuted
+     * @return iterable<CoverageFileData>
      */
-    public function parse(): CoveredFileData
-    {
-        $xPath = IndexXmlCoverageParser::createXPath(file_get_contents(
-            $this->coverageDir . '/' . $this->relativeCoverageFilePath
-        ));
-
-        $sourceFileInfo = self::retrieveSourceFileInfo($xPath, $this->relativeCoverageFilePath, $this->projectSource);
-
-        return new CoveredFileData($sourceFileInfo, $this->retrieveCoverageFileData($xPath));
-    }
-
-    /** @return iterable<CoverageFileData> */
-    private function retrieveCoverageFileData(SafeDOMXPath $xPath): iterable
+    private static function lazilyRetrieveCoverageFileData(SafeDOMXPath $xPath): iterable
     {
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
 
@@ -136,47 +115,6 @@ final class XmlCoverageParser
             self::collectCoveredLinesData($coveredLineNodes),
             self::collectMethodsCoverageData($coveredMethodNodes)
         );
-    }
-
-    private static function retrieveSourceFileInfo(
-        SafeDOMXPath $xPath,
-        string $relativeCoverageFilePath,
-        string $projectSource
-    ): SplFileInfo {
-        $fileNode = $xPath->query('/phpunit/file')[0];
-
-        Assert::notNull($fileNode);
-
-        $fileName = $fileNode->getAttribute('name');
-        $relativeFilePath = $fileNode->getAttribute('path');
-
-        if ($relativeFilePath === '') {
-            // The relative path is not present for old versions of PHPUnit. As a result we parse
-            // the relative path from the source file path and the XML coverage file
-            $relativeFilePath = str_replace(
-                sprintf('%s.xml', $fileName),
-                '',
-                $relativeCoverageFilePath
-            );
-        }
-
-        $path = implode(
-            '/',
-            array_filter([$projectSource, trim($relativeFilePath, '/'), $fileName])
-        );
-
-        $realPath = native_realpath($path);
-
-        if ($realPath === false) {
-            throw new InvalidCoverage(sprintf(
-                'Could not find the source file "%s" referred by "%s". Make sure the '
-                . 'coverage used is up to date',
-                $path,
-                $relativeFilePath
-            ));
-        }
-
-        return new SplFileInfo($realPath, $relativeFilePath, $path);
     }
 
     /**
