@@ -40,6 +40,7 @@ use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Tests\Double;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use OndraM\CiDetector\CiDetector;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -67,6 +68,11 @@ final class BadgeLoggerTest extends TestCase
     private $metricsCalculatorMock;
 
     /**
+     * @var Double\OndraM\CiDetector\ConfigurableEnv
+     */
+    private $ciDetectorEnv;
+
+    /**
      * @var BadgeLogger
      */
     private $badgeLogger;
@@ -79,9 +85,11 @@ final class BadgeLoggerTest extends TestCase
         $this->badgeApiClientMock = $this->createMock(StrykerDashboardClient::class);
         $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
 
+        $this->ciDetectorEnv = new Double\OndraM\CiDetector\ConfigurableEnv();
+
         $this->badgeLogger = new BadgeLogger(
             $this->outputMock,
-            new BuildContextResolver(new CiDetector()),
+            new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
             new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,
@@ -96,7 +104,9 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_skips_logging_when_it_is_not_travis(): void
     {
-        putenv('TRAVIS');
+        $this->ciDetectorEnv->configure([
+            'TRAVIS' => false,
+        ]);
 
         $this->outputMock
             ->method('writeln')
@@ -113,8 +123,10 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_skips_logging_when_it_is_pull_request(): void
     {
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=123');
+        $this->ciDetectorEnv->configure([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => '123',
+        ]);
 
         $this->outputMock
             ->method('writeln')
@@ -131,10 +143,12 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_skips_logging_when_branch_not_found(): void
     {
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG=a/b');
-        putenv('TRAVIS_BRANCH');
+        $this->ciDetectorEnv->configure([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => false,
+        ]);
 
         $this->outputMock
             ->method('writeln')
@@ -150,10 +164,12 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_skips_logging_when_repo_slug_not_found(): void
     {
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG');
-        putenv('TRAVIS_BRANCH=foo');
+        $this->ciDetectorEnv->configure([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => false,
+            'TRAVIS_BRANCH' => 'foo',
+        ]);
 
         $this->outputMock
             ->method('writeln')
@@ -170,10 +186,12 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_skips_logging_when_it_is_branch_not_from_config(): void
     {
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG=a/b');
-        putenv('TRAVIS_BRANCH=foo');
+        $this->ciDetectorEnv->configure([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => 'foo',
+        ]);
 
         $this->outputMock
             ->method('writeln')
@@ -190,10 +208,13 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_sends_report_missing_our_api_key(): void
     {
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG=a/b');
-        putenv('TRAVIS_BRANCH=master');
+        $this->ciDetectorEnv->configure([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => 'master',
+        ]);
+
         putenv('INFECTION_BADGE_API_KEY');
         putenv('STRYKER_DASHBOARD_API_KEY');
 
@@ -212,11 +233,14 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_sends_report_when_everything_is_ok_with_stryker_key(): void
     {
+        $this->ciDetectorEnv->configure([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => 'master',
+        ]);
+
         putenv('STRYKER_DASHBOARD_API_KEY=abc');
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG=a/b');
-        putenv('TRAVIS_BRANCH=master');
 
         $this->outputMock
             ->method('writeln')
@@ -239,11 +263,14 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_sends_report_when_everything_is_ok_with_our_key(): void
     {
+        $this->ciDetectorEnv->configure([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => 'master',
+        ]);
+
         putenv('INFECTION_BADGE_API_KEY=abc');
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG=a/b');
-        putenv('TRAVIS_BRANCH=master');
 
         $this->outputMock
             ->method('writeln')
