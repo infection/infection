@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
+use Traversable;
 
 /**
  * @covers \Infection\TestFramework\Coverage\CoveredFileDataFactory
@@ -92,6 +93,24 @@ final class CoveredFileDataFactoryTest extends TestCase
         })->toArray();
 
         $this->assertSame($expectedFileNames, $actualFileNames);
+    }
+
+    public function test_it_provides_added_source_files_with_no_coverage(): void
+    {
+        $providedFiles = $this->factoryProvidesFiles(
+            [],
+            [$this->createSplFileInfoMock('src/Foo.php')],
+            false
+        );
+
+        if ($providedFiles instanceof Traversable) {
+            $providedFiles = iterator_to_array($providedFiles);
+        }
+
+        /** @var CoveredFileData $fileWithoutCoverage */
+        $fileWithoutCoverage = $providedFiles[0];
+
+        $this->assertFalse($fileWithoutCoverage->hasTests());
     }
 
     public function test_it_ignores_source_files_when_only_covered(): void
