@@ -42,7 +42,6 @@ use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\SafeDOMXPath;
-use function Safe\substr;
 use Webmozart\Assert\Assert;
 
 /**
@@ -81,22 +80,7 @@ final class XmlCoverageParser
 
         $percentage = $linesNode->getAttribute('percent');
 
-        if (substr($percentage, -1) === '%') {
-            // In PHPUnit <6 the percentage value would take the form "0.00%" in _some_ cases.
-            // For example could find both with percentage and without in
-            // https://github.com/maks-rafalko/tactician-domain-events/tree/1eb23434d3a833dedb6180ead75ff983ef09a2e9
-            $percentage = substr($percentage, 0, -1);
-        }
-
-        if ($percentage === '') {
-            $percentage = .0;
-        } else {
-            Assert::numeric($percentage);
-
-            $percentage = (float) $percentage;
-        }
-
-        if ($percentage === .0) {
+        if (self::percentageToFloat($percentage) === .0) {
             return new CoverageFileData();
         }
 
@@ -116,6 +100,16 @@ final class XmlCoverageParser
             self::collectCoveredLinesData($coveredLineNodes),
             self::collectMethodsCoverageData($coveredMethodNodes)
         );
+    }
+
+    private static function percentageToFloat(string $percentage): float
+    {
+        // In PHPUnit <6 the percentage value would take the form "0.00%" in _some_ cases.
+        // For example could find both with percentage and without in
+        // https://github.com/maks-rafalko/tactician-domain-events/tree/1eb23434d3a833dedb6180ead75ff983ef09a2e9
+
+        // But PHP can handle them all. Together with an empty string.
+        return (float) $percentage;
     }
 
     /**
