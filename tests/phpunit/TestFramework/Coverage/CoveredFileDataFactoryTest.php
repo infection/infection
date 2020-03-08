@@ -35,9 +35,156 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use Infection\TestFramework\Coverage\CoveredFileData;
+use Infection\TestFramework\Coverage\CoveredFileDataFactory;
+use Infection\TestFramework\Coverage\CoveredFileDataProvider;
+use Infection\TestFramework\Coverage\CoveredFileNameFilter;
+use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
+use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * @covers \Infection\TestFramework\Coverage\CoveredFileDataFactory
+ */
 final class CoveredFileDataFactoryTest extends TestCase
 {
-    // TODO
+    public function test_it_provides_files(): void
+    {
+        $canary = [1, 2, 3];
+
+        $providedFiles = $this->factoryProvidesFiles(
+            $canary,
+            [$this->createMock(SplFileInfo::class)],
+            true
+        );
+
+        $this->assertSame($canary, $providedFiles);
+        $this->assertCount(3, $canary);
+    }
+
+    public function test_it_adds_source_files_to_provided_files(): void
+    {
+        $inputFileNames = [
+            'src/Foo.php',
+            'src/Bar.php',
+        ];
+
+        $expectedFileNames = [
+            'src/Foo.php',
+            'src/Bar.php',
+            'src/Baz.php',
+            'src/Test/Foo.php',
+        ];
+
+        $providedFiles = $this->factoryProvidesFiles(
+            take($inputFileNames)->map(function (string $filename) {
+                return $this->createCoveredFileDataMock($filename);
+            }),
+            take($expectedFileNames)->map(function (string $filename) {
+                return $this->createSplFileInfoMock($filename);
+            }),
+            false
+        );
+
+        $actualFileNames = take($providedFiles)->map(static function (CoveredFileData $data) {
+            return $data->getSplFileInfo()->getRealPath();
+        })->toArray();
+
+        $this->assertSame($expectedFileNames, $actualFileNames);
+    }
+
+    public function test_it_ignores_source_files_when_only_covered(): void
+    {
+        $expectedFileNames = [
+            'src/Foo.php',
+            'src/Bar.php',
+        ];
+
+        $inputFileNames = [
+            'src/Foo.php',
+            'src/Bar.php',
+            'src/Baz.php',
+            'src/Test/Foo.php',
+        ];
+
+        $providedFiles = $this->factoryProvidesFiles(
+            take($expectedFileNames)->map(function (string $filename) {
+                return $this->createCoveredFileDataMock($filename);
+            }),
+            take($inputFileNames)->map(function (string $filename) {
+                return $this->createSplFileInfoMock($filename);
+            }),
+            true
+        );
+
+        $actualFileNames = take($providedFiles)->map(static function (CoveredFileData $data) {
+            return $data->getSplFileInfo()->getRealPath();
+        })->toArray();
+
+        $this->assertSame($expectedFileNames, $actualFileNames);
+    }
+
+    private function factoryProvidesFiles(
+        iterable $canary,
+        iterable $sourceFiles,
+        bool $onlyCovered
+    ): iterable {
+        $coveredFileDataProvider = $this->createMock(CoveredFileDataProvider::class);
+        $coveredFileDataProvider
+            ->expects($this->once())
+            ->method('provideFiles')
+            ->willReturn($canary)
+        ;
+
+        $filter = $this->createMock(CoveredFileNameFilter::class);
+        $filter
+            ->expects($this->once())
+            ->method('filter')
+            ->with($canary)
+            ->willReturn($canary)
+        ;
+
+        $testFileDataAdder = $this->createMock(TestFileDataAdder::class);
+        $testFileDataAdder
+            ->expects($this->once())
+            ->method('addTestExecutionInfo')
+            ->with($canary)
+            ->willReturn($canary)
+        ;
+
+        $factory = new CoveredFileDataFactory(
+            $coveredFileDataProvider,
+            $testFileDataAdder,
+            $filter,
+            $sourceFiles,
+            $onlyCovered
+        );
+
+        return $factory->provideFiles();
+    }
+
+    private function createSplFileInfoMock(string $filename): SplFileInfo
+    {
+        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+        $splFileInfoMock
+            ->method('getRealPath')
+            ->willReturn($filename)
+        ;
+
+        return $splFileInfoMock;
+    }
+
+    private function createCoveredFileDataMock(string $filename): CoveredFileData
+    {
+        $splFileInfoMock = $this->createSplFileInfoMock($filename);
+
+        $codeCoverageMock = $this->createMock(CoveredFileData::class);
+        $codeCoverageMock
+            ->method('getSplFileInfo')
+            ->willReturn($splFileInfoMock)
+        ;
+
+        return $codeCoverageMock;
+    }
 }

@@ -41,8 +41,9 @@ use Infection\FileSystem\SourceFileFilter;
  * @see CoveredFileDataFactory
  *
  * @internal
+ * @final
  */
-final class CoveredFileNameFilter
+class CoveredFileNameFilter
 {
     private $filter;
 

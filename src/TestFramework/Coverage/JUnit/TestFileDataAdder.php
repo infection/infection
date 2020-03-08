@@ -44,8 +44,9 @@ use Infection\TestFramework\Coverage\CoveredFileData;
  * Adds test execution info to selected covered file data object.
  *
  * @internal
+ * @final
  */
-final class TestFileDataAdder
+class TestFileDataAdder
 {
     private $testFileDataProvider;
 
