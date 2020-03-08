@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
 use Infection\TestFramework\SafeDOMXPath;
 use PHPUnit\Framework\TestCase;
-use function Pipeline\map;
 
 /**
  * @group integration
@@ -46,23 +45,20 @@ use function Pipeline\map;
  */
 final class SourceFileInfoProviderTest extends TestCase
 {
-    public static function filePairsProvider(): iterable
+    public static function fileFixturesProvider(): iterable
     {
-        return map(static function () {
-            yield from XmlCoverageFixtures::provideFixtures();
-            yield from XmlCoverageFixtures::provideLegacyFormatFixtures();
-        })->map(static function (XmlCoverageFixture $fixture) {
-            return [
+        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
+            yield [
                 $fixture->coverageDir,
                 $fixture->relativeCoverageFilePath,
                 $fixture->projectSource,
                 $fixture->sourceFilePath,
             ];
-        });
+        }
     }
 
     /**
-     * @dataProvider filePairsProvider
+     * @dataProvider fileFixturesProvider
      */
     public function test_it_provides_file_info_and_xpath(
         string $coverageDir,

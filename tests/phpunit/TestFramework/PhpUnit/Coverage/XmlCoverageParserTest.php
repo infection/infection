@@ -35,12 +35,50 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
+use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
+use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
+use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group integration
+ * @covers \Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser
  */
 final class XmlCoverageParserTest extends TestCase
 {
-    // TODO
+    public static function sourceFileInfoProviderProvider(): iterable
+    {
+        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
+            yield [
+                new SourceFileInfoProvider(
+                    $fixture->coverageDir,
+                    $fixture->relativeCoverageFilePath,
+                    $fixture->projectSource
+                ),
+                $fixture->serializedCoverage,
+                $fixture->sourceFilePath,
+            ];
+        }
+    }
+
+    /**
+     * @dataProvider sourceFileInfoProviderProvider
+     */
+    public function test_it_reads_every_type_of_data(
+        SourceFileInfoProvider $provider,
+        iterable $expectedCoverage,
+        string $sourceFilePath
+    ): void {
+        $parser = new XmlCoverageParser($provider);
+        $fileData = $parser->parse();
+
+        $this->assertSame($fileData->getSplFileInfo()->getRealPath(), $provider->provideFileInfo()->getRealPath());
+
+        $coverageData = $fileData->retrieveCoverageFileData();
+
+        $this->assertSame(
+            [$expectedCoverage],
+            CoverageHelper::convertToArray([$coverageData])
+        );
+    }
 }

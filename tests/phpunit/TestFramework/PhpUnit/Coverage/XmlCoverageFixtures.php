@@ -46,6 +46,15 @@ final class XmlCoverageFixtures
     /**
      * @return iterable<XmlCoverageFixture>
      */
+    public static function provideAllFixtures(): iterable
+    {
+        yield from self::provideFixtures();
+        yield from self::provideLegacyFormatFixtures();
+    }
+
+    /**
+     * @return iterable<XmlCoverageFixture>
+     */
     public static function provideFixtures(): iterable
     {
         yield new XmlCoverageFixture(
