@@ -44,8 +44,8 @@ use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\SafeDOMXPath;
+use function realpath as native_realpath;
 use function Safe\file_get_contents;
-use function Safe\realpath;
 use function Safe\sprintf;
 use function Safe\substr;
 use function str_replace;
@@ -165,7 +165,16 @@ final class XmlCoverageParser
             array_filter([$projectSource, trim($relativeFilePath, '/'), $fileName])
         );
 
-        $realPath = realpath($path);
+        $realPath = native_realpath($path);
+
+        if ($realPath === false) {
+            throw new InvalidCoverage(sprintf(
+                'Could not find the source file "%s" referred by "%s". Make sure the '
+                . 'coverage used is up to date',
+                $path,
+                $relativeFilePath
+            ));
+        }
 
         return new SplFileInfo($realPath, $relativeFilePath, $path);
     }
