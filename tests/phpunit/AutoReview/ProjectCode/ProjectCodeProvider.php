@@ -117,7 +117,6 @@ final class ProjectCodeProvider
         InitialTestRunProcessBuilder::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
-        IndexXmlCoverageParser::class,
         MemoryLimiterEnvironment::class,
     ];
 
