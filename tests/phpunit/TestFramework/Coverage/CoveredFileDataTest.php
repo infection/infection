@@ -35,9 +35,113 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoveredFileData;
+use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * @covers \Infection\TestFramework\Coverage\CoveredFileData
+ */
 final class CoveredFileDataTest extends TestCase
 {
-    // TODO
+    public function test_returns_file_info(): void
+    {
+        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+
+        $coveredFileData = new CoveredFileData($splFileInfoMock, []);
+
+        $actual = $coveredFileData->getSplFileInfo();
+
+        $this->assertSame($splFileInfoMock, $actual);
+    }
+
+    public function test_it_can_return_real_path(): void
+    {
+        $expected = 'Foo.php';
+
+        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+        $splFileInfoMock
+            ->method('getRealPath')
+            ->willReturn($expected);
+
+        $coveredFileData = new CoveredFileData($splFileInfoMock, []);
+
+        $actual = $coveredFileData->getRealPath();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_can_retreive_file_data(): void
+    {
+        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+        $coverageFileData = new CoverageFileData();
+
+        $coveredFileData = new CoveredFileData($splFileInfoMock, [$coverageFileData]);
+
+        $actual = $coveredFileData->retrieveCoverageFileData();
+        $this->assertSame($coverageFileData, $actual);
+
+        // From cache
+        $actual = $coveredFileData->retrieveCoverageFileData();
+        $this->assertSame($coverageFileData, $actual);
+    }
+
+    public function test_it_can_detect_coverage_data_without_tests(): void
+    {
+        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+
+        $coverageFileData = new CoverageFileData();
+
+        $coveredFileData = new CoveredFileData($splFileInfoMock, [$coverageFileData]);
+
+        $this->assertFalse($coveredFileData->hasTests());
+    }
+
+    public function test_it_proxies_call_file_code_coverage(): void
+    {
+        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+
+        $coverageFileData = new CoverageFileData(
+            [
+                21 => [
+                    CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
+                ],
+            ],
+            [
+                '__construct' => new MethodLocationData(
+                    19,
+                    22
+                ),
+            ]
+        );
+
+        $coveredFileData = new CoveredFileData($splFileInfoMock, [$coverageFileData]);
+
+        $this->assertTrue($coveredFileData->hasTests());
+
+        $this->assertCount(0, $coveredFileData->getAllTestsForMutation(
+            new NodeLineRangeData(1, 1),
+            false
+        ));
+
+        $this->assertCount(1, $coveredFileData->getAllTestsForMutation(
+            new NodeLineRangeData(20, 21),
+            false
+        ));
+
+        // This iterator_to_array is due to bug in our version of PHPUnit
+        $this->assertCount(0, iterator_to_array($coveredFileData->getAllTestsForMutation(
+            new NodeLineRangeData(1, 1),
+            true
+        )));
+
+        $this->assertCount(1, iterator_to_array($coveredFileData->getAllTestsForMutation(
+            new NodeLineRangeData(19, 22),
+            true
+        )));
+    }
 }
