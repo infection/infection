@@ -82,7 +82,11 @@ class IndexXmlCoverageParser
         foreach ($nodes as $node) {
             $relativeCoverageFilePath = $node->getAttribute('href');
 
-            $fileInfoProvider = new SourceFileInfoProvider($this->coverageDir, $relativeCoverageFilePath, $projectSource);
+            $fileInfoProvider = new SourceFileInfoProvider(
+                $this->coverageDir, 
+                $relativeCoverageFilePath, 
+                $projectSource
+            );
 
             $parser = new XmlCoverageParser($fileInfoProvider);
 
