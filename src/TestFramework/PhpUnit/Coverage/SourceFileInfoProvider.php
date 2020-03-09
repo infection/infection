@@ -54,7 +54,7 @@ use Webmozart\PathUtil\Path;
 class SourceFileInfoProvider
 {
     /**
-     * @var ?SafeDOMXPath
+     * @var SafeDOMXPath|null
      */
     private $xPath;
     private $coverageDir;
