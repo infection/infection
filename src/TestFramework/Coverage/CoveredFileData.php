@@ -63,7 +63,7 @@ class CoveredFileData implements LineCodeCoverage
     private $lazyCoverageFileData;
 
     /**
-     * @var ?FileCodeCoverage
+     * @var FileCodeCoverage|null
      */
     private $lineCodeCoverage;
 
