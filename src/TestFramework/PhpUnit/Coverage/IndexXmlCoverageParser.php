@@ -83,8 +83,8 @@ class IndexXmlCoverageParser
             $relativeCoverageFilePath = $node->getAttribute('href');
 
             $fileInfoProvider = new SourceFileInfoProvider(
-                $this->coverageDir, 
-                $relativeCoverageFilePath, 
+                $this->coverageDir,
+                $relativeCoverageFilePath,
                 $projectSource
             );
 

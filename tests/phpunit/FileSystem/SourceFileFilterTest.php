@@ -113,7 +113,7 @@ final class SourceFileFilterTest extends TestCase
 
     private function assertFilter(string $filter, iterable $input, array $expected): void
     {
-        $actual =  (new SourceFileFilter($filter))->filter($input);
+        $actual = (new SourceFileFilter($filter))->filter($input);
 
         $actual = take($actual)
             ->map(static function (SplFileInfo $fileInfo) {
