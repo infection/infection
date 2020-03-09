@@ -33,50 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Environment;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use OndraM\CiDetector\CiDetector;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
+use Infection\TestFramework\Coverage\CoverageNotFound;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class BuildContextResolver
+final class CoverageNotFoundTest extends TestCase
 {
-    private $ciDetector;
-
-    public function __construct(CiDetector $ciDetector)
+    public function test_it_can_be_instantiated(): void
     {
-        $this->ciDetector = $ciDetector;
-    }
+        $exception = new CoverageNotFound('Hello', 12);
 
-    public function resolve(): BuildContext
-    {
-        try {
-            $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException $exception) {
-            throw new CouldNotResolveBuildContext('The current process is not executed in a CI build');
-        }
-
-        if ($ci->isPullRequest()->yes()) {
-            throw new CouldNotResolveBuildContext('The current process is a pull request build');
-        }
-
-        if ($ci->isPullRequest()->maybe()) {
-            throw new CouldNotResolveBuildContext('The current process is maybe a pull request build');
-        }
-
-        if (trim($ci->getRepositoryName()) === '') {
-            throw new CouldNotResolveBuildContext('The repository name could not be determined for the current process');
-        }
-
-        if (trim($ci->getGitBranch()) === '') {
-            throw new CouldNotResolveBuildContext('The branch name could not be determined for the current process');
-        }
-
-        return new BuildContext(
-            $ci->getRepositoryName(),
-            $ci->getGitBranch()
-        );
+        $this->assertSame('Hello', $exception->getMessage());
+        $this->assertSame(12, $exception->getCode());
     }
 }

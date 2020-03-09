@@ -33,58 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Coverage;
+namespace Infection\TestFramework\Coverage;
 
-use Composer\XdebugHandler\XdebugHandler;
-use function extension_loaded;
-use const PHP_SAPI;
-use function Safe\preg_match;
+use LogicException;
 
 /**
  * @internal
  */
-final class CoverageRequirementChecker
+final class CoverageNotFound extends LogicException
 {
-    private $skipCoverage;
-    private $skipInitialTests;
-    private $initialTestPhpOptions;
-
-    public function __construct(bool $skipCoverage, bool $skipInitialTests, string $initialTestPhpOptions)
-    {
-        $this->skipCoverage = $skipCoverage;
-        $this->skipInitialTests = $skipInitialTests;
-        $this->initialTestPhpOptions = $initialTestPhpOptions;
-    }
-
-    public function hasDebuggerOrCoverageOption(): bool
-    {
-        return $this->skipCoverage
-            || PHP_SAPI === 'phpdbg'
-            || extension_loaded('xdebug')
-            || extension_loaded('pcov')
-            || XdebugHandler::getSkippedVersion()
-            || $this->isXdebugIncludedInInitialTestPhpOptions()
-            || $this->isPcovIncludedInInitialTestPhpOptions();
-    }
-
-    public function hasSkipInitialTestsWithoutCoverageOption(): bool
-    {
-        return $this->skipInitialTests && !$this->skipCoverage;
-    }
-
-    private function isXdebugIncludedInInitialTestPhpOptions(): bool
-    {
-        return (bool) preg_match(
-            '/(zend_extension\s*=.*xdebug.*)/mi',
-            $this->initialTestPhpOptions
-        );
-    }
-
-    private function isPcovIncludedInInitialTestPhpOptions(): bool
-    {
-        return (bool) preg_match(
-            '/(extension\s*=.*pcov.*)/mi',
-            $this->initialTestPhpOptions
-        );
-    }
 }

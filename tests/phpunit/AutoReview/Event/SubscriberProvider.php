@@ -51,11 +51,6 @@ final class SubscriberProvider
      */
     private static $subscriberClasses;
 
-    /**
-     * @var array<array{class-string, string[]}>|null
-     */
-    private static $subscriberMethods;
-
     private function __construct()
     {
     }

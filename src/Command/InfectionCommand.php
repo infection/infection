@@ -47,7 +47,6 @@ use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function Safe\sprintf;
@@ -202,6 +201,7 @@ final class InfectionCommand extends BaseCommand
         $engine = new Engine(
             $this->container->getConfiguration(),
             $this->container->getTestFrameworkAdapter(),
+            $this->container->getCoverageChecker(),
             $this->container->getEventDispatcher(),
             $this->container->getInitialTestsRunner(),
             $this->container->getMemoryLimiter(),
@@ -246,15 +246,7 @@ final class InfectionCommand extends BaseCommand
     {
         Assert::notNull($this->container);
 
-        $coverageChecker = $this->container->getCoverageRequirementChecker();
-
-        if ($coverageChecker->hasSkipInitialTestsWithoutCoverageOption()) {
-            throw CoverageDoesNotExistException::mustAlreadyExist();
-        }
-
-        if (!$coverageChecker->hasDebuggerOrCoverageOption()) {
-            throw CoverageDoesNotExistException::unableToGenerate();
-        }
+        $this->container->getCoverageChecker()->checkCoverageRequirements();
 
         $config = $this->container->getConfiguration();
 

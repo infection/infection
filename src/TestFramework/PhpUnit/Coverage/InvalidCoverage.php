@@ -33,49 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Environment;
+namespace Infection\TestFramework\PhpUnit\Coverage;
 
-use function array_key_exists;
-use function Safe\sprintf;
+use InvalidArgumentException;
 
 /**
  * @internal
- *
- * @see https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
  */
-final class TravisCiResolver implements BuildContextResolver
+final class InvalidCoverage extends InvalidArgumentException
 {
-    public function resolve(array $environment): BuildContext
-    {
-        if (
-            !array_key_exists('TRAVIS', $environment)
-            || !array_key_exists('TRAVIS_PULL_REQUEST', $environment)
-            || $environment['TRAVIS'] !== 'true'
-        ) {
-            throw new CouldNotResolveBuildContext(
-                'The current process is not executed in a Travis CI build'
-            );
-        }
-
-        if ($environment['TRAVIS_PULL_REQUEST'] !== 'false') {
-            throw new CouldNotResolveBuildContext(sprintf(
-                'The current process is a pull request build (TRAVIS_PULL_REQUEST=%s)',
-                $environment['TRAVIS_PULL_REQUEST']
-            ));
-        }
-
-        if (
-            !array_key_exists('TRAVIS_REPO_SLUG', $environment)
-            || !array_key_exists('TRAVIS_BRANCH', $environment)
-        ) {
-            throw new CouldNotResolveBuildContext(
-                'Could not find the repository slug (TRAVIS_REPO_SLUG) or branch (TRAVIS_BRANCH)'
-            );
-        }
-
-        return new BuildContext(
-            $environment['TRAVIS_REPO_SLUG'],
-            $environment['TRAVIS_BRANCH']
-        );
-    }
 }

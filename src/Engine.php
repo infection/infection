@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use function dirname;
 use function explode;
-use function file_exists;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
@@ -50,14 +48,10 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryLimiter;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use const PHP_EOL;
-use function Safe\sprintf;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -66,6 +60,7 @@ final class Engine
 {
     private $config;
     private $adapter;
+    private $coverageChecker;
     private $eventDispatcher;
     private $initialTestsRunner;
     private $memoryLimitApplier;
@@ -79,6 +74,7 @@ final class Engine
     public function __construct(
         Configuration $config,
         TestFrameworkAdapter $adapter,
+        CoverageChecker $coverageChecker,
         EventDispatcher $eventDispatcher,
         InitialTestsRunner $initialTestsRunner,
         MemoryLimiter $memoryLimitApplier,
@@ -91,6 +87,7 @@ final class Engine
     ) {
         $this->config = $config;
         $this->adapter = $adapter;
+        $this->coverageChecker = $coverageChecker;
         $this->eventDispatcher = $eventDispatcher;
         $this->initialTestsRunner = $initialTestsRunner;
         $this->memoryLimitApplier = $memoryLimitApplier;
@@ -114,7 +111,7 @@ final class Engine
     {
         if ($this->config->shouldSkipInitialTests()) {
             $this->consoleOutput->logSkippingInitialTests();
-            $this->assertCodeCoverageExists($this->config->getTestFramework());
+            $this->coverageChecker->checkCoverageExists();
 
             return;
         }
@@ -129,7 +126,10 @@ final class Engine
             throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuitProcess, $this->adapter);
         }
 
-        $this->assertCodeCoverageProduced($initialTestSuitProcess, $this->config->getTestFramework());
+        $this->coverageChecker->checkCoverageHasBeenGenerated(
+            $initialTestSuitProcess->getCommandLine(),
+            $initialTestSuitProcess->getOutput()
+        );
 
         $this->memoryLimitApplier->applyMemoryLimitFromProcess($initialTestSuitProcess, $this->adapter);
     }
@@ -175,44 +175,5 @@ final class Engine
         $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
 
         return true;
-    }
-
-    private function assertCodeCoverageExists(string $testFrameworkKey): void
-    {
-        $coverageDir = $this->config->getCoveragePath();
-
-        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME;
-
-        if (!file_exists($coverageIndexFilePath)) {
-            throw CoverageDoesNotExistException::with(
-                $coverageIndexFilePath,
-                $testFrameworkKey,
-                dirname($coverageIndexFilePath, 2)
-            );
-        }
-    }
-
-    private function assertCodeCoverageProduced(Process $initialTestsProcess, string $testFrameworkKey): void
-    {
-        $coverageDir = $this->config->getCoveragePath();
-
-        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME;
-
-        $processInfo = sprintf(
-            '%sCommand line: %s%sProcess Output: %s',
-            PHP_EOL,
-            $initialTestsProcess->getCommandLine(),
-            PHP_EOL,
-            $initialTestsProcess->getOutput()
-        );
-
-        if (!file_exists($coverageIndexFilePath)) {
-            throw CoverageDoesNotExistException::with(
-                $coverageIndexFilePath,
-                $testFrameworkKey,
-                dirname($coverageIndexFilePath, 2),
-                $processInfo
-            );
-        }
     }
 }

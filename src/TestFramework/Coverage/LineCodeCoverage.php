@@ -42,14 +42,9 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
  */
 interface LineCodeCoverage
 {
-    /**
-     * @throws CoverageDoesNotExistException
-     */
     public function hasTests(): bool;
 
     /**
-     * @throws CoverageDoesNotExistException
-     *
      * @return iterable<CoverageLineData>
      */
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;

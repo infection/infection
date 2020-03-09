@@ -33,32 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Environment;
+namespace Infection\Tests\Double\OndraM\CiDetector;
 
-/**
- * @internal
- */
-final class ChainBuildContextResolver implements BuildContextResolver
+use OndraM\CiDetector\Env;
+
+final class ConfigurableEnv extends Env
 {
-    private $buildContextResolvers;
+    private $variables = [];
 
-    public function __construct(BuildContextResolver ...$buildContextResolvers)
+    /**
+     * @param array<string, string|false> $variables
+     */
+    public function setVariables(array $variables): void
     {
-        $this->buildContextResolvers = $buildContextResolvers;
+        $this->variables = $variables;
     }
 
-    public function resolve(array $environment): BuildContext
+    public function get(string $name)
     {
-        foreach ($this->buildContextResolvers as $buildContextResolver) {
-            try {
-                $buildContext = $buildContextResolver->resolve($environment);
-            } catch (CouldNotResolveBuildContext $exception) {
-                continue;
-            }
-
-            return $buildContext;
+        if (!array_key_exists($name, $this->variables)) {
+            return false;
         }
 
-        throw new CouldNotResolveBuildContext('Build context could not be resolved.');
+        return $this->variables[$name];
     }
 }
