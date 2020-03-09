@@ -145,7 +145,7 @@ final class E2ETest extends TestCase
         }
 
         $output = $this->runInfection(self::EXPECT_SUCCESS, [
-            sprintf('--test-framework-options=--exclude-group=%s', self::EXCLUDED_GROUP),
+            '--test-framework-options=--exclude-group=' . self::EXCLUDED_GROUP,
         ]);
 
         $this->assertRegExp('/\d+ mutations were generated/', $output);
