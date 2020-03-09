@@ -91,7 +91,7 @@ class SourceFileFilter
      *
      * @return Iterator<SplFileInfo&CoveredFileData>
      */
-    private function iterableToIterator(iterable $input)
+    private function iterableToIterator(iterable $input): Iterator
     {
         if ($input instanceof Iterator) {
             // Generator is an iterator, means most of the time we're done right here.
