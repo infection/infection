@@ -98,7 +98,16 @@ class SourceFileFilter
             return $input;
         }
 
-        // Clause for all other cases, e.g. when testing
+        /*
+         * Clause for all other cases, e.g. when testing.
+         *
+         * RealPathFilterIterator wants an iterator, not just any iterable or traversable.
+         * But not any Traversable is an Iterator. But since we know most of the time we're
+         * dealing with Generators, which are instances of an Iterator, we can jump them
+         * through. But we may want to use other types of iterables, e.g. arrays in tests,
+         * and that last clause is to covert them, or any other non-Iterator object, to
+         * a Generator which is an Iterator. Traversable types are complicated, right.
+         */
         return (static function () use ($input): Iterator {
             yield from $input;
         })();
