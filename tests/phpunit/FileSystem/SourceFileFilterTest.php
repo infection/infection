@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use function array_values;
 use Generator;
 use Infection\FileSystem\SourceFileFilter;
 use IteratorIterator;
@@ -57,7 +58,7 @@ final class SourceFileFilterTest extends TestCase
     {
         $fileFilter = new SourceFileFilter($filter);
 
-        $this->assertSame($expectedFilters, $fileFilter->getFilters());
+        $this->assertSame($expectedFilters, array_values($fileFilter->getFilters()));
     }
 
     public function filterProvider(): Generator
