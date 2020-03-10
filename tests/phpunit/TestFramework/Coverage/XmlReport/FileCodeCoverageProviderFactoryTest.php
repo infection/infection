@@ -35,34 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Generator;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
 
 final class FileCodeCoverageProviderFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider valueProvider
-     */
-    public function test_it_can_create_an_XMLLine_code_coverage_instance(
-        string $frameworkKey
-    ): void {
+    public function test_it_can_create_an_XMLLine_code_coverage_instance(): void
+    {
         // We cannot test much of the generated instance here since it does not exposes any state.
         // We can only ensure that an instance is created in all scenarios
         (new FileCodeCoverageProviderFactory(
             '/path/to/coverage/dir',
             $this->createMock(IndexXmlCoverageParser::class)
-        ))->create($frameworkKey);
+        ))->create();
 
         $this->addToAssertionCount(1);
-    }
-
-    public function valueProvider(): Generator
-    {
-        foreach (TestFrameworkTypes::TYPES as $frameworkKey) {
-            yield [$frameworkKey];
-        }
     }
 }

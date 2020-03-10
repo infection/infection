@@ -37,8 +37,6 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\SourceFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -56,14 +54,11 @@ final class FileCodeCoverageProviderFactory
         $this->coverageXmlParser = $coverageXmlParser;
     }
 
-    public function create(string $testFrameworkKey): SourceFileDataProvider
+    public function create(): SourceFileDataProvider
     {
-        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
-
         return new PhpUnitXmlCoveredFileDataProvider(
             $this->coverageDir,
-            $this->coverageXmlParser,
-            $testFrameworkKey
+            $this->coverageXmlParser
         );
     }
 }

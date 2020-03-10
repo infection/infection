@@ -57,16 +57,13 @@ class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
 
     private $coverageDir;
     private $parser;
-    private $testFrameworkKey;
 
     public function __construct(
         string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser,
-        string $testFrameworkKey
+        IndexXmlCoverageParser $coverageXmlParser
     ) {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;
-        $this->testFrameworkKey = $testFrameworkKey;
     }
 
     /**

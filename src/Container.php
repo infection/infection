@@ -160,9 +160,7 @@ final class Container
             },
             SourceFileDataFactory::class => static function (self $container): SourceFileDataFactory {
                 return new SourceFileDataFactory(
-                    $container->getFileCodeCoverageProviderFactory()->create(
-                        $container->getConfiguration()->getTestFramework()
-                    ),
+                    $container->getFileCodeCoverageProviderFactory()->create(),
                     $container->getJUnitTestExecutionInfoAdder(),
                     $container->getSourceFileFilter(),
                     $container->getConfiguration()->getSourceFiles(),
