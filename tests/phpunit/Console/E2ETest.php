@@ -133,6 +133,7 @@ final class E2ETest extends TestCase
      * php -dmemory_limit=512M vendor/bin/phpunit --group=large
      *
      * @large
+     * @coversNothing
      */
     public function test_it_runs_on_itself(): void
     {
