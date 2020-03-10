@@ -37,6 +37,8 @@ namespace Infection\Mutation;
 
 use function array_intersect_key;
 use function array_keys;
+use function array_map;
+use function array_sum;
 use function count;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
@@ -156,6 +158,13 @@ class Mutation
     public function getAllTests(): array
     {
         return $this->tests;
+    }
+
+    public function getTimeToTest(): float
+    {
+        return array_sum(array_map(static function (CoverageLineData $data) {
+            return $data->time;
+        }, $this->tests));
     }
 
     public function getHash(): string

@@ -39,6 +39,7 @@ use function floor;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\MutantWasCreated;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MetricsCalculator;
@@ -86,6 +87,11 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->mutationCount = $event->getMutationCount();
 
         $this->outputFormatter->start($this->mutationCount);
+    }
+
+    public function onMutantWasCreated(MutantWasCreated $event): void
+    {
+        $this->metricsCalculator->collectMutant($event->getMutant());
     }
 
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
@@ -161,6 +167,9 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $coveredMsi = floor($this->metricsCalculator->getCoveredCodeMutationScoreIndicator());
         $coveredMsiTag = $this->getPercentageTag($coveredMsi);
 
+        $medianTestingTime = round($this->metricsCalculator->getMedianTimeToTest(), 5);
+        $medianTestingTimeTag = $this->getTimeTag($medianTestingTime);
+
         $this->output->writeln(['', 'Metrics:']);
 
         $this->output->writeln(
@@ -173,6 +182,10 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
         $this->output->writeln(
             $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$coveredMsi}%</{$coveredMsiTag}>")
+        );
+
+        $this->output->writeln(
+            $this->addIndentation("Median testing time: <{$medianTestingTimeTag}>{$medianTestingTime}%</{$medianTestingTimeTag}>")
         );
 
         $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
@@ -198,6 +211,19 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         }
 
         if ($percentage >= 50 && $percentage < 90) {
+            return 'medium';
+        }
+
+        return 'high';
+    }
+
+    private function getTimeTag(float $time): string
+    {
+        if ($time > 1) {
+            return 'low';
+        }
+
+        if ($time > 0.1) {
             return 'medium';
         }
 

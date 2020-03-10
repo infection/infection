@@ -37,6 +37,7 @@ namespace Infection\Mutant;
 
 use Infection\Process\MutantProcess;
 use InvalidArgumentException;
+use function Safe\sort;
 use function Safe\sprintf;
 
 /**
@@ -80,6 +81,9 @@ class MetricsCalculator
     private $notCoveredExecutionResults;
     private $allExecutionResults;
 
+    /** @var float[] */
+    private $timeToTest = [];
+
     /**
      * @var Calculator|null
      */
@@ -93,6 +97,33 @@ class MetricsCalculator
         $this->timedOutExecutionResults = new SortableMutantExecutionResults();
         $this->notCoveredExecutionResults = new SortableMutantExecutionResults();
         $this->allExecutionResults = new SortableMutantExecutionResults();
+    }
+
+    public function collectMutant(Mutant ...$mutants): void
+    {
+        foreach ($mutants as $mutant) {
+            $this->timeToTest[] = $mutant->getMutation()->getTimeToTest();
+        }
+    }
+
+    public function getMedianTimeToTest(): float
+    {
+        if ($this->timeToTest === []) {
+            return .0;
+        }
+
+        sort($this->timeToTest);
+
+        $mutationsCount = count($this->timeToTest);
+        $medianIndex = ceil($mutationsCount / 2);
+
+        if ($mutationsCount % 2 === 1) {
+            // Odd number of items, we're done
+            return $this->timeToTest[$medianIndex];
+        }
+
+        // Average of two items in the middle
+        return ($this->timeToTest[$medianIndex] + $this->timeToTest[$medianIndex + 1]) / 2;
     }
 
     public function collect(MutantExecutionResult ...$executionResults): void
