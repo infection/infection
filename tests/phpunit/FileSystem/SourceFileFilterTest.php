@@ -56,14 +56,14 @@ final class SourceFileFilterTest extends TestCase
     public function test_it_can_parse_and_normalize_string_filter(string $filter, array $expectedFilters): void
     {
         $fileFilter = new SourceFileFilter($filter);
-        
+
         $this->assertSame($expectedFilters, $fileFilter->getFilters());
     }
 
     public function filterProvider(): Generator
     {
         yield 'empty' => ['', []];
-        
+
         yield 'nominal' => [
             'src/Foo.php, src/Bar.php',
             [
@@ -71,8 +71,8 @@ final class SourceFileFilterTest extends TestCase
                 'src/Bar.php',
             ],
         ];
-        
-         yield 'spaces & untrimmed string' => [
+
+        yield 'spaces & untrimmed string' => [
             '  src/Foo.php,, , src/Bar.php  ',
             [
                 'src/Foo.php',
@@ -80,6 +80,7 @@ final class SourceFileFilterTest extends TestCase
             ],
         ];
     }
+
     /**
      * @dataProvider fileListProvider
      */
