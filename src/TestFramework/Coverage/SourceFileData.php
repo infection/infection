@@ -55,7 +55,7 @@ class SourceFileData implements LineCodeCoverage
     /**
      * @var CoverageReport|null
      */
-    private $coverageFileData;
+    private $coverageReport;
 
     /**
      * @var iterable<CoverageReport>
@@ -97,22 +97,22 @@ class SourceFileData implements LineCodeCoverage
      */
     public function retrieveCoverageReport(): CoverageReport
     {
-        if ($this->coverageFileData !== null) {
-            return $this->coverageFileData;
+        if ($this->coverageReport !== null) {
+            return $this->coverageReport;
         }
 
-        foreach ($this->lazyCoverageReport as $coverageFileData) {
+        foreach ($this->lazyCoverageReport as $coverageReport) {
             // is a Generator with one yield, thus it'll only trigger here
             // (or this can be an array with one element)
-            $this->coverageFileData = $coverageFileData;
+            $this->coverageReport = $coverageReport;
 
             break;
         }
 
-        Assert::isInstanceOf($this->coverageFileData, CoverageReport::class);
+        Assert::isInstanceOf($this->coverageReport, CoverageReport::class);
         $this->lazyCoverageReport = []; // let GC have it
 
-        return $this->coverageFileData;
+        return $this->coverageReport;
     }
 
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable

@@ -78,25 +78,25 @@ final class SourceFileDataTest extends TestCase
     public function test_it_can_retreive_file_data(): void
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $coverageFileData = new CoverageReport();
+        $coverageReport = new CoverageReport();
 
-        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageFileData, null]);
+        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageReport, null]);
 
         $actual = $sourceFileData->retrieveCoverageReport();
-        $this->assertSame($coverageFileData, $actual);
+        $this->assertSame($coverageReport, $actual);
 
         // From cache
         $actual = $sourceFileData->retrieveCoverageReport();
-        $this->assertSame($coverageFileData, $actual);
+        $this->assertSame($coverageReport, $actual);
     }
 
     public function test_it_can_detect_coverage_data_without_tests(): void
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $coverageFileData = new CoverageReport();
+        $coverageReport = new CoverageReport();
 
-        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageFileData]);
+        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageReport]);
 
         $this->assertFalse($sourceFileData->hasTests());
     }
@@ -105,7 +105,7 @@ final class SourceFileDataTest extends TestCase
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $coverageFileData = new CoverageReport(
+        $coverageReport = new CoverageReport(
             [
                 21 => [
                     CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
@@ -119,7 +119,7 @@ final class SourceFileDataTest extends TestCase
             ]
         );
 
-        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageFileData]);
+        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageReport]);
 
         $this->assertTrue($sourceFileData->hasTests());
 
