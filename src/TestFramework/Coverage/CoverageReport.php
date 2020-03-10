@@ -33,54 +33,56 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\CoverageReport;
-use function is_array;
-use function is_scalar;
-use function iterator_to_array;
-use Traversable;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 
-final class CoverageHelper
+/**
+ * @internal
+ *
+ * ```
+ * 'byMethod' => [
+ *      'mutate' => MethodLocationData::['startLine' => 12, 'endLine' => 16],
+ *      ...
+ * ],
+ * 'byLine' => [
+ *     22 => [
+ *         CoverageLineData::[
+ *             'testMethod' => '\A\B\C::test_it_works',
+ *             'testFilePath' => '/path/to/A/B/C.php',
+ *             'time' => 0.34325,
+ *         ],
+ *         ...
+ *      ]
+ *  ]
+ * ```
+ *
+ * TODO: rename to TestLocations
+ */
+final class CoverageReport
 {
-    private function __construct()
-    {
-    }
+    /**
+     * @var array<int, array<int, CoverageLineData>>
+     */
+    public $byLine = [];
 
     /**
-     * @param array<string, CoverageReport> $coverage
+     * TODO: use a getter "get"
      *
-     * @return array<string|int, mixed>
+     * @var array<string, MethodLocationData>
      */
-    public static function convertToArray(iterable $coverage): array
+    public $byMethod = [];
+
+    /**
+     * TODO: rename CoverageLineData to TestLocation
+     * TODO: rename MethodLocationData to SourceMethodRange
+     *
+     * @param array<int, array<int, CoverageLineData>> $byLine
+     * @param array<string, MethodLocationData> $byMethod
+     */
+    public function __construct(array $byLine = [], array $byMethod = [])
     {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
-        }
-
-        return self::serializeValue($coverage);
-    }
-
-    private static function serializeValue($mixed)
-    {
-        if ($mixed === null) {
-            return null;
-        }
-
-        if (is_scalar($mixed)) {
-            return $mixed;
-        }
-
-        if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
-        }
-
-        return self::serializeValue((array) $mixed);
+        $this->byLine = $byLine;
+        $this->byMethod = $byMethod;
     }
 }

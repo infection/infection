@@ -33,33 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
-use Infection\TestFramework\Coverage\MethodLocationData;
-use PHPUnit\Framework\TestCase;
+use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\SourceFileDataProvider;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use function Safe\file_get_contents;
 
-final class CoverageFileDataTest extends TestCase
+/**
+ * Source of primary coverage data. Used by SourceFileDataFactory.
+ *
+ * @internal
+ * @final
+ *
+ * TODO: rename to PhpUnitXmlCoverageTraceProvider: Provides the traces based on the PHPUnit XML coverage collected
+ */
+class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
 {
-    public function test_it_has_default_values(): void
-    {
-        $coverageFileData = new CoverageFileData();
+    /**
+     * TODO: make this constant private
+     */
+    public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
 
-        $this->assertSame([], $coverageFileData->byMethod);
-        $this->assertSame([], $coverageFileData->byLine);
+    private $coverageDir;
+    private $parser;
+
+    public function __construct(
+        string $coverageDir,
+        IndexXmlCoverageParser $coverageXmlParser
+    ) {
+        $this->coverageDir = $coverageDir;
+        $this->parser = $coverageXmlParser;
     }
 
-    public function test_it_creates_self_object_with_named_constructor(): void
+    /**
+     * @return iterable<SourceFileData>
+     */
+    public function provideFiles(): iterable
     {
-        $pathToTest = '/path/to/Test.php';
-
-        $coverageFileData = new CoverageFileData(
-            [1 => [CoverageLineData::withTestMethod($pathToTest)]],
-            ['method' => new MethodLocationData(1, 3)]
+        $coverageIndexFileContent = file_get_contents(
+            $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME
         );
 
-        $this->assertSame($pathToTest, $coverageFileData->byLine[1][0]->testMethod);
-        $this->assertSame(1, $coverageFileData->byMethod['method']->startLine);
+        return $this->parser->parse($coverageIndexFileContent);
     }
 }

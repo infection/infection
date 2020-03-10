@@ -33,54 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\TestFramework\PhpUnit\Coverage;
 
-use Infection\TestFramework\Coverage\CoverageReport;
-use function is_array;
-use function is_scalar;
-use function iterator_to_array;
-use Traversable;
+use DOMDocument;
+use Infection\TestFramework\SafeDOMXPath;
+use function Safe\preg_replace;
+use Webmozart\Assert\Assert;
 
-final class CoverageHelper
+/**
+ * @internal
+ */
+final class XPathFactory
 {
     private function __construct()
     {
     }
 
-    /**
-     * @param array<string, CoverageReport> $coverage
-     *
-     * @return array<string|int, mixed>
-     */
-    public static function convertToArray(iterable $coverage): array
+    public static function createXPath(string $coverageContent): SafeDOMXPath
     {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
-        }
+        $document = new DOMDocument();
+        $success = @$document->loadXML(self::removeNamespace($coverageContent));
 
-        return self::serializeValue($coverage);
+        Assert::true($success);
+
+        return new SafeDOMXPath($document);
     }
 
-    private static function serializeValue($mixed)
+    /**
+     * Remove namespace to work with xPath without a headache
+     */
+    private static function removeNamespace(string $xml): string
     {
-        if ($mixed === null) {
-            return null;
-        }
+        /** @var string $cleanedXml */
+        $cleanedXml = preg_replace('/xmlns=\".*?\"/', '', $xml);
 
-        if (is_scalar($mixed)) {
-            return $mixed;
-        }
+        Assert::string($cleanedXml);
 
-        if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
-        }
-
-        return self::serializeValue((array) $mixed);
+        return $cleanedXml;
     }
 }

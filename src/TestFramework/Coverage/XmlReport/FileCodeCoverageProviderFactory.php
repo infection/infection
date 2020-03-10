@@ -35,11 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
+use Infection\TestFramework\Coverage\SourceFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -48,35 +45,20 @@ final class FileCodeCoverageProviderFactory
 {
     private $coverageDir;
     private $coverageXmlParser;
-    private $testFileDataProvider;
 
     public function __construct(
         string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser,
-        TestFileDataProvider $testFileDataProvider
+        IndexXmlCoverageParser $coverageXmlParser
     ) {
         $this->coverageDir = $coverageDir;
         $this->coverageXmlParser = $coverageXmlParser;
-        $this->testFileDataProvider = $testFileDataProvider;
     }
 
-    public function create(
-        string $testFrameworkKey,
-        TestFrameworkAdapter $adapter
-    ): FileCodeCoverageProvider {
-        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
-
-        $testFileDataProviderService = $adapter->hasJUnitReport()
-            ? $this->testFileDataProvider
-            : null
-        ;
-
-        return new FileCodeCoverageProvider(
-            new PhpUnitXmlCoverageFactory(
-                $this->coverageDir,
-                $this->coverageXmlParser,
-                $testFileDataProviderService
-            )
+    public function create(): SourceFileDataProvider
+    {
+        return new PhpUnitXmlCoveredFileDataProvider(
+            $this->coverageDir,
+            $this->coverageXmlParser
         );
     }
 }

@@ -93,7 +93,6 @@ class Mutation
         array $tests
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
-        Assert::allIsInstanceOf($tests, CoverageLineData::class);
 
         foreach (self::ATTRIBUTE_KEYS as $key) {
             Assert::keyExists($attributes, $key);

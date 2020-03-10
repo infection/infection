@@ -63,13 +63,12 @@ use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\TestFramework\AdapterInstaller;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
@@ -117,7 +116,6 @@ final class ProjectCodeProvider
         InitialTestRunProcessBuilder::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
-        IndexXmlCoverageParser::class,
         MemoryLimiterEnvironment::class,
     ];
 
@@ -222,7 +220,7 @@ final class ProjectCodeProvider
                     && !in_array(
                         $className,
                         [
-                            CoverageFileData::class,
+                            CoverageReport::class,
                             CoverageLineData::class,
                             MethodLocationData::class,
                             NodeLineRangeData::class,
