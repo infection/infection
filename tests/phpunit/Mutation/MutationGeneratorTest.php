@@ -45,8 +45,8 @@ use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\CoverageReport;
-use Infection\TestFramework\Coverage\CoveredFileData;
-use Infection\TestFramework\Coverage\CoveredFileDataProvider;
+use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\SourceFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverage;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
@@ -63,8 +63,8 @@ final class MutationGeneratorTest extends TestCase
         $fileInfo = $this->createMock(SplFileInfo::class);
 
         // Prophecy compares arguments on equality, therefore these have to be somewhat unique
-        $fileInfoA = new CoveredFileData($fileInfo, [1]);
-        $fileInfoB = new CoveredFileData($fileInfo, [2]);
+        $fileInfoA = new SourceFileData($fileInfo, [1]);
+        $fileInfoB = new SourceFileData($fileInfo, [2]);
 
         $codeCoverageMock = $this->createMock(FileCodeCoverage::class);
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
@@ -114,7 +114,7 @@ final class MutationGeneratorTest extends TestCase
             $mutation2,
         ];
 
-        $fileDataProviderMock = $this->createMock(CoveredFileDataProvider::class);
+        $fileDataProviderMock = $this->createMock(SourceFileDataProvider::class);
         $fileDataProviderMock
             ->expects($this->exactly(1))
             ->method('provideFiles')
@@ -174,7 +174,7 @@ final class MutationGeneratorTest extends TestCase
         $providerMock = $this->createMock(FileCodeCoverageProvider::class);
 
         $mutationGenerator = new MutationGenerator(
-            $this->createCoveredFileDataProviderMock($sourceFiles),
+            $this->createSourceFileDataProviderMock($sourceFiles),
             $providerMock,
             [],
             $eventDispatcherMock,
@@ -219,7 +219,7 @@ final class MutationGeneratorTest extends TestCase
         $providerMock = $this->createMock(FileCodeCoverageProvider::class);
 
         $mutationGenerator = new MutationGenerator(
-            $this->createCoveredFileDataProviderMock($sourceFiles),
+            $this->createSourceFileDataProviderMock($sourceFiles),
             $providerMock,
             [],
             $eventDispatcherMock,
@@ -231,13 +231,13 @@ final class MutationGeneratorTest extends TestCase
         }
     }
 
-    private function createCoveredFileDataProviderMock(iterable $files): CoveredFileDataProvider
+    private function createSourceFileDataProviderMock(iterable $files): SourceFileDataProvider
     {
-        $providerMock = $this->createMock(CoveredFileDataProvider::class);
+        $providerMock = $this->createMock(SourceFileDataProvider::class);
         $providerMock
             ->method('provideFiles')
             ->willReturn(take($files)->map(static function (SplFileInfo $fileInfo) {
-                return new CoveredFileData($fileInfo, [new CoverageReport()]);
+                return new SourceFileData($fileInfo, [new CoverageReport()]);
             }))
         ;
 

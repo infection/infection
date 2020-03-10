@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\CoveredFileData;
+use Infection\TestFramework\Coverage\SourceFileData;
 
 /**
  * @internal
@@ -43,7 +43,7 @@ use Infection\TestFramework\Coverage\CoveredFileData;
  */
 class FileCodeCoverageProvider
 {
-    public function provideFor(CoveredFileData $fileData): FileCodeCoverage
+    public function provideFor(SourceFileData $fileData): FileCodeCoverage
     {
         return new FileCodeCoverage($fileData->retrieveCoverageReport());
     }

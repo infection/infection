@@ -37,8 +37,8 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageReport;
-use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
@@ -50,7 +50,7 @@ final class FileCodeCoverageProviderTest extends TestCase
         $filePath = '/path/to/acme/Foo.php';
 
         $provider = $this->createCodeCoverageDataProvider();
-        $codeCoverageData = $provider->provideFor($this->createCoveredFileData($filePath));
+        $codeCoverageData = $provider->provideFor($this->createSourceFileData($filePath));
 
         $this->assertTrue($codeCoverageData->hasTests());
     }
@@ -106,9 +106,9 @@ final class FileCodeCoverageProviderTest extends TestCase
         );
     }
 
-    private function createCoveredFileData(string $filePath): CoveredFileData
+    private function createSourceFileData(string $filePath): SourceFileData
     {
-        return new CoveredFileData(
+        return new SourceFileData(
             $this->createSplFileInfo($filePath),
             [$this->getParsedCodeCoverageData()]
         );

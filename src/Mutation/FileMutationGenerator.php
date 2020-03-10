@@ -42,9 +42,9 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
-use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\SourceFileData;
 use Webmozart\Assert\Assert;
 
 /**
@@ -76,7 +76,7 @@ class FileMutationGenerator
      * @return iterable<Mutation>
      */
     public function generate(
-        CoveredFileData $fileData,
+        SourceFileData $fileData,
         bool $onlyCovered,
         LineCodeCoverage $codeCoverage,
         array $mutators,

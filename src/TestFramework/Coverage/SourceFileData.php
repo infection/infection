@@ -45,7 +45,7 @@ use Webmozart\Assert\Assert;
  * @internal
  * @final
  */
-class CoveredFileData implements LineCodeCoverage
+class SourceFileData implements LineCodeCoverage
 {
     /**
      * @var SplFileInfo

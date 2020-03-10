@@ -43,8 +43,8 @@ use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\TestFramework\Coverage\CoveredFileData;
-use Infection\TestFramework\Coverage\CoveredFileDataProvider;
+use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\SourceFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Webmozart\Assert\Assert;
 
@@ -69,7 +69,7 @@ final class MutationGenerator
      * @param Mutator[] $mutators
      */
     public function __construct(
-        CoveredFileDataProvider $coveredFileDataProvider,
+        SourceFileDataProvider $coveredFileDataProvider,
         FileCodeCoverageProvider $coverageProvider,
         array $mutators,
         EventDispatcher $eventDispatcher,
@@ -102,7 +102,7 @@ final class MutationGenerator
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
-        /** @var CoveredFileData $fileData */
+        /** @var SourceFileData $fileData */
         foreach ($coveredFiles as $fileData) {
             yield from $this->fileMutationGenerator->generate(
                 $fileData,

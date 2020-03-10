@@ -35,18 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\CoveredFileData;
-use Infection\TestFramework\Coverage\CoveredFileDataProvider;
+use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\SourceFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use function Safe\file_get_contents;
 
 /**
- * Source of primary coverage data. Used by CoveredFileDataFactory.
+ * Source of primary coverage data. Used by SourceFileDataFactory.
  *
  * @internal
  * @final
  */
-class PhpUnitXmlCoveredFileDataProvider implements CoveredFileDataProvider
+class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
 {
     /**
      * TODO: make this constant private
@@ -68,7 +68,7 @@ class PhpUnitXmlCoveredFileDataProvider implements CoveredFileDataProvider
     }
 
     /**
-     * @return iterable<CoveredFileData>
+     * @return iterable<SourceFileData>
      */
     public function provideFiles(): iterable
     {

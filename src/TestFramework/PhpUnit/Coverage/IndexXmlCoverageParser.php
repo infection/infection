@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use DOMElement;
-use Infection\TestFramework\Coverage\CoveredFileData;
+use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\SafeDOMXPath;
 
 /**
@@ -59,7 +59,7 @@ class IndexXmlCoverageParser
      *
      * @throws NoLineExecuted
      *
-     * @return iterable<CoveredFileData>
+     * @return iterable<SourceFileData>
      */
     public function parse(string $coverageXmlContent): iterable
     {
@@ -71,7 +71,7 @@ class IndexXmlCoverageParser
     }
 
     /**
-     * @return iterable<CoveredFileData>
+     * @return iterable<SourceFileData>
      */
     private function parseNodes(SafeDOMXPath $xPath): iterable
     {

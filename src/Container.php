@@ -89,13 +89,13 @@ use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\Coverage\CoveredFileDataFactory;
 use Infection\TestFramework\Coverage\CoveredFileNameFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\SourceFileDataFactory;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
 use Infection\TestFramework\Factory;
@@ -159,8 +159,8 @@ final class Container
             IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
                 return new IndexXmlCoverageParser($container->getConfiguration()->getCoveragePath());
             },
-            CoveredFileDataFactory::class => static function (self $container): CoveredFileDataFactory {
-                return new CoveredFileDataFactory(
+            SourceFileDataFactory::class => static function (self $container): SourceFileDataFactory {
+                return new SourceFileDataFactory(
                     $container->getFileCodeCoverageProviderFactory()->create(
                         $container->getConfiguration()->getTestFramework()
                     ),
@@ -432,7 +432,7 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new MutationGenerator(
-                    $container->getCoveredFileDataFactory(),
+                    $container->getSourceFileDataFactory(),
                     $container->getFileCodeCoverageProvider(),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
@@ -580,9 +580,9 @@ final class Container
         return $this->get(IndexXmlCoverageParser::class);
     }
 
-    public function getCoveredFileDataFactory(): CoveredFileDataFactory
+    public function getSourceFileDataFactory(): SourceFileDataFactory
     {
-        return $this->get(CoveredFileDataFactory::class);
+        return $this->get(SourceFileDataFactory::class);
     }
 
     public function getCoveredFileNameFilter(): CoveredFileNameFilter

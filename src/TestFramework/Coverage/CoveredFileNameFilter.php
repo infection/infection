@@ -51,9 +51,9 @@ class CoveredFileNameFilter
     }
 
     /**
-     * @param iterable<CoveredFileData> $input
+     * @param iterable<SourceFileData> $input
      *
-     * @return iterable<CoveredFileData>
+     * @return iterable<SourceFileData>
      */
     public function filter(iterable $input): iterable
     {

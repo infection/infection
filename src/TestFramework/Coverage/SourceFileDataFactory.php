@@ -43,17 +43,17 @@ use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
- * Assembles a ready feed of CoveredFileData from different sources. Feeds data into MutationGenerator.
+ * Assembles a ready feed of SourceFileData from different sources. Feeds data into MutationGenerator.
  * Does not known about differences between adapters and what not.
  *
  * @internal
  */
-final class CoveredFileDataFactory implements CoveredFileDataProvider
+final class SourceFileDataFactory implements SourceFileDataProvider
 {
     private const SEEN = true;
 
     /**
-     * @var CoveredFileDataProvider|PhpUnitXmlCoveredFileDataProvider
+     * @var SourceFileDataProvider|PhpUnitXmlCoveredFileDataProvider
      */
     private $primaryCoverageProvider;
 
@@ -72,7 +72,7 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
      * @param iterable<SplFileInfo> $sourceFiles
      */
     public function __construct(
-        CoveredFileDataProvider $primaryCoverageProvider,
+        SourceFileDataProvider $primaryCoverageProvider,
         JUnitTestExecutionInfoAdder $testFileDataAdder,
         CoveredFileNameFilter $filter,
         iterable $sourceFiles,
@@ -86,7 +86,7 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
     }
 
     /**
-     * @return iterable<CoveredFileData>
+     * @return iterable<SourceFileData>
      */
     public function provideFiles(): iterable
     {
@@ -105,9 +105,9 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
     }
 
     /**
-     * @param iterable<CoveredFileData> $coverage
+     * @param iterable<SourceFileData> $coverage
      *
-     * @return iterable<CoveredFileData>
+     * @return iterable<SourceFileData>
      */
     private function appendUncoveredFiles(iterable $coverage): iterable
     {
@@ -130,7 +130,7 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
                 continue;
             }
 
-            yield new CoveredFileData($splFileInfo, [new CoverageReport()]);
+            yield new SourceFileData($splFileInfo, [new CoverageReport()]);
         }
     }
 }

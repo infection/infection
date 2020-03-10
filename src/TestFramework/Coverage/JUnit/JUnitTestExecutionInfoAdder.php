@@ -39,7 +39,7 @@ use function explode;
 use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\CoveredFileData;
+use Infection\TestFramework\Coverage\SourceFileData;
 
 /**
  * Adds test execution info to selected covered file data object.
@@ -63,9 +63,9 @@ class JUnitTestExecutionInfoAdder
     }
 
     /**
-     * @param iterable<CoveredFileData> $coverage
+     * @param iterable<SourceFileData> $coverage
      *
-     * @return iterable<CoveredFileData>
+     * @return iterable<SourceFileData>
      */
     public function addTestExecutionInfo(iterable $coverage): iterable
     {
@@ -77,9 +77,9 @@ class JUnitTestExecutionInfoAdder
     }
 
     /**
-     * @param iterable<CoveredFileData> $coverage
+     * @param iterable<SourceFileData> $coverage
      *
-     * @return Generator<CoveredFileData>
+     * @return Generator<SourceFileData>
      */
     private function testExecutionInfoAdder(iterable $coverage): Generator
     {

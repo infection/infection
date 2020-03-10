@@ -37,7 +37,7 @@ namespace Infection\FileSystem;
 
 use function explode;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
-use Infection\TestFramework\Coverage\CoveredFileData;
+use Infection\TestFramework\Coverage\SourceFileData;
 use Iterator;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -69,9 +69,9 @@ class SourceFileFilter
     }
 
     /**
-     * @param iterable<SplFileInfo&CoveredFileData> $input
+     * @param iterable<SplFileInfo&SourceFileData> $input
      *
-     * @return iterable<SplFileInfo&CoveredFileData>
+     * @return iterable<SplFileInfo&SourceFileData>
      */
     public function filter(iterable $input): iterable
     {
@@ -87,9 +87,9 @@ class SourceFileFilter
     }
 
     /**
-     * @param iterable<SplFileInfo&CoveredFileData> $input
+     * @param iterable<SplFileInfo&SourceFileData> $input
      *
-     * @return Iterator<SplFileInfo&CoveredFileData>
+     * @return Iterator<SplFileInfo&SourceFileData>
      */
     private function iterableToIterator(iterable $input): Iterator
     {

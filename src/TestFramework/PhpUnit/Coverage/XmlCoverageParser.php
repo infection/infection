@@ -39,8 +39,8 @@ use DOMElement;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageReport;
-use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\SafeDOMXPath;
 use Webmozart\Assert\Assert;
 
@@ -56,9 +56,9 @@ final class XmlCoverageParser
         $this->provider = $provider;
     }
 
-    public function parse(): CoveredFileData
+    public function parse(): SourceFileData
     {
-        return new CoveredFileData(
+        return new SourceFileData(
             $this->provider->provideFileInfo(),
             $this->lazilyRetrieveCoverageReport(
                 $this->provider->provideXPath()

@@ -45,9 +45,9 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
-use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Mutator\MutatorName;
@@ -107,7 +107,7 @@ final class FileMutationGeneratorTest extends TestCase
         $mutationGenerator = SingletonContainer::getContainer()->getFileMutationGenerator();
 
         $mutations = $mutationGenerator->generate(
-            $this->createCoveredFileDataMock(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
+            $this->createSourceFileDataMock(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
             false,
             $codeCoverageMock,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
@@ -136,7 +136,7 @@ final class FileMutationGeneratorTest extends TestCase
      * @dataProvider parsedFilesProvider
      */
     public function test_it_attempts_to_generate_mutations_for_the_file_if_covered_or_not_only_covered_code(
-        CoveredFileData $coveredFileData,
+        SourceFileData $coveredFileData,
         bool $onlyCovered,
         LineCodeCoverage $codeCoverage,
         string $expectedFilePath
@@ -184,7 +184,7 @@ final class FileMutationGeneratorTest extends TestCase
      * @dataProvider skippedFilesProvider
      */
     public function test_it_skips_the_mutation_generation_if_checks_only_covered_code_and_the_file_has_no_tests(
-        CoveredFileData $coveredFileData,
+        SourceFileData $coveredFileData,
         string $expectedFilePath
     ): void {
         $this->fileParserMock
@@ -227,7 +227,7 @@ final class FileMutationGeneratorTest extends TestCase
             );
 
             yield $title => [
-                $this->createCoveredFileDataMock('/path/to/file', 'relativePath', 'relativePathName'),
+                $this->createSourceFileDataMock('/path/to/file', 'relativePath', 'relativePathName'),
                 false,
                 $this->createCodeCoverageMock(
                     true
@@ -243,7 +243,7 @@ final class FileMutationGeneratorTest extends TestCase
             );
 
             yield $title => [
-                $this->createCoveredFileDataMock(__FILE__, 'relativePath', 'relativePathName'),
+                $this->createSourceFileDataMock(__FILE__, 'relativePath', 'relativePathName'),
                 false,
                 $this->createCodeCoverageMock(
                     true
@@ -253,7 +253,7 @@ final class FileMutationGeneratorTest extends TestCase
         }
 
         yield 'path - only covered: true - has tests: %s' => [
-            $this->createCoveredFileDataMock('/path/to/file', 'relativePath', 'relativePathName'),
+            $this->createSourceFileDataMock('/path/to/file', 'relativePath', 'relativePathName'),
             true,
             $this->createCodeCoverageMock(
                 true
@@ -262,7 +262,7 @@ final class FileMutationGeneratorTest extends TestCase
         ];
 
         yield 'real path - only covered: true - has tests: %s' => [
-            $this->createCoveredFileDataMock(__FILE__, 'relativePath', 'relativePathName'),
+            $this->createSourceFileDataMock(__FILE__, 'relativePath', 'relativePathName'),
             true,
             $this->createCodeCoverageMock(
                 true
@@ -274,12 +274,12 @@ final class FileMutationGeneratorTest extends TestCase
     public function skippedFilesProvider(): Generator
     {
         yield 'path - only covered: true - has tests: %s' => [
-            $this->createCoveredFileDataMock('/path/to/file', 'relativePath', 'relativePathName'),
+            $this->createSourceFileDataMock('/path/to/file', 'relativePath', 'relativePathName'),
             '/path/to/file',
         ];
 
         yield 'real path - only covered: true - has tests: %s' => [
-            $this->createCoveredFileDataMock(__FILE__, 'relativePath', 'relativePathName'),
+            $this->createSourceFileDataMock(__FILE__, 'relativePath', 'relativePathName'),
             __FILE__,
         ];
     }
@@ -289,9 +289,9 @@ final class FileMutationGeneratorTest extends TestCase
         yield from [true, false];
     }
 
-    private function createCoveredFileDataMock(string $file, string $relativePath, string $relativePathname): CoveredFileData
+    private function createSourceFileDataMock(string $file, string $relativePath, string $relativePathname): SourceFileData
     {
-        $codeCoverageMock = $this->createMock(CoveredFileData::class);
+        $codeCoverageMock = $this->createMock(SourceFileData::class);
         $codeCoverageMock
             ->method('getSplFileInfo')
             ->willReturn(new SplFileInfo($file, $relativePath, $relativePathname))

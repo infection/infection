@@ -38,10 +38,10 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CoverageReport;
-use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\SourceFileData;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -105,7 +105,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
             ],
         ];
 
-        $coveredFileDataMock = $this->createMock(CoveredFileData::class);
+        $coveredFileDataMock = $this->createMock(SourceFileData::class);
         $coveredFileDataMock
             ->expects($this->once())
             ->method('retrieveCoverageReport')

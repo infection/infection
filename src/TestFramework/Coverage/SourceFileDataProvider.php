@@ -38,10 +38,10 @@ namespace Infection\TestFramework\Coverage;
 /**
  * @internal
  */
-interface CoveredFileDataProvider
+interface SourceFileDataProvider
 {
     /**
-     * @return iterable<CoveredFileData>
+     * @return iterable<SourceFileData>
      */
     public function provideFiles(): iterable;
 }

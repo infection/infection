@@ -37,22 +37,22 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageReport;
-use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\TestFramework\Coverage\SourceFileData;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @covers \Infection\TestFramework\Coverage\CoveredFileData
+ * @covers \Infection\TestFramework\Coverage\SourceFileData
  */
-final class CoveredFileDataTest extends TestCase
+final class SourceFileDataTest extends TestCase
 {
     public function test_returns_file_info(): void
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $coveredFileData = new CoveredFileData($splFileInfoMock, []);
+        $coveredFileData = new SourceFileData($splFileInfoMock, []);
 
         $actual = $coveredFileData->getSplFileInfo();
 
@@ -68,7 +68,7 @@ final class CoveredFileDataTest extends TestCase
             ->method('getRealPath')
             ->willReturn($expected);
 
-        $coveredFileData = new CoveredFileData($splFileInfoMock, []);
+        $coveredFileData = new SourceFileData($splFileInfoMock, []);
 
         $actual = $coveredFileData->getRealPath();
 
@@ -80,7 +80,7 @@ final class CoveredFileDataTest extends TestCase
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
         $coverageFileData = new CoverageReport();
 
-        $coveredFileData = new CoveredFileData($splFileInfoMock, [$coverageFileData, null]);
+        $coveredFileData = new SourceFileData($splFileInfoMock, [$coverageFileData, null]);
 
         $actual = $coveredFileData->retrieveCoverageReport();
         $this->assertSame($coverageFileData, $actual);
@@ -96,7 +96,7 @@ final class CoveredFileDataTest extends TestCase
 
         $coverageFileData = new CoverageReport();
 
-        $coveredFileData = new CoveredFileData($splFileInfoMock, [$coverageFileData]);
+        $coveredFileData = new SourceFileData($splFileInfoMock, [$coverageFileData]);
 
         $this->assertFalse($coveredFileData->hasTests());
     }
@@ -119,7 +119,7 @@ final class CoveredFileDataTest extends TestCase
             ]
         );
 
-        $coveredFileData = new CoveredFileData($splFileInfoMock, [$coverageFileData]);
+        $coveredFileData = new SourceFileData($splFileInfoMock, [$coverageFileData]);
 
         $this->assertTrue($coveredFileData->hasTests());
 
