@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Console\OutputFormatter;
 
 use Infection\Console\OutputFormatter\DotFormatter;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Process\MutantProcess;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use function strip_tags;
@@ -68,51 +68,86 @@ final class DotFormatterTest extends TestCase
     public function test_killed_logs_correctly_in_console(): void
     {
         $outputKilled = $this->getStartOutputFormatter();
-        $outputKilled->expects($this->once())->method('write')->with('<killed>.</killed>');
+        $outputKilled
+            ->expects($this->once())
+            ->method('write')
+            ->with('<killed>.</killed>')
+        ;
 
         $dot = new DotFormatter($outputKilled);
         $dot->start(10);
-        $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_KILLED)[0], 10);
+        $dot->advance(
+            $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0],
+            10
+        );
     }
 
     public function test_escaped_logs_correctly_in_console(): void
     {
         $outputEscaped = $this->getStartOutputFormatter();
-        $outputEscaped->expects($this->once())->method('write')->with('<escaped>M</escaped>');
+        $outputEscaped
+            ->expects($this->once())
+            ->method('write')
+            ->with('<escaped>M</escaped>')
+        ;
 
         $dot = new DotFormatter($outputEscaped);
         $dot->start(10);
-        $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_ESCAPED)[0], 10);
+        $dot->advance(
+            $this->createMutantExecutionResultsOfType(DetectionStatus::ESCAPED)[0],
+            10
+        );
     }
 
     public function test_errored_logs_correctly_in_console(): void
     {
         $outputErrored = $this->getStartOutputFormatter();
-        $outputErrored->expects($this->once())->method('write')->with('<with-error>E</with-error>');
+        $outputErrored
+            ->expects($this->once())
+            ->method('write')
+            ->with('<with-error>E</with-error>')
+        ;
 
         $dot = new DotFormatter($outputErrored);
         $dot->start(10);
-        $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_ERROR)[0], 10);
+        $dot->advance(
+            $this->createMutantExecutionResultsOfType(DetectionStatus::ERROR)[0],
+            10
+        );
     }
 
     public function test_timed_out_logs_correctly_in_console(): void
     {
         $outputTimedOut = $this->getStartOutputFormatter();
-        $outputTimedOut->expects($this->once())->method('write')->with('<timeout>T</timeout>');
+        $outputTimedOut
+            ->expects($this->once())
+            ->method('write')
+            ->with('<timeout>T</timeout>')
+        ;
 
         $dot = new DotFormatter($outputTimedOut);
         $dot->start(10);
-        $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_TIMED_OUT)[0], 10);
+        $dot->advance(
+            $this->createMutantExecutionResultsOfType(DetectionStatus::TIMED_OUT)[0],
+            10
+        );
     }
 
     public function test_not_covered_correctly_in_console(): void
     {
-        $outputNotcovered = $this->getStartOutputFormatter();
-        $outputNotcovered->expects($this->once())->method('write')->with('<uncovered>S</uncovered>');
+        $outputNotCovered = $this->getStartOutputFormatter();
+        $outputNotCovered
+            ->expects($this->once())
+            ->method('write')
+            ->with('<uncovered>S</uncovered>')
+        ;
 
-        $dot = new DotFormatter($outputNotcovered);
+        $dot = new DotFormatter($outputNotCovered);
         $dot->start(10);
-        $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_NOT_COVERED)[0], 10);
+        $dot->advance(
+            $this->createMutantExecutionResultsOfType(DetectionStatus::NOT_COVERED)[0],
+            10
+        );
     }
 
     public function test_it_prints_total_number_of_mutations(): void
@@ -124,7 +159,7 @@ final class DotFormatterTest extends TestCase
         $dot->start($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_KILLED)[0], $totalMutations);
+            $dot->advance($this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0], $totalMutations);
         }
 
         $this->assertSame(str_replace("\n", PHP_EOL,
@@ -150,7 +185,10 @@ TXT
         $dot->start(0);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_KILLED)[0], 0);
+            $dot->advance(
+                $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0],
+                0
+            );
         }
 
         $this->assertSame(str_replace("\n", PHP_EOL,
@@ -167,8 +205,10 @@ TXT
         );
     }
 
-    private function createMutantExecutionResultsOfType(int $processCode, int $count = 1): array
-    {
+    private function createMutantExecutionResultsOfType(
+        string $detectionStatus,
+        int $count = 1
+    ): array {
         $executionResults = [];
 
         for ($i = 0; $i < $count; ++$i) {
@@ -176,7 +216,7 @@ TXT
             $executionResult
                 ->expects($this->once())
                 ->method('getProcessResultCode')
-                ->willReturn($processCode)
+                ->willReturn($detectionStatus)
             ;
             $executionResults[] = $executionResult;
         }

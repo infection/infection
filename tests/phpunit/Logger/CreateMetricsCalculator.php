@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
 use const PHP_EOL;
 use function str_replace;
@@ -54,61 +54,61 @@ trait CreateMetricsCalculator
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
-                MutantProcess::CODE_KILLED,
+                DetectionStatus::KILLED,
                 'killed#0'
             ),
             $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
-                MutantProcess::CODE_KILLED,
+                DetectionStatus::KILLED,
                 'killed#1'
             ),
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
-                MutantProcess::CODE_ERROR,
+                DetectionStatus::ERROR,
                 'error#0'
             ),
             $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
-                MutantProcess::CODE_ERROR,
+                DetectionStatus::ERROR,
                 'error#1'
             ),
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
-                MutantProcess::CODE_ESCAPED,
+                DetectionStatus::ESCAPED,
                 'escaped#0'
             ),
             $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
-                MutantProcess::CODE_ESCAPED,
+                DetectionStatus::ESCAPED,
                 'escaped#1'
             ),
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
-                MutantProcess::CODE_TIMED_OUT,
+                DetectionStatus::TIMED_OUT,
                 'timedOut#0'
             ),
             $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
-                MutantProcess::CODE_TIMED_OUT,
+                DetectionStatus::TIMED_OUT,
                 'timedOut#1'
             ),
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
-                MutantProcess::CODE_NOT_COVERED,
+                DetectionStatus::NOT_COVERED,
                 'notCovered#0'
             ),
             $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
-                MutantProcess::CODE_NOT_COVERED,
+                DetectionStatus::NOT_COVERED,
                 'notCovered#1'
             )
         );
@@ -119,13 +119,13 @@ trait CreateMetricsCalculator
     private function createMutantExecutionResult(
         int $i,
         string $mutatorClassName,
-        int $resultCode,
+        string $detectionStatus,
         string $echoMutatedMessage
     ): MutantExecutionResult {
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
-            $resultCode,
+            $detectionStatus,
             str_replace(
                 "\n",
                 PHP_EOL,

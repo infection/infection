@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
@@ -54,7 +55,7 @@ final class MutantExecutionResultTest extends TestCase
     {
         $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"';
         $processOutput = 'Passed!';
-        $processResultCode = MutantProcess::CODE_ESCAPED;
+        $processResultCode = DetectionStatus::ESCAPED;
         $mutantDiff = <<<'DIFF'
 --- Original
 +++ New
@@ -134,7 +135,7 @@ DIFF
             MutantExecutionResult::createFromNonCoveredMutant($mutant),
             '',
             '',
-            MutantProcess::CODE_NOT_COVERED,
+            DetectionStatus::NOT_COVERED,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
@@ -150,7 +151,7 @@ DIFF
             ->willReturn($processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
         ;
         $processMock
-            ->method('isStarted')
+            ->method('isTerminated')
             ->willReturn(true)
         ;
         $processMock
@@ -214,7 +215,7 @@ DIFF
             MutantExecutionResult::createFromProcess($mutantProcess),
             $processCommandLine,
             $processOutput,
-            MutantProcess::CODE_ERROR,
+            DetectionStatus::ERROR,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
@@ -230,23 +231,25 @@ DIFF
             ->willReturn($processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
         ;
         $processMock
-            ->method('isStarted')
-            ->willReturn(false)
+            ->method('isTerminated')
+            ->willReturn(true)
         ;
         $processMock
-            ->expects($this->never())
             ->method('getOutput')
+            ->willReturn('Tests passed!')
         ;
         $processMock
             ->expects($this->once())
             ->method('getExitCode')
-            ->willReturn(152)
+            ->willReturn(0)
         ;
 
         $testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
         $testFrameworkAdapterMock
-            ->expects($this->never())
-            ->method($this->anything())
+            ->expects($this->once())
+            ->method('testsPass')
+            ->with('Tests passed!')
+            ->willReturn(true)
         ;
 
         $mutantProcess = new MutantProcess(
@@ -293,8 +296,8 @@ DIFF
         $this->assertResultStateIs(
             MutantExecutionResult::createFromProcess($mutantProcess),
             $processCommandLine,
-            '',
-            MutantProcess::CODE_ERROR,
+            'Tests passed!',
+            DetectionStatus::ESCAPED,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
@@ -306,7 +309,7 @@ DIFF
         MutantExecutionResult $result,
         string $expectedProcessCommandLine,
         string $expectedProcessOutput,
-        int $expectedProcessResultCode,
+        string $expectedDetectionStatus,
         string $expectedMutantDiff,
         string $expectedMutatorName,
         string $expectedOriginalFilePath,
@@ -314,7 +317,7 @@ DIFF
     ): void {
         $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
-        $this->assertSame($expectedProcessResultCode, $result->getProcessResultCode());
+        $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
         $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
         $this->assertSame($expectedMutatorName, $result->getMutatorName());
         $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());

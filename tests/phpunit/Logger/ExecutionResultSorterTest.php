@@ -37,9 +37,9 @@ namespace Infection\Tests\Logger;
 
 use Generator;
 use Infection\Logger\ExecutionResultSorter;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 
@@ -148,7 +148,7 @@ final class ExecutionResultSorterTest extends TestCase
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'Passed!',
-            MutantProcess::CODE_ESCAPED,
+            DetectionStatus::ESCAPED,
             '#' . $id,
             MutatorName::getName(For_::class),
             $originalFilePath,
