@@ -51,7 +51,7 @@ use Webmozart\Assert\Assert;
  *
  * TODO: FilteredSourceFilesTraceProvider: Leverages a decorated trace provider in order to provide
  *          the traces but fall-backs on the original source files in order to ensure all the
- *          files are included.
+ *          files are included
  */
 final class SourceFileDataFactory implements SourceFileDataProvider
 {
