@@ -85,7 +85,7 @@ trait ConfigurationAssertions
             self::normalizePaths($expectedSourceFiles),
             self::normalizePaths($configuration->getSourceFiles())
         );
-        $this->assertSame($filter, $configuration->getFilter());
+        $this->assertSame($filter, $configuration->getSourceFilesFilter());
         $this->assertLogsStateIs(
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),

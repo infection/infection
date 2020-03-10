@@ -62,7 +62,7 @@ class Configuration
     private $timeout;
     private $sourceDirectories;
     private $sourceFiles;
-    private $filter;
+    private $sourceFilesFilter;
     private $logs;
     private $logVerbosity;
     private $tmpDir;
@@ -93,7 +93,7 @@ class Configuration
         int $timeout,
         array $sourceDirectories,
         iterable $sourceFiles,
-        string $filter,
+        string $sourceFilesFilter,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -127,7 +127,7 @@ class Configuration
         $this->timeout = $timeout;
         $this->sourceDirectories = $sourceDirectories;
         $this->sourceFiles = $sourceFiles;
-        $this->filter = $filter;
+        $this->sourceFilesFilter = $sourceFilesFilter;
         $this->logs = $logs;
         $this->logVerbosity = $logVerbosity;
         $this->tmpDir = $tmpDir;
@@ -171,9 +171,9 @@ class Configuration
         return $this->sourceFiles;
     }
 
-    public function getFilter(): string
+    public function getSourceFilesFilter(): string
     {
-        return $this->filter;
+        return $this->sourceFilesFilter;
     }
 
     public function getLogs(): Logs
