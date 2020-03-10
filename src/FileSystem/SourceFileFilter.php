@@ -63,6 +63,10 @@ class SourceFileFilter
     }
 
     /**
+     * Returns a filter array to be used in tests.
+     *
+     * TODO Good candidate to be refactored into a class.
+     *
      * @return string[]
      */
     public function getFilters(): array
