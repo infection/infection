@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
@@ -55,9 +55,9 @@ final class FileCodeCoverageProviderTest extends TestCase
         $this->assertTrue($codeCoverageData->hasTests());
     }
 
-    private function getParsedCodeCoverageData(): CoverageFileData
+    private function getParsedCodeCoverageData(): CoverageReport
     {
-        return new CoverageFileData(
+        return new CoverageReport(
             [
                 26 => [
                     CoverageLineData::with(

@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 
@@ -48,11 +48,11 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 class FileCodeCoverage implements LineCodeCoverage
 {
     /**
-     * @var CoverageFileData
+     * @var CoverageReport
      */
     private $coverageFileData;
 
-    public function __construct(CoverageFileData $coverageFileData)
+    public function __construct(CoverageReport $coverageFileData)
     {
         $this->coverageFileData = $coverageFileData;
     }

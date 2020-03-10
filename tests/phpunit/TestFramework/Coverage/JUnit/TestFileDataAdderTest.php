@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
@@ -98,7 +98,7 @@ final class TestFileDataAdderTest extends TestCase
 
         $lineData = CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated');
 
-        $fileData = new CoverageFileData();
+        $fileData = new CoverageReport();
         $fileData->byLine = [
             11 => [
                 $lineData,
@@ -108,7 +108,7 @@ final class TestFileDataAdderTest extends TestCase
         $coveredFileDataMock = $this->createMock(CoveredFileData::class);
         $coveredFileDataMock
             ->expects($this->once())
-            ->method('retrieveCoverageFileData')
+            ->method('retrieveCoverageReport')
             ->willReturn($fileData)
         ;
 

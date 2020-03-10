@@ -38,7 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 use DOMElement;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\SafeDOMXPath;
@@ -60,34 +60,34 @@ final class XmlCoverageParser
     {
         return new CoveredFileData(
             $this->provider->provideFileInfo(),
-            $this->lazilyRetrieveCoverageFileData(
+            $this->lazilyRetrieveCoverageReport(
                 $this->provider->provideXPath()
             )
         );
     }
 
     /**
-     * @return iterable<CoverageFileData>
+     * @return iterable<CoverageReport>
      */
-    private static function lazilyRetrieveCoverageFileData(SafeDOMXPath $xPath): iterable
+    private static function lazilyRetrieveCoverageReport(SafeDOMXPath $xPath): iterable
     {
-        yield self::retrieveCoverageFileData($xPath);
+        yield self::retrieveCoverageReport($xPath);
     }
 
-    private static function retrieveCoverageFileData(SafeDOMXPath $xPath): CoverageFileData
+    private static function retrieveCoverageReport(SafeDOMXPath $xPath): CoverageReport
     {
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
 
         $percentage = $linesNode->getAttribute('percent');
 
         if (self::percentageToFloat($percentage) === .0) {
-            return new CoverageFileData();
+            return new CoverageReport();
         }
 
         $coveredLineNodes = $xPath->query('/phpunit/file/coverage/line');
 
         if ($coveredLineNodes->length === 0) {
-            return new CoverageFileData();
+            return new CoverageReport();
         }
 
         $coveredMethodNodes = $xPath->query('/phpunit/file/class/method');
@@ -96,7 +96,7 @@ final class XmlCoverageParser
             $coveredMethodNodes = $xPath->query('/phpunit/file/trait/method');
         }
 
-        return new CoverageFileData(
+        return new CoverageReport(
             self::collectCoveredLinesData($coveredLineNodes),
             self::collectMethodsCoverageData($coveredMethodNodes)
         );

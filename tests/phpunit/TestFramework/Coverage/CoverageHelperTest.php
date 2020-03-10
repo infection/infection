@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use PHPUnit\Framework\TestCase;
 
@@ -59,7 +59,7 @@ final class CoverageHelperTest extends TestCase
 
         yield 'empty coverage file data' => [
             [
-                '/path/to/file' => new CoverageFileData(),
+                '/path/to/file' => new CoverageReport(),
             ],
             [
                 '/path/to/file' => [
@@ -71,7 +71,7 @@ final class CoverageHelperTest extends TestCase
 
         yield 'coverage file data with byLine data' => [
             [
-                '/path/to/acme/Foo.php' => new CoverageFileData(
+                '/path/to/acme/Foo.php' => new CoverageReport(
                     [
                         11 => [
                             CoverageLineData::with(
@@ -101,7 +101,7 @@ final class CoverageHelperTest extends TestCase
 
         yield 'coverage coverage file data with byMethod data' => [
             [
-                '/path/to/acme/Foo.php' => new CoverageFileData(
+                '/path/to/acme/Foo.php' => new CoverageReport(
                     [],
                     [
                         '__construct' => new MethodLocationData(
@@ -126,7 +126,7 @@ final class CoverageHelperTest extends TestCase
 
         yield 'nominal' => [
             [
-                '/path/to/acme/Foo.php' => new CoverageFileData(
+                '/path/to/acme/Foo.php' => new CoverageReport(
                     [
                         11 => [
                             CoverageLineData::with(

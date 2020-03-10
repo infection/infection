@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
 use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\XPathFactory;
@@ -79,7 +79,7 @@ final class XmlCoverageParserTest extends TestCase
 
         $this->assertSame($fileData->getSplFileInfo()->getRealPath(), $provider->provideFileInfo()->getRealPath());
 
-        $coverageData = $fileData->retrieveCoverageFileData();
+        $coverageData = $fileData->retrieveCoverageReport();
 
         $this->assertSame(
             $expectedCoverage,
@@ -154,7 +154,7 @@ XML;
         $this->assertArrayNotHasKey(11, $coverageData->byLine);
     }
 
-    private function parseXml(string $xml): CoverageFileData
+    private function parseXml(string $xml): CoverageReport
     {
         $xPath = XPathFactory::createXPath($xml);
 
@@ -173,6 +173,6 @@ XML;
         $parser = new XmlCoverageParser($providerMock);
         $fileData = $parser->parse();
 
-        return $fileData->retrieveCoverageFileData();
+        return $fileData->retrieveCoverageReport();
     }
 }

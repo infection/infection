@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -78,15 +78,15 @@ final class CoveredFileDataTest extends TestCase
     public function test_it_can_retreive_file_data(): void
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $coverageFileData = new CoverageFileData();
+        $coverageFileData = new CoverageReport();
 
         $coveredFileData = new CoveredFileData($splFileInfoMock, [$coverageFileData, null]);
 
-        $actual = $coveredFileData->retrieveCoverageFileData();
+        $actual = $coveredFileData->retrieveCoverageReport();
         $this->assertSame($coverageFileData, $actual);
 
         // From cache
-        $actual = $coveredFileData->retrieveCoverageFileData();
+        $actual = $coveredFileData->retrieveCoverageReport();
         $this->assertSame($coverageFileData, $actual);
     }
 
@@ -94,7 +94,7 @@ final class CoveredFileDataTest extends TestCase
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $coverageFileData = new CoverageFileData();
+        $coverageFileData = new CoverageReport();
 
         $coveredFileData = new CoveredFileData($splFileInfoMock, [$coverageFileData]);
 
@@ -105,7 +105,7 @@ final class CoveredFileDataTest extends TestCase
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $coverageFileData = new CoverageFileData(
+        $coverageFileData = new CoverageReport(
             [
                 21 => [
                     CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated'),

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
@@ -178,7 +178,7 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
     private function getParsedCodeCoverageData(string $testMethod = 'Acme\FooTest::test_it_can_be_instantiated'): array
     {
         return [
-            '/path/to/acme/Foo.php' => new CoverageFileData(
+            '/path/to/acme/Foo.php' => new CoverageReport(
                 [
                     11 => [
                         CoverageLineData::withTestMethod($testMethod),

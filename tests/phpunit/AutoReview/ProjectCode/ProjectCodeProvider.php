@@ -63,7 +63,7 @@ use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\TestFramework\AdapterInstaller;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -220,7 +220,7 @@ final class ProjectCodeProvider
                     && !in_array(
                         $className,
                         [
-                            CoverageFileData::class,
+                            CoverageReport::class,
                             CoverageLineData::class,
                             MethodLocationData::class,
                             NodeLineRangeData::class,

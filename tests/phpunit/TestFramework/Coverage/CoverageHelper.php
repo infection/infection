@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use function is_array;
 use function is_scalar;
 use function iterator_to_array;
@@ -48,7 +48,7 @@ final class CoverageHelper
     }
 
     /**
-     * @param array<string, CoverageFileData> $coverage
+     * @param array<string, CoverageReport> $coverage
      *
      * @return array<string|int, mixed>
      */

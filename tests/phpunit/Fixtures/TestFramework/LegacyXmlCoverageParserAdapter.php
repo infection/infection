@@ -19,13 +19,13 @@ final class LegacyXmlCoverageParserAdapter
     }
 
     /**
-     * @return array<string, CoverageFileData>
+     * @return array<string, CoverageReport>
      */
     public function parse(string $coverageXmlContent): array
     {
         $coverage = take($this->parser->parse($coverageXmlContent))
             ->map(static function (CoveredFileData $data) {
-                yield $data->getSplFileInfo()->getRealPath() => $data->retrieveCoverageFileData();
+                yield $data->getSplFileInfo()->getRealPath() => $data->retrieveCoverageReport();
             });
 
         return iterator_to_array($coverage, true);

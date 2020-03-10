@@ -130,7 +130,7 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
                 continue;
             }
 
-            yield new CoveredFileData($splFileInfo, [new CoverageFileData()]);
+            yield new CoveredFileData($splFileInfo, [new CoverageReport()]);
         }
     }
 }

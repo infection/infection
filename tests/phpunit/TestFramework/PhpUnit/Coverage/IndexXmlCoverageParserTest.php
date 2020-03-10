@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
@@ -113,7 +113,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             self::getXml()
         ));
 
-        $this->assertCoverageReportSame(
+        $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::provideFixtures(),
             $coverage
         );
@@ -158,7 +158,7 @@ XML;
             file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml')
         ));
 
-        $this->assertCoverageReportSame(
+        $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::provideLegacyFormatFixtures(),
             $coverage
         );
@@ -267,9 +267,9 @@ XML
 
     /**
      * @param iterable<XmlCoverageFixture> $fixtures
-     * @param array<string, CoverageFileData> $coverage
+     * @param array<string, CoverageReport> $coverage
      */
-    private function assertCoverageReportSame(iterable $fixtures, iterable $coverage): void
+    private function assertCoverageFixtureSame(iterable $fixtures, iterable $coverage): void
     {
         $preparedFixtures = take($fixtures)->map(static function (XmlCoverageFixture $fixture) {
             yield $fixture->sourceFilePath => $fixture->serializedCoverage;

@@ -84,7 +84,7 @@ class TestFileDataAdder
     private function testExecutionInfoAdder(iterable $coverage): Generator
     {
         foreach ($coverage as $data) {
-            foreach ($data->retrieveCoverageFileData()->byLine as $linesCoverageData) {
+            foreach ($data->retrieveCoverageReport()->byLine as $linesCoverageData) {
                 foreach ($linesCoverageData as $test) {
                     self::updateTestExecutionInfo($test, $this->testFileDataProvider);
                 }

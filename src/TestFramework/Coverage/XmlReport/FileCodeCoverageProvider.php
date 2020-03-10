@@ -45,6 +45,6 @@ class FileCodeCoverageProvider
 {
     public function provideFor(CoveredFileData $fileData): FileCodeCoverage
     {
-        return new FileCodeCoverage($fileData->retrieveCoverageFileData());
+        return new FileCodeCoverage($fileData->retrieveCoverageReport());
     }
 }

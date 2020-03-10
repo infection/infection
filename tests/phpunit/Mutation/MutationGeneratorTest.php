@@ -44,7 +44,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\CoveredFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverage;
@@ -237,7 +237,7 @@ final class MutationGeneratorTest extends TestCase
         $providerMock
             ->method('provideFiles')
             ->willReturn(take($files)->map(static function (SplFileInfo $fileInfo) {
-                return new CoveredFileData($fileInfo, [new CoverageFileData()]);
+                return new CoveredFileData($fileInfo, [new CoverageReport()]);
             }))
         ;
 

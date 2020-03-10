@@ -53,14 +53,14 @@ class CoveredFileData implements LineCodeCoverage
     private $sourceFile;
 
     /**
-     * @var CoverageFileData|null
+     * @var CoverageReport|null
      */
     private $coverageFileData;
 
     /**
-     * @var iterable<CoverageFileData>
+     * @var iterable<CoverageReport>
      */
-    private $lazyCoverageFileData;
+    private $lazyCoverageReport;
 
     /**
      * @var FileCodeCoverage|null
@@ -68,14 +68,14 @@ class CoveredFileData implements LineCodeCoverage
     private $lineCodeCoverage;
 
     /**
-     * @param iterable<CoverageFileData> $lazyCoverageFileData
+     * @param iterable<CoverageReport> $lazyCoverageReport
      */
-    public function __construct(SplFileInfo $sourceFile, iterable $lazyCoverageFileData)
+    public function __construct(SplFileInfo $sourceFile, iterable $lazyCoverageReport)
     {
         $this->sourceFile = $sourceFile;
 
         // There's no point to have it parsed right away as we may not need it, e.g. because of a filter
-        $this->lazyCoverageFileData = $lazyCoverageFileData;
+        $this->lazyCoverageReport = $lazyCoverageReport;
     }
 
     public function getSplFileInfo(): SplFileInfo
@@ -93,15 +93,15 @@ class CoveredFileData implements LineCodeCoverage
     }
 
     /**
-     * Accessor used to update CoverageFileData with TestFileTimeData.
+     * Accessor used to update CoverageReport with TestFileTimeData.
      */
-    public function retrieveCoverageFileData(): CoverageFileData
+    public function retrieveCoverageReport(): CoverageReport
     {
         if ($this->coverageFileData !== null) {
             return $this->coverageFileData;
         }
 
-        foreach ($this->lazyCoverageFileData as $coverageFileData) {
+        foreach ($this->lazyCoverageReport as $coverageFileData) {
             // is a Generator with one yield, thus it'll only trigger here
             // (or this can be an array with one element)
             $this->coverageFileData = $coverageFileData;
@@ -109,8 +109,8 @@ class CoveredFileData implements LineCodeCoverage
             break;
         }
 
-        Assert::isInstanceOf($this->coverageFileData, CoverageFileData::class);
-        $this->lazyCoverageFileData = []; // let GC have it
+        Assert::isInstanceOf($this->coverageFileData, CoverageReport::class);
+        $this->lazyCoverageReport = []; // let GC have it
 
         return $this->coverageFileData;
     }
@@ -131,7 +131,7 @@ class CoveredFileData implements LineCodeCoverage
             return $this->lineCodeCoverage;
         }
 
-        $this->lineCodeCoverage = new FileCodeCoverage($this->retrieveCoverageFileData());
+        $this->lineCodeCoverage = new FileCodeCoverage($this->retrieveCoverageReport());
 
         return $this->lineCodeCoverage;
     }

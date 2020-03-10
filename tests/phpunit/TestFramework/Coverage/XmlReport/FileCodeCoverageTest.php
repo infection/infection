@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverage;
@@ -250,7 +250,7 @@ final class FileCodeCoverageTest extends TestCase
     private function getParsedCodeCoverageData(): array
     {
         return [
-            '/path/to/acme/Foo.php' => new CoverageFileData(
+            '/path/to/acme/Foo.php' => new CoverageReport(
                 [
                     26 => [
                         CoverageLineData::with(
@@ -305,7 +305,7 @@ final class FileCodeCoverageTest extends TestCase
         $parsedData = $this->getParsedCodeCoverageData();
 
         if (!array_key_exists($filePath, $parsedData)) {
-            return new FileCodeCoverage(new CoverageFileData());
+            return new FileCodeCoverage(new CoverageReport());
         }
 
         return new FileCodeCoverage($parsedData[$filePath]);
