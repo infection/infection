@@ -149,8 +149,8 @@ final class SourceFileDataFactoryTest extends TestCase
         iterable $sourceFiles,
         bool $onlyCovered
     ): iterable {
-        $coveredFileDataProvider = $this->createMock(SourceFileDataProvider::class);
-        $coveredFileDataProvider
+        $sourceFileDataProvider = $this->createMock(SourceFileDataProvider::class);
+        $sourceFileDataProvider
             ->expects($this->once())
             ->method('provideFiles')
             ->willReturn($canary)
@@ -173,7 +173,7 @@ final class SourceFileDataFactoryTest extends TestCase
         ;
 
         $factory = new SourceFileDataFactory(
-            $coveredFileDataProvider,
+            $sourceFileDataProvider,
             $testFileDataAdder,
             $filter,
             $sourceFiles,

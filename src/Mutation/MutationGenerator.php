@@ -53,7 +53,7 @@ use Webmozart\Assert\Assert;
  */
 final class MutationGenerator
 {
-    private $coveredFileDataProvider;
+    private $sourceFileDataProvider;
     private $coverageProvider;
 
     /**
@@ -69,7 +69,7 @@ final class MutationGenerator
      * @param Mutator[] $mutators
      */
     public function __construct(
-        SourceFileDataProvider $coveredFileDataProvider,
+        SourceFileDataProvider $sourceFileDataProvider,
         FileCodeCoverageProvider $coverageProvider,
         array $mutators,
         EventDispatcher $eventDispatcher,
@@ -78,7 +78,7 @@ final class MutationGenerator
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
-        $this->coveredFileDataProvider = $coveredFileDataProvider;
+        $this->sourceFileDataProvider = $sourceFileDataProvider;
         $this->coverageProvider = $coverageProvider;
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
@@ -96,7 +96,7 @@ final class MutationGenerator
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
-        $coveredFiles = $this->coveredFileDataProvider->provideFiles();
+        $coveredFiles = $this->sourceFileDataProvider->provideFiles();
 
         $numberOfFiles = IterableCounter::bufferAndCountIfNeeded($coveredFiles, $this->runConcurrently);
 

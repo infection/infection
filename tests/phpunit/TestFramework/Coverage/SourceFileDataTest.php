@@ -52,9 +52,9 @@ final class SourceFileDataTest extends TestCase
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $coveredFileData = new SourceFileData($splFileInfoMock, []);
+        $sourceFileData = new SourceFileData($splFileInfoMock, []);
 
-        $actual = $coveredFileData->getSplFileInfo();
+        $actual = $sourceFileData->getSplFileInfo();
 
         $this->assertSame($splFileInfoMock, $actual);
     }
@@ -68,9 +68,9 @@ final class SourceFileDataTest extends TestCase
             ->method('getRealPath')
             ->willReturn($expected);
 
-        $coveredFileData = new SourceFileData($splFileInfoMock, []);
+        $sourceFileData = new SourceFileData($splFileInfoMock, []);
 
-        $actual = $coveredFileData->getRealPath();
+        $actual = $sourceFileData->getRealPath();
 
         $this->assertSame($expected, $actual);
     }
@@ -80,13 +80,13 @@ final class SourceFileDataTest extends TestCase
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
         $coverageFileData = new CoverageReport();
 
-        $coveredFileData = new SourceFileData($splFileInfoMock, [$coverageFileData, null]);
+        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageFileData, null]);
 
-        $actual = $coveredFileData->retrieveCoverageReport();
+        $actual = $sourceFileData->retrieveCoverageReport();
         $this->assertSame($coverageFileData, $actual);
 
         // From cache
-        $actual = $coveredFileData->retrieveCoverageReport();
+        $actual = $sourceFileData->retrieveCoverageReport();
         $this->assertSame($coverageFileData, $actual);
     }
 
@@ -96,9 +96,9 @@ final class SourceFileDataTest extends TestCase
 
         $coverageFileData = new CoverageReport();
 
-        $coveredFileData = new SourceFileData($splFileInfoMock, [$coverageFileData]);
+        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageFileData]);
 
-        $this->assertFalse($coveredFileData->hasTests());
+        $this->assertFalse($sourceFileData->hasTests());
     }
 
     public function test_it_proxies_call_file_code_coverage(): void
@@ -119,27 +119,27 @@ final class SourceFileDataTest extends TestCase
             ]
         );
 
-        $coveredFileData = new SourceFileData($splFileInfoMock, [$coverageFileData]);
+        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageFileData]);
 
-        $this->assertTrue($coveredFileData->hasTests());
+        $this->assertTrue($sourceFileData->hasTests());
 
-        $this->assertCount(0, $coveredFileData->getAllTestsForMutation(
+        $this->assertCount(0, $sourceFileData->getAllTestsForMutation(
             new NodeLineRangeData(1, 1),
             false
         ));
 
-        $this->assertCount(1, $coveredFileData->getAllTestsForMutation(
+        $this->assertCount(1, $sourceFileData->getAllTestsForMutation(
             new NodeLineRangeData(20, 21),
             false
         ));
 
         // This iterator_to_array is due to bug in our version of PHPUnit
-        $this->assertCount(0, iterator_to_array($coveredFileData->getAllTestsForMutation(
+        $this->assertCount(0, iterator_to_array($sourceFileData->getAllTestsForMutation(
             new NodeLineRangeData(1, 1),
             true
         )));
 
-        $this->assertCount(1, iterator_to_array($coveredFileData->getAllTestsForMutation(
+        $this->assertCount(1, iterator_to_array($sourceFileData->getAllTestsForMutation(
             new NodeLineRangeData(19, 22),
             true
         )));

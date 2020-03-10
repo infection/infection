@@ -105,15 +105,15 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
             ],
         ];
 
-        $coveredFileDataMock = $this->createMock(SourceFileData::class);
-        $coveredFileDataMock
+        $sourceFileDataMock = $this->createMock(SourceFileData::class);
+        $sourceFileDataMock
             ->expects($this->once())
             ->method('retrieveCoverageReport')
             ->willReturn($fileData)
         ;
 
         $expected = [
-            $coveredFileDataMock,
+            $sourceFileDataMock,
         ];
 
         $actual = $adder->addTestExecutionInfo($expected);

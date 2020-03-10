@@ -136,7 +136,7 @@ final class FileMutationGeneratorTest extends TestCase
      * @dataProvider parsedFilesProvider
      */
     public function test_it_attempts_to_generate_mutations_for_the_file_if_covered_or_not_only_covered_code(
-        SourceFileData $coveredFileData,
+        SourceFileData $sourceFileData,
         bool $onlyCovered,
         LineCodeCoverage $codeCoverage,
         string $expectedFilePath
@@ -168,7 +168,7 @@ final class FileMutationGeneratorTest extends TestCase
         ;
 
         $mutations = $this->mutationGenerator->generate(
-            $coveredFileData,
+            $sourceFileData,
             $onlyCovered,
             $codeCoverage,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
@@ -184,7 +184,7 @@ final class FileMutationGeneratorTest extends TestCase
      * @dataProvider skippedFilesProvider
      */
     public function test_it_skips_the_mutation_generation_if_checks_only_covered_code_and_the_file_has_no_tests(
-        SourceFileData $coveredFileData,
+        SourceFileData $sourceFileData,
         string $expectedFilePath
     ): void {
         $this->fileParserMock
@@ -204,7 +204,7 @@ final class FileMutationGeneratorTest extends TestCase
         );
 
         $mutations = $mutationGenerator->generate(
-            $coveredFileData,
+            $sourceFileData,
             true,
             $this->createCodeCoverageMock(
                 false
