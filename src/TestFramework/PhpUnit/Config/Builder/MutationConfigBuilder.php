@@ -164,6 +164,9 @@ class MutationConfigBuilder extends ConfigBuilder
             <<<'PHP'
 <?php
 
+if (function_exists('proc_nice')) {
+    proc_nice(10);
+}
 %s
 require_once '%s';
 
