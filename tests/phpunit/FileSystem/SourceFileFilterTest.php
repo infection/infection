@@ -106,28 +106,50 @@ final class SourceFileFilterTest extends TestCase
 
     public static function fileListProvider(): Generator
     {
-        yield ['src/Example', ['src/Example/Test.php'], ['src/Example/Test.php']];
+        yield [
+            'src/Example',
+            [
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Example/Test.php',
+            ],
+        ];
 
-        yield ['src/Foo', ['src/Example/Test.php'], []];
+        yield [
+            'src/Foo',
+            [
+                'src/Example/Test.php',
+            ],
+            [],
+        ];
 
-        yield ['', [
-            'src/Foo/Test.php',
-            'src/Bar/Baz.php',
-            'src/Example/Test.php',
-        ], [
-            'src/Foo/Test.php',
-            'src/Bar/Baz.php',
-            'src/Example/Test.php',
-        ]];
+        yield [
+            '',
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+        ];
 
-        yield ['src/Foo,src/Bar', [
-            'src/Foo/Test.php',
-            'src/Bar/Baz.php',
-            'src/Example/Test.php',
-        ], [
-            'src/Foo/Test.php',
-            'src/Bar/Baz.php',
-        ]];
+        yield [
+            'src/Foo,src/Bar',
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+            ],
+        ];
     }
 
     private function assertCanFilterInput(string $filter, iterable $input, array $expected): void
