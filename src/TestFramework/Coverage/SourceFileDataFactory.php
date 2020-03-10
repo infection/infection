@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use function array_key_exists;
+use Infection\FileSystem\SourceFileFilter;
 use Infection\Mutation\MutationGenerator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
@@ -74,7 +75,7 @@ final class SourceFileDataFactory implements SourceFileDataProvider
     public function __construct(
         SourceFileDataProvider $primaryCoverageProvider,
         JUnitTestExecutionInfoAdder $testFileDataAdder,
-        CoveredFileNameFilter $filter,
+        SourceFileFilter $filter,
         iterable $sourceFiles,
         bool $onlyCovered
     ) {

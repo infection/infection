@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\CoveredFileNameFilter;
+use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\Coverage\SourceFileDataFactory;
@@ -156,7 +156,7 @@ final class SourceFileDataFactoryTest extends TestCase
             ->willReturn($canary)
         ;
 
-        $filter = $this->createMock(CoveredFileNameFilter::class);
+        $filter = $this->createMock(SourceFileFilter::class);
         $filter
             ->expects($this->once())
             ->method('filter')

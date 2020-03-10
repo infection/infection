@@ -89,7 +89,6 @@ use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\Coverage\CoveredFileNameFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
@@ -165,14 +164,9 @@ final class Container
                         $container->getConfiguration()->getTestFramework()
                     ),
                     $container->getJUnitTestExecutionInfoAdder(),
-                    $container->getCoveredFileNameFilter(),
+                    $container->getSourceFileFilter(),
                     $container->getConfiguration()->getSourceFiles(),
                     $container->getConfiguration()->mutateOnlyCoveredCode()
-                );
-            },
-            CoveredFileNameFilter::class => static function (self $container): CoveredFileNameFilter {
-                return new CoveredFileNameFilter(
-                    $container->getSourceFileFilter()
                 );
             },
             SourceFileFilter::class => static function (self $container): SourceFileFilter {
@@ -583,11 +577,6 @@ final class Container
     public function getSourceFileDataFactory(): SourceFileDataFactory
     {
         return $this->get(SourceFileDataFactory::class);
-    }
-
-    public function getCoveredFileNameFilter(): CoveredFileNameFilter
-    {
-        return $this->get(CoveredFileNameFilter::class);
     }
 
     public function getSourceFileFilter(): SourceFileFilter
