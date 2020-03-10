@@ -87,7 +87,7 @@ final class Application extends BaseApplication
             $version = Versions::getVersion(self::PACKAGE_NAME);
             // @codeCoverageIgnoreStart
         } catch (OutOfBoundsException $e) {
-            if (preg_match('/package .*' . preg_quote(self::PACKAGE_NAME) . '.* not installed/', $e->getMessage()) === 0) {
+            if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#', $e->getMessage()) === 0) {
                 throw $e;
             }
 
