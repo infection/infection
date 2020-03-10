@@ -56,6 +56,8 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
  *      ]
  *  ]
  * ```
+ *
+ * TODO: rename to TestLocations
  */
 final class CoverageReport
 {
@@ -65,11 +67,16 @@ final class CoverageReport
     public $byLine = [];
 
     /**
+     * TODO: use a getter "get"
+     *
      * @var array<string, MethodLocationData>
      */
     public $byMethod = [];
 
     /**
+     * TODO: rename CoverageLineData to TestLocation
+     * TODO: rename MethodLocationData to SourceMethodRange
+     *
      * @param array<int, array<int, CoverageLineData>> $byLine
      * @param array<string, MethodLocationData> $byMethod
      */

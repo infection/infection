@@ -44,6 +44,8 @@ use Webmozart\Assert\Assert;
  *
  * @internal
  * @final
+ *
+ * TODO: rename to Trace
  */
 class SourceFileData implements LineCodeCoverage
 {
@@ -101,6 +103,9 @@ class SourceFileData implements LineCodeCoverage
             return $this->coverageReport;
         }
 
+        // TODO: maybe instead of having iterable<CoverageReport> lazyCoverageReport, we could have
+        // `Closure<() => TestLocations> testLocationsFactory`: it returns only one element but
+        // remains lazy
         foreach ($this->lazyCoverageReport as $coverageReport) {
             // is a Generator with one yield, thus it'll only trigger here
             // (or this can be an array with one element)
