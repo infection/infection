@@ -46,33 +46,45 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResult
 {
+    private $mutationHash;
     private $processCommandLine;
     private $processOutput;
     private $processResultCode;
-    private $mutantDiff;
+    private $mutationDiff;
     private $mutatorName;
     private $originalFilePath;
     private $originalStartingLine;
+    private $originalEndingLine;
+    private $originalStartingColumn;
+    private $originalEndingColumn;
 
     public function __construct(
+        string $mutationHash,
         string $processCommandLine,
         string $processOutput,
         int $processResultCode,
-        string $mutantDiff,
+        string $mutationDiff,
         string $mutatorName,
         string $originalFilePath,
-        int $originalStartingLine
+        int $originalStartingLine,
+        int $originalEndingLine,
+        int $originalStartingColumn,
+        int $originalEndingColumn
     ) {
         Assert::oneOf($processResultCode, MutantProcess::RESULT_CODES);
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
+        $this->mutationHash = $mutationHash;
         $this->processCommandLine = $processCommandLine;
         $this->processOutput = $processOutput;
         $this->processResultCode = $processResultCode;
-        $this->mutantDiff = $mutantDiff;
+        $this->mutationDiff = $mutationDiff;
         $this->mutatorName = $mutatorName;
         $this->originalFilePath = $originalFilePath;
         $this->originalStartingLine = $originalStartingLine;
+        $this->originalEndingLine = $originalEndingLine;
+        $this->originalStartingColumn = $originalStartingColumn;
+        $this->originalEndingColumn = $originalEndingColumn;
     }
 
     public static function createFromNonCoveredMutant(Mutant $mutant): self
@@ -80,14 +92,17 @@ class MutantExecutionResult
         $mutation = $mutant->getMutation();
 
         return new self(
+            $mutation->getHash(),
             '',
             '',
             MutantProcess::CODE_NOT_COVERED,
             $mutant->getDiff(),
             $mutant->getMutation()->getMutatorName(),
             $mutation->getOriginalFilePath(),
-            // TODO: move this in Mutation?
-            (int) $mutation->getAttributes()['startLine']
+            $mutation->getOriginalStartingLine(),
+            $mutation->getOriginalEndingLine(),
+            $mutation->getOriginalStartingColumn(),
+            $mutation->getOriginalEndingColumn()
         );
     }
 
@@ -95,16 +110,26 @@ class MutantExecutionResult
     {
         $process = $mutantProcess->getProcess();
         $mutant = $mutantProcess->getMutant();
+        $mutation = $mutant->getMutation();
 
         return new self(
+            $mutation->getHash(),
             $process->getCommandLine(),
             $process->isStarted() ? $process->getOutput() : '',
             $mutantProcess->getResultCode(),
             $mutant->getDiff(),
-            $mutant->getMutation()->getMutatorName(),
+            $mutation->getMutatorName(),
             $mutantProcess->getOriginalFilePath(),
-            $mutantProcess->getOriginalStartingLine()
+            $mutation->getOriginalStartingLine(),
+            $mutation->getOriginalEndingLine(),
+            $mutation->getOriginalStartingColumn(),
+            $mutation->getOriginalEndingColumn()
         );
+    }
+
+    public function getMutationHash(): string
+    {
+        return $this->mutationHash;
     }
 
     public function getProcessCommandLine(): string
@@ -122,9 +147,9 @@ class MutantExecutionResult
         return $this->processResultCode;
     }
 
-    public function getMutantDiff(): string
+    public function getMutationDiff(): string
     {
-        return $this->mutantDiff;
+        return $this->mutationDiff;
     }
 
     public function getMutatorName(): string
@@ -140,5 +165,20 @@ class MutantExecutionResult
     public function getOriginalStartingLine(): int
     {
         return $this->originalStartingLine;
+    }
+
+    public function getOriginalEndingLine(): int
+    {
+        return $this->originalEndingLine;
+    }
+
+    public function getOriginalStartingColumn(): int
+    {
+        return $this->originalStartingColumn;
+    }
+
+    public function getOriginalEndingColumn(): int
+    {
+        return $this->originalEndingColumn;
     }
 }

@@ -315,7 +315,7 @@ DIFF
         $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
         $this->assertSame($expectedProcessResultCode, $result->getProcessResultCode());
-        $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
+        $this->assertSame($expectedMutantDiff, $result->getMutationDiff());
         $this->assertSame($expectedMutatorName, $result->getMutatorName());
         $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
         $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());

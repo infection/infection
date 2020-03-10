@@ -136,6 +136,26 @@ class Mutation
         return $this->attributes;
     }
 
+    public function getOriginalStartingLine(): int
+    {
+        return (int) $this->attributes['startLine'];
+    }
+
+    public function getOriginalEndingLine(): int
+    {
+        return (int) $this->attributes['endLine'];
+    }
+
+    public function getOriginalStartingColumn(): int
+    {
+        return (int) $this->attributes['startTokenPos'];
+    }
+
+    public function getOriginalEndingColumn(): int
+    {
+        return (int) $this->attributes['endTokenPos'];
+    }
+
     public function getMutatedNodeClass(): string
     {
         return $this->mutatedNodeClass;
