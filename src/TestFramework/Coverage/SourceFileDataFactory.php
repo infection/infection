@@ -90,21 +90,23 @@ final class SourceFileDataFactory implements SourceFileDataProvider
      */
     public function provideFiles(): iterable
     {
-        $coverageFeed = $this->primaryCoverageProvider->provideFiles();
+        $filesFeed = $this->primaryCoverageProvider->provideFiles();
 
-        $filteredCoverageFeed = $this->filter->filter($coverageFeed);
+        $filteredFilesFeed = $this->filter->filter($filesFeed);
 
-        $readyCoverageFeed = $this->testFileDataAdder->addTestExecutionInfo($filteredCoverageFeed);
+        $readyFilesFeed = $this->testFileDataAdder->addTestExecutionInfo($filteredFilesFeed);
 
         if ($this->onlyCovered === true) {
             // The case where only covered files are considered
-            return $readyCoverageFeed;
+            return $readyFilesFeed;
         }
 
-        return $this->appendUncoveredFiles($readyCoverageFeed);
+        return $this->appendUncoveredFiles($readyFilesFeed);
     }
 
     /**
+     * Adds to the queue uncovered files found on disk.
+     *
      * @param iterable<SourceFileData> $coverage
      *
      * @return iterable<SourceFileData>
