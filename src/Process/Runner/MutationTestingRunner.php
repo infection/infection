@@ -37,6 +37,7 @@ namespace Infection\Process\Runner;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\MutantWasCreated;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
@@ -91,6 +92,8 @@ final class MutationTestingRunner
                 return $this->mutantFactory->create($mutation);
             })
             ->filter(function (Mutant $mutant) {
+                $this->eventDispatcher->dispatch(new MutantWasCreated());
+
                 if ($mutant->isCoveredByTest()) {
                     return true;
                 }

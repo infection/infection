@@ -41,6 +41,7 @@ use function count;
 use function get_class;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\Event\MutantWasCreated;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\Mutant;
@@ -201,6 +202,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutationTestingWasStarted(2),
+                new MutantWasCreated(),
+                new MutantWasCreated(),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -280,6 +283,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutationTestingWasStarted(0),
+                new MutantWasCreated(),
+                new MutantWasCreated(),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -358,14 +363,15 @@ final class MutationTestingRunnerTest extends TestCase
     }
 
     /**
-     * @param array<MutationTestingWasStarted|MutationTestingWasFinished> $expectedEvents
-     * @param array<MutationTestingWasStarted|MutationTestingWasFinished> $actualEvents
+     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantWasCreated> $expectedEvents
+     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantWasCreated> $actualEvents
      */
     private function assertAreSameEvents(array $expectedEvents, array $actualEvents): void
     {
         $expectedClasses = [
             MutationTestingWasStarted::class,
             MutationTestingWasFinished::class,
+            MutantWasCreated::class,
         ];
 
         $assertionErrorMessage = sprintf(
