@@ -41,8 +41,11 @@ use Infection\Environment\CouldNotResolveStrykerApiKey;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Mutant\MetricsCalculator;
+use function file_put_contents;
 use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
+use function str_replace;
+use const JSON_PRETTY_PRINT;
 
 /**
  * @internal
@@ -74,6 +77,33 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
     public function log(): void
     {
+        $json = (new StrykerReportFactory())->create($this->metricsCalculator);
+
+        $template = <<<'HTML'
+<!DOCTYPE html>
+
+<head>
+    <title>Install local example - Mutation test elements</title>
+    <script defer src="https://www.unpkg.com/mutation-testing-elements"></script>
+</head>
+
+<body>
+<a href="/">Back</a></li>
+<mutation-test-report-app></mutation-test-report-app>
+<script>
+    document.getElementsByTagName('mutation-test-report-app').item(0).report = JSON.parse('__JSON__');
+</script>
+</body>
+
+</html>
+HTML;
+        file_put_contents(
+            __DIR__.'/../../report.json',
+            json_encode(json_decode($json), JSON_PRETTY_PRINT)
+        );file_put_contents(
+            __DIR__.'/../../report.html',
+            str_replace('__JSON__', $json, $template)
+        );
         try {
             $buildContext = $this->buildContextResolver->resolve();
         } catch (CouldNotResolveBuildContext $exception) {

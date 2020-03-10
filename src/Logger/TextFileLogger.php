@@ -138,7 +138,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
 
             $lines[] = self::getMutatorLine($index, $executionResult);
             $lines[] = '';
-            $lines[] = Str::trimLineReturns($executionResult->getMutantDiff());
+            $lines[] = Str::trimLineReturns($executionResult->getMutationDiff());
 
             if ($this->debugMode) {
                 $lines[] = '';
