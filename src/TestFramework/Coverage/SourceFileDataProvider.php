@@ -44,6 +44,7 @@ interface SourceFileDataProvider
 {
     /**
      * TODO: rename to provideTraces()
+     *
      * @return iterable<SourceFileData>
      */
     public function provideFiles(): iterable;
