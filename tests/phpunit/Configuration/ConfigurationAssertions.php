@@ -57,6 +57,7 @@ trait ConfigurationAssertions
         ?int $expectedTimeout,
         array $expectedSourceDirectories,
         array $expectedSourceFiles,
+        string $filter,
         Logs $expectedLogs,
         string $expectedLogVerbosity,
         string $expectedTmpDir,
@@ -84,6 +85,7 @@ trait ConfigurationAssertions
             self::normalizePaths($expectedSourceFiles),
             self::normalizePaths($configuration->getSourceFiles())
         );
+        $this->assertSame($filter, $configuration->getSourceFilesFilter());
         $this->assertLogsStateIs(
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),

@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 
@@ -48,18 +48,18 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 class FileCodeCoverage implements LineCodeCoverage
 {
     /**
-     * @var CoverageFileData
+     * @var CoverageReport
      */
-    private $coverageFileData;
+    private $coverageReport;
 
-    public function __construct(CoverageFileData $coverageFileData)
+    public function __construct(CoverageReport $coverageReport)
     {
-        $this->coverageFileData = $coverageFileData;
+        $this->coverageReport = $coverageReport;
     }
 
     public function hasTests(): bool
     {
-        foreach ($this->coverageFileData->byLine as $testMethods) {
+        foreach ($this->coverageReport->byLine as $testMethods) {
             if ($testMethods !== []) {
                 return true;
             }
@@ -95,8 +95,8 @@ class FileCodeCoverage implements LineCodeCoverage
     private function getTestsForLineRange(NodeLineRangeData $lineRange): iterable
     {
         foreach ($lineRange->range as $line) {
-            if (array_key_exists($line, $this->coverageFileData->byLine)) {
-                yield from $this->coverageFileData->byLine[$line];
+            if (array_key_exists($line, $this->coverageReport->byLine)) {
+                yield from $this->coverageReport->byLine[$line];
             }
         }
     }
@@ -106,7 +106,7 @@ class FileCodeCoverage implements LineCodeCoverage
      */
     private function getTestsForExecutedMethodOnLine(int $line): iterable
     {
-        foreach ($this->coverageFileData->byMethod as $coverageMethodData) {
+        foreach ($this->coverageReport->byMethod as $coverageMethodData) {
             if (
                 $line >= $coverageMethodData->startLine
                 && $line <= $coverageMethodData->endLine

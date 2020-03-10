@@ -33,54 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
-use Infection\TestFramework\Coverage\CoverageReport;
-use function is_array;
-use function is_scalar;
-use function iterator_to_array;
-use Traversable;
+use Infection\TestFramework\PhpUnit\Coverage\XPathFactory;
+use PHPUnit\Framework\TestCase;
 
-final class CoverageHelper
+/**
+ * @covers \Infection\TestFramework\PhpUnit\Coverage\XPathFactory
+ */
+final class XPathFactoryTest extends TestCase
 {
-    private function __construct()
+    public function test_it_removes_namespace(): void
     {
-    }
+        $xPath = XPathFactory::createXPath('<?xml version="1.0"?><phpunit xmlns="http://schema.phpunit.de/coverage/1.0"></phpunit>');
 
-    /**
-     * @param array<string, CoverageReport> $coverage
-     *
-     * @return array<string|int, mixed>
-     */
-    public static function convertToArray(iterable $coverage): array
-    {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
-        }
-
-        return self::serializeValue($coverage);
-    }
-
-    private static function serializeValue($mixed)
-    {
-        if ($mixed === null) {
-            return null;
-        }
-
-        if (is_scalar($mixed)) {
-            return $mixed;
-        }
-
-        if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
-        }
-
-        return self::serializeValue((array) $mixed);
+        $this->assertStringNotContainsString('xmlns', $xPath->document->saveXML());
     }
 }

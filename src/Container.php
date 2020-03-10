@@ -57,6 +57,7 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
+use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
@@ -88,10 +89,13 @@ use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\SourceFileDataFactory;
+use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -154,12 +158,34 @@ final class Container
             IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
                 return new IndexXmlCoverageParser($container->getConfiguration()->getCoveragePath());
             },
+            SourceFileDataFactory::class => static function (self $container): SourceFileDataFactory {
+                return new SourceFileDataFactory(
+                    $container->getFileCodeCoverageProviderFactory()->create(),
+                    $container->getJUnitTestExecutionInfoAdder(),
+                    $container->getSourceFileFilter(),
+                    $container->getConfiguration()->getSourceFiles(),
+                    $container->getConfiguration()->mutateOnlyCoveredCode()
+                );
+            },
+            SourceFileFilter::class => static function (self $container): SourceFileFilter {
+                return new SourceFileFilter(
+                    $container->getConfiguration()->getSourceFilesFilter()
+                );
+            },
+            JUnitTestExecutionInfoAdder::class => static function (self $container): JUnitTestExecutionInfoAdder {
+                return new JUnitTestExecutionInfoAdder(
+                    $container->getTestFrameworkAdapter(),
+                    $container->getMemoizedTestFileDataProvider()
+                );
+            },
             FileCodeCoverageProviderFactory::class => static function (self $container): FileCodeCoverageProviderFactory {
                 return new FileCodeCoverageProviderFactory(
                     $container->getConfiguration()->getCoveragePath(),
-                    $container->getIndexXmlCoverageParser(),
-                    $container->getMemoizedTestFileDataProvider()
+                    $container->getIndexXmlCoverageParser()
                 );
+            },
+            FileCodeCoverageProvider::class => static function (self $container): FileCodeCoverageProvider {
+                return new FileCodeCoverageProvider();
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
                 return new RootsFileOrDirectoryLocator(
@@ -398,11 +424,8 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new MutationGenerator(
-                    $config->getSourceFiles(),
-                    $container->getFileCodeCoverageProviderFactory()->create(
-                        $config->getTestFramework(),
-                        $container->getTestFrameworkAdapter()
-                    ),
+                    $container->getSourceFileDataFactory(),
+                    $container->getFileCodeCoverageProvider(),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
@@ -549,9 +572,29 @@ final class Container
         return $this->get(IndexXmlCoverageParser::class);
     }
 
+    public function getSourceFileDataFactory(): SourceFileDataFactory
+    {
+        return $this->get(SourceFileDataFactory::class);
+    }
+
+    public function getSourceFileFilter(): SourceFileFilter
+    {
+        return $this->get(SourceFileFilter::class);
+    }
+
+    public function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
+    {
+        return $this->get(JUnitTestExecutionInfoAdder::class);
+    }
+
     public function getFileCodeCoverageProviderFactory(): FileCodeCoverageProviderFactory
     {
         return $this->get(FileCodeCoverageProviderFactory::class);
+    }
+
+    public function getFileCodeCoverageProvider(): FileCodeCoverageProvider
+    {
+        return $this->get(FileCodeCoverageProvider::class);
     }
 
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator

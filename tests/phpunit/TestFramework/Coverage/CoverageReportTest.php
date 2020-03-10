@@ -35,52 +35,31 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageReport;
-use function is_array;
-use function is_scalar;
-use function iterator_to_array;
-use Traversable;
+use Infection\TestFramework\Coverage\MethodLocationData;
+use PHPUnit\Framework\TestCase;
 
-final class CoverageHelper
+final class CoverageReportTest extends TestCase
 {
-    private function __construct()
+    public function test_it_has_default_values(): void
     {
+        $coverageReport = new CoverageReport();
+
+        $this->assertSame([], $coverageReport->byMethod);
+        $this->assertSame([], $coverageReport->byLine);
     }
 
-    /**
-     * @param array<string, CoverageReport> $coverage
-     *
-     * @return array<string|int, mixed>
-     */
-    public static function convertToArray(iterable $coverage): array
+    public function test_it_creates_self_object_with_named_constructor(): void
     {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
-        }
+        $pathToTest = '/path/to/Test.php';
 
-        return self::serializeValue($coverage);
-    }
+        $coverageReport = new CoverageReport(
+            [1 => [CoverageLineData::withTestMethod($pathToTest)]],
+            ['method' => new MethodLocationData(1, 3)]
+        );
 
-    private static function serializeValue($mixed)
-    {
-        if ($mixed === null) {
-            return null;
-        }
-
-        if (is_scalar($mixed)) {
-            return $mixed;
-        }
-
-        if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
-        }
-
-        return self::serializeValue((array) $mixed);
+        $this->assertSame($pathToTest, $coverageReport->byLine[1][0]->testMethod);
+        $this->assertSame(1, $coverageReport->byMethod['method']->startLine);
     }
 }

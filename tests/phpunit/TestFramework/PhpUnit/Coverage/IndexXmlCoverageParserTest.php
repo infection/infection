@@ -36,11 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
+use Infection\Tests\Fixtures\TestFramework\LegacyXmlCoverageParserAdapter;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
@@ -50,27 +53,27 @@ use Webmozart\PathUtil\Path;
 
 /**
  * @group integration
+ * @covers \Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser
+ * @covers \Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider
+ * @covers \Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser
  */
 final class IndexXmlCoverageParserTest extends TestCase
 {
-    private const FIXTURES_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/src';
-    private const FIXTURES_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
-    private const FIXTURES_INCORRECT_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-incomplete';
-    private const FIXTURES_OLD_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/old-coverage';
-
     /**
      * @var string|null
      */
     private static $xml;
 
     /**
-     * @var IndexXmlCoverageParser
+     * @var LegacyXmlCoverageParserAdapter
      */
     private $parser;
 
     protected function setUp(): void
     {
-        $this->parser = new IndexXmlCoverageParser(self::FIXTURES_COVERAGE_DIR);
+        $this->parser = new LegacyXmlCoverageParserAdapter(
+            new IndexXmlCoverageParser(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR)
+        );
     }
 
     public static function getXml(): string
@@ -79,12 +82,12 @@ final class IndexXmlCoverageParserTest extends TestCase
             return self::$xml;
         }
 
-        $xml = file_get_contents(self::FIXTURES_COVERAGE_DIR . '/index.xml');
+        $xml = file_get_contents(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/index.xml');
 
         // Replaces dummy source path with the real path
         self::$xml = preg_replace(
             '/(source=\").*?(\")/',
-            sprintf('$1%s$2', realpath(self::FIXTURES_SRC_DIR)),
+            sprintf('$1%s$2', realpath(XmlCoverageFixtures::FIXTURES_SRC_DIR)),
             $xml
         );
 
@@ -110,128 +113,9 @@ final class IndexXmlCoverageParserTest extends TestCase
             self::getXml()
         ));
 
-        $zeroLevelPath = realpath(self::FIXTURES_SRC_DIR . '/zeroLevel.php');
-        $noPercentagePath = realpath(self::FIXTURES_SRC_DIR . '/noPercentage.php');
-        $firstLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/firstLevel.php');
-        $secondLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
-        $secondLevelTraitPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
-
-        $this->assertSame(
-            [
-                $firstLevelPath => [
-                    'byLine' => [
-                        26 => [
-                            [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                            [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                        30 => [
-                            [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                            [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                        31 => [
-                            [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                        34 => [
-                            [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                    ],
-                    'byMethod' => [
-                        'mutate' => [
-                            'startLine' => 19,
-                            'endLine' => 22,
-                        ],
-                        'shouldMutate' => [
-                            'startLine' => 24,
-                            'endLine' => 35,
-                        ],
-                    ],
-                ],
-                $secondLevelPath => [
-                    'byLine' => [
-                        11 => [
-                            [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                            [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                    ],
-                    'byMethod' => [
-                        'mutate' => [
-                            'startLine' => 19,
-                            'endLine' => 22,
-                        ],
-                        'shouldMutate' => [
-                            'startLine' => 24,
-                            'endLine' => 35,
-                        ],
-                    ],
-                ],
-                $secondLevelTraitPath => [
-                    'byLine' => [
-                        11 => [
-                            [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                            [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                    ],
-                    'byMethod' => [
-                        'mutate' => [
-                            'startLine' => 19,
-                            'endLine' => 22,
-                        ],
-                        'shouldMutate' => [
-                            'startLine' => 24,
-                            'endLine' => 35,
-                        ],
-                    ],
-                ],
-                $zeroLevelPath => [
-                    'byLine' => [],
-                    'byMethod' => [],
-                ],
-                $noPercentagePath => [
-                    'byLine' => [],
-                    'byMethod' => [],
-                ],
-            ],
-            CoverageHelper::convertToArray($coverage)
+        $this->assertCoverageFixtureSame(
+            XmlCoverageFixtures::provideFixtures(),
+            $coverage
         );
     }
 
@@ -266,56 +150,17 @@ XML;
 
     public function test_it_has_correct_coverage_data_for_each_file_for_old_phpunit_versions(): void
     {
-        $coverage = (new IndexXmlCoverageParser(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml'))->parse(str_replace(
+        $coverage = (new LegacyXmlCoverageParserAdapter(
+            new IndexXmlCoverageParser(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR)
+        ))->parse(str_replace(
             '/path/to/src',
-            realpath(self::FIXTURES_OLD_COVERAGE_DIR . '/src'),
-            file_get_contents(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml/index.xml')
+            realpath(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
+            file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml')
         ));
 
-        $middlewarePath = realpath(self::FIXTURES_OLD_COVERAGE_DIR . '/src/Middleware/ReleaseRecordedEventsMiddleware.php');
-
-        $this->assertSame(
-            [
-                $middlewarePath => [
-                    'byLine' => [
-                        29 => [
-                            [
-                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                            [
-                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                        30 => [
-                            [
-                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                            [
-                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                    ],
-                    'byMethod' => [
-                        '__construct' => [
-                            'startLine' => 27,
-                            'endLine' => 31,
-                        ],
-                        'execute' => [
-                            'startLine' => 43,
-                            'endLine' => 60,
-                        ],
-                    ],
-                ],
-            ],
-            CoverageHelper::convertToArray($coverage)
+        $this->assertCoverageFixtureSame(
+            XmlCoverageFixtures::provideLegacyFormatFixtures(),
+            $coverage
         );
     }
 
@@ -327,36 +172,6 @@ XML;
         $this->expectException(NoLineExecuted::class);
 
         $this->parser->parse($xml);
-    }
-
-    public function test_it_errors_when_the_source_file_could_not_be_found(): void
-    {
-        $incorrectCoverageSrcDir = Path::canonicalize(self::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
-
-        // Replaces dummy source path with the real path
-        $xml = preg_replace(
-            '/(source=\").*?(\")/',
-            sprintf('$1%s$2', $incorrectCoverageSrcDir),
-            file_get_contents(self::FIXTURES_INCORRECT_COVERAGE_DIR . '/coverage-xml/index.xml')
-        );
-
-        try {
-            $this->parser->parse($xml);
-
-            $this->fail();
-        } catch (InvalidCoverage $exception) {
-            $this->assertSame(
-                sprintf(
-                    'Could not find the source file "%s/zeroLevel.php" referred by '
-                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
-                    $incorrectCoverageSrcDir,
-                    Path::canonicalize(self::FIXTURES_COVERAGE_DIR)
-                ),
-                $exception->getMessage()
-            );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
-        }
     }
 
     public function coverageProvider(): Generator
@@ -418,5 +233,51 @@ XML
 </phpunit>
 XML
         ];
+    }
+
+    public function test_it_errors_when_the_source_file_could_not_be_found(): void
+    {
+        $incorrectCoverageSrcDir = Path::canonicalize(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
+
+        // Replaces dummy source path with the real path
+        $xml = preg_replace(
+            '/(source=\").*?(\")/',
+            sprintf('$1%s$2', $incorrectCoverageSrcDir),
+            file_get_contents(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/coverage-xml/index.xml')
+        );
+
+        try {
+            $this->parser->parse($xml);
+
+            $this->fail();
+        } catch (InvalidCoverage $exception) {
+            $this->assertSame(
+                sprintf(
+                    'Could not find the source file "%s/zeroLevel.php" referred by '
+                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
+                    $incorrectCoverageSrcDir,
+                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR)
+                ),
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
+    }
+
+    /**
+     * @param iterable<XmlCoverageFixture> $fixtures
+     * @param array<string, CoverageReport> $coverage
+     */
+    private function assertCoverageFixtureSame(iterable $fixtures, iterable $coverage): void
+    {
+        $preparedFixtures = take($fixtures)->map(static function (XmlCoverageFixture $fixture) {
+            yield $fixture->sourceFilePath => $fixture->serializedCoverage;
+        });
+
+        $this->assertSame(
+            iterator_to_array($preparedFixtures, true),
+            CoverageHelper::convertToArray($coverage)
+        );
     }
 }

@@ -36,101 +36,95 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
 final class FileCodeCoverageProviderTest extends TestCase
 {
-    public function test_it_determines_file_is_not_covered_for_unknown_path(): void
-    {
-        $filePath = '/path/to/unknown-file';
-
-        $provider = $this->createCodeCoverageDataProvider();
-        $codeCoverageData = $provider->provideFor($this->createSplFileInfo($filePath));
-
-        $this->assertFalse($codeCoverageData->hasTests());
-    }
-
     public function test_it_determines_file_is_covered(): void
     {
         $filePath = '/path/to/acme/Foo.php';
 
         $provider = $this->createCodeCoverageDataProvider();
-        $codeCoverageData = $provider->provideFor($this->createSplFileInfo($filePath));
+        $codeCoverageData = $provider->provideFor($this->createSourceFileData($filePath));
 
         $this->assertTrue($codeCoverageData->hasTests());
     }
 
-    private function getParsedCodeCoverageData(): array
+    private function getParsedCodeCoverageData(): CoverageReport
     {
-        return [
-            '/path/to/acme/Foo.php' => new CoverageFileData(
-                [
-                    26 => [
-                        CoverageLineData::with(
-                            'Infection\\Acme\\FooTest::test_it_can_do_0',
-                            '/path/to/acme/FooTest.php',
-                            0.123
-                        ),
-                        CoverageLineData::with(
-                            'Infection\\Acme\\FooTest::test_it_can_do_1',
-                            '/path/to/acme/FooTest.php',
-                            0.456
-                        ),
-                    ],
-                    30 => [
-                        CoverageLineData::with(
-                            'Infection\\Acme\\FooTest::test_it_can_do_0',
-                            '/path/to/acme/FooTest.php',
-                            0.123
-                        ),
-                        CoverageLineData::with(
-                            'Infection\\Acme\\FooTest::test_it_can_do_1',
-                            '/path/to/acme/FooTest.php',
-                            0.456
-                        ),
-                    ],
-                    31 => [
-                        CoverageLineData::with(
-                            'Infection\\Acme\\FooTest::test_it_can_do_1',
-                            '/path/to/acme/FooTest.php',
-                            0.456
-                        ),
-                    ],
-                    34 => [
-                        CoverageLineData::with(
-                            'Infection\\Acme\\FooTest::test_it_can_do_0',
-                            '/path/to/acme/FooTest.php',
-                            0.123
-                        ),
-                    ],
+        return new CoverageReport(
+            [
+                26 => [
+                    CoverageLineData::with(
+                        'Infection\\Acme\\FooTest::test_it_can_do_0',
+                        '/path/to/acme/FooTest.php',
+                        0.123
+                    ),
+                    CoverageLineData::with(
+                        'Infection\\Acme\\FooTest::test_it_can_do_1',
+                        '/path/to/acme/FooTest.php',
+                        0.456
+                    ),
                 ],
-                [
-                    'do0' => new MethodLocationData(19, 22),
-                    'do1' => new MethodLocationData(24, 35),
-                    'doSomethingUncovered' => new MethodLocationData(3, 5),
-                ]
-            ),
-        ];
+                30 => [
+                    CoverageLineData::with(
+                        'Infection\\Acme\\FooTest::test_it_can_do_0',
+                        '/path/to/acme/FooTest.php',
+                        0.123
+                    ),
+                    CoverageLineData::with(
+                        'Infection\\Acme\\FooTest::test_it_can_do_1',
+                        '/path/to/acme/FooTest.php',
+                        0.456
+                    ),
+                ],
+                31 => [
+                    CoverageLineData::with(
+                        'Infection\\Acme\\FooTest::test_it_can_do_1',
+                        '/path/to/acme/FooTest.php',
+                        0.456
+                    ),
+                ],
+                34 => [
+                    CoverageLineData::with(
+                        'Infection\\Acme\\FooTest::test_it_can_do_0',
+                        '/path/to/acme/FooTest.php',
+                        0.123
+                    ),
+                ],
+            ],
+            [
+                'do0' => new MethodLocationData(19, 22),
+                'do1' => new MethodLocationData(24, 35),
+                'doSomethingUncovered' => new MethodLocationData(3, 5),
+            ]
+        );
+    }
+
+    private function createSourceFileData(string $filePath): SourceFileData
+    {
+        return new SourceFileData(
+            $this->createSplFileInfo($filePath),
+            [$this->getParsedCodeCoverageData()]
+        );
     }
 
     private function createSplFileInfo(string $filePath): SplFileInfo
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
         $splFileInfoMock
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('getRealPath')
-            ->willReturn(false)
         ;
 
         $splFileInfoMock
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('getPathname')
-            ->willReturn($filePath)
         ;
 
         return $splFileInfoMock;
@@ -138,13 +132,6 @@ final class FileCodeCoverageProviderTest extends TestCase
 
     private function createCodeCoverageDataProvider(): FileCodeCoverageProvider
     {
-        $coverageFactoryMock = $this->createMock(PhpUnitXmlCoverageFactory::class);
-        $coverageFactoryMock
-            ->expects($this->once())
-            ->method('createCoverage')
-            ->willReturn($this->getParsedCodeCoverageData())
-        ;
-
-        return new FileCodeCoverageProvider($coverageFactoryMock);
+        return new FileCodeCoverageProvider();
     }
 }

@@ -41,7 +41,7 @@ use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
 use function file_exists;
 use function implode;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\preg_match;
@@ -108,7 +108,7 @@ TXT
     public function checkCoverageExists(): void
     {
         $coverageIndexFilePath = Path::canonicalize(
-            $this->coveragePath . DIRECTORY_SEPARATOR . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME
+            $this->coveragePath . DIRECTORY_SEPARATOR . PhpUnitXmlCoveredFileDataProvider::COVERAGE_INDEX_FILE_NAME
         );
 
         if (!file_exists($coverageIndexFilePath)) {
@@ -160,7 +160,7 @@ TXT
         $errors = [];
 
         $coverageIndexFilePath = Path::canonicalize(
-            $this->coveragePath . DIRECTORY_SEPARATOR . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME
+            $this->coveragePath . DIRECTORY_SEPARATOR . PhpUnitXmlCoveredFileDataProvider::COVERAGE_INDEX_FILE_NAME
         );
 
         if (!file_exists($coverageIndexFilePath)) {

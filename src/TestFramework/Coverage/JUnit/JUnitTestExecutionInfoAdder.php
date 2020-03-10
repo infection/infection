@@ -33,71 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Coverage\JUnit;
 
 use function explode;
+use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageFileData;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use function Safe\file_get_contents;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Coverage\SourceFileData;
 
 /**
+ * Adds test execution info to selected covered file data object.
+ *
  * @internal
  * @final
  */
-class PhpUnitXmlCoverageFactory
+class JUnitTestExecutionInfoAdder
 {
-    /**
-     * TODO: make this constant private
-     */
-    public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
-
-    private $coverageDir;
-    private $parser;
     private $testFileDataProvider;
 
+    private $adapter;
+
     public function __construct(
-        string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser,
-        ?TestFileDataProvider $testFileDataProvider
+        TestFrameworkAdapter $adapter,
+        TestFileDataProvider $testFileDataProvider
     ) {
-        $this->coverageDir = $coverageDir;
-        $this->parser = $coverageXmlParser;
+        $this->adapter = $adapter;
+
         $this->testFileDataProvider = $testFileDataProvider;
     }
 
     /**
-     * @return array<string, CoverageFileData>
+     * @param iterable<SourceFileData> $coverage
+     *
+     * @return iterable<SourceFileData>
      */
-    public function createCoverage(): array
+    public function addTestExecutionInfo(iterable $coverage): iterable
     {
-        $coverageIndexFileContent = file_get_contents(
-            $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME
-        );
+        if (!$this->adapter->hasJUnitReport()) {
+            return $coverage;
+        }
 
-        $coverage = $this->parser->parse($coverageIndexFileContent);
-
-        $this->addTestExecutionInfo($coverage);
-
-        return $coverage;
+        return $this->testExecutionInfoAdder($coverage);
     }
 
     /**
-     * @param CoverageFileData[] $coverage
+     * @param iterable<SourceFileData> $coverage
+     *
+     * @return Generator<SourceFileData>
      */
-    private function addTestExecutionInfo(array $coverage): void
+    private function testExecutionInfoAdder(iterable $coverage): Generator
     {
-        if ($this->testFileDataProvider === null) {
-            return;
-        }
-
-        foreach ($coverage as $sourceFilePath => $fileCoverageData) {
-            foreach ($fileCoverageData->byLine as $line => $linesCoverageData) {
+        foreach ($coverage as $data) {
+            foreach ($data->retrieveCoverageReport()->byLine as $linesCoverageData) {
                 foreach ($linesCoverageData as $test) {
                     self::updateTestExecutionInfo($test, $this->testFileDataProvider);
                 }
             }
+
+            yield $data;
         }
     }
 

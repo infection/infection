@@ -43,8 +43,10 @@ use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\SourceFileDataFactory;
+use Infection\TestFramework\Coverage\SourceFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
-use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -53,26 +55,25 @@ use Webmozart\Assert\Assert;
 final class MutationGenerator
 {
     /**
-     * @var iterable<SplFileInfo>
+     * @var SourceFileDataProvider|SourceFileDataFactory
      */
-    private $sourceFiles;
+    private $sourceFileDataProvider;
+    private $coverageProvider;
 
     /**
      * @var Mutator[]
      */
     private $mutators;
 
-    private $coverageProvider;
     private $eventDispatcher;
     private $fileMutationGenerator;
     private $runConcurrently;
 
     /**
-     * @param iterable<SplFileInfo> $sourceFiles
      * @param Mutator[] $mutators
      */
     public function __construct(
-        iterable $sourceFiles,
+        SourceFileDataProvider $sourceFileDataProvider,
         FileCodeCoverageProvider $coverageProvider,
         array $mutators,
         EventDispatcher $eventDispatcher,
@@ -81,7 +82,7 @@ final class MutationGenerator
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
-        $this->sourceFiles = $sourceFiles;
+        $this->sourceFileDataProvider = $sourceFileDataProvider;
         $this->coverageProvider = $coverageProvider;
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
@@ -99,15 +100,18 @@ final class MutationGenerator
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
-        $numberOfFiles = IterableCounter::bufferAndCountIfNeeded($this->sourceFiles, $this->runConcurrently);
+        $files = $this->sourceFileDataProvider->provideFiles();
+
+        $numberOfFiles = IterableCounter::bufferAndCountIfNeeded($files, $this->runConcurrently);
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
-        foreach ($this->sourceFiles as $fileInfo) {
+        /** @var SourceFileData $fileData */
+        foreach ($files as $fileData) {
             yield from $this->fileMutationGenerator->generate(
-                $fileInfo,
+                $fileData,
                 $onlyCovered,
-                $this->coverageProvider->provideFor($fileInfo),
+                $this->coverageProvider->provideFor($fileData),
                 $this->mutators,
                 $nodeIgnorers
             );
