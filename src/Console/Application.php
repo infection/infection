@@ -41,8 +41,10 @@ use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
 use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
 use Infection\Container;
+use OutOfBoundsException;
 use PackageVersions\Versions;
 use const PHP_SAPI;
+use function Safe\preg_match;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -58,6 +60,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class Application extends BaseApplication
 {
     private const NAME = 'Infection - PHP Mutation Testing Framework';
+
+    private const PACKAGE_NAME = 'infection/infection';
 
     private const INFECTION_PREFIX = 'INFECTION';
 
@@ -78,7 +82,20 @@ final class Application extends BaseApplication
 
     public function __construct(Container $container)
     {
-        parent::__construct(self::NAME, Versions::getVersion('infection/infection'));
+        try {
+            $version = Versions::getVersion(self::PACKAGE_NAME);
+            // @codeCoverageIgnoreStart
+        } catch (OutOfBoundsException $e) {
+            if (preg_match('/package .*' . self::PACKAGE_NAME . '.* not installed/', $e->getMessage()) === 0) {
+                throw $e;
+            }
+
+            // We have a bogus exception: how can Infection be not installed if we're here?
+            $version = 'not-installed';
+        }
+        // @codeCoverageIgnoreEnd
+
+        parent::__construct(self::NAME, $version);
 
         $this->container = $container;
         $this->setDefaultCommand('run');
