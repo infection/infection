@@ -93,7 +93,7 @@ use Infection\TestFramework\Coverage\CoveredFileDataFactory;
 use Infection\TestFramework\Coverage\CoveredFileNameFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
@@ -164,7 +164,7 @@ final class Container
                     $container->getFileCodeCoverageProviderFactory()->create(
                         $container->getConfiguration()->getTestFramework()
                     ),
-                    $container->getTestFileDataAdder(),
+                    $container->getJUnitTestExecutionInfoAdder(),
                     $container->getCoveredFileNameFilter(),
                     $container->getConfiguration()->getSourceFiles(),
                     $container->getConfiguration()->mutateOnlyCoveredCode()
@@ -180,8 +180,8 @@ final class Container
                     $container->getConfiguration()->getFilter()
                 );
             },
-            TestFileDataAdder::class => static function (self $container): TestFileDataAdder {
-                return new TestFileDataAdder(
+            JUnitTestExecutionInfoAdder::class => static function (self $container): JUnitTestExecutionInfoAdder {
+                return new JUnitTestExecutionInfoAdder(
                     $container->getTestFrameworkAdapter(),
                     $container->getMemoizedTestFileDataProvider()
                 );
@@ -595,9 +595,9 @@ final class Container
         return $this->get(SourceFileFilter::class);
     }
 
-    public function getTestFileDataAdder(): TestFileDataAdder
+    public function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
     {
-        return $this->get(TestFileDataAdder::class);
+        return $this->get(JUnitTestExecutionInfoAdder::class);
     }
 
     public function getFileCodeCoverageProviderFactory(): FileCodeCoverageProviderFactory

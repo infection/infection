@@ -39,7 +39,7 @@ use Infection\TestFramework\Coverage\CoveredFileData;
 use Infection\TestFramework\Coverage\CoveredFileDataFactory;
 use Infection\TestFramework\Coverage\CoveredFileDataProvider;
 use Infection\TestFramework\Coverage\CoveredFileNameFilter;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
@@ -164,7 +164,7 @@ final class CoveredFileDataFactoryTest extends TestCase
             ->willReturn($canary)
         ;
 
-        $testFileDataAdder = $this->createMock(TestFileDataAdder::class);
+        $testFileDataAdder = $this->createMock(JUnitTestExecutionInfoAdder::class);
         $testFileDataAdder
             ->expects($this->once())
             ->method('addTestExecutionInfo')

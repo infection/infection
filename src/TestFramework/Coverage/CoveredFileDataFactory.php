@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Coverage;
 
 use function array_key_exists;
 use Infection\Mutation\MutationGenerator;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -73,7 +73,7 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
      */
     public function __construct(
         CoveredFileDataProvider $primaryCoverageProvider,
-        TestFileDataAdder $testFileDataAdder,
+        JUnitTestExecutionInfoAdder $testFileDataAdder,
         CoveredFileNameFilter $filter,
         iterable $sourceFiles,
         bool $onlyCovered

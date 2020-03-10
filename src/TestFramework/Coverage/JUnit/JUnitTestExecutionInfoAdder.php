@@ -47,7 +47,7 @@ use Infection\TestFramework\Coverage\CoveredFileData;
  * @internal
  * @final
  */
-class TestFileDataAdder
+class JUnitTestExecutionInfoAdder
 {
     private $testFileDataProvider;
 

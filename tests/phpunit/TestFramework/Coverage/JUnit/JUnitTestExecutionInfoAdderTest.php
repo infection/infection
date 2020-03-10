@@ -39,15 +39,15 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\CoveredFileData;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataAdder;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Infection\TestFramework\Coverage\JUnit\TestFileDataAdder
+ * @covers \Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder
  */
-final class TestFileDataAdderTest extends TestCase
+final class JUnitTestExecutionInfoAdderTest extends TestCase
 {
     public function test_it_does_not_add_if_junit_is_not_provided(): void
     {
@@ -64,7 +64,7 @@ final class TestFileDataAdderTest extends TestCase
             ->method($this->anything())
         ;
 
-        $adder = new TestFileDataAdder($adapter, $testFileDataProvider);
+        $adder = new JUnitTestExecutionInfoAdder($adapter, $testFileDataProvider);
 
         $expected = [1, 2, 3];
 
@@ -94,7 +94,7 @@ final class TestFileDataAdderTest extends TestCase
             ))
         ;
 
-        $adder = new TestFileDataAdder($adapter, $testFileDataProvider);
+        $adder = new JUnitTestExecutionInfoAdder($adapter, $testFileDataProvider);
 
         $lineData = CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated');
 
