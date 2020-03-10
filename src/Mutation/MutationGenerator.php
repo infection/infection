@@ -100,14 +100,14 @@ final class MutationGenerator
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
-        $sourceFiles = $this->sourceFileDataProvider->provideFiles();
+        $files = $this->sourceFileDataProvider->provideFiles();
 
-        $numberOfFiles = IterableCounter::bufferAndCountIfNeeded($sourceFiles, $this->runConcurrently);
+        $numberOfFiles = IterableCounter::bufferAndCountIfNeeded($files, $this->runConcurrently);
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
         /** @var SourceFileData $fileData */
-        foreach ($sourceFiles as $fileData) {
+        foreach ($files as $fileData) {
             yield from $this->fileMutationGenerator->generate(
                 $fileData,
                 $onlyCovered,
