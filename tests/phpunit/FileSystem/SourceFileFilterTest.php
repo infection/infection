@@ -48,21 +48,38 @@ use Traversable;
  */
 final class SourceFileFilterTest extends TestCase
 {
-    public function test_it_parses_empty_filters(): void
+    /**
+     * @dataProvider filterProvider
+     *
+     * @param string[] $expectedFilters
+     */
+    public function test_it_can_parse_and_normalize_string_filter(string $filter, array $expectedFilters): void
     {
-        $fileFilter = new SourceFileFilter('');
-        $this->assertSame([], $fileFilter->getFilters());
+        $fileFilter = new SourceFileFilter($filter);
+        
+        $this->assertSame($expectedFilters, $fileFilter->getFilters());
     }
 
-    public function test_it_parses_filters(): void
+    public function filterProvider(): Generator
     {
-        $fileFilter = new SourceFileFilter('src/Foo.php, src/Bar.php');
-        $this->assertSame([
-            'src/Foo.php',
-            'src/Bar.php',
-        ], $fileFilter->getFilters());
+        yield 'empty' => ['', []];
+        
+        yield 'nominal' => [
+            'src/Foo.php, src/Bar.php',
+            [
+                'src/Foo.php',
+                'src/Bar.php',
+            ],
+        ];
+        
+         yield 'spaces & untrimmed string' => [
+            '  src/Foo.php,, , src/Bar.php  ',
+            [
+                'src/Foo.php',
+                'src/Bar.php',
+            ],
+        ];
     }
-
     /**
      * @dataProvider fileListProvider
      */
