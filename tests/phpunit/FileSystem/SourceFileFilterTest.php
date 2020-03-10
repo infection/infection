@@ -88,7 +88,7 @@ final class SourceFileFilterTest extends TestCase
     {
         $input = self::arrayToSplFileInfoTraversable($input);
 
-        $this->assertFilter($filter, $input, $expected);
+        $this->assertCanFilterInput($filter, $input, $expected);
     }
 
     /**
@@ -100,7 +100,7 @@ final class SourceFileFilterTest extends TestCase
 
         $input = new IteratorIterator($input);
 
-        $this->assertFilter($filter, $input, $expected);
+        $this->assertCanFilterInput($filter, $input, $expected);
     }
 
     public static function fileListProvider(): Generator
@@ -129,7 +129,7 @@ final class SourceFileFilterTest extends TestCase
         ]];
     }
 
-    private function assertFilter(string $filter, iterable $input, array $expected): void
+    private function assertCanFilterInput(string $filter, iterable $input, array $expected): void
     {
         $actual = (new SourceFileFilter($filter))->filter($input);
 
