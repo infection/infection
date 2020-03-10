@@ -45,6 +45,9 @@ class FileCodeCoverageProvider
 {
     public function provideFor(SourceFileData $fileData): FileCodeCoverage
     {
+        // TODO: I'm pretty sure this step can be simplified and maybe we can
+        //  find a way to merge SourceFileData & FileCodeCoverage: they implement the same interface
+        //  and one just decorate the other so I'm not convinced this is really needed
         return new FileCodeCoverage($fileData->retrieveCoverageReport());
     }
 }

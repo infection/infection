@@ -88,6 +88,7 @@ class IndexXmlCoverageParser
                 $projectSource
             );
 
+            // TODO: I don't get this one: why is it not a service instead and `$$fileInfoProvider` passed to `parse()` instead?
             $parser = new XmlCoverageParser($fileInfoProvider);
 
             yield $parser->parse();

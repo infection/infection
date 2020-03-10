@@ -39,6 +39,8 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 
 /**
  * @internal
+ *
+ * TODO: rename to Tracer
  */
 interface LineCodeCoverage
 {

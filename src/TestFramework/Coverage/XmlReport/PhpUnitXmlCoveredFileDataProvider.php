@@ -45,6 +45,8 @@ use function Safe\file_get_contents;
  *
  * @internal
  * @final
+ *
+ * TODO: rename to PhpUnitXmlCoverageTraceProvider: Provides the traces based on the PHPUnit XML coverage collected
  */
 class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
 {

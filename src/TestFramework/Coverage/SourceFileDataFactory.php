@@ -48,6 +48,10 @@ use Webmozart\Assert\Assert;
  * Does not known about differences between adapters and what not.
  *
  * @internal
+ *
+ * TODO: FilteredSourceFilesTraceProvider: Leverages a decorated trace provider in order to provide
+ *          the traces but fall-backs on the original source files in order to ensure all the
+ *          files are included
  */
 final class SourceFileDataFactory implements SourceFileDataProvider
 {
@@ -91,6 +95,7 @@ final class SourceFileDataFactory implements SourceFileDataProvider
      */
     public function provideFiles(): iterable
     {
+        // TODO: testFileDataAdder could be added to primaryCoverageProvider directory to provide "ready" information right away instead of having to do 2 steps here
         $filesFeed = $this->primaryCoverageProvider->provideFiles();
 
         $filteredFilesFeed = $this->filter->filter($filesFeed);
