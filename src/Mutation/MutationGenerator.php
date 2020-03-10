@@ -44,6 +44,7 @@ use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\SourceFileDataFactory;
 use Infection\TestFramework\Coverage\SourceFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Webmozart\Assert\Assert;
@@ -53,6 +54,9 @@ use Webmozart\Assert\Assert;
  */
 final class MutationGenerator
 {
+    /**
+     * @var SourceFileDataProvider|SourceFileDataFactory
+     */
     private $sourceFileDataProvider;
     private $coverageProvider;
 
