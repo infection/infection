@@ -59,22 +59,6 @@ final class SourceFileDataTest extends TestCase
         $this->assertSame($splFileInfoMock, $actual);
     }
 
-    public function test_it_can_return_real_path(): void
-    {
-        $expected = 'Foo.php';
-
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $splFileInfoMock
-            ->method('getRealPath')
-            ->willReturn($expected);
-
-        $sourceFileData = new SourceFileData($splFileInfoMock, []);
-
-        $actual = $sourceFileData->getRealPath();
-
-        $this->assertSame($expected, $actual);
-    }
-
     public function test_it_can_retreive_file_data(): void
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);

@@ -83,15 +83,6 @@ class SourceFileData implements LineCodeCoverage
         return $this->sourceFile;
     }
 
-    public function getRealPath(): string
-    {
-        $realPath = $this->sourceFile->getRealPath();
-
-        Assert::string($realPath);
-
-        return $realPath;
-    }
-
     /**
      * Accessor used to update CoverageReport with TestFileTimeData.
      */
