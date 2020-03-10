@@ -85,6 +85,9 @@ class SourceFileData implements LineCodeCoverage
         return $this->sourceFile;
     }
 
+    /**
+     * Used by RealPathFilterIterator
+     */
     public function getRealPath(): string
     {
         $realPath = $this->sourceFile->getRealPath();
