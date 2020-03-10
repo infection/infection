@@ -215,7 +215,7 @@ TXT
             $executionResult = $this->createMock(MutantExecutionResult::class);
             $executionResult
                 ->expects($this->once())
-                ->method('getProcessResultCode')
+                ->method('getDetectionStatus')
                 ->willReturn($detectionStatus)
             ;
             $executionResults[] = $executionResult;

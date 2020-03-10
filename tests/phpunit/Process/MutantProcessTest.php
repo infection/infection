@@ -122,6 +122,11 @@ final class MutantProcessTest extends TestCase
 
     public function test_it_handles_escaped_mutant(): void
     {
+        $this->process
+            ->method('isTerminated')
+            ->willReturn(true)
+        ;
+
         $this->mutant
             ->expects($this->once())
             ->method('isCoveredByTest')
@@ -150,6 +155,11 @@ final class MutantProcessTest extends TestCase
 
     public function test_it_handles_killed_mutant(): void
     {
+        $this->process
+            ->method('isTerminated')
+            ->willReturn(true)
+        ;
+
         $this->mutant
             ->expects($this->once())
             ->method('isCoveredByTest')
