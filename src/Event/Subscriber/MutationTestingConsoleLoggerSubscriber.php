@@ -185,7 +185,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         );
 
         $this->output->writeln(
-            $this->addIndentation("Median testing time: <{$medianTestingTimeTag}>{$medianTestingTime}%</{$medianTestingTimeTag}>")
+            $this->addIndentation("Median testing time: <{$medianTestingTimeTag}>{$medianTestingTime} s.</{$medianTestingTimeTag}>")
         );
 
         $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
