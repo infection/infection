@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use function array_filter;
+use function array_map;
 use function explode;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Infection\TestFramework\Coverage\SourceFileData;
