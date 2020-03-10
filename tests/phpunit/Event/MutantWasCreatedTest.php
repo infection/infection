@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Event;
 
 use Infection\Event\MutantWasCreated;
+use Infection\Mutant\Mutant;
 use PHPUnit\Framework\TestCase;
 
 final class MutantWasCreatedTest extends TestCase
@@ -45,8 +46,12 @@ final class MutantWasCreatedTest extends TestCase
      */
     public function test_it_can_be_instantiated(): void
     {
-        $class = new MutantWasCreated();
+        $mutantMock = $this->createMock(Mutant::class);
+
+        $class = new MutantWasCreated($mutantMock);
 
         $this->assertInstanceOf(MutantWasCreated::class, $class);
+
+        $this->assertSame($mutantMock, $class->getMutant());
     }
 }

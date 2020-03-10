@@ -202,8 +202,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutationTestingWasStarted(2),
-                new MutantWasCreated(),
-                new MutantWasCreated(),
+                new MutantWasCreated($this->createMock(Mutant::class)),
+                new MutantWasCreated($this->createMock(Mutant::class)),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -283,8 +283,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutationTestingWasStarted(0),
-                new MutantWasCreated(),
-                new MutantWasCreated(),
+                new MutantWasCreated($this->createMock(Mutant::class)),
+                new MutantWasCreated($this->createMock(Mutant::class)),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()

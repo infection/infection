@@ -35,9 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Event;
 
+use Infection\Mutant\Mutant;
+
 /**
  * @internal
  */
 final class MutantWasCreated
 {
+    private $mutant;
+
+    public function __construct(Mutant $mutant)
+    {
+        $this->mutant = $mutant;
+    }
+
+    public function getMutant(): Mutant
+    {
+        return $this->mutant;
+    }
 }

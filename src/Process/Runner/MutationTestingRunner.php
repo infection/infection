@@ -92,7 +92,7 @@ final class MutationTestingRunner
                 return $this->mutantFactory->create($mutation);
             })
             ->filter(function (Mutant $mutant) {
-                $this->eventDispatcher->dispatch(new MutantWasCreated());
+                $this->eventDispatcher->dispatch(new MutantWasCreated($mutant));
 
                 if ($mutant->isCoveredByTest()) {
                     return true;
