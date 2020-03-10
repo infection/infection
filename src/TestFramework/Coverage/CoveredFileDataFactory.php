@@ -111,10 +111,10 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
      */
     private function appendUncoveredFiles(iterable $coverage): iterable
     {
-        $seenFiles = [];
+        $filesSeen = [];
 
         foreach ($coverage as $data) {
-            $seenFiles[$data->getSplFileInfo()->getRealPath()] = self::SEEN;
+            $filesSeen[$data->getSplFileInfo()->getRealPath()] = self::SEEN;
 
             yield $data;
         }
@@ -126,7 +126,7 @@ final class CoveredFileDataFactory implements CoveredFileDataProvider
 
             Assert::string($sourceFilePath);
 
-            if (array_key_exists($sourceFilePath, $seenFiles)) {
+            if (array_key_exists($sourceFilePath, $filesSeen)) {
                 continue;
             }
 
