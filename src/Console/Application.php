@@ -44,6 +44,7 @@ use Infection\Container;
 use OutOfBoundsException;
 use PackageVersions\Versions;
 use const PHP_SAPI;
+use function preg_quote;
 use function Safe\preg_match;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
@@ -86,7 +87,7 @@ final class Application extends BaseApplication
             $version = Versions::getVersion(self::PACKAGE_NAME);
             // @codeCoverageIgnoreStart
         } catch (OutOfBoundsException $e) {
-            if (preg_match('/package .*' . self::PACKAGE_NAME . '.* not installed/', $e->getMessage()) === 0) {
+            if (preg_match('/package .*' . preg_quote(self::PACKAGE_NAME) . '.* not installed/', $e->getMessage()) === 0) {
                 throw $e;
             }
 
