@@ -212,7 +212,7 @@ XML
 <?php
 
 if (function_exists('proc_nice')) {
-    proc_nice(10);
+    proc_nice(1);
 }
 
 require_once '$interceptorPath';
@@ -281,7 +281,7 @@ XML
 <?php
 
 if (function_exists('proc_nice')) {
-    proc_nice(10);
+    proc_nice(1);
 }
 
 require_once '$interceptorPath';
