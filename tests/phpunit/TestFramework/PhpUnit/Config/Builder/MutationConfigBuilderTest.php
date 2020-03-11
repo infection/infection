@@ -40,6 +40,8 @@ use DOMDocument;
 use DOMNode;
 use DOMNodeList;
 use DOMXPath;
+use function escapeshellarg;
+use function exec;
 use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\StreamWrapper\IncludeInterceptor;
@@ -202,10 +204,16 @@ XML
                 )
             )
         );
+
+        $phpCode = file_get_contents($this->tmp . '/interceptor.autoload.hash1.infection.php');
+
         $this->assertSame(
             <<<PHP
 <?php
 
+if (function_exists('proc_nice')) {
+    proc_nice(1);
+}
 
 require_once '$interceptorPath';
 
@@ -217,8 +225,10 @@ require_once '$projectPath/app/autoload2.php';
 
 PHP
             ,
-            file_get_contents($this->tmp . '/interceptor.autoload.hash1.infection.php')
+            $phpCode
         );
+
+        $this->assertPHPSyntaxIsValid($phpCode);
 
         $this->assertSame(
             <<<XML
@@ -263,10 +273,16 @@ XML
                 )
             )
         );
+
+        $phpCode = file_get_contents($this->tmp . '/interceptor.autoload.hash2.infection.php');
+
         $this->assertSame(
             <<<PHP
 <?php
 
+if (function_exists('proc_nice')) {
+    proc_nice(1);
+}
 
 require_once '$interceptorPath';
 
@@ -278,8 +294,10 @@ require_once '$projectPath/app/autoload2.php';
 
 PHP
             ,
-            file_get_contents($this->tmp . '/interceptor.autoload.hash2.infection.php')
+            $phpCode
         );
+
+        $this->assertPHPSyntaxIsValid($phpCode);
     }
 
     public function test_it_builds_path_to_mutation_config_file(): void
@@ -586,6 +604,21 @@ PHP
             new XmlConfigurationManipulator($replacer, ''),
             'project/dir',
             new JUnitTestCaseSorter()
+        );
+    }
+
+    private function assertPHPSyntaxIsValid(string $phpCode): void
+    {
+        exec(
+            sprintf('echo %s | php -l', escapeshellarg($phpCode)),
+            $output,
+            $returnCode
+        );
+
+        $this->assertSame(
+            0,
+            $returnCode,
+            'Builder produced invalid code'
         );
     }
 }
