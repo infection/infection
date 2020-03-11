@@ -84,9 +84,63 @@ final class CalculatorTest extends TestCase
     }
 
     /**
+     * @dataProvider metricsWithTimeoutProvider
+     */
+    public function test_it_can_calculate_the_scores_while_counting_timeouts_as_escapes(
+        int $killedCount,
+        int $errorCount,
+        int $escapedCount,
+        int $timedOutCount,
+        int $notTestedCount,
+        float $expectedMsi,
+        float $expectedCoverageRate,
+        float $expectedCoveredMsi
+    ): void {
+        $calculator = new Calculator(
+            $killedCount,
+            $errorCount,
+            $timedOutCount,
+            $notTestedCount,
+            array_sum([
+                $killedCount,
+                $errorCount,
+                $escapedCount,
+                $timedOutCount,
+                $notTestedCount,
+            ]),
+            true
+        );
+
+        $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
+        $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
+        $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
+
+        // The calls are idempotent
+        $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
+        $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
+        $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
+    }
+
+    /**
      * @dataProvider metricsCalculatorProvider
      */
     public function test_it_can_be_created_from_a_metrics_calculator(
+        MetricsCalculator $metricsCalculator,
+        float $expectedMsi,
+        float $expectedCoverageRate,
+        float $expectedCoveredMsi
+    ): void {
+        $calculator = Calculator::fromMetrics($metricsCalculator);
+
+        $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
+        $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
+        $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
+    }
+
+    /**
+     * @dataProvider metricsCalculatorWithTimeoutProvider
+     */
+    public function test_it_can_be_created_from_a_metrics_calculator_while_counting_timeouts_as_escapes(
         MetricsCalculator $metricsCalculator,
         float $expectedMsi,
         float $expectedCoverageRate,
@@ -146,6 +200,53 @@ final class CalculatorTest extends TestCase
         ];
     }
 
+    public function metricsWithTimeoutProvider(): Generator
+    {
+        yield 'empty' => [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.,
+            0.,
+            0.,
+        ];
+
+        yield 'int scores' => [
+            1,
+            0,
+            9,
+            0,
+            0,
+            10.,
+            100.0,
+            10.0,
+        ];
+
+        yield 'nominal' => [
+            7,
+            2,
+            2,
+            2,
+            1,
+            64.285714285714292,
+            92.85714285714286,
+            69.230769230769226,
+        ];
+
+        yield 'nominal no non-tested' => [
+            7,
+            2,
+            2,
+            2,
+            0,
+            69.230769230769226,
+            100,
+            69.230769230769226,
+        ];
+    }
+
     public function metricsCalculatorProvider(): Generator
     {
         yield 'empty' => [
@@ -160,6 +261,23 @@ final class CalculatorTest extends TestCase
             60.,
             80.0,
             75.0,
+        ];
+    }
+
+    public function metricsCalculatorWithTimeoutProvider(): Generator
+    {
+        yield 'empty' => [
+            new MetricsCalculator(true),
+            0.,
+            0.,
+            0.,
+        ];
+
+        yield 'nominal' => [
+            $this->createCompleteMetricsCalculator(true),
+            40.0,
+            80.0,
+            50.0,
         ];
     }
 }

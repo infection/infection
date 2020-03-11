@@ -84,7 +84,12 @@ class MetricsCalculator
      */
     private $calculator;
 
-    public function __construct()
+    /**
+     * @var bool
+     */
+    private $treatTimeoutsAsEscapes = false;
+
+    public function __construct(bool $treatTimeoutsAsEscapes = false)
     {
         $this->killedExecutionResults = new SortableMutantExecutionResults();
         $this->errorExecutionResults = new SortableMutantExecutionResults();
@@ -92,6 +97,7 @@ class MetricsCalculator
         $this->timedOutExecutionResults = new SortableMutantExecutionResults();
         $this->notCoveredExecutionResults = new SortableMutantExecutionResults();
         $this->allExecutionResults = new SortableMutantExecutionResults();
+        $this->treatTimeoutsAsEscapes = $treatTimeoutsAsEscapes;
     }
 
     public function collect(MutantExecutionResult ...$executionResults): void
@@ -240,6 +246,14 @@ class MetricsCalculator
     public function getCoveredCodeMutationScoreIndicator(): float
     {
         return $this->getCalculator()->getCoveredCodeMutationScoreIndicator();
+    }
+
+    /**
+     * Are mutation timeouts treated as escapes?
+     */
+    public function getTreatTimeoutsAsEscapes(): bool
+    {
+        return $this->treatTimeoutsAsEscapes;
     }
 
     private function getCalculator(): Calculator

@@ -61,18 +61,25 @@ final class Calculator
      */
     private $coveredMutationScoreIndicator;
 
+    /**
+     * @var bool
+     */
+    private $treatTimeoutsAsEscapes = false;
+
     public function __construct(
         int $killedCount,
         int $errorCount,
         int $timedOutCount,
         int $notTestedCount,
-        int $totalCount
+        int $totalCount,
+        bool $treatTimeoutsAsEscapes = false
     ) {
         $this->killedCount = $killedCount;
         $this->errorCount = $errorCount;
         $this->timedOutCount = $timedOutCount;
         $this->notTestedCount = $notTestedCount;
         $this->totalCount = $totalCount;
+        $this->treatTimeoutsAsEscapes = $treatTimeoutsAsEscapes;
     }
 
     public static function fromMetrics(MetricsCalculator $calculator): self
@@ -82,7 +89,8 @@ final class Calculator
             $calculator->getErrorCount(),
             $calculator->getTimedOutCount(),
             $calculator->getNotTestedCount(),
-            $calculator->getTotalMutantsCount()
+            $calculator->getTotalMutantsCount(),
+            $calculator->getTreatTimeoutsAsEscapes()
         );
     }
 
@@ -96,7 +104,11 @@ final class Calculator
         }
 
         $score = 0.;
-        $coveredTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
+        $coveredTotal = $this->killedCount + $this->errorCount;
+
+        if (!$this->treatTimeoutsAsEscapes) {
+            $coveredTotal += $this->timedOutCount;
+        }
         $totalCount = $this->totalCount;
 
         if ($totalCount !== 0) {
@@ -137,7 +149,11 @@ final class Calculator
 
         $score = 0.;
         $testedTotal = $this->totalCount - $this->notTestedCount;
-        $coveredTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
+        $coveredTotal = $this->killedCount + $this->errorCount;
+
+        if (!$this->treatTimeoutsAsEscapes) {
+            $coveredTotal += $this->timedOutCount;
+        }
 
         if ($testedTotal !== 0) {
             $score = 100 * $coveredTotal / $testedTotal;
