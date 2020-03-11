@@ -58,6 +58,7 @@ use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
@@ -101,6 +102,7 @@ final class ProjectCodeProvider
         Engine::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
+        DetectionStatus::class,
     ];
 
     /**

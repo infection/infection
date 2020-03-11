@@ -37,10 +37,12 @@ namespace Infection\Process;
 
 use function in_array;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
 use Infection\Process\Runner\Parallel\ProcessBearer;
+use function Safe\sprintf;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -48,20 +50,6 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcess implements ProcessBearer
 {
-    public const CODE_KILLED = 0;
-    public const CODE_ESCAPED = 1;
-    public const CODE_ERROR = 2;
-    public const CODE_TIMED_OUT = 3;
-    public const CODE_NOT_COVERED = 4;
-
-    public const RESULT_CODES = [
-        self::CODE_KILLED,
-        self::CODE_ESCAPED,
-        self::CODE_ERROR,
-        self::CODE_TIMED_OUT,
-        self::CODE_NOT_COVERED,
-    ];
-
     private const PROCESS_OK = 0;
     private const PROCESS_GENERAL_ERROR = 1;
     private const PROCESS_MISUSE_SHELL_BUILTINS = 2;
@@ -78,11 +66,14 @@ class MutantProcess implements ProcessBearer
     /**
      * @var bool
      */
-    private $isTimedOut = false;
+    private $timeout = false;
     private $testFrameworkAdapter;
 
-    public function __construct(Process $process, Mutant $mutant, TestFrameworkAdapter $testFrameworkAdapter)
-    {
+    public function __construct(
+        Process $process,
+        Mutant $mutant,
+        TestFrameworkAdapter $testFrameworkAdapter
+    ) {
         $this->process = $process;
         $this->mutant = $mutant;
         $this->testFrameworkAdapter = $testFrameworkAdapter;
@@ -100,52 +91,40 @@ class MutantProcess implements ProcessBearer
 
     public function markAsTimedOut(): void
     {
-        $this->isTimedOut = true;
+        $this->timeout = true;
     }
 
-    public function getResultCode(): int
+    public function retrieveProcessOutput(): string
     {
-        if (!$this->getMutant()->isCoveredByTest()) {
-            return self::CODE_NOT_COVERED;
+        Assert::true(
+            $this->process->isTerminated(),
+            sprintf(
+                'Cannot retrieve a non-terminated process output. Got "%s"',
+                $this->process->getStatus()
+            )
+        );
+
+        return $this->process->getOutput();
+    }
+
+    public function retrieveDetectionStatus(): string
+    {
+        if (!$this->mutant->isCoveredByTest()) {
+            return DetectionStatus::NOT_COVERED;
         }
 
-        if ($this->isTimedOut()) {
-            return self::CODE_TIMED_OUT;
+        if ($this->timeout) {
+            return DetectionStatus::TIMED_OUT;
         }
 
         if (!in_array($this->getProcess()->getExitCode(), self::NOT_FATAL_ERROR_CODES, true)) {
-            return self::CODE_ERROR;
+            return DetectionStatus::ERROR;
         }
 
-        if ($this->testFrameworkAdapter->testsPass($this->getProcess()->getOutput())) {
-            return self::CODE_ESCAPED;
+        if ($this->testFrameworkAdapter->testsPass($this->retrieveProcessOutput())) {
+            return DetectionStatus::ESCAPED;
         }
 
-        return self::CODE_KILLED;
-    }
-
-    public function getMutatorName(): string
-    {
-        return $this->getMutation()->getMutatorName();
-    }
-
-    public function getOriginalFilePath(): string
-    {
-        return $this->getMutation()->getOriginalFilePath();
-    }
-
-    public function getOriginalStartingLine(): int
-    {
-        return (int) $this->getMutation()->getAttributes()['startLine'];
-    }
-
-    private function isTimedOut(): bool
-    {
-        return $this->isTimedOut;
-    }
-
-    private function getMutation(): Mutation
-    {
-        return $this->getMutant()->getMutation();
+        return DetectionStatus::KILLED;
     }
 }
