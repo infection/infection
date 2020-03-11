@@ -17,9 +17,11 @@ use function current;
 use function explode;
 use function implode;
 use function iterator_to_array;
+use function ltrim;
 use function Pipeline\take;
 use function Safe\file_get_contents;
 use function Safe\json_encode;
+use function strlen;
 use function substr;
 use const JSON_PRETTY_PRINT;
 use const PHP_EOL;
@@ -91,19 +93,27 @@ final class StrykerReportFactory
     {
         return array_map(
             static function (MutantExecutionResult $result): array {
+                $replacement = self::retrieveReplacementFromDiff($result->getMutationDiff());
+
+                $lTrimedReplacement = ltrim($replacement);
+                $replacementLength = strlen($replacement) + 1;
+
+                $startingColumn = $replacementLength - strlen($lTrimedReplacement);
+                $endingColumn = $replacementLength + 1;
+
                 return [
                     'id' => $result->getMutationHash(),
                     'mutatorName' => $result->getMutatorName(),
-                    'replacement' => self::retrieveReplacementFromDiff($result->getMutationDiff()),
-                    'description' => '',
+                    'replacement' => $replacement,
+                    'description' => 'yo',
                     'location' => [
                         'start' => [
                             'line' => $result->getOriginalStartingLine(),
-                            'column' => $result->getOriginalStartingColumn(),
+                            'column' => $startingColumn,
                         ],
                         'end' => [
                             'line' => $result->getOriginalEndingLine(),
-                            'column' => $result->getOriginalEndingColumn(),
+                            'column' => $endingColumn,
                         ],
                     ],
                     'status' => self::DETECTION_STATUS_MAP[$result->getProcessResultCode()],

@@ -79,6 +79,10 @@ final class BadgeLogger implements MutationTestingResultsLogger
     {
         $json = (new StrykerReportFactory())->create($this->metricsCalculator);
 
+        $escapedJson = json_encode( json_decode($json), JSON_HEX_QUOT|JSON_HEX_APOS );
+        $escapedJson = str_replace("\u0022", "\\\"", $escapedJson );
+        $escapedJson = str_replace("\u0027", "\\'",  $escapedJson );
+
         $template = <<<'HTML'
 <!DOCTYPE html>
 
@@ -91,7 +95,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
 <a href="/">Back</a></li>
 <mutation-test-report-app></mutation-test-report-app>
 <script>
-    document.getElementsByTagName('mutation-test-report-app').item(0).report = JSON.parse('__JSON__');
+    document.getElementsByTagName('mutation-test-report-app').item(0).report = __JSON__;
 </script>
 </body>
 
@@ -102,7 +106,11 @@ HTML;
             json_encode(json_decode($json), JSON_PRETTY_PRINT)
         );file_put_contents(
             __DIR__.'/../../report.html',
-            str_replace('__JSON__', $json, $template)
+            str_replace(
+                '__JSON__',
+                $json,
+                $template
+            )
         );
         try {
             $buildContext = $this->buildContextResolver->resolve();

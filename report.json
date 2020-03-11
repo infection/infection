@@ -13,16 +13,16 @@
                 {
                     "id": "49e4c033e82152deffaff902aa51ac0e",
                     "mutatorName": "FalseValue",
-                    "replacement": "        $separateSections = true;",
-                    "description": "",
+                    "replacement": "true",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 73,
-                            "column": 213
+                            "column": 29
                         },
                         "end": {
                             "line": 73,
-                            "column": 213
+                            "column": 34
                         }
                     },
                     "status": "Killed"
@@ -31,15 +31,15 @@
                     "id": "20a5ecac3e1b72a7e9165b2561d915f6",
                     "mutatorName": "LogicalNot",
                     "replacement": "        if ($this->onlyCoveredMode) {",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 99,
-                            "column": 343
+                            "column": 9
                         },
                         "end": {
                             "line": 99,
-                            "column": 346
+                            "column": 39
                         }
                     },
                     "status": "Killed"
@@ -48,15 +48,15 @@
                     "id": "38059b5b328cbcf554448979bd91f0a0",
                     "mutatorName": "ArrayOneItem",
                     "replacement": "        return count($logs) > 1 ? array_slice($logs, 0, 1, true) : $logs;",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 111,
-                            "column": 400
+                            "column": 9
                         },
                         "end": {
                             "line": 111,
-                            "column": 403
+                            "column": 75
                         }
                     },
                     "status": "Killed"
@@ -65,15 +65,15 @@
                     "id": "a75a4009b933f26f9c429376eddd3523",
                     "mutatorName": "FalseValue",
                     "replacement": "        $separateSections = true;",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 131,
-                            "column": 492
+                            "column": 9
                         },
                         "end": {
                             "line": 131,
-                            "column": 492
+                            "column": 35
                         }
                     },
                     "status": "Killed"
@@ -82,15 +82,15 @@
                     "id": "3de83231228d28dd3a9a8fd29dc27e16",
                     "mutatorName": "Foreach_",
                     "replacement": "        foreach (array() as $index => $executionResult) {",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 133,
-                            "column": 495
+                            "column": 9
                         },
                         "end": {
                             "line": 157,
-                            "column": 680
+                            "column": 59
                         }
                     },
                     "status": "Killed"
@@ -99,15 +99,15 @@
                     "id": "ebf143eb565188ddd7959bfbe70f631f",
                     "mutatorName": "LogicalNot",
                     "replacement": "                if ($this->debugMode) {",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 149,
-                            "column": 634
+                            "column": 17
                         },
                         "end": {
                             "line": 149,
-                            "column": 637
+                            "column": 41
                         }
                     },
                     "status": "NoCoverage"
@@ -116,15 +116,15 @@
                     "id": "78df83645d5862a489725a1ca83c2e46",
                     "mutatorName": "TrueValue",
                     "replacement": "            $separateSections = false;",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 156,
-                            "column": 677
+                            "column": 13
                         },
                         "end": {
                             "line": 156,
-                            "column": 677
+                            "column": 40
                         }
                     },
                     "status": "NoCoverage"
@@ -133,15 +133,15 @@
                     "id": "f846f1fb950a4effa3412240e7f47824",
                     "mutatorName": "ArrayItemRemoval",
                     "replacement": "        return implode(PHP_EOL, [str_repeat('=', strlen($headline)), '']);",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 168,
-                            "column": 734
+                            "column": 9
                         },
                         "end": {
                             "line": 172,
-                            "column": 754
+                            "column": 76
                         }
                     },
                     "status": "Killed"
@@ -150,15 +150,15 @@
                     "id": "8054ad82df5a2551ed9626773f43a04d",
                     "mutatorName": "UnwrapStrRepeat",
                     "replacement": "        return implode(PHP_EOL, [$headline, '=', '']);",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 170,
-                            "column": 739
+                            "column": 9
                         },
                         "end": {
                             "line": 170,
-                            "column": 748
+                            "column": 56
                         }
                     },
                     "status": "Killed"
@@ -167,15 +167,15 @@
                     "id": "bf33233e4af421b6a9847e7e74496280",
                     "mutatorName": "IncrementInteger",
                     "replacement": "        return sprintf('%d) %s:%d    [M] %s', $index + 2, $mutantProcess->getOriginalFilePath(), $mutantProcess->getOriginalStartingLine(), $mutantProcess->getMutatorName());",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 180,
-                            "column": 796
+                            "column": 9
                         },
                         "end": {
                             "line": 180,
-                            "column": 796
+                            "column": 176
                         }
                     },
                     "status": "NoCoverage"
@@ -184,15 +184,15 @@
                     "id": "2b8250c49e391d4977b8845335444060",
                     "mutatorName": "OneZeroInteger",
                     "replacement": "        return sprintf('%d) %s:%d    [M] %s', $index + 0, $mutantProcess->getOriginalFilePath(), $mutantProcess->getOriginalStartingLine(), $mutantProcess->getMutatorName());",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 180,
-                            "column": 796
+                            "column": 9
                         },
                         "end": {
                             "line": 180,
-                            "column": 796
+                            "column": 176
                         }
                     },
                     "status": "NoCoverage"
@@ -201,15 +201,15 @@
                     "id": "69422fbd0d5e80c9838c02bacc4e280f",
                     "mutatorName": "Plus",
                     "replacement": "        return sprintf('%d) %s:%d    [M] %s', $index - 1, $mutantProcess->getOriginalFilePath(), $mutantProcess->getOriginalStartingLine(), $mutantProcess->getMutatorName());",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 180,
-                            "column": 792
+                            "column": 9
                         },
                         "end": {
                             "line": 180,
-                            "column": 796
+                            "column": 176
                         }
                     },
                     "status": "NoCoverage"
@@ -218,15 +218,15 @@
                     "id": "2e34f5a6b5f690e84959724852b8a05c",
                     "mutatorName": "UnwrapArrayMap",
                     "replacement": "        return implode(PHP_EOL, explode(PHP_EOL, Str::trimLineReturns($value)));",
-                    "description": "",
+                    "description": "yo",
                     "location": {
                         "start": {
                             "line": 191,
-                            "column": 850
+                            "column": 9
                         },
                         "end": {
                             "line": 196,
-                            "column": 893
+                            "column": 82
                         }
                     },
                     "status": "NoCoverage"
