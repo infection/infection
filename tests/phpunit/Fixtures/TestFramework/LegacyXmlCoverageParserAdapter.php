@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\TestFramework;
 
-
+use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\SourceFileData;
 use function Pipeline\take;
@@ -21,9 +21,9 @@ final class LegacyXmlCoverageParserAdapter
     /**
      * @return array<string, CoverageReport>
      */
-    public function parse(string $coverageXmlContent): array
+    public function parse(string $coverageIndexPath, string $xmlIndexCoverageContent): array
     {
-        $coverage = take($this->parser->parse($coverageXmlContent))
+        $coverage = take($this->parser->parse($coverageIndexPath, $xmlIndexCoverageContent))
             ->map(static function (SourceFileData $data) {
                 yield $data->getSplFileInfo()->getRealPath() => $data->retrieveCoverageReport();
             });

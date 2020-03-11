@@ -61,19 +61,19 @@ class IndexXmlCoverageParser
      *
      * @return iterable<SourceFileData>
      */
-    public function parse(string $coverageXmlContent): iterable
+    public function parse(string $coverageIndexPath, string $xmlIndexCoverageContent): iterable
     {
-        $xPath = XPathFactory::createXPath($coverageXmlContent);
+        $xPath = XPathFactory::createXPath($xmlIndexCoverageContent);
 
         self::assertHasCoverage($xPath);
 
-        return $this->parseNodes($xPath);
+        return $this->parseNodes($coverageIndexPath, $xPath);
     }
 
     /**
      * @return iterable<SourceFileData>
      */
-    private function parseNodes(SafeDOMXPath $xPath): iterable
+    private function parseNodes(string $coverageIndexPath, SafeDOMXPath $xPath): iterable
     {
         $projectSource = self::getProjectSource($xPath);
 
@@ -83,6 +83,7 @@ class IndexXmlCoverageParser
             $relativeCoverageFilePath = $node->getAttribute('href');
 
             $fileInfoProvider = new SourceFileInfoProvider(
+                $coverageIndexPath,
                 $this->coverageDir,
                 $relativeCoverageFilePath,
                 $projectSource
