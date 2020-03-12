@@ -100,6 +100,7 @@ use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
 use function php_ini_loaded_file;
@@ -156,7 +157,10 @@ final class Container
                 return new TmpDirProvider();
             },
             IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
-                return new IndexXmlCoverageParser($container->getConfiguration()->getCoveragePath());
+                return new IndexXmlCoverageParser(
+                    $container->getConfiguration()->getCoveragePath(),
+                    new XmlCoverageParser()
+                );
             },
             SourceFileDataFactory::class => static function (self $container): SourceFileDataFactory {
                 return new SourceFileDataFactory(

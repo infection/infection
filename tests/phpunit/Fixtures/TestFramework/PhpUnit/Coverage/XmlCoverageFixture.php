@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage;
 
 use function Safe\realpath;
 
