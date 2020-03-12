@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\Coverage\SourceFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
 use function Safe\file_get_contents;
 
 /**
@@ -46,7 +47,7 @@ use function Safe\file_get_contents;
  * @internal
  * @final
  *
- * TODO: rename to PhpUnitXmlCoverageTraceProvider: Provides the traces based on the PHPUnit XML coverage collected
+ * TODO: rename to PhpUnitXmlCoverageTraceProvider: Provides the traces based on the PHPUnit XML coverage collected TODO
  */
 class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
 {
@@ -56,13 +57,16 @@ class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
     public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
 
     private $coverageDir;
+    private $indexParser;
     private $parser;
 
     public function __construct(
         string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser
+        IndexXmlCoverageParser $indexCoverageXmlParser,
+        XmlCoverageParser $coverageXmlParser
     ) {
         $this->coverageDir = $coverageDir;
+        $this->indexParser = $indexCoverageXmlParser;
         $this->parser = $coverageXmlParser;
     }
 
@@ -74,6 +78,9 @@ class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
         $coverageIndexPath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
         $coverageIndexContent = file_get_contents($coverageIndexPath);
 
-        return $this->parser->parse($coverageIndexPath, $coverageIndexContent);
+        foreach ($this->indexParser->parse($coverageIndexPath, $coverageIndexContent) as $infoProvider) {
+            // TODO It might be benificial to filter files at this stage, rather than later. SourceFileDataFactory does that.
+            yield $this->parser->parse($infoProvider);
+        }
     }
 }

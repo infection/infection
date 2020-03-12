@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use DOMElement;
-use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\SafeDOMXPath;
 
 /**
@@ -46,22 +45,20 @@ use Infection\TestFramework\SafeDOMXPath;
 class IndexXmlCoverageParser
 {
     private $coverageDir;
-    private $xmlCoverageParser;
 
-    public function __construct(string $coverageDir, XmlCoverageParser $xmlCoverageParser)
+    public function __construct(string $coverageDir)
     {
         $this->coverageDir = $coverageDir;
-        $this->xmlCoverageParser = $xmlCoverageParser;
     }
 
     /**
-     * Parses the given PHPUnit XML coverage index report (index.xml) to collect the general
-     * coverage data. Note that this data is likely incomplete an will need to be enriched to
-     * contain all the desired data.
+     * Parses the given PHPUnit XML coverage index report (index.xml) to collect the information
+     * needed to parse general coverage data. Note that this data is likely incomplete an will
+     * need to be enriched to contain all the desired data.
      *
      * @throws NoLineExecuted
      *
-     * @return iterable<SourceFileData>
+     * @return iterable<SourceFileInfoProvider>
      */
     public function parse(string $coverageIndexPath, string $xmlIndexCoverageContent): iterable
     {
@@ -73,7 +70,7 @@ class IndexXmlCoverageParser
     }
 
     /**
-     * @return iterable<SourceFileData>
+     * @return iterable<SourceFileInfoProvider>
      */
     private function parseNodes(string $coverageIndexPath, SafeDOMXPath $xPath): iterable
     {
@@ -82,13 +79,11 @@ class IndexXmlCoverageParser
         foreach ($xPath->query('//file') as $node) {
             $relativeCoverageFilePath = $node->getAttribute('href');
 
-            yield $this->xmlCoverageParser->parse(
-                new SourceFileInfoProvider(
-                    $coverageIndexPath,
-                    $this->coverageDir,
-                    $relativeCoverageFilePath,
-                    $projectSource
-                )
+            yield new SourceFileInfoProvider(
+                $coverageIndexPath,
+                $this->coverageDir,
+                $relativeCoverageFilePath,
+                $projectSource
             );
         }
     }
