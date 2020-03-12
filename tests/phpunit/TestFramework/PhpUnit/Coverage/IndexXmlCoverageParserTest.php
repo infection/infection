@@ -36,14 +36,16 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
-use Infection\TestFramework\Coverage\CoverageReport;
+use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
-use Infection\Tests\Fixtures\TestFramework\LegacyXmlCoverageParserAdapter;
+use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
+use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
-use function Pipeline\take;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
@@ -65,14 +67,15 @@ final class IndexXmlCoverageParserTest extends TestCase
     private static $xml;
 
     /**
-     * @var LegacyXmlCoverageParserAdapter
+     * @var IndexXmlCoverageParser
      */
     private $parser;
 
     protected function setUp(): void
     {
-        $this->parser = new LegacyXmlCoverageParserAdapter(
-            new IndexXmlCoverageParser(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR)
+        $this->parser = new IndexXmlCoverageParser(
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
+            new XmlCoverageParser()
         );
     }
 
@@ -99,7 +102,7 @@ final class IndexXmlCoverageParserTest extends TestCase
      */
     public function test_it_collects_data_recursively_for_all_files(string $xml): void
     {
-        $coverage = $this->parser->parse($xml);
+        $coverage = $this->parser->parse('/path/to/index.xml', $xml);
 
         // zeroLevel + noPercentage + firstLevel + secondLevel
         $this->assertCount(5, $coverage);
@@ -107,11 +110,14 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     public function test_it_has_correct_coverage_data_for_each_file(): void
     {
-        $coverage = $this->parser->parse(preg_replace(
-            '/percent=".*"/',
-            '',
-            self::getXml()
-        ));
+        $coverage = $this->parser->parse(
+            '/path/to/index.xml',
+            preg_replace(
+                '/percent=".*"/',
+                '',
+                self::getXml()
+            )
+        );
 
         $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::provideFixtures(),
@@ -143,15 +149,16 @@ final class IndexXmlCoverageParserTest extends TestCase
 </phpunit>
 XML;
 
-        $coverage = $this->parser->parse($xml);
+        $coverage = $this->parser->parse('/path/to/index.xml', $xml);
 
-        $this->assertSame([], $coverage);
+        $this->assertCoverageFixtureSame([], $coverage);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file_for_old_phpunit_versions(): void
     {
-        $coverage = (new LegacyXmlCoverageParserAdapter(
-            new IndexXmlCoverageParser(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR)
+        $coverage = (new IndexXmlCoverageParser(
+            XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
+            new XmlCoverageParser()
         ))->parse(str_replace(
             '/path/to/src',
             realpath(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
@@ -159,7 +166,7 @@ XML;
         ));
 
         $this->assertCoverageFixtureSame(
-            XmlCoverageFixtures::provideLegacyFormatFixtures(),
+            XmlCoverageFixtures::providePhpUnit6Fixtures(),
             $coverage
         );
     }
@@ -171,7 +178,7 @@ XML;
     {
         $this->expectException(NoLineExecuted::class);
 
-        $this->parser->parse($xml);
+        $this->parser->parse('/path/to/index.xml', $xml);
     }
 
     public function coverageProvider(): Generator
@@ -246,8 +253,10 @@ XML
             file_get_contents(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/coverage-xml/index.xml')
         );
 
+        $sourceFiles = $this->parser->parse('/path/to/index.xml', $xml);
+
         try {
-            $this->parser->parse($xml);
+            iterator_to_array($sourceFiles, false);
 
             $this->fail();
         } catch (InvalidCoverage $exception) {
@@ -266,18 +275,30 @@ XML
     }
 
     /**
-     * @param iterable<XmlCoverageFixture> $fixtures
-     * @param array<string, CoverageReport> $coverage
+     * @param iterable<string, XmlCoverageFixture> $coverageFixtures
+     * @param iterable<string, SourceFileData> $sourceFileDatas
      */
-    private function assertCoverageFixtureSame(iterable $fixtures, iterable $coverage): void
-    {
-        $preparedFixtures = take($fixtures)->map(static function (XmlCoverageFixture $fixture) {
-            yield $fixture->sourceFilePath => $fixture->serializedCoverage;
-        });
+    private function assertCoverageFixtureSame(
+        iterable $coverageFixtures,
+        iterable $sourceFileDatas
+    ): void {
+        $normalizedFixtures = [];
+
+        foreach ($coverageFixtures as $fixture) {
+            /* @var XmlCoverageFixture $fixture */
+            $normalizedFixtures[$fixture->sourceFilePath] = $fixture->serializedCoverage;
+        }
+
+        $normalizedCoverage = [];
+
+        foreach ($sourceFileDatas as $data) {
+            /* @var SourceFileData $data */
+            $normalizedCoverage[$data->getSplFileInfo()->getRealPath()] = $data->retrieveCoverageReport();
+        }
 
         $this->assertSame(
-            iterator_to_array($preparedFixtures, true),
-            CoverageHelper::convertToArray($coverage)
+            $normalizedFixtures,
+            CoverageHelper::convertToArray($normalizedCoverage)
         );
     }
 }

@@ -49,29 +49,18 @@ use Webmozart\Assert\Assert;
  */
 final class XmlCoverageParser
 {
-    private $provider;
-
-    public function __construct(SourceFileInfoProvider $provider)
+    public function __construct()
     {
-        $this->provider = $provider;
     }
 
-    public function parse(): SourceFileData
+    public function parse(SourceFileInfoProvider $provider): SourceFileData
     {
         return new SourceFileData(
-            $this->provider->provideFileInfo(),
-            $this->lazilyRetrieveCoverageReport(
-                $this->provider->provideXPath()
-            )
+            $provider->provideFileInfo(),
+            (static function (SafeDOMXPath $xPath) {
+                yield self::retrieveCoverageReport($xPath);
+            })($provider->provideXPath())
         );
-    }
-
-    /**
-     * @return iterable<CoverageReport>
-     */
-    private static function lazilyRetrieveCoverageReport(SafeDOMXPath $xPath): iterable
-    {
-        yield self::retrieveCoverageReport($xPath);
     }
 
     private static function retrieveCoverageReport(SafeDOMXPath $xPath): CoverageReport

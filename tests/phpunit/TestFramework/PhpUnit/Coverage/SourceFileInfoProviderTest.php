@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
 use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\TestFramework\SafeDOMXPath;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
@@ -67,18 +68,18 @@ final class SourceFileInfoProviderTest extends TestCase
         string $coverageDir,
         string $relativeCoverageFilePath,
         string $projectSource,
-        string $expectedsourceFilePath
+        string $expectedSourceFilePath
     ): void {
         $provider = new SourceFileInfoProvider(
+            '/path/to/index.xml',
             $coverageDir,
             $relativeCoverageFilePath,
             $projectSource
         );
 
-        $this->assertSame($expectedsourceFilePath, $provider->provideFileInfo()->getRealPath());
+        $this->assertSame($expectedSourceFilePath, $provider->provideFileInfo()->getRealPath());
 
         $xPath = $provider->provideXPath();
-        $this->assertInstanceOf(SafeDOMXPath::class, $xPath);
 
         $xPathAgain = $provider->provideXPath();
 
@@ -90,6 +91,7 @@ final class SourceFileInfoProviderTest extends TestCase
         $incorrectCoverageSrcDir = Path::canonicalize(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
 
         $provider = new SourceFileInfoProvider(
+            '/path/to/index.xml',
             XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
             'zeroLevel.php.xml',
             $incorrectCoverageSrcDir
