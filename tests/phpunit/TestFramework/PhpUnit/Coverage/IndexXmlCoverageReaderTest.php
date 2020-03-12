@@ -50,7 +50,7 @@ final class IndexXmlCoverageReaderTest extends TestCase
         $reader = new IndexXmlCoverageReader(self::COVERAGE_DIR);
 
         $this->assertStringStartsWith(self::COVERAGE_DIR, $reader->getIndexXmlPath());
-        $this->assertStringContainsString('coverage/coverage-xml/index.xml', $reader->getIndexXmlPath());
+        $this->assertStringEndsWith('index.xml', $reader->getIndexXmlPath());
 
         $this->assertStringEqualsFile(self::COVERAGE_DIR . '/index.xml', $reader->getIndexXmlContent());
     }
