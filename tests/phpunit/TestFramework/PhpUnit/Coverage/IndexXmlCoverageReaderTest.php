@@ -33,49 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
-use Infection\TestFramework\Coverage\SourceFileData;
-use Infection\TestFramework\Coverage\SourceFileDataProvider;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
-use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Source of primary coverage data. Used by SourceFileDataFactory.
- *
- * @internal
- * @final
- *
- * TODO: rename to PhpUnitXmlCoverageTraceProvider: Provides the traces based on the PHPUnit XML coverage collected
+ * @group integration
  */
-class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
+final class IndexXmlCoverageReaderTest extends TestCase
 {
-    private $indexReader;
-    private $indexParser;
-    private $parser;
+    private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
 
-    public function __construct(
-        IndexXmlCoverageReader $indexReader,
-        IndexXmlCoverageParser $indexCoverageXmlParser,
-        XmlCoverageParser $coverageXmlParser
-    ) {
-        $this->indexReader = $indexReader;
-        $this->indexParser = $indexCoverageXmlParser;
-        $this->parser = $coverageXmlParser;
-    }
-
-    /**
-     * @return iterable<SourceFileData>
-     */
-    public function provideFiles(): iterable
+    public function test_it(): void
     {
-        foreach ($this->indexParser->parse(
-            $this->indexReader->getIndexXmlPath(),
-            $this->indexReader->getIndexXmlContent()
-        ) as $infoProvider) {
-            // TODO It might be benificial to filter files at this stage, rather than later. SourceFileDataFactory does that.
-            yield $this->parser->parse($infoProvider);
-        }
+        $reader = new IndexXmlCoverageReader(self::COVERAGE_DIR);
+
+        $this->assertStringStartsWith(self::COVERAGE_DIR, $reader->getIndexXmlPath());
+        $this->assertStringContainsString('coverage/coverage-xml/index.xml', $reader->getIndexXmlPath());
+
+        $this->assertStringEqualsFile(self::COVERAGE_DIR . '/index.xml', $reader->getIndexXmlContent());
     }
 }

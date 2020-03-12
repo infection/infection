@@ -33,23 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\PhpUnit\Coverage;
 
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use PHPUnit\Framework\TestCase;
+use const DIRECTORY_SEPARATOR;
+use function Safe\file_get_contents;
 
-final class FileCodeCoverageProviderFactoryTest extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class IndexXmlCoverageReader
 {
-    public function test_it_can_create_an_XMLLine_code_coverage_instance(): void
-    {
-        // We cannot test much of the generated instance here since it does not exposes any state.
-        // We can only ensure that an instance is created in all scenarios
-        (new FileCodeCoverageProviderFactory(
-            '/path/to/coverage/dir',
-            $this->createMock(IndexXmlCoverageParser::class)
-        ))->create();
+    private const COVERAGE_INDEX_FILE_NAME = 'index.xml';
 
-        $this->addToAssertionCount(1);
+    private $coverageDir;
+
+    public function __construct(string $coverageDir)
+    {
+        $this->coverageDir = $coverageDir;
+    }
+
+    public function getIndexXmlPath(): string
+    {
+        return $this->coverageDir . DIRECTORY_SEPARATOR . self::COVERAGE_INDEX_FILE_NAME;
+    }
+
+    public function getIndexXmlContent(): string
+    {
+        return file_get_contents($this->getIndexXmlPath());
     }
 }

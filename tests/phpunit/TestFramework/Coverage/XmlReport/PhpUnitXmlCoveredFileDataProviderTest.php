@@ -35,158 +35,59 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageReport;
-use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\Tests\TestFramework\Coverage\CoverageHelper;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
+use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
+use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
 use PHPUnit\Framework\TestCase;
-use function Safe\realpath;
 
-/**
- * @group integration
- */
 final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
 {
-    private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
-
-    public function test_it_can_parse_and_enrich_the_coverage_data(): void
+    public function test_it_can_parse_coverage_data(): void
     {
-        $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
+        $reader = $this->createMock(IndexXmlCoverageReader::class);
+        $reader
+            ->expects($this->once())
+            ->method('getIndexXmlPath')
+            ->willReturn('foo/index.xml')
+        ;
+
+        $reader
+            ->expects($this->once())
+            ->method('getIndexXmlContent')
+            ->willReturn('<xml><placeholder /></xml>')
+        ;
+
+        $providerMock = $this->createMock(SourceFileInfoProvider::class);
+
+        $indexXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
+        $indexXmlParserMock
+            ->expects($this->once())
+            ->method('parse')
+            ->with('foo/index.xml', '<xml><placeholder /></xml>')
+            ->willReturn([$providerMock])
+        ;
+
+        $sourceFileDataMock = $this->createMock(SourceFileData::class);
+
+        $coverageXmlParserMock = $this->createMock(XmlCoverageParser::class);
         $coverageXmlParserMock
             ->expects($this->once())
             ->method('parse')
-            ->willReturn($this->getParsedCodeCoverageData())
+            ->with($providerMock)
+            ->willReturn($sourceFileDataMock)
         ;
 
         $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
-            realpath(self::COVERAGE_DIR),
+            $reader,
+            $indexXmlParserMock,
             $coverageXmlParserMock
         );
 
         $coverage = $coverageProvider->provideFiles();
 
-        $this->assertSame(
-            [
-                '/path/to/acme/Foo.php' => [
-                    'byLine' => [
-                        11 => [
-                            [
-                                'testMethod' => 'Acme\FooTest::test_it_can_be_instantiated',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                    ],
-                    'byMethod' => [
-                        '__construct' => [
-                            'startLine' => 19,
-                            'endLine' => 22,
-                        ],
-                    ],
-                ],
-            ],
-            CoverageHelper::convertToArray($coverage)
-        );
-    }
-
-    public function test_it_can_parse_codeception_cest_coverage(): void
-    {
-        $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
-        $coverageXmlParserMock
-            ->expects($this->once())
-            ->method('parse')
-            ->willReturn($this->getParsedCodeCoverageData('Acme\FooCest:test_it_can_be_instantiated'))
-        ;
-
-        $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
-            realpath(self::COVERAGE_DIR),
-            $coverageXmlParserMock
-        );
-
-        $coverage = $coverageProvider->provideFiles();
-
-        $this->assertSame(
-            [
-                '/path/to/acme/Foo.php' => [
-                    'byLine' => [
-                        11 => [
-                            [
-                                'testMethod' => 'Acme\FooCest:test_it_can_be_instantiated',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                    ],
-                    'byMethod' => [
-                        '__construct' => [
-                            'startLine' => 19,
-                            'endLine' => 22,
-                        ],
-                    ],
-                ],
-            ],
-            CoverageHelper::convertToArray($coverage)
-        );
-    }
-
-    public function test_it_does_not_add_test_file_info_if_not_provider_is_given(): void
-    {
-        $coverageXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
-        $coverageXmlParserMock
-            ->expects($this->once())
-            ->method('parse')
-            ->willReturn($this->getParsedCodeCoverageData())
-        ;
-
-        $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
-            realpath(self::COVERAGE_DIR),
-            $coverageXmlParserMock
-        );
-
-        $coverage = $coverageProvider->provideFiles();
-
-        $this->assertSame(
-            [
-                '/path/to/acme/Foo.php' => [
-                    'byLine' => [
-                        11 => [
-                            [
-                                'testMethod' => 'Acme\FooTest::test_it_can_be_instantiated',
-                                'testFilePath' => null,
-                                'time' => null,
-                            ],
-                        ],
-                    ],
-                    'byMethod' => [
-                        '__construct' => [
-                            'startLine' => 19,
-                            'endLine' => 22,
-                        ],
-                    ],
-                ],
-            ],
-            CoverageHelper::convertToArray($coverage)
-        );
-    }
-
-    private function getParsedCodeCoverageData(string $testMethod = 'Acme\FooTest::test_it_can_be_instantiated'): array
-    {
-        return [
-            '/path/to/acme/Foo.php' => new CoverageReport(
-                [
-                    11 => [
-                        CoverageLineData::withTestMethod($testMethod),
-                    ],
-                ],
-                [
-                    '__construct' => new MethodLocationData(
-                        19,
-                        22
-                    ),
-                ]
-            ),
-        ];
+        $this->assertSame([$sourceFileDataMock], iterator_to_array($coverage));
     }
 }

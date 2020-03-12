@@ -47,8 +47,9 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class XmlCoverageParser
+class XmlCoverageParser
 {
     public function __construct()
     {

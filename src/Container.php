@@ -100,6 +100,7 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
 use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
@@ -187,7 +188,9 @@ final class Container
             },
             PhpUnitXmlCoveredFileDataProvider::class => static function (self $container): PhpUnitXmlCoveredFileDataProvider {
                 return new PhpUnitXmlCoveredFileDataProvider(
-                    $container->getConfiguration()->getCoveragePath(),
+                    new IndexXmlCoverageReader(
+                        $container->getConfiguration()->getCoveragePath()
+                    ),
                     $container->getIndexXmlCoverageParser(),
                     $container->getXmlCoverageParser()
                 );
