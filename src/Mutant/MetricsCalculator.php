@@ -72,6 +72,7 @@ class MetricsCalculator
      * @var int
      */
     private $totalMutantsCount = 0;
+
     private $killedExecutionResults;
     private $errorExecutionResults;
     private $escapedExecutionResults;
@@ -83,6 +84,11 @@ class MetricsCalculator
      * @var Calculator|null
      */
     private $calculator;
+
+    /**
+     * @var float|null
+     */
+    private $totalLineCodeCoverage;
 
     public function __construct()
     {
@@ -218,6 +224,16 @@ class MetricsCalculator
         return $this->allExecutionResults->getSortedExecutionResults();
     }
 
+    public function registerTotalCoverage(float $totalCoverage): void
+    {
+        $this->totalLineCodeCoverage = $totalCoverage;
+    }
+
+    public function getTotalLineCodeCoverage(): ?float
+    {
+        return $this->totalLineCodeCoverage;
+    }
+
     /**
      * Mutation Score Indicator (MSI)
      */
@@ -226,12 +242,9 @@ class MetricsCalculator
         return $this->getCalculator()->getMutationScoreIndicator();
     }
 
-    /**
-     * Mutation coverage percentage
-     */
-    public function getCoverageRate(): float
+    public function getMutationCoverage(): float
     {
-        return $this->getCalculator()->getCoverageRate();
+        return $this->getCalculator()->getMutationCoverage();
     }
 
     /**
@@ -240,6 +253,14 @@ class MetricsCalculator
     public function getCoveredCodeMutationScoreIndicator(): float
     {
         return $this->getCalculator()->getCoveredCodeMutationScoreIndicator();
+    }
+
+    /**
+     * Mutation Score Indicator relative to the total lines code coverage
+     */
+    public function getRelativeCoveredCodeMutationScoreIndicator(): float
+    {
+        return $this->getCalculator()->getRelativeCoveredCodeMutationScoreIndicator();
     }
 
     private function getCalculator(): Calculator

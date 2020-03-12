@@ -78,9 +78,9 @@ final class XmlCoverageParser
     {
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
 
-        $percentage = $linesNode->getAttribute('percent');
+        $percentage = PercentageParser::parsePercentage($linesNode->getAttribute('percent'));
 
-        if (self::percentageToFloat($percentage) === .0) {
+        if ($percentage === .0) {
             return new CoverageReport();
         }
 
@@ -100,16 +100,6 @@ final class XmlCoverageParser
             self::collectCoveredLinesData($coveredLineNodes),
             self::collectMethodsCoverageData($coveredMethodNodes)
         );
-    }
-
-    private static function percentageToFloat(string $percentage): float
-    {
-        // In PHPUnit <6 the percentage value would take the form "0.00%" in _some_ cases.
-        // For example could find both with percentage and without in
-        // https://github.com/maks-rafalko/tactician-domain-events/tree/1eb23434d3a833dedb6180ead75ff983ef09a2e9
-
-        // But PHP can handle them all. Together with an empty string.
-        return (float) $percentage;
     }
 
     /**

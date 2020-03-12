@@ -156,7 +156,10 @@ final class Container
                 return new TmpDirProvider();
             },
             IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
-                return new IndexXmlCoverageParser($container->getConfiguration()->getCoveragePath());
+                return new IndexXmlCoverageParser(
+                    $container->getConfiguration()->getCoveragePath(),
+                    $container->getEventDispatcher()
+                );
             },
             SourceFileDataFactory::class => static function (self $container): SourceFileDataFactory {
                 return new SourceFileDataFactory(

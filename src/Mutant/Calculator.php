@@ -45,6 +45,7 @@ final class Calculator
     private $timedOutCount;
     private $notTestedCount;
     private $totalCount;
+    private $totalLineCodeCoverage;
 
     /**
      * @var float|null
@@ -61,18 +62,25 @@ final class Calculator
      */
     private $coveredMutationScoreIndicator;
 
+    /**
+     * @var float|null
+     */
+    private $relativeMutationScoreIndicator;
+
     public function __construct(
         int $killedCount,
         int $errorCount,
         int $timedOutCount,
         int $notTestedCount,
-        int $totalCount
+        int $totalCount,
+        float $totalLineCodeCoverage
     ) {
         $this->killedCount = $killedCount;
         $this->errorCount = $errorCount;
         $this->timedOutCount = $timedOutCount;
         $this->notTestedCount = $notTestedCount;
         $this->totalCount = $totalCount;
+        $this->totalLineCodeCoverage = $totalLineCodeCoverage;
     }
 
     public static function fromMetrics(MetricsCalculator $calculator): self
@@ -82,7 +90,8 @@ final class Calculator
             $calculator->getErrorCount(),
             $calculator->getTimedOutCount(),
             $calculator->getNotTestedCount(),
-            $calculator->getTotalMutantsCount()
+            $calculator->getTotalMutantsCount(),
+            $calculator->getTotalLineCodeCoverage()
         );
     }
 
@@ -106,10 +115,7 @@ final class Calculator
         return $this->mutationScoreIndicator = $score;
     }
 
-    /**
-     * Mutation coverage percentage
-     */
-    public function getCoverageRate(): float
+    public function getMutationCoverage(): float
     {
         if ($this->coverageRate !== null) {
             return $this->coverageRate;
@@ -144,5 +150,13 @@ final class Calculator
         }
 
         return $this->coveredMutationScoreIndicator = $score;
+    }
+
+    /**
+     * Mutation Score Indicator relative to the total lines code coverage
+     */
+    public function getRelativeCoveredCodeMutationScoreIndicator(): float
+    {
+        return $this->relativeMutationScoreIndicator ?? ($this->getCoveredCodeMutationScoreIndicator() * $this->totalLineCodeCoverage / 100);
     }
 }

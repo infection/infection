@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use DOMElement;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\TotalLineCodeCoverageWasCalculated;
 use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\SafeDOMXPath;
 
@@ -46,10 +48,12 @@ use Infection\TestFramework\SafeDOMXPath;
 class IndexXmlCoverageParser
 {
     private $coverageDir;
+    private $eventDispatcher;
 
-    public function __construct(string $coverageDir)
+    public function __construct(string $coverageDir, EventDispatcher $eventDispatcher)
     {
         $this->coverageDir = $coverageDir;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -65,7 +69,9 @@ class IndexXmlCoverageParser
     {
         $xPath = XPathFactory::createXPath($xmlIndexCoverageContent);
 
-        self::assertHasCoverage($xPath);
+        $totalCoverage = self::retrieveTotalCoverage($xPath);
+
+        $this->eventDispatcher->dispatch(new TotalLineCodeCoverageWasCalculated($totalCoverage));
 
         return $this->parseNodes($coverageIndexPath, $xPath);
     }
@@ -99,7 +105,7 @@ class IndexXmlCoverageParser
     /**
      * @throws NoLineExecuted
      */
-    private static function assertHasCoverage(SafeDOMXPath $xPath): void
+    private static function retrieveTotalCoverage(SafeDOMXPath $xPath): float
     {
         $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
 
@@ -110,6 +116,8 @@ class IndexXmlCoverageParser
         ) {
             throw NoLineExecuted::create();
         }
+
+        return PercentageParser::parsePercentage($lineCoverage);
     }
 
     private static function getProjectSource(SafeDOMXPath $xPath): string

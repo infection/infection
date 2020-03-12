@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use Infection\Event\TotalLineCodeCoverageWasCalculated;
 use function floor;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
@@ -112,6 +113,11 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->showMetrics();
     }
 
+    public function onTotalLineCodeCoverageWasCalculated(TotalLineCodeCoverageWasCalculated $event): void
+    {
+        $this->metricsCalculator->registerTotalCoverage($event->getCodeCoverage());
+    }
+
     /**
      * @param MutantExecutionResult[] $executionResults
      */
@@ -155,7 +161,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $mutationScoreIndicator = floor($this->metricsCalculator->getMutationScoreIndicator());
         $msiTag = $this->getPercentageTag($mutationScoreIndicator);
 
-        $coverageRate = floor($this->metricsCalculator->getCoverageRate());
+        $coverageRate = floor($this->metricsCalculator->getMutationCoverage());
         $mutationCoverageTag = $this->getPercentageTag($coverageRate);
 
         $coveredMsi = floor($this->metricsCalculator->getCoveredCodeMutationScoreIndicator());

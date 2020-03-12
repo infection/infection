@@ -74,12 +74,12 @@ final class CalculatorTest extends TestCase
         );
 
         $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
-        $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
+        $this->assertSame($expectedCoverageRate, $calculator->getMutationCoverage());
         $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
 
         // The calls are idempotent
         $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
-        $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
+        $this->assertSame($expectedCoverageRate, $calculator->getMutationCoverage());
         $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
@@ -95,7 +95,7 @@ final class CalculatorTest extends TestCase
         $calculator = Calculator::fromMetrics($metricsCalculator);
 
         $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
-        $this->assertSame($expectedCoverageRate, $calculator->getCoverageRate());
+        $this->assertSame($expectedCoverageRate, $calculator->getMutationCoverage());
         $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
