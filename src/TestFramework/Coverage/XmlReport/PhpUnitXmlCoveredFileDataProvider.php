@@ -71,10 +71,9 @@ class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
      */
     public function provideFiles(): iterable
     {
-        $coverageIndexFileContent = file_get_contents(
-            $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME
-        );
+        $coverageIndexPath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexContent = file_get_contents($coverageIndexPath);
 
-        return $this->parser->parse($coverageIndexFileContent);
+        return $this->parser->parse($coverageIndexPath, $coverageIndexContent);
     }
 }

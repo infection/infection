@@ -54,6 +54,7 @@ final class XmlCoverageParserTest extends TestCase
         foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
             yield [
                 new SourceFileInfoProvider(
+                    '/path/to/index.xml',
                     $fixture->coverageDir,
                     $fixture->relativeCoverageFilePath,
                     $fixture->projectSource
