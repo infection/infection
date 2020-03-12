@@ -111,7 +111,7 @@ final class ContainerTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function test_it_can_build_source_file_data_factory(): void
+    public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
     {
         $container = SingletonContainer::getContainer();
         $newContainer = $container->withDynamicParameters(
