@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
 use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
-use Infection\TestFramework\SafeDOMXPath;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 use Webmozart\PathUtil\Path;
@@ -49,18 +48,6 @@ use Webmozart\PathUtil\Path;
  */
 final class SourceFileInfoProviderTest extends TestCase
 {
-    public static function fileFixturesProvider(): iterable
-    {
-        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
-            yield [
-                $fixture->coverageDir,
-                $fixture->relativeCoverageFilePath,
-                $fixture->projectSource,
-                $fixture->sourceFilePath,
-            ];
-        }
-    }
-
     /**
      * @dataProvider fileFixturesProvider
      */
@@ -138,6 +125,18 @@ final class SourceFileInfoProviderTest extends TestCase
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNull($exception->getPrevious());
+        }
+    }
+
+    public function fileFixturesProvider(): iterable
+    {
+        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
+            yield [
+                $fixture->coverageDir,
+                $fixture->relativeCoverageFilePath,
+                $fixture->projectSource,
+                $fixture->sourceFilePath,
+            ];
         }
     }
 }
