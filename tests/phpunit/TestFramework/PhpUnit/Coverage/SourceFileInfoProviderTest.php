@@ -86,6 +86,31 @@ final class SourceFileInfoProviderTest extends TestCase
         $this->assertSame($xPath, $xPathAgain);
     }
 
+    public function test_it_errors_when_the_XML_file_could_not_be_found(): void
+    {
+        $provider = new SourceFileInfoProvider(
+            '/path/to/index.xml',
+            '/path/to/coverage-dir',
+            'zeroLevel.php.xml',
+            'projectSource'
+        );
+
+        try {
+            $provider->provideFileInfo();
+
+            $this->fail();
+        } catch (InvalidCoverage $exception) {
+            $this->assertSame(
+                'Could not find the XML coverage file '
+                . '"/path/to/coverage-dir/zeroLevel.php.xml" listed in "/path/to/index.xml". Make '
+                . 'sure the coverage used is up to date',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
+    }
+
     public function test_it_errors_when_the_source_file_could_not_be_found(): void
     {
         $incorrectCoverageSrcDir = Path::canonicalize(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');

@@ -84,6 +84,7 @@ class IndexXmlCoverageParser
 
             yield $this->xmlCoverageParser->parse(
                 new SourceFileInfoProvider(
+                    $coverageIndexPath,
                     $this->coverageDir,
                     $relativeCoverageFilePath,
                     $projectSource

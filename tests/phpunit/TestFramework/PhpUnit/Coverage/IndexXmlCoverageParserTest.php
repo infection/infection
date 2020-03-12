@@ -159,11 +159,14 @@ XML;
         $coverage = (new IndexXmlCoverageParser(
             XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
             new XmlCoverageParser()
-        ))->parse(str_replace(
-            '/path/to/src',
-            realpath(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
-            file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml')
-        ));
+        ))->parse(
+            '/path/to/index.xml',
+            str_replace(
+                '/path/to/src',
+                realpath(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
+                file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml')
+            )
+        );
 
         $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::providePhpUnit6Fixtures(),
