@@ -38,10 +38,10 @@ namespace Infection\Logger;
 use function implode;
 use function in_array;
 use const PHP_EOL;
+use Psr\Log\LoggerInterface;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
 use function strpos;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -52,19 +52,19 @@ final class FileLogger implements MutationTestingResultsLogger
 {
     private $filePath;
     private $fileSystem;
-    private $output;
     private $lineLogger;
+    private $logger;
 
     public function __construct(
-        OutputInterface $output,
         string $filePath,
         Filesystem $fileSystem,
-        LineMutationTestingResultsLogger $lineLogger
+        LineMutationTestingResultsLogger $lineLogger,
+        LoggerInterface $logger
     ) {
         $this->filePath = $filePath;
         $this->fileSystem = $fileSystem;
-        $this->output = $output;
         $this->lineLogger = $lineLogger;
+        $this->logger = $logger;
     }
 
     public function log(): void
@@ -78,9 +78,10 @@ final class FileLogger implements MutationTestingResultsLogger
             } else {
                 // The Symfony filesystem component doesn't support using streams so provide a
                 // sensible error message
-                $this->output->writeln(sprintf(
-                    '<error>%s</error>',
-                    'The only streams supported are php://stdout and php://stderr'
+                $this->logger->error(sprintf(
+                    '<error>The only streams supported are "php://stdout" and "php://stderr"'
+                    . '. Got "%s"</error>',
+                    $this->filePath
                 ));
             }
 
@@ -90,7 +91,7 @@ final class FileLogger implements MutationTestingResultsLogger
         try {
             $this->fileSystem->dumpFile($this->filePath, $content);
         } catch (IOException $exception) {
-            $this->output->writeln(sprintf(
+            $this->logger->error(sprintf(
                 '<error>%s</error>',
                 $exception->getMessage()
             ));

@@ -40,8 +40,8 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
 use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LogLevel;
 use function str_replace;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -58,14 +58,14 @@ final class FileLoggerTest extends FileSystemTestCase
     private $fileSystemMock;
 
     /**
-     * @var OutputInterface|MockObject
+     * @var DummyLogger
      */
-    private $outputMock;
+    private $logger;
 
     protected function setUp(): void
     {
         $this->fileSystemMock = $this->createMock(Filesystem::class);
-        $this->outputMock = $this->createMock(OutputInterface::class);
+        $this->logger = new DummyLogger();
     }
 
     public function test_it_logs_the_correct_lines_with_no_mutations(): void
@@ -84,45 +84,52 @@ TXT;
         ;
 
         $debugFileLogger = new FileLogger(
-            $this->outputMock,
             self::LOG_FILE_PATH,
             $this->fileSystemMock,
-            new DummyLineMutationTestingResultsLogger(['foo', 'bar'])
+            new DummyLineMutationTestingResultsLogger(['foo', 'bar']),
+            $this->logger
         );
 
         $debugFileLogger->log();
+
+        $this->assertSame([], $this->logger->getLogs());
     }
 
     public function test_it_can_log_on_valid_streams(): void
     {
         $debugFileLogger = new FileLogger(
-            $this->outputMock,
             'php://stdout',
             $this->fileSystemMock,
-            new DummyLineMutationTestingResultsLogger([])
+            new DummyLineMutationTestingResultsLogger([]),
+            $this->logger
         );
 
         $debugFileLogger->log();
 
-        $this->addToAssertionCount(1);
+        $this->assertSame([], $this->logger->getLogs());
     }
 
     public function test_it_cannot_log_on_invalid_streams(): void
     {
-        $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with('<error>The only streams supported are php://stdout and php://stderr</error>')
-        ;
-
         $debugFileLogger = new FileLogger(
-            $this->outputMock,
             'php://memory',
             $this->fileSystemMock,
-            new DummyLineMutationTestingResultsLogger(['foo', 'bar'])
+            new DummyLineMutationTestingResultsLogger(['foo', 'bar']),
+            $this->logger
         );
 
         $debugFileLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::ERROR,
+                    '<error>The only streams supported are "php://stdout" and "php://stderr". Got "php://memory"</error>',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_fails_if_cannot_write_file(): void
@@ -133,19 +140,24 @@ TXT;
             ->with(self::LOG_FILE_PATH, $this->anything())
             ->willThrowException(new IOException('Cannot write in directory X'));
 
-        $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with('<error>Cannot write in directory X</error>')
-        ;
-
         $debugFileLogger = new FileLogger(
-            $this->outputMock,
             self::LOG_FILE_PATH,
             $this->fileSystemMock,
-            new DummyLineMutationTestingResultsLogger([])
+            new DummyLineMutationTestingResultsLogger([]),
+            $this->logger
         );
 
         $debugFileLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::ERROR,
+                    '<error>Cannot write in directory X</error>',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 }
