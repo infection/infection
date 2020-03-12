@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use DOMElement;
 use DOMNodeList;
+use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
@@ -57,10 +58,16 @@ final class XmlCoverageParser
     {
         return new SourceFileData(
             $provider->provideFileInfo(),
-            (static function (SafeDOMXPath $xPath) {
-                yield self::retrieveCoverageReport($xPath);
-            })($provider->provideXPath())
+            self::createCoverageReportGenerator($provider->provideXPath())
         );
+    }
+
+    /**
+     * @return Generator<CoverageReport>
+     */
+    private static function createCoverageReportGenerator(SafeDOMXPath $xPath): Generator
+    {
+        yield self::retrieveCoverageReport($xPath);
     }
 
     private static function retrieveCoverageReport(SafeDOMXPath $xPath): CoverageReport
