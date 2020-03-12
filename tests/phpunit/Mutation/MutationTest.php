@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use function array_merge;
-use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -94,7 +93,7 @@ final class MutationTest extends TestCase
         $this->assertSame($expectedHash, $mutation->getHash());
     }
 
-    public function valuesProvider(): Generator
+    public function valuesProvider(): iterable
     {
         $nominalAttributes = [
             'startLine' => $originalStartingLine = 3,

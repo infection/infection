@@ -41,7 +41,6 @@ use function array_keys;
 use function array_map;
 use function array_merge;
 use function array_values;
-use Generator;
 use function implode;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
@@ -113,7 +112,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
         );
     }
 
-    public function provideRawConfig(): Generator
+    public function provideRawConfig(): iterable
     {
         // The schema is given as a JSON here to be closer to how the user configure the schema
         yield 'minimal' => [

@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use DomainException;
-use Generator;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
@@ -173,7 +172,7 @@ final class IgnoreMutatorTest extends TestCase
             ->expects($this->once())
             ->method('mutate')
             ->with($this->nodeMock)
-            ->willReturnCallback(static function () use ($mutatedNodeMock): Generator {
+            ->willReturnCallback(static function () use ($mutatedNodeMock): iterable {
                 yield $mutatedNodeMock;
             })
         ;

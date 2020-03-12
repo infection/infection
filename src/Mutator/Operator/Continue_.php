@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -65,9 +64,9 @@ TXT
     /**
      * @param Node\Stmt\Continue_ $node
      *
-     * @return Generator<Node\Stmt\Break_>
+     * @return iterable<Node\Stmt\Break_>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Break_();
     }

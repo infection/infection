@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Generator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use PHPUnit\Framework\TestCase;
@@ -240,7 +239,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertSame($expected, $constraintChecker->isActualOverRequired());
     }
 
-    public function isMsiOverMinimumMsiProvider(): Generator
+    public function isMsiOverMinimumMsiProvider(): iterable
     {
         $minMsi = 10.0;
 

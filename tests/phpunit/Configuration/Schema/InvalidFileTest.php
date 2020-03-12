@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Schema;
 
 use Error;
-use Generator;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\TestCase;
@@ -102,7 +101,7 @@ final class InvalidFileTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    public function jsonErrorProvider(): Generator
+    public function jsonErrorProvider(): iterable
     {
         yield [
             new SchemaConfigurationFile('/path/to/config'),

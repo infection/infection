@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use function explode;
-use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Coverage\SourceFileData;
@@ -79,9 +78,9 @@ class JUnitTestExecutionInfoAdder
     /**
      * @param iterable<SourceFileData> $coverage
      *
-     * @return Generator<SourceFileData>
+     * @return iterable<SourceFileData>
      */
-    private function testExecutionInfoAdder(iterable $coverage): Generator
+    private function testExecutionInfoAdder(iterable $coverage): iterable
     {
         foreach ($coverage as $data) {
             foreach ($data->retrieveCoverageReport()->byLine as $linesCoverageData) {

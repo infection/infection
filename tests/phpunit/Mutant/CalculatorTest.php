@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use function array_sum;
-use Generator;
 use Infection\Mutant\Calculator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Tests\Logger\CreateMetricsCalculator;
@@ -99,7 +98,7 @@ final class CalculatorTest extends TestCase
         $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
-    public function metricsProvider(): Generator
+    public function metricsProvider(): iterable
     {
         yield 'empty' => [
             0,
@@ -146,7 +145,7 @@ final class CalculatorTest extends TestCase
         ];
     }
 
-    public function metricsCalculatorProvider(): Generator
+    public function metricsCalculatorProvider(): iterable
     {
         yield 'empty' => [
             new MetricsCalculator(),

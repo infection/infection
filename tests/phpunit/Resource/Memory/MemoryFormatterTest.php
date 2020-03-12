@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Memory;
 
-use Generator;
 use Infection\Resource\Memory\MemoryFormatter;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -76,7 +75,7 @@ final class MemoryFormatterTest extends TestCase
         }
     }
 
-    public function bytesProvider(): Generator
+    public function bytesProvider(): iterable
     {
         yield [0., '0.00B'];
 

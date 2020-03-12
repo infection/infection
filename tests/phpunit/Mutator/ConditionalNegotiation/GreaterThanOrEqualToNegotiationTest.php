@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class GreaterThanOrEqualToNegotiationTest extends AbstractMutatorTestCase
@@ -50,7 +49,7 @@ final class GreaterThanOrEqualToNegotiationTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates greater than or equal to' => [
             <<<'PHP'

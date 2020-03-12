@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use function array_map;
-use Generator;
 use function get_class;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
@@ -149,7 +148,7 @@ final class LoggerFactoryTest extends TestCase
         $this->assertRegisteredLoggersAre($expectedLoggerClasses, $logger);
     }
 
-    public function logsProvider(): Generator
+    public function logsProvider(): iterable
     {
         yield 'no logger' => [
             Logs::createEmpty(),

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -53,7 +52,7 @@ final class IoCodeDetectorTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function codeProvider(): Generator
+    public function codeProvider(): iterable
     {
         yield 'empty' => [
             '',

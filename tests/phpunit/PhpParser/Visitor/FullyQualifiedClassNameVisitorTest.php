@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use function array_map;
-use Generator;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -76,7 +75,7 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
         $this->assertSame($expectedProcessedNodesFqcn, $actualProcessedNodesFqcn);
     }
 
-    public function codeProvider(): Generator
+    public function codeProvider(): iterable
     {
         yield [
             'Fqcn/fqcn-empty-class.php',

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -67,9 +66,9 @@ TXT
     /**
      * @param Node\Expr\BinaryOp\NotIdentical $node
      *
-     * @return Generator<Node\Expr\BinaryOp\NotEqual>
+     * @return iterable<Node\Expr\BinaryOp\NotEqual>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Expr\BinaryOp\NotEqual($node->left, $node->right, $node->getAttributes());
     }

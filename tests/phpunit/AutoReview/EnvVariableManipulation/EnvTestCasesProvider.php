@@ -39,7 +39,6 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function class_exists;
-use Generator;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use function iterator_to_array;
@@ -64,7 +63,7 @@ final class EnvTestCasesProvider
      * it checks the source classes, but it is not excluded that a fixture file used in a test case
      * contains env writings. In this scenario, the current implementation would miss out that one.
      */
-    public static function provideEnvTestCaseTuple(): Generator
+    public static function provideEnvTestCaseTuple(): iterable
     {
         if (self::$envTestCaseClassesTuple !== null) {
             yield from self::$envTestCaseClassesTuple;
@@ -82,7 +81,7 @@ final class EnvTestCasesProvider
         yield from self::$envTestCaseClassesTuple;
     }
 
-    public static function envTestCaseTupleProvider(): Generator
+    public static function envTestCaseTupleProvider(): iterable
     {
         yield from self::provideEnvTestCaseTuple();
     }

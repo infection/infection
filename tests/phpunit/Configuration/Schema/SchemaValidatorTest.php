@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
-use Generator;
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
@@ -75,7 +74,7 @@ final class SchemaValidatorTest extends TestCase
         }
     }
 
-    public function configProvider(): Generator
+    public function configProvider(): iterable
     {
         $path = '/path/to/config';
 

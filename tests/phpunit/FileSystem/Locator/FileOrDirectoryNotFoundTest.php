@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Locator;
 
-use Generator;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use PHPUnit\Framework\TestCase;
 
@@ -88,7 +87,7 @@ final class FileOrDirectoryNotFoundTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function nonExistentPathsProvider(): Generator
+    public function nonExistentPathsProvider(): iterable
     {
         yield [
             'unknown',
@@ -115,7 +114,7 @@ final class FileOrDirectoryNotFoundTest extends TestCase
         ];
     }
 
-    public function multipleNonExistentPathsProvider(): Generator
+    public function multipleNonExistentPathsProvider(): iterable
     {
         yield [
             [],
