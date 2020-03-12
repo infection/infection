@@ -55,9 +55,6 @@ use Webmozart\PathUtil\Path;
 
 /**
  * @group integration
- * @covers \Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser
- * @covers \Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider
- * @covers \Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser
  */
 final class IndexXmlCoverageParserTest extends TestCase
 {
@@ -102,15 +99,15 @@ final class IndexXmlCoverageParserTest extends TestCase
      */
     public function test_it_collects_data_recursively_for_all_files(string $xml): void
     {
-        $coverage = $this->parser->parse('/path/to/index.xml', $xml);
+        $sourceFilesData = $this->parser->parse('/path/to/index.xml', $xml);
 
         // zeroLevel + noPercentage + firstLevel + secondLevel
-        $this->assertCount(5, $coverage);
+        $this->assertCount(5, $sourceFilesData);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file(): void
     {
-        $coverage = $this->parser->parse(
+        $sourceFilesData = $this->parser->parse(
             '/path/to/index.xml',
             preg_replace(
                 '/percent=".*"/',
@@ -121,7 +118,7 @@ final class IndexXmlCoverageParserTest extends TestCase
 
         $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::provideFixtures(),
-            $coverage
+            $sourceFilesData
         );
     }
 
@@ -149,14 +146,14 @@ final class IndexXmlCoverageParserTest extends TestCase
 </phpunit>
 XML;
 
-        $coverage = $this->parser->parse('/path/to/index.xml', $xml);
+        $sourceFilesData = $this->parser->parse('/path/to/index.xml', $xml);
 
-        $this->assertCoverageFixtureSame([], $coverage);
+        $this->assertCoverageFixtureSame([], $sourceFilesData);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file_for_old_phpunit_versions(): void
     {
-        $coverage = (new IndexXmlCoverageParser(
+        $sourceFilesData = (new IndexXmlCoverageParser(
             XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
             new XmlCoverageParser()
         ))->parse(
@@ -170,7 +167,7 @@ XML;
 
         $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::providePhpUnit6Fixtures(),
-            $coverage
+            $sourceFilesData
         );
     }
 
@@ -195,6 +192,38 @@ XML;
                 self::getXml()
             ),
         ];
+    }
+
+    public function test_it_errors_when_the_source_file_could_not_be_found(): void
+    {
+        $incorrectCoverageSrcDir = Path::canonicalize(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
+
+        // Replaces dummy source path with the real path
+        $xml = preg_replace(
+            '/(source=\").*?(\")/',
+            sprintf('$1%s$2', $incorrectCoverageSrcDir),
+            file_get_contents(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/coverage-xml/index.xml')
+        );
+
+        $sourceFiles = $this->parser->parse('/path/to/index.xml', $xml);
+
+        try {
+            iterator_to_array($sourceFiles, false);
+
+            $this->fail();
+        } catch (InvalidCoverage $exception) {
+            $this->assertSame(
+                sprintf(
+                    'Could not find the source file "%s/zeroLevel.php" referred by '
+                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
+                    $incorrectCoverageSrcDir,
+                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR)
+                ),
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
     }
 
     public function noCoveredLineReportProviders(): Generator
@@ -245,45 +274,13 @@ XML
         ];
     }
 
-    public function test_it_errors_when_the_source_file_could_not_be_found(): void
-    {
-        $incorrectCoverageSrcDir = Path::canonicalize(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
-
-        // Replaces dummy source path with the real path
-        $xml = preg_replace(
-            '/(source=\").*?(\")/',
-            sprintf('$1%s$2', $incorrectCoverageSrcDir),
-            file_get_contents(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/coverage-xml/index.xml')
-        );
-
-        $sourceFiles = $this->parser->parse('/path/to/index.xml', $xml);
-
-        try {
-            iterator_to_array($sourceFiles, false);
-
-            $this->fail();
-        } catch (InvalidCoverage $exception) {
-            $this->assertSame(
-                sprintf(
-                    'Could not find the source file "%s/zeroLevel.php" referred by '
-                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
-                    $incorrectCoverageSrcDir,
-                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR)
-                ),
-                $exception->getMessage()
-            );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
-        }
-    }
-
     /**
      * @param iterable<string, XmlCoverageFixture> $coverageFixtures
-     * @param iterable<string, SourceFileData> $sourceFileDatas
+     * @param iterable<string, SourceFileData> $sourceFilesData
      */
     private function assertCoverageFixtureSame(
         iterable $coverageFixtures,
-        iterable $sourceFileDatas
+        iterable $sourceFilesData
     ): void {
         $normalizedFixtures = [];
 
@@ -292,16 +289,16 @@ XML
             $normalizedFixtures[$fixture->sourceFilePath] = $fixture->serializedCoverage;
         }
 
-        $normalizedCoverage = [];
+        $normalizedFilesData = [];
 
-        foreach ($sourceFileDatas as $data) {
+        foreach ($sourceFilesData as $data) {
             /* @var SourceFileData $data */
-            $normalizedCoverage[$data->getSplFileInfo()->getRealPath()] = $data->retrieveCoverageReport();
+            $normalizedFilesData[$data->getSplFileInfo()->getRealPath()] = $data->retrieveCoverageReport();
         }
 
         $this->assertSame(
             $normalizedFixtures,
-            CoverageHelper::convertToArray($normalizedCoverage)
+            CoverageHelper::convertToArray($normalizedFilesData)
         );
     }
 }
