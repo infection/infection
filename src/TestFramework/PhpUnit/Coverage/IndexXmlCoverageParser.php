@@ -46,10 +46,12 @@ use Infection\TestFramework\SafeDOMXPath;
 class IndexXmlCoverageParser
 {
     private $coverageDir;
+    private $xmlCoverageParser;
 
-    public function __construct(string $coverageDir)
+    public function __construct(string $coverageDir, XmlCoverageParser $xmlCoverageParser)
     {
         $this->coverageDir = $coverageDir;
+        $this->xmlCoverageParser = $xmlCoverageParser;
     }
 
     /**
@@ -65,7 +67,7 @@ class IndexXmlCoverageParser
     {
         $xPath = XPathFactory::createXPath($xmlIndexCoverageContent);
 
-        self::assertHasCoverage($xPath);
+        self::assertHasExecutedLines($xPath);
 
         return $this->parseNodes($coverageIndexPath, $xPath);
     }
@@ -77,29 +79,24 @@ class IndexXmlCoverageParser
     {
         $projectSource = self::getProjectSource($xPath);
 
-        $nodes = $xPath->query('//file');
-
-        foreach ($nodes as $node) {
+        foreach ($xPath->query('//file') as $node) {
             $relativeCoverageFilePath = $node->getAttribute('href');
 
-            $fileInfoProvider = new SourceFileInfoProvider(
-                $coverageIndexPath,
-                $this->coverageDir,
-                $relativeCoverageFilePath,
-                $projectSource
+            yield $this->xmlCoverageParser->parse(
+                new SourceFileInfoProvider(
+                    $coverageIndexPath,
+                    $this->coverageDir,
+                    $relativeCoverageFilePath,
+                    $projectSource
+                )
             );
-
-            // TODO: I don't get this one: why is it not a service instead and `$$fileInfoProvider` passed to `parse()` instead?
-            $parser = new XmlCoverageParser($fileInfoProvider);
-
-            yield $parser->parse();
         }
     }
 
     /**
      * @throws NoLineExecuted
      */
-    private static function assertHasCoverage(SafeDOMXPath $xPath): void
+    private static function assertHasExecutedLines(SafeDOMXPath $xPath): void
     {
         $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
 
