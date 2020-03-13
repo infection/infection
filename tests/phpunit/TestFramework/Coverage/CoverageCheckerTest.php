@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use function extension_loaded;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageNotFound;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use const PHP_SAPI;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -68,14 +68,19 @@ final class CoverageCheckerTest extends TestCase
     private static $jUnit;
 
     /**
-     * @var TestFrameworkAdapter|MockObject
+     * @var IndexXmlCoverageReader|MockObject
      */
-    private $testFrameworkAdapterMock;
+    private $indexXmlCoverageReaderMock;
 
     public static function setUpBeforeClass(): void
     {
         self::$coveragePath = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/coverage/coverage-xml');
         self::$jUnit = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/junit.xml');
+    }
+
+    protected function setUp(): void
+    {
+        $this->indexXmlCoverageReaderMock = $this->createMock(IndexXmlCoverageReader::class);
     }
 
     public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_without_JUnit_report(): void
@@ -86,8 +91,14 @@ final class CoverageCheckerTest extends TestCase
             '',
             '',
             null,
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
@@ -106,8 +117,14 @@ final class CoverageCheckerTest extends TestCase
             '',
             '',
             '/path/to/junit.xml',
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
@@ -130,8 +147,14 @@ final class CoverageCheckerTest extends TestCase
             '',
             '',
             '',
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(<<<TXT
@@ -155,8 +178,14 @@ TXT
             '',
             self::$coveragePath,
             self::$jUnit,
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn(self::$coveragePath . '/index.xml')
+        ;
 
         $checker->checkCoverageExists();
 
@@ -171,8 +200,14 @@ TXT
             '',
             self::$coveragePath,
             self::$jUnit,
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn(self::$coveragePath . '/index.xml')
+        ;
 
         $checker->checkCoverageExists();
 
@@ -187,8 +222,14 @@ TXT
             '',
             '/nowhere',
             self::$jUnit,
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn('/nowhere/index.xml')
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
@@ -207,8 +248,14 @@ TXT
             '',
             '/nowhere',
             self::$jUnit,
-            'phpunit'
+            'phpunit',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn('/nowhere/index.xml')
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
@@ -228,8 +275,14 @@ TXT
             '',
             '/nowhere',
             self::$jUnit,
-            'codeception'
+            'codeception',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn('/nowhere/index.xml')
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
@@ -249,8 +302,14 @@ TXT
             '',
             self::$coveragePath,
             null,
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn(self::$coveragePath . '/index.xml')
+        ;
 
         $checker->checkCoverageExists();
 
@@ -265,8 +324,14 @@ TXT
             '',
             self::$coveragePath,
             '/invalid/path/to/junit.xml',
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn(self::$coveragePath . '/index.xml')
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(sprintf(
@@ -289,8 +354,14 @@ TXT
             '',
             self::$coveragePath,
             '/invalid/path/to/junit.xml',
-            'phpunit'
+            'phpunit',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn(self::$coveragePath . '/index.xml')
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(sprintf(
@@ -311,8 +382,14 @@ TXT
             '',
             self::$coveragePath,
             '/invalid/path/to/junit.xml',
-            'codeception'
+            'codeception',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn(self::$coveragePath . '/index.xml')
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage('Could not find the file "/invalid/path/to/junit.xml". Please'
@@ -331,8 +408,14 @@ TXT
             '',
             self::$coveragePath,
             self::$jUnit,
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn(self::$coveragePath . '/index.xml')
+        ;
 
         $checker->checkCoverageHasBeenGenerated(
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
@@ -350,8 +433,14 @@ TXT
             '',
             self::$coveragePath,
             self::$jUnit,
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn(self::$coveragePath . '/index.xml')
+        ;
 
         $checker->checkCoverageHasBeenGenerated(
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
@@ -369,8 +458,14 @@ TXT
             '',
             '/nowhere',
             self::$jUnit,
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn('/nowhere/index.xml')
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(<<<'TXT'
@@ -403,8 +498,14 @@ TXT
             '',
             $coveragePath,
             '/invalid/path/to/junit.xml',
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn(self::$coveragePath . '/index.xml')
+        ;
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(<<<'TXT'
@@ -435,8 +536,14 @@ TXT
             '',
             self::$coveragePath,
             null,
-            'unknown'
+            'unknown',
+            $this->indexXmlCoverageReaderMock
         );
+
+        $this->indexXmlCoverageReaderMock
+            ->method('getIndexXmlPath')
+            ->willReturn(self::$coveragePath . '/index.xml')
+        ;
 
         $checker->checkCoverageHasBeenGenerated(
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',

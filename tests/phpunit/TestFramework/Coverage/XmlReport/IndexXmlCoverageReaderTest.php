@@ -36,7 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
+use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\TestCase;
+use function Safe\file_get_contents;
+use function Safe\realpath;
 
 /**
  * @group integration
@@ -45,13 +48,31 @@ final class IndexXmlCoverageReaderTest extends TestCase
 {
     private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
 
-    public function test_it_can_give_the_path_to_the_PHPUnit_index_XML_report(): void
+    public function test_it_can_provide_the_PHPUnit_XML_report_index_file_path(): void
     {
         $reader = new IndexXmlCoverageReader(self::COVERAGE_DIR);
 
-        $this->assertStringStartsWith(self::COVERAGE_DIR, $reader->getIndexXmlPath());
-        $this->assertStringEndsWith('index.xml', $reader->getIndexXmlPath());
+        $expectedIndexPath = normalizePath(realpath(self::COVERAGE_DIR . '/index.xml'));
 
-        $this->assertStringEqualsFile(self::COVERAGE_DIR . '/index.xml', $reader->getIndexXmlContent());
+        $this->assertSame(
+            $expectedIndexPath,
+            $reader->getIndexXmlPath()
+        );
+    }
+
+    public function test_it_does_not_check_the_file_existence_when_retrieving_the_index_file_path(): void
+    {
+        $reader = new IndexXmlCoverageReader('/nowhere');
+
+        $this->assertSame('/nowhere/index.xml', $reader->getIndexXmlPath());
+    }
+
+    public function test_it_can_provide_the_PHPUnit_XML_report_index_file_content(): void
+    {
+        $reader = new IndexXmlCoverageReader(self::COVERAGE_DIR);
+
+        $expectedContents = file_get_contents(self::COVERAGE_DIR . '/index.xml');
+
+        $this->assertSame($expectedContents, $reader->getIndexXmlContent());
     }
 }
