@@ -118,7 +118,7 @@ final class MutationGeneratorTest extends TestCase
         $fileDataProviderMock = $this->createMock(TraceProvider::class);
         $fileDataProviderMock
             ->expects($this->exactly(1))
-            ->method('provideFiles')
+            ->method('provideTraces')
             ->willReturn([
                 $proxyTraceA,
                 $proxyTraceB,
@@ -236,7 +236,7 @@ final class MutationGeneratorTest extends TestCase
     {
         $providerMock = $this->createMock(TraceProvider::class);
         $providerMock
-            ->method('provideFiles')
+            ->method('provideTraces')
             ->willReturn(take($files)->map(static function (SplFileInfo $fileInfo) {
                 return new ProxyTrace($fileInfo, [new TestLocations()]);
             }))
