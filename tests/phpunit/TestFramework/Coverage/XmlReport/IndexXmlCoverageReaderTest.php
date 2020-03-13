@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
-use PHPUnit\Framework\TestCase;
 use function Infection\Tests\normalizePath;
+use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 
