@@ -161,7 +161,7 @@ final class Container
                     $container->getConfiguration()->getCoveragePath(),
                 );
             },
-            XmlCoverageParser::class => static function (self $container): XmlCoverageParser {
+            XmlCoverageParser::class => static function (): XmlCoverageParser {
                 // TODO XmlCoverageParser might want to notify ProcessRunner if it can't parse another file due to lack of RAM
                 return new XmlCoverageParser();
             },
