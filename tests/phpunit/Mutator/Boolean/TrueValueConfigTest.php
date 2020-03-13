@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Generator;
 use Infection\Mutator\Boolean\TrueValueConfig;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +79,7 @@ final class TrueValueConfigTest extends TestCase
         }
     }
 
-    public function settingsProvider(): Generator
+    public function settingsProvider(): iterable
     {
         yield 'default' => [
             [],

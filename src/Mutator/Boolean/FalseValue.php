@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -61,9 +60,9 @@ final class FalseValue implements Mutator
     /**
      * @param Node\Expr\ConstFetch $node
      *
-     * @return Generator<Node\Expr\ConstFetch>
+     * @return iterable<Node\Expr\ConstFetch>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Expr\ConstFetch(new Node\Name('true'));
     }

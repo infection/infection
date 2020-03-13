@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Locator;
 
 use function defined;
-use Generator;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use function Infection\Tests\normalizePath as p;
@@ -131,13 +130,13 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         }
     }
 
-    public function pathsProvider(): Generator
+    public function pathsProvider(): iterable
     {
         $root = realpath(self::FIXTURES_DIR);
 
         $generators = [];
 
-        $generators[] = static function () use ($root): Generator {
+        $generators[] = static function () use ($root): iterable {
             $title = 'one root';
             $case = 'locate root file';
 
@@ -165,7 +164,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
             }
         };
 
-        $generators[] = static function () use ($root): Generator {
+        $generators[] = static function () use ($root): iterable {
             $title = 'one root';
             $case = 'locate sub-dir root file';
 
@@ -188,7 +187,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
             }
         };
 
-        $generators[] = static function () use ($root): Generator {
+        $generators[] = static function () use ($root): iterable {
             $title = 'multiple roots';
             $case = 'locate root file';
 
@@ -218,7 +217,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
             }
         };
 
-        $generators[] = static function () use ($root): Generator {
+        $generators[] = static function () use ($root): iterable {
             $title = 'multiple roots';
             $case = 'locate sub-dir root file';
 
@@ -244,7 +243,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
             }
         };
 
-        $generators[] = static function () use ($root): Generator {
+        $generators[] = static function () use ($root): iterable {
             $title = 'one root';
             $case = 'locate root directory';
 
@@ -272,7 +271,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         };
 
         if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            $generators[] = static function () use ($root): Generator {
+            $generators[] = static function () use ($root): iterable {
                 $title = 'one root';
                 $case = 'locate symlinked file';
 
@@ -303,7 +302,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         }
     }
 
-    public function invalidPathsProvider(): Generator
+    public function invalidPathsProvider(): iterable
     {
         yield [
             ['/nowhere'],
@@ -337,7 +336,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         }
     }
 
-    public function multiplePathsProvider(): Generator
+    public function multiplePathsProvider(): iterable
     {
         $root = realpath(self::FIXTURES_DIR);
 
@@ -402,7 +401,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         ];
     }
 
-    public function multipleInvalidPathsProvider(): Generator
+    public function multipleInvalidPathsProvider(): iterable
     {
         $root1 = realpath(self::FIXTURES_DIR);
         $root2 = realpath(self::FIXTURES_DIR) . '/dir';

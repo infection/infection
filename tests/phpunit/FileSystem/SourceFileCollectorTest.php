@@ -37,7 +37,6 @@ namespace Infection\Tests\FileSystem;
 
 use function array_map;
 use function array_values;
-use Generator;
 use Infection\FileSystem\SourceFileCollector;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
@@ -77,7 +76,7 @@ final class SourceFileCollectorTest extends TestCase
         }
     }
 
-    public function sourceFilesProvider(): Generator
+    public function sourceFilesProvider(): iterable
     {
         yield 'empty' => [
             [],

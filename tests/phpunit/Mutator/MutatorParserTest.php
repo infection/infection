@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Generator;
 use Infection\Mutator\MutatorParser;
 use PHPUnit\Framework\TestCase;
 
@@ -65,7 +64,7 @@ final class MutatorParserTest extends TestCase
         $this->assertSame($expectedMutators, $parsedMutators);
     }
 
-    public function mutatorInputProvider(): Generator
+    public function mutatorInputProvider(): iterable
     {
         yield 'empty string' => ['', []];
 

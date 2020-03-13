@@ -37,7 +37,6 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use DOMElement;
 use DOMNodeList;
-use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
@@ -47,8 +46,9 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class XmlCoverageParser
+class XmlCoverageParser
 {
     public function __construct()
     {
@@ -63,9 +63,9 @@ final class XmlCoverageParser
     }
 
     /**
-     * @return Generator<CoverageReport>
+     * @return iterable<CoverageReport>
      */
-    private static function createCoverageReportGenerator(SafeDOMXPath $xPath): Generator
+    private static function createCoverageReportGenerator(SafeDOMXPath $xPath): iterable
     {
         yield self::retrieveCoverageReport($xPath);
     }

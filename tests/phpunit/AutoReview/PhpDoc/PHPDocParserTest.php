@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\PhpDoc;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 
 final class PHPDocParserTest extends TestCase
@@ -50,7 +49,7 @@ final class PHPDocParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function phpDocProvider(): Generator
+    public function phpDocProvider(): iterable
     {
         yield 'empty' => [
             '',

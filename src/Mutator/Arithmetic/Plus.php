@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -64,9 +63,9 @@ TXT
     /**
      * @param Node\Expr\BinaryOp\Plus $node
      *
-     * @return Generator<Node\Expr\BinaryOp\Minus>
+     * @return iterable<Node\Expr\BinaryOp\Minus>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Expr\BinaryOp\Minus($node->left, $node->right, $node->getAttributes());
     }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class PregMatchMatchesTest extends AbstractMutatorTestCase
@@ -50,7 +49,7 @@ final class PregMatchMatchesTest extends AbstractMutatorTestCase
         $this->doTest($input, $output);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates ' => [
             <<<'PHP'

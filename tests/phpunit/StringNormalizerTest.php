@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 
 final class StringNormalizerTest extends TestCase
@@ -50,7 +49,7 @@ final class StringNormalizerTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function stringValuesProvider(): Generator
+    public function stringValuesProvider(): iterable
     {
         yield 'empty' => ['', ''];
 

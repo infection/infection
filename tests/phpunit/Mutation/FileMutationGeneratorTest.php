@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use function current;
-use Generator;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -218,7 +217,7 @@ final class FileMutationGeneratorTest extends TestCase
         $this->assertSame([], $mutations);
     }
 
-    public function parsedFilesProvider(): Generator
+    public function parsedFilesProvider(): iterable
     {
         foreach ($this->provideBoolean() as $hasTests) {
             $title = sprintf(
@@ -271,7 +270,7 @@ final class FileMutationGeneratorTest extends TestCase
         ];
     }
 
-    public function skippedFilesProvider(): Generator
+    public function skippedFilesProvider(): iterable
     {
         yield 'path - only covered: true - has tests: %s' => [
             $this->createSourceFileDataMock('/path/to/file', 'relativePath', 'relativePathName'),
@@ -284,7 +283,7 @@ final class FileMutationGeneratorTest extends TestCase
         ];
     }
 
-    public function provideBoolean(): Generator
+    public function provideBoolean(): iterable
     {
         yield from [true, false];
     }

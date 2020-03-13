@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem;
 
 use function array_values;
-use Generator;
 use Infection\FileSystem\SourceFileFilter;
 use IteratorIterator;
 use PHPUnit\Framework\TestCase;
@@ -61,7 +60,7 @@ final class SourceFileFilterTest extends TestCase
         $this->assertSame($expectedFilters, array_values($fileFilter->getFilters()));
     }
 
-    public function filterProvider(): Generator
+    public function filterProvider(): iterable
     {
         yield 'empty' => ['', []];
 
@@ -104,7 +103,7 @@ final class SourceFileFilterTest extends TestCase
         $this->assertCanFilterInput($filter, $input, $expected);
     }
 
-    public static function fileListProvider(): Generator
+    public static function fileListProvider(): iterable
     {
         yield [
             'src/Example',

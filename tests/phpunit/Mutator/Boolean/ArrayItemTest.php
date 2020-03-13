@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class ArrayItemTest extends AbstractMutatorTestCase
@@ -50,7 +49,7 @@ final class ArrayItemTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is property' => [
             <<<'PHP'

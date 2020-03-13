@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
-use Generator;
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use function Infection\Tests\normalizeLineReturn;
@@ -61,7 +60,7 @@ final class InvalidSchemaTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function configWithErrorsProvider(): Generator
+    public function configWithErrorsProvider(): iterable
     {
         $path = '/path/to/config';
 

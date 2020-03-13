@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use Generator;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
@@ -207,7 +206,7 @@ final class ConfigurationFactoryTest extends TestCase
         );
     }
 
-    public function valueProvider(): Generator
+    public function valueProvider(): iterable
     {
         yield 'minimal' => [
             new SchemaConfiguration(

@@ -96,10 +96,11 @@ use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\SourceFileDataFactory;
 use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
 use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
@@ -159,12 +160,15 @@ final class Container
             IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
                 return new IndexXmlCoverageParser(
                     $container->getConfiguration()->getCoveragePath(),
-                    new XmlCoverageParser()
                 );
+            },
+            XmlCoverageParser::class => static function (self $container): XmlCoverageParser {
+                // TODO XmlCoverageParser might want to notify ProcessRunner if it can't parse another file due to lack of RAM
+                return new XmlCoverageParser();
             },
             SourceFileDataFactory::class => static function (self $container): SourceFileDataFactory {
                 return new SourceFileDataFactory(
-                    $container->getFileCodeCoverageProviderFactory()->create(),
+                    $container->getPhpUnitXmlCoveredFileDataProvider(),
                     $container->getJUnitTestExecutionInfoAdder(),
                     $container->getSourceFileFilter(),
                     $container->getConfiguration()->getSourceFiles(),
@@ -182,10 +186,13 @@ final class Container
                     $container->getMemoizedTestFileDataProvider()
                 );
             },
-            FileCodeCoverageProviderFactory::class => static function (self $container): FileCodeCoverageProviderFactory {
-                return new FileCodeCoverageProviderFactory(
-                    $container->getConfiguration()->getCoveragePath(),
-                    $container->getIndexXmlCoverageParser()
+            PhpUnitXmlCoveredFileDataProvider::class => static function (self $container): PhpUnitXmlCoveredFileDataProvider {
+                return new PhpUnitXmlCoveredFileDataProvider(
+                    new IndexXmlCoverageReader(
+                        $container->getConfiguration()->getCoveragePath()
+                    ),
+                    $container->getIndexXmlCoverageParser(),
+                    $container->getXmlCoverageParser()
                 );
             },
             FileCodeCoverageProvider::class => static function (self $container): FileCodeCoverageProvider {
@@ -576,6 +583,11 @@ final class Container
         return $this->get(IndexXmlCoverageParser::class);
     }
 
+    public function getXmlCoverageParser(): XmlCoverageParser
+    {
+        return $this->get(XmlCoverageParser::class);
+    }
+
     public function getSourceFileDataFactory(): SourceFileDataFactory
     {
         return $this->get(SourceFileDataFactory::class);
@@ -591,9 +603,9 @@ final class Container
         return $this->get(JUnitTestExecutionInfoAdder::class);
     }
 
-    public function getFileCodeCoverageProviderFactory(): FileCodeCoverageProviderFactory
+    public function getPhpUnitXmlCoveredFileDataProvider(): PhpUnitXmlCoveredFileDataProvider
     {
-        return $this->get(FileCodeCoverageProviderFactory::class);
+        return $this->get(PhpUnitXmlCoveredFileDataProvider::class);
     }
 
     public function getFileCodeCoverageProvider(): FileCodeCoverageProvider

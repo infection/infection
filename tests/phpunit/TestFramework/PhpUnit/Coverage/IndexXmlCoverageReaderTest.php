@@ -33,32 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
-use Infection\TestFramework\Coverage\SourceFileDataProvider;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @internal
+ * @group integration
  */
-final class FileCodeCoverageProviderFactory
+final class IndexXmlCoverageReaderTest extends TestCase
 {
-    private $coverageDir;
-    private $coverageXmlParser;
+    private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
 
-    public function __construct(
-        string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser
-    ) {
-        $this->coverageDir = $coverageDir;
-        $this->coverageXmlParser = $coverageXmlParser;
-    }
-
-    public function create(): SourceFileDataProvider
+    public function test_it(): void
     {
-        return new PhpUnitXmlCoveredFileDataProvider(
-            $this->coverageDir,
-            $this->coverageXmlParser
-        );
+        $reader = new IndexXmlCoverageReader(self::COVERAGE_DIR);
+
+        $this->assertStringStartsWith(self::COVERAGE_DIR, $reader->getIndexXmlPath());
+        $this->assertStringEndsWith('index.xml', $reader->getIndexXmlPath());
+
+        $this->assertStringEqualsFile(self::COVERAGE_DIR . '/index.xml', $reader->getIndexXmlContent());
     }
 }

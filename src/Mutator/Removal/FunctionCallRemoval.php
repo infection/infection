@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -63,9 +62,9 @@ final class FunctionCallRemoval implements Mutator
      *
      * @param Node\Stmt\Expression $node
      *
-     * @return Generator<Node\Stmt\Nop>
+     * @return iterable<Node\Stmt\Nop>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Nop();
     }

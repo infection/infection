@@ -42,7 +42,6 @@ use DOMNodeList;
 use DOMXPath;
 use function escapeshellarg;
 use function exec;
-use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
@@ -526,7 +525,7 @@ PHP
         );
     }
 
-    public function coverageTestsProvider(): Generator
+    public function coverageTestsProvider(): iterable
     {
         yield [
             [

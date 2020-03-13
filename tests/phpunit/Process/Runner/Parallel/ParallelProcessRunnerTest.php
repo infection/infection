@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner\Parallel;
 
 use Closure;
-use Generator;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\MutantExecutionResult;
@@ -71,7 +70,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_it_checks_for_timeout(): void
     {
-        $processes = (function (): Generator {
+        $processes = (function (): iterable {
             for ($i = 0; $i < 10; ++$i) {
                 yield $this->buildMutantProcessWithTimeout();
             }

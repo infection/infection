@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
@@ -53,7 +52,7 @@ final class CoverageHelperTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function coverageProvider(): Generator
+    public function coverageProvider(): iterable
     {
         yield 'empty' => [[], []];
 

@@ -60,7 +60,7 @@ final class MBString implements ConfigurableMutator
     use GetConfigClassName;
 
     /**
-     * @var array<string, Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>>
+     * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>>
      */
     private $converters;
 
@@ -95,9 +95,9 @@ TXT
     /**
      * @param Node\Expr\FuncCall $node
      *
-     * @return Generator<Node\Expr\FuncCall>
+     * @return iterable<Node\Expr\FuncCall>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         /** @var Node\Name $name */
         $name = $node->name;
@@ -148,31 +148,31 @@ TXT
     }
 
     /**
-     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     * @return Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>
      */
     private static function makeFunctionMapper(string $newFunctionName): Closure
     {
-        return static function (Node\Expr\FuncCall $node) use ($newFunctionName): Generator {
+        return static function (Node\Expr\FuncCall $node) use ($newFunctionName): iterable {
             yield self::mapFunctionCall($node, $newFunctionName, $node->args);
         };
     }
 
     /**
-     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     * @return Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>
      */
     private static function makeFunctionAndRemoveExtraArgsMapper(string $newFunctionName, int $argsAtMost): Closure
     {
-        return static function (Node\Expr\FuncCall $node) use ($newFunctionName, $argsAtMost): Generator {
+        return static function (Node\Expr\FuncCall $node) use ($newFunctionName, $argsAtMost): iterable {
             yield self::mapFunctionCall($node, $newFunctionName, array_slice($node->args, 0, $argsAtMost));
         };
     }
 
     /**
-     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     * @return Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>
      */
     private static function makeConvertCaseMapper(): Closure
     {
-        return static function (Node\Expr\FuncCall $node): Generator {
+        return static function (Node\Expr\FuncCall $node): Generator { // PHPStan can't infer this from yield
             $modeValue = self::getConvertCaseModeValue($node);
 
             if ($modeValue === null) {
