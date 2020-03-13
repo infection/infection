@@ -46,7 +46,6 @@ use const PHP_SAPI;
 use function Safe\preg_match;
 use function Safe\sprintf;
 use function strtolower;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -62,6 +61,7 @@ final class CoverageChecker
     private $coveragePath;
     private $jUnitPath;
     private $frameworkAdapterName;
+    private $indexXmlCoverageReader;
 
     public function __construct(
         bool $skipCoverage,
@@ -69,7 +69,8 @@ final class CoverageChecker
         string $initialTestPhpOptions,
         string $coveragePath,
         ?string $jUnitPath,
-        string $testFrameworkAdapterName
+        string $testFrameworkAdapterName,
+        IndexXmlCoverageReader $indexXmlCoverageReader
     ) {
         $this->skipCoverage = $skipCoverage;
         $this->skipInitialTests = $skipInitialTests;
@@ -77,6 +78,7 @@ final class CoverageChecker
         $this->coveragePath = $coveragePath;
         $this->jUnitPath = $jUnitPath;
         $this->frameworkAdapterName = strtolower($testFrameworkAdapterName);
+        $this->indexXmlCoverageReader = $indexXmlCoverageReader;
     }
 
     public function checkCoverageRequirements(): void
@@ -106,7 +108,7 @@ TXT
 
     public function checkCoverageExists(): void
     {
-        $coverageIndexFilePath = $this->getCoverageIndexFilePath();
+        $coverageIndexFilePath = $this->indexXmlCoverageReader->getIndexXmlPath();
 
         if (!file_exists($coverageIndexFilePath)) {
             $message = sprintf(
@@ -156,7 +158,7 @@ TXT
     ): void {
         $errors = [];
 
-        $coverageIndexFilePath = $this->getCoverageIndexFilePath();
+        $coverageIndexFilePath = $this->indexXmlCoverageReader->getIndexXmlPath();
 
         if (!file_exists($coverageIndexFilePath)) {
             $errors[] = sprintf('- The file "%s" could not be found', $coverageIndexFilePath);
@@ -215,13 +217,6 @@ TXT
         return (bool) preg_match(
             '/(extension\s*=.*pcov.*)/mi',
             $this->initialTestPhpOptions
-        );
-    }
-
-    private function getCoverageIndexFilePath(): string
-    {
-        return Path::canonicalize(
-            (new IndexXmlCoverageReader($this->coveragePath))->getIndexXmlPath()
         );
     }
 }
