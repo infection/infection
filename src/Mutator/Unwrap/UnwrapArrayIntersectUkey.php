@@ -37,7 +37,6 @@ namespace Infection\Mutator\Unwrap;
 
 use function array_slice;
 use function count;
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
@@ -81,7 +80,7 @@ TXT
         return 'array_intersect_ukey';
     }
 
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): Generator
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_slice(
             array_keys($node->args),

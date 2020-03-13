@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Generator;
 use Infection\Logger\ExecutionResultSorter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
@@ -58,7 +57,7 @@ final class ExecutionResultSorterTest extends TestCase
         $this->assertSame($expectedResults, $executionResults);
     }
 
-    public function resultsProvider(): Generator
+    public function resultsProvider(): iterable
     {
         yield 'empty' => [[], []];
 

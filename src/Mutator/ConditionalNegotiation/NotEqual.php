@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -64,9 +63,9 @@ TXT
     /**
      * @param Node\Expr\BinaryOp\NotEqual $node
      *
-     * @return Generator<Node\Expr\BinaryOp\Equal>
+     * @return iterable<Node\Expr\BinaryOp\Equal>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
     }

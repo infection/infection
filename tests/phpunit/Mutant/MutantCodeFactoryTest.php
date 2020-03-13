@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Generator;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -84,7 +83,7 @@ final class MutantCodeFactoryTest extends TestCase
         $this->assertSame($originalNodesDump, $originalNodesDumpAfterMutation);
     }
 
-    public function mutationProvider(): Generator
+    public function mutationProvider(): iterable
     {
         yield [
             new Mutation(

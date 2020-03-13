@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
@@ -53,7 +52,7 @@ final class PlusTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates normal plus' => [
             <<<'PHP'

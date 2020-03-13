@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use Generator;
 use PhpParser\Node;
 
 /**
@@ -50,7 +49,7 @@ interface Mutator
     public function canMutate(Node $node): bool;
 
     /**
-     * @return Generator<Node|Node[]>
+     * @return iterable<Node|Node[]>
      */
-    public function mutate(Node $node): Generator;
+    public function mutate(Node $node): iterable;
 }

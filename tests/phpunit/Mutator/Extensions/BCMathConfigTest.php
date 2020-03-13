@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Extensions;
 
-use Generator;
 use Infection\Mutator\Extensions\BCMathConfig;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +79,7 @@ final class BCMathConfigTest extends TestCase
         }
     }
 
-    public function settingsProvider(): Generator
+    public function settingsProvider(): iterable
     {
         yield 'default' => [
             [],

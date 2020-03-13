@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
-use Generator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -363,7 +362,7 @@ XML
         );
     }
 
-    public function executionOrderProvider(): Generator
+    public function executionOrderProvider(): iterable
     {
         yield 'PHPUnit 7.1.99 runs without random test order' => [
             '7.1.99',

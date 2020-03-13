@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage;
 
-use Generator;
-
 final class XmlCoverageFixtures
 {
     public const FIXTURES_SRC_DIR = __DIR__ . '/../../../Files/phpunit/coverage/src';
@@ -46,18 +44,18 @@ final class XmlCoverageFixtures
     public const FIXTURES_OLD_SRC_DIR = __DIR__ . '/../../../Files/phpunit/old-coverage/src';
 
     /**
-     * @return Generator<XmlCoverageFixture>
+     * @return iterable<XmlCoverageFixture>
      */
-    public static function provideAllFixtures(): Generator
+    public static function provideAllFixtures(): iterable
     {
         yield from self::provideFixtures();
         yield from self::providePhpUnit6Fixtures();
     }
 
     /**
-     * @return Generator<XmlCoverageFixture>
+     * @return iterable<XmlCoverageFixture>
      */
-    public static function provideFixtures(): Generator
+    public static function provideFixtures(): iterable
     {
         yield new XmlCoverageFixture(
             self::FIXTURES_COVERAGE_DIR,

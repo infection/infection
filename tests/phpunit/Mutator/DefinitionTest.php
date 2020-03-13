@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use PHPUnit\Framework\TestCase;
@@ -57,7 +56,7 @@ final class DefinitionTest extends TestCase
         $this->assertSame($remedies, $definition->getRemedies());
     }
 
-    public function valuesProvider(): Generator
+    public function valuesProvider(): iterable
     {
         yield 'empty' => [
             '',

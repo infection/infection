@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
-use Generator;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 
@@ -53,7 +52,7 @@ final class PhpUnitCodeCoverageAnnotationIgnorerTest extends BaseNodeIgnorerTest
         $this->assertSame($count, $spy->nodeCounter);
     }
 
-    public function provideIgnoreCases(): Generator
+    public function provideIgnoreCases(): iterable
     {
         yield 'classes with annotation are ignored' => [
             <<<'PHP'

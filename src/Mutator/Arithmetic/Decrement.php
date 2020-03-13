@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -65,9 +64,9 @@ TXT
     /**
      * @param Node\Expr\PreDec|Node\Expr\PostDec $node
      *
-     * @return Generator<Node\Expr\PreInc|Node\Expr\PostInc>
+     * @return iterable<Node\Expr\PreInc|Node\Expr\PostInc>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         if ($node instanceof Node\Expr\PreDec) {
             yield new Node\Expr\PreInc($node->var, $node->getAttributes());

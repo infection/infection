@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Generator;
 use Infection\Logger\DebugFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
@@ -58,7 +57,7 @@ final class DebugFileLoggerTest extends TestCase
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): Generator
+    public function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(),

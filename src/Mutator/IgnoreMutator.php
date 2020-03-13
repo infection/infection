@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use DomainException;
-use Generator;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use PhpParser\Node;
@@ -97,9 +96,9 @@ final class IgnoreMutator implements Mutator
     }
 
     /**
-     * @return Generator<Node|Node[]>
+     * @return iterable<Node|Node[]>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         return $this->mutator->mutate($node);
     }

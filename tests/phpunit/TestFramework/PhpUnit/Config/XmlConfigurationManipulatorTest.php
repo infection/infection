@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 use Closure;
 use DOMDocument;
 use const E_ALL;
-use Generator;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
@@ -669,14 +668,14 @@ XML
         );
     }
 
-    public function schemaProvider(): Generator
+    public function schemaProvider(): iterable
     {
         yield 'remote XSD' => ['https://raw.githubusercontent.com/sebastianbergmann/phpunit/7.4.0/phpunit.xsd'];
 
         yield 'local XSD' => ['./vendor/phpunit/phpunit/phpunit.xsd'];
     }
 
-    public function invalidSchemaProvider(): Generator
+    public function invalidSchemaProvider(): iterable
     {
         yield 'empty' => [
             '',

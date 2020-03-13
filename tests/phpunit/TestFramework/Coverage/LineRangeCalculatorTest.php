@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Generator;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Tests\SingletonContainer;
@@ -65,7 +64,7 @@ final class LineRangeCalculatorTest extends TestCase
         $this->assertSame($nodeRange, $range);
     }
 
-    public function provideCodeAndRangeCases(): Generator
+    public function provideCodeAndRangeCases(): iterable
     {
         /* @see https://github.com/infection/infection/issues/815 */
         yield 'Code from original issue 815' => [

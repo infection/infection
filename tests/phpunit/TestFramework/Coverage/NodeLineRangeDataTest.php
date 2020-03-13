@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Generator;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -58,7 +57,7 @@ final class NodeLineRangeDataTest extends TestCase
         $this->assertSame($expected, $range->range);
     }
 
-    public function providesLineRanges(): Generator
+    public function providesLineRanges(): iterable
     {
         yield 'Single line range' => [10, 10, [10]];
 

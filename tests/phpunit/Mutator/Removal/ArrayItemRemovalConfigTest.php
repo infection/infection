@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
-use Generator;
 use Infection\Mutator\Removal\ArrayItemRemovalConfig;
 use InvalidArgumentException;
 use const PHP_INT_MAX;
@@ -99,7 +98,7 @@ final class ArrayItemRemovalConfigTest extends TestCase
         }
     }
 
-    public function settingsProvider(): Generator
+    public function settingsProvider(): iterable
     {
         yield 'default' => [
             [],

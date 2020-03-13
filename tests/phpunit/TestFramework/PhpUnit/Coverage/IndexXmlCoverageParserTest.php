@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
-use Generator;
 use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
@@ -181,7 +180,7 @@ XML;
         $this->parser->parse('/path/to/index.xml', $xml);
     }
 
-    public function coverageProvider(): Generator
+    public function coverageProvider(): iterable
     {
         yield 'nominal' => [self::getXml()];
 
@@ -226,7 +225,7 @@ XML;
         }
     }
 
-    public function noCoveredLineReportProviders(): Generator
+    public function noCoveredLineReportProviders(): iterable
     {
         yield 'zero lines executed' => [<<<'XML'
 <?xml version="1.0"?>

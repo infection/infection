@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use const DIRECTORY_SEPARATOR;
-use Generator;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Command\ConfigureCommand;
@@ -150,7 +149,7 @@ final class ProjectCodeProvider
     {
     }
 
-    public static function provideSourceClasses(): Generator
+    public static function provideSourceClasses(): iterable
     {
         if (self::$sourceClasses !== null) {
             yield from self::$sourceClasses;
@@ -183,14 +182,14 @@ final class ProjectCodeProvider
         yield from self::$sourceClasses;
     }
 
-    public static function sourceClassesProvider(): Generator
+    public static function sourceClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::provideSourceClasses()
         );
     }
 
-    public static function provideConcreteSourceClasses(): Generator
+    public static function provideConcreteSourceClasses(): iterable
     {
         yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(
             self::provideSourceClasses(),
@@ -198,14 +197,14 @@ final class ProjectCodeProvider
         ));
     }
 
-    public static function concreteSourceClassesProvider(): Generator
+    public static function concreteSourceClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::provideConcreteSourceClasses()
         );
     }
 
-    public static function provideSourceClassesToCheckForPublicProperties(): Generator
+    public static function provideSourceClassesToCheckForPublicProperties(): iterable
     {
         if (self::$sourceClassesToCheckForPublicProperties !== null) {
             yield from self::$sourceClassesToCheckForPublicProperties;
@@ -237,14 +236,14 @@ final class ProjectCodeProvider
         yield from self::$sourceClassesToCheckForPublicProperties;
     }
 
-    public static function sourceClassesToCheckForPublicPropertiesProvider(): Generator
+    public static function sourceClassesToCheckForPublicPropertiesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::provideSourceClassesToCheckForPublicProperties()
         );
     }
 
-    public static function provideTestClasses(): Generator
+    public static function provideTestClasses(): iterable
     {
         if (self::$testClasses !== null) {
             yield from self::$testClasses;
@@ -287,21 +286,21 @@ final class ProjectCodeProvider
 
     // "testClassesProvider" would be more correct but PHPUnit will then detect this method as a
     // test instead of a test provider.
-    public static function classesTestProvider(): Generator
+    public static function classesTestProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::provideTestClasses()
         );
     }
 
-    public static function nonTestedConcreteClassesProvider(): Generator
+    public static function nonTestedConcreteClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::NON_TESTED_CONCRETE_CLASSES
         );
     }
 
-    public static function nonFinalExtensionClasses(): Generator
+    public static function nonFinalExtensionClasses(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::NON_FINAL_EXTENSION_CLASSES

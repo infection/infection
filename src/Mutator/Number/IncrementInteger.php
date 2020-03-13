@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
@@ -60,9 +59,9 @@ final class IncrementInteger extends AbstractNumberMutator
     /**
      * @param Node\Scalar\LNumber $node
      *
-     * @return Generator<Node\Scalar\LNumber>
+     * @return iterable<Node\Scalar\LNumber>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Scalar\LNumber($node->value + 1);
     }
