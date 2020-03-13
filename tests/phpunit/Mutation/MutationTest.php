@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use function array_merge;
-use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -66,6 +65,7 @@ final class MutationTest extends TestCase
         int $mutationByMutatorIndex,
         array $tests,
         array $expectedAttributes,
+        int $expectedOriginalStartingLine,
         bool $expectedCoveredByTests,
         string $expectedHash
     ): void {
@@ -84,6 +84,7 @@ final class MutationTest extends TestCase
         $this->assertSame($originalFileAst, $mutation->getOriginalFileAst());
         $this->assertSame($mutatorName, $mutation->getMutatorName());
         $this->assertSame($expectedAttributes, $mutation->getAttributes());
+        $this->assertSame($expectedOriginalStartingLine, $mutation->getOriginalStartingLine());
         $this->assertSame($mutatedNodeClass, $mutation->getMutatedNodeClass());
         $this->assertSame($mutatedNode, $mutation->getMutatedNode());
         $this->assertSame($tests, $mutation->getAllTests());
@@ -92,10 +93,10 @@ final class MutationTest extends TestCase
         $this->assertSame($expectedHash, $mutation->getHash());
     }
 
-    public function valuesProvider(): Generator
+    public function valuesProvider(): iterable
     {
         $nominalAttributes = [
-            'startLine' => 3,
+            'startLine' => $originalStartingLine = 3,
             'endLine' => 5,
             'startTokenPos' => 21,
             'endTokenPos' => 31,
@@ -113,6 +114,7 @@ final class MutationTest extends TestCase
             -1,
             [],
             $nominalAttributes,
+            $originalStartingLine,
             false,
             md5('_Plus_-1_3_5_21_31_43_53'),
         ];
@@ -136,6 +138,7 @@ final class MutationTest extends TestCase
                 ),
             ],
             $nominalAttributes,
+            $originalStartingLine,
             true,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
@@ -159,6 +162,7 @@ final class MutationTest extends TestCase
                 ),
             ],
             $nominalAttributes,
+            $originalStartingLine,
             true,
             md5('/path/to/acme/Foo.php_Plus_99_3_5_21_31_43_53'),
         ];
@@ -182,6 +186,7 @@ final class MutationTest extends TestCase
                 ),
             ],
             $nominalAttributes,
+            $originalStartingLine,
             true,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
@@ -199,6 +204,7 @@ final class MutationTest extends TestCase
             0,
             [],
             $nominalAttributes,
+            $originalStartingLine,
             false,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
@@ -225,6 +231,7 @@ final class MutationTest extends TestCase
                 ),
             ],
             $nominalAttributes,
+            $originalStartingLine,
             true,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];

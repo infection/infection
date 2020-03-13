@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Entry;
 
-use Generator;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use PHPUnit\Framework\TestCase;
@@ -86,7 +85,7 @@ final class LogsTest extends TestCase
         );
     }
 
-    public function valuesProvider(): Generator
+    public function valuesProvider(): iterable
     {
         yield 'minimal' => [
             null,

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
@@ -75,7 +74,7 @@ final class MutantTest extends TestCase
         );
     }
 
-    public function valuesProvider(): Generator
+    public function valuesProvider(): iterable
     {
         $nominalAttributes = [
             'startLine' => 3,

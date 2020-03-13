@@ -33,24 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
-use PHPUnit\Framework\TestCase;
+use const DIRECTORY_SEPARATOR;
+use function Safe\file_get_contents;
 
-final class NoLineExecutedTest extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class IndexXmlCoverageReader
 {
-    public function test_it_can_create_an_instance(): void
+    private const COVERAGE_INDEX_FILE_NAME = 'index.xml';
+
+    private $coverageDir;
+
+    public function __construct(string $coverageDir)
     {
-        $exception = NoLineExecuted::create();
+        $this->coverageDir = $coverageDir;
+    }
 
-        $expectedMessage = <<<'MSG'
-No line of code was executed during tests. This could be due to "@covers" annotations or your
-PHPUnit filters not being set up correctly.
-MSG;
+    public function getIndexXmlPath(): string
+    {
+        return $this->coverageDir . DIRECTORY_SEPARATOR . self::COVERAGE_INDEX_FILE_NAME;
+    }
 
-        $this->assertSame($expectedMessage, $exception->getMessage());
-        $this->assertSame(0, $exception->getCode());
-        $this->assertNull($exception->getPrevious());
+    public function getIndexXmlContent(): string
+    {
+        return file_get_contents($this->getIndexXmlPath());
     }
 }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\Process\MutantProcess;
 use InvalidArgumentException;
 use function Safe\sort;
 use function Safe\sprintf;
@@ -132,32 +131,32 @@ class MetricsCalculator
             ++$this->totalMutantsCount;
             $this->allExecutionResults->add($executionResult);
 
-            switch ($executionResult->getProcessResultCode()) {
-                case MutantProcess::CODE_KILLED:
+            switch ($executionResult->getDetectionStatus()) {
+                case DetectionStatus::KILLED:
                     $this->killedCount++;
                     $this->killedExecutionResults->add($executionResult);
 
                     break;
 
-                case MutantProcess::CODE_NOT_COVERED:
+                case DetectionStatus::NOT_COVERED:
                     $this->notCoveredByTestsCount++;
                     $this->notCoveredExecutionResults->add($executionResult);
 
                     break;
 
-                case MutantProcess::CODE_ESCAPED:
+                case DetectionStatus::ESCAPED:
                     $this->escapedCount++;
                     $this->escapedExecutionResults->add($executionResult);
 
                     break;
 
-                case MutantProcess::CODE_TIMED_OUT:
+                case DetectionStatus::TIMED_OUT:
                     $this->timedOutCount++;
                     $this->timedOutExecutionResults->add($executionResult);
 
                     break;
 
-                case MutantProcess::CODE_ERROR:
+                case DetectionStatus::ERROR:
                     $this->errorCount++;
                     $this->errorExecutionResults->add($executionResult);
 
@@ -166,7 +165,7 @@ class MetricsCalculator
                 default:
                     throw new InvalidArgumentException(sprintf(
                         'Unknown execution result process result code "%s"',
-                        $executionResult->getProcessResultCode()
+                        $executionResult->getDetectionStatus()
                     ));
             }
         }

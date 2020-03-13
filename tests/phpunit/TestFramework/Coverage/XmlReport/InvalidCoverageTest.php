@@ -33,32 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\SourceFileDataProvider;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class FileCodeCoverageProviderFactory
+final class InvalidCoverageTest extends TestCase
 {
-    private $coverageDir;
-    private $coverageXmlParser;
-
-    public function __construct(
-        string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser
-    ) {
-        $this->coverageDir = $coverageDir;
-        $this->coverageXmlParser = $coverageXmlParser;
-    }
-
-    public function create(): SourceFileDataProvider
+    public function test_it_can_be_instantiated(): void
     {
-        return new PhpUnitXmlCoveredFileDataProvider(
-            $this->coverageDir,
-            $this->coverageXmlParser
-        );
+        $exception = new InvalidCoverage('Hello', 12);
+
+        $this->assertSame('Hello', $exception->getMessage());
+        $this->assertSame(12, $exception->getCode());
     }
 }

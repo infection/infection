@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
 use DOMNodeList;
@@ -46,30 +46,26 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class XmlCoverageParser
+class XmlCoverageParser
 {
-    private $provider;
-
-    public function __construct(SourceFileInfoProvider $provider)
+    public function __construct()
     {
-        $this->provider = $provider;
     }
 
-    public function parse(): SourceFileData
+    public function parse(SourceFileInfoProvider $provider): SourceFileData
     {
         return new SourceFileData(
-            $this->provider->provideFileInfo(),
-            $this->lazilyRetrieveCoverageReport(
-                $this->provider->provideXPath()
-            )
+            $provider->provideFileInfo(),
+            self::createCoverageReportGenerator($provider->provideXPath())
         );
     }
 
     /**
      * @return iterable<CoverageReport>
      */
-    private static function lazilyRetrieveCoverageReport(SafeDOMXPath $xPath): iterable
+    private static function createCoverageReportGenerator(SafeDOMXPath $xPath): iterable
     {
         yield self::retrieveCoverageReport($xPath);
     }

@@ -33,29 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Generator;
-use Infection\TestFramework\Coverage\CoverageReport;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
-use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
-use Infection\Tests\Fixtures\TestFramework\LegacyXmlCoverageParserAdapter;
-use Infection\Tests\TestFramework\Coverage\CoverageHelper;
+use function array_diff;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
+use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
+use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
-use function Pipeline\take;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
 use function Safe\sprintf;
 use function str_replace;
+use Traversable;
 use Webmozart\PathUtil\Path;
 
 /**
  * @group integration
- * @covers \Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser
- * @covers \Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider
- * @covers \Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser
  */
 final class IndexXmlCoverageParserTest extends TestCase
 {
@@ -65,33 +62,15 @@ final class IndexXmlCoverageParserTest extends TestCase
     private static $xml;
 
     /**
-     * @var LegacyXmlCoverageParserAdapter
+     * @var IndexXmlCoverageParser
      */
     private $parser;
 
     protected function setUp(): void
     {
-        $this->parser = new LegacyXmlCoverageParserAdapter(
-            new IndexXmlCoverageParser(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR)
+        $this->parser = new IndexXmlCoverageParser(
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
-    }
-
-    public static function getXml(): string
-    {
-        if (self::$xml !== null) {
-            return self::$xml;
-        }
-
-        $xml = file_get_contents(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/index.xml');
-
-        // Replaces dummy source path with the real path
-        self::$xml = preg_replace(
-            '/(source=\").*?(\")/',
-            sprintf('$1%s$2', realpath(XmlCoverageFixtures::FIXTURES_SRC_DIR)),
-            $xml
-        );
-
-        return self::$xml;
     }
 
     /**
@@ -99,23 +78,26 @@ final class IndexXmlCoverageParserTest extends TestCase
      */
     public function test_it_collects_data_recursively_for_all_files(string $xml): void
     {
-        $coverage = $this->parser->parse($xml);
+        $sourceFilesData = $this->parser->parse('/path/to/index.xml', $xml);
 
         // zeroLevel + noPercentage + firstLevel + secondLevel
-        $this->assertCount(5, $coverage);
+        $this->assertCount(5, $sourceFilesData);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file(): void
     {
-        $coverage = $this->parser->parse(preg_replace(
-            '/percent=".*"/',
-            '',
-            self::getXml()
-        ));
+        $sourceFilesData = $this->parser->parse(
+            '/path/to/index.xml',
+            preg_replace(
+                '/percent=".*"/',
+                '',
+                self::getXml()
+            )
+        );
 
         $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::provideFixtures(),
-            $coverage
+            $sourceFilesData
         );
     }
 
@@ -143,24 +125,27 @@ final class IndexXmlCoverageParserTest extends TestCase
 </phpunit>
 XML;
 
-        $coverage = $this->parser->parse($xml);
+        $sourceFilesData = $this->parser->parse('/path/to/index.xml', $xml);
 
-        $this->assertSame([], $coverage);
+        $this->assertCoverageFixtureSame([], $sourceFilesData);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file_for_old_phpunit_versions(): void
     {
-        $coverage = (new LegacyXmlCoverageParserAdapter(
-            new IndexXmlCoverageParser(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR)
-        ))->parse(str_replace(
-            '/path/to/src',
-            realpath(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
-            file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml')
-        ));
+        $sourceFilesData = (new IndexXmlCoverageParser(
+            XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR
+        ))->parse(
+            '/path/to/index.xml',
+            str_replace(
+                '/path/to/src',
+                realpath(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
+                file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml')
+            )
+        );
 
         $this->assertCoverageFixtureSame(
-            XmlCoverageFixtures::provideLegacyFormatFixtures(),
-            $coverage
+            XmlCoverageFixtures::providePhpUnit6Fixtures(),
+            $sourceFilesData
         );
     }
 
@@ -171,10 +156,10 @@ XML;
     {
         $this->expectException(NoLineExecuted::class);
 
-        $this->parser->parse($xml);
+        $this->parser->parse('/path/to/index.xml', $xml);
     }
 
-    public function coverageProvider(): Generator
+    public function coverageProvider(): iterable
     {
         yield 'nominal' => [self::getXml()];
 
@@ -187,7 +172,7 @@ XML;
         ];
     }
 
-    public function noCoveredLineReportProviders(): Generator
+    public function noCoveredLineReportProviders(): iterable
     {
         yield 'zero lines executed' => [<<<'XML'
 <?xml version="1.0"?>
@@ -235,49 +220,60 @@ XML
         ];
     }
 
-    public function test_it_errors_when_the_source_file_could_not_be_found(): void
+    private static function getXml(): string
     {
-        $incorrectCoverageSrcDir = Path::canonicalize(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
+        if (self::$xml !== null) {
+            return self::$xml;
+        }
+
+        $xml = file_get_contents(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/index.xml');
 
         // Replaces dummy source path with the real path
-        $xml = preg_replace(
+        self::$xml = preg_replace(
             '/(source=\").*?(\")/',
-            sprintf('$1%s$2', $incorrectCoverageSrcDir),
-            file_get_contents(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/coverage-xml/index.xml')
+            sprintf('$1%s$2', realpath(XmlCoverageFixtures::FIXTURES_SRC_DIR)),
+            $xml
         );
 
-        try {
-            $this->parser->parse($xml);
+        return self::$xml;
+    }
 
-            $this->fail();
-        } catch (InvalidCoverage $exception) {
-            $this->assertSame(
-                sprintf(
-                    'Could not find the source file "%s/zeroLevel.php" referred by '
-                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
-                    $incorrectCoverageSrcDir,
-                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR)
-                ),
-                $exception->getMessage()
-            );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
+    /**
+     * @param iterable<XmlCoverageFixture> $coverageFixtures
+     * @param iterable<SourceFileInfoProvider> $sourceFilesData
+     */
+    private function assertCoverageFixtureSame(
+        iterable $coverageFixtures,
+        iterable $sourceFilesData
+    ): void {
+        $this->assertSame([], array_diff(
+            // Fixtures are not expected to be in any particular order
+            iterator_to_array(self::xmlCoverageFixturesToList($coverageFixtures), false),
+            iterator_to_array(self::sourceFileInfoProvidersToList($sourceFilesData), false),
+        ));
+    }
+
+    /**
+     * @param iterable<SourceFileInfoProvider> $sourceFilesData
+     *
+     * @return Traversable<string>
+     */
+    private static function sourceFileInfoProvidersToList(iterable $sourceFilesData): Traversable
+    {
+        foreach ($sourceFilesData as $provider) {
+            yield $provider->provideFileInfo()->getPathname();
         }
     }
 
     /**
      * @param iterable<XmlCoverageFixture> $fixtures
-     * @param array<string, CoverageReport> $coverage
+     *
+     * @return Traversable<string>
      */
-    private function assertCoverageFixtureSame(iterable $fixtures, iterable $coverage): void
+    private static function xmlCoverageFixturesToList(iterable $fixtures): Traversable
     {
-        $preparedFixtures = take($fixtures)->map(static function (XmlCoverageFixture $fixture) {
-            yield $fixture->sourceFilePath => $fixture->serializedCoverage;
-        });
-
-        $this->assertSame(
-            iterator_to_array($preparedFixtures, true),
-            CoverageHelper::convertToArray($coverage)
-        );
+        foreach ($fixtures as $fixture) {
+            yield $fixture->sourceFilePath;
+        }
     }
 }

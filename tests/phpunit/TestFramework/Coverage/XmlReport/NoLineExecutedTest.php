@@ -33,42 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use DOMDocument;
-use Infection\TestFramework\SafeDOMXPath;
-use function Safe\preg_replace;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class XPathFactory
+final class NoLineExecutedTest extends TestCase
 {
-    private function __construct()
+    public function test_it_can_create_an_instance(): void
     {
-    }
+        $exception = NoLineExecuted::create();
 
-    public static function createXPath(string $coverageContent): SafeDOMXPath
-    {
-        $document = new DOMDocument();
-        $success = @$document->loadXML(self::removeNamespace($coverageContent));
+        $expectedMessage = <<<'MSG'
+No line of code was executed during tests. This could be due to "@covers" annotations or your
+PHPUnit filters not being set up correctly.
+MSG;
 
-        Assert::true($success);
-
-        return new SafeDOMXPath($document);
-    }
-
-    /**
-     * Remove namespace to work with xPath without a headache
-     */
-    private static function removeNamespace(string $xml): string
-    {
-        /** @var string $cleanedXml */
-        $cleanedXml = preg_replace('/xmlns=\".*?\"/', '', $xml);
-
-        Assert::string($cleanedXml);
-
-        return $cleanedXml;
+        $this->assertSame($expectedMessage, $exception->getMessage());
+        $this->assertSame(0, $exception->getCode());
+        $this->assertNull($exception->getPrevious());
     }
 }

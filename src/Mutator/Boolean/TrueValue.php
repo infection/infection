@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use function array_key_exists;
-use Generator;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
@@ -76,9 +75,9 @@ final class TrueValue implements ConfigurableMutator
     /**
      * @param Node\Expr\ConstFetch $node
      *
-     * @return Generator<Node\Expr\ConstFetch>
+     * @return iterable<Node\Expr\ConstFetch>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Expr\ConstFetch(new Node\Name('false'));
     }

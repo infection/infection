@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Http;
 
-use Generator;
 use Infection\Http\Response;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -67,7 +66,7 @@ final class ResponseTest extends TestCase
         }
     }
 
-    public function valueProvider(): Generator
+    public function valueProvider(): iterable
     {
         yield 'empty' => [200, ''];
 

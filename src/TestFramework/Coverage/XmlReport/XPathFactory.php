@@ -33,20 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\PhpUnit\Coverage\XPathFactory;
-use PHPUnit\Framework\TestCase;
+use DOMDocument;
+use Infection\TestFramework\SafeDOMXPath;
+use function Safe\preg_replace;
+use Webmozart\Assert\Assert;
 
 /**
- * @covers \Infection\TestFramework\PhpUnit\Coverage\XPathFactory
+ * @internal
  */
-final class XPathFactoryTest extends TestCase
+final class XPathFactory
 {
-    public function test_it_removes_namespace(): void
+    private function __construct()
     {
-        $xPath = XPathFactory::createXPath('<?xml version="1.0"?><phpunit xmlns="http://schema.phpunit.de/coverage/1.0"></phpunit>');
+    }
 
-        $this->assertStringNotContainsString('xmlns', $xPath->document->saveXML());
+    public static function createXPath(string $coverageContent): SafeDOMXPath
+    {
+        $document = new DOMDocument();
+        $success = @$document->loadXML(self::removeNamespace($coverageContent));
+
+        Assert::true($success);
+
+        return new SafeDOMXPath($document);
+    }
+
+    /**
+     * Remove namespace to work with xPath without a headache
+     */
+    private static function removeNamespace(string $xml): string
+    {
+        /** @var string $cleanedXml */
+        $cleanedXml = preg_replace('/xmlns=\".*?\"/', '', $xml);
+
+        Assert::string($cleanedXml);
+
+        return $cleanedXml;
     }
 }

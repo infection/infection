@@ -33,35 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\CoverageReport;
-use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
-use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
-use Infection\TestFramework\PhpUnit\Coverage\XPathFactory;
+use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
+use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
+use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @group integration
- * @covers \Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser
  */
 final class XmlCoverageParserTest extends TestCase
 {
-    public static function sourceFileInfoProviderProvider(): iterable
+    /**
+     * @var XmlCoverageParser
+     */
+    private $parser;
+
+    protected function setUp(): void
     {
-        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
-            yield [
-                new SourceFileInfoProvider(
-                    $fixture->coverageDir,
-                    $fixture->relativeCoverageFilePath,
-                    $fixture->projectSource
-                ),
-                $fixture->serializedCoverage,
-                $fixture->sourceFilePath,
-            ];
-        }
+        $this->parser = new XmlCoverageParser();
     }
 
     /**
@@ -71,13 +66,14 @@ final class XmlCoverageParserTest extends TestCase
      */
     public function test_it_reads_every_type_of_fixture(
         SourceFileInfoProvider $provider,
-        array $expectedCoverage,
-        string $sourceFilePath
+        array $expectedCoverage
     ): void {
-        $parser = new XmlCoverageParser($provider);
-        $fileData = $parser->parse();
+        $fileData = $this->parser->parse($provider);
 
-        $this->assertSame($fileData->getSplFileInfo()->getRealPath(), $provider->provideFileInfo()->getRealPath());
+        $this->assertSame(
+            $fileData->getSplFileInfo()->getRealPath(),
+            $provider->provideFileInfo()->getRealPath()
+        );
 
         $coverageData = $fileData->retrieveCoverageReport();
 
@@ -102,7 +98,10 @@ final class XmlCoverageParserTest extends TestCase
 </phpunit>
 XML;
 
-        $coverageData = $this->parseXml($xml);
+        $coverageData = $this->parser
+            ->parse($this->createSourceFileInfoProvider($xml))
+            ->retrieveCoverageReport()
+        ;
 
         $this->assertSame([], $coverageData->byLine);
         $this->assertSame([], $coverageData->byMethod);
@@ -126,7 +125,10 @@ XML;
 </phpunit>
 XML;
 
-        $coverageData = $this->parseXml($xml);
+        $coverageData = $this->parser
+            ->parse($this->createSourceFileInfoProvider($xml))
+            ->retrieveCoverageReport()
+        ;
 
         $this->assertArrayHasKey(11, $coverageData->byLine);
     }
@@ -149,12 +151,33 @@ XML;
 </phpunit>
 XML;
 
-        $coverageData = $this->parseXml($xml);
+        $coverageData = $this->parser
+            ->parse($this->createSourceFileInfoProvider($xml))
+            ->retrieveCoverageReport()
+        ;
 
         $this->assertArrayNotHasKey(11, $coverageData->byLine);
     }
 
-    private function parseXml(string $xml): CoverageReport
+    public function sourceFileInfoProviderProvider(): iterable
+    {
+        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
+            yield [
+                new SourceFileInfoProvider(
+                    '/path/to/index.xml',
+                    $fixture->coverageDir,
+                    $fixture->relativeCoverageFilePath,
+                    $fixture->projectSource
+                ),
+                $fixture->serializedCoverage,
+            ];
+        }
+    }
+
+    /**
+     * @return SourceFileInfoProvider|MockObject
+     */
+    private function createSourceFileInfoProvider(string $xml)
     {
         $xPath = XPathFactory::createXPath($xml);
 
@@ -163,16 +186,15 @@ XML;
         $providerMock
             ->expects($this->once())
             ->method('provideFileInfo')
-            ->willReturn($this->createMock(SplFileInfo::class));
+            ->willReturn($this->createMock(SplFileInfo::class))
+        ;
 
         $providerMock
             ->expects($this->once())
             ->method('provideXPath')
-            ->willReturn($xPath);
+            ->willReturn($xPath)
+        ;
 
-        $parser = new XmlCoverageParser($providerMock);
-        $fileData = $parser->parse();
-
-        return $fileData->retrieveCoverageReport();
+        return $providerMock;
     }
 }

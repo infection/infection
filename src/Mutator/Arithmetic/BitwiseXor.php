@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -61,9 +60,9 @@ final class BitwiseXor implements Mutator
     /**
      * @param Node\Expr\BinaryOp\BitwiseXor $node
      *
-     * @return Generator<Node\Expr\BinaryOp\BitwiseAnd>
+     * @return iterable<Node\Expr\BinaryOp\BitwiseAnd>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Expr\BinaryOp\BitwiseAnd($node->left, $node->right, $node->getAttributes());
     }

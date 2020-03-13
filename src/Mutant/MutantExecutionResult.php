@@ -48,7 +48,7 @@ class MutantExecutionResult
 {
     private $processCommandLine;
     private $processOutput;
-    private $processResultCode;
+    private $detectionStatus;
     private $mutantDiff;
     private $mutatorName;
     private $originalFilePath;
@@ -57,18 +57,18 @@ class MutantExecutionResult
     public function __construct(
         string $processCommandLine,
         string $processOutput,
-        int $processResultCode,
+        string $detectionStatus,
         string $mutantDiff,
         string $mutatorName,
         string $originalFilePath,
         int $originalStartingLine
     ) {
-        Assert::oneOf($processResultCode, MutantProcess::RESULT_CODES);
+        Assert::oneOf($detectionStatus, DetectionStatus::ALL);
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
         $this->processCommandLine = $processCommandLine;
         $this->processOutput = $processOutput;
-        $this->processResultCode = $processResultCode;
+        $this->detectionStatus = $detectionStatus;
         $this->mutantDiff = $mutantDiff;
         $this->mutatorName = $mutatorName;
         $this->originalFilePath = $originalFilePath;
@@ -82,12 +82,11 @@ class MutantExecutionResult
         return new self(
             '',
             '',
-            MutantProcess::CODE_NOT_COVERED,
+            DetectionStatus::NOT_COVERED,
             $mutant->getDiff(),
             $mutant->getMutation()->getMutatorName(),
             $mutation->getOriginalFilePath(),
-            // TODO: move this in Mutation?
-            (int) $mutation->getAttributes()['startLine']
+            $mutation->getOriginalStartingLine()
         );
     }
 
@@ -95,15 +94,16 @@ class MutantExecutionResult
     {
         $process = $mutantProcess->getProcess();
         $mutant = $mutantProcess->getMutant();
+        $mutation = $mutant->getMutation();
 
         return new self(
             $process->getCommandLine(),
-            $process->isStarted() ? $process->getOutput() : '',
-            $mutantProcess->getResultCode(),
+            $mutantProcess->retrieveProcessOutput(),
+            $mutantProcess->retrieveDetectionStatus(),
             $mutant->getDiff(),
-            $mutant->getMutation()->getMutatorName(),
-            $mutantProcess->getOriginalFilePath(),
-            $mutantProcess->getOriginalStartingLine()
+            $mutation->getMutatorName(),
+            $mutation->getOriginalFilePath(),
+            $mutation->getOriginalStartingLine()
         );
     }
 
@@ -117,9 +117,9 @@ class MutantExecutionResult
         return $this->processOutput;
     }
 
-    public function getProcessResultCode(): int
+    public function getDetectionStatus(): string
     {
-        return $this->processResultCode;
+        return $this->detectionStatus;
     }
 
     public function getMutantDiff(): string

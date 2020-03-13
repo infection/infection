@@ -33,15 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage;
 
 final class XmlCoverageFixtures
 {
-    public const FIXTURES_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/src';
-    public const FIXTURES_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
-    public const FIXTURES_INCORRECT_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-incomplete';
-    public const FIXTURES_OLD_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/old-coverage/coverage-xml';
-    public const FIXTURES_OLD_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/old-coverage/src';
+    public const FIXTURES_SRC_DIR = __DIR__ . '/../../../Files/phpunit/coverage/src';
+    public const FIXTURES_COVERAGE_DIR = __DIR__ . '/../../../Files/phpunit/coverage/coverage-xml';
+    public const FIXTURES_INCORRECT_COVERAGE_DIR = __DIR__ . '/../../../Files/phpunit/coverage-incomplete';
+    public const FIXTURES_OLD_COVERAGE_DIR = __DIR__ . '/../../../Files/phpunit/old-coverage/coverage-xml';
+    public const FIXTURES_OLD_SRC_DIR = __DIR__ . '/../../../Files/phpunit/old-coverage/src';
 
     /**
      * @return iterable<XmlCoverageFixture>
@@ -49,7 +49,7 @@ final class XmlCoverageFixtures
     public static function provideAllFixtures(): iterable
     {
         yield from self::provideFixtures();
-        yield from self::provideLegacyFormatFixtures();
+        yield from self::providePhpUnit6Fixtures();
     }
 
     /**
@@ -208,7 +208,7 @@ final class XmlCoverageFixtures
     /**
      * @return iterable<XmlCoverageFixture>
      */
-    public static function provideLegacyFormatFixtures(): iterable
+    public static function providePhpUnit6Fixtures(): iterable
     {
         yield new XmlCoverageFixture(
             self::FIXTURES_OLD_COVERAGE_DIR,

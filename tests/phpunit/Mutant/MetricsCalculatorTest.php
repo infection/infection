@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use function array_merge;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 
@@ -76,27 +76,27 @@ final class MetricsCalculatorTest extends TestCase
 
         $expectedKilledResults = $this->addMutantExecutionResult(
             $calculator,
-            MutantProcess::CODE_KILLED,
+            DetectionStatus::KILLED,
             7
         );
         $expectedErrorResults = $this->addMutantExecutionResult(
             $calculator,
-            MutantProcess::CODE_ERROR,
+            DetectionStatus::ERROR,
             2
         );
         $expectedEscapedResults = $this->addMutantExecutionResult(
             $calculator,
-            MutantProcess::CODE_ESCAPED,
+            DetectionStatus::ESCAPED,
             2
         );
         $expectedTimedOutResults = $this->addMutantExecutionResult(
             $calculator,
-            MutantProcess::CODE_TIMED_OUT,
+            DetectionStatus::TIMED_OUT,
             2
         );
         $expectedNotCoveredResults = $this->addMutantExecutionResult(
             $calculator,
-            MutantProcess::CODE_NOT_COVERED,
+            DetectionStatus::NOT_COVERED,
             1
         );
 
@@ -141,7 +141,7 @@ final class MetricsCalculatorTest extends TestCase
 
         $expectedKilledResults = $this->addMutantExecutionResult(
             $calculator,
-            MutantProcess::CODE_KILLED,
+            DetectionStatus::KILLED,
             1
         );
 
@@ -158,13 +158,13 @@ final class MetricsCalculatorTest extends TestCase
      */
     private function addMutantExecutionResult(
         MetricsCalculator $calculator,
-        int $resultCode,
+        string $detectionStatus,
         int $count
     ): array {
         $executionResults = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $executionResults[] = $this->createMutantExecutionResult($resultCode);
+            $executionResults[] = $this->createMutantExecutionResult($detectionStatus);
         }
 
         $calculator->collect(...$executionResults);
@@ -172,7 +172,7 @@ final class MetricsCalculatorTest extends TestCase
         return $executionResults;
     }
 
-    private function createMutantExecutionResult(int $resultCode): MutantExecutionResult
+    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
     {
         $id = $this->id;
         ++$this->id;
@@ -180,7 +180,7 @@ final class MetricsCalculatorTest extends TestCase
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
-            $resultCode,
+            $detectionStatus,
             str_replace(
                 "\n",
                 PHP_EOL,

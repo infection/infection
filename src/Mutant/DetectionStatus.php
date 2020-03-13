@@ -33,23 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Mutant;
 
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProviderFactory;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use PHPUnit\Framework\TestCase;
-
-final class FileCodeCoverageProviderFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final class DetectionStatus
 {
-    public function test_it_can_create_an_XMLLine_code_coverage_instance(): void
-    {
-        // We cannot test much of the generated instance here since it does not exposes any state.
-        // We can only ensure that an instance is created in all scenarios
-        (new FileCodeCoverageProviderFactory(
-            '/path/to/coverage/dir',
-            $this->createMock(IndexXmlCoverageParser::class)
-        ))->create();
+    public const KILLED = 'killed';
+    public const ESCAPED = 'escaped';
+    public const ERROR = 'error';
+    public const TIMED_OUT = 'timed out';
+    public const NOT_COVERED = 'not covered';
 
-        $this->addToAssertionCount(1);
-    }
+    public const ALL = [
+        self::KILLED,
+        self::ESCAPED,
+        self::ERROR,
+        self::TIMED_OUT,
+        self::NOT_COVERED,
+    ];
 }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
-use Generator;
 use Infection\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -52,7 +51,7 @@ final class StrTest extends TestCase
         );
     }
 
-    public function stringProvider(): Generator
+    public function stringProvider(): iterable
     {
         yield 'empty' => [
             '',

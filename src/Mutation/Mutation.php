@@ -137,6 +137,11 @@ class Mutation
         return $this->attributes;
     }
 
+    public function getOriginalStartingLine(): int
+    {
+        return (int) $this->attributes['startLine'];
+    }
+
     public function getMutatedNodeClass(): string
     {
         return $this->mutatedNodeClass;

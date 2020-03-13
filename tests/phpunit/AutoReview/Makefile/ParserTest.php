@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Makefile;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 
 final class ParserTest extends TestCase
@@ -50,7 +49,7 @@ final class ParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function makefileContentProvider(): Generator
+    public function makefileContentProvider(): iterable
     {
         yield [
             <<<'MAKEFILE'

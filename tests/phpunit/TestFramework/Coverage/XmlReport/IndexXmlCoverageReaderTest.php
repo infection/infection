@@ -33,21 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use UnexpectedValueException;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @internal
+ * @group integration
  */
-final class NoLineExecuted extends UnexpectedValueException
+final class IndexXmlCoverageReaderTest extends TestCase
 {
-    public static function create(): self
+    private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
+
+    public function test_it(): void
     {
-        return new self(<<<'MSG'
-No line of code was executed during tests. This could be due to "@covers" annotations or your
-PHPUnit filters not being set up correctly.
-MSG
-        );
+        $reader = new IndexXmlCoverageReader(self::COVERAGE_DIR);
+
+        $this->assertStringStartsWith(self::COVERAGE_DIR, $reader->getIndexXmlPath());
+        $this->assertStringEndsWith('index.xml', $reader->getIndexXmlPath());
+
+        $this->assertStringEqualsFile(self::COVERAGE_DIR . '/index.xml', $reader->getIndexXmlContent());
     }
 }

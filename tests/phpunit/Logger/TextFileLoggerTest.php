@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Generator;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
@@ -83,7 +82,7 @@ final class TextFileLoggerTest extends TestCase
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function emptyMetricsProvider(): Generator
+    public function emptyMetricsProvider(): iterable
     {
         yield 'no debug verbosity; no debug mode' => [
             false,
@@ -234,7 +233,7 @@ TXT
         ];
     }
 
-    public function completeMetricsProvider(): Generator
+    public function completeMetricsProvider(): iterable
     {
         yield 'no debug verbosity; no debug mode' => [
             false,

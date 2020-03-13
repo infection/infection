@@ -33,18 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
-use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
-final class InvalidCoverageTest extends TestCase
+/**
+ * @internal
+ */
+final class NoLineExecuted extends UnexpectedValueException
 {
-    public function test_it_can_be_instantiated(): void
+    public static function create(): self
     {
-        $exception = new InvalidCoverage('Hello', 12);
-
-        $this->assertSame('Hello', $exception->getMessage());
-        $this->assertSame(12, $exception->getCode());
+        return new self(<<<'MSG'
+No line of code was executed during tests. This could be due to "@covers" annotations or your
+PHPUnit filters not being set up correctly.
+MSG
+        );
     }
 }

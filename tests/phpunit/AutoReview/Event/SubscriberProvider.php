@@ -37,7 +37,6 @@ namespace Infection\Tests\AutoReview\Event;
 
 use function array_filter;
 use function array_values;
-use Generator;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use function Infection\Tests\generator_to_phpunit_data_provider;
@@ -55,7 +54,7 @@ final class SubscriberProvider
     {
     }
 
-    public static function provideSubscriberClasses(): Generator
+    public static function provideSubscriberClasses(): iterable
     {
         if (self::$subscriberClasses !== null) {
             yield from self::$subscriberClasses;
@@ -75,7 +74,7 @@ final class SubscriberProvider
         yield from self::$subscriberClasses;
     }
 
-    public static function subscriberClassesProvider(): Generator
+    public static function subscriberClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(self::provideSubscriberClasses());
     }

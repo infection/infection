@@ -33,37 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\Mutant\MutantExecutionResult;
-use function Safe\usort;
+use InvalidArgumentException;
 
 /**
  * @internal
  */
-final class ExecutionResultSorter
+final class InvalidCoverage extends InvalidArgumentException
 {
-    private function __construct()
-    {
-    }
-
-    /**
-     * TODO: move this call in the metrics calculator otherwise the process is repeated for
-     *  multiple loggers
-     *
-     * @param MutantExecutionResult[] $executionResults
-     */
-    public static function sortResults(array &$executionResults): void
-    {
-        usort(
-            $executionResults,
-            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
-                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
-                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
-                }
-
-                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
-            }
-        );
-    }
 }

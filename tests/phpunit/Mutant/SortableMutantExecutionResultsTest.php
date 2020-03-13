@@ -35,11 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Generator;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\SortableMutantExecutionResults;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 
@@ -98,7 +97,7 @@ final class SortableMutantExecutionResultsTest extends TestCase
         );
     }
 
-    public function resultsProvider(): Generator
+    public function resultsProvider(): iterable
     {
         yield 'empty' => [[], []];
 
@@ -191,7 +190,7 @@ final class SortableMutantExecutionResultsTest extends TestCase
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'Passed!',
-            MutantProcess::CODE_ESCAPED,
+            DetectionStatus::ESCAPED,
             '#' . $id,
             MutatorName::getName(For_::class),
             $originalFilePath,

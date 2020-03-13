@@ -39,7 +39,6 @@ use function array_fill_keys;
 use function array_intersect_key;
 use Closure;
 use function count;
-use Generator;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
@@ -56,7 +55,7 @@ final class BCMath implements ConfigurableMutator
     use GetConfigClassName;
 
     /**
-     * @var array<string, Closure(Node\Expr\FuncCall): Generator<Node\Expr>>
+     * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr>>
      */
     private $converters;
 
@@ -90,9 +89,9 @@ TXT
     /**
      * @param Node\Expr\FuncCall $node
      *
-     * @return Generator<Node\Expr>
+     * @return iterable<Node\Expr>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         /** @var Node\Name $name */
         $name = $node->name;
@@ -112,7 +111,7 @@ TXT
     /**
      * @param string[] $functionsMap
      *
-     * @return array<string, Closure(Node\Expr\FuncCall): Generator<Node\Expr>>
+     * @return array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr>>
      */
     private static function createConverters(array $functionsMap): array
     {
@@ -176,13 +175,13 @@ TXT
     }
 
     /**
-     * @param Closure(Node\Expr\FuncCall): Generator<Node\Expr> $converter
+     * @param Closure(Node\Expr\FuncCall): iterable<Node\Expr> $converter
      *
-     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr>
+     * @return Closure(Node\Expr\FuncCall): iterable<Node\Expr>
      */
     private static function makeCheckingMinArgsMapper(int $minimumArgsCount, Closure $converter): Closure
     {
-        return static function (Node\Expr\FuncCall $node) use ($minimumArgsCount, $converter): Generator {
+        return static function (Node\Expr\FuncCall $node) use ($minimumArgsCount, $converter): iterable {
             if (count($node->args) >= $minimumArgsCount) {
                 yield from $converter($node);
             }
@@ -190,13 +189,13 @@ TXT
     }
 
     /**
-     * @param Closure(Node\Expr\FuncCall): Generator<Node\Expr> $converter
+     * @param Closure(Node\Expr\FuncCall): iterable<Node\Expr> $converter
      *
-     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\Cast\String_>
+     * @return Closure(Node\Expr\FuncCall): iterable<Node\Expr\Cast\String_>
      */
     private static function makeCastToStringMapper(Closure $converter): Closure
     {
-        return static function (Node\Expr\FuncCall $node) use ($converter): Generator {
+        return static function (Node\Expr\FuncCall $node) use ($converter): iterable {
             foreach ($converter($node) as $newNode) {
                 yield new Node\Expr\Cast\String_($newNode);
             }
@@ -206,31 +205,31 @@ TXT
     /**
      * @phpstan-param class-string<Node\Expr\BinaryOp> $operator
      *
-     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\BinaryOp>
+     * @return Closure(Node\Expr\FuncCall): iterable<Node\Expr\BinaryOp>
      */
     private static function makeBinaryOperatorMapper(string $operator): Closure
     {
-        return static function (Node\Expr\FuncCall $node) use ($operator): Generator {
+        return static function (Node\Expr\FuncCall $node) use ($operator): iterable {
             yield new $operator($node->args[0]->value, $node->args[1]->value);
         };
     }
 
     /**
-     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     * @return Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>
      */
     private static function makeSquareRootsMapper(): Closure
     {
-        return static function (Node\Expr\FuncCall $node): Generator {
+        return static function (Node\Expr\FuncCall $node): iterable {
             yield new Node\Expr\FuncCall(new Node\Name('\sqrt'), [$node->args[0]]);
         };
     }
 
     /**
-     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\BinaryOp\Mod>
+     * @return Closure(Node\Expr\FuncCall): iterable<Node\Expr\BinaryOp\Mod>
      */
     private static function makePowerModuloMapper(): Closure
     {
-        return static function (Node\Expr\FuncCall $node): Generator {
+        return static function (Node\Expr\FuncCall $node): iterable {
             yield new Node\Expr\BinaryOp\Mod(
                 new Node\Expr\FuncCall(
                     new Node\Name('\pow'),

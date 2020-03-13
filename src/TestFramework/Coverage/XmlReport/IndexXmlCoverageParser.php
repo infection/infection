@@ -33,10 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
-use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\SafeDOMXPath;
 
 /**
@@ -53,52 +52,46 @@ class IndexXmlCoverageParser
     }
 
     /**
-     * Parses the given PHPUnit XML coverage index report (index.xml) to collect the general
-     * coverage data. Note that this data is likely incomplete an will need to be enriched to
-     * contain all the desired data.
+     * Parses the given PHPUnit XML coverage index report (index.xml) to collect the information
+     * needed to parse general coverage data. Note that this data is likely incomplete an will
+     * need to be enriched to contain all the desired data.
      *
      * @throws NoLineExecuted
      *
-     * @return iterable<SourceFileData>
+     * @return iterable<SourceFileInfoProvider>
      */
-    public function parse(string $coverageXmlContent): iterable
+    public function parse(string $coverageIndexPath, string $xmlIndexCoverageContent): iterable
     {
-        $xPath = XPathFactory::createXPath($coverageXmlContent);
+        $xPath = XPathFactory::createXPath($xmlIndexCoverageContent);
 
-        self::assertHasCoverage($xPath);
+        self::assertHasExecutedLines($xPath);
 
-        return $this->parseNodes($xPath);
+        return $this->parseNodes($coverageIndexPath, $xPath);
     }
 
     /**
-     * @return iterable<SourceFileData>
+     * @return iterable<SourceFileInfoProvider>
      */
-    private function parseNodes(SafeDOMXPath $xPath): iterable
+    private function parseNodes(string $coverageIndexPath, SafeDOMXPath $xPath): iterable
     {
         $projectSource = self::getProjectSource($xPath);
 
-        $nodes = $xPath->query('//file');
-
-        foreach ($nodes as $node) {
+        foreach ($xPath->query('//file') as $node) {
             $relativeCoverageFilePath = $node->getAttribute('href');
 
-            $fileInfoProvider = new SourceFileInfoProvider(
+            yield new SourceFileInfoProvider(
+                $coverageIndexPath,
                 $this->coverageDir,
                 $relativeCoverageFilePath,
                 $projectSource
             );
-
-            // TODO: I don't get this one: why is it not a service instead and `$$fileInfoProvider` passed to `parse()` instead?
-            $parser = new XmlCoverageParser($fileInfoProvider);
-
-            yield $parser->parse();
         }
     }
 
     /**
      * @throws NoLineExecuted
      */
-    private static function assertHasCoverage(SafeDOMXPath $xPath): void
+    private static function assertHasExecutedLines(SafeDOMXPath $xPath): void
     {
         $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
 

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use function Safe\file_get_contents;
 use function Safe\sprintf;
@@ -55,7 +54,7 @@ final class ArrayOneItemTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates when return typehint is not nullable array' => [
             $this->getFileContent('mutates-not-nullable-array.php'),

@@ -33,13 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage;
 
-use InvalidArgumentException;
+use function Safe\realpath;
 
-/**
- * @internal
- */
-final class InvalidCoverage extends InvalidArgumentException
+final class XmlCoverageFixture
 {
+    public $coverageDir;
+    public $relativeCoverageFilePath;
+    public $projectSource;
+    public $sourceFilePath;
+    public $serializedCoverage;
+
+    /**
+     * @param array<string, mixed> $serializedCoverage
+     */
+    public function __construct(
+        string $coverageDir,
+        string $relativeCoverageFilePath,
+        string $projectSource,
+        string $sourceFilePath,
+        array $serializedCoverage
+    ) {
+        $this->coverageDir = $coverageDir;
+        $this->relativeCoverageFilePath = $relativeCoverageFilePath;
+        $this->projectSource = $projectSource;
+        $this->sourceFilePath = realpath($projectSource . DIRECTORY_SEPARATOR . $sourceFilePath);
+        $this->serializedCoverage = $serializedCoverage;
+    }
 }

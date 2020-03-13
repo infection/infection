@@ -33,32 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use function Safe\realpath;
+use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
+use PHPUnit\Framework\TestCase;
 
-final class XmlCoverageFixture
+final class XPathFactoryTest extends TestCase
 {
-    public $coverageDir;
-    public $relativeCoverageFilePath;
-    public $projectSource;
-    public $sourceFilePath;
-    public $serializedCoverage;
+    public function test_it_removes_namespace(): void
+    {
+        $xPath = XPathFactory::createXPath('<?xml version="1.0"?><phpunit xmlns="http://schema.phpunit.de/coverage/1.0"></phpunit>');
 
-    /**
-     * @param array<string, mixed> $serializedCoverage
-     */
-    public function __construct(
-        string $coverageDir,
-        string $relativeCoverageFilePath,
-        string $projectSource,
-        string $sourceFilePath,
-        array $serializedCoverage
-    ) {
-        $this->coverageDir = $coverageDir;
-        $this->relativeCoverageFilePath = $relativeCoverageFilePath;
-        $this->projectSource = $projectSource;
-        $this->sourceFilePath = realpath($projectSource . DIRECTORY_SEPARATOR . $sourceFilePath);
-        $this->serializedCoverage = $serializedCoverage;
+        $this->assertStringNotContainsString('xmlns', $xPath->document->saveXML());
     }
 }

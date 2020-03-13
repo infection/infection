@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Generator;
 use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
@@ -71,9 +70,9 @@ TXT
     /**
      * @param Node\Expr\FuncCall $node
      *
-     * @return Generator<Node\Expr\FuncCall>
+     * @return iterable<Node\Expr\FuncCall>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         /** @var Node\Name $name */
         $name = $node->name;

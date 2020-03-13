@@ -33,33 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
-use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 use Webmozart\PathUtil\Path;
 
 /**
  * @group integration
- * @covers \Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider
  */
 final class SourceFileInfoProviderTest extends TestCase
 {
-    public static function fileFixturesProvider(): iterable
-    {
-        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
-            yield [
-                $fixture->coverageDir,
-                $fixture->relativeCoverageFilePath,
-                $fixture->projectSource,
-                $fixture->sourceFilePath,
-            ];
-        }
-    }
-
     /**
      * @dataProvider fileFixturesProvider
      */
@@ -67,22 +54,47 @@ final class SourceFileInfoProviderTest extends TestCase
         string $coverageDir,
         string $relativeCoverageFilePath,
         string $projectSource,
-        string $expectedsourceFilePath
+        string $expectedSourceFilePath
     ): void {
         $provider = new SourceFileInfoProvider(
+            '/path/to/index.xml',
             $coverageDir,
             $relativeCoverageFilePath,
             $projectSource
         );
 
-        $this->assertSame($expectedsourceFilePath, $provider->provideFileInfo()->getRealPath());
+        $this->assertSame($expectedSourceFilePath, $provider->provideFileInfo()->getRealPath());
 
         $xPath = $provider->provideXPath();
-        $this->assertInstanceOf(SafeDOMXPath::class, $xPath);
 
         $xPathAgain = $provider->provideXPath();
 
         $this->assertSame($xPath, $xPathAgain);
+    }
+
+    public function test_it_errors_when_the_XML_file_could_not_be_found(): void
+    {
+        $provider = new SourceFileInfoProvider(
+            '/path/to/index.xml',
+            '/path/to/coverage-dir',
+            'zeroLevel.php.xml',
+            'projectSource'
+        );
+
+        try {
+            $provider->provideFileInfo();
+
+            $this->fail();
+        } catch (InvalidCoverage $exception) {
+            $this->assertSame(
+                'Could not find the XML coverage file '
+                . '"/path/to/coverage-dir/zeroLevel.php.xml" listed in "/path/to/index.xml". Make '
+                . 'sure the coverage used is up to date',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
     }
 
     public function test_it_errors_when_the_source_file_could_not_be_found(): void
@@ -90,6 +102,7 @@ final class SourceFileInfoProviderTest extends TestCase
         $incorrectCoverageSrcDir = Path::canonicalize(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
 
         $provider = new SourceFileInfoProvider(
+            '/path/to/index.xml',
             XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
             'zeroLevel.php.xml',
             $incorrectCoverageSrcDir
@@ -111,6 +124,18 @@ final class SourceFileInfoProviderTest extends TestCase
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNull($exception->getPrevious());
+        }
+    }
+
+    public function fileFixturesProvider(): iterable
+    {
+        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
+            yield [
+                $fixture->coverageDir,
+                $fixture->relativeCoverageFilePath,
+                $fixture->projectSource,
+                $fixture->sourceFilePath,
+            ];
         }
     }
 }

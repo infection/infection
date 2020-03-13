@@ -40,22 +40,17 @@ use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Tests\Double;
+use Infection\Tests\Double\OndraM\CiDetector\ConfigurableEnv;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use OndraM\CiDetector\CiDetector;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use function Safe\putenv;
-use Symfony\Component\Console\Output\OutputInterface;
 
 final class BadgeLoggerTest extends TestCase
 {
     use BacksUpEnvironmentVariables;
-
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $outputMock;
 
     /**
      * @var StrykerDashboardClient|MockObject
@@ -68,9 +63,14 @@ final class BadgeLoggerTest extends TestCase
     private $metricsCalculatorMock;
 
     /**
-     * @var Double\OndraM\CiDetector\ConfigurableEnv
+     * @var ConfigurableEnv
      */
     private $ciDetectorEnv;
+
+    /**
+     * @var DummyLogger
+     */
+    private $logger;
 
     /**
      * @var BadgeLogger
@@ -81,19 +81,18 @@ final class BadgeLoggerTest extends TestCase
     {
         $this->backupEnvironmentVariables();
 
-        $this->outputMock = $this->createMock(OutputInterface::class);
         $this->badgeApiClientMock = $this->createMock(StrykerDashboardClient::class);
         $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
-
-        $this->ciDetectorEnv = new Double\OndraM\CiDetector\ConfigurableEnv();
+        $this->ciDetectorEnv = new ConfigurableEnv();
+        $this->logger = new DummyLogger();
 
         $this->badgeLogger = new BadgeLogger(
-            $this->outputMock,
             new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
             new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,
-            'master'
+            'master',
+            $this->logger
         );
     }
 
@@ -108,17 +107,23 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS' => false,
         ]);
 
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: The current process is not executed in a CI build')
-        ;
-
         $this->badgeApiClientMock
             ->expects($this->never())
             ->method('sendReport')
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: The current process is not executed in a CI build',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_skips_logging_when_it_is_pull_request(): void
@@ -128,17 +133,23 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_PULL_REQUEST' => '123',
         ]);
 
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: The current process is a pull request build')
-        ;
-
         $this->badgeApiClientMock
             ->expects($this->never())
             ->method('sendReport')
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: The current process is a pull request build',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_skips_logging_when_branch_not_found(): void
@@ -150,16 +161,22 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_BRANCH' => false,
         ]);
 
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: The branch name could not be determined for the current process')
-        ;
-
         $this->badgeApiClientMock
             ->expects($this->never())
             ->method('sendReport');
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: The branch name could not be determined for the current process',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_skips_logging_when_repo_slug_not_found(): void
@@ -171,17 +188,23 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_BRANCH' => 'foo',
         ]);
 
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: The repository name could not be determined for the current process')
-        ;
-
         $this->badgeApiClientMock
             ->expects($this->never())
             ->method('sendReport')
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: The repository name could not be determined for the current process',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_skips_logging_when_it_is_branch_not_from_config(): void
@@ -193,17 +216,23 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_BRANCH' => 'foo',
         ]);
 
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: Expected branch "master", found "foo"')
-        ;
-
         $this->badgeApiClientMock
             ->expects($this->never())
             ->method('sendReport')
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: Expected branch "master", found "foo"',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_sends_report_missing_our_api_key(): void
@@ -218,17 +247,23 @@ final class BadgeLoggerTest extends TestCase
         putenv('INFECTION_BADGE_API_KEY');
         putenv('STRYKER_DASHBOARD_API_KEY');
 
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: The Stryker API key needs to be configured using one of the environment variables "INFECTION_BADGE_API_KEY" or "STRYKER_DASHBOARD_API_KEY", but could not find any of these.')
-        ;
-
         $this->badgeApiClientMock
             ->expects($this->never())
             ->method('sendReport')
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: The Stryker API key needs to be configured using one of the environment variables "INFECTION_BADGE_API_KEY" or "STRYKER_DASHBOARD_API_KEY", but could not find any of these.',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_sends_report_when_everything_is_ok_with_stryker_key(): void
@@ -242,11 +277,6 @@ final class BadgeLoggerTest extends TestCase
 
         putenv('STRYKER_DASHBOARD_API_KEY=abc');
 
-        $this->outputMock
-            ->method('writeln')
-            ->with('Sending dashboard report...')
-        ;
-
         $this->badgeApiClientMock
             ->expects($this->once())
             ->method('sendReport')
@@ -259,6 +289,17 @@ final class BadgeLoggerTest extends TestCase
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Sending dashboard report...',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_sends_report_when_everything_is_ok_with_our_key(): void
@@ -272,11 +313,6 @@ final class BadgeLoggerTest extends TestCase
 
         putenv('INFECTION_BADGE_API_KEY=abc');
 
-        $this->outputMock
-            ->method('writeln')
-            ->with('Sending dashboard report...')
-        ;
-
         $this->badgeApiClientMock
             ->expects($this->once())
             ->method('sendReport')
@@ -289,5 +325,16 @@ final class BadgeLoggerTest extends TestCase
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Sending dashboard report...',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
-use Generator;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use PHPUnit\Framework\TestCase;
 
@@ -53,7 +52,7 @@ final class TestFrameworkExtraOptionsFilterTest extends TestCase
         $this->assertSame($expectedExtraOptions, $filteredOptions);
     }
 
-    public function mutantProcessProvider(): Generator
+    public function mutantProcessProvider(): iterable
     {
         yield ['--filter=someTest#2 --a --b=value', '--a --b=value'];
 

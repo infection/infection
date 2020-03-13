@@ -33,9 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_filter;
+use function file_exists;
 use function implode;
 use Infection\TestFramework\SafeDOMXPath;
 use function realpath as native_realpath;
@@ -53,19 +54,23 @@ use Webmozart\PathUtil\Path;
  */
 class SourceFileInfoProvider
 {
-    /**
-     * @var SafeDOMXPath|null
-     */
-    private $xPath;
+    private $coverageIndexPath;
     private $coverageDir;
     private $relativeCoverageFilePath;
     private $projectSource;
 
+    /**
+     * @var SafeDOMXPath|null
+     */
+    private $xPath;
+
     public function __construct(
+        string $coverageIndexPath,
         string $coverageDir,
         string $relativeCoverageFilePath,
         string $projectSource
     ) {
+        $this->coverageIndexPath = $coverageIndexPath;
         $this->coverageDir = $coverageDir;
         $this->relativeCoverageFilePath = $relativeCoverageFilePath;
         $this->projectSource = $projectSource;
@@ -81,13 +86,22 @@ class SourceFileInfoProvider
 
     public function provideXPath(): SafeDOMXPath
     {
-        if ($this->xPath === null) {
-            $this->xPath = XPathFactory::createXPath(file_get_contents(
-                $this->coverageDir . '/' . $this->relativeCoverageFilePath
+        if ($this->xPath !== null) {
+            return $this->xPath;
+        }
+
+        $coverageFile = $this->coverageDir . '/' . $this->relativeCoverageFilePath;
+
+        if (!file_exists($coverageFile)) {
+            throw new InvalidCoverage(sprintf(
+                'Could not find the XML coverage file "%s" listed in "%s". Make sure the '
+                . 'coverage used is up to date',
+                $coverageFile,
+                $this->coverageIndexPath
             ));
         }
 
-        return $this->xPath;
+        return $this->xPath = XPathFactory::createXPath(file_get_contents($coverageFile));
     }
 
     private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo

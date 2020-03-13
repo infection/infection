@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use Generator;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
@@ -140,7 +139,7 @@ final class ConfigurationTest extends TestCase
         );
     }
 
-    public function valueProvider(): Generator
+    public function valueProvider(): iterable
     {
         yield 'empty' => [
             10,

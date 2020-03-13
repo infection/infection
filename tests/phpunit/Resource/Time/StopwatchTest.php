@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Time;
 
-use Generator;
 use Infection\Resource\Time\Stopwatch;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -102,7 +101,7 @@ final class StopwatchTest extends TestCase
         }
     }
 
-    public function timeProvider(): Generator
+    public function timeProvider(): iterable
     {
         yield 'no time' => [0, 0.];
 

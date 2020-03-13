@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Generator;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
@@ -194,7 +193,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         $this->assertSame(Bug2::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass->getName());
     }
 
-    public function isPartOfSignatureFlagProvider(): Generator
+    public function isPartOfSignatureFlagProvider(): iterable
     {
         yield [Node\Stmt\ClassMethod::class, true];
 
