@@ -101,7 +101,6 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\TestTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
 use function php_ini_loaded_file;
@@ -186,28 +185,25 @@ final class Container
                     $container->getMemoizedTestFileDataProvider()
                 );
             },
-            PhpUnitXmlCoverageTraceProvider::class => static function (self $container): PhpUnitXmlCoverageTraceProvider {
+            PhpUnitXmlCoverageTraceProvider::class => static function (self $container): PhpUnitXmlCoveredFileDataProvider {
                 return new PhpUnitXmlCoverageTraceProvider(
-                    new IndexXmlCoverageReader(
-                        $container->getConfiguration()->getCoveragePath()
-                    ),
+                    $container->getIndexXmlCoverageReader(),
                     $container->getIndexXmlCoverageParser(),
                     $container->getXmlCoverageParser()
                 );
             },
-            TestTraceProvider::class => static function (self $container): TestTraceProvider {
+            IndexXmlCoverageReader::class => static function (self $container): IndexXmlCoverageReader {
+                return new IndexXmlCoverageReader(
+                    $container->getConfiguration()->getCoveragePath()
+                );
+            },
+            TestTraceProvider::class => static function (self $container): FileCodeCoverageProvider {
                 return new TestTraceProvider();
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
                 return new RootsFileOrDirectoryLocator(
                     [$container->getProjectDir()],
                     $container->getFileSystem()
-                );
-            },
-            PathReplacer::class => static function (self $container): PathReplacer {
-                return new PathReplacer(
-                    $container->getFileSystem(),
-                    $container->getConfiguration()->getPhpUnit()->getConfigDir()
                 );
             },
             Factory::class => static function (self $container): Factory {
@@ -346,7 +342,8 @@ final class Container
                     $testFrameworkAdapter->hasJUnitReport()
                         ? $container->getJUnitFilePath()
                         : null,
-                    $testFrameworkAdapter->getName()
+                    $testFrameworkAdapter->getName(),
+                    $container->getIndexXmlCoverageReader()
                 );
             },
             TestRunConstraintChecker::class => static function (self $container): TestRunConstraintChecker {
@@ -608,6 +605,11 @@ final class Container
         return $this->get(PhpUnitXmlCoverageTraceProvider::class);
     }
 
+    public function getIndexXmlCoverageReader(): IndexXmlCoverageReader
+    {
+        return $this->get(IndexXmlCoverageReader::class);
+    }
+
     public function getFileCodeCoverageProvider(): TestTraceProvider
     {
         return $this->get(TestTraceProvider::class);
@@ -616,11 +618,6 @@ final class Container
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
     {
         return $this->get(RootsFileOrDirectoryLocator::class);
-    }
-
-    public function getPathReplacer(): PathReplacer
-    {
-        return $this->get(PathReplacer::class);
     }
 
     public function getFactory(): Factory
