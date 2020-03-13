@@ -45,7 +45,7 @@ final class IndexXmlCoverageReaderTest extends TestCase
 {
     private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
 
-    public function test_it(): void
+    public function test_it_can_give_the_path_to_the_PHPUnit_index_XML_report(): void
     {
         $reader = new IndexXmlCoverageReader(self::COVERAGE_DIR);
 

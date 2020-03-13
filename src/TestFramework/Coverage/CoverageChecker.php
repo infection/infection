@@ -221,6 +221,7 @@ TXT
     private function getCoverageIndexFilePath(): string
     {
         return Path::canonicalize(
+            // TODO IndexXmlCoverageReader should be injected instead
             (new IndexXmlCoverageReader($this->coveragePath))->getIndexXmlPath()
         );
     }
