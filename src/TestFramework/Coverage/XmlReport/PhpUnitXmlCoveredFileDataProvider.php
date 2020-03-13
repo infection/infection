@@ -37,9 +37,6 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\Coverage\SourceFileDataProvider;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
-use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
 
 /**
  * Source of primary coverage data. Used by SourceFileDataFactory.

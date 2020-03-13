@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\PhpUnit\Coverage\InvalidCoverage;
-use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
+use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
@@ -44,7 +44,6 @@ use Webmozart\PathUtil\Path;
 
 /**
  * @group integration
- * @covers \Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider
  */
 final class SourceFileInfoProviderTest extends TestCase
 {

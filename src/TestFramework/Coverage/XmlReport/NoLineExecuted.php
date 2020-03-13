@@ -33,42 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use DOMDocument;
-use Infection\TestFramework\SafeDOMXPath;
-use function Safe\preg_replace;
-use Webmozart\Assert\Assert;
+use UnexpectedValueException;
 
 /**
  * @internal
  */
-final class XPathFactory
+final class NoLineExecuted extends UnexpectedValueException
 {
-    private function __construct()
+    public static function create(): self
     {
-    }
-
-    public static function createXPath(string $coverageContent): SafeDOMXPath
-    {
-        $document = new DOMDocument();
-        $success = @$document->loadXML(self::removeNamespace($coverageContent));
-
-        Assert::true($success);
-
-        return new SafeDOMXPath($document);
-    }
-
-    /**
-     * Remove namespace to work with xPath without a headache
-     */
-    private static function removeNamespace(string $xml): string
-    {
-        /** @var string $cleanedXml */
-        $cleanedXml = preg_replace('/xmlns=\".*?\"/', '', $xml);
-
-        Assert::string($cleanedXml);
-
-        return $cleanedXml;
+        return new self(<<<'MSG'
+No line of code was executed during tests. This could be due to "@covers" annotations or your
+PHPUnit filters not being set up correctly.
+MSG
+        );
     }
 }

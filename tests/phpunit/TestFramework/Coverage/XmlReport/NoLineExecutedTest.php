@@ -33,20 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\PhpUnit\Coverage\XPathFactory;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Infection\TestFramework\PhpUnit\Coverage\XPathFactory
- */
-final class XPathFactoryTest extends TestCase
+final class NoLineExecutedTest extends TestCase
 {
-    public function test_it_removes_namespace(): void
+    public function test_it_can_create_an_instance(): void
     {
-        $xPath = XPathFactory::createXPath('<?xml version="1.0"?><phpunit xmlns="http://schema.phpunit.de/coverage/1.0"></phpunit>');
+        $exception = NoLineExecuted::create();
 
-        $this->assertStringNotContainsString('xmlns', $xPath->document->saveXML());
+        $expectedMessage = <<<'MSG'
+No line of code was executed during tests. This could be due to "@covers" annotations or your
+PHPUnit filters not being set up correctly.
+MSG;
+
+        $this->assertSame($expectedMessage, $exception->getMessage());
+        $this->assertSame(0, $exception->getCode());
+        $this->assertNull($exception->getPrevious());
     }
 }

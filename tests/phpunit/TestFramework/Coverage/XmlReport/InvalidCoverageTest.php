@@ -33,13 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use InvalidArgumentException;
+use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class InvalidCoverage extends InvalidArgumentException
+final class InvalidCoverageTest extends TestCase
 {
+    public function test_it_can_be_instantiated(): void
+    {
+        $exception = new InvalidCoverage('Hello', 12);
+
+        $this->assertSame('Hello', $exception->getMessage());
+        $this->assertSame(12, $exception->getCode());
+    }
 }

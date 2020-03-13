@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
 use Infection\TestFramework\SafeDOMXPath;
