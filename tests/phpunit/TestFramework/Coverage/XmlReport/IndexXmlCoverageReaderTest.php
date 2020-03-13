@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use PHPUnit\Framework\TestCase;
+use function Infection\Tests\normalizePath;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 
@@ -51,7 +52,7 @@ final class IndexXmlCoverageReaderTest extends TestCase
     {
         $reader = new IndexXmlCoverageReader(self::COVERAGE_DIR);
 
-        $expectedIndexPath = realpath(self::COVERAGE_DIR . '/index.xml');
+        $expectedIndexPath = normalizePath(realpath(self::COVERAGE_DIR . '/index.xml'));
 
         $this->assertSame(
             $expectedIndexPath,
