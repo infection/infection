@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -70,9 +69,9 @@ TXT
     /**
      * @param Node\Expr\Yield_ $node
      *
-     * @return Generator<Node\Expr\Yield_>
+     * @return iterable<Node\Expr\Yield_>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         /** @var Node\Expr $key */
         $key = $node->key;

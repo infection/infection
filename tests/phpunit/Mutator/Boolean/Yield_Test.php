@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class Yield_Test extends AbstractMutatorTestCase
@@ -50,7 +49,7 @@ final class Yield_Test extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates a yield with a double arrow to a yield with a greater than comparison' => [
             <<<'PHP'

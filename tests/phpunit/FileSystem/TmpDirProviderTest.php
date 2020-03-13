@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
-use Generator;
 use Infection\FileSystem\TmpDirProvider;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -111,7 +110,7 @@ final class TmpDirProviderTest extends TestCase
         }
     }
 
-    public function tmpDirProvider(): Generator
+    public function tmpDirProvider(): iterable
     {
         yield 'root dir path' => [
             '/',
@@ -129,7 +128,7 @@ final class TmpDirProviderTest extends TestCase
         ];
     }
 
-    public function invalidTmpDirProvider(): Generator
+    public function invalidTmpDirProvider(): iterable
     {
         yield 'empty dir path' => [
             '',

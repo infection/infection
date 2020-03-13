@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Generator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\SortableMutantExecutionResults;
@@ -98,7 +97,7 @@ final class SortableMutantExecutionResultsTest extends TestCase
         );
     }
 
-    public function resultsProvider(): Generator
+    public function resultsProvider(): iterable
     {
         yield 'empty' => [[], []];
 

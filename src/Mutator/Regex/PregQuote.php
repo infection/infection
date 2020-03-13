@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -75,9 +74,9 @@ TXT
     /**
      * @param Node\Expr\FuncCall $node
      *
-     * @return Generator<Node\Arg>
+     * @return iterable<Node\Arg>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield $node->args[0];
     }

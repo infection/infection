@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Environment;
 
-use Generator;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use OndraM\CiDetector\Ci\CiInterface;
@@ -176,7 +175,7 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver->resolve();
     }
 
-    public function provideBlankOrEmptyString(): Generator
+    public function provideBlankOrEmptyString(): iterable
     {
         yield 'string-blank' => [' '];
 

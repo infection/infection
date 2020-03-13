@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Number;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class DecrementIntegerTest extends AbstractMutatorTestCase
@@ -50,7 +49,7 @@ final class DecrementIntegerTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It does not decrement an integer in a comparison' => [
             <<<'PHP'

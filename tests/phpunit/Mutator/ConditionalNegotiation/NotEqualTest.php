@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class NotEqualTest extends AbstractMutatorTestCase
@@ -50,7 +49,7 @@ final class NotEqualTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates not strict comparison' => [
             <<<'PHP'

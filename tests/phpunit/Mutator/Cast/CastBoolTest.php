@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class CastBoolTest extends AbstractMutatorTestCase
@@ -50,7 +49,7 @@ final class CastBoolTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It removes casting to bool with "bool"' => [
             <<<'PHP'

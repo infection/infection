@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt\Return_;
@@ -52,7 +51,7 @@ final class IntegerNegationTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates negative -1 int return to positive' => [
             <<<'PHP'
