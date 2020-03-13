@@ -18,7 +18,7 @@ a given piece of source code. It may also work the other way around or both ways
 
 ### Trace
 
-Artifact produced by a tracer: provides the piece of source code and its associated tests. 
+Artifact produced by a tracer: provides the piece of source code and its associated tests.
 
 
 <hr />

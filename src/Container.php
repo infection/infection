@@ -167,7 +167,7 @@ final class Container
             },
             FilteredEnrichedTraceProvider::class => static function (self $container): FilteredEnrichedTraceProvider {
                 return new FilteredEnrichedTraceProvider(
-                    $container->getPhpUnitXmlCoveredFileDataProvider(),
+                    $container->getPhpUnitXmlCoverageTraceProvider(),
                     $container->getJUnitTestExecutionInfoAdder(),
                     $container->getSourceFileFilter(),
                     $container->getConfiguration()->getSourceFiles(),
@@ -185,7 +185,7 @@ final class Container
                     $container->getMemoizedTestFileDataProvider()
                 );
             },
-            PhpUnitXmlCoverageTraceProvider::class => static function (self $container): PhpUnitXmlCoveredFileDataProvider {
+            PhpUnitXmlCoverageTraceProvider::class => static function (self $container): PhpUnitXmlCoverageTraceProvider {
                 return new PhpUnitXmlCoverageTraceProvider(
                     $container->getIndexXmlCoverageReader(),
                     $container->getIndexXmlCoverageParser(),
@@ -197,7 +197,7 @@ final class Container
                     $container->getConfiguration()->getCoveragePath()
                 );
             },
-            TestTraceProvider::class => static function (self $container): FileCodeCoverageProvider {
+            TestTraceProvider::class => static function (): TestTraceProvider {
                 return new TestTraceProvider();
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
@@ -433,7 +433,7 @@ final class Container
 
                 return new MutationGenerator(
                     $container->getFilteredEnrichedTraceProvider(),
-                    $container->getFileCodeCoverageProvider(),
+                    $container->getTestTraceProvider(),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
@@ -600,7 +600,7 @@ final class Container
         return $this->get(JUnitTestExecutionInfoAdder::class);
     }
 
-    public function getPhpUnitXmlCoveredFileDataProvider(): PhpUnitXmlCoverageTraceProvider
+    public function getPhpUnitXmlCoverageTraceProvider(): PhpUnitXmlCoverageTraceProvider
     {
         return $this->get(PhpUnitXmlCoverageTraceProvider::class);
     }
@@ -610,7 +610,7 @@ final class Container
         return $this->get(IndexXmlCoverageReader::class);
     }
 
-    public function getFileCodeCoverageProvider(): TestTraceProvider
+    public function getTestTraceProvider(): TestTraceProvider
     {
         return $this->get(TestTraceProvider::class);
     }

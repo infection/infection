@@ -43,9 +43,6 @@ use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 use Traversable;
 
-/**
- * @covers \Infection\FileSystem\SourceFileFilter
- */
 final class SourceFileFilterTest extends TestCase
 {
     /**

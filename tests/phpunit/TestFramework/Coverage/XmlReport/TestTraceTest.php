@@ -45,7 +45,7 @@ use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use Traversable;
 
-final class FileCodeCoverageTest extends TestCase
+final class TestTraceTest extends TestCase
 {
     private static $testsLocations;
 

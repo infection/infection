@@ -83,7 +83,7 @@ class JUnitTestExecutionInfoAdder
     private function testExecutionInfoAdder(iterable $traces): iterable
     {
         foreach ($traces as $trace) {
-            foreach ($trace->retrieveCoverageReport()->byLine as $linesCoverageData) {
+            foreach ($trace->retrieveTestLocations()->byLine as $linesCoverageData) {
                 foreach ($linesCoverageData as $test) {
                     self::updateTestExecutionInfo($test, $this->testFileDataProvider);
                 }

@@ -89,6 +89,7 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
      */
     public function provideTraces(): iterable
     {
+        /** @var iterable<ProxyTrace> $traces */
         $traces = $this->filter->filter(
             $this->primaryTraceProvider->provideTraces()
         );

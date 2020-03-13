@@ -155,7 +155,7 @@ final class FilteredEnrichedTraceProviderTest extends TestCase
         $traceProviderMock = $this->createMock(TraceProvider::class);
         $traceProviderMock
             ->expects($this->once())
-            ->method('provideFiles')
+            ->method('provideTraces')
             ->willReturn($canary)
         ;
 

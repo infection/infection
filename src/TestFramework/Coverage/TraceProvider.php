@@ -38,7 +38,7 @@ namespace Infection\TestFramework\Coverage;
 /**
  * @internal
  */
-interface SourceFileDataProvider
+interface TraceProvider
 {
     /**
      * @return iterable<ProxyTrace>

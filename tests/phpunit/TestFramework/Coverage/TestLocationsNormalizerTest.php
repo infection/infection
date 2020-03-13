@@ -43,7 +43,7 @@ use PHPUnit\Framework\TestCase;
 final class TestLocationsNormalizerTest extends TestCase
 {
     /**
-     * @dataProvider testLocationsProvider
+     * @dataProvider locationsProvider
      */
     public function test_it_can_convert_an_associative_array_of_test_locations_into_an_associative_array_of_scalar_values(array $coverage, array $expected): void
     {
@@ -52,7 +52,7 @@ final class TestLocationsNormalizerTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_locations_provider(): iterable
+    public function locationsProvider(): iterable
     {
         yield 'empty' => [[], []];
 

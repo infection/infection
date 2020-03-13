@@ -44,9 +44,6 @@ use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder
- */
 final class JUnitTestExecutionInfoAdderTest extends TestCase
 {
     public function test_it_does_not_add_if_junit_is_not_provided(): void
@@ -66,11 +63,13 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
         $adder = new JUnitTestExecutionInfoAdder($adapter, $testFileDataProvider);
 
-        $expected = [1, 2, 3];
+        $proxyTraceMock = $this->createMock(ProxyTrace::class);
+        $proxyTraceMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
 
-        $actual = $adder->addTestExecutionInfo($expected);
-
-        $this->assertSame($expected, $actual);
+        $adder->addTestExecutionInfo([$proxyTraceMock]);
     }
 
     public function test_it_adds_if_junit_is_provided(): void
@@ -107,7 +106,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
         $proxyTraceMock = $this->createMock(ProxyTrace::class);
         $proxyTraceMock
             ->expects($this->once())
-            ->method('retrieveCoverageReport')
+            ->method('retrieveTestLocations')
             ->willReturn($tests)
         ;
 
