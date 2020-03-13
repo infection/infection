@@ -37,11 +37,10 @@ namespace Infection\TestFramework\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
 use function count;
-use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
 use function file_exists;
 use function implode;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
 use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\preg_match;
@@ -107,9 +106,7 @@ TXT
 
     public function checkCoverageExists(): void
     {
-        $coverageIndexFilePath = Path::canonicalize(
-            $this->coveragePath . DIRECTORY_SEPARATOR . PhpUnitXmlCoveredFileDataProvider::COVERAGE_INDEX_FILE_NAME
-        );
+        $coverageIndexFilePath = $this->getCoverageIndexFilePath();
 
         if (!file_exists($coverageIndexFilePath)) {
             $message = sprintf(
@@ -159,9 +156,7 @@ TXT
     ): void {
         $errors = [];
 
-        $coverageIndexFilePath = Path::canonicalize(
-            $this->coveragePath . DIRECTORY_SEPARATOR . PhpUnitXmlCoveredFileDataProvider::COVERAGE_INDEX_FILE_NAME
-        );
+        $coverageIndexFilePath = $this->getCoverageIndexFilePath();
 
         if (!file_exists($coverageIndexFilePath)) {
             $errors[] = sprintf('- The file "%s" could not be found', $coverageIndexFilePath);
@@ -220,6 +215,13 @@ TXT
         return (bool) preg_match(
             '/(extension\s*=.*pcov.*)/mi',
             $this->initialTestPhpOptions
+        );
+    }
+
+    private function getCoverageIndexFilePath(): string
+    {
+        return Path::canonicalize(
+            (new IndexXmlCoverageReader($this->coveragePath))->getIndexXmlPath()
         );
     }
 }

@@ -38,7 +38,8 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use Infection\TestFramework\Coverage\SourceFileData;
 use Infection\TestFramework\Coverage\SourceFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use function Safe\file_get_contents;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
+use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
 
 /**
  * Source of primary coverage data. Used by SourceFileDataFactory.
@@ -50,19 +51,17 @@ use function Safe\file_get_contents;
  */
 class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
 {
-    /**
-     * TODO: make this constant private
-     */
-    public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
-
-    private $coverageDir;
+    private $indexReader;
+    private $indexParser;
     private $parser;
 
     public function __construct(
-        string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser
+        IndexXmlCoverageReader $indexReader,
+        IndexXmlCoverageParser $indexCoverageXmlParser,
+        XmlCoverageParser $coverageXmlParser
     ) {
-        $this->coverageDir = $coverageDir;
+        $this->indexReader = $indexReader;
+        $this->indexParser = $indexCoverageXmlParser;
         $this->parser = $coverageXmlParser;
     }
 
@@ -71,9 +70,12 @@ class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
      */
     public function provideFiles(): iterable
     {
-        $coverageIndexPath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
-        $coverageIndexContent = file_get_contents($coverageIndexPath);
-
-        return $this->parser->parse($coverageIndexPath, $coverageIndexContent);
+        foreach ($this->indexParser->parse(
+            $this->indexReader->getIndexXmlPath(),
+            $this->indexReader->getIndexXmlContent()
+        ) as $infoProvider) {
+            // TODO It might be benificial to filter files at this stage, rather than later. SourceFileDataFactory does that.
+            yield $this->parser->parse($infoProvider);
+        }
     }
 }

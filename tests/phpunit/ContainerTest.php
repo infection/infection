@@ -37,6 +37,7 @@ namespace Infection\Tests;
 
 use Infection\Container;
 use InvalidArgumentException;
+use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -89,10 +90,10 @@ final class ContainerTest extends TestCase
             null,
             '',
             false,
-            '',
+            'default',
             false,
             false,
-            '',
+            'dot',
             false,
             '/path/to/coverage',
             '',
@@ -108,5 +109,40 @@ final class ContainerTest extends TestCase
         $newContainer->getSchemaConfiguration();
 
         $this->addToAssertionCount(1);
+    }
+
+    public function test_it_can_build_source_file_data_factory(): void
+    {
+        $container = SingletonContainer::getContainer();
+        $newContainer = $container->withDynamicParameters(
+            null,
+            '',
+            false,
+            'default',
+            false,
+            false,
+            'dot',
+            false,
+            '/path/to/coverage',
+            '',
+            false,
+            false,
+            .0,
+            .0,
+            'phpunit',
+            '',
+            ''
+        );
+
+        $files = $newContainer->getSourceFileDataFactory()->provideFiles();
+
+        $this->assertIsIterable($files);
+
+        $this->expectException(Warning::class);
+        $this->expectExceptionMessage('No such file or directory');
+
+        foreach ($files as $file) {
+            $this->fail();
+        }
     }
 }

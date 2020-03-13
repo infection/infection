@@ -95,11 +95,15 @@ final class SourceFileDataFactory implements SourceFileDataProvider
      */
     public function provideFiles(): iterable
     {
-        // TODO: testFileDataAdder could be added to primaryCoverageProvider directory to provide "ready" information right away instead of having to do 2 steps here
         $filesFeed = $this->primaryCoverageProvider->provideFiles();
 
         $filteredFilesFeed = $this->filter->filter($filesFeed);
 
+        /*
+         * Looking up test executing timings is not a free operation. We even had to memoize it to help speed things up.
+         * Therefore we add test execution info only after applying filter to the files feed. Adding this step above the
+         * filter will negatively affect perfomance. The greater the junit.xml report size, the more.
+         */
         $readyFilesFeed = $this->testFileDataAdder->addTestExecutionInfo($filteredFilesFeed);
 
         if ($this->onlyCovered === true) {
