@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use function array_diff;
-use Generator;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
 use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
@@ -160,7 +159,7 @@ XML;
         $this->parser->parse('/path/to/index.xml', $xml);
     }
 
-    public function coverageProvider(): Generator
+    public function coverageProvider(): iterable
     {
         yield 'nominal' => [self::getXml()];
 
@@ -173,7 +172,7 @@ XML;
         ];
     }
 
-    public function noCoveredLineReportProviders(): Generator
+    public function noCoveredLineReportProviders(): iterable
     {
         yield 'zero lines executed' => [<<<'XML'
 <?xml version="1.0"?>
