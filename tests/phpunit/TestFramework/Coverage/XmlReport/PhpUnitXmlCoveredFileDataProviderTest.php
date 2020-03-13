@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
-use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
-use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
+use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
+use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use PHPUnit\Framework\TestCase;
 
 final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase

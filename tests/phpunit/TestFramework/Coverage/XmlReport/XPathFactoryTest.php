@@ -33,21 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use UnexpectedValueException;
+use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class NoLineExecuted extends UnexpectedValueException
+final class XPathFactoryTest extends TestCase
 {
-    public static function create(): self
+    public function test_it_removes_namespace(): void
     {
-        return new self(<<<'MSG'
-No line of code was executed during tests. This could be due to "@covers" annotations or your
-PHPUnit filters not being set up correctly.
-MSG
-        );
+        $xPath = XPathFactory::createXPath('<?xml version="1.0"?><phpunit xmlns="http://schema.phpunit.de/coverage/1.0"></phpunit>');
+
+        $this->assertStringNotContainsString('xmlns', $xPath->document->saveXML());
     }
 }

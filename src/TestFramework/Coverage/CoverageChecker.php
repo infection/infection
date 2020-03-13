@@ -40,7 +40,7 @@ use function count;
 use function extension_loaded;
 use function file_exists;
 use function implode;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\preg_match;

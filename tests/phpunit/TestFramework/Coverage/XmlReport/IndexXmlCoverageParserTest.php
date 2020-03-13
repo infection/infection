@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use function array_diff;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
-use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
+use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use function iterator_to_array;

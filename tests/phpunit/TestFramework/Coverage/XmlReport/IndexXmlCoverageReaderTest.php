@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageReader;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use PHPUnit\Framework\TestCase;
 
 /**

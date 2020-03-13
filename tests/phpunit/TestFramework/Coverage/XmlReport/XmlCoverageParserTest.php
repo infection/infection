@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\PhpUnit\Coverage\SourceFileInfoProvider;
-use Infection\TestFramework\PhpUnit\Coverage\XmlCoverageParser;
-use Infection\TestFramework\PhpUnit\Coverage\XPathFactory;
+use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
+use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
+use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use PHPUnit\Framework\MockObject\MockObject;
