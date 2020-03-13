@@ -35,19 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverage;
+use Infection\TestFramework\Coverage\XmlReport\TestTrace;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
- * Workhorse AKA envelope for all things coverage-related in regard of mutators.
+ * Full-pledge trace that acts as a proxy i.e. for which the tracing of the test files will be done
+ * lazily.
  *
  * @internal
  * @final
- *
- * TODO: rename to Trace
  */
-class SourceFileData implements LineCodeCoverage
+class ProxyTrace implements Trace
 {
     /**
      * @var SplFileInfo
@@ -55,29 +54,29 @@ class SourceFileData implements LineCodeCoverage
     private $sourceFile;
 
     /**
-     * @var CoverageReport|null
+     * @var TestLocations|null
      */
-    private $coverageReport;
+    private $testLocations;
 
     /**
-     * @var iterable<CoverageReport>
+     * @var iterable<TestLocations>
      */
-    private $lazyCoverageReport;
+    private $lazyTestLocations;
 
     /**
-     * @var FileCodeCoverage|null
+     * @var TestTrace|null
      */
-    private $lineCodeCoverage;
+    private $tests;
 
     /**
-     * @param iterable<CoverageReport> $lazyCoverageReport
+     * @param iterable<TestLocations> $lazyTestLocations
      */
-    public function __construct(SplFileInfo $sourceFile, iterable $lazyCoverageReport)
+    public function __construct(SplFileInfo $sourceFile, iterable $lazyTestLocations)
     {
         $this->sourceFile = $sourceFile;
 
         // There's no point to have it parsed right away as we may not need it, e.g. because of a filter
-        $this->lazyCoverageReport = $lazyCoverageReport;
+        $this->lazyTestLocations = $lazyTestLocations;
     }
 
     public function getSplFileInfo(): SplFileInfo
@@ -100,47 +99,47 @@ class SourceFileData implements LineCodeCoverage
     /**
      * Accessor used to update CoverageReport with TestFileTimeData.
      */
-    public function retrieveCoverageReport(): CoverageReport
+    public function retrieveTestLocations(): TestLocations
     {
-        if ($this->coverageReport !== null) {
-            return $this->coverageReport;
+        if ($this->testLocations !== null) {
+            return $this->testLocations;
         }
 
         // TODO: maybe instead of having iterable<CoverageReport> lazyCoverageReport, we could have
         // `Closure<() => TestLocations> testLocationsFactory`: it returns only one element but
         // remains lazy
-        foreach ($this->lazyCoverageReport as $coverageReport) {
+        foreach ($this->lazyTestLocations as $coverageReport) {
             // is a Generator with one yield, thus it'll only trigger here
             // (or this can be an array with one element)
-            $this->coverageReport = $coverageReport;
+            $this->testLocations = $coverageReport;
 
             break;
         }
 
-        Assert::isInstanceOf($this->coverageReport, CoverageReport::class);
-        $this->lazyCoverageReport = []; // let GC have it
+        Assert::isInstanceOf($this->testLocations, TestLocations::class);
+        $this->lazyTestLocations = []; // let GC have it
 
-        return $this->coverageReport;
+        return $this->testLocations;
     }
 
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
     {
-        return $this->getFileCodeCoverage()->getAllTestsForMutation($lineRange, $isOnFunctionSignature);
+        return $this->getTestTrace()->getAllTestsForMutation($lineRange, $isOnFunctionSignature);
     }
 
     public function hasTests(): bool
     {
-        return $this->getFileCodeCoverage()->hasTests();
+        return $this->getTestTrace()->hasTests();
     }
 
-    private function getFileCodeCoverage(): FileCodeCoverage
+    private function getTestTrace(): TestTrace
     {
-        if ($this->lineCodeCoverage !== null) {
-            return $this->lineCodeCoverage;
+        if ($this->tests !== null) {
+            return $this->tests;
         }
 
-        $this->lineCodeCoverage = new FileCodeCoverage($this->retrieveCoverageReport());
+        $this->tests = new TestTrace($this->retrieveTestLocations());
 
-        return $this->lineCodeCoverage;
+        return $this->tests;
     }
 }

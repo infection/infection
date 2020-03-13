@@ -37,15 +37,11 @@ namespace Infection\TestFramework\Coverage;
 
 /**
  * @internal
- *
- * TODO: rename to TraceProvider
  */
 interface SourceFileDataProvider
 {
     /**
-     * TODO: rename to provideTraces()
-     *
-     * @return iterable<SourceFileData>
+     * @return iterable<ProxyTrace>
      */
-    public function provideFiles(): iterable;
+    public function provideTraces(): iterable;
 }

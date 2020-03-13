@@ -36,29 +36,29 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
 
-final class CoverageHelperTest extends TestCase
+final class TestLocationsNormalizerTest extends TestCase
 {
     /**
-     * @dataProvider coverageProvider
+     * @dataProvider testLocationsProvider
      */
-    public function test_it_can_convert_a_coverage_into_array(array $coverage, array $expected): void
+    public function test_it_can_convert_an_associative_array_of_test_locations_into_an_associative_array_of_scalar_values(array $coverage, array $expected): void
     {
-        $actual = CoverageHelper::convertToArray($coverage);
+        $actual = TestLocationsNormalizer::normalize($coverage);
 
         $this->assertSame($expected, $actual);
     }
 
-    public function coverageProvider(): iterable
+    public function test_locations_provider(): iterable
     {
         yield 'empty' => [[], []];
 
         yield 'empty coverage file data' => [
             [
-                '/path/to/file' => new CoverageReport(),
+                '/path/to/file' => new TestLocations(),
             ],
             [
                 '/path/to/file' => [
@@ -70,7 +70,7 @@ final class CoverageHelperTest extends TestCase
 
         yield 'coverage file data with byLine data' => [
             [
-                '/path/to/acme/Foo.php' => new CoverageReport(
+                '/path/to/acme/Foo.php' => new TestLocations(
                     [
                         11 => [
                             CoverageLineData::with(
@@ -100,7 +100,7 @@ final class CoverageHelperTest extends TestCase
 
         yield 'coverage coverage file data with byMethod data' => [
             [
-                '/path/to/acme/Foo.php' => new CoverageReport(
+                '/path/to/acme/Foo.php' => new TestLocations(
                     [],
                     [
                         '__construct' => new MethodLocationData(
@@ -125,7 +125,7 @@ final class CoverageHelperTest extends TestCase
 
         yield 'nominal' => [
             [
-                '/path/to/acme/Foo.php' => new CoverageReport(
+                '/path/to/acme/Foo.php' => new TestLocations(
                     [
                         11 => [
                             CoverageLineData::with(

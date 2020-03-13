@@ -36,76 +36,71 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
-/**
- * @covers \Infection\TestFramework\Coverage\SourceFileData
- */
-final class SourceFileDataTest extends TestCase
+final class ProxyTraceTest extends TestCase
 {
-    public function test_returns_file_info(): void
+    public function test_it_exposes_its_source_file_file_info(): void
     {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $sourceFileData = new SourceFileData($splFileInfoMock, []);
+        $actual = (new ProxyTrace($fileInfoMock, []))->getSplFileInfo();
 
-        $actual = $sourceFileData->getSplFileInfo();
-
-        $this->assertSame($splFileInfoMock, $actual);
+        $this->assertSame(
+            $fileInfoMock,
+            $actual
+        );
     }
 
-    public function test_it_can_return_real_path(): void
+    public function test_it_exposes_its_source_file_real_path(): void
     {
         $expected = 'Foo.php';
 
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $splFileInfoMock
+        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock
             ->method('getRealPath')
-            ->willReturn($expected);
+            ->willReturn($expected)
+        ;
 
-        $sourceFileData = new SourceFileData($splFileInfoMock, []);
-
-        $actual = $sourceFileData->getRealPath();
+        $actual = (new ProxyTrace($fileInfoMock, []))->getRealPath();
 
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_can_retreive_file_data(): void
+    public function test_it_can_retrieve_the_test_locations(): void
     {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $coverageReport = new CoverageReport();
+        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $tests = new TestLocations();
 
-        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageReport, null]);
+        $trace = new ProxyTrace($fileInfoMock, [$tests]);
 
-        $actual = $sourceFileData->retrieveCoverageReport();
-        $this->assertSame($coverageReport, $actual);
+        $actual = $trace->retrieveTestLocations();
+        $this->assertSame($tests, $actual);
 
         // From cache
-        $actual = $sourceFileData->retrieveCoverageReport();
-        $this->assertSame($coverageReport, $actual);
+        $actual = $trace->retrieveTestLocations();
+        $this->assertSame($tests, $actual);
     }
 
-    public function test_it_can_detect_coverage_data_without_tests(): void
+    public function test_it_has_no_tests_if_no_covered(): void
+    {
+        $fileInfoMock = $this->createMock(SplFileInfo::class);
+
+        $trace = new ProxyTrace($fileInfoMock, [new TestLocations()]);
+
+        $this->assertFalse($trace->hasTests());
+    }
+
+    public function test_it_exposes_its_test_locations(): void
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $coverageReport = new CoverageReport();
-
-        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageReport]);
-
-        $this->assertFalse($sourceFileData->hasTests());
-    }
-
-    public function test_it_proxies_call_file_code_coverage(): void
-    {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-
-        $coverageReport = new CoverageReport(
+        $tests = new TestLocations(
             [
                 21 => [
                     CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
@@ -119,29 +114,41 @@ final class SourceFileDataTest extends TestCase
             ]
         );
 
-        $sourceFileData = new SourceFileData($splFileInfoMock, [$coverageReport]);
+        $trace = new ProxyTrace($splFileInfoMock, [$tests]);
 
-        $this->assertTrue($sourceFileData->hasTests());
+        $this->assertTrue($trace->hasTests());
 
-        $this->assertCount(0, $sourceFileData->getAllTestsForMutation(
-            new NodeLineRangeData(1, 1),
-            false
-        ));
+        $this->assertCount(
+            0,
+            $trace->getAllTestsForMutation(
+                new NodeLineRangeData(1, 1),
+                false
+            )
+        );
 
-        $this->assertCount(1, $sourceFileData->getAllTestsForMutation(
-            new NodeLineRangeData(20, 21),
-            false
-        ));
+        $this->assertCount(
+            1,
+            $trace->getAllTestsForMutation(
+                new NodeLineRangeData(20, 21),
+                false
+            )
+        );
 
         // This iterator_to_array is due to bug in our version of PHPUnit
-        $this->assertCount(0, iterator_to_array($sourceFileData->getAllTestsForMutation(
-            new NodeLineRangeData(1, 1),
-            true
-        )));
+        $this->assertCount(
+            0,
+            iterator_to_array($trace->getAllTestsForMutation(
+                new NodeLineRangeData(1, 1),
+                true
+            ))
+        );
 
-        $this->assertCount(1, iterator_to_array($sourceFileData->getAllTestsForMutation(
-            new NodeLineRangeData(19, 22),
-            true
-        )));
+        $this->assertCount(
+            1,
+            iterator_to_array($trace->getAllTestsForMutation(
+                new NodeLineRangeData(19, 22),
+                true
+            ))
+        );
     }
 }

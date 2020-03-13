@@ -37,30 +37,24 @@ namespace Infection\TestFramework\Coverage;
 
 use function array_key_exists;
 use Infection\FileSystem\SourceFileFilter;
-use Infection\Mutation\MutationGenerator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
- * Assembles a ready feed of SourceFileData from different sources. Feeds data into MutationGenerator.
- * Does not known about differences between adapters and what not.
+ * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
+ * original source files in order to ensure all the files are included.
  *
  * @internal
- *
- * TODO: FilteredSourceFilesTraceProvider: Leverages a decorated trace provider in order to provide
- *          the traces but fall-backs on the original source files in order to ensure all the
- *          files are included
  */
-final class SourceFileDataFactory implements SourceFileDataProvider
+final class FilteredEnrichedTraceProvider implements TraceProvider
 {
     private const SEEN = true;
 
     /**
-     * @var SourceFileDataProvider|PhpUnitXmlCoveredFileDataProvider
+     * @var TraceProvider
      */
-    private $primaryCoverageProvider;
+    private $primaryTraceProvider;
 
     private $testFileDataAdder;
 
@@ -77,13 +71,13 @@ final class SourceFileDataFactory implements SourceFileDataProvider
      * @param iterable<SplFileInfo> $sourceFiles
      */
     public function __construct(
-        SourceFileDataProvider $primaryCoverageProvider,
+        TraceProvider $primaryTraceProvider,
         JUnitTestExecutionInfoAdder $testFileDataAdder,
         SourceFileFilter $filter,
         iterable $sourceFiles,
         bool $onlyCovered
     ) {
-        $this->primaryCoverageProvider = $primaryCoverageProvider;
+        $this->primaryTraceProvider = $primaryTraceProvider;
         $this->testFileDataAdder = $testFileDataAdder;
         $this->filter = $filter;
         $this->sourceFiles = $sourceFiles;
@@ -91,44 +85,44 @@ final class SourceFileDataFactory implements SourceFileDataProvider
     }
 
     /**
-     * @return iterable<SourceFileData>
+     * @return iterable<ProxyTrace>
      */
-    public function provideFiles(): iterable
+    public function provideTraces(): iterable
     {
-        $filesFeed = $this->primaryCoverageProvider->provideFiles();
-
-        $filteredFilesFeed = $this->filter->filter($filesFeed);
+        $traces = $this->filter->filter(
+            $this->primaryTraceProvider->provideTraces()
+        );
 
         /*
          * Looking up test executing timings is not a free operation. We even had to memoize it to help speed things up.
          * Therefore we add test execution info only after applying filter to the files feed. Adding this step above the
-         * filter will negatively affect perfomance. The greater the junit.xml report size, the more.
+         * filter will negatively affect performance. The greater the junit.xml report size, the more.
          */
-        $readyFilesFeed = $this->testFileDataAdder->addTestExecutionInfo($filteredFilesFeed);
+        $enrichedTraces = $this->testFileDataAdder->addTestExecutionInfo($traces);
 
         if ($this->onlyCovered === true) {
             // The case where only covered files are considered
-            return $readyFilesFeed;
+            return $enrichedTraces;
         }
 
-        return $this->appendUncoveredFiles($readyFilesFeed);
+        return $this->appendUncoveredFiles($enrichedTraces);
     }
 
     /**
      * Adds to the queue uncovered files found on disk.
      *
-     * @param iterable<SourceFileData> $coverage
+     * @param iterable<ProxyTrace> $traces
      *
-     * @return iterable<SourceFileData>
+     * @return iterable<ProxyTrace>
      */
-    private function appendUncoveredFiles(iterable $coverage): iterable
+    private function appendUncoveredFiles(iterable $traces): iterable
     {
         $filesSeen = [];
 
-        foreach ($coverage as $data) {
-            $filesSeen[$data->getSplFileInfo()->getRealPath()] = self::SEEN;
+        foreach ($traces as $trace) {
+            $filesSeen[$trace->getSplFileInfo()->getRealPath()] = self::SEEN;
 
-            yield $data;
+            yield $trace;
         }
 
         // Since these are sorted sets, there should be a way to optimize.
@@ -142,7 +136,7 @@ final class SourceFileDataFactory implements SourceFileDataProvider
                 continue;
             }
 
-            yield new SourceFileData($splFileInfo, [new CoverageReport()]);
+            yield new ProxyTrace($splFileInfo, [new TestLocations()]);
         }
     }
 }

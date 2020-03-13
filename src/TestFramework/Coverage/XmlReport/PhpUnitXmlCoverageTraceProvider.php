@@ -33,21 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\TraceProvider;
 
 /**
- * @internal
+ * Provides the traces based on the PHPUnit XML coverage collected.
  *
- * TODO: rename to Tracer
+ * @internal
+ * @final
  */
-interface LineCodeCoverage
+class PhpUnitXmlCoverageTraceProvider implements TraceProvider
 {
-    public function hasTests(): bool;
+    private $indexReader;
+    private $indexParser;
+    private $parser;
+
+    public function __construct(
+        IndexXmlCoverageReader $indexReader,
+        IndexXmlCoverageParser $indexCoverageXmlParser,
+        XmlCoverageParser $coverageXmlParser
+    ) {
+        $this->indexReader = $indexReader;
+        $this->indexParser = $indexCoverageXmlParser;
+        $this->parser = $coverageXmlParser;
+    }
 
     /**
-     * @return iterable<CoverageLineData>
+     * @return iterable<ProxyTrace>
      */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+    public function provideTraces(): iterable
+    {
+        foreach ($this->indexParser->parse(
+            $this->indexReader->getIndexXmlPath(),
+            $this->indexReader->getIndexXmlContent()
+        ) as $infoProvider) {
+            // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
+            yield $this->parser->parse($infoProvider);
+        }
+    }
 }

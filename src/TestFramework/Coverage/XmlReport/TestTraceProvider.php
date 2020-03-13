@@ -35,44 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\SourceFileData;
-use Infection\TestFramework\Coverage\SourceFileDataProvider;
+use Infection\TestFramework\Coverage\ProxyTrace;
 
 /**
- * Source of primary coverage data. Used by SourceFileDataFactory.
- *
  * @internal
  * @final
- *
- * TODO: rename to PhpUnitXmlCoverageTraceProvider: Provides the traces based on the PHPUnit XML coverage collected
  */
-class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
+class TestTraceProvider
 {
-    private $indexReader;
-    private $indexParser;
-    private $parser;
-
-    public function __construct(
-        IndexXmlCoverageReader $indexReader,
-        IndexXmlCoverageParser $indexCoverageXmlParser,
-        XmlCoverageParser $coverageXmlParser
-    ) {
-        $this->indexReader = $indexReader;
-        $this->indexParser = $indexCoverageXmlParser;
-        $this->parser = $coverageXmlParser;
-    }
-
-    /**
-     * @return iterable<SourceFileData>
-     */
-    public function provideFiles(): iterable
+    public function provideFor(ProxyTrace $trace): TestTrace
     {
-        foreach ($this->indexParser->parse(
-            $this->indexReader->getIndexXmlPath(),
-            $this->indexReader->getIndexXmlContent()
-        ) as $infoProvider) {
-            // TODO It might be benificial to filter files at this stage, rather than later. SourceFileDataFactory does that.
-            yield $this->parser->parse($infoProvider);
-        }
+        // TODO: I'm pretty sure this step can be simplified and maybe we can
+        //  find a way to merge SourceFileData & FileCodeCoverage: they implement the same interface
+        //  and one just decorate the other so I'm not convinced this is really needed
+        return new TestTrace($trace->retrieveTestLocations());
     }
 }

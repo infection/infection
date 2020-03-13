@@ -36,30 +36,30 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
 
-final class CoverageReportTest extends TestCase
+final class TestLocationsTest extends TestCase
 {
     public function test_it_has_default_values(): void
     {
-        $coverageReport = new CoverageReport();
+        $tests = new TestLocations();
 
-        $this->assertSame([], $coverageReport->byMethod);
-        $this->assertSame([], $coverageReport->byLine);
+        $this->assertSame([], $tests->byMethod);
+        $this->assertSame([], $tests->byLine);
     }
 
     public function test_it_creates_self_object_with_named_constructor(): void
     {
         $pathToTest = '/path/to/Test.php';
 
-        $coverageReport = new CoverageReport(
+        $tests = new TestLocations(
             [1 => [CoverageLineData::withTestMethod($pathToTest)]],
             ['method' => new MethodLocationData(1, 3)]
         );
 
-        $this->assertSame($pathToTest, $coverageReport->byLine[1][0]->testMethod);
-        $this->assertSame(1, $coverageReport->byMethod['method']->startLine);
+        $this->assertSame($pathToTest, $tests->byLine[1][0]->testMethod);
+        $this->assertSame(1, $tests->byMethod['method']->startLine);
     }
 }

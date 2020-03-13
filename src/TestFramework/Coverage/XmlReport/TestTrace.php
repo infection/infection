@@ -37,29 +37,38 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageReport;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\Coverage\Trace;
 
 /**
+ * Impartial trace providing information regarding the tests but completely lacks any awareness of
+ * its associated source files.
+ *
+ * TODO: FileMutationGenerator::generate() ends up having to rely on both SourceFileData & Trace due
+ *  to the fact that a Trace right now only exposes a test-related API
+ *  (`hasTests()`, `getAllTestsForMutation()`). Maybe a cleaner solution would be expose the
+ *  associated source file API to `Trace` as well, i.e. moving up `SourceFileData::getSplFileInfo()`
+ *  to `Trace`. This current class `TestsTrace` could then become a simple helper for `SourceFileData`
+ *  instead of a full-pledge `Trace` implementation. And FileMutationGenerator as a result would
+ *  also be simplified to not have to rely on SourceFileData which is `Trace` implementation and
+ *  depend on `Trace` only.
+ *
  * @internal
  * @final
  */
-class FileCodeCoverage implements LineCodeCoverage
+class TestTrace implements Trace
 {
-    /**
-     * @var CoverageReport
-     */
-    private $coverageReport;
+    private $testLocations;
 
-    public function __construct(CoverageReport $coverageReport)
+    public function __construct(TestLocations $testLocations)
     {
-        $this->coverageReport = $coverageReport;
+        $this->testLocations = $testLocations;
     }
 
     public function hasTests(): bool
     {
-        foreach ($this->coverageReport->byLine as $testMethods) {
+        foreach ($this->testLocations->byLine as $testMethods) {
             if ($testMethods !== []) {
                 return true;
             }
@@ -95,8 +104,8 @@ class FileCodeCoverage implements LineCodeCoverage
     private function getTestsForLineRange(NodeLineRangeData $lineRange): iterable
     {
         foreach ($lineRange->range as $line) {
-            if (array_key_exists($line, $this->coverageReport->byLine)) {
-                yield from $this->coverageReport->byLine[$line];
+            if (array_key_exists($line, $this->testLocations->byLine)) {
+                yield from $this->testLocations->byLine[$line];
             }
         }
     }
@@ -106,7 +115,7 @@ class FileCodeCoverage implements LineCodeCoverage
      */
     private function getTestsForExecutedMethodOnLine(int $line): iterable
     {
-        foreach ($this->coverageReport->byMethod as $coverageMethodData) {
+        foreach ($this->testLocations->byMethod as $coverageMethodData) {
             if (
                 $line >= $coverageMethodData->startLine
                 && $line <= $coverageMethodData->endLine

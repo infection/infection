@@ -33,56 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\TestLocations;
+use function is_array;
+use function is_scalar;
+use function iterator_to_array;
+use Traversable;
 
-/**
- * @internal
- *
- * ```
- * 'byMethod' => [
- *      'mutate' => MethodLocationData::['startLine' => 12, 'endLine' => 16],
- *      ...
- * ],
- * 'byLine' => [
- *     22 => [
- *         CoverageLineData::[
- *             'testMethod' => '\A\B\C::test_it_works',
- *             'testFilePath' => '/path/to/A/B/C.php',
- *             'time' => 0.34325,
- *         ],
- *         ...
- *      ]
- *  ]
- * ```
- *
- * TODO: rename to TestLocations
- */
-final class CoverageReport
+final class TestLocationsNormalizer
 {
-    /**
-     * @var array<int, array<int, CoverageLineData>>
-     */
-    public $byLine = [];
-
-    /**
-     * TODO: use a getter "get"
-     *
-     * @var array<string, MethodLocationData>
-     */
-    public $byMethod = [];
-
-    /**
-     * TODO: rename CoverageLineData to TestLocation
-     * TODO: rename MethodLocationData to SourceMethodRange
-     *
-     * @param array<int, array<int, CoverageLineData>> $byLine
-     * @param array<string, MethodLocationData> $byMethod
-     */
-    public function __construct(array $byLine = [], array $byMethod = [])
+    private function __construct()
     {
-        $this->byLine = $byLine;
-        $this->byMethod = $byMethod;
+    }
+
+    /**
+     * @param array<string, TestLocations> $coverage
+     *
+     * @return array<string|int, mixed>
+     */
+    public static function normalize(iterable $coverage): array
+    {
+        if ($coverage instanceof Traversable) {
+            $coverage = iterator_to_array($coverage, false);
+        }
+
+        return self::serializeValue($coverage);
+    }
+
+    private static function serializeValue($mixed)
+    {
+        if ($mixed === null) {
+            return null;
+        }
+
+        if (is_scalar($mixed)) {
+            return $mixed;
+        }
+
+        if (is_array($mixed)) {
+            $convertedArray = [];
+
+            foreach ($mixed as $key => $value) {
+                $convertedArray[$key] = self::serializeValue($value);
+            }
+
+            return $convertedArray;
+        }
+
+        return self::serializeValue((array) $mixed);
     }
 }

@@ -36,28 +36,25 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\Coverage\SourceFileData;
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\Coverage\XmlReport\TestTraceProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
-final class FileCodeCoverageProviderTest extends TestCase
+final class TestTraceProviderTest extends TestCase
 {
-    public function test_it_determines_file_is_covered(): void
+    public function test_it_determines_if_trace_is_covered(): void
     {
-        $filePath = '/path/to/acme/Foo.php';
+        $trace = (new TestTraceProvider())->provideFor($this->createProxyTrace());
 
-        $provider = $this->createCodeCoverageDataProvider();
-        $codeCoverageData = $provider->provideFor($this->createSourceFileData($filePath));
-
-        $this->assertTrue($codeCoverageData->hasTests());
+        $this->assertTrue($trace->hasTests());
     }
 
-    private function getParsedCodeCoverageData(): CoverageReport
+    private function getParsedTestLocations(): TestLocations
     {
-        return new CoverageReport(
+        return new TestLocations(
             [
                 26 => [
                     CoverageLineData::with(
@@ -106,15 +103,15 @@ final class FileCodeCoverageProviderTest extends TestCase
         );
     }
 
-    private function createSourceFileData(string $filePath): SourceFileData
+    private function createProxyTrace(): ProxyTrace
     {
-        return new SourceFileData(
-            $this->createSplFileInfo($filePath),
-            [$this->getParsedCodeCoverageData()]
+        return new ProxyTrace(
+            $this->createFileInfoMock(),
+            [$this->getParsedTestLocations()]
         );
     }
 
-    private function createSplFileInfo(string $filePath): SplFileInfo
+    private function createFileInfoMock(): SplFileInfo
     {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
         $splFileInfoMock
@@ -128,10 +125,5 @@ final class FileCodeCoverageProviderTest extends TestCase
         ;
 
         return $splFileInfoMock;
-    }
-
-    private function createCodeCoverageDataProvider(): FileCodeCoverageProvider
-    {
-        return new FileCodeCoverageProvider();
     }
 }

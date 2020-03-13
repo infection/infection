@@ -39,7 +39,7 @@ use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
-use Infection\Tests\TestFramework\Coverage\CoverageHelper;
+use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
@@ -75,11 +75,11 @@ final class XmlCoverageParserTest extends TestCase
             $provider->provideFileInfo()->getRealPath()
         );
 
-        $coverageData = $fileData->retrieveCoverageReport();
+        $coverageData = $fileData->retrieveTestLocations();
 
         $this->assertSame(
             $expectedCoverage,
-            CoverageHelper::convertToArray([$coverageData])[0]
+            TestLocationsNormalizer::normalize([$coverageData])[0]
         );
     }
 
@@ -100,7 +100,7 @@ XML;
 
         $coverageData = $this->parser
             ->parse($this->createSourceFileInfoProvider($xml))
-            ->retrieveCoverageReport()
+            ->retrieveTestLocations()
         ;
 
         $this->assertSame([], $coverageData->byLine);
@@ -127,7 +127,7 @@ XML;
 
         $coverageData = $this->parser
             ->parse($this->createSourceFileInfoProvider($xml))
-            ->retrieveCoverageReport()
+            ->retrieveTestLocations()
         ;
 
         $this->assertArrayHasKey(11, $coverageData->byLine);
@@ -153,7 +153,7 @@ XML;
 
         $coverageData = $this->parser
             ->parse($this->createSourceFileInfoProvider($xml))
-            ->retrieveCoverageReport()
+            ->retrieveTestLocations()
         ;
 
         $this->assertArrayNotHasKey(11, $coverageData->byLine);
