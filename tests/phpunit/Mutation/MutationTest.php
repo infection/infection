@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use function array_merge;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
@@ -53,7 +53,7 @@ final class MutationTest extends TestCase
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
      * @param array<string|int|float> $expectedAttributes
-     * @param CoverageLineData[] $tests
+     * @param TestLocation[] $tests
      */
     public function test_it_can_be_instantiated(
         string $originalFilePath,
@@ -131,7 +131,7 @@ final class MutationTest extends TestCase
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
                     0.01
@@ -155,7 +155,7 @@ final class MutationTest extends TestCase
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             99,
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
                     0.01
@@ -179,7 +179,7 @@ final class MutationTest extends TestCase
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
                     0.01
@@ -224,7 +224,7 @@ final class MutationTest extends TestCase
             ]),
             0,
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
                     0.01

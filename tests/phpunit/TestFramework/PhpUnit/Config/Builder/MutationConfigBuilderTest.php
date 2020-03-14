@@ -42,7 +42,7 @@ use DOMNodeList;
 use DOMXPath;
 use function escapeshellarg;
 use function exec;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -191,7 +191,7 @@ XML
             file_get_contents(
                 $this->builder->build(
                     [
-                        CoverageLineData::with(
+                        new TestLocation(
                             'FooTest::test_foo',
                             '/path/to/FooTest.php',
                             1.
@@ -260,7 +260,7 @@ XML
             file_get_contents(
                 $this->builder->build(
                     [
-                        CoverageLineData::with(
+                        new TestLocation(
                             'BarTest::test_bar_1',
                             '/path/to/BarTest.php',
                             1.
@@ -453,18 +453,18 @@ PHP
     }
 
     /**
-     * @dataProvider coverageTestsProvider
+     * @dataProvider locationsProvider
      *
-     * @param CoverageLineData[] $coverageTests
+     * @param TestLocation[] $tests
      * @param string[] $expectedFiles
      */
     public function test_it_sets_sorted_list_of_test_files(
-        array $coverageTests,
+        array $tests,
         array $expectedFiles
     ): void {
         $xml = file_get_contents(
             $this->builder->build(
-                $coverageTests,
+                $tests,
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH
@@ -525,26 +525,26 @@ PHP
         );
     }
 
-    public function coverageTestsProvider(): iterable
+    public function locationsProvider(): iterable
     {
         yield [
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #5',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
                     0.086178
                 ),
-                CoverageLineData::with(
+                new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #6',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
                     0.086178
                 ),
-                CoverageLineData::with(
+                new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_id',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
                     0.035935
                 ),
-                CoverageLineData::with(
+                new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_recorded_at_date',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
                     0.035935
@@ -558,17 +558,17 @@ PHP
 
         yield [
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'Path\\To\\A::test_a',
                     '/path/to/A.php',
                     0.186178
                 ),
-                CoverageLineData::with(
+                new TestLocation(
                     'Path\\To\\B::test_b',
                     '/path/to/B.php',
                     0.086178
                 ),
-                CoverageLineData::with(
+                new TestLocation(
                     'Path\\To\\C::test_c',
                     '/path/to/C.php',
                     0.016178

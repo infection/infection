@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use PHPUnit\Framework\TestCase;
 
@@ -44,7 +44,7 @@ final class JUnitTestCaseSorterTest extends TestCase
     public function test_it_returns_first_file_name_if_there_is_only_one(): void
     {
         $coverageTestCases = [
-            CoverageLineData::with(
+            new TestLocation(
                 'testMethod1',
                 '/path/to/test-file-1',
                 0.000234
@@ -64,22 +64,22 @@ final class JUnitTestCaseSorterTest extends TestCase
     public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
     {
         $coverageTestCases = [
-            CoverageLineData::with(
+            new TestLocation(
                 'testMethod1',
                 '/path/to/test-file-1',
                 0.000234
             ),
-            CoverageLineData::with(
+            new TestLocation(
                 'testMethod2',
                 '/path/to/test-file-2',
                 0.600221
             ),
-            CoverageLineData::with(
+            new TestLocation(
                 'testMethod3_1',
                 '/path/to/test-file-3',
                 0.000022
             ),
-            CoverageLineData::with(
+            new TestLocation(
                 'testMethod3_2',
                 '/path/to/test-file-3',
                 0.010022
@@ -89,7 +89,8 @@ final class JUnitTestCaseSorterTest extends TestCase
         $sorter = new JUnitTestCaseSorter();
 
         $uniqueSortedFileNames = iterator_to_array(
-            $sorter->getUniqueSortedFileNames($coverageTestCases)
+            $sorter->getUniqueSortedFileNames($coverageTestCases),
+            true
         );
 
         $this->assertCount(3, $uniqueSortedFileNames);

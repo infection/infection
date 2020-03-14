@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
@@ -103,7 +103,7 @@ final class ProxyTraceTest extends TestCase
         $tests = new TestLocations(
             [
                 21 => [
-                    CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
+                    TestLocation::forTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
                 ],
             ],
             [

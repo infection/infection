@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c51752167680ca484a4c6e6d26d4e384",
+    "content-hash": "6a6277ac6f4270174033923b9b68e6d5",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -52,17 +52,23 @@
         },
         {
             "name": "infection/abstract-testframework-adapter",
-            "version": "0.2.3",
+            "version": "0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/abstract-testframework-adapter.git",
-                "reference": "5235ec702bae66a5ee46bad28d571497708d7dac"
+                "reference": "f3ec6fc4beb6377b72d8106f5ff329dffd51ca8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/abstract-testframework-adapter/zipball/5235ec702bae66a5ee46bad28d571497708d7dac",
-                "reference": "5235ec702bae66a5ee46bad28d571497708d7dac",
+                "url": "https://api.github.com/repos/infection/abstract-testframework-adapter/zipball/f3ec6fc4beb6377b72d8106f5ff329dffd51ca8a",
+                "reference": "f3ec6fc4beb6377b72d8106f5ff329dffd51ca8a",
                 "shasum": ""
+            },
+            "require": {
+                "php": "^7.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.0"
             },
             "type": "library",
             "autoload": {
@@ -81,7 +87,7 @@
                 }
             ],
             "description": "Abstract Test Framework Adapter for Infection",
-            "time": "2020-01-16T21:29:02+00:00"
+            "time": "2020-03-14T07:20:06+00:00"
         },
         {
             "name": "infection/extension-installer",
@@ -3161,5 +3167,6 @@
     },
     "platform-overrides": {
         "php": "7.3.12"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }

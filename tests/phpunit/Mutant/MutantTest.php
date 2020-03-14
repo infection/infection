@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -51,7 +51,7 @@ final class MutantTest extends TestCase
     /**
      * @dataProvider valuesProvider
      *
-     * @param CoverageLineData[] $expectedTests
+     * @param TestLocation[] $expectedTests
      */
     public function test_it_can_be_instantiated(
         string $filePath,
@@ -86,7 +86,7 @@ final class MutantTest extends TestCase
         ];
 
         $tests = [
-            CoverageLineData::with(
+            new TestLocation(
                 'FooTest::test_it_can_instantiate',
                 '/path/to/acme/FooTest.php',
                 0.01

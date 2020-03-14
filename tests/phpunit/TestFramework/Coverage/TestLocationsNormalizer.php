@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\TestLocations;
 use function is_array;
 use function is_scalar;
@@ -48,17 +49,17 @@ final class TestLocationsNormalizer
     }
 
     /**
-     * @param array<string, TestLocations> $coverage
+     * @param array<string, TestLocations> $tests
      *
      * @return array<string|int, mixed>
      */
-    public static function normalize(iterable $coverage): array
+    public static function normalize(iterable $tests): array
     {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
+        if ($tests instanceof Traversable) {
+            $tests = iterator_to_array($tests, false);
         }
 
-        return self::serializeValue($coverage);
+        return self::serializeValue($tests);
     }
 
     private static function serializeValue($mixed)
@@ -69,6 +70,14 @@ final class TestLocationsNormalizer
 
         if (is_scalar($mixed)) {
             return $mixed;
+        }
+
+        if ($mixed instanceof TestLocation) {
+            return [
+                'testMethod' => $mixed->getMethod(),
+                'testFilePath' => $mixed->getFilePath(),
+                'testExecutionTime' => $mixed->getExecutionTime(),
+            ];
         }
 
         if (is_array($mixed)) {

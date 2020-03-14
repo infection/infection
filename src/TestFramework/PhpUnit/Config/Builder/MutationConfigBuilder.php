@@ -38,7 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 use DOMDocument;
 use DOMNode;
 use DOMNodeList;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
@@ -85,10 +85,10 @@ class MutationConfigBuilder extends ConfigBuilder
     }
 
     /**
-     * @param CoverageLineData[] $coverageTests
+     * @param TestLocation[] $tests
      */
     public function build(
-        array $coverageTests,
+        array $tests,
         string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath
@@ -119,7 +119,7 @@ class MutationConfigBuilder extends ConfigBuilder
         );
 
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
-        $this->setFilteredTestsToRun($coverageTests, $dom, $xPath);
+        $this->setFilteredTestsToRun($tests, $dom, $xPath);
 
         file_put_contents(
             $customAutoloadFilePath,
@@ -199,13 +199,13 @@ PHP
     }
 
     /**
-     * @param CoverageLineData[] $coverageTests
+     * @param TestLocation[] $tests
      */
-    private function setFilteredTestsToRun(array $coverageTests, DOMDocument $dom, SafeDOMXPath $xPath): void
+    private function setFilteredTestsToRun(array $tests, DOMDocument $dom, SafeDOMXPath $xPath): void
     {
         $this->removeExistingTestSuite($xPath);
 
-        $this->addTestSuiteWithFilteredTestFiles($coverageTests, $dom, $xPath);
+        $this->addTestSuiteWithFilteredTestFiles($tests, $dom, $xPath);
     }
 
     private function removeExistingTestSuite(SafeDOMXPath $xPath): void
@@ -235,10 +235,10 @@ PHP
     }
 
     /**
-     * @param CoverageLineData[] $coverageTestCases
+     * @param TestLocation[] $tests
      */
     private function addTestSuiteWithFilteredTestFiles(
-        array $coverageTestCases,
+        array $tests,
         DOMDocument $dom,
         SafeDOMXPath $xPath
     ): void {
@@ -254,7 +254,7 @@ PHP
         $testSuite = $dom->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
-        $uniqueTestFilePaths = $this->jUnitTestCaseSorter->getUniqueSortedFileNames($coverageTestCases);
+        $uniqueTestFilePaths = $this->jUnitTestCaseSorter->getUniqueSortedFileNames($tests);
 
         foreach ($uniqueTestFilePaths as $testFilePath) {
             $file = $dom->createElement('file', $testFilePath);

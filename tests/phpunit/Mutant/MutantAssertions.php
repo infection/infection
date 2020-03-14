@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
 
 trait MutantAssertions
 {
     /**
-     * @param CoverageLineData[] $expectedTests
+     * @param TestLocation[] $expectedTests
      */
     public function assertMutantStateIs(
         Mutant $mutant,

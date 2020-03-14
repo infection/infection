@@ -43,22 +43,22 @@ final class XmlCoverageFixture
     public $relativeCoverageFilePath;
     public $projectSource;
     public $sourceFilePath;
-    public $serializedCoverage;
+    public $normalizedTests;
 
     /**
-     * @param array<string, mixed> $serializedCoverage
+     * @param array<string, mixed> $normalizedTests
      */
     public function __construct(
         string $coverageDir,
         string $relativeCoverageFilePath,
         string $projectSource,
         string $sourceFilePath,
-        array $serializedCoverage
+        array $normalizedTests
     ) {
         $this->coverageDir = $coverageDir;
         $this->relativeCoverageFilePath = $relativeCoverageFilePath;
         $this->projectSource = $projectSource;
         $this->sourceFilePath = realpath($projectSource . DIRECTORY_SEPARATOR . $sourceFilePath);
-        $this->serializedCoverage = $serializedCoverage;
+        $this->normalizedTests = $normalizedTests;
     }
 }

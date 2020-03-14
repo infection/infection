@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
 use DOMNodeList;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TestLocations;
@@ -112,7 +112,7 @@ class XmlCoverageParser
      * @param DOMNodeList|DOMElement[] $coveredLineNodes
      * @phpstan-param DOMNodeList<DOMElement> $coveredLineNodes
      *
-     * @return array<int, array<int, CoverageLineData>>
+     * @return array<int, array<int, TestLocation>>
      */
     private static function &collectCoveredLinesData(DOMNodeList $coveredLineNodes): array
     {
@@ -133,7 +133,7 @@ class XmlCoverageParser
                     continue;
                 }
 
-                $data[$lineNumber][] = CoverageLineData::withTestMethod(
+                $data[$lineNumber][] = TestLocation::forTestMethod(
                     $coveredNode->getAttribute('by')
                 );
             }
