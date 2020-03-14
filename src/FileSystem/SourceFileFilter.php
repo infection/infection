@@ -41,7 +41,7 @@ use function explode;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Iterator;
-use SplFileInfo;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
