@@ -38,9 +38,9 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use DOMElement;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\SafeDOMXPath;
 use Webmozart\Assert\Assert;
 
@@ -54,36 +54,36 @@ class XmlCoverageParser
     {
     }
 
-    public function parse(SourceFileInfoProvider $provider): SourceFileData
+    public function parse(SourceFileInfoProvider $provider): ProxyTrace
     {
-        return new SourceFileData(
+        return new ProxyTrace(
             $provider->provideFileInfo(),
-            self::createCoverageReportGenerator($provider->provideXPath())
+            self::createTestLocationsGenerator($provider->provideXPath())
         );
     }
 
     /**
-     * @return iterable<CoverageReport>
+     * @return iterable<TestLocations>
      */
-    private static function createCoverageReportGenerator(SafeDOMXPath $xPath): iterable
+    private static function createTestLocationsGenerator(SafeDOMXPath $xPath): iterable
     {
-        yield self::retrieveCoverageReport($xPath);
+        yield self::retrieveTestLocations($xPath);
     }
 
-    private static function retrieveCoverageReport(SafeDOMXPath $xPath): CoverageReport
+    private static function retrieveTestLocations(SafeDOMXPath $xPath): TestLocations
     {
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
 
         $percentage = $linesNode->getAttribute('percent');
 
         if (self::percentageToFloat($percentage) === .0) {
-            return new CoverageReport();
+            return new TestLocations();
         }
 
         $coveredLineNodes = $xPath->query('/phpunit/file/coverage/line');
 
         if ($coveredLineNodes->length === 0) {
-            return new CoverageReport();
+            return new TestLocations();
         }
 
         $coveredMethodNodes = $xPath->query('/phpunit/file/class/method');
@@ -92,7 +92,7 @@ class XmlCoverageParser
             $coveredMethodNodes = $xPath->query('/phpunit/file/trait/method');
         }
 
-        return new CoverageReport(
+        return new TestLocations(
             self::collectCoveredLinesData($coveredLineNodes),
             self::collectMethodsCoverageData($coveredMethodNodes)
         );

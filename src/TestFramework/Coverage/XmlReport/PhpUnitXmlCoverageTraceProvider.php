@@ -33,33 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageReport;
-use Infection\TestFramework\Coverage\MethodLocationData;
-use PHPUnit\Framework\TestCase;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\TraceProvider;
 
-final class CoverageReportTest extends TestCase
+/**
+ * Provides the traces based on the PHPUnit XML coverage collected.
+ *
+ * @internal
+ * @final
+ */
+class PhpUnitXmlCoverageTraceProvider implements TraceProvider
 {
-    public function test_it_has_default_values(): void
-    {
-        $coverageReport = new CoverageReport();
+    private $indexReader;
+    private $indexParser;
+    private $parser;
 
-        $this->assertSame([], $coverageReport->byMethod);
-        $this->assertSame([], $coverageReport->byLine);
+    public function __construct(
+        IndexXmlCoverageReader $indexReader,
+        IndexXmlCoverageParser $indexCoverageXmlParser,
+        XmlCoverageParser $coverageXmlParser
+    ) {
+        $this->indexReader = $indexReader;
+        $this->indexParser = $indexCoverageXmlParser;
+        $this->parser = $coverageXmlParser;
     }
 
-    public function test_it_creates_self_object_with_named_constructor(): void
+    /**
+     * @return iterable<ProxyTrace>
+     */
+    public function provideTraces(): iterable
     {
-        $pathToTest = '/path/to/Test.php';
-
-        $coverageReport = new CoverageReport(
-            [1 => [CoverageLineData::withTestMethod($pathToTest)]],
-            ['method' => new MethodLocationData(1, 3)]
-        );
-
-        $this->assertSame($pathToTest, $coverageReport->byLine[1][0]->testMethod);
-        $this->assertSame(1, $coverageReport->byMethod['method']->startLine);
+        foreach ($this->indexParser->parse(
+            $this->indexReader->getIndexXmlPath(),
+            $this->indexReader->getIndexXmlContent()
+        ) as $infoProvider) {
+            // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
+            yield $this->parser->parse($infoProvider);
+        }
     }
 }

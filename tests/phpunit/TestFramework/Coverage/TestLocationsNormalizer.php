@@ -33,46 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\SourceFileData;
-use Infection\TestFramework\Coverage\SourceFileDataProvider;
+use Infection\TestFramework\Coverage\TestLocations;
+use function is_array;
+use function is_scalar;
+use function iterator_to_array;
+use Traversable;
 
-/**
- * Source of primary coverage data. Used by SourceFileDataFactory.
- *
- * @internal
- * @final
- *
- * TODO: rename to PhpUnitXmlCoverageTraceProvider: Provides the traces based on the PHPUnit XML coverage collected
- */
-class PhpUnitXmlCoveredFileDataProvider implements SourceFileDataProvider
+final class TestLocationsNormalizer
 {
-    private $indexReader;
-    private $indexParser;
-    private $parser;
-
-    public function __construct(
-        IndexXmlCoverageReader $indexReader,
-        IndexXmlCoverageParser $indexCoverageXmlParser,
-        XmlCoverageParser $coverageXmlParser
-    ) {
-        $this->indexReader = $indexReader;
-        $this->indexParser = $indexCoverageXmlParser;
-        $this->parser = $coverageXmlParser;
+    private function __construct()
+    {
     }
 
     /**
-     * @return iterable<SourceFileData>
+     * @param array<string, TestLocations> $coverage
+     *
+     * @return array<string|int, mixed>
      */
-    public function provideFiles(): iterable
+    public static function normalize(iterable $coverage): array
     {
-        foreach ($this->indexParser->parse(
-            $this->indexReader->getIndexXmlPath(),
-            $this->indexReader->getIndexXmlContent()
-        ) as $infoProvider) {
-            // TODO It might be benificial to filter files at this stage, rather than later. SourceFileDataFactory does that.
-            yield $this->parser->parse($infoProvider);
+        if ($coverage instanceof Traversable) {
+            $coverage = iterator_to_array($coverage, false);
         }
+
+        return self::serializeValue($coverage);
+    }
+
+    private static function serializeValue($mixed)
+    {
+        if ($mixed === null) {
+            return null;
+        }
+
+        if (is_scalar($mixed)) {
+            return $mixed;
+        }
+
+        if (is_array($mixed)) {
+            $convertedArray = [];
+
+            foreach ($mixed as $key => $value) {
+                $convertedArray[$key] = self::serializeValue($value);
+            }
+
+            return $convertedArray;
+        }
+
+        return self::serializeValue((array) $mixed);
     }
 }

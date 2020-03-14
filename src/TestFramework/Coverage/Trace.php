@@ -33,54 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\CoverageReport;
-use function is_array;
-use function is_scalar;
-use function iterator_to_array;
-use Traversable;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 
-final class CoverageHelper
+/**
+ * @internal
+ */
+interface Trace
 {
-    private function __construct()
-    {
-    }
+    public function hasTests(): bool;
 
     /**
-     * @param array<string, CoverageReport> $coverage
-     *
-     * @return array<string|int, mixed>
+     * @return iterable<CoverageLineData>
      */
-    public static function convertToArray(iterable $coverage): array
-    {
-        if ($coverage instanceof Traversable) {
-            $coverage = iterator_to_array($coverage, false);
-        }
-
-        return self::serializeValue($coverage);
-    }
-
-    private static function serializeValue($mixed)
-    {
-        if ($mixed === null) {
-            return null;
-        }
-
-        if (is_scalar($mixed)) {
-            return $mixed;
-        }
-
-        if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
-        }
-
-        return self::serializeValue((array) $mixed);
-    }
+    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
 }

@@ -35,17 +35,52 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+
 /**
  * @internal
  *
- * TODO: rename to TraceProvider
+ * ```
+ * 'byMethod' => [
+ *      'mutate' => MethodLocationData::['startLine' => 12, 'endLine' => 16],
+ *      ...
+ * ],
+ * 'byLine' => [
+ *     22 => [
+ *         CoverageLineData::[
+ *             'testMethod' => '\A\B\C::test_it_works',
+ *             'testFilePath' => '/path/to/A/B/C.php',
+ *             'time' => 0.34325,
+ *         ],
+ *         ...
+ *      ]
+ *  ]
+ * ```
  */
-interface SourceFileDataProvider
+final class TestLocations
 {
     /**
-     * TODO: rename to provideTraces()
-     *
-     * @return iterable<SourceFileData>
+     * @var array<int, array<int, CoverageLineData>>
      */
-    public function provideFiles(): iterable;
+    public $byLine = [];
+
+    /**
+     * TODO: use a getter "get"
+     *
+     * @var array<string, MethodLocationData>
+     */
+    public $byMethod = [];
+
+    /**
+     * TODO: rename CoverageLineData to TestLocation
+     * TODO: rename MethodLocationData to SourceMethodRange
+     *
+     * @param array<int, array<int, CoverageLineData>> $byLine
+     * @param array<string, MethodLocationData> $byMethod
+     */
+    public function __construct(array $byLine = [], array $byMethod = [])
+    {
+        $this->byLine = $byLine;
+        $this->byMethod = $byMethod;
+    }
 }

@@ -35,15 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use PHPUnit\Framework\TestCase;
 
-final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
+final class PhpUnitXmlCoverageTraceProviderTest extends TestCase
 {
     public function test_it_can_parse_coverage_data(): void
     {
@@ -70,24 +70,24 @@ final class PhpUnitXmlCoveredFileDataProviderTest extends TestCase
             ->willReturn([$providerMock])
         ;
 
-        $sourceFileDataMock = $this->createMock(SourceFileData::class);
+        $proxyTraceMock = $this->createMock(ProxyTrace::class);
 
         $coverageXmlParserMock = $this->createMock(XmlCoverageParser::class);
         $coverageXmlParserMock
             ->expects($this->once())
             ->method('parse')
             ->with($providerMock)
-            ->willReturn($sourceFileDataMock)
+            ->willReturn($proxyTraceMock)
         ;
 
-        $coverageProvider = new PhpUnitXmlCoveredFileDataProvider(
+        $provider = new PhpUnitXmlCoverageTraceProvider(
             $reader,
             $indexXmlParserMock,
             $coverageXmlParserMock
         );
 
-        $coverage = $coverageProvider->provideFiles();
+        $traces = $provider->provideTraces();
 
-        $this->assertSame([$sourceFileDataMock], iterator_to_array($coverage));
+        $this->assertSame([$proxyTraceMock], iterator_to_array($traces));
     }
 }

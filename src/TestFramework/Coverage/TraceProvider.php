@@ -35,19 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-
 /**
  * @internal
- *
- * TODO: rename to Tracer
  */
-interface LineCodeCoverage
+interface TraceProvider
 {
-    public function hasTests(): bool;
-
     /**
-     * @return iterable<CoverageLineData>
+     * @return iterable<ProxyTrace>
      */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+    public function provideTraces(): iterable;
 }

@@ -42,9 +42,9 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\Trace;
 use Webmozart\Assert\Assert;
 
 /**
@@ -76,16 +76,17 @@ class FileMutationGenerator
      * @return iterable<Mutation>
      */
     public function generate(
-        SourceFileData $fileData,
+        // TODO: rename this one once the TODO in TestTrace has been taken care of
+        ProxyTrace $fileData,
         bool $onlyCovered,
-        LineCodeCoverage $codeCoverage,
+        Trace $trace,
         array $mutators,
         array $nodeIgnorers
     ): iterable {
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
-        if ($onlyCovered && !$codeCoverage->hasTests()) {
+        if ($onlyCovered && !$trace->hasTests()) {
             return;
         }
 
@@ -98,7 +99,7 @@ class FileMutationGenerator
                 $mutators,
                 $fileInfo->getPathname(),
                 $initialStatements,
-                $codeCoverage,
+                $trace,
                 $onlyCovered,
                 $this->lineRangeCalculator
             )

@@ -33,56 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\TestLocations;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * ```
- * 'byMethod' => [
- *      'mutate' => MethodLocationData::['startLine' => 12, 'endLine' => 16],
- *      ...
- * ],
- * 'byLine' => [
- *     22 => [
- *         CoverageLineData::[
- *             'testMethod' => '\A\B\C::test_it_works',
- *             'testFilePath' => '/path/to/A/B/C.php',
- *             'time' => 0.34325,
- *         ],
- *         ...
- *      ]
- *  ]
- * ```
- *
- * TODO: rename to TestLocations
- */
-final class CoverageReport
+final class TestLocationsTest extends TestCase
 {
-    /**
-     * @var array<int, array<int, CoverageLineData>>
-     */
-    public $byLine = [];
-
-    /**
-     * TODO: use a getter "get"
-     *
-     * @var array<string, MethodLocationData>
-     */
-    public $byMethod = [];
-
-    /**
-     * TODO: rename CoverageLineData to TestLocation
-     * TODO: rename MethodLocationData to SourceMethodRange
-     *
-     * @param array<int, array<int, CoverageLineData>> $byLine
-     * @param array<string, MethodLocationData> $byMethod
-     */
-    public function __construct(array $byLine = [], array $byMethod = [])
+    public function test_it_has_default_values(): void
     {
-        $this->byLine = $byLine;
-        $this->byMethod = $byMethod;
+        $tests = new TestLocations();
+
+        $this->assertSame([], $tests->byMethod);
+        $this->assertSame([], $tests->byLine);
+    }
+
+    public function test_it_creates_self_object_with_named_constructor(): void
+    {
+        $pathToTest = '/path/to/Test.php';
+
+        $tests = new TestLocations(
+            [1 => [CoverageLineData::withTestMethod($pathToTest)]],
+            ['method' => new MethodLocationData(1, 3)]
+        );
+
+        $this->assertSame($pathToTest, $tests->byLine[1][0]->testMethod);
+        $this->assertSame(1, $tests->byMethod['method']->startLine);
     }
 }

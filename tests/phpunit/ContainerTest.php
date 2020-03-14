@@ -134,14 +134,14 @@ final class ContainerTest extends TestCase
             ''
         );
 
-        $files = $newContainer->getSourceFileDataFactory()->provideFiles();
+        $traces = $newContainer->getFilteredEnrichedTraceProvider()->provideTraces();
 
-        $this->assertIsIterable($files);
+        $this->assertIsIterable($traces);
 
         $this->expectException(Warning::class);
         $this->expectExceptionMessage('No such file or directory');
 
-        foreach ($files as $file) {
+        foreach ($traces as $trace) {
             $this->fail();
         }
     }

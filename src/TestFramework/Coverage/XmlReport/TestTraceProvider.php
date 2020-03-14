@@ -35,19 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\ProxyTrace;
 
 /**
  * @internal
  * @final
  */
-class FileCodeCoverageProvider
+class TestTraceProvider
 {
-    public function provideFor(SourceFileData $fileData): FileCodeCoverage
+    public function provideFor(ProxyTrace $trace): TestTrace
     {
         // TODO: I'm pretty sure this step can be simplified and maybe we can
         //  find a way to merge SourceFileData & FileCodeCoverage: they implement the same interface
         //  and one just decorate the other so I'm not convinced this is really needed
-        return new FileCodeCoverage($fileData->retrieveCoverageReport());
+        return new TestTrace($trace->retrieveTestLocations());
     }
 }

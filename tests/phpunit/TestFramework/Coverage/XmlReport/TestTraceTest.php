@@ -36,24 +36,24 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverage;
-use Infection\Tests\TestFramework\Coverage\CoverageHelper;
+use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\Coverage\XmlReport\TestTrace;
+use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
 use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use Traversable;
 
-final class FileCodeCoverageTest extends TestCase
+final class TestTraceTest extends TestCase
 {
+    private static $testsLocations;
+
     public function test_it_correctly_sets_coverage_information_for_method_body(): void
     {
         $filePath = '/path/to/acme/Foo.php';
 
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
-
-        $tests = $codeCoverageData->getAllTestsForMutation(
+        $tests = $this->createTestTrace($filePath)->getAllTestsForMutation(
             new NodeLineRangeData(34, 34),
             false
         );
@@ -66,7 +66,7 @@ final class FileCodeCoverageTest extends TestCase
                     'time' => 0.123,
                 ],
             ],
-            CoverageHelper::convertToArray($tests)
+            TestLocationsNormalizer::normalize($tests)
         );
     }
 
@@ -74,9 +74,7 @@ final class FileCodeCoverageTest extends TestCase
     {
         $filePath = '/path/to/acme/Foo.php';
 
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
-
-        $tests = $codeCoverageData->getAllTestsForMutation(
+        $tests = $this->createTestTrace($filePath)->getAllTestsForMutation(
             new NodeLineRangeData(24, 24),
             true
         );
@@ -114,103 +112,130 @@ final class FileCodeCoverageTest extends TestCase
                     'time' => 0.123,
                 ],
             ],
-            CoverageHelper::convertToArray($tests)
+            TestLocationsNormalizer::normalize($tests)
         );
     }
 
     public function test_it_determines_method_was_not_executed_from_coverage_report(): void
     {
         $filePath = '/path/to/acme/Foo.php';
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
+        $trace = $this->createTestTrace($filePath);
 
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
-            new NodeLineRangeData(19, 19),
-            true
-        ));
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
-            new NodeLineRangeData(21, 21),
-            false
-        ));
+        $this->assertCount(
+            0,
+            $trace->getAllTestsForMutation(
+                new NodeLineRangeData(19, 19),
+                true
+            )
+        );
+
+        $this->assertCount(
+            0,
+            $trace->getAllTestsForMutation(
+                new NodeLineRangeData(21, 21),
+                false
+            )
+        );
     }
 
     public function test_it_determines_line_was_not_executed_from_coverage_report(): void
     {
         $filePath = '/path/to/acme/Foo.php';
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
+        $trace = $this->createTestTrace($filePath);
 
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
-            new NodeLineRangeData(27, 27),
-            false
-        ));
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
-            new NodeLineRangeData(32, 32),
-            false
-        ));
+        $this->assertCount(
+            0,
+            $trace->getAllTestsForMutation(
+                new NodeLineRangeData(27, 27),
+                false
+            )
+        );
+
+        $this->assertCount(
+            0,
+            $trace->getAllTestsForMutation(
+                new NodeLineRangeData(32, 32),
+                false
+            )
+        );
     }
 
     public function test_it_determines_file_is_not_covered_for_unknown_path(): void
     {
         $filePath = '/path/to/unknown-file';
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
 
-        $this->assertFalse($codeCoverageData->hasTests());
+        $this->assertFalse($this->createTestTrace($filePath)->hasTests());
     }
 
     public function test_it_determines_file_is_covered(): void
     {
         $filePath = '/path/to/acme/Foo.php';
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
 
-        $this->assertTrue($codeCoverageData->hasTests());
+        $this->assertTrue($this->createTestTrace($filePath)->hasTests());
     }
 
     public function test_it_determines_file_does_not_have_tests_on_line_for_unknown_file(): void
     {
         $filePath = '/path/to/unknown-file';
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
+        $trace = $this->createTestTrace($filePath);
 
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
-            new NodeLineRangeData(34, 34),
-            true
-        ));
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
-            new NodeLineRangeData(34, 34),
-            false
-        ));
+        $this->assertCount(
+            0,
+            $trace->getAllTestsForMutation(
+                new NodeLineRangeData(34, 34),
+                true
+            )
+        );
+
+        $this->assertCount(
+            0,
+            $trace->getAllTestsForMutation(
+                new NodeLineRangeData(34, 34),
+                false
+            )
+        );
     }
 
     public function test_it_determines_file_does_not_have_tests_for_line(): void
     {
         $filePath = '/path/to/acme/Foo.php';
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
 
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
-            new NodeLineRangeData(1, 1),
-            true
-        ));
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
-            new NodeLineRangeData(1, 1),
-            false
-        ));
+        $trace = $this->createTestTrace($filePath);
+
+        $this->assertCount(
+            0,
+            $trace->getAllTestsForMutation(
+                new NodeLineRangeData(1, 1),
+                true
+            )
+        );
+
+        $this->assertCount(
+            0,
+            $trace->getAllTestsForMutation(
+                new NodeLineRangeData(1, 1),
+                false
+            )
+        );
     }
 
     public function test_it_returns_zero_tests_for_not_covered_function_body_mutator(): void
     {
         $filePath = '/path/to/acme/Foo.php';
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
-
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
-            new NodeLineRangeData(1, 1),
-            false
-        ));
+        $this->assertCount(
+            0,
+            $this->createTestTrace($filePath)->getAllTestsForMutation(
+                new NodeLineRangeData(1, 1),
+                false
+            )
+        );
     }
 
     public function test_it_returns_tests_for_covered_function_body_mutator(): void
     {
         $filePath = '/path/to/acme/Foo.php';
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
 
-        $tests = $codeCoverageData->getAllTestsForMutation(
+        $tests = $this->createTestTrace($filePath)->getAllTestsForMutation(
             new NodeLineRangeData(26, 26),
             false
         );
@@ -227,19 +252,20 @@ final class FileCodeCoverageTest extends TestCase
     public function test_it_returns_zero_tests_for_not_covered_function_signature_mutator(): void
     {
         $filePath = '/path/to/acme/Foo.php';
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
 
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
-            new NodeLineRangeData(1, 1), true
-        ));
+        $this->assertCount(
+            0,
+            $this->createTestTrace($filePath)->getAllTestsForMutation(
+                new NodeLineRangeData(1, 1), true
+            )
+        );
     }
 
     public function test_it_returns_tests_for_covered_function_signature_mutator(): void
     {
         $filePath = '/path/to/acme/Foo.php';
-        $codeCoverageData = $this->createCodeCoverageData($filePath);
 
-        $tests = $codeCoverageData->getAllTestsForMutation(
+        $tests = $this->createTestTrace($filePath)->getAllTestsForMutation(
             new NodeLineRangeData(24, 24),
             true
         );
@@ -247,10 +273,21 @@ final class FileCodeCoverageTest extends TestCase
         $this->assertCount(6, $tests);
     }
 
-    private function getParsedCodeCoverageData(): array
+    private function createTestTrace(string $filePath): TestTrace
     {
-        return [
-            '/path/to/acme/Foo.php' => new CoverageReport(
+        $testsLocations = $this->getTestsLocations();
+
+        if (!array_key_exists($filePath, $testsLocations)) {
+            return new TestTrace(new TestLocations());
+        }
+
+        return new TestTrace($testsLocations[$filePath]);
+    }
+
+    private function getTestsLocations(): array
+    {
+        return self::$testsLocations ?? [
+            '/path/to/acme/Foo.php' => new TestLocations(
                 [
                     26 => [
                         CoverageLineData::with(
@@ -298,16 +335,5 @@ final class FileCodeCoverageTest extends TestCase
                 ]
             ),
         ];
-    }
-
-    private function createCodeCoverageData(string $filePath): FileCodeCoverage
-    {
-        $parsedData = $this->getParsedCodeCoverageData();
-
-        if (!array_key_exists($filePath, $parsedData)) {
-            return new FileCodeCoverage(new CoverageReport());
-        }
-
-        return new FileCodeCoverage($parsedData[$filePath]);
     }
 }

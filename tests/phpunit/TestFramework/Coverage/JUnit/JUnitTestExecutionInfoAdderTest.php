@@ -37,16 +37,13 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
-use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder
- */
 final class JUnitTestExecutionInfoAdderTest extends TestCase
 {
     public function test_it_does_not_add_if_junit_is_not_provided(): void
@@ -66,12 +63,13 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
         $adder = new JUnitTestExecutionInfoAdder($adapter, $testFileDataProvider);
 
-        $expected = [1, 2, 3];
+        $proxyTraceMock = $this->createMock(ProxyTrace::class);
+        $proxyTraceMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
 
-        /** @var array $actual */
-        $actual = $adder->addTestExecutionInfo($expected);
-
-        $this->assertSame($expected, $actual);
+        $adder->addTestExecutionInfo([$proxyTraceMock]);
     }
 
     public function test_it_adds_if_junit_is_provided(): void
@@ -98,23 +96,21 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
         $lineData = CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated');
 
-        $fileData = new CoverageReport();
-        $fileData->byLine = [
+        $tests = new TestLocations();
+        $tests->byLine = [
             11 => [
                 $lineData,
             ],
         ];
 
-        $sourceFileDataMock = $this->createMock(SourceFileData::class);
-        $sourceFileDataMock
+        $proxyTraceMock = $this->createMock(ProxyTrace::class);
+        $proxyTraceMock
             ->expects($this->once())
-            ->method('retrieveCoverageReport')
-            ->willReturn($fileData)
+            ->method('retrieveTestLocations')
+            ->willReturn($tests)
         ;
 
-        $expected = [
-            $sourceFileDataMock,
-        ];
+        $expected = [$proxyTraceMock];
 
         $actual = $adder->addTestExecutionInfo($expected);
         $actual = iterator_to_array($actual, false);
@@ -125,6 +121,6 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
         $this->assertSame('/path/to/acme/FooTest.php', $lineData->testFilePath);
         $this->assertSame(0.000234, $lineData->time);
 
-        $this->assertSame($lineData, $fileData->byLine[11][0]);
+        $this->assertSame($lineData, $tests->byLine[11][0]);
     }
 }

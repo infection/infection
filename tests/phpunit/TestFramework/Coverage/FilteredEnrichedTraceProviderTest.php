@@ -36,35 +36,32 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\FileSystem\SourceFileFilter;
+use Infection\TestFramework\Coverage\FilteredEnrichedTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\SourceFileData;
-use Infection\TestFramework\Coverage\SourceFileDataFactory;
-use Infection\TestFramework\Coverage\SourceFileDataProvider;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\TraceProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 use Traversable;
 
-/**
- * @covers \Infection\TestFramework\Coverage\SourceFileDataFactory
- */
-final class SourceFileDataFactoryTest extends TestCase
+final class FilteredEnrichedTraceProviderTest extends TestCase
 {
-    public function test_it_provides_files(): void
+    public function test_it_provides_traces(): void
     {
         $canary = [1, 2, 3];
 
-        $providedFiles = $this->factoryProvidesFiles(
+        $traces = $this->createTraces(
             $canary,
             [$this->createMock(SplFileInfo::class)],
             true
         );
 
-        $this->assertSame($canary, $providedFiles);
+        $this->assertSame($canary, $traces);
         $this->assertCount(3, $canary);
     }
 
-    public function test_it_adds_source_files_to_provided_files(): void
+    public function test_it_takes_its_traces_from_the_decorated_trace_provider_and_not_the_provided_source_files(): void
     {
         $inputFileNames = [
             'src/Foo.php',
@@ -78,42 +75,45 @@ final class SourceFileDataFactoryTest extends TestCase
             'src/Test/Foo.php',
         ];
 
-        $providedFiles = $this->factoryProvidesFiles(
+        $traces = $this->createTraces(
             take($inputFileNames)->map(function (string $filename) {
-                return $this->createSourceFileDataMock($filename);
+                return $this->createProxyTraceMock($filename);
             }),
             take($expectedFileNames)->map(function (string $filename) {
-                return $this->createSplFileInfoMock($filename);
+                return $this->createFileInfoMock($filename);
             }),
             false
         );
 
-        $actualFileNames = take($providedFiles)->map(static function (SourceFileData $data) {
-            return $data->getSplFileInfo()->getRealPath();
-        })->toArray();
+        $actualFileNames = take($traces)
+            ->map(static function (ProxyTrace $trace) {
+                return $trace->getSplFileInfo()->getRealPath();
+            })
+            ->toArray()
+        ;
 
         $this->assertSame($expectedFileNames, $actualFileNames);
     }
 
-    public function test_it_provides_added_source_files_with_no_coverage(): void
+    public function test_it_appends_the_missing_source_files_as_uncovered_traces(): void
     {
-        $providedFiles = $this->factoryProvidesFiles(
+        $traces = $this->createTraces(
             [],
-            [$this->createSplFileInfoMock('src/Foo.php')],
+            [$this->createFileInfoMock('src/Foo.php')],
             false
         );
 
-        if ($providedFiles instanceof Traversable) {
-            $providedFiles = iterator_to_array($providedFiles);
+        if ($traces instanceof Traversable) {
+            $traces = iterator_to_array($traces);
         }
 
-        /** @var SourceFileData $fileWithoutCoverage */
-        $fileWithoutCoverage = $providedFiles[0];
+        /** @var ProxyTrace $uncoveredTrace */
+        $uncoveredTrace = $traces[0];
 
-        $this->assertFalse($fileWithoutCoverage->hasTests());
+        $this->assertFalse($uncoveredTrace->hasTests());
     }
 
-    public function test_it_ignores_source_files_when_only_covered(): void
+    public function test_it_does_not_append_missing_sources_files_as_uncovered_traces_if_only_covered_is_enabled(): void
     {
         $expectedFileNames = [
             'src/Foo.php',
@@ -127,32 +127,35 @@ final class SourceFileDataFactoryTest extends TestCase
             'src/Test/Foo.php',
         ];
 
-        $providedFiles = $this->factoryProvidesFiles(
+        $providedFiles = $this->createTraces(
             take($expectedFileNames)->map(function (string $filename) {
-                return $this->createSourceFileDataMock($filename);
+                return $this->createProxyTraceMock($filename);
             }),
             take($inputFileNames)->map(function (string $filename) {
-                return $this->createSplFileInfoMock($filename);
+                return $this->createFileInfoMock($filename);
             }),
             true
         );
 
-        $actualFileNames = take($providedFiles)->map(static function (SourceFileData $data) {
-            return $data->getSplFileInfo()->getRealPath();
-        })->toArray();
+        $traces = take($providedFiles)
+            ->map(static function (ProxyTrace $trace) {
+                return $trace->getSplFileInfo()->getRealPath();
+            })
+            ->toArray()
+        ;
 
-        $this->assertSame($expectedFileNames, $actualFileNames);
+        $this->assertSame($expectedFileNames, $traces);
     }
 
-    private function factoryProvidesFiles(
+    private function createTraces(
         iterable $canary,
         iterable $sourceFiles,
         bool $onlyCovered
     ): iterable {
-        $sourceFileDataProvider = $this->createMock(SourceFileDataProvider::class);
-        $sourceFileDataProvider
+        $traceProviderMock = $this->createMock(TraceProvider::class);
+        $traceProviderMock
             ->expects($this->once())
-            ->method('provideFiles')
+            ->method('provideTraces')
             ->willReturn($canary)
         ;
 
@@ -172,38 +175,38 @@ final class SourceFileDataFactoryTest extends TestCase
             ->willReturn($canary)
         ;
 
-        $factory = new SourceFileDataFactory(
-            $sourceFileDataProvider,
+        $provider = new FilteredEnrichedTraceProvider(
+            $traceProviderMock,
             $testFileDataAdder,
             $filter,
             $sourceFiles,
             $onlyCovered
         );
 
-        return $factory->provideFiles();
+        return $provider->provideTraces();
     }
 
-    private function createSplFileInfoMock(string $filename): SplFileInfo
+    private function createFileInfoMock(string $filename): SplFileInfo
     {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $splFileInfoMock
+        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock
             ->method('getRealPath')
             ->willReturn($filename)
         ;
 
-        return $splFileInfoMock;
+        return $fileInfoMock;
     }
 
-    private function createSourceFileDataMock(string $filename): SourceFileData
+    private function createProxyTraceMock(string $filename): ProxyTrace
     {
-        $splFileInfoMock = $this->createSplFileInfoMock($filename);
+        $splFileInfoMock = $this->createFileInfoMock($filename);
 
-        $codeCoverageMock = $this->createMock(SourceFileData::class);
-        $codeCoverageMock
+        $proxyTraceMock = $this->createMock(ProxyTrace::class);
+        $proxyTraceMock
             ->method('getSplFileInfo')
             ->willReturn($splFileInfoMock)
         ;
 
-        return $codeCoverageMock;
+        return $proxyTraceMock;
     }
 }

@@ -89,16 +89,16 @@ use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\FilteredEnrichedTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\SourceFileDataFactory;
-use Infection\TestFramework\Coverage\XmlReport\FileCodeCoverageProvider;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
+use Infection\TestFramework\Coverage\XmlReport\TestTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -165,9 +165,9 @@ final class Container
                 // TODO XmlCoverageParser might want to notify ProcessRunner if it can't parse another file due to lack of RAM
                 return new XmlCoverageParser();
             },
-            SourceFileDataFactory::class => static function (self $container): SourceFileDataFactory {
-                return new SourceFileDataFactory(
-                    $container->getPhpUnitXmlCoveredFileDataProvider(),
+            FilteredEnrichedTraceProvider::class => static function (self $container): FilteredEnrichedTraceProvider {
+                return new FilteredEnrichedTraceProvider(
+                    $container->getPhpUnitXmlCoverageTraceProvider(),
                     $container->getJUnitTestExecutionInfoAdder(),
                     $container->getSourceFileFilter(),
                     $container->getConfiguration()->getSourceFiles(),
@@ -185,8 +185,8 @@ final class Container
                     $container->getMemoizedTestFileDataProvider()
                 );
             },
-            PhpUnitXmlCoveredFileDataProvider::class => static function (self $container): PhpUnitXmlCoveredFileDataProvider {
-                return new PhpUnitXmlCoveredFileDataProvider(
+            PhpUnitXmlCoverageTraceProvider::class => static function (self $container): PhpUnitXmlCoverageTraceProvider {
+                return new PhpUnitXmlCoverageTraceProvider(
                     $container->getIndexXmlCoverageReader(),
                     $container->getIndexXmlCoverageParser(),
                     $container->getXmlCoverageParser()
@@ -197,8 +197,8 @@ final class Container
                     $container->getConfiguration()->getCoveragePath()
                 );
             },
-            FileCodeCoverageProvider::class => static function (self $container): FileCodeCoverageProvider {
-                return new FileCodeCoverageProvider();
+            TestTraceProvider::class => static function (): TestTraceProvider {
+                return new TestTraceProvider();
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
                 return new RootsFileOrDirectoryLocator(
@@ -432,8 +432,8 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new MutationGenerator(
-                    $container->getSourceFileDataFactory(),
-                    $container->getFileCodeCoverageProvider(),
+                    $container->getFilteredEnrichedTraceProvider(),
+                    $container->getTestTraceProvider(),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
@@ -585,9 +585,9 @@ final class Container
         return $this->get(XmlCoverageParser::class);
     }
 
-    public function getSourceFileDataFactory(): SourceFileDataFactory
+    public function getFilteredEnrichedTraceProvider(): FilteredEnrichedTraceProvider
     {
-        return $this->get(SourceFileDataFactory::class);
+        return $this->get(FilteredEnrichedTraceProvider::class);
     }
 
     public function getSourceFileFilter(): SourceFileFilter
@@ -600,9 +600,9 @@ final class Container
         return $this->get(JUnitTestExecutionInfoAdder::class);
     }
 
-    public function getPhpUnitXmlCoveredFileDataProvider(): PhpUnitXmlCoveredFileDataProvider
+    public function getPhpUnitXmlCoverageTraceProvider(): PhpUnitXmlCoverageTraceProvider
     {
-        return $this->get(PhpUnitXmlCoveredFileDataProvider::class);
+        return $this->get(PhpUnitXmlCoverageTraceProvider::class);
     }
 
     public function getIndexXmlCoverageReader(): IndexXmlCoverageReader
@@ -610,9 +610,9 @@ final class Container
         return $this->get(IndexXmlCoverageReader::class);
     }
 
-    public function getFileCodeCoverageProvider(): FileCodeCoverageProvider
+    public function getTestTraceProvider(): TestTraceProvider
     {
-        return $this->get(FileCodeCoverageProvider::class);
+        return $this->get(TestTraceProvider::class);
     }
 
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
