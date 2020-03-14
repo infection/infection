@@ -40,6 +40,7 @@ use Infection\TestFramework\Coverage\FilteredEnrichedTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\TestFramework\Coverage\XmlReport\TestTrace;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
@@ -110,7 +111,9 @@ final class FilteredEnrichedTraceProviderTest extends TestCase
         /** @var ProxyTrace $uncoveredTrace */
         $uncoveredTrace = $traces[0];
 
-        $this->assertFalse($uncoveredTrace->hasTests());
+        $testTrace = new TestTrace($uncoveredTrace->retrieveTestLocations());
+
+        $this->assertFalse($testTrace->hasTests());
     }
 
     public function test_it_does_not_append_missing_sources_files_as_uncovered_traces_if_only_covered_is_enabled(): void

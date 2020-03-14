@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
@@ -85,70 +82,5 @@ final class ProxyTraceTest extends TestCase
         // From cache
         $actual = $trace->retrieveTestLocations();
         $this->assertSame($tests, $actual);
-    }
-
-    public function test_it_has_no_tests_if_no_covered(): void
-    {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
-
-        $trace = new ProxyTrace($fileInfoMock, [new TestLocations()]);
-
-        $this->assertFalse($trace->hasTests());
-    }
-
-    public function test_it_exposes_its_test_locations(): void
-    {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-
-        $tests = new TestLocations(
-            [
-                21 => [
-                    CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
-                ],
-            ],
-            [
-                '__construct' => new MethodLocationData(
-                    19,
-                    22
-                ),
-            ]
-        );
-
-        $trace = new ProxyTrace($splFileInfoMock, [$tests]);
-
-        $this->assertTrue($trace->hasTests());
-
-        $this->assertCount(
-            0,
-            $trace->getAllTestsForMutation(
-                new NodeLineRangeData(1, 1),
-                false
-            )
-        );
-
-        $this->assertCount(
-            1,
-            $trace->getAllTestsForMutation(
-                new NodeLineRangeData(20, 21),
-                false
-            )
-        );
-
-        // This iterator_to_array is due to bug in our version of PHPUnit
-        $this->assertCount(
-            0,
-            iterator_to_array($trace->getAllTestsForMutation(
-                new NodeLineRangeData(1, 1),
-                true
-            ))
-        );
-
-        $this->assertCount(
-            1,
-            iterator_to_array($trace->getAllTestsForMutation(
-                new NodeLineRangeData(19, 22),
-                true
-            ))
-        );
     }
 }

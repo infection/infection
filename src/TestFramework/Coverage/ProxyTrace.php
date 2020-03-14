@@ -41,12 +41,12 @@ use Webmozart\Assert\Assert;
 
 /**
  * Full-pledge trace that acts as a proxy i.e. for which the tracing of the test files will be done
- * lazily.
+ * lazily. TODO reword
  *
  * @internal
  * @final
  */
-class ProxyTrace implements Trace
+class ProxyTrace
 {
     /**
      * @var SplFileInfo
@@ -120,26 +120,5 @@ class ProxyTrace implements Trace
         $this->lazyTestLocations = []; // let GC have it
 
         return $this->testLocations;
-    }
-
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
-    {
-        return $this->getTestTrace()->getAllTestsForMutation($lineRange, $isOnFunctionSignature);
-    }
-
-    public function hasTests(): bool
-    {
-        return $this->getTestTrace()->hasTests();
-    }
-
-    private function getTestTrace(): TestTrace
-    {
-        if ($this->tests !== null) {
-            return $this->tests;
-        }
-
-        $this->tests = new TestTrace($this->retrieveTestLocations());
-
-        return $this->tests;
     }
 }
