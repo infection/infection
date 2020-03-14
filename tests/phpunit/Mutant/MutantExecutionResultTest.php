@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
@@ -112,7 +112,7 @@ DIFF;
                 MutatedNode::wrap(new Nop()),
                 0,
                 [
-                    CoverageLineData::with(
+                    new TestLocation(
                         'FooTest::test_it_can_instantiate',
                         '/path/to/acme/FooTest.php',
                         0.01
@@ -190,7 +190,7 @@ DIFF
                     MutatedNode::wrap(new Nop()),
                     0,
                     [
-                        CoverageLineData::with(
+                        new TestLocation(
                             'FooTest::test_it_can_instantiate',
                             '/path/to/acme/FooTest.php',
                             0.01
@@ -272,7 +272,7 @@ DIFF
                     MutatedNode::wrap(new Nop()),
                     0,
                     [
-                        CoverageLineData::with(
+                        new TestLocation(
                             'FooTest::test_it_can_instantiate',
                             '/path/to/acme/FooTest.php',
                             0.01

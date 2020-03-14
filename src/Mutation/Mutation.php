@@ -39,7 +39,7 @@ use function array_intersect_key;
 use function array_keys;
 use function count;
 use function implode;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\MutatedNode;
 use function md5;
@@ -80,7 +80,7 @@ class Mutation
     /**
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
-     * @param CoverageLineData[] $tests
+     * @param TestLocation[] $tests
      */
     public function __construct(
         string $originalFilePath,
@@ -150,13 +150,14 @@ class Mutation
         return $this->mutatedNode;
     }
 
+    // TODO: hasTest()?
     public function isCoveredByTest(): bool
     {
         return $this->coveredByTests;
     }
 
     /**
-     * @return CoverageLineData[]
+     * @return TestLocation[]
      */
     public function getAllTests(): array
     {

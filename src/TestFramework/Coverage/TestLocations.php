@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 
 /**
  * @internal
@@ -60,7 +60,7 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 final class TestLocations
 {
     /**
-     * @var array<int, array<int, CoverageLineData>>
+     * @var array<int, array<int, TestLocation>>
      */
     public $byLine = [];
 
@@ -75,7 +75,7 @@ final class TestLocations
      * TODO: rename CoverageLineData to TestLocation
      * TODO: rename MethodLocationData to SourceMethodRange
      *
-     * @param array<int, array<int, CoverageLineData>> $byLine
+     * @param array<int, array<int, TestLocation>> $byLine
      * @param array<string, MethodLocationData> $byMethod
      */
     public function __construct(array $byLine = [], array $byMethod = [])

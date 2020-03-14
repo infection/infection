@@ -35,14 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TestLocations;
+use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class JUnitTestExecutionInfoAdderTest extends TestCase
 {
@@ -94,33 +96,41 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
         $adder = new JUnitTestExecutionInfoAdder($adapter, $testFileDataProvider);
 
-        $lineData = CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated');
-
         $tests = new TestLocations();
         $tests->byLine = [
             11 => [
-                $lineData,
+                TestLocation::forTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
             ],
         ];
 
-        $proxyTraceMock = $this->createMock(ProxyTrace::class);
-        $proxyTraceMock
-            ->expects($this->once())
-            ->method('retrieveTestLocations')
-            ->willReturn($tests)
-        ;
+        $proxyTrace = new ProxyTrace(
+            new SplFileInfo('/path/to/Foo.php', 'Foo.php', 'Foo.php'),
+            [$tests]
+        );
 
-        $expected = [$proxyTraceMock];
+        $expected = [$proxyTrace];
 
         $actual = $adder->addTestExecutionInfo($expected);
         $actual = iterator_to_array($actual, false);
 
         $this->assertSame($expected, $actual);
 
-        $this->assertSame('Acme\FooTest::test_it_can_be_instantiated', $lineData->testMethod);
-        $this->assertSame('/path/to/acme/FooTest.php', $lineData->testFilePath);
-        $this->assertSame(0.000234, $lineData->time);
-
-        $this->assertSame($lineData, $tests->byLine[11][0]);
+        $this->assertSame(
+            [
+                [
+                    'byLine' => [
+                        11 => [
+                            [
+                                'testMethod' => 'Acme\FooTest::test_it_can_be_instantiated',
+                                'testFilePath' => '/path/to/acme/FooTest.php',
+                                'testExecutionTime' => 0.000234,
+                            ],
+                        ],
+                    ],
+                    'byMethod' => [],
+                ],
+            ],
+            TestLocationsNormalizer::normalize([$proxyTrace->retrieveTestLocations()])
+        );
     }
 }

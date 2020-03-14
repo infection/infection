@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 
 /**
  * @internal
@@ -45,7 +45,7 @@ interface Trace
     public function hasTests(): bool;
 
     /**
-     * @return iterable<CoverageLineData>
+     * @return iterable<TestLocation>
      */
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
 }

@@ -571,7 +571,7 @@ final class Container
             Path::canonicalize(
                 $this->getConfiguration()->getCoveragePath() . '/..'
             ),
-            TestFrameworkAdapter::JUNIT_FILE_NAME
+            'junit.xml'
         );
     }
 

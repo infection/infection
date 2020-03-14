@@ -62,11 +62,11 @@ final class XmlCoverageParserTest extends TestCase
     /**
      * @dataProvider sourceFileInfoProviderProvider
      *
-     * @param array<string, mixed> $expectedCoverage
+     * @param array<string, mixed> $expectedTests
      */
     public function test_it_reads_every_type_of_fixture(
         SourceFileInfoProvider $provider,
-        array $expectedCoverage
+        array $expectedTests
     ): void {
         $fileData = $this->parser->parse($provider);
 
@@ -78,7 +78,7 @@ final class XmlCoverageParserTest extends TestCase
         $coverageData = $fileData->retrieveTestLocations();
 
         $this->assertSame(
-            $expectedCoverage,
+            $expectedTests,
             TestLocationsNormalizer::normalize([$coverageData])[0]
         );
     }
@@ -169,7 +169,7 @@ XML;
                     $fixture->relativeCoverageFilePath,
                     $fixture->projectSource
                 ),
-                $fixture->serializedCoverage,
+                $fixture->normalizedTests,
             ];
         }
     }
