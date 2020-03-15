@@ -66,6 +66,7 @@ class SourceFileCollector
             ->name('*.php')
         ;
 
-        return $finder;
+        // Yield here to make sure these files are used only once
+        yield from $finder;
     }
 }
