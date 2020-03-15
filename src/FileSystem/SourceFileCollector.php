@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
-use Infection\FileSystem\Finder\FilterableFinder;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -59,7 +59,7 @@ class SourceFileCollector
             return [];
         }
 
-        $finder = FilterableFinder::create()
+        $finder = Finder::create()
             ->exclude($excludeDirectories)
             ->in($sourceDirectories)
             ->files()

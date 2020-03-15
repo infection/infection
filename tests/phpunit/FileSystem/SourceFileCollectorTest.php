@@ -43,10 +43,6 @@ use function Pipeline\take;
 use function Safe\natcasesort;
 use Webmozart\PathUtil\Path;
 
-/**
- * @covers \Infection\FileSystem\Finder\FilterableFinder
- * @covers \Infection\FileSystem\SourceFileCollector
- */
 final class SourceFileCollectorTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
