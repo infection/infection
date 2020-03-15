@@ -56,7 +56,7 @@ class SourceFileCollector
         array $excludeDirectories
     ): iterable {
         if ([] === $sourceDirectories) {
-            return [];
+            return;
         }
 
         $finder = Finder::create()
@@ -66,7 +66,7 @@ class SourceFileCollector
             ->name('*.php')
         ;
 
-        // Yield here to make sure these files are used only once
+        // Generator here to make sure these files are used only once
         yield from $finder;
     }
 }
