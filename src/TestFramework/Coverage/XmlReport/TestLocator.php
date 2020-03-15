@@ -65,6 +65,9 @@ class TestLocator
         return false;
     }
 
+    /**
+     * @return iterable<TestLocation>
+     */
     public function getAllTestsForMutation(
         NodeLineRangeData $lineRange,
         bool $isOnFunctionSignature
