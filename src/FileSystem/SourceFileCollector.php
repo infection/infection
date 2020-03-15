@@ -66,7 +66,7 @@ class SourceFileCollector
             ->name('*.php')
         ;
 
-        // Generator here to make sure these files are used only once
+        // Generator here to make sure these files used only once
         yield from $finder;
     }
 }
