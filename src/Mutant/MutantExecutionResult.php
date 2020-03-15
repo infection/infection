@@ -77,17 +77,12 @@ class MutantExecutionResult
 
     public static function createFromNonCoveredMutant(Mutant $mutant): self
     {
-        $mutation = $mutant->getMutation();
+        return self::createFromMutant($mutant, DetectionStatus::NOT_COVERED);
+    }
 
-        return new self(
-            '',
-            '',
-            DetectionStatus::NOT_COVERED,
-            $mutant->getDiff(),
-            $mutant->getMutation()->getMutatorName(),
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalStartingLine()
-        );
+    public static function createFromTimeConstrainedMutant(Mutant $mutant): self
+    {
+        return self::createFromMutant($mutant, DetectionStatus::TIMED_OUT);
     }
 
     public static function createFromProcess(MutantProcess $mutantProcess): self
@@ -140,5 +135,20 @@ class MutantExecutionResult
     public function getOriginalStartingLine(): int
     {
         return $this->originalStartingLine;
+    }
+
+    private static function createFromMutant(Mutant $mutant, string $detectionStatus): self
+    {
+        $mutation = $mutant->getMutation();
+
+        return new self(
+            '',
+            '',
+            $detectionStatus,
+            $mutant->getDiff(),
+            $mutant->getMutation()->getMutatorName(),
+            $mutation->getOriginalFilePath(),
+            $mutation->getOriginalStartingLine()
+        );
     }
 }

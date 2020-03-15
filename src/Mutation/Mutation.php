@@ -37,6 +37,8 @@ namespace Infection\Mutation;
 
 use function array_intersect_key;
 use function array_keys;
+use function array_map;
+use function array_sum;
 use function count;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -162,6 +164,18 @@ class Mutation
     public function getAllTests(): array
     {
         return $this->tests;
+    }
+
+    /**
+     * Overall time needed to run known tests for a mutation, excluding dependencies.
+     */
+    public function getTimeToTest(): float
+    {
+        // TODO this needs to be memoized
+
+        return array_sum(array_map(static function (TestLocation $data) {
+            return $data->getExecutionTime();
+        }, $this->tests));
     }
 
     public function getHash(): string

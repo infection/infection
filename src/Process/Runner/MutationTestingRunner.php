@@ -61,6 +61,7 @@ final class MutationTestingRunner
     private $eventDispatcher;
     private $fileSystem;
     private $runConcurrently;
+    private $timeout;
 
     public function __construct(
         MutantProcessBuilder $mutantProcessBuilder,
@@ -68,7 +69,8 @@ final class MutationTestingRunner
         ParallelProcessRunner $parallelProcessManager,
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
-        bool $runConcurrently
+        bool $runConcurrently,
+        int $timeout
     ) {
         $this->processBuilder = $mutantProcessBuilder;
         $this->mutantFactory = $mutantFactory;
@@ -76,6 +78,7 @@ final class MutationTestingRunner
         $this->eventDispatcher = $eventDispatcher;
         $this->fileSystem = $fileSystem;
         $this->runConcurrently = $runConcurrently;
+        $this->timeout = $timeout;
     }
 
     /**
@@ -97,6 +100,17 @@ final class MutationTestingRunner
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
                     MutantExecutionResult::createFromNonCoveredMutant($mutant)
+                ));
+
+                return false;
+            })
+            ->filter(function (Mutant $mutant) {
+                if ($mutant->getMutation()->getTimeToTest() < $this->timeout) {
+                    return true;
+                }
+
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromTimeConstrainedMutant($mutant)
                 ));
 
                 return false;

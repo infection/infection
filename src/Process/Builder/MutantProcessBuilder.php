@@ -53,7 +53,7 @@ class MutantProcessBuilder
     public function __construct(TestFrameworkAdapter $testFrameworkAdapter, int $timeout)
     {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
-        $this->timeout = $timeout;
+        $this->timeout = (float) $timeout;
     }
 
     public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
@@ -68,7 +68,7 @@ class MutantProcessBuilder
             )
         );
 
-        $process->setTimeout((float) $this->timeout);
+        $process->setTimeout($this->timeout);
 
         if (method_exists($process, 'inheritEnvironmentVariables')) {
             // in version 4.4.0 this method is deprecated and removed in 5.0.0

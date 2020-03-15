@@ -447,7 +447,8 @@ final class Container
                     $container->getParallelProcessRunner(),
                     $container->getEventDispatcher(),
                     $container->getFileSystem(),
-                    $container->getConfiguration()->noProgress()
+                    $container->getConfiguration()->noProgress(),
+                    $container->getConfiguration()->getProcessTimeout()
                 );
             },
             LineRangeCalculator::class => static function (): LineRangeCalculator {
