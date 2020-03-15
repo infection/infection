@@ -83,11 +83,12 @@ class JUnitTestExecutionInfoAdder
     private function testExecutionInfoAdder(iterable $traces): iterable
     {
         foreach ($traces as $trace) {
-            foreach ($trace->retrieveTestLocations()->byLine as &$testsLocations) {
+            foreach ($trace->retrieveTestLocations()->getTestsLocationsBySourceLine() as &$testsLocations) {
                 foreach ($testsLocations as $line => $test) {
-                    $testsLocations[$line] = self::createCompleteTestLocation($test);
+                    $testsLocations[$line] = $this->createCompleteTestLocation($test);
                 }
             }
+            unset($testsLocations);
 
             yield $trace;
         }

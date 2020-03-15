@@ -33,26 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
 
-/**
- * @internal
- */
-final class MethodLocationData
+use Infection\TestFramework\Coverage\SourceMethodRange;
+use PHPUnit\Framework\TestCase;
+
+final class SourceMethodRangeTest extends TestCase
 {
-    /**
-     * @var int
-     */
-    public $startLine;
-
-    /**
-     * @var int
-     */
-    public $endLine;
-
-    public function __construct(int $startLine, int $endLine)
+    public function test_it_creates_self_with_named_constructor(): void
     {
-        $this->startLine = $startLine;
-        $this->endLine = $endLine;
+        $range = new SourceMethodRange(11, 22);
+
+        $this->assertSame(11, $range->getStartLine());
+        $this->assertSame(22, $range->getEndLine());
     }
 }

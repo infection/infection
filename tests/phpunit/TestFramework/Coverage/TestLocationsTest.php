@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\SourceMethodRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
 
@@ -44,22 +44,135 @@ final class TestLocationsTest extends TestCase
 {
     public function test_it_has_default_values(): void
     {
-        $tests = new TestLocations();
+        $testLocations = new TestLocations();
 
-        $this->assertSame([], $tests->byMethod);
-        $this->assertSame([], $tests->byLine);
+        $this->assertSame([], $testLocations->getTestsLocationsBySourceLine());
+        $this->assertSame([], $testLocations->getSourceMethodRangeByMethod());
     }
 
-    public function test_it_creates_self_object_with_named_constructor(): void
+    public function test_it_can_be_instantiated(): void
     {
-        $pathToTest = '/path/to/Test.php';
-
-        $tests = new TestLocations(
-            [1 => [TestLocation::forTestMethod($pathToTest)]],
-            ['method' => new MethodLocationData(1, 3)]
+        $testLocations = new TestLocations(
+            [
+                22 => [
+                    new TestLocation(
+                        '\A\B\C::test_it_works',
+                        '/path/to/A/B/C.php',
+                        0.34325
+                    ),
+                ],
+            ],
+            [
+                'mutate' => new SourceMethodRange(12, 16),
+                'createNode' => new SourceMethodRange(32, 33),
+            ],
         );
 
-        $this->assertSame($pathToTest, $tests->byLine[1][0]->getMethod());
-        $this->assertSame(1, $tests->byMethod['method']->startLine);
+        $this->assertSame(
+            [
+                [
+                    'byLine' => [
+                        22 => [
+                            [
+                                'testMethod' => '\A\B\C::test_it_works',
+                                'testFilePath' => '/path/to/A/B/C.php',
+                                'testExecutionTime' => 0.34325,
+                            ],
+                        ],
+                    ],
+                    'byMethod' => [
+                        'mutate' => [
+                            'startLine' => 12,
+                            'endLine' => 16,
+                        ],
+                        'createNode' => [
+                            'startLine' => 32,
+                            'endLine' => 33,
+                        ],
+                    ],
+                ],
+            ],
+            TestLocationsNormalizer::normalize([$testLocations])
+        );
+    }
+
+    public function test_it_can_expose_its_tests_locations_by_reference(): void
+    {
+        $testLocations = new TestLocations(
+            [
+                22 => [
+                    new TestLocation(
+                        '\A\B\C::test_it_works',
+                        '/path/to/A/B/C.php',
+                        0.34325
+                    ),
+                ],
+            ],
+            [
+                'mutate' => new SourceMethodRange(12, 16),
+                'createNode' => new SourceMethodRange(32, 33),
+            ],
+        );
+
+        foreach ($testLocations->getTestsLocationsBySourceLine() as $testsLocations) {
+            foreach ($testsLocations as $line => $test) {
+                $testsLocations[$line] = null;
+            }
+        }
+
+        $this->assertSame(
+            [
+                [
+                    'byLine' => [
+                        22 => [
+                            [
+                                'testMethod' => '\A\B\C::test_it_works',
+                                'testFilePath' => '/path/to/A/B/C.php',
+                                'testExecutionTime' => 0.34325,
+                            ],
+                        ],
+                    ],
+                    'byMethod' => [
+                        'mutate' => [
+                            'startLine' => 12,
+                            'endLine' => 16,
+                        ],
+                        'createNode' => [
+                            'startLine' => 32,
+                            'endLine' => 33,
+                        ],
+                    ],
+                ],
+            ],
+            TestLocationsNormalizer::normalize([$testLocations])
+        );
+
+        foreach ($testLocations->getTestsLocationsBySourceLine() as &$testsLocations) {
+            foreach ($testsLocations as $line => $test) {
+                $testsLocations[$line] = null;
+            }
+        }
+        unset($testsLocations);
+
+        $this->assertSame(
+            [
+                [
+                    'byLine' => [
+                        22 => [null],
+                    ],
+                    'byMethod' => [
+                        'mutate' => [
+                            'startLine' => 12,
+                            'endLine' => 16,
+                        ],
+                        'createNode' => [
+                            'startLine' => 32,
+                            'endLine' => 33,
+                        ],
+                    ],
+                ],
+            ],
+            TestLocationsNormalizer::normalize([$testLocations])
+        );
     }
 }

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\SourceMethodRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
 
@@ -45,9 +45,11 @@ final class TestLocationsNormalizerTest extends TestCase
     /**
      * @dataProvider locationsProvider
      */
-    public function test_it_can_convert_an_associative_array_of_test_locations_into_an_associative_array_of_scalar_values(array $coverage, array $expected): void
-    {
-        $actual = TestLocationsNormalizer::normalize($coverage);
+    public function test_it_can_convert_an_associative_array_of_test_locations_into_an_associative_array_of_scalar_values(
+        array $value,
+        array $expected
+    ): void {
+        $actual = TestLocationsNormalizer::normalize($value);
 
         $this->assertSame($expected, $actual);
     }
@@ -103,7 +105,7 @@ final class TestLocationsNormalizerTest extends TestCase
                 '/path/to/acme/Foo.php' => new TestLocations(
                     [],
                     [
-                        '__construct' => new MethodLocationData(
+                        '__construct' => new SourceMethodRange(
                             19,
                             22
                         ),
@@ -136,7 +138,7 @@ final class TestLocationsNormalizerTest extends TestCase
                         ],
                     ],
                     [
-                        '__construct' => new MethodLocationData(
+                        '__construct' => new SourceMethodRange(
                             19,
                             22
                         ),

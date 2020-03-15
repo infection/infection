@@ -39,48 +39,37 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 
 /**
  * @internal
- *
- * ```
- * 'byMethod' => [
- *      'mutate' => MethodLocationData::['startLine' => 12, 'endLine' => 16],
- *      ...
- * ],
- * 'byLine' => [
- *     22 => [
- *         CoverageLineData::[
- *             'testMethod' => '\A\B\C::test_it_works',
- *             'testFilePath' => '/path/to/A/B/C.php',
- *             'time' => 0.34325,
- *         ],
- *         ...
- *      ]
- *  ]
- * ```
  */
 final class TestLocations
 {
-    /**
-     * @var array<int, array<int, TestLocation>>
-     */
-    public $byLine = [];
+    private $byLine;
+    private $byMethod;
 
     /**
-     * TODO: use a getter "get"
-     *
-     * @var array<string, MethodLocationData>
+     * @param array<int, array<int, TestLocation>> $testLocationsBySourceLine
+     * @param array<string, SourceMethodRange> $sourceMethodRangeByMethod
      */
-    public $byMethod = [];
+    public function __construct(
+        array $testLocationsBySourceLine = [],
+        array $sourceMethodRangeByMethod = []
+    ) {
+        $this->byLine = $testLocationsBySourceLine;
+        $this->byMethod = $sourceMethodRangeByMethod;
+    }
 
     /**
-     * TODO: rename CoverageLineData to TestLocation
-     * TODO: rename MethodLocationData to SourceMethodRange
-     *
-     * @param array<int, array<int, TestLocation>> $byLine
-     * @param array<string, MethodLocationData> $byMethod
+     * @return array<int, array<int, TestLocation>>
      */
-    public function __construct(array $byLine = [], array $byMethod = [])
+    public function &getTestsLocationsBySourceLine(): array
     {
-        $this->byLine = $byLine;
-        $this->byMethod = $byMethod;
+        return $this->byLine;
+    }
+
+    /**
+     * @return array<string, SourceMethodRange>
+     */
+    public function getSourceMethodRangeByMethod(): array
+    {
+        return $this->byMethod;
     }
 }

@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\SourceMethodRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
@@ -107,7 +107,7 @@ final class ProxyTraceTest extends TestCase
                 ],
             ],
             [
-                '__construct' => new MethodLocationData(
+                '__construct' => new SourceMethodRange(
                     19,
                     22
                 ),

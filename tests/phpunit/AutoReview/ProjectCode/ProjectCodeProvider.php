@@ -63,8 +63,8 @@ use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
-use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\TestFramework\Coverage\SourceMethodRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
@@ -221,7 +221,7 @@ final class ProjectCodeProvider
                         $className,
                         [
                             TestLocations::class,
-                            MethodLocationData::class,
+                            SourceMethodRange::class,
                             NodeLineRangeData::class,
                             TestFileTimeData::class,
                         ],

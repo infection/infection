@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\TestFramework\Coverage\SourceMethodRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\XmlReport\TestTrace;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
@@ -342,9 +342,9 @@ final class TestTraceTest extends TestCase
                     ],
                 ],
                 [
-                    'do0' => new MethodLocationData(19, 22),
-                    'do1' => new MethodLocationData(24, 35),
-                    'doSomethingUncovered' => new MethodLocationData(3, 5),
+                    'do0' => new SourceMethodRange(19, 22),
+                    'do1' => new SourceMethodRange(24, 35),
+                    'doSomethingUncovered' => new SourceMethodRange(3, 5),
                 ]
             ),
         ];

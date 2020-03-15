@@ -96,12 +96,14 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
         $adder = new JUnitTestExecutionInfoAdder($adapter, $testFileDataProvider);
 
-        $tests = new TestLocations();
-        $tests->byLine = [
-            11 => [
-                TestLocation::forTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
+        $tests = new TestLocations(
+            [
+                11 => [
+                    TestLocation::forTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
+                ],
             ],
-        ];
+            []
+        );
 
         $proxyTrace = new ProxyTrace(
             new SplFileInfo('/path/to/Foo.php', 'Foo.php', 'Foo.php'),
