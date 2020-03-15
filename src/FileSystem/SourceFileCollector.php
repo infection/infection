@@ -56,8 +56,7 @@ class SourceFileCollector
      */
     public function collectFiles(
         array $sourceDirectories,
-        array $excludeDirectories,
-        string $filter
+        array $excludeDirectories
     ): iterable {
         if ([] === $sourceDirectories) {
             return [];
@@ -67,20 +66,8 @@ class SourceFileCollector
             ->exclude($excludeDirectories)
             ->in($sourceDirectories)
             ->files()
+            ->name('*.php')
         ;
-
-        if ($filter === '') {
-            $finder->name('*.php');
-        } else {
-            $finder->filterFiles(
-                array_filter(
-                    array_map(
-                        'trim',
-                        explode(',', $filter)
-                    )
-                )
-            );
-        }
 
         return $finder;
     }
