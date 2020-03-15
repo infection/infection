@@ -161,10 +161,16 @@ final class FilteredEnrichedTraceProviderTest extends TestCase
 
         $filter = $this->createMock(SourceFileFilter::class);
         $filter
-            ->expects($this->once())
+            ->expects($this->exactly($onlyCovered ? 1 : 2))
             ->method('filter')
-            ->with($canary)
-            ->willReturn($canary)
+            ->withConsecutive(
+                [$canary],
+                [$sourceFiles]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $canary,
+                $sourceFiles
+            )
         ;
 
         $testFileDataAdder = $this->createMock(JUnitTestExecutionInfoAdder::class);
