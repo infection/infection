@@ -39,7 +39,7 @@ use function array_filter;
 use function array_map;
 use function explode;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
-use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\Trace;
 use Iterator;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -75,9 +75,9 @@ class SourceFileFilter
     }
 
     /**
-     * @param iterable<SplFileInfo&ProxyTrace> $input
+     * @param iterable<SplFileInfo&Trace> $input
      *
-     * @return iterable<SplFileInfo&ProxyTrace>
+     * @return iterable<SplFileInfo&Trace>
      */
     public function filter(iterable $input): iterable
     {
@@ -93,9 +93,9 @@ class SourceFileFilter
     }
 
     /**
-     * @param iterable<SplFileInfo&ProxyTrace> $input
+     * @param iterable<SplFileInfo&Trace> $input
      *
-     * @return Iterator<SplFileInfo&ProxyTrace>
+     * @return Iterator<SplFileInfo&Trace>
      */
     private function iterableToIterator(iterable $input): Iterator
     {

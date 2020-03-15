@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\XmlReport\TestTrace;
+use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -64,7 +64,7 @@ class ProxyTrace implements Trace
     private $lazyTestLocations;
 
     /**
-     * @var TestTrace|null
+     * @var TestLocator|null
      */
     private $tests;
 
@@ -79,15 +79,12 @@ class ProxyTrace implements Trace
         $this->lazyTestLocations = $lazyTestLocations;
     }
 
-    public function getSplFileInfo(): SplFileInfo
+    public function getSourceFileInfo(): SplFileInfo
     {
         return $this->sourceFile;
     }
 
-    /**
-     * Used by RealPathFilterIterator
-     */
-    public function getRealPath(): string
+    public function getSourceRealPath(): string
     {
         $realPath = $this->sourceFile->getRealPath();
 
@@ -96,10 +93,12 @@ class ProxyTrace implements Trace
         return $realPath;
     }
 
-    /**
-     * Accessor used to update CoverageReport with TestFileTimeData.
-     */
-    public function retrieveTestLocations(): TestLocations
+    public function hasTests(): bool
+    {
+        return $this->getTestLocator()->hasTests();
+    }
+
+    public function getTests(): TestLocations
     {
         if ($this->testLocations !== null) {
             return $this->testLocations;
@@ -124,21 +123,16 @@ class ProxyTrace implements Trace
 
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
     {
-        return $this->getTestTrace()->getAllTestsForMutation($lineRange, $isOnFunctionSignature);
+        return $this->getTestLocator()->getAllTestsForMutation($lineRange, $isOnFunctionSignature);
     }
 
-    public function hasTests(): bool
-    {
-        return $this->getTestTrace()->hasTests();
-    }
-
-    private function getTestTrace(): TestTrace
+    private function getTestLocator(): TestLocator
     {
         if ($this->tests !== null) {
             return $this->tests;
         }
 
-        $this->tests = new TestTrace($this->retrieveTestLocations());
+        $this->tests = new TestLocator($this->getTests());
 
         return $this->tests;
     }

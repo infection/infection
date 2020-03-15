@@ -98,7 +98,6 @@ use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\TestTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -196,9 +195,6 @@ final class Container
                 return new IndexXmlCoverageReader(
                     $container->getConfiguration()->getCoveragePath()
                 );
-            },
-            TestTraceProvider::class => static function (): TestTraceProvider {
-                return new TestTraceProvider();
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
                 return new RootsFileOrDirectoryLocator(
@@ -433,7 +429,6 @@ final class Container
 
                 return new MutationGenerator(
                     $container->getFilteredEnrichedTraceProvider(),
-                    $container->getTestTraceProvider(),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
@@ -608,11 +603,6 @@ final class Container
     public function getIndexXmlCoverageReader(): IndexXmlCoverageReader
     {
         return $this->get(IndexXmlCoverageReader::class);
-    }
-
-    public function getTestTraceProvider(): TestTraceProvider
-    {
-        return $this->get(TestTraceProvider::class);
     }
 
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator

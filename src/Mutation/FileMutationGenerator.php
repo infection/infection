@@ -43,7 +43,6 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\Trace;
 use Webmozart\Assert\Assert;
 
@@ -76,10 +75,8 @@ class FileMutationGenerator
      * @return iterable<Mutation>
      */
     public function generate(
-        // TODO: rename this one once the TODO in TestTrace has been taken care of
-        ProxyTrace $fileData,
-        bool $onlyCovered,
         Trace $trace,
+        bool $onlyCovered,
         array $mutators,
         array $nodeIgnorers
     ): iterable {
@@ -90,7 +87,7 @@ class FileMutationGenerator
             return;
         }
 
-        $fileInfo = $fileData->getSplFileInfo();
+        $fileInfo = $trace->getSourceFileInfo();
 
         $initialStatements = $this->parser->parse($fileInfo);
 

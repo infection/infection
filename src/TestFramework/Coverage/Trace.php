@@ -36,13 +36,20 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
  */
 interface Trace
 {
+    public function getSourceFileInfo(): SplFileInfo;
+
+    public function getSourceRealPath(): string;
+
     public function hasTests(): bool;
+
+    public function getTests(): TestLocations;
 
     /**
      * @return iterable<TestLocation>

@@ -43,9 +43,8 @@ use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\TestTraceProvider;
 use Webmozart\Assert\Assert;
 
 /**
@@ -54,13 +53,7 @@ use Webmozart\Assert\Assert;
 final class MutationGenerator
 {
     private $traceProvider;
-    private $coverageProvider;
-
-    /**
-     * @var Mutator[]
-     */
     private $mutators;
-
     private $eventDispatcher;
     private $fileMutationGenerator;
     private $runConcurrently;
@@ -70,7 +63,6 @@ final class MutationGenerator
      */
     public function __construct(
         TraceProvider $traceProvider,
-        TestTraceProvider $coverageProvider,
         array $mutators,
         EventDispatcher $eventDispatcher,
         FileMutationGenerator $fileMutationGenerator,
@@ -79,7 +71,6 @@ final class MutationGenerator
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
         $this->traceProvider = $traceProvider;
-        $this->coverageProvider = $coverageProvider;
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileMutationGenerator = $fileMutationGenerator;
@@ -102,12 +93,11 @@ final class MutationGenerator
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
-        /** @var ProxyTrace $trace */
+        /** @var Trace $trace */
         foreach ($traces as $trace) {
             yield from $this->fileMutationGenerator->generate(
                 $trace,
                 $onlyCovered,
-                $this->coverageProvider->provideFor($trace),
                 $this->mutators,
                 $nodeIgnorers
             );

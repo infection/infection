@@ -38,7 +38,7 @@ namespace Infection\TestFramework\Coverage\JUnit;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\Trace;
 
 /**
  * Adds test execution info to selected covered file data object.
@@ -62,9 +62,9 @@ class JUnitTestExecutionInfoAdder
     }
 
     /**
-     * @param iterable<ProxyTrace> $traces
+     * @param iterable<Trace> $traces
      *
-     * @return iterable<ProxyTrace>
+     * @return iterable<Trace>
      */
     public function addTestExecutionInfo(iterable $traces): iterable
     {
@@ -76,14 +76,15 @@ class JUnitTestExecutionInfoAdder
     }
 
     /**
-     * @param iterable<ProxyTrace> $traces
+     * @param iterable<Trace> $traces
      *
-     * @return iterable<ProxyTrace>
+     * @return iterable<Trace>
      */
     private function testExecutionInfoAdder(iterable $traces): iterable
     {
+        /** @var Trace $trace */
         foreach ($traces as $trace) {
-            foreach ($trace->retrieveTestLocations()->getTestsLocationsBySourceLine() as &$testsLocations) {
+            foreach ($trace->getTests()->getTestsLocationsBySourceLine() as &$testsLocations) {
                 foreach ($testsLocations as $line => $test) {
                     $testsLocations[$line] = $this->createCompleteTestLocation($test);
                 }
