@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function Safe\file_put_contents;
 use function Safe\tempnam;
 use function Safe\unlink;
 

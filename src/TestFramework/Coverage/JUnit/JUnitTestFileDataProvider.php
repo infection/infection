@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use DOMDocument;
+use DOMElement;
+use DOMNodeList;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;
 use function Safe\sprintf;
@@ -65,6 +67,9 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     {
         $xPath = $this->getXPath();
 
+        /** @var DOMNodeList<DOMElement> $nodes */
+        $nodes = null;
+
         foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {
             $nodes = $xPath->query(sprintf($queryString, $placeholder));
 
@@ -88,6 +93,9 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         );
     }
 
+    /**
+     * @return iterable<string, string>
+     */
     private static function testCaseMapGenerator(string $fullyQualifiedClassName): iterable
     {
         // A default format for <testsuite>
