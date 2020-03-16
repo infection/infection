@@ -90,14 +90,14 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
     private static function testCaseMapGenerator(string $fullyQualifiedClassName): iterable
     {
-        // Similar format for <testsuite>
-        yield '(//testsuite[@name="%s"])[1]' => $fullyQualifiedClassName;
+        // A default format for <testsuite>
+        yield '//testsuite[@name="%s"][1]' => $fullyQualifiedClassName;
 
         // A format where the class name is inside `class` attribute of `testcase` tag
-        yield '(//testcase[@class="%s"])[1]' => $fullyQualifiedClassName;
+        yield '//testcase[@class="%s"][1]' => $fullyQualifiedClassName;
 
         // A format where the class name is inside `file` attribute of `testcase` tag
-        yield '(//testcase[contains(@file, "%s")])[1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
+        yield '//testcase[contains(@file, "%s")][1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
     }
 
     private function getXPath(): SafeDOMXPath
