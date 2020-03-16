@@ -41,6 +41,7 @@ use Infection\TestFramework\Coverage\Trace;
 use IteratorIterator;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
+use SplFileInfo;
 use Traversable;
 
 final class SourceFileFilterTest extends TestCase
@@ -50,24 +51,13 @@ final class SourceFileFilterTest extends TestCase
      *
      * @param string[] $expectedFilters
      */
-    public function test_it_can_parse_and_normalize_string_filter(string $filter, array $expectedFilters): void
-    {
+    public function test_it_can_parse_and_normalize_string_filter(
+        string $filter,
+        array $expectedFilters
+    ): void {
         $fileFilter = new SourceFileFilter($filter);
 
         $this->assertSame($expectedFilters, array_values($fileFilter->getFilters()));
-    }
-
-    /**
-     * @dataProvider fileListProvider
-     */
-    public function test_it_filters_traversable(
-        string $filter,
-        array $filePaths,
-        array $expectedFilePaths
-    ): void {
-        $filePaths = $this->arrayToSplFileInfoTraversable($filePaths);
-
-        $this->assertCanFilterInput($filter, $filePaths, $expectedFilePaths);
     }
 
     /**
@@ -76,16 +66,66 @@ final class SourceFileFilterTest extends TestCase
      * @param string[] $filePaths
      * @param string[] $expectedFilePaths
      */
-    public function test_it_filters_iterator(
+    public function test_it_filters_spl_file_info_files_traversable(
         string $filter,
         array $filePaths,
         array $expectedFilePaths
     ): void {
-        $filePaths = $this->arrayToSplFileInfoTraversable($filePaths);
+        $filePaths = $this->createSplFileInfosTraversable($filePaths);
+
+        $this->assertFiltersExpectedInput($filter, $filePaths, $expectedFilePaths);
+    }
+
+    /**
+     * @dataProvider fileListProvider
+     *
+     * @param string[] $filePaths
+     * @param string[] $expectedFilePaths
+     */
+    public function test_it_filters_traces_traversable(
+        string $filter,
+        array $filePaths,
+        array $expectedFilePaths
+    ): void {
+        $filePaths = $this->createTracesTraversable($filePaths);
+
+        $this->assertFiltersExpectedInput($filter, $filePaths, $expectedFilePaths);
+    }
+
+    /**
+     * @dataProvider fileListProvider
+     *
+     * @param string[] $filePaths
+     * @param string[] $expectedFilePaths
+     */
+    public function test_it_filters_spl_file_info_iterator(
+        string $filter,
+        array $filePaths,
+        array $expectedFilePaths
+    ): void {
+        $filePaths = $this->createSplFileInfosTraversable($filePaths);
 
         $filePaths = new IteratorIterator($filePaths);
 
-        $this->assertCanFilterInput($filter, $filePaths, $expectedFilePaths);
+        $this->assertFiltersExpectedInput($filter, $filePaths, $expectedFilePaths);
+    }
+
+    /**
+     * @dataProvider fileListProvider
+     *
+     * @param string[] $filePaths
+     * @param string[] $expectedFilePaths
+     */
+    public function test_it_filters_trace_iterator(
+        string $filter,
+        array $filePaths,
+        array $expectedFilePaths
+    ): void {
+        $filePaths = $this->createTracesTraversable($filePaths);
+
+        $filePaths = new IteratorIterator($filePaths);
+
+        $this->assertFiltersExpectedInput($filter, $filePaths, $expectedFilePaths);
     }
 
     public function filterProvider(): iterable
@@ -161,7 +201,7 @@ final class SourceFileFilterTest extends TestCase
      * @param iterable<Trace> $input
      * @param string[] $expectedFilePaths
      */
-    private function assertCanFilterInput(
+    private function assertFiltersExpectedInput(
         string $filter,
         iterable $input,
         array $expectedFilePaths
@@ -169,8 +209,9 @@ final class SourceFileFilterTest extends TestCase
         $actual = (new SourceFileFilter($filter))->filter($input);
 
         $actual = take($actual)
-            ->map(static function (Trace $fileInfo) {
-                return $fileInfo->getRealPath();
+            ->map(static function ($traceOrFileInfo) {
+                /* @var Trace|SplFileInfo */
+                return $traceOrFileInfo->getRealPath();
             })
             ->toArray();
 
@@ -180,9 +221,29 @@ final class SourceFileFilterTest extends TestCase
     /**
      * @param string[] $filePaths
      *
+     * @return Traversable<SplFileInfo>
+     */
+    private function createSplFileInfosTraversable(array $filePaths): Traversable
+    {
+        return take($filePaths)
+            ->map(function (string $filename) {
+                $traceMock = $this->createMock(SplFileInfo::class);
+                $traceMock
+                    ->method('getRealPath')
+                    ->willReturn($filename)
+                ;
+
+                return $traceMock;
+            })
+        ;
+    }
+
+    /**
+     * @param string[] $filePaths
+     *
      * @return Traversable<Trace>
      */
-    private function arrayToSplFileInfoTraversable(array $filePaths): Traversable
+    private function createTracesTraversable(array $filePaths): Traversable
     {
         return take($filePaths)
             ->map(function (string $filename) {

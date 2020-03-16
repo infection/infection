@@ -89,6 +89,7 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
      */
     public function provideTraces(): iterable
     {
+        /** @var iterable<Trace> $traces */
         $traces = $this->filter->filter(
             $this->primaryTraceProvider->provideTraces()
         );
@@ -126,6 +127,7 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
             yield $trace;
         }
 
+        /** @var iterable<SplFileInfo> $filteredSourceFiles */
         $filteredSourceFiles = $this->filter->filter(
             $this->sourceFiles
         );

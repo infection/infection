@@ -41,6 +41,7 @@ use function explode;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Infection\TestFramework\Coverage\Trace;
 use Iterator;
+use SplFileInfo;
 
 /**
  * @internal
@@ -74,9 +75,9 @@ class SourceFileFilter
     }
 
     /**
-     * @param iterable<Trace> $input
+     * @param iterable<SplFileInfo|Trace> $input
      *
-     * @return iterable<Trace>
+     * @return iterable<SplFileInfo|Trace>
      */
     public function filter(iterable $input): iterable
     {
@@ -92,9 +93,9 @@ class SourceFileFilter
     }
 
     /**
-     * @param iterable<Trace> $input
+     * @param iterable<SplFileInfo|Trace> $input
      *
-     * @return Iterator<Trace>
+     * @return Iterator<SplFileInfo|Trace>
      */
     private function iterableToIterator(iterable $input): Iterator
     {

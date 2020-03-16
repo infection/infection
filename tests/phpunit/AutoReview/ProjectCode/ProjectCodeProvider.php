@@ -51,7 +51,6 @@ use Infection\Console\Util\PhpProcess;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
-use Infection\FileSystem\Finder\FilterableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Http\StrykerCurlClient;
@@ -96,7 +95,6 @@ final class ProjectCodeProvider
         MutationGeneratingConsoleLoggerSubscriber::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
-        FilterableFinder::class,
         Engine::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
