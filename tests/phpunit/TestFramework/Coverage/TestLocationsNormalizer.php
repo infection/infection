@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use function is_array;
 use function is_scalar;
@@ -49,17 +50,17 @@ final class TestLocationsNormalizer
     }
 
     /**
-     * @param array<string, TestLocations> $tests
+     * @param TestLocations[]|TestLocation[] $value
      *
      * @return array<string|int, mixed>
      */
-    public static function normalize(iterable $tests): array
+    public static function normalize(iterable $value): array
     {
-        if ($tests instanceof Traversable) {
-            $tests = iterator_to_array($tests, false);
+        if ($value instanceof Traversable) {
+            $value = iterator_to_array($value, false);
         }
 
-        return self::serializeValue($tests);
+        return self::serializeValue($value);
     }
 
     private static function serializeValue($mixed)
@@ -77,6 +78,20 @@ final class TestLocationsNormalizer
                 'testMethod' => $mixed->getMethod(),
                 'testFilePath' => $mixed->getFilePath(),
                 'testExecutionTime' => $mixed->getExecutionTime(),
+            ];
+        }
+
+        if ($mixed instanceof SourceMethodLineRange) {
+            return [
+                'startLine' => $mixed->getStartLine(),
+                'endLine' => $mixed->getEndLine(),
+            ];
+        }
+
+        if ($mixed instanceof TestLocations) {
+            return [
+                'byLine' => self::serializeValue($mixed->getTestsLocationsBySourceLine()),
+                'byMethod' => self::serializeValue($mixed->getSourceMethodLineRangeByMethod()),
             ];
         }
 

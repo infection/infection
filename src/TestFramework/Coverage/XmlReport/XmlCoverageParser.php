@@ -38,8 +38,8 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use DOMElement;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\SafeDOMXPath;
 use Webmozart\Assert\Assert;
@@ -144,9 +144,10 @@ class XmlCoverageParser
 
     /**
      * @param DOMNodeList|DOMElement[] $methodsCoverageNodes
+     *
      * @phpstan-param DOMNodeList<DOMElement> $methodsCoverageNodes
      *
-     * @return MethodLocationData[]
+     * @return SourceMethodLineRange[]
      */
     private static function &collectMethodsCoverageData(DOMNodeList $methodsCoverageNodes): array
     {
@@ -161,7 +162,7 @@ class XmlCoverageParser
             Assert::integerish($start);
             Assert::integerish($end);
 
-            $methodsCoverage[$methodName] = new MethodLocationData(
+            $methodsCoverage[$methodName] = new SourceMethodLineRange(
                 (int) $start,
                 (int) $end
             );
