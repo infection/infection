@@ -47,14 +47,14 @@ final class TestLocations
 
     /**
      * @param array<int, array<int, TestLocation>> $testLocationsBySourceLine
-     * @param array<string, SourceMethodRange> $sourceMethodRangeByMethod
+     * @param array<string, SourceMethodRange> $sourceMethodLineRangeByMethod
      */
     public function __construct(
         array $testLocationsBySourceLine = [],
-        array $sourceMethodRangeByMethod = []
+        array $sourceMethodLineRangeByMethod = []
     ) {
         $this->byLine = $testLocationsBySourceLine;
-        $this->byMethod = $sourceMethodRangeByMethod;
+        $this->byMethod = $sourceMethodLineRangeByMethod;
     }
 
     /**

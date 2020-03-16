@@ -84,7 +84,7 @@ class ProxyTrace implements Trace
         return $this->sourceFile;
     }
 
-    public function getSourceRealPath(): string
+    public function getRealPath(): string
     {
         $realPath = $this->sourceFile->getRealPath();
 

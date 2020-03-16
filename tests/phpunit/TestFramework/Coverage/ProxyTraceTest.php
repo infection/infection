@@ -67,7 +67,7 @@ final class ProxyTraceTest extends TestCase
             ->willReturn($expected)
         ;
 
-        $actual = (new ProxyTrace($fileInfoMock, []))->getSourceRealPath();
+        $actual = (new ProxyTrace($fileInfoMock, []))->getRealPath();
 
         $this->assertSame($expected, $actual);
     }
