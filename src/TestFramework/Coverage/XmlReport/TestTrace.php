@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 
@@ -68,8 +69,8 @@ class TestTrace implements Trace
 
     public function hasTests(): bool
     {
-        foreach ($this->testLocations->byLine as $testMethods) {
-            if ($testMethods !== []) {
+        foreach ($this->testLocations->getTestsLocationsBySourceLine() as $testLocations) {
+            if ($testLocations !== []) {
                 return true;
             }
         }
@@ -104,8 +105,8 @@ class TestTrace implements Trace
     private function getTestsForLineRange(NodeLineRangeData $lineRange): iterable
     {
         foreach ($lineRange->range as $line) {
-            if (array_key_exists($line, $this->testLocations->byLine)) {
-                yield from $this->testLocations->byLine[$line];
+            if (array_key_exists($line, $this->testLocations->getTestsLocationsBySourceLine())) {
+                yield from $this->testLocations->getTestsLocationsBySourceLine()[$line];
             }
         }
     }
@@ -115,14 +116,15 @@ class TestTrace implements Trace
      */
     private function getTestsForExecutedMethodOnLine(int $line): iterable
     {
-        foreach ($this->testLocations->byMethod as $coverageMethodData) {
+        foreach ($this->testLocations->getSourceMethodLineRangeByMethod() as $methodRange) {
+            /** @var SourceMethodLineRange $methodRange */
             if (
-                $line >= $coverageMethodData->startLine
-                && $line <= $coverageMethodData->endLine
+                $line >= $methodRange->getStartLine()
+                && $line <= $methodRange->getEndLine()
             ) {
                 return $this->getTestsForLineRange(new NodeLineRangeData(
-                    $coverageMethodData->startLine,
-                    $coverageMethodData->endLine
+                    $methodRange->getStartLine(),
+                    $methodRange->getEndLine()
                 ));
             }
         }

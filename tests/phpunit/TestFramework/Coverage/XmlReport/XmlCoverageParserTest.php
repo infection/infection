@@ -103,8 +103,8 @@ XML;
             ->retrieveTestLocations()
         ;
 
-        $this->assertSame([], $coverageData->byLine);
-        $this->assertSame([], $coverageData->byMethod);
+        $this->assertSame([], $coverageData->getTestsLocationsBySourceLine());
+        $this->assertSame([], $coverageData->getSourceMethodLineRangeByMethod());
     }
 
     public function test_it_reads_report_with_percent_signs(): void
@@ -130,7 +130,7 @@ XML;
             ->retrieveTestLocations()
         ;
 
-        $this->assertArrayHasKey(11, $coverageData->byLine);
+        $this->assertArrayHasKey(11, $coverageData->getTestsLocationsBySourceLine());
     }
 
     public function test_it_reads_report_with_empty_percentage(): void
@@ -156,7 +156,7 @@ XML;
             ->retrieveTestLocations()
         ;
 
-        $this->assertArrayNotHasKey(11, $coverageData->byLine);
+        $this->assertArrayNotHasKey(11, $coverageData->getTestsLocationsBySourceLine());
     }
 
     public function sourceFileInfoProviderProvider(): iterable

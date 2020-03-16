@@ -39,48 +39,41 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 
 /**
  * @internal
- *
- * ```
- * 'byMethod' => [
- *      'mutate' => MethodLocationData::['startLine' => 12, 'endLine' => 16],
- *      ...
- * ],
- * 'byLine' => [
- *     22 => [
- *         CoverageLineData::[
- *             'testMethod' => '\A\B\C::test_it_works',
- *             'testFilePath' => '/path/to/A/B/C.php',
- *             'time' => 0.34325,
- *         ],
- *         ...
- *      ]
- *  ]
- * ```
  */
 final class TestLocations
 {
-    /**
-     * @var array<int, array<int, TestLocation>>
-     */
-    public $byLine = [];
+    private $byLine;
+    private $byMethod;
 
     /**
-     * TODO: use a getter "get"
-     *
-     * @var array<string, MethodLocationData>
+     * @param array<int, array<int, TestLocation>> $testLocationsBySourceLine
+     * @param array<string, SourceMethodLineRange> $sourceMethodRangeByMethod
      */
-    public $byMethod = [];
+    public function __construct(
+        array $testLocationsBySourceLine = [],
+        array $sourceMethodRangeByMethod = []
+    ) {
+        $this->byLine = $testLocationsBySourceLine;
+        $this->byMethod = $sourceMethodRangeByMethod;
+    }
 
     /**
-     * TODO: rename CoverageLineData to TestLocation
-     * TODO: rename MethodLocationData to SourceMethodRange
+     * This method needs to be able to return a reference for performance reasons.
      *
-     * @param array<int, array<int, TestLocation>> $byLine
-     * @param array<string, MethodLocationData> $byMethod
+     * @see \Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder
+     *
+     * @return array<int, array<int, TestLocation>>
      */
-    public function __construct(array $byLine = [], array $byMethod = [])
+    public function &getTestsLocationsBySourceLine(): array
     {
-        $this->byLine = $byLine;
-        $this->byMethod = $byMethod;
+        return $this->byLine;
+    }
+
+    /**
+     * @return array<string, SourceMethodLineRange>
+     */
+    public function getSourceMethodLineRangeByMethod(): array
+    {
+        return $this->byMethod;
     }
 }
