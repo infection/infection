@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\SourceMethodRange;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use function is_array;
 use function is_scalar;
@@ -81,7 +81,7 @@ final class TestLocationsNormalizer
             ];
         }
 
-        if ($mixed instanceof SourceMethodRange) {
+        if ($mixed instanceof SourceMethodLineRange) {
             return [
                 'startLine' => $mixed->getStartLine(),
                 'endLine' => $mixed->getEndLine(),

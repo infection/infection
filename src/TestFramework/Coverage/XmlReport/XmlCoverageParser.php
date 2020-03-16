@@ -39,7 +39,7 @@ use DOMElement;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\ProxyTrace;
-use Infection\TestFramework\Coverage\SourceMethodRange;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\SafeDOMXPath;
 use Webmozart\Assert\Assert;
@@ -147,7 +147,7 @@ class XmlCoverageParser
      *
      * @phpstan-param DOMNodeList<DOMElement> $methodsCoverageNodes
      *
-     * @return SourceMethodRange[]
+     * @return SourceMethodLineRange[]
      */
     private static function &collectMethodsCoverageData(DOMNodeList $methodsCoverageNodes): array
     {
@@ -162,7 +162,7 @@ class XmlCoverageParser
             Assert::integerish($start);
             Assert::integerish($end);
 
-            $methodsCoverage[$methodName] = new SourceMethodRange(
+            $methodsCoverage[$methodName] = new SourceMethodLineRange(
                 (int) $start,
                 (int) $end
             );

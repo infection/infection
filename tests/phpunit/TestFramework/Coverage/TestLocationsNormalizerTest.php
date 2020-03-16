@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\SourceMethodRange;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
 
@@ -105,7 +105,7 @@ final class TestLocationsNormalizerTest extends TestCase
                 '/path/to/acme/Foo.php' => new TestLocations(
                     [],
                     [
-                        '__construct' => new SourceMethodRange(
+                        '__construct' => new SourceMethodLineRange(
                             19,
                             22
                         ),
@@ -138,7 +138,7 @@ final class TestLocationsNormalizerTest extends TestCase
                         ],
                     ],
                     [
-                        '__construct' => new SourceMethodRange(
+                        '__construct' => new SourceMethodLineRange(
                             19,
                             22
                         ),

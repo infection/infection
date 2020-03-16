@@ -47,7 +47,7 @@ final class TestLocations
 
     /**
      * @param array<int, array<int, TestLocation>> $testLocationsBySourceLine
-     * @param array<string, SourceMethodRange> $sourceMethodLineRangeByMethod
+     * @param array<string, SourceMethodLineRange> $sourceMethodLineRangeByMethod
      */
     public function __construct(
         array $testLocationsBySourceLine = [],
@@ -70,7 +70,7 @@ final class TestLocations
     }
 
     /**
-     * @return array<string, SourceMethodRange>
+     * @return array<string, SourceMethodLineRange>
      */
     public function getSourceMethodRangeByMethod(): array
     {
