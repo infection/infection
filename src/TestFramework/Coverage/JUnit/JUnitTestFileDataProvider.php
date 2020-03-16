@@ -80,6 +80,8 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
             );
         }
 
+        Assert::same($nodes->length, 1);
+
         return new TestFileTimeData(
             $nodes[0]->getAttribute('file'),
             (float) $nodes[0]->getAttribute('time')
