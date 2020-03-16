@@ -78,6 +78,8 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
             }
         }
 
+        Assert::notNull($nodes);
+
         if ($nodes->length === 0) {
             throw TestFileNameNotFoundException::notFoundFromFQN(
                 $fullyQualifiedClassName,
