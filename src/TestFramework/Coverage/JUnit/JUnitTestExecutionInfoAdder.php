@@ -49,7 +49,7 @@ use Infection\TestFramework\Coverage\Trace;
 class JUnitTestExecutionInfoAdder
 {
     /**
-     * @var TestFileDataProvider|MemoizedTestFileDataProvider|JUnitTestFileDataProvider
+     * @var TestFileDataProvider
      */
     private $testFileDataProvider;
 
