@@ -104,7 +104,7 @@ XML;
         ;
 
         $this->assertSame([], $coverageData->getTestsLocationsBySourceLine());
-        $this->assertSame([], $coverageData->getSourceMethodRangeByMethod());
+        $this->assertSame([], $coverageData->getSourceMethodLineRangeByMethod());
     }
 
     public function test_it_reads_report_with_percent_signs(): void

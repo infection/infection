@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\SourceMethodRange;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
 
@@ -47,7 +47,7 @@ final class TestLocationsTest extends TestCase
         $testLocations = new TestLocations();
 
         $this->assertSame([], $testLocations->getTestsLocationsBySourceLine());
-        $this->assertSame([], $testLocations->getSourceMethodRangeByMethod());
+        $this->assertSame([], $testLocations->getSourceMethodLineRangeByMethod());
     }
 
     public function test_it_can_be_instantiated(): void
@@ -63,8 +63,8 @@ final class TestLocationsTest extends TestCase
                 ],
             ],
             [
-                'mutate' => new SourceMethodRange(12, 16),
-                'createNode' => new SourceMethodRange(32, 33),
+                'mutate' => new SourceMethodLineRange(12, 16),
+                'createNode' => new SourceMethodLineRange(32, 33),
             ],
         );
 
@@ -109,8 +109,8 @@ final class TestLocationsTest extends TestCase
                 ],
             ],
             [
-                'mutate' => new SourceMethodRange(12, 16),
-                'createNode' => new SourceMethodRange(32, 33),
+                'mutate' => new SourceMethodLineRange(12, 16),
+                'createNode' => new SourceMethodLineRange(32, 33),
             ],
         );
 

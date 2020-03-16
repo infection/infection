@@ -38,7 +38,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\SourceMethodRange;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 
@@ -116,8 +116,8 @@ class TestTrace implements Trace
      */
     private function getTestsForExecutedMethodOnLine(int $line): iterable
     {
-        foreach ($this->testLocations->getSourceMethodRangeByMethod() as $methodRange) {
-            /** @var SourceMethodRange $methodRange */
+        foreach ($this->testLocations->getSourceMethodLineRangeByMethod() as $methodRange) {
+            /** @var SourceMethodLineRange $methodRange */
             if (
                 $line >= $methodRange->getStartLine()
                 && $line <= $methodRange->getEndLine()

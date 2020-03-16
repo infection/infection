@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\ProxyTrace;
-use Infection\TestFramework\Coverage\SourceMethodRange;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\XmlReport\TestTraceProvider;
 use PHPUnit\Framework\TestCase;
@@ -96,9 +96,9 @@ final class TestTraceProviderTest extends TestCase
                 ],
             ],
             [
-                'do0' => new SourceMethodRange(19, 22),
-                'do1' => new SourceMethodRange(24, 35),
-                'doSomethingUncovered' => new SourceMethodRange(3, 5),
+                'do0' => new SourceMethodLineRange(19, 22),
+                'do1' => new SourceMethodLineRange(24, 35),
+                'doSomethingUncovered' => new SourceMethodLineRange(3, 5),
             ]
         );
     }
