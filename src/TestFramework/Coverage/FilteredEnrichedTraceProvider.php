@@ -126,9 +126,13 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
             yield $trace;
         }
 
+        $filteredSourceFiles = $this->filter->filter(
+            $this->sourceFiles
+        );
+
         // Since these are sorted sets, there should be a way to optimize.
 
-        foreach ($this->sourceFiles as $splFileInfo) {
+        foreach ($filteredSourceFiles as $splFileInfo) {
             $sourceFilePath = $splFileInfo->getRealPath();
 
             Assert::string($sourceFilePath);
