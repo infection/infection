@@ -71,11 +71,11 @@ final class XmlCoverageParserTest extends TestCase
         $fileData = $this->parser->parse($provider);
 
         $this->assertSame(
-            $fileData->getSplFileInfo()->getRealPath(),
+            $fileData->getSourceFileInfo()->getRealPath(),
             $provider->provideFileInfo()->getRealPath()
         );
 
-        $coverageData = $fileData->retrieveTestLocations();
+        $coverageData = $fileData->getTests();
 
         $this->assertSame(
             $expectedTests,
@@ -100,11 +100,11 @@ XML;
 
         $coverageData = $this->parser
             ->parse($this->createSourceFileInfoProvider($xml))
-            ->retrieveTestLocations()
+            ->getTests()
         ;
 
         $this->assertSame([], $coverageData->getTestsLocationsBySourceLine());
-        $this->assertSame([], $coverageData->getSourceMethodLineRangeByMethod());
+        $this->assertSame([], $coverageData->getSourceMethodRangeByMethod());
     }
 
     public function test_it_reads_report_with_percent_signs(): void
@@ -127,7 +127,7 @@ XML;
 
         $coverageData = $this->parser
             ->parse($this->createSourceFileInfoProvider($xml))
-            ->retrieveTestLocations()
+            ->getTests()
         ;
 
         $this->assertArrayHasKey(11, $coverageData->getTestsLocationsBySourceLine());
@@ -153,7 +153,7 @@ XML;
 
         $coverageData = $this->parser
             ->parse($this->createSourceFileInfoProvider($xml))
-            ->retrieveTestLocations()
+            ->getTests()
         ;
 
         $this->assertArrayNotHasKey(11, $coverageData->getTestsLocationsBySourceLine());

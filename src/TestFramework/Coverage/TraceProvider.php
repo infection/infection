@@ -41,7 +41,7 @@ namespace Infection\TestFramework\Coverage;
 interface TraceProvider
 {
     /**
-     * @return iterable<ProxyTrace>
+     * @return iterable<Trace>
      */
     public function provideTraces(): iterable;
 }

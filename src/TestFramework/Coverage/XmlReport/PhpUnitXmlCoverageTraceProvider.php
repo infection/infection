@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
 
 /**
@@ -61,7 +61,7 @@ class PhpUnitXmlCoverageTraceProvider implements TraceProvider
     }
 
     /**
-     * @return iterable<ProxyTrace>
+     * @return iterable<Trace>
      */
     public function provideTraces(): iterable
     {

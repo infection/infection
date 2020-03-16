@@ -39,26 +39,69 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\XmlReport\TestTrace;
+use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
-use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
-use Traversable;
 
-final class TestTraceTest extends TestCase
+final class TestLocatorTest extends TestCase
 {
+    /**
+     * @var array<string, TestLocations>|null
+     */
     private static $testsLocations;
 
-    public function test_it_correctly_sets_coverage_information_for_method_body(): void
+    public function test_it_can_determine_if_the_file_is_tested(): void
     {
-        $filePath = '/path/to/acme/Foo.php';
+        $testLocator = $this->createTestLocator('/path/to/unknown-file');
 
-        $tests = $this->createTestTrace($filePath)->getAllTestsForMutation(
+        $this->assertFalse($testLocator->hasTests());
+    }
+
+    public function test_it_can_determine_if_the_file_is_not_tested(): void
+    {
+        $testLocator = $this->createTestLocator('/path/to/acme/Foo.php');
+
+        $this->assertTrue($testLocator->hasTests());
+    }
+
+    /**
+     * @dataProvider rangeProvider
+     *
+     * @param array<string, string|float>[] $expectedTests
+     */
+    public function test_it_can_locate_the_tests_executing_the_given_range(
+        NodeLineRangeData $range,
+        bool $onFunctionSignature,
+        array $expectedTests
+    ): void {
+        $testLocator = $this->createTestLocator('/path/to/acme/Foo.php');
+
+        $tests = $testLocator->getAllTestsForMutation($range, $onFunctionSignature);
+
+        $this->assertSame($expectedTests, TestLocationsNormalizer::normalize($tests));
+    }
+
+    /**
+     * @dataProvider rangeProvider
+     */
+    public function test_it_cannot_locate_any_tests_executing_the_given_range_if_no_tests_are_found(
+        NodeLineRangeData $range,
+        bool $onFunctionSignature
+    ): void {
+        $testLocator = $this->createTestLocator('/path/to/unknown-file');
+
+        $this->assertFalse($testLocator->hasTests());
+
+        $tests = $testLocator->getAllTestsForMutation($range, $onFunctionSignature);
+
+        $this->assertSame([], TestLocationsNormalizer::normalize($tests));
+    }
+
+    public function rangeProvider(): iterable
+    {
+        yield 'executed body' => [
             new NodeLineRangeData(34, 34),
-            false
-        );
-
-        $this->assertSame(
+            false,
             [
                 [
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
@@ -66,20 +109,11 @@ final class TestTraceTest extends TestCase
                     'testExecutionTime' => 0.123,
                 ],
             ],
-            TestLocationsNormalizer::normalize($tests)
-        );
-    }
+        ];
 
-    public function test_it_correctly_sets_coverage_information_for_method_signature(): void
-    {
-        $filePath = '/path/to/acme/Foo.php';
-
-        $tests = $this->createTestTrace($filePath)->getAllTestsForMutation(
+        yield 'executed function signature' => [
             new NodeLineRangeData(24, 24),
-            true
-        );
-
-        $this->assertSame(
+            true,
             [
                 [
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
@@ -112,189 +146,42 @@ final class TestTraceTest extends TestCase
                     'testExecutionTime' => 0.123,
                 ],
             ],
-            TestLocationsNormalizer::normalize($tests)
-        );
+        ];
+
+        yield 'non executed body' => [
+            new NodeLineRangeData(21, 21),
+            false,
+            [],
+        ];
+
+        yield 'non executed function signature' => [
+            new NodeLineRangeData(19, 19),
+            true,
+            [],
+        ];
+
+        yield 'non executed line' => [
+            new NodeLineRangeData(1, 1),
+            false,
+            [],
+        ];
+
+        yield 'non executed function signature line' => [
+            new NodeLineRangeData(1, 1),
+            true,
+            [],
+        ];
     }
 
-    public function test_it_determines_method_was_not_executed_from_coverage_report(): void
-    {
-        $filePath = '/path/to/acme/Foo.php';
-        $trace = $this->createTestTrace($filePath);
-
-        $this->assertCount(
-            0,
-            $trace->getAllTestsForMutation(
-                new NodeLineRangeData(19, 19),
-                true
-            )
-        );
-
-        $this->assertCount(
-            0,
-            $trace->getAllTestsForMutation(
-                new NodeLineRangeData(21, 21),
-                false
-            )
-        );
-    }
-
-    public function test_it_determines_line_was_not_executed_from_coverage_report(): void
-    {
-        $filePath = '/path/to/acme/Foo.php';
-        $trace = $this->createTestTrace($filePath);
-
-        $this->assertCount(
-            0,
-            $trace->getAllTestsForMutation(
-                new NodeLineRangeData(27, 27),
-                false
-            )
-        );
-
-        $this->assertCount(
-            0,
-            $trace->getAllTestsForMutation(
-                new NodeLineRangeData(32, 32),
-                false
-            )
-        );
-    }
-
-    public function test_it_determines_file_is_not_covered_for_unknown_path(): void
-    {
-        $filePath = '/path/to/unknown-file';
-
-        $this->assertFalse($this->createTestTrace($filePath)->hasTests());
-    }
-
-    public function test_it_determines_file_is_covered(): void
-    {
-        $filePath = '/path/to/acme/Foo.php';
-
-        $this->assertTrue($this->createTestTrace($filePath)->hasTests());
-    }
-
-    public function test_it_determines_file_does_not_have_tests_on_line_for_unknown_file(): void
-    {
-        $filePath = '/path/to/unknown-file';
-        $trace = $this->createTestTrace($filePath);
-
-        $this->assertCount(
-            0,
-            $trace->getAllTestsForMutation(
-                new NodeLineRangeData(34, 34),
-                true
-            )
-        );
-
-        $this->assertCount(
-            0,
-            $trace->getAllTestsForMutation(
-                new NodeLineRangeData(34, 34),
-                false
-            )
-        );
-    }
-
-    public function test_it_determines_file_does_not_have_tests_for_line(): void
-    {
-        $filePath = '/path/to/acme/Foo.php';
-
-        $trace = $this->createTestTrace($filePath);
-
-        $this->assertCount(
-            0,
-            $trace->getAllTestsForMutation(
-                new NodeLineRangeData(1, 1),
-                true
-            )
-        );
-
-        $this->assertCount(
-            0,
-            $trace->getAllTestsForMutation(
-                new NodeLineRangeData(1, 1),
-                false
-            )
-        );
-    }
-
-    public function test_it_returns_zero_tests_for_not_covered_function_body_mutator(): void
-    {
-        $filePath = '/path/to/acme/Foo.php';
-
-        $this->assertCount(
-            0,
-            $this->createTestTrace($filePath)->getAllTestsForMutation(
-                new NodeLineRangeData(1, 1),
-                false
-            )
-        );
-    }
-
-    public function test_it_returns_tests_for_covered_function_body_mutator(): void
-    {
-        $filePath = '/path/to/acme/Foo.php';
-
-        $tests = $this->createTestTrace($filePath)->getAllTestsForMutation(
-            new NodeLineRangeData(26, 26),
-            false
-        );
-
-        if ($tests instanceof Traversable) {
-            $tests = iterator_to_array($tests, true);
-        }
-
-        $this->assertSame(
-            [
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'testExecutionTime' => 0.123,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'testExecutionTime' => 0.456,
-                ],
-            ],
-            TestLocationsNormalizer::normalize($tests)
-        );
-    }
-
-    public function test_it_returns_zero_tests_for_not_covered_function_signature_mutator(): void
-    {
-        $filePath = '/path/to/acme/Foo.php';
-
-        $this->assertCount(
-            0,
-            $this->createTestTrace($filePath)->getAllTestsForMutation(
-                new NodeLineRangeData(1, 1), true
-            )
-        );
-    }
-
-    public function test_it_returns_tests_for_covered_function_signature_mutator(): void
-    {
-        $filePath = '/path/to/acme/Foo.php';
-
-        $tests = $this->createTestTrace($filePath)->getAllTestsForMutation(
-            new NodeLineRangeData(24, 24),
-            true
-        );
-
-        $this->assertCount(6, $tests);
-    }
-
-    private function createTestTrace(string $filePath): TestTrace
+    private function createTestLocator(string $filePath): TestLocator
     {
         $testsLocations = $this->getTestsLocations();
 
         if (!array_key_exists($filePath, $testsLocations)) {
-            return new TestTrace(new TestLocations());
+            return new TestLocator(new TestLocations());
         }
 
-        return new TestTrace($testsLocations[$filePath]);
+        return new TestLocator($testsLocations[$filePath]);
     }
 
     private function getTestsLocations(): array

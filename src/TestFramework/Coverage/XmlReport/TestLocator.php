@@ -40,25 +40,12 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
 
 /**
- * Impartial trace providing information regarding the tests but completely lacks any awareness of
- * its associated source files.
- *
- * TODO: FileMutationGenerator::generate() ends up having to rely on both SourceFileData & Trace due
- *  to the fact that a Trace right now only exposes a test-related API
- *  (`hasTests()`, `getAllTestsForMutation()`). Maybe a cleaner solution would be expose the
- *  associated source file API to `Trace` as well, i.e. moving up `SourceFileData::getSplFileInfo()`
- *  to `Trace`. This current class `TestsTrace` could then become a simple helper for `SourceFileData`
- *  instead of a full-pledge `Trace` implementation. And FileMutationGenerator as a result would
- *  also be simplified to not have to rely on SourceFileData which is `Trace` implementation and
- *  depend on `Trace` only.
- *
  * @internal
  * @final
  */
-class TestTrace implements Trace
+class TestLocator
 {
     private $testLocations;
 
@@ -78,10 +65,14 @@ class TestTrace implements Trace
         return false;
     }
 
+    /**
+     * @return iterable<TestLocation>
+     */
     public function getAllTestsForMutation(
         NodeLineRangeData $lineRange,
         bool $isOnFunctionSignature
     ): iterable {
+        // TODO: would any of those operations benefit from being cached? To be checked with a profile
         if ($isOnFunctionSignature) {
             return $this->getTestsForFunctionSignature($lineRange);
         }
@@ -116,7 +107,7 @@ class TestTrace implements Trace
      */
     private function getTestsForExecutedMethodOnLine(int $line): iterable
     {
-        foreach ($this->testLocations->getSourceMethodLineRangeByMethod() as $methodRange) {
+        foreach ($this->testLocations->getSourceMethodRangeByMethod() as $methodRange) {
             /** @var SourceMethodLineRange $methodRange */
             if (
                 $line >= $methodRange->getStartLine()

@@ -38,7 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Coverage\FilteredEnrichedTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
@@ -77,7 +77,7 @@ final class FilteredEnrichedTraceProviderTest extends TestCase
 
         $traces = $this->createTraces(
             take($inputFileNames)->map(function (string $filename) {
-                return $this->createProxyTraceMock($filename);
+                return $this->createTraceMock($filename);
             }),
             take($expectedFileNames)->map(function (string $filename) {
                 return $this->createFileInfoMock($filename);
@@ -86,8 +86,8 @@ final class FilteredEnrichedTraceProviderTest extends TestCase
         );
 
         $actualFileNames = take($traces)
-            ->map(static function (ProxyTrace $trace) {
-                return $trace->getSplFileInfo()->getRealPath();
+            ->map(static function (Trace $trace) {
+                return $trace->getSourceFileInfo()->getRealPath();
             })
             ->toArray()
         ;
@@ -107,7 +107,7 @@ final class FilteredEnrichedTraceProviderTest extends TestCase
             $traces = iterator_to_array($traces);
         }
 
-        /** @var ProxyTrace $uncoveredTrace */
+        /** @var Trace $uncoveredTrace */
         $uncoveredTrace = $traces[0];
 
         $this->assertFalse($uncoveredTrace->hasTests());
@@ -129,7 +129,7 @@ final class FilteredEnrichedTraceProviderTest extends TestCase
 
         $providedFiles = $this->createTraces(
             take($expectedFileNames)->map(function (string $filename) {
-                return $this->createProxyTraceMock($filename);
+                return $this->createTraceMock($filename);
             }),
             take($inputFileNames)->map(function (string $filename) {
                 return $this->createFileInfoMock($filename);
@@ -138,8 +138,8 @@ final class FilteredEnrichedTraceProviderTest extends TestCase
         );
 
         $traces = take($providedFiles)
-            ->map(static function (ProxyTrace $trace) {
-                return $trace->getSplFileInfo()->getRealPath();
+            ->map(static function (Trace $trace) {
+                return $trace->getSourceFileInfo()->getRealPath();
             })
             ->toArray()
         ;
@@ -192,6 +192,19 @@ final class FilteredEnrichedTraceProviderTest extends TestCase
         return $provider->provideTraces();
     }
 
+    private function createTraceMock(string $filename): Trace
+    {
+        $fileInfoMock = $this->createFileInfoMock($filename);
+
+        $traceMock = $this->createMock(Trace::class);
+        $traceMock
+            ->method('getSourceFileInfo')
+            ->willReturn($fileInfoMock)
+        ;
+
+        return $traceMock;
+    }
+
     private function createFileInfoMock(string $filename): SplFileInfo
     {
         $fileInfoMock = $this->createMock(SplFileInfo::class);
@@ -201,18 +214,5 @@ final class FilteredEnrichedTraceProviderTest extends TestCase
         ;
 
         return $fileInfoMock;
-    }
-
-    private function createProxyTraceMock(string $filename): ProxyTrace
-    {
-        $splFileInfoMock = $this->createFileInfoMock($filename);
-
-        $proxyTraceMock = $this->createMock(ProxyTrace::class);
-        $proxyTraceMock
-            ->method('getSplFileInfo')
-            ->willReturn($splFileInfoMock)
-        ;
-
-        return $proxyTraceMock;
     }
 }

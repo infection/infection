@@ -37,10 +37,11 @@ namespace Infection\Tests\FileSystem;
 
 use function array_values;
 use Infection\FileSystem\SourceFileFilter;
+use Infection\TestFramework\Coverage\Trace;
 use IteratorIterator;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 use Traversable;
 
 final class SourceFileFilterTest extends TestCase
@@ -50,11 +51,81 @@ final class SourceFileFilterTest extends TestCase
      *
      * @param string[] $expectedFilters
      */
-    public function test_it_can_parse_and_normalize_string_filter(string $filter, array $expectedFilters): void
-    {
+    public function test_it_can_parse_and_normalize_string_filter(
+        string $filter,
+        array $expectedFilters
+    ): void {
         $fileFilter = new SourceFileFilter($filter);
 
         $this->assertSame($expectedFilters, array_values($fileFilter->getFilters()));
+    }
+
+    /**
+     * @dataProvider fileListProvider
+     *
+     * @param string[] $filePaths
+     * @param string[] $expectedFilePaths
+     */
+    public function test_it_filters_spl_file_info_files_traversable(
+        string $filter,
+        array $filePaths,
+        array $expectedFilePaths
+    ): void {
+        $filePaths = $this->createSplFileInfosTraversable($filePaths);
+
+        $this->assertFiltersExpectedInput($filter, $filePaths, $expectedFilePaths);
+    }
+
+    /**
+     * @dataProvider fileListProvider
+     *
+     * @param string[] $filePaths
+     * @param string[] $expectedFilePaths
+     */
+    public function test_it_filters_traces_traversable(
+        string $filter,
+        array $filePaths,
+        array $expectedFilePaths
+    ): void {
+        $filePaths = $this->createTracesTraversable($filePaths);
+
+        $this->assertFiltersExpectedInput($filter, $filePaths, $expectedFilePaths);
+    }
+
+    /**
+     * @dataProvider fileListProvider
+     *
+     * @param string[] $filePaths
+     * @param string[] $expectedFilePaths
+     */
+    public function test_it_filters_spl_file_info_iterator(
+        string $filter,
+        array $filePaths,
+        array $expectedFilePaths
+    ): void {
+        $filePaths = $this->createSplFileInfosTraversable($filePaths);
+
+        $filePaths = new IteratorIterator($filePaths);
+
+        $this->assertFiltersExpectedInput($filter, $filePaths, $expectedFilePaths);
+    }
+
+    /**
+     * @dataProvider fileListProvider
+     *
+     * @param string[] $filePaths
+     * @param string[] $expectedFilePaths
+     */
+    public function test_it_filters_trace_iterator(
+        string $filter,
+        array $filePaths,
+        array $expectedFilePaths
+    ): void {
+        $filePaths = $this->createTracesTraversable($filePaths);
+
+        $filePaths = new IteratorIterator($filePaths);
+
+        $this->assertFiltersExpectedInput($filter, $filePaths, $expectedFilePaths);
     }
 
     public function filterProvider(): iterable
@@ -76,28 +147,6 @@ final class SourceFileFilterTest extends TestCase
                 'src/Bar.php',
             ],
         ];
-    }
-
-    /**
-     * @dataProvider fileListProvider
-     */
-    public function test_it_filters_traversable(string $filter, array $input, array $expected): void
-    {
-        $input = self::arrayToSplFileInfoTraversable($input);
-
-        $this->assertCanFilterInput($filter, $input, $expected);
-    }
-
-    /**
-     * @dataProvider fileListProvider
-     */
-    public function test_it_filters_iterator(string $filter, array $input, array $expected): void
-    {
-        $input = self::arrayToSplFileInfoTraversable($input);
-
-        $input = new IteratorIterator($input);
-
-        $this->assertCanFilterInput($filter, $input, $expected);
     }
 
     public static function fileListProvider(): iterable
@@ -148,29 +197,64 @@ final class SourceFileFilterTest extends TestCase
         ];
     }
 
-    private function assertCanFilterInput(string $filter, iterable $input, array $expected): void
-    {
+    /**
+     * @param iterable<Trace> $input
+     * @param string[] $expectedFilePaths
+     */
+    private function assertFiltersExpectedInput(
+        string $filter,
+        iterable $input,
+        array $expectedFilePaths
+    ): void {
         $actual = (new SourceFileFilter($filter))->filter($input);
 
         $actual = take($actual)
-            ->map(static function (SplFileInfo $fileInfo) {
-                return $fileInfo->getRealPath();
+            ->map(static function ($traceOrFileInfo) {
+                /* @var Trace|SplFileInfo */
+                return $traceOrFileInfo->getRealPath();
             })
             ->toArray();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame($expectedFilePaths, $actual);
     }
 
-    private function arrayToSplFileInfoTraversable(array $input): Traversable
+    /**
+     * @param string[] $filePaths
+     *
+     * @return Traversable<SplFileInfo>
+     */
+    private function createSplFileInfosTraversable(array $filePaths): Traversable
     {
-        return take($input)
+        return take($filePaths)
             ->map(function (string $filename) {
-                $splFileInfoMock = $this->createMock(SplFileInfo::class);
-                $splFileInfoMock
+                $traceMock = $this->createMock(SplFileInfo::class);
+                $traceMock
                     ->method('getRealPath')
-                    ->willReturn($filename);
+                    ->willReturn($filename)
+                ;
 
-                return $splFileInfoMock;
-            });
+                return $traceMock;
+            })
+        ;
+    }
+
+    /**
+     * @param string[] $filePaths
+     *
+     * @return Traversable<Trace>
+     */
+    private function createTracesTraversable(array $filePaths): Traversable
+    {
+        return take($filePaths)
+            ->map(function (string $filename) {
+                $traceMock = $this->createMock(Trace::class);
+                $traceMock
+                    ->method('getRealPath')
+                    ->willReturn($filename)
+                ;
+
+                return $traceMock;
+            })
+        ;
     }
 }

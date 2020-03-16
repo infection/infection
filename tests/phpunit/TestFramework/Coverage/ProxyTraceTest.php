@@ -49,7 +49,7 @@ final class ProxyTraceTest extends TestCase
     {
         $fileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $actual = (new ProxyTrace($fileInfoMock, []))->getSplFileInfo();
+        $actual = (new ProxyTrace($fileInfoMock, []))->getSourceFileInfo();
 
         $this->assertSame(
             $fileInfoMock,
@@ -79,11 +79,11 @@ final class ProxyTraceTest extends TestCase
 
         $trace = new ProxyTrace($fileInfoMock, [$tests]);
 
-        $actual = $trace->retrieveTestLocations();
+        $actual = $trace->getTests();
         $this->assertSame($tests, $actual);
 
         // From cache
-        $actual = $trace->retrieveTestLocations();
+        $actual = $trace->getTests();
         $this->assertSame($tests, $actual);
     }
 
@@ -98,7 +98,7 @@ final class ProxyTraceTest extends TestCase
 
     public function test_it_exposes_its_test_locations(): void
     {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = $this->createMock(SplFileInfo::class);
 
         $tests = new TestLocations(
             [
@@ -114,10 +114,11 @@ final class ProxyTraceTest extends TestCase
             ]
         );
 
-        $trace = new ProxyTrace($splFileInfoMock, [$tests]);
+        $trace = new ProxyTrace($fileInfoMock, [$tests]);
 
         $this->assertTrue($trace->hasTests());
 
+        // More extensive tests done on the ability to locate the tests are done in the TestLocator
         $this->assertCount(
             0,
             $trace->getAllTestsForMutation(
