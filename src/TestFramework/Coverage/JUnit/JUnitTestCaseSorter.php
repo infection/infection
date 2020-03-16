@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use function array_key_exists;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use function current;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use function Safe\usort;
 
 /**
@@ -45,54 +46,63 @@ use function Safe\usort;
 final class JUnitTestCaseSorter
 {
     /**
-     * @param CoverageLineData[] $coverageTestCases
+     * @param TestLocation[] $tests
      *
      * @return string[]
      */
-    public function getUniqueSortedFileNames(array $coverageTestCases): iterable
+    public function getUniqueSortedFileNames(array $tests): iterable
     {
-        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
+        $uniqueTestLocations = $this->uniqueByTestFile($tests);
 
-        if (count($uniqueCoverageTests) === 1) {
+        if (count($uniqueTestLocations) === 1) {
             // Around 5% speed up compared to when without this optimization.
-            yield current($uniqueCoverageTests)->testFilePath;
+            /** @var TestLocation $testLocation */
+            $testLocation = current($uniqueTestLocations);
+
+            $filePath = $testLocation->getFilePath();
+
+            if ($filePath !== null) {
+                yield $filePath;
+            }
 
             return;
         }
 
         /*
          * Two tests per file are also very frequent. Yet it doesn't make sense
-         * to sort them by hand: apparently usort does that just as good.
+         * to sort them by hand: usort does that just as good.
          */
 
         // sort tests to run the fastest first
         usort(
-            $uniqueCoverageTests,
-            static function (CoverageLineData $a, CoverageLineData $b) {
-                return $a->time <=> $b->time;
+            $uniqueTestLocations,
+            static function (TestLocation $a, TestLocation $b) {
+                return $a->getExecutionTime() <=> $b->getExecutionTime();
             }
         );
 
-        foreach ($uniqueCoverageTests as $coverageLineData) {
-            yield $coverageLineData->testFilePath;
+        foreach ($uniqueTestLocations as $testLocation) {
+            yield $testLocation->getFilePath();
         }
     }
 
     /**
-     * @param CoverageLineData[] $coverageTestCases
+     * @param TestLocation[] $testLocations
      *
-     * @return CoverageLineData[]
+     * @return TestLocation[]
      */
-    private function uniqueByTestFile(array $coverageTestCases): array
+    private function uniqueByTestFile(array $testLocations): array
     {
         // It is faster to have two arrays, and discard one later.
         $usedFileNames = [];
         $uniqueTests = [];
 
-        foreach ($coverageTestCases as $coverageLineData) {
-            if (!array_key_exists($coverageLineData->testFilePath, $usedFileNames)) {
-                $uniqueTests[] = $coverageLineData;
-                $usedFileNames[$coverageLineData->testFilePath] = true;
+        foreach ($testLocations as $testLocation) {
+            $filePath = $testLocation->getFilePath();
+
+            if (!array_key_exists($filePath, $usedFileNames)) {
+                $uniqueTests[] = $testLocation;
+                $usedFileNames[$filePath] = true;
             }
         }
 

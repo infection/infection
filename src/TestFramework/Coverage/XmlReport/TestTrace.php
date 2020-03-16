@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_key_exists;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
@@ -89,7 +89,7 @@ class TestTrace implements Trace
     }
 
     /**
-     * @return iterable<CoverageLineData>
+     * @return iterable<TestLocation>
      */
     private function getTestsForFunctionSignature(NodeLineRangeData $lineRange): iterable
     {
@@ -99,7 +99,7 @@ class TestTrace implements Trace
     }
 
     /**
-     * @return iterable<CoverageLineData>
+     * @return iterable<TestLocation>
      */
     private function getTestsForLineRange(NodeLineRangeData $lineRange): iterable
     {
@@ -111,7 +111,7 @@ class TestTrace implements Trace
     }
 
     /**
-     * @return iterable<CoverageLineData>
+     * @return iterable<TestLocation>
      */
     private function getTestsForExecutedMethodOnLine(int $line): iterable
     {

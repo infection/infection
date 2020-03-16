@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
@@ -55,11 +55,11 @@ final class TestLocationsTest extends TestCase
         $pathToTest = '/path/to/Test.php';
 
         $tests = new TestLocations(
-            [1 => [CoverageLineData::withTestMethod($pathToTest)]],
+            [1 => [TestLocation::forTestMethod($pathToTest)]],
             ['method' => new MethodLocationData(1, 3)]
         );
 
-        $this->assertSame($pathToTest, $tests->byLine[1][0]->testMethod);
+        $this->assertSame($pathToTest, $tests->byLine[1][0]->getMethod());
         $this->assertSame(1, $tests->byMethod['method']->startLine);
     }
 }

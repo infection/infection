@@ -37,7 +37,6 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 
 use const DIRECTORY_SEPARATOR;
 use function in_array;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
 use Infection\Config\ConsoleHelper;
@@ -222,7 +221,6 @@ final class ProjectCodeProvider
                         $className,
                         [
                             TestLocations::class,
-                            CoverageLineData::class,
                             MethodLocationData::class,
                             NodeLineRangeData::class,
                             TestFileTimeData::class,

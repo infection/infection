@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TestLocations;
@@ -57,38 +57,38 @@ final class TestTraceProviderTest extends TestCase
         return new TestLocations(
             [
                 26 => [
-                    CoverageLineData::with(
+                    new TestLocation(
                         'Infection\\Acme\\FooTest::test_it_can_do_0',
                         '/path/to/acme/FooTest.php',
                         0.123
                     ),
-                    CoverageLineData::with(
+                    new TestLocation(
                         'Infection\\Acme\\FooTest::test_it_can_do_1',
                         '/path/to/acme/FooTest.php',
                         0.456
                     ),
                 ],
                 30 => [
-                    CoverageLineData::with(
+                    new TestLocation(
                         'Infection\\Acme\\FooTest::test_it_can_do_0',
                         '/path/to/acme/FooTest.php',
                         0.123
                     ),
-                    CoverageLineData::with(
+                    new TestLocation(
                         'Infection\\Acme\\FooTest::test_it_can_do_1',
                         '/path/to/acme/FooTest.php',
                         0.456
                     ),
                 ],
                 31 => [
-                    CoverageLineData::with(
+                    new TestLocation(
                         'Infection\\Acme\\FooTest::test_it_can_do_1',
                         '/path/to/acme/FooTest.php',
                         0.456
                     ),
                 ],
                 34 => [
-                    CoverageLineData::with(
+                    new TestLocation(
                         'Infection\\Acme\\FooTest::test_it_can_do_0',
                         '/path/to/acme/FooTest.php',
                         0.123

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Phar;
 use function Safe\sprintf;
 use function str_replace;
@@ -49,10 +49,10 @@ use Webmozart\Assert\Assert;
 abstract class MutationConfigBuilder
 {
     /**
-     * @param CoverageLineData[] $coverageTests
+     * @param TestLocation[] $tests
      */
     abstract public function build(
-        array $coverageTests,
+        array $tests,
         string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath

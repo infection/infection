@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\TestLocations;
 use PHPUnit\Framework\TestCase;
@@ -73,7 +73,7 @@ final class TestLocationsNormalizerTest extends TestCase
                 '/path/to/acme/Foo.php' => new TestLocations(
                     [
                         11 => [
-                            CoverageLineData::with(
+                            new TestLocation(
                                 'Acme\FooTest::test_it_can_be_instantiated',
                                 '/path/to/acme/FooTest.php',
                                 0.000234
@@ -89,7 +89,7 @@ final class TestLocationsNormalizerTest extends TestCase
                             [
                                 'testMethod' => 'Acme\FooTest::test_it_can_be_instantiated',
                                 'testFilePath' => '/path/to/acme/FooTest.php',
-                                'time' => 0.000234,
+                                'testExecutionTime' => 0.000234,
                             ],
                         ],
                     ],
@@ -128,7 +128,7 @@ final class TestLocationsNormalizerTest extends TestCase
                 '/path/to/acme/Foo.php' => new TestLocations(
                     [
                         11 => [
-                            CoverageLineData::with(
+                            new TestLocation(
                                 'Acme\FooTest::test_it_can_be_instantiated',
                                 '/path/to/acme/FooTest.php',
                                 0.000234
@@ -150,7 +150,7 @@ final class TestLocationsNormalizerTest extends TestCase
                             [
                                 'testMethod' => 'Acme\FooTest::test_it_can_be_instantiated',
                                 'testFilePath' => '/path/to/acme/FooTest.php',
-                                'time' => 0.000234,
+                                'testExecutionTime' => 0.000234,
                             ],
                         ],
                     ],

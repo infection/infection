@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\TestLocations;
@@ -63,7 +63,7 @@ final class TestTraceTest extends TestCase
                 [
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
                     'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.123,
+                    'testExecutionTime' => 0.123,
                 ],
             ],
             TestLocationsNormalizer::normalize($tests)
@@ -84,32 +84,32 @@ final class TestTraceTest extends TestCase
                 [
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
                     'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.123,
+                    'testExecutionTime' => 0.123,
                 ],
                 [
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
                     'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.456,
+                    'testExecutionTime' => 0.456,
                 ],
                 [
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
                     'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.123,
+                    'testExecutionTime' => 0.123,
                 ],
                 [
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
                     'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.456,
+                    'testExecutionTime' => 0.456,
                 ],
                 [
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
                     'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.456,
+                    'testExecutionTime' => 0.456,
                 ],
                 [
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
                     'testFilePath' => '/path/to/acme/FooTest.php',
-                    'time' => 0.123,
+                    'testExecutionTime' => 0.123,
                 ],
             ],
             TestLocationsNormalizer::normalize($tests)
@@ -222,6 +222,7 @@ final class TestTraceTest extends TestCase
     public function test_it_returns_zero_tests_for_not_covered_function_body_mutator(): void
     {
         $filePath = '/path/to/acme/Foo.php';
+
         $this->assertCount(
             0,
             $this->createTestTrace($filePath)->getAllTestsForMutation(
@@ -241,12 +242,24 @@ final class TestTraceTest extends TestCase
         );
 
         if ($tests instanceof Traversable) {
-            $tests = iterator_to_array($tests);
+            $tests = iterator_to_array($tests, true);
         }
 
-        $this->assertCount(2, $tests);
-        $this->assertSame('/path/to/acme/FooTest.php', $tests[0]->testFilePath);
-        $this->assertSame(0.123, $tests[0]->time);
+        $this->assertSame(
+            [
+                [
+                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
+                    'testFilePath' => '/path/to/acme/FooTest.php',
+                    'testExecutionTime' => 0.123,
+                ],
+                [
+                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
+                    'testFilePath' => '/path/to/acme/FooTest.php',
+                    'testExecutionTime' => 0.456,
+                ],
+            ],
+            TestLocationsNormalizer::normalize($tests)
+        );
     }
 
     public function test_it_returns_zero_tests_for_not_covered_function_signature_mutator(): void
@@ -290,38 +303,38 @@ final class TestTraceTest extends TestCase
             '/path/to/acme/Foo.php' => new TestLocations(
                 [
                     26 => [
-                        CoverageLineData::with(
+                        new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_0',
                             '/path/to/acme/FooTest.php',
                             0.123
                         ),
-                        CoverageLineData::with(
+                        new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_1',
                             '/path/to/acme/FooTest.php',
                             0.456
                         ),
                     ],
                     30 => [
-                        CoverageLineData::with(
+                        new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_0',
                             '/path/to/acme/FooTest.php',
                             0.123
                         ),
-                        CoverageLineData::with(
+                        new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_1',
                             '/path/to/acme/FooTest.php',
                             0.456
                         ),
                     ],
                     31 => [
-                        CoverageLineData::with(
+                        new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_1',
                             '/path/to/acme/FooTest.php',
                             0.456
                         ),
                     ],
                     34 => [
-                        CoverageLineData::with(
+                        new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_0',
                             '/path/to/acme/FooTest.php',
                             0.123

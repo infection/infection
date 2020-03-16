@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 
 /**
@@ -87,7 +87,7 @@ class Mutant
     }
 
     /**
-     * @return CoverageLineData[]
+     * @return TestLocation[]
      */
     public function getTests(): array
     {

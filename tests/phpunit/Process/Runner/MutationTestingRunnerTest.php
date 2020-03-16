@@ -40,7 +40,7 @@ use ArrayIterator;
 use function count;
 use function get_class;
 use function implode;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\Mutant;
@@ -499,7 +499,7 @@ final class MutationTestingRunnerTest extends TestCase
             MutatedNode::wrap(new Nop()),
             0,
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
                     0.01

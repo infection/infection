@@ -108,10 +108,10 @@ class ProxyTrace
         // TODO: maybe instead of having iterable<CoverageReport> lazyCoverageReport, we could have
         // `Closure<() => TestLocations> testLocationsFactory`: it returns only one element but
         // remains lazy
-        foreach ($this->lazyTestLocations as $coverageReport) {
+        foreach ($this->lazyTestLocations as $testLocations) {
             // is a Generator with one yield, thus it'll only trigger here
             // (or this can be an array with one element)
-            $this->testLocations = $coverageReport;
+            $this->testLocations = $testLocations;
 
             break;
         }

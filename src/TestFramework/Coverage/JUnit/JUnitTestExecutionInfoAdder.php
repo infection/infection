@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use function explode;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Coverage\ProxyTrace;
 
@@ -83,9 +83,9 @@ class JUnitTestExecutionInfoAdder
     private function testExecutionInfoAdder(iterable $traces): iterable
     {
         foreach ($traces as $trace) {
-            foreach ($trace->retrieveTestLocations()->byLine as $linesCoverageData) {
-                foreach ($linesCoverageData as $test) {
-                    self::updateTestExecutionInfo($test, $this->testFileDataProvider);
+            foreach ($trace->retrieveTestLocations()->byLine as &$testsLocations) {
+                foreach ($testsLocations as $line => $test) {
+                    $testsLocations[$line] = self::createCompleteTestLocation($test);
                 }
             }
 
@@ -93,15 +93,16 @@ class JUnitTestExecutionInfoAdder
         }
     }
 
-    private static function updateTestExecutionInfo(
-        CoverageLineData $test,
-        TestFileDataProvider $testFileDataProvider
-    ): void {
-        $class = explode(':', $test->testMethod, 2)[0];
+    private function createCompleteTestLocation(TestLocation $test): TestLocation
+    {
+        $class = explode(':', $test->getMethod(), 2)[0];
 
-        $testFileData = $testFileDataProvider->getTestFileInfo($class);
+        $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
 
-        $test->testFilePath = $testFileData->path;
-        $test->time = $testFileData->time;
+        return new TestLocation(
+            $test->getMethod(),
+            $testFileData->path,
+            $testFileData->time
+        );
     }
 }

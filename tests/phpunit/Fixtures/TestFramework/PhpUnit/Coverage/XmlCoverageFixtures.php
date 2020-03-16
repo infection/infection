@@ -68,38 +68,38 @@ final class XmlCoverageFixtures
                         [
                             'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                         [
                             'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                     ],
                     30 => [
                         [
                             'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                         [
                             'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                     ],
                     31 => [
                         [
                             'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                     ],
                     34 => [
                         [
                             'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                     ],
                 ],
@@ -127,12 +127,12 @@ final class XmlCoverageFixtures
                         [
                             'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                         [
                             'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                     ],
                 ],
@@ -160,12 +160,12 @@ final class XmlCoverageFixtures
                         [
                             'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                         [
                             'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                     ],
                 ],
@@ -221,24 +221,24 @@ final class XmlCoverageFixtures
                         [
                             'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                         [
                             'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                     ],
                     30 => [
                         [
                             'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                         [
                             'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
                             'testFilePath' => null,
-                            'time' => null,
+                            'testExecutionTime' => null,
                         ],
                     ],
                 ],
