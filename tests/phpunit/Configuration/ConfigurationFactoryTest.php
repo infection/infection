@@ -87,11 +87,11 @@ final class ConfigurationFactoryTest extends TestCase
         $sourceFilesCollectorProphecy = $this->prophesize(SourceFileCollector::class);
 
         $sourceFilesCollectorProphecy
-            ->collectFiles([], [], '')
+            ->collectFiles([], [])
             ->willReturn([])
         ;
         $sourceFilesCollectorProphecy
-            ->collectFiles(['src/'], ['vendor/'], 'src/Foo.php, src/Bar.php')
+            ->collectFiles(['src/'], ['vendor/'])
             ->willReturn([
                 new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                 new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),

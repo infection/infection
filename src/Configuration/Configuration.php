@@ -117,7 +117,6 @@ class Configuration
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::allString($sourceDirectories);
-        Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);

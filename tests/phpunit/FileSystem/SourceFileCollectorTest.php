@@ -43,10 +43,6 @@ use function Pipeline\take;
 use function Safe\natcasesort;
 use Webmozart\PathUtil\Path;
 
-/**
- * @covers \Infection\FileSystem\Finder\FilterableFinder
- * @covers \Infection\FileSystem\SourceFileCollector
- */
 final class SourceFileCollectorTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
@@ -54,11 +50,11 @@ final class SourceFileCollectorTest extends TestCase
     /**
      * @dataProvider sourceFilesProvider
      */
-    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFiles, string $filter, array $expected): void
+    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFiles, array $expected): void
     {
         $root = self::FIXTURES;
 
-        $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles, $filter);
+        $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles);
 
         $files = take($files)->toArray(); // PHP 7.4 [...$files]
 
@@ -81,14 +77,12 @@ final class SourceFileCollectorTest extends TestCase
         yield 'empty' => [
             [],
             [],
-            '',
             [],
         ];
 
         yield 'one directory, no filter, no excludes' => [
             [self::FIXTURES . '/case0'],
             [],
-            '',
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
@@ -99,7 +93,6 @@ final class SourceFileCollectorTest extends TestCase
         yield 'multiple directories, no filter, no excludes' => [
             [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
             [],
-            '',
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
@@ -109,107 +102,9 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'filter by file name, no excludes' => [
-            [self::FIXTURES . '/case0'],
-            [],
-            'a.php',
-            [
-                'case0/a.php',
-            ],
-        ];
-
-        yield 'filter by file name with multiple sources, no excludes' => [
-            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
-            [],
-            'a.php',
-            [
-                'case0/a.php',
-                'case1/a.php',
-            ],
-        ];
-
-        yield 'filter by file name file in sub-dir, no excludes' => [
-            [self::FIXTURES . '/case0'],
-            [],
-            'b.php',
-            [
-                'case0/sub-dir/b.php',
-            ],
-        ];
-
-        yield 'filter by file name relative from source root, no excludes' => [
-            [self::FIXTURES . '/case0'],
-            [],
-            'case0/a.php',
-            [
-                'case0/a.php',
-            ],
-        ];
-
-        yield 'filter by file name relative from source root which excludes other possible match, no excludes' => [
-            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
-            [],
-            'case0/a.php',
-            [
-                'case0/a.php',
-            ],
-        ];
-
-        yield 'filter by file name relative from file outside of source roo, no excludes' => [
-            [self::FIXTURES . '/case0'],
-            [],
-            './../Fixtures/Files/SourceFileCollector/case0/a.php',
-            [],
-        ];
-
-        yield 'filter by absolute file name, no excludes' => [
-            [self::FIXTURES . '/case0'],
-            [],
-            self::FIXTURES . '/case0/a.php',
-            [],
-        ];
-
-        yield 'filter by comma separated file names, no excludes' => [
-            [self::FIXTURES . '/case0'],
-            [],
-            'a.php,b.php',
-            [
-                'case0/a.php',
-                'case0/sub-dir/b.php',
-            ],
-        ];
-
-        yield 'filter by comma separated (with spaces) file names, no excludes' => [
-            [self::FIXTURES . '/case0'],
-            [],
-            'a.php, b.php',
-            [
-                'case0/a.php',
-                'case0/sub-dir/b.php',
-            ],
-        ];
-
-        yield 'filter by comma separated (with spaces & empty) file names, no excludes' => [
-            [self::FIXTURES . '/case0'],
-            [],
-            'a.php, ,, b.php',
-            [
-                'case0/a.php',
-                'case0/sub-dir/b.php',
-            ],
-        ];
-
-        yield 'filter by unknown file' => [
-            [self::FIXTURES . '/case0'],
-            [],
-            'unknown',
-            [],
-        ];
-
         yield 'one directory, no filter, one excludes' => [
             [self::FIXTURES . '/case0'],
             ['sub-dir'],
-            '',
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
@@ -219,7 +114,6 @@ final class SourceFileCollectorTest extends TestCase
         yield 'one directory, no filter, absolute path excludes' => [
             [self::FIXTURES . '/case0'],
             [self::FIXTURES . '/sub-dir'],
-            '',
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
@@ -230,7 +124,6 @@ final class SourceFileCollectorTest extends TestCase
         yield 'one directory, no filter, relative path excludes relative to source root' => [
             [self::FIXTURES . '/case0'],
             ['case0/sub-dir'],
-            '',
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
@@ -241,20 +134,9 @@ final class SourceFileCollectorTest extends TestCase
         yield 'multiple directories, no filter, one common excludes' => [
             [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
             ['sub-dir'],
-            '',
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
-                'case1/a.php',
-            ],
-        ];
-
-        yield 'nominal' => [
-            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
-            ['sub-dir'],
-            'a.php',
-            [
-                'case0/a.php',
                 'case1/a.php',
             ],
         ];
