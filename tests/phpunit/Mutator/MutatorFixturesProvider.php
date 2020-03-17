@@ -71,7 +71,7 @@ final class MutatorFixturesProvider
     }
 
     /**
-     * @param string-class $testCaseClass
+     * @param class-string $testCaseClass
      */
     private static function getTestCaseFixtureDir(string $testCaseClass): string
     {
