@@ -37,10 +37,10 @@ namespace Infection\Tests\Mutator\Extensions;
 
 use function array_map;
 use function implode;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 use function range;
 
-final class BCMathTest extends AbstractMutatorTestCase
+final class BCMathTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider

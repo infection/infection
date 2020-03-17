@@ -35,14 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
-use function Safe\file_get_contents;
-use function Safe\sprintf;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
 /**
  * @group integration
  */
-final class ArrayOneItemTest extends AbstractMutatorTestCase
+final class ArrayOneItemTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -57,7 +55,7 @@ final class ArrayOneItemTest extends AbstractMutatorTestCase
     public function mutationsProvider(): iterable
     {
         yield 'It mutates when return typehint is not nullable array' => [
-            $this->getFileContent('mutates-not-nullable-array.php'),
+            $this->getFixtureFileContent('mutates-not-nullable-array.php'),
             <<<'PHP'
 <?php
 
@@ -75,32 +73,27 @@ PHP
         ];
 
         yield 'It does not mutate the method call' => [
-            $this->getFileContent('does-not-mutate-method-call.php'),
+            $this->getFixtureFileContent('does-not-mutate-method-call.php'),
         ];
 
         yield 'It does not mutate the function call' => [
-            $this->getFileContent('does-not-mutate-function-call.php'),
+            $this->getFixtureFileContent('does-not-mutate-function-call.php'),
         ];
 
         yield 'It does not mutate the function variable call' => [
-            $this->getFileContent('does-not-mutate-function-variable-call.php'),
+            $this->getFixtureFileContent('does-not-mutate-function-variable-call.php'),
         ];
 
         yield 'It does not mutate when raw array is returned' => [
-            $this->getFileContent('does-not-mutate-raw-array.php'),
+            $this->getFixtureFileContent('does-not-mutate-raw-array.php'),
         ];
 
         yield 'It does not mutate when return typehint is nullable array' => [
-            $this->getFileContent('does-not-mutate-nullable-array.php'),
+            $this->getFixtureFileContent('does-not-mutate-nullable-array.php'),
         ];
 
         yield 'It does not mutate when return typehint is not an array' => [
-            $this->getFileContent('does-not-mutate-not-array.php'),
+            $this->getFixtureFileContent('does-not-mutate-not-array.php'),
         ];
-    }
-
-    private function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/ArrayOneItem/%s', $file));
     }
 }

@@ -95,14 +95,8 @@
         "psr-4": {
             "Infection\\Tests\\": "tests/phpunit"
         },
-        "classmap": [
-            "tests/phpunit/Fixtures/Autoloaded",
-            "tests/phpunit/Fixtures/CodeSamples"
-        ],
-        "files": [
-            "tests/phpunit/Helpers.php",
-            "tests/phpunit/Fixtures/Autoloaded/Reflection/rv-inside-function.php"
-        ]
+        "classmap": ["tests/autoloaded"],
+        "files": ["tests/phpunit/Helpers.php"]
     },
     "bin": [
         "bin/infection"

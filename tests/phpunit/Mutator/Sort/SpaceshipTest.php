@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Sort;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class SpaceshipTest extends AbstractMutatorTestCase
+final class SpaceshipTest extends BaseMutatorTestCase
 {
     public function test_get_name(): void
     {

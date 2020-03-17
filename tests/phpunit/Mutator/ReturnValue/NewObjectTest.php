@@ -35,14 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
-use function Safe\file_get_contents;
-use function Safe\sprintf;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
 /**
  * @group integration
  */
-final class NewObjectTest extends AbstractMutatorTestCase
+final class NewObjectTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -72,15 +70,15 @@ PHP
         ];
 
         yield 'It does not mutate with not nullable return typehint' => [
-            $this->getFileContent('no-not-mutates-with-not-nullable-typehint.php'),
+            $this->getFixtureFileContent('no-not-mutates-with-not-nullable-typehint.php'),
         ];
 
         yield 'It does not mutate return typehint fqcn does not allow null' => [
-            $this->getFileContent('no-not-mutates-return-typehint-fqcn-does-not-allow-null.php'),
+            $this->getFixtureFileContent('no-not-mutates-return-typehint-fqcn-does-not-allow-null.php'),
         ];
 
         yield 'It mutates without typehint' => [
-            $this->getFileContent('no-mutates-without-typehint.php'),
+            $this->getFixtureFileContent('no-mutates-without-typehint.php'),
             <<<"PHP"
 <?php
 
@@ -99,11 +97,11 @@ PHP
         ];
 
         yield 'It does not mutate when scalar return typehint does not allow null' => [
-            $this->getFileContent('no-not-mutates-scalar-return-typehint-does-not-allow-null.php'),
+            $this->getFixtureFileContent('no-not-mutates-scalar-return-typehint-does-not-allow-null.php'),
         ];
 
         yield 'It mutates when function contains another function but returns new instance and null allowed' => [
-            $this->getFileContent('no-contains-another-func-and-null-allowed.php'),
+            $this->getFixtureFileContent('no-contains-another-func-and-null-allowed.php'),
             <<<"CODE"
 <?php
 
@@ -126,12 +124,12 @@ CODE
         ];
 
         yield 'It does not mutate when function contains another function but return null is not allowed' => [
-            $this->getFileContent('no-contains-another-func-and-null-is-not-allowed.php'),
+            $this->getFixtureFileContent('no-contains-another-func-and-null-is-not-allowed.php'),
             null,
         ];
 
         yield 'It mutates when return typehint fqcn allows null' => [
-            $this->getFileContent('no-mutates-return-typehint-fqcn-allows-null.php'),
+            $this->getFixtureFileContent('no-mutates-return-typehint-fqcn-allows-null.php'),
             <<<"CODE"
 <?php
 
@@ -151,7 +149,7 @@ CODE
         ];
 
         yield 'It mutates when scalar return typehint allows null' => [
-            $this->getFileContent('no-mutates-scalar-return-typehint-allows-null.php'),
+            $this->getFixtureFileContent('no-mutates-scalar-return-typehint-allows-null.php'),
             <<<"CODE"
 <?php
 
@@ -171,12 +169,7 @@ CODE
         ];
 
         yield 'It does not mutate the return of an anonymous class' => [
-            $this->getFileContent('no-not-mutates-anonymous-class.php'),
+            $this->getFixtureFileContent('no-not-mutates-anonymous-class.php'),
         ];
-    }
-
-    private function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/NewObject/%s', $file));
     }
 }

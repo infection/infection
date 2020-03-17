@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt\Return_;
 
-final class IntegerNegationTest extends AbstractMutatorTestCase
+final class IntegerNegationTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
