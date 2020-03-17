@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function Safe\file_put_contents;
 use function Safe\tempnam;
 use function Safe\unlink;
 
@@ -109,5 +110,44 @@ final class JUnitTestFileDataProviderTest extends TestCase
         $testFileInfo = $provider->getTestFileInfo('FeatureA:Scenario A1');
 
         $this->assertSame('/codeception/tests/bdd/FeatureA.feature', $testFileInfo->path);
+    }
+
+    /**
+     * @dataProvider xmlProvider
+     */
+    public function test_it_does_not_trigger_count_assertion(string $xml): void
+    {
+        file_put_contents($this->tempfile, $xml);
+
+        $provider = new JUnitTestFileDataProvider($this->tempfile);
+        $provider->getTestFileInfo('ExampleTest');
+        $this->addToAssertionCount(1);
+    }
+
+    public static function xmlProvider(): iterable
+    {
+        yield [<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+    <testsuite name="ExampleTest"/>
+    <testsuite name="ExampleTest"/>
+</testsuites>
+XML];
+
+        yield [<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+    <testcase class="ExampleTest"/>
+    <testcase class="ExampleTest"/>
+</testsuites>
+XML];
+
+        yield [<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+    <testcase file="foo/ExampleTest.feature"/>
+    <testcase file="foo/ExampleTest.feature"/>
+</testsuites>
+XML];
     }
 }

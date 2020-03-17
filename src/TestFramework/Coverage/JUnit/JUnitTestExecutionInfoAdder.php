@@ -48,6 +48,9 @@ use Infection\TestFramework\Coverage\Trace;
  */
 class JUnitTestExecutionInfoAdder
 {
+    /**
+     * @var TestFileDataProvider
+     */
     private $testFileDataProvider;
 
     private $adapter;
