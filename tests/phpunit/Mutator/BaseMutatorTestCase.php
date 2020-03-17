@@ -37,10 +37,8 @@ namespace Infection\Tests\Mutator;
 
 use function array_shift;
 use function count;
-use function end;
 use function escapeshellarg;
 use function exec;
-use function explode;
 use function get_class;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -53,25 +51,15 @@ use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
 use function Safe\sprintf;
-use function Safe\substr;
 use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
-    private const MUTATOR_FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-fixtures';
-
     /**
      * @var Mutator
      */
     protected $mutator;
-
-    /**
-     * @var string|null
-     */
-    private $testCaseFixtureDir;
 
     protected function setUp(): void
     {
@@ -161,21 +149,6 @@ abstract class BaseMutatorTestCase extends TestCase
         }
 
         return $mutants;
-    }
-
-    final protected function getFixtureFileContent(string $file): string
-    {
-        if ($this->testCaseFixtureDir === null) {
-            $testCaseClassParts = explode('\\', static::class);
-
-            $this->testCaseFixtureDir = Path::canonicalize(sprintf(
-                '%s/%s',
-                self::MUTATOR_FIXTURES_DIR,
-                substr(end($testCaseClassParts), 0, -4)
-            ));
-        }
-
-        return file_get_contents(sprintf('%s/%s', $this->testCaseFixtureDir, $file));
     }
 
     /**

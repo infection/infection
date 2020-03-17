@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 
 /**
  * @group integration
@@ -55,15 +56,15 @@ final class FunctionCallTest extends BaseMutatorTestCase
     public function mutationsProvider(): iterable
     {
         yield 'It does not mutate with not nullable return typehint' => [
-            $this->getFixtureFileContent('fc-not-mutates-with-not-nullable-typehint.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'fc-not-mutates-with-not-nullable-typehint.php'),
         ];
 
         yield 'It does not mutates when return typehint FQCN does not allow null' => [
-            $this->getFixtureFileContent('fc-not-mutates-return-typehint-fqcn-does-not-allow-null.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'fc-not-mutates-return-typehint-fqcn-does-not-allow-null.php'),
         ];
 
         yield 'It mutates without typehint' => [
-            $this->getFixtureFileContent('fc-mutates-without-typehint.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'fc-mutates-without-typehint.php'),
             <<<"PHP"
 <?php
 
@@ -81,13 +82,13 @@ PHP
         ];
 
         yield 'It does not mutate when scalar return typehint does not allow null' => [
-            $this->getFixtureFileContent('fc-not-mutates-scalar-return-typehint-does-not-allow-null.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'fc-not-mutates-scalar-return-typehint-does-not-allow-null.php'),
         ];
     }
 
     public function test_it_does_not_mutate_when_function_contains_another_function_but_return_null_is_not_allowed(): void
     {
-        $code = $this->getFixtureFileContent('fc-contains-another-func-and-null-is-not-allowed.php');
+        $code = MutatorFixturesProvider::getFixtureFileContent($this, 'fc-contains-another-func-and-null-is-not-allowed.php');
 
         $mutations = $this->mutate($code);
 
@@ -96,7 +97,7 @@ PHP
 
     public function test_it_mutates_when_return_typehint_fqcn_allows_null(): void
     {
-        $code = $this->getFixtureFileContent('fc-mutates-return-typehint-fqcn-allows-null.php');
+        $code = MutatorFixturesProvider::getFixtureFileContent($this, 'fc-mutates-return-typehint-fqcn-allows-null.php');
         $mutations = $this->mutate($code);
 
         $expectedMutatedCode = <<<"PHP"
@@ -120,7 +121,7 @@ PHP;
 
     public function test_it_mutates_when_scalar_return_typehint_allows_null(): void
     {
-        $code = $this->getFixtureFileContent('fc-mutates-scalar-return-typehint-allows-null.php');
+        $code = MutatorFixturesProvider::getFixtureFileContent($this, 'fc-mutates-scalar-return-typehint-allows-null.php');
         $mutations = $this->mutate($code);
 
         $expectedMutatedCode = <<<"PHP"
@@ -144,7 +145,7 @@ PHP;
 
     public function test_it_mutates_when_function_contains_another_function_but_returns_function_call_and_null_allowed(): void
     {
-        $code = $this->getFixtureFileContent('fc-contains-another-func-and-null-allowed.php');
+        $code = MutatorFixturesProvider::getFixtureFileContent($this, 'fc-contains-another-func-and-null-allowed.php');
         $mutations = $this->mutate($code);
 
         $expectedMutatedCode = <<<"PHP"

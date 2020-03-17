@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 
 /**
  * @group integration
@@ -70,15 +71,15 @@ PHP
         ];
 
         yield 'It does not mutate with not nullable return typehint' => [
-            $this->getFixtureFileContent('no-not-mutates-with-not-nullable-typehint.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'no-not-mutates-with-not-nullable-typehint.php'),
         ];
 
         yield 'It does not mutate return typehint fqcn does not allow null' => [
-            $this->getFixtureFileContent('no-not-mutates-return-typehint-fqcn-does-not-allow-null.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'no-not-mutates-return-typehint-fqcn-does-not-allow-null.php'),
         ];
 
         yield 'It mutates without typehint' => [
-            $this->getFixtureFileContent('no-mutates-without-typehint.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'no-mutates-without-typehint.php'),
             <<<"PHP"
 <?php
 
@@ -97,11 +98,11 @@ PHP
         ];
 
         yield 'It does not mutate when scalar return typehint does not allow null' => [
-            $this->getFixtureFileContent('no-not-mutates-scalar-return-typehint-does-not-allow-null.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'no-not-mutates-scalar-return-typehint-does-not-allow-null.php'),
         ];
 
         yield 'It mutates when function contains another function but returns new instance and null allowed' => [
-            $this->getFixtureFileContent('no-contains-another-func-and-null-allowed.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'no-contains-another-func-and-null-allowed.php'),
             <<<"CODE"
 <?php
 
@@ -124,12 +125,12 @@ CODE
         ];
 
         yield 'It does not mutate when function contains another function but return null is not allowed' => [
-            $this->getFixtureFileContent('no-contains-another-func-and-null-is-not-allowed.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'no-contains-another-func-and-null-is-not-allowed.php'),
             null,
         ];
 
         yield 'It mutates when return typehint fqcn allows null' => [
-            $this->getFixtureFileContent('no-mutates-return-typehint-fqcn-allows-null.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'no-mutates-return-typehint-fqcn-allows-null.php'),
             <<<"CODE"
 <?php
 
@@ -149,7 +150,7 @@ CODE
         ];
 
         yield 'It mutates when scalar return typehint allows null' => [
-            $this->getFixtureFileContent('no-mutates-scalar-return-typehint-allows-null.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'no-mutates-scalar-return-typehint-allows-null.php'),
             <<<"CODE"
 <?php
 
@@ -169,7 +170,7 @@ CODE
         ];
 
         yield 'It does not mutate the return of an anonymous class' => [
-            $this->getFixtureFileContent('no-not-mutates-anonymous-class.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'no-not-mutates-anonymous-class.php'),
         ];
     }
 }

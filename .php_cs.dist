@@ -54,6 +54,7 @@ $finder = Finder::create()
         'build',
         'devTools',
         'resources',
+        'tests/autoloaded',
         'tests/e2e',
         'tests/phpunit/Fixtures',
     ])
