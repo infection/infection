@@ -1,6 +1,6 @@
 <?php
 
-namespace Memory_Aware;
+namespace Infection\Tests\Fixtures\TestFramework;
 
 use ErrorException;
 use Infection\AbstractTestFramework\MemoryUsageAware;

@@ -1,6 +1,6 @@
 <?php
 
-namespace This_ReturnTypes;
+namespace ThisReturnTypes;
 
 class Foo
 {

@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Extensions;
 
 use function defined;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 use function Safe\define;
 
-final class MBStringTest extends AbstractMutatorTestCase
+final class MBStringTest extends BaseMutatorTestCase
 {
     public static function setUpBeforeClass(): void
     {

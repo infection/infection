@@ -1,6 +1,6 @@
 <?php
 
-namespace Infection\Tests\Fixtures\Autoloaded\Finder;
+namespace Infection\Tests\Fixtures\Finder;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Iterator\PathFilterIterator;

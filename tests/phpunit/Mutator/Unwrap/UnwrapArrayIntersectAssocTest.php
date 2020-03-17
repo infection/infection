@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class UnwrapArrayIntersectAssocTest extends AbstractMutatorTestCase
+final class UnwrapArrayIntersectAssocTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
