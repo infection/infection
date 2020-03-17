@@ -35,9 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
+use function array_fill;
 use function array_key_exists;
+use function array_key_last;
+use function count;
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use function Safe\array_combine;
 use function Safe\usort;
 
 /**
@@ -45,6 +49,48 @@ use function Safe\usort;
  */
 final class JUnitTestCaseSorter
 {
+    /**
+     * Millisecond buckets. Exposed for testing purposes.
+     *
+     * @var int[]
+     */
+    public const BUCKETS = [
+        4, // e^(x/C) basically
+        5,
+        7,
+        10,
+        14,
+        20,
+        28,
+        39,
+        55,
+        76,
+        106,
+        148,
+        207,
+        289,
+        403,
+        563,
+        786,
+        1097,
+        1530,
+        2136,
+        2981,
+        4160,
+        5806, // five seconds, give or take
+    ];
+
+    /**
+     * For 23 buckets QS becomes theoretically less efficient on average at and after 15 elements.
+     * Exposed for testing purposes.
+     */
+    public const USE_BUCKET_SORT_AFTER = 15;
+
+    /**
+     * Milliseconds in a second. То stop Infection mutating a constant;
+     */
+    private const MS_IN_S = 1000;
+
     /**
      * @param TestLocation[] $tests
      *
@@ -59,11 +105,10 @@ final class JUnitTestCaseSorter
             /** @var TestLocation $testLocation */
             $testLocation = current($uniqueTestLocations);
 
+            /** @var string $filePath */
             $filePath = $testLocation->getFilePath();
 
-            if ($filePath !== null) {
-                yield $filePath;
-            }
+            yield $filePath;
 
             return;
         }
@@ -74,15 +119,77 @@ final class JUnitTestCaseSorter
          */
 
         // sort tests to run the fastest first
-        usort(
-            $uniqueTestLocations,
-            static function (TestLocation $a, TestLocation $b) {
-                return $a->getExecutionTime() <=> $b->getExecutionTime();
-            }
-        );
+        foreach (self::sort($uniqueTestLocations) as $testLocation) {
+            $filePath = $testLocation->getFilePath();
 
-        foreach ($uniqueTestLocations as $testLocation) {
-            yield $testLocation->getFilePath();
+            if ($filePath !== null) {
+                yield $filePath;
+            }
+        }
+    }
+
+    /**
+     * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
+     *
+     * @param TestLocation[] $uniqueTestLocations
+     *
+     * @return iterable<TestLocation>
+     */
+    public static function sort(array &$uniqueTestLocations): iterable
+    {
+        if (count($uniqueTestLocations) < self::USE_BUCKET_SORT_AFTER) {
+            usort(
+                $uniqueTestLocations,
+                static function (TestLocation $a, TestLocation $b) {
+                    return $a->getExecutionTime() <=> $b->getExecutionTime();
+                }
+            );
+
+            return $uniqueTestLocations;
+        }
+
+        return self::bucketSort($uniqueTestLocations);
+    }
+
+    /**
+     * @param TestLocation[] $uniqueTestLocations
+     *
+     * @return iterable<TestLocation>
+     */
+    private static function bucketSort(array $uniqueTestLocations): iterable
+    {
+        $buckets = array_combine(self::BUCKETS, array_fill(0, count(self::BUCKETS), []));
+        $catchAllBucket = array_key_last($buckets);
+
+        foreach ($uniqueTestLocations as $location) {
+            /** @var TestLocation $location */
+            $msTime = (int) $location->getExecutionTime() * self::MS_IN_S;
+
+            foreach (self::BUCKETS as $bucketTime) {
+                if ($msTime < $bucketTime) {
+                    $buckets[$bucketTime][] = $location;
+
+                    continue 2;
+                }
+            }
+
+            $buckets[$catchAllBucket][] = $location;
+        }
+
+        // Sort the slowest tests, if any
+        if ($buckets[$catchAllBucket] !== []) {
+            usort(
+                $buckets[$catchAllBucket],
+                static function (TestLocation $a, TestLocation $b) {
+                    return $a->getExecutionTime() <=> $b->getExecutionTime();
+                }
+            );
+        }
+
+        foreach ($buckets as $bucket) {
+            if ($bucket !== []) {
+                yield from $bucket;
+            }
         }
     }
 
@@ -100,7 +207,13 @@ final class JUnitTestCaseSorter
         foreach ($testLocations as $testLocation) {
             $filePath = $testLocation->getFilePath();
 
-            if (!array_key_exists($filePath, $usedFileNames)) {
+            // To skip this check later on
+            if ($filePath === null) {
+                continue;
+            }
+
+            // isset() is 20% faster than array_key_exists()
+            if (!isset($usedFileNames[$filePath])) {
                 $uniqueTests[] = $testLocation;
                 $usedFileNames[$filePath] = true;
             }

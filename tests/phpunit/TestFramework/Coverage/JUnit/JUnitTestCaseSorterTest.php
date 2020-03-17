@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
+use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
+use function log;
 use PHPUnit\Framework\TestCase;
 
 final class JUnitTestCaseSorterTest extends TestCase
@@ -95,5 +97,15 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         $this->assertCount(3, $uniqueSortedFileNames);
         $this->assertSame('/path/to/test-file-3', $uniqueSortedFileNames[0]);
+    }
+
+    public function test_it_has_correct_constants_for_bucket_sort(): void
+    {
+        $this->assertLessThan(
+            // Quicksort's average O(n log n)
+            JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * log(JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER),
+            // Bucket Sort's average O(n + k)
+            JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER + count(JUnitTestCaseSorter::BUCKETS)
+        );
     }
 }
