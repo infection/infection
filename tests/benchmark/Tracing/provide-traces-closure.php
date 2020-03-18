@@ -37,7 +37,6 @@ namespace Infection\Benchmark\Tracing;
 
 use Generator;
 use Infection\Container;
-use function iterator_to_array;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
@@ -61,22 +60,31 @@ $container = Container::create()->withDynamicParameters(
     ''
 );
 
-$generateTraces = static function (?int $maxCount) use ($container): Generator {
+$generateTraces = static function (?int $maxCount) use ($container): iterable {
     $traces = $container->getFilteredEnrichedTraceProvider()->provideTraces();
 
-    $i = 0;
-
-    foreach ($traces as $trace) {
-        ++$i;
-
-        if ($maxCount !== null && $i === $maxCount) {
-            return;
-        }
-
-        yield $trace;
+    if ($maxCount === null) {
+        // Avoid extra limiting generator for a simpler case
+        return $traces;
     }
+
+    return (static function () use ($traces): Generator {
+        $i = 0;
+
+        foreach ($traces as $trace) {
+            ++$i;
+
+            if ($i === $maxCount) {
+                return;
+            }
+
+            yield $trace;
+        }
+    })();
 };
 
-return static function (?int $maxCount = null) use ($generateTraces): array {
-    return iterator_to_array($generateTraces($maxCount), true);
+return static function (?int $maxCount = null) use ($generateTraces): void {
+    foreach ($generateTraces($maxCount) as $_) {
+        // discard
+    }
 };

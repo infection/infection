@@ -38,7 +38,6 @@ namespace Infection\Benchmark\MutationGenerator;
 use function array_map;
 use Infection\Container;
 use Infection\TestFramework\Coverage\Trace;
-use function is_array;
 use function iterator_to_array;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -98,8 +97,9 @@ return static function () use ($fileMutationGenerator, $traces, $mutators): void
             []
         );
 
-        if (!is_array($mutations)) {
-            iterator_to_array($mutations, false);
+        // avoid all possible buffering
+        foreach ($mutations as $_) {
+            // discard
         }
     }
 };
