@@ -77,7 +77,8 @@ trait ConfigurationAssertions
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
-        ?float $expectedMinCoveredMsi
+        ?float $expectedMinCoveredMsi,
+        int $expectedThreads
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
@@ -120,6 +121,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi());
         $this->assertSame($expectedShowMutations, $configuration->showMutations());
         $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi());
+        $this->assertSame($expectedThreads, $configuration->getThreads());
     }
 
     /**

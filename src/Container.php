@@ -480,7 +480,8 @@ final class Container
         ?float $minCoveredMsi,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
-        string $filter
+        string $filter,
+        int $threads
     ): self {
         $clone = clone $this;
 
@@ -517,7 +518,8 @@ final class Container
                 $mutatorsInput,
                 $testFramework,
                 $testFrameworkExtraOptions,
-                $filter
+                $filter,
+                $threads
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -536,7 +538,8 @@ final class Container
                     $mutatorsInput,
                     $testFramework,
                     $testFrameworkExtraOptions,
-                    $filter
+                    $filter,
+                    $threads
                 );
             }
         );
