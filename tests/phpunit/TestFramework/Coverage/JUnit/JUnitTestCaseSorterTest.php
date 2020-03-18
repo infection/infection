@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use function log;
@@ -105,7 +104,7 @@ final class JUnitTestCaseSorterTest extends TestCase
             // Quicksort's average O(n log n)
             JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * log(JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER),
             // Bucket Sort's average O(n + k)
-            JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER + count(JUnitTestCaseSorter::BUCKETS)
+            JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER + JUnitTestCaseSorter::BUCKETS_COUNT
         );
     }
 }
