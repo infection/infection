@@ -152,7 +152,6 @@ final class JUnitTestCaseSorterTest extends TestCase
             $totalQuickSort += microtime(true) - $start;
         }
 
-
         $this->assertLessThan($totalQuickSort, $totalBucketSort);
     }
 
