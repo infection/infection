@@ -83,7 +83,7 @@ class Configuration
     private $minMsi;
     private $showMutations;
     private $minCoveredMsi;
-    private $threads;
+    private $threadsCount;
 
     /**
      * @param string[] $sourceDirectories
@@ -115,7 +115,7 @@ class Configuration
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
-        int $threads
+        int $threadsCount
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::allString($sourceDirectories);
@@ -124,7 +124,7 @@ class Configuration
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
         Assert::oneOf($formatter, self::FORMATTER);
         Assert::nullOrGreaterThanEq($minMsi, 0.);
-        Assert::greaterThanEq($threads, 0);
+        Assert::greaterThanEq($threadsCount, 0);
 
         $this->timeout = $timeout;
         $this->sourceDirectories = $sourceDirectories;
@@ -150,7 +150,7 @@ class Configuration
         $this->minMsi = $minMsi;
         $this->showMutations = $showMutations;
         $this->minCoveredMsi = $minCoveredMsi;
-        $this->threads = $threads;
+        $this->threadsCount = $threadsCount;
     }
 
     public function getProcessTimeout(): int
@@ -282,8 +282,8 @@ class Configuration
         return $this->minCoveredMsi;
     }
 
-    public function getThreads(): int
+    public function getThreadsCount(): int
     {
-        return $this->threads;
+        return $this->threadsCount;
     }
 }

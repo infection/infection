@@ -82,7 +82,7 @@ final class ConfigurationTest extends TestCase
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
-        int $threads
+        int $threadsCount
     ): void {
         $config = new Configuration(
             $timeout,
@@ -109,7 +109,7 @@ final class ConfigurationTest extends TestCase
             $minMsi,
             $showMutations,
             $minCoveredMsi,
-            $threads
+            $threadsCount
         );
 
         $this->assertConfigurationStateIs(
@@ -138,7 +138,7 @@ final class ConfigurationTest extends TestCase
             $minMsi,
             $showMutations,
             $minCoveredMsi,
-            $threads
+            $threadsCount
         );
     }
 

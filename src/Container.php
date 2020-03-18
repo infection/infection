@@ -233,11 +233,14 @@ final class Container
                 return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
-                return new ParallelProcessRunner(static function (MutantProcess $mutantProcess) use ($container): void {
-                    $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished(
-                        MutantExecutionResult::createFromProcess($mutantProcess)
-                    ));
-                });
+                return new ParallelProcessRunner(
+                    static function (MutantProcess $mutantProcess) use ($container): void {
+                        $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished(
+                            MutantExecutionResult::createFromProcess($mutantProcess)
+                        ));
+                    },
+                    $container->getConfiguration()->getThreadsCount()
+                );
             },
             TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {
                 return new TestFrameworkConfigLocator(

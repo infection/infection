@@ -62,7 +62,8 @@ $container = Container::create()->withDynamicParameters(
     .0,
     'phpunit',
     '',
-    ''
+    '',
+    0
 );
 
 $files = Finder::create()

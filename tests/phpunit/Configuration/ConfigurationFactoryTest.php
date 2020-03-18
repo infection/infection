@@ -132,7 +132,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $inputTestFramework,
         ?string $inputTestFrameworkExtraOptions,
         string $inputFilter,
-        int $inputThreads,
+        int $inputThreadsCount,
         int $expectedTimeout,
         array $expectedSourceDirectories,
         array $expectedSourceFiles,
@@ -176,7 +176,7 @@ final class ConfigurationFactoryTest extends TestCase
             $inputTestFramework,
             $inputTestFrameworkExtraOptions,
             $inputFilter,
-            $inputThreads
+            $inputThreadsCount
         );
 
         $this->assertConfigurationStateIs(
@@ -205,7 +205,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedMinMsi,
             $expectedShowMutations,
             $expectedMinCoveredMsi,
-            $inputThreads
+            $inputThreadsCount
         );
     }
 
