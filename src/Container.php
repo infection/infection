@@ -239,7 +239,7 @@ final class Container
                             MutantExecutionResult::createFromProcess($mutantProcess)
                         ));
                     },
-                    $container->getConfiguration()->getThreadsCount()
+                    $container->getConfiguration()->getThreadCount()
                 );
             },
             TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {
@@ -484,7 +484,7 @@ final class Container
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         string $filter,
-        int $threads
+        int $threadCount
     ): self {
         $clone = clone $this;
 
@@ -522,7 +522,7 @@ final class Container
                 $testFramework,
                 $testFrameworkExtraOptions,
                 $filter,
-                $threads
+                $threadCount
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -542,7 +542,7 @@ final class Container
                     $testFramework,
                     $testFrameworkExtraOptions,
                     $filter,
-                    $threads
+                    $threadCount
                 );
             }
         );
