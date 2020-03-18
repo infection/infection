@@ -3,6 +3,7 @@
 # Denote all files that are truly binary and should not be modified.
 *.png binary
 *.jpg binary
+
 # Directories and files we do not want to distribute
 /.*                     export-ignore
 /adr/                   export-ignore
@@ -17,4 +18,3 @@
 /phpunit.xml.dist       export-ignore
 /phpunit_autoreview.xml export-ignore
 /setup_environment.sh   export-ignore
-. !text !filter !merge !diff
