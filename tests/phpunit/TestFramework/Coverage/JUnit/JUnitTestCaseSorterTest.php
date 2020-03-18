@@ -41,6 +41,7 @@ use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\JUnitTimes;
 use function iterator_to_array;
 use function log;
 use PHPUnit\Framework\TestCase;
+use function Safe\usort;
 
 final class JUnitTestCaseSorterTest extends TestCase
 {
