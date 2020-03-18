@@ -35,6 +35,7 @@ DOCKER_RUN_74=$(FLOCK) devTools/*php74*.json $(DOCKER_RUN) infection_php74
 DOCKER_RUN_74_IMAGE=devTools/Dockerfile-php74-xdebug.json
 
 FLOCK=./devTools/flock
+COMMIT_HASH=$(shell git rev-parse --short HEAD)
 
 
 #
@@ -64,6 +65,23 @@ phpstan: vendor $(PHPSTAN)
 .PHONY: validate
 validate:
 	composer validate --strict
+
+.PHONY: profile
+profile: 	 ## Runs Blackfire
+profile: vendor tests/benchmark/MutationGenerator/sources tests/benchmark/Tracing/coverage tests/benchmark/Tracing/sources
+	composer dump --classmap-authoritative
+	blackfire run \
+		--samples=5 \
+		--title="MutationGenerator" \
+		--metadata="commit=$(COMMIT_HASH)" \
+		php tests/benchmark/MutationGenerator/profile.php
+	blackfire run \
+		--samples=5 \
+		--title="Tracing" \
+		--metadata="commit=$(COMMIT_HASH)" \
+		php tests/benchmark/Tracing/profile.php
+	composer dump
+
 
 .PHONY: autoreview
 autoreview: 	 ## Runs various checks (static analysis & AutoReview test suite)
@@ -215,4 +233,18 @@ $(DOCKER_RUN_73_IMAGE): devTools/Dockerfile-php73-xdebug
 $(DOCKER_RUN_74_IMAGE): devTools/Dockerfile-php74-xdebug
 	docker build --tag infection_php74 --file devTools/Dockerfile-php74-xdebug .
 	docker image inspect infection_php74 > $(DOCKER_RUN_74_IMAGE)
+	touch $@
+
+tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
+	cd tests/benchmark/MutationGenerator; tar -xf sources.tar.gz
+	touch $@
+
+tests/benchmark/Tracing/coverage: tests/benchmark/Tracing/coverage.tar.gz
+	@echo "Untarring the coverage, this might take a while"
+	cd tests/benchmark/Tracing; tar -xf coverage.tar.gz
+	touch $@
+
+tests/benchmark/Tracing/sources: tests/benchmark/Tracing/sources.tar.gz
+	@echo "Untarring the sources, this might take a while"
+	cd tests/benchmark/Tracing; tar -xf sources.tar.gz
 	touch $@
