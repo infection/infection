@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class CastStringTest extends AbstractMutatorTestCase
+final class CastStringTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider

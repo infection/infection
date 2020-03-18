@@ -253,6 +253,7 @@ final class ProjectCodeProvider
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
             ->exclude([
+                'autoloaded',
                 'e2e',
                 'Fixtures',
             ])

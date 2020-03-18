@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class EqualTest extends AbstractMutatorTestCase
+final class EqualTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider

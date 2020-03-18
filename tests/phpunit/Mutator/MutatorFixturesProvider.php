@@ -33,37 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\ConditionalBoundary;
+namespace Infection\Tests\Mutator;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use function array_key_exists;
+use function end;
+use function explode;
+use function get_class;
+use PHPUnit\Framework\TestCase;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
+use function Safe\substr;
+use Webmozart\Assert\Assert;
+use Webmozart\PathUtil\Path;
 
-final class LessThanTest extends BaseMutatorTestCase
+final class MutatorFixturesProvider
 {
+    private const MUTATOR_FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-fixtures';
+
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @var array<string, string>
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    private static $testCaseFixtureDirMapping = [];
+
+    private function __construct()
     {
-        $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function getFixtureFileContent(TestCase $testCase, string $file): string
     {
-        yield 'It mutates less than' => [
-            <<<'PHP'
-<?php
+        Assert::isInstanceOf($testCase, BaseMutatorTestCase::class);
 
-1 < 2;
-PHP
-            ,
-            <<<'PHP'
-<?php
+        return file_get_contents(sprintf(
+            '%s/%s',
+            self::getTestCaseFixtureDir(get_class($testCase)),
+            $file
+        ));
+    }
 
-1 <= 2;
-PHP
-            ,
-        ];
+    /**
+     * @param class-string $testCaseClass
+     */
+    private static function getTestCaseFixtureDir(string $testCaseClass): string
+    {
+        if (array_key_exists($testCaseClass, self::$testCaseFixtureDirMapping)) {
+            return self::$testCaseFixtureDirMapping[$testCaseClass];
+        }
+
+        $testCaseClassParts = explode('\\', $testCaseClass);
+
+        return self::$testCaseFixtureDirMapping[$testCaseClass] = Path::canonicalize(sprintf(
+            '%s/%s',
+            self::MUTATOR_FIXTURES_DIR,
+            substr(end($testCaseClassParts), 0, -4)
+        ));
     }
 }

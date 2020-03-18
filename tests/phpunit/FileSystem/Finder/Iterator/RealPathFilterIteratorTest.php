@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder\Iterator;
 
-use Infection\Tests\Fixtures\Autoloaded\Finder\MockRelativePathFinder;
 use Infection\Tests\Fixtures\Finder\MockRealPathFinder;
+use Infection\Tests\Fixtures\Finder\MockRelativePathFinder;
 use PHPUnit\Framework\TestCase;
 
 final class RealPathFilterIteratorTest extends TestCase

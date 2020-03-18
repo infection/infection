@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
-use function Safe\file_get_contents;
-use function Safe\sprintf;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 
 /**
  * @group integration
  */
-final class ThisTest extends AbstractMutatorTestCase
+final class ThisTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -57,11 +56,11 @@ final class ThisTest extends AbstractMutatorTestCase
     public function mutationsProvider(): iterable
     {
         yield 'It does mutate with no typehint' => [
-            $this->getFileContent('this_return-this.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'this_return-this.php'),
             <<<'PHP'
 <?php
 
-namespace This_ReturnThis;
+namespace ThisReturnThis;
 
 class Test
 {
@@ -74,12 +73,7 @@ PHP
         ];
 
         yield 'It does not mutate non \'this\' return statements' => [
-            $this->getFileContent('this-return-types.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'this-return-types.php'),
         ];
-    }
-
-    private function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/This_/%s', $file));
     }
 }

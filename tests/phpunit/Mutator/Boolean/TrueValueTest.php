@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-final class TrueValueTest extends AbstractMutatorTestCase
+final class TrueValueTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider

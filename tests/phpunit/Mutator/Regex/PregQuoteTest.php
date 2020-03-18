@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class PregQuoteTest extends AbstractMutatorTestCase
+final class PregQuoteTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider

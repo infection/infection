@@ -54,7 +54,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
-abstract class AbstractMutatorTestCase extends TestCase
+abstract class BaseMutatorTestCase extends TestCase
 {
     /**
      * @var Mutator
