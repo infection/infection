@@ -254,6 +254,7 @@ final class ProjectCodeProvider
             ->notName('Helpers.php')
             ->exclude([
                 'autoloaded',
+                'benchmark',
                 'e2e',
                 'Fixtures',
             ])

@@ -55,6 +55,9 @@ $finder = Finder::create()
         'devTools',
         'resources',
         'tests/autoloaded',
+        'tests/benchmark/MutationGenerator/sources',
+        'tests/benchmark/Tracing/coverage',
+        'tests/benchmark/Tracing/sources',
         'tests/e2e',
         'tests/phpunit/Fixtures',
     ])
