@@ -138,8 +138,8 @@ final class JUnitTestCaseSorter
         ksort($buckets);
 
         foreach ($buckets as $bucket) {
-            if ($bucket !== []) {
-                yield from $bucket;
+            foreach ($bucket as $value) {
+                yield $value;
             }
         }
     }

@@ -37,6 +37,8 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\JUnitTimes;
+use function iterator_to_array;
 use function log;
 use PHPUnit\Framework\TestCase;
 
@@ -106,5 +108,105 @@ final class JUnitTestCaseSorterTest extends TestCase
             // Bucket Sort's average O(n + k)
             JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER + JUnitTestCaseSorter::BUCKETS_COUNT
         );
+    }
+
+    public function test_it_sorts_correctly(): void
+    {
+        $uniqueTestLocations = self::makeTestLocationsArray();
+
+        // Sanity check
+        $this->assertNotTrue(self::orderConstraintsValid($uniqueTestLocations));
+
+        $sortedTestLocations = iterator_to_array(JUnitTestCaseSorter::sort($uniqueTestLocations));
+        $this->assertTrue(self::orderConstraintsValid($sortedTestLocations), 'Bucket sort failed order check');
+
+        // Another sanity check
+        $sortedTestLocations = self::quicksort($uniqueTestLocations);
+        $this->assertTrue(self::orderConstraintsValid($uniqueTestLocations), 'Quicksort failed order check');
+    }
+
+    public function test_it_sorts_faster_than_quicksort(): void
+    {
+        $uniqueTestLocations = self::makeTestLocationsArray();
+
+        // Sanity check
+        $this->assertNotTrue(self::orderConstraintsValid($uniqueTestLocations));
+
+        $tries = 100;
+
+        // Benchmark bucket sort
+        $totalBucketSort = 0;
+
+        for ($i = 0; $i < $tries; ++$i) {
+            $start = microtime(true);
+            iterator_to_array(JUnitTestCaseSorter::sort($uniqueTestLocations));
+            $totalBucketSort += microtime(true) - $start;
+        }
+
+        // Benchmark quicksort
+        $totalQuickSort = 0;
+
+        for ($i = 0; $i < $tries; ++$i) {
+            $start = microtime(true);
+            self::quicksort($uniqueTestLocations);
+            $totalQuickSort += microtime(true) - $start;
+        }
+
+
+        $this->assertLessThan($totalQuickSort, $totalBucketSort);
+    }
+
+    private static function makeTestLocationsArray(): array
+    {
+        return array_map(
+            static function (float $executionTime): TestLocation {
+                return new TestLocation('', '', $executionTime);
+            },
+            JUnitTimes::JUNIT_TIMES
+        );
+    }
+
+    private static function quicksort($uniqueTestLocations): array
+    {
+        usort(
+            $uniqueTestLocations,
+            static function (TestLocation $a, TestLocation $b) {
+                return $a->getExecutionTime() <=> $b->getExecutionTime();
+            }
+        );
+
+        return $uniqueTestLocations;
+    }
+
+    /**
+     * We assume locations should be ordered within an order of magnitude.
+     *
+     * @return bool
+     */
+    private static function orderConstraintsValid(array $sortedTestLocations)
+    {
+        // Minimal precision: there's no sort below this number
+        $minimalPrecisionTime = 0.125;
+        $lastSeenTime = null;
+
+        foreach ($sortedTestLocations as $location) {
+            /* @var TestLocation $location */
+            if ($lastSeenTime === null) {
+                // Don't enable checks unless a to-be-sorted value is seen
+                if ($location->getExecutionTime() > $minimalPrecisionTime) {
+                    $lastSeenTime = $location->getExecutionTime();
+                }
+
+                continue;
+            }
+
+            if ($lastSeenTime / $location->getExecutionTime() > 10.) {
+                return false;
+            }
+
+            $lastSeenTime = $location->getExecutionTime();
+        }
+
+        return true;
     }
 }
