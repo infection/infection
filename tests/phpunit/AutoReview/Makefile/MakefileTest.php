@@ -75,6 +75,7 @@ final class MakefileTest extends TestCase
 
 [33mcompile:[0m	  Bundles Infection into a PHAR
 [33mcs:[0m	  	  Runs PHP-CS-Fixer
+[33mprofile:[0m 	  Runs Blackfire
 [33mautoreview:[0m 	  Runs various checks (static analysis & AutoReview test suite)
 [33mtest:[0m		  Runs all the tests
 [33mtest-unit:[0m	  Runs the unit tests
