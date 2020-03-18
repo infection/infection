@@ -42,9 +42,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-$io = new SymfonyStyle(new ArgvInput(), new ConsoleOutput());
-
 BlackfireInstrumentor::profile(
     require __DIR__ . '/generate-mutations-closure.php',
-    $io
+    new SymfonyStyle(new ArgvInput(), new ConsoleOutput())
 );

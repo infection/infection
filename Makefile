@@ -80,7 +80,7 @@ profile: vendor tests/benchmark/MutationGenerator/sources tests/benchmark/Tracin
 		--title="Tracing" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/Tracing/profile.php
-	composer dump --classmap-authoritative
+	composer dump
 
 
 .PHONY: autoreview
