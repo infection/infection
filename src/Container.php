@@ -74,9 +74,11 @@ use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\MutantProcess;
+use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
+use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
@@ -241,6 +243,9 @@ final class Container
                     },
                     $container->getConfiguration()->getThreadCount()
                 );
+            },
+            DryProcessRunner::class => static function (): DryProcessRunner {
+                return new DryProcessRunner();
             },
             TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {
                 return new TestFrameworkConfigLocator(
@@ -442,7 +447,7 @@ final class Container
                 return new MutationTestingRunner(
                     $container->getMutantProcessBuilder(),
                     $container->getMutantFactory(),
-                    $container->getParallelProcessRunner(),
+                    $container->getProcessRunner(),
                     $container->getEventDispatcher(),
                     $container->getFileSystem(),
                     $container->getConfiguration()->noProgress()
@@ -644,9 +649,14 @@ final class Container
         return $this->get(SyncEventDispatcher::class);
     }
 
-    public function getParallelProcessRunner(): ParallelProcessRunner
+    public function getProcessRunner(): ProcessRunner
     {
-        return $this->get(ParallelProcessRunner::class);
+        $config = $this->getConfiguration();
+
+        return $config->isDryRun()
+            ? $this->get(DryProcessRunner::class)
+            : $this->get(ParallelProcessRunner::class)
+        ;
     }
 
     public function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
