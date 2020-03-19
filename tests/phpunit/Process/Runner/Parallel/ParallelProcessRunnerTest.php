@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner\Parallel;
 
 use Closure;
-use Generator;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\MutantExecutionResult;

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use const PHP_OS_FAMILY;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -58,6 +59,10 @@ final class BenchmarkTest extends TestCase
      */
     public function test_all_the_benchmarks_can_be_executed(string $path): void
     {
+        if (PHP_OS_FAMILY === 'Windows') {
+            $this->markTestSkipped('Not interested in profiling on Windows');
+        }
+
         $this->assertFileExists($path);
 
         $benchmarkProcess = new Process([
