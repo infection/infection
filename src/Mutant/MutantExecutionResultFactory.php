@@ -35,92 +35,76 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use function array_keys;
-use Infection\Mutator\ProfileList;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Process\MutantProcess;
+use function Safe\sprintf;
+use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  * @final
  */
-class MutantExecutionResult
+class MutantExecutionResultFactory
 {
-    private $processCommandLine;
-    private $processOutput;
-    private $detectionStatus;
-    private $mutantDiff;
-    private $mutatorName;
-    private $originalFilePath;
-    private $originalStartingLine;
+    private $testFrameworkAdapter;
 
-    public function __construct(
-        string $processCommandLine,
-        string $processOutput,
-        string $detectionStatus,
-        string $mutantDiff,
-        string $mutatorName,
-        string $originalFilePath,
-        int $originalStartingLine
-    ) {
-        Assert::oneOf($detectionStatus, DetectionStatus::ALL);
-        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
-
-        $this->processCommandLine = $processCommandLine;
-        $this->processOutput = $processOutput;
-        $this->detectionStatus = $detectionStatus;
-        $this->mutantDiff = $mutantDiff;
-        $this->mutatorName = $mutatorName;
-        $this->originalFilePath = $originalFilePath;
-        $this->originalStartingLine = $originalStartingLine;
+    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
+    {
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    public static function createFromNonCoveredMutant(Mutant $mutant): self
+    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
     {
+        $process = $mutantProcess->getProcess();
+        $mutant = $mutantProcess->getMutant();
         $mutation = $mutant->getMutation();
 
-        return new self(
-            '',
-            '',
-            DetectionStatus::NOT_COVERED,
+        return new MutantExecutionResult(
+            $process->getCommandLine(),
+            $this->retrieveProcessOutput($process),
+            $this->retrieveDetectionStatus($mutantProcess),
             $mutant->getDiff(),
-            $mutant->getMutation()->getMutatorName(),
+            $mutation->getMutatorName(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalStartingLine()
         );
     }
 
-    public function getProcessCommandLine(): string
+    public function retrieveProcessOutput(Process $process): string
     {
-        return $this->processCommandLine;
+        Assert::true(
+            $process->isTerminated(),
+            sprintf(
+                'Cannot retrieve a non-terminated process output. Got "%s"',
+                $process->getStatus()
+            )
+        );
+
+        return $process->getOutput();
     }
 
-    public function getProcessOutput(): string
+    public function retrieveDetectionStatus(MutantProcess $mutantProcess): string
     {
-        return $this->processOutput;
-    }
+        if (!$mutantProcess->getMutant()->isCoveredByTest()) {
+            return DetectionStatus::NOT_COVERED;
+        }
 
-    public function getDetectionStatus(): string
-    {
-        return $this->detectionStatus;
-    }
+        if ($mutantProcess->isTimedOut()) {
+            return DetectionStatus::TIMED_OUT;
+        }
 
-    public function getMutantDiff(): string
-    {
-        return $this->mutantDiff;
-    }
+        $process = $mutantProcess->getProcess();
 
-    public function getMutatorName(): string
-    {
-        return $this->mutatorName;
-    }
+        if ($process->getExitCode() > 100) {
+            // See Symfony\Component\Process\Process::$exitCodes
+            return DetectionStatus::ERROR;
+        }
 
-    public function getOriginalFilePath(): string
-    {
-        return $this->originalFilePath;
-    }
+        if ($this->testFrameworkAdapter->testsPass($this->retrieveProcessOutput($process))) {
+            return DetectionStatus::ESCAPED;
+        }
 
-    public function getOriginalStartingLine(): int
-    {
-        return $this->originalStartingLine;
+        return DetectionStatus::KILLED;
     }
 }

@@ -63,7 +63,7 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
@@ -239,7 +239,7 @@ final class Container
                 return new ParallelProcessRunner(
                     static function (MutantProcess $mutantProcess) use ($container): void {
                         $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished(
-                            MutantExecutionResult::createFromProcess($mutantProcess)
+                            $container->getMutantExecutionResultFactory()->createFromProcess($mutantProcess)
                         ));
                     },
                     $container->getConfiguration()->getThreadCount()
@@ -465,11 +465,14 @@ final class Container
             TestFrameworkExtraOptionsFilter::class => static function (): TestFrameworkExtraOptionsFilter {
                 return new TestFrameworkExtraOptionsFilter();
             },
-            AdapterInstallationDecider::class => static function (self $container): AdapterInstallationDecider {
+            AdapterInstallationDecider::class => static function (): AdapterInstallationDecider {
                 return new AdapterInstallationDecider(new QuestionHelper());
             },
             AdapterInstaller::class => static function (): AdapterInstaller {
                 return new AdapterInstaller(new ComposerExecutableFinder());
+            },
+            MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
+                return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
             },
         ]);
     }
@@ -865,6 +868,11 @@ final class Container
     public function getAdapterInstaller(): AdapterInstaller
     {
         return $this->get(AdapterInstaller::class);
+    }
+
+    public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
+    {
+        return $this->get(MutantExecutionResultFactory::class);
     }
 
     /**
