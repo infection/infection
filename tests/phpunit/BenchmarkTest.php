@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function is_dir;
 use const PHP_OS_FAMILY;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
