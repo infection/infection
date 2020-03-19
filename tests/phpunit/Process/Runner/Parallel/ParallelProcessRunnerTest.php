@@ -66,7 +66,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_it_starts_the_given_processes(): void
     {
-        $processes = (function (): Generator {
+        $processes = (function (): iterable {
             for ($i = 0; $i < 10; ++$i) {
                 yield $this->createProcessBearer();
             }
@@ -85,7 +85,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_it_checks_if_the_executed_processes_time_out(): void
     {
-        $processes = (function (): Generator {
+        $processes = (function (): iterable {
             for ($i = 0; $i < 10; ++$i) {
                 yield $this->createTimeOutProcessBearer();
             }
@@ -183,7 +183,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     private function runWithAllKindsOfProcesses(int $threadCount): void
     {
-        $processes = (function (): Generator {
+        $processes = (function (): iterable {
             for ($i = 0; $i < 5; ++$i) {
                 yield $this->createProcessBearer();
 
