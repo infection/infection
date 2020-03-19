@@ -35,7 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_map;
 use ArrayIterator;
+use function count;
+use function get_class;
+use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
@@ -55,12 +59,8 @@ use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
-use function array_map;
-use function count;
-use function get_class;
-use function implode;
 use function Safe\sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group integration
