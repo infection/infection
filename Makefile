@@ -236,15 +236,15 @@ $(DOCKER_RUN_74_IMAGE): devTools/Dockerfile-php74-xdebug
 	touch $@
 
 tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
-	cd tests/benchmark/MutationGenerator; tar -xf sources.tar.gz
+	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
 	touch $@
 
 tests/benchmark/Tracing/coverage: tests/benchmark/Tracing/coverage.tar.gz
 	@echo "Untarring the coverage, this might take a while"
-	cd tests/benchmark/Tracing; tar -xf coverage.tar.gz
+	cd tests/benchmark/Tracing; tar -xzf coverage.tar.gz
 	touch $@
 
 tests/benchmark/Tracing/sources: tests/benchmark/Tracing/sources.tar.gz
 	@echo "Untarring the sources, this might take a while"
-	cd tests/benchmark/Tracing; tar -xf sources.tar.gz
+	cd tests/benchmark/Tracing; tar -xzf sources.tar.gz
 	touch $@
