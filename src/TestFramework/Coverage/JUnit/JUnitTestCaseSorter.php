@@ -69,7 +69,9 @@ final class JUnitTestCaseSorter
     {
         $uniqueTestLocations = $this->uniqueByTestFile($tests);
 
-        if (count($uniqueTestLocations) === 1) {
+        $numberOfTestLocation = count($uniqueTestLocations);
+
+        if ($numberOfTestLocation === 1) {
             // Around 5% speed up compared to when without this optimization.
             /** @var TestLocation $testLocation */
             $testLocation = current($uniqueTestLocations);
@@ -87,7 +89,7 @@ final class JUnitTestCaseSorter
          * to sort them by hand: usort does that just as good.
          */
 
-        if (count($uniqueTestLocations) < self::USE_BUCKET_SORT_AFTER) {
+        if ($numberOfTestLocation < self::USE_BUCKET_SORT_AFTER) {
             usort(
                 $uniqueTestLocations,
                 static function (TestLocation $a, TestLocation $b) {
@@ -144,6 +146,7 @@ final class JUnitTestCaseSorter
 
         foreach ($buckets as $bucket) {
             foreach ($bucket as $value) {
+                // not `yield from` here because it'll break order in PHP 7.3
                 yield $value;
             }
         }
