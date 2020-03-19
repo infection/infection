@@ -42,6 +42,7 @@ use function iterator_to_array;
 use function log;
 use function microtime;
 use PHPUnit\Framework\TestCase;
+use function round;
 use function Safe\usort;
 
 final class JUnitTestCaseSorterTest extends TestCase
@@ -166,7 +167,7 @@ final class JUnitTestCaseSorterTest extends TestCase
             $totalQuickSort += microtime(true) - $start;
         }
 
-        $this->assertLessThan($totalQuickSort, $totalBucketSort);
+        $this->assertLessThanOrEqual(round($totalQuickSort, 3), round($totalBucketSort, 3));
     }
 
     public static function locationsArrayProvider(): iterable
