@@ -58,6 +58,7 @@ jobs:
             fi
       script:
         - if [[ "$DRIVER" == "xdebug" || "$DRIVER" == "none" ]]; then xdebug_enable; fi
+        - make tests/benchmark/MutationGenerator/sources tests/benchmark/Tracing/coverage tests/benchmark/Tracing/sources
         - if [[ "$DRIVER" != "phpdbg" ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
         - |
           if [[ "$DEPS" == "LOW" ]]; then
