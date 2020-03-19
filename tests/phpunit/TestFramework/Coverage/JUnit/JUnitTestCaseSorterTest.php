@@ -58,9 +58,8 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         $sorter = new JUnitTestCaseSorter();
 
-        $uniqueSortedFileNames = iterator_to_array(
-            $sorter->getUniqueSortedFileNames($coverageTestCases)
-        );
+        /** @var array $uniqueSortedFileNames */
+        $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
 
         $this->assertCount(1, $uniqueSortedFileNames);
         $this->assertSame('/path/to/test-file-1', $uniqueSortedFileNames[0]);
@@ -72,12 +71,12 @@ final class JUnitTestCaseSorterTest extends TestCase
             new TestLocation(
                 'testMethod1',
                 '/path/to/test-file-1',
-                0.000234
+                0.500234
             ),
             new TestLocation(
                 'testMethod2',
                 '/path/to/test-file-2',
-                0.600221
+                0.900221
             ),
             new TestLocation(
                 'testMethod3_1',
@@ -87,7 +86,7 @@ final class JUnitTestCaseSorterTest extends TestCase
             new TestLocation(
                 'testMethod3_2',
                 '/path/to/test-file-3',
-                0.010022
+                0.210022
             ),
         ];
 
@@ -112,27 +111,38 @@ final class JUnitTestCaseSorterTest extends TestCase
         );
     }
 
-    public function test_it_sorts_correctly(): void
+    /**
+     * @dataProvider locationsArrayProvider
+     */
+    public function test_it_sorts_correctly(array $uniqueTestLocations): void
     {
-        $uniqueTestLocations = self::makeTestLocationsArray();
-
-        // Sanity check
-        $this->assertNotTrue(self::isOrderConstraintsValid($uniqueTestLocations));
-
-        $sortedTestLocations = iterator_to_array(JUnitTestCaseSorter::sort($uniqueTestLocations));
+        $sortedTestLocations = iterator_to_array(JUnitTestCaseSorter::bucketSort($uniqueTestLocations));
         $this->assertTrue(self::isOrderConstraintsValid($sortedTestLocations), 'Bucket sort failed order check');
+    }
 
-        // Another sanity check
-        $sortedTestLocations = self::quicksort($uniqueTestLocations);
+    /**
+     * Sanity check
+     *
+     * @dataProvider locationsArrayProvider
+     */
+    public function test_quicksort_sorts_correctly(array $uniqueTestLocations): void
+    {
+        self::quicksort($uniqueTestLocations);
+
         $this->assertTrue(self::isOrderConstraintsValid($uniqueTestLocations), 'Quicksort failed order check');
     }
 
-    public function test_it_sorts_faster_than_quicksort(): void
+    /**
+     * @dataProvider locationsArrayProvider
+     */
+    public function test_it_sorts_faster_than_quicksort(array $uniqueTestLocations): void
     {
-        $uniqueTestLocations = self::makeTestLocationsArray();
+        if (self::isOrderConstraintsValid($uniqueTestLocations) === true) {
+            // Ignore silently as to not pollute to the log.
+            $this->addToAssertionCount(1);
 
-        // Sanity check
-        $this->assertNotTrue(self::isOrderConstraintsValid($uniqueTestLocations));
+            return;
+        }
 
         $tries = 100;
 
@@ -141,7 +151,7 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         for ($i = 0; $i < $tries; ++$i) {
             $start = microtime(true);
-            iterator_to_array(JUnitTestCaseSorter::sort($uniqueTestLocations));
+            iterator_to_array(JUnitTestCaseSorter::bucketSort($uniqueTestLocations));
             $totalBucketSort += microtime(true) - $start;
         }
 
@@ -150,24 +160,36 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         for ($i = 0; $i < $tries; ++$i) {
             $start = microtime(true);
-            self::quicksort($uniqueTestLocations);
+            // Updates by reference
+            $locationsCopy = $uniqueTestLocations;
+            self::quicksort($locationsCopy);
             $totalQuickSort += microtime(true) - $start;
         }
 
         $this->assertLessThan($totalQuickSort, $totalBucketSort);
     }
 
-    private static function makeTestLocationsArray(): array
+    public static function locationsArrayProvider(): iterable
     {
-        return array_map(
+        $locations = array_map(
             static function (float $executionTime): TestLocation {
                 return new TestLocation('', '', $executionTime);
             },
             JUnitTimes::JUNIT_TIMES
         );
+
+        yield [array_slice($locations, 0, 10)];
+
+        yield [array_slice($locations, 0, 100)];
+
+        for ($i = 0; $i < 100; ++$i) {
+            yield [array_slice($locations, random_int(0, count($locations) - JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER), JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER)];
+        }
+
+        yield [$locations];
     }
 
-    private static function quicksort($uniqueTestLocations): array
+    private static function quicksort(&$uniqueTestLocations): void
     {
         usort(
             $uniqueTestLocations,
@@ -175,8 +197,6 @@ final class JUnitTestCaseSorterTest extends TestCase
                 return $a->getExecutionTime() <=> $b->getExecutionTime();
             }
         );
-
-        return $uniqueTestLocations;
     }
 
     /**

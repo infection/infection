@@ -63,7 +63,7 @@ final class JUnitTestCaseSorter
     /**
      * @param TestLocation[] $tests
      *
-     * @return string[]
+     * @return iterable<string>
      */
     public function getUniqueSortedFileNames(array $tests): iterable
     {
@@ -77,23 +77,33 @@ final class JUnitTestCaseSorter
             /** @var string $filePath */
             $filePath = $testLocation->getFilePath();
 
-            yield $filePath;
-
-            return;
+            return [$filePath];
         }
 
         /*
+         * We need to sort tests to run the fastest first.
+         *
          * Two tests per file are also very frequent. Yet it doesn't make sense
          * to sort them by hand: usort does that just as good.
          */
 
-        // sort tests to run the fastest first
-        foreach (self::sort($uniqueTestLocations) as $testLocation) {
-            /** @var string $filePath */
-            $filePath = $testLocation->getFilePath();
+        if (count($uniqueTestLocations) < self::USE_BUCKET_SORT_AFTER) {
+            usort(
+                $uniqueTestLocations,
+                static function (TestLocation $a, TestLocation $b) {
+                    return $a->getExecutionTime() <=> $b->getExecutionTime();
+                }
+            );
 
-            yield $filePath;
+            return self::sortedLocationsGenerator($uniqueTestLocations);
         }
+
+        /*
+         * For large number of tests use a more efficient algorithm.
+         */
+        return self::sortedLocationsGenerator(
+            self::bucketSort($uniqueTestLocations)
+        );
     }
 
     /**
@@ -103,7 +113,7 @@ final class JUnitTestCaseSorter
      *
      * @return iterable<TestLocation>
      */
-    public static function sort(array $uniqueTestLocations): iterable
+    public static function bucketSort(array $uniqueTestLocations): iterable
     {
         // Pre-sort first buckets, optimistically assuming that
         // most projects won't have tests longer than a second
@@ -136,6 +146,21 @@ final class JUnitTestCaseSorter
             foreach ($bucket as $value) {
                 yield $value;
             }
+        }
+    }
+
+    /**
+     * @param iterable<TestLocation> $sortedTestLocations
+     *
+     * @return iterable<string>
+     */
+    private static function sortedLocationsGenerator(iterable $sortedTestLocations): iterable
+    {
+        foreach ($sortedTestLocations as $testLocation) {
+            /** @var string $filePath */
+            $filePath = $testLocation->getFilePath();
+
+            yield $filePath;
         }
     }
 
