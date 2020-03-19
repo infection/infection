@@ -52,7 +52,7 @@ $input = new ArgvInput(
         new InputArgument(
             MAX_MUTATIONS_COUNT_ARG,
             InputArgument::OPTIONAL,
-            'Maximum number of traces retrieved. Use -1 for no maximum',
+            'Maximum number of mutations retrieved. Use -1 for no maximum',
             50
         ),
     ])
