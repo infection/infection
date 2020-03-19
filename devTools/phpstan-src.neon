@@ -29,6 +29,10 @@ parameters:
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
             count: 1
         -
+            path: '../src/Container.php'
+            message: '#^Parameter \#1 \$processHandler of class Infection\\Process\\Runner\\Parallel\\ParallelProcessRunner constructor expects Closure\(Infection\\Process\\Runner\\Parallel\\ProcessBearer\)\: void\, Closure\(Infection\\Process\\MutantProcess\): void given\.$#'
+            count: 1
+        -
             path: '../src/TestFramework/Coverage/JUnit/JUnitTestCaseSorter.php'
             message: '#array_key_exists expects int\|string, string\|null given#'
             count: 1

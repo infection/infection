@@ -81,7 +81,7 @@ final class MutationTestingRunner
     /**
      * @param iterable<Mutation> $mutations
      */
-    public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
+    public function run(iterable $mutations, string $testFrameworkExtraOptions): void
     {
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
@@ -110,7 +110,7 @@ final class MutationTestingRunner
             })
         ;
 
-        $this->parallelProcessManager->run($processes, $threadCount);
+        $this->parallelProcessManager->run($processes);
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }
