@@ -69,9 +69,6 @@ final class ParallelProcessRunner implements ProcessRunner
         $this->poll = $poll;
     }
 
-    /**
-     * @param iterable<ProcessBearer> $processes
-     */
     public function run(iterable $processes): void
     {
         /*
