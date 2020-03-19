@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner\Parallel;
+namespace Infection\Tests\Process\Runner;
 
-use Infection\Process\Runner\Parallel\DryProcessRunner;
+use Infection\Process\Runner\DryProcessRunner;
 use Infection\Tests\Fixtures\Process\FakeProcessBearer;
 use PHPUnit\Framework\TestCase;
 

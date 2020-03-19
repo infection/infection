@@ -33,13 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner\Parallel;
+namespace Infection\Process\Runner;
 
-use function array_shift;
 use Closure;
-use function count;
 use Generator;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use function array_shift;
+use function count;
 use function usleep;
 
 /**

@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use function array_filter;
-use function array_key_exists;
 use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
@@ -78,7 +76,7 @@ use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
+use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
@@ -102,19 +100,21 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
-use function php_ini_loaded_file;
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
-use function Safe\getcwd;
-use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
+use function array_filter;
+use function array_key_exists;
+use function php_ini_loaded_file;
+use function Safe\getcwd;
+use function Safe\sprintf;
 
 /**
  * @internal

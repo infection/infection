@@ -33,20 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner\Parallel;
+namespace Infection\Tests\Process\Runner;
 
 use Closure;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Infection\Process\Runner\Parallel\ProcessBearer;
+use Infection\Process\Runner\ParallelProcessRunner;
+use Infection\Process\Runner\ProcessBearer;
 use Infection\Tests\Fixtures\Process\DummyProcessBearer;
-use const PHP_INT_MAX;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use const PHP_INT_MAX;
 
 final class ParallelProcessRunnerTest extends TestCase
 {

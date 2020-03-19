@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use function in_array;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Process\Runner\Parallel\ProcessBearer;
-use function Safe\sprintf;
+use Infection\Process\Runner\ProcessBearer;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
+use function in_array;
+use function Safe\sprintf;
 
 /**
  * @internal

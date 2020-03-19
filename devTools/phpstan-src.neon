@@ -30,7 +30,7 @@ parameters:
             count: 1
         -
             path: '../src/Container.php'
-            message: '#^Parameter \#1 \$processHandler of class Infection\\Process\\Runner\\Parallel\\ParallelProcessRunner constructor expects Closure\(Infection\\Process\\Runner\\Parallel\\ProcessBearer\)\: void\, Closure\(Infection\\Process\\MutantProcess\): void given\.$#'
+            message: '#^Parameter \#1 \$processHandler of class Infection\\Process\\Runner\\ParallelProcessRunner constructor expects Closure\(Infection\\Process\\Runner\\ProcessBearer\)\: void\, Closure\(Infection\\Process\\MutantProcess\): void given\.$#'
             count: 1
         -
             path: '../src/TestFramework/Coverage/JUnit/JUnitTestCaseSorter.php'

@@ -33,22 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner\Parallel;
+namespace Infection\Process\Runner;
 
-use function array_shift;
-use Closure;
-use function count;
-use Generator;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use function usleep;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-interface ProcessRunner
+interface ProcessBearer
 {
-    /**
-     * @param iterable<ProcessBearer> $processes
-     */
-    public function run(iterable $processes): void;
+    public function getProcess(): Process;
+
+    public function markAsTimedOut(): void;
 }

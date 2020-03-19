@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner\Parallel;
+namespace Infection\Process\Runner;
 
 final class DryProcessRunner implements ProcessRunner
 {

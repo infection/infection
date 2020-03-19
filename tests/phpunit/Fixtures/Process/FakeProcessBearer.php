@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\Process;
 
-use Infection\Process\Runner\Parallel\ProcessBearer;
+use Infection\Process\Runner\ProcessBearer;
 use LogicException;
 use Symfony\Component\Process\Process;
 

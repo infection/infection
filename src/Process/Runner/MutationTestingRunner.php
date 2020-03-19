@@ -46,10 +46,8 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Infection\Process\Runner\Parallel\ProcessRunner;
-use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
+use function Pipeline\take;
 
 /**
  * @internal
