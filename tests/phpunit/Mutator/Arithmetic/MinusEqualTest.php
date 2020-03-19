@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class MinusEqualTest extends AbstractMutatorTestCase
+final class MinusEqualTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider

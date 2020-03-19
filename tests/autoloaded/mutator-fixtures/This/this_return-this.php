@@ -1,6 +1,6 @@
 <?php
 
-namespace This_ReturnThis;
+namespace ThisReturnThis;
 
 class Test
 {
