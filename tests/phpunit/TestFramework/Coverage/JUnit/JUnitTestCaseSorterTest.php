@@ -117,14 +117,14 @@ final class JUnitTestCaseSorterTest extends TestCase
         $uniqueTestLocations = self::makeTestLocationsArray();
 
         // Sanity check
-        $this->assertNotTrue(self::orderConstraintsValid($uniqueTestLocations));
+        $this->assertNotTrue(self::isOrderConstraintsValid($uniqueTestLocations));
 
         $sortedTestLocations = iterator_to_array(JUnitTestCaseSorter::sort($uniqueTestLocations));
-        $this->assertTrue(self::orderConstraintsValid($sortedTestLocations), 'Bucket sort failed order check');
+        $this->assertTrue(self::isOrderConstraintsValid($sortedTestLocations), 'Bucket sort failed order check');
 
         // Another sanity check
         $sortedTestLocations = self::quicksort($uniqueTestLocations);
-        $this->assertTrue(self::orderConstraintsValid($uniqueTestLocations), 'Quicksort failed order check');
+        $this->assertTrue(self::isOrderConstraintsValid($uniqueTestLocations), 'Quicksort failed order check');
     }
 
     public function test_it_sorts_faster_than_quicksort(): void
@@ -132,7 +132,7 @@ final class JUnitTestCaseSorterTest extends TestCase
         $uniqueTestLocations = self::makeTestLocationsArray();
 
         // Sanity check
-        $this->assertNotTrue(self::orderConstraintsValid($uniqueTestLocations));
+        $this->assertNotTrue(self::isOrderConstraintsValid($uniqueTestLocations));
 
         $tries = 100;
 
@@ -182,16 +182,17 @@ final class JUnitTestCaseSorterTest extends TestCase
     /**
      * We assume locations should be ordered within an order of magnitude.
      *
+     * @param TestLocation[] $sortedTestLocations
+     *
      * @return bool
      */
-    private static function orderConstraintsValid(array $sortedTestLocations)
+    private static function isOrderConstraintsValid(array $sortedTestLocations)
     {
         // Minimal precision: there's no sort below this number
         $minimalPrecisionTime = 0.125;
         $lastSeenTime = null;
 
         foreach ($sortedTestLocations as $location) {
-            /* @var TestLocation $location */
             if ($lastSeenTime === null) {
                 // Don't enable checks unless a to-be-sorted value is seen
                 if ($location->getExecutionTime() > $minimalPrecisionTime) {
