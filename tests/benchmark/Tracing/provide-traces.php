@@ -35,4 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\Tracing;
 
-(require __DIR__ . '/provide-traces-closure.php')();
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
+
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
+const MAX_TRACE_COUNT_ARG = 'max-trace-count';
+
+$input = new ArgvInput(
+    null,
+    new InputDefinition([
+        new InputArgument(
+            MAX_TRACE_COUNT_ARG,
+            InputArgument::OPTIONAL,
+            'Maximum number of traces retrieved. Use -1 for no maximum',
+            50
+        ),
+    ])
+);
+
+(require __DIR__ . '/provide-traces-closure.php')((int) $input->getArgument(MAX_TRACE_COUNT_ARG));
