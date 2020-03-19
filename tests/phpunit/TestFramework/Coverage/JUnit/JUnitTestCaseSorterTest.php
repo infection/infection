@@ -36,12 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use function abs;
+use function extension_loaded;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\JUnitTimes;
 use function iterator_to_array;
 use function log;
 use function microtime;
+use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
 use function Safe\usort;
 
@@ -138,6 +140,10 @@ final class JUnitTestCaseSorterTest extends TestCase
      */
     public function test_it_sorts_faster_than_quicksort(array $uniqueTestLocations): void
     {
+        if (extension_loaded('xdebug') || PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('Benchmarks under xdebug or phpdbg are brittle');
+        }
+
         if (self::isOrderConstraintsValid($uniqueTestLocations) === true) {
             // Ignore silently as to not pollute to the log.
             $this->addToAssertionCount(1);
