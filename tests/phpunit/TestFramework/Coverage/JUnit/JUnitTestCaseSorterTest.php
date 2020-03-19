@@ -179,8 +179,6 @@ final class JUnitTestCaseSorterTest extends TestCase
             JUnitTimes::JUNIT_TIMES
         );
 
-        yield [array_slice($locations, 0, 10)];
-
         yield [array_slice($locations, 0, 100)];
 
         for ($i = 0; $i < 100; ++$i) {
