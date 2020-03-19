@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use const PHP_OS_FAMILY;
+use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -44,6 +45,7 @@ use Symfony\Component\Process\Process;
 
 /**
  * @group integration
+ * @coversNothing
  */
 final class BenchmarkTest extends TestCase
 {
@@ -61,6 +63,10 @@ final class BenchmarkTest extends TestCase
     {
         if (PHP_OS_FAMILY === 'Windows') {
             $this->markTestSkipped('Not interested in profiling on Windows');
+        }
+
+        if (PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('This test requires running without PHPDBG');
         }
 
         $this->assertFileExists($path);
