@@ -61,15 +61,20 @@ $container = Container::create()->withDynamicParameters(
     ''
 );
 
-$generateTraces = static function (?int $maxCount) use ($container): Generator {
+$generateTraces = static function (?int $maxCount) use ($container): iterable {
     $traces = $container->getFilteredEnrichedTraceProvider()->provideTraces();
+
+    if ($maxCount === null) {
+        // Avoid extra limiting generator for a simpler case
+        return $traces;
+    }
 
     $i = 0;
 
     foreach ($traces as $trace) {
         ++$i;
 
-        if ($maxCount !== null && $i === $maxCount) {
+        if ($i === $maxCount) {
             return;
         }
 
@@ -77,10 +82,14 @@ $generateTraces = static function (?int $maxCount) use ($container): Generator {
     }
 };
 
-return static function (int $maxCount) use ($generateTraces): array {
+return static function (int $maxCount) use ($generateTraces): void {
     if ($maxCount < 0) {
         $maxCount = null;
     }
 
-    return iterator_to_array($generateTraces($maxCount), true);
+    $traces = $generateTraces($maxCount);
+
+    foreach ($traces as $_) {
+        // Iterate over the generator: do not use iterator_to_array which is less GC friendly
+    }
 };

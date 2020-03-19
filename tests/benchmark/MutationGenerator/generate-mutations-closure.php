@@ -103,7 +103,7 @@ return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mu
             []
         );
 
-        foreach ($mutations as $mutation) {
+        foreach ($mutations as $_) {
             ++$count;
 
             if ($maxCount !== null && $count === $maxCount) {
