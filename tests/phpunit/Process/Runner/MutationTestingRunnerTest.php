@@ -118,16 +118,15 @@ final class MutationTestingRunnerTest extends TestCase
     public function test_it_does_not_create_processes_when_there_is_not_mutations(): void
     {
         $mutations = [];
-        $threadCount = 4;
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->emptyIterable(), $threadCount)
+            ->with($this->emptyIterable())
         ;
 
-        $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
+        $this->runner->run($mutations, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
@@ -144,7 +143,6 @@ final class MutationTestingRunnerTest extends TestCase
             $mutation0 = $this->createMutation(0),
             $mutation1 = $this->createMutation(1),
         ];
-        $threadCount = 4;
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
         $this->mutantFactoryMock
@@ -193,10 +191,10 @@ final class MutationTestingRunnerTest extends TestCase
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->iterableContaining([$process0, $process1]), $threadCount)
+            ->with($this->iterableContaining([$process0, $process1]))
         ;
 
-        $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
+        $this->runner->run($mutations, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
@@ -214,7 +212,6 @@ final class MutationTestingRunnerTest extends TestCase
             $mutation1 = $this->createMutation(1),
         ]);
 
-        $threadCount = 4;
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
         $this->mutantFactoryMock
@@ -263,7 +260,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->iterableContaining([$process0, $process1]), $threadCount)
+            ->with($this->iterableContaining([$process0, $process1]), )
         ;
 
         $this->runner = new MutationTestingRunner(
@@ -275,7 +272,7 @@ final class MutationTestingRunnerTest extends TestCase
             true
         );
 
-        $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
+        $this->runner->run($mutations, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
@@ -294,8 +291,6 @@ final class MutationTestingRunnerTest extends TestCase
             ->method($this->anything())
         ;
 
-        $threadCount = 4;
-
         $this->mutantFactoryMock
             ->expects($this->never())
             ->method($this->anything())
@@ -309,7 +304,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->someIterable(), $threadCount)
+            ->with($this->someIterable())
         ;
 
         $this->runner = new MutationTestingRunner(
@@ -321,13 +316,12 @@ final class MutationTestingRunnerTest extends TestCase
             true
         );
 
-        $this->runner->run($mutations, $threadCount, '');
+        $this->runner->run($mutations, '');
     }
 
     public function test_it_dispatches_events_even_when_no_mutations_is_given(): void
     {
         $mutations = [];
-        $threadCount = 4;
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
         $this->processBuilderMock
@@ -343,10 +337,10 @@ final class MutationTestingRunnerTest extends TestCase
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->emptyIterable(), $threadCount)
+            ->with($this->emptyIterable())
         ;
 
-        $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
+        $this->runner->run($mutations, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [

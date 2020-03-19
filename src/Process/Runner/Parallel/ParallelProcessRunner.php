@@ -39,9 +39,7 @@ use function array_shift;
 use Closure;
 use function count;
 use Generator;
-use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Exception\RuntimeException;
 use function usleep;
 
 /**
@@ -52,25 +50,30 @@ use function usleep;
  */
 class ParallelProcessRunner
 {
-    private $processHandler;
-
     /**
      * @var ProcessBearer[]
      */
     private $runningProcesses = [];
 
-    public function __construct(Closure $processHandler)
+    private $processHandler;
+    private $threadCount;
+    private $poll;
+
+    /**
+     * @param Closure(ProcessBearer): void $processHandler
+     * @param int $poll Delay (in milliseconds) to wait in-between two polls
+     */
+    public function __construct(Closure $processHandler, int $threadCount, int $poll = 1000)
     {
         $this->processHandler = $processHandler;
+        $this->threadCount = $threadCount;
+        $this->poll = $poll;
     }
 
     /**
      * @param iterable<ProcessBearer> $processes
-     *
-     * @throws RuntimeException
-     * @throws LogicException
      */
-    public function run(iterable $processes, int $threadCount, int $poll = 1000): void
+    public function run(iterable $processes): void
     {
         /*
          * It takes about 100000 ms for a mutated process to finish, where it takes
@@ -89,7 +92,7 @@ class ParallelProcessRunner
         // Load the first process from the queue to buy us some time.
         self::fillBucketOnce($bucket, $generator, 1);
 
-        $threadCount = max(1, $threadCount);
+        $threadCount = max(1, $this->threadCount);
 
         // start the initial batch of processes
         while ($process = array_shift($bucket)) {
@@ -99,7 +102,7 @@ class ParallelProcessRunner
                 do {
                     // While we wait, try fetch a good amount of next processes from the queue,
                     // reducing the poll delay with each loaded process
-                    usleep(max(0, $poll - self::fillBucketOnce($bucket, $generator, $threadCount)));
+                    usleep(max(0, $this->poll - self::fillBucketOnce($bucket, $generator, $threadCount)));
                 } while (!$this->freeTerminatedProcesses());
             }
 
@@ -108,7 +111,7 @@ class ParallelProcessRunner
         }
 
         do {
-            usleep($poll);
+            usleep($this->poll);
             $this->freeTerminatedProcesses();
             // continue loop while there are processes being executed or waiting for execution
         } while ($this->runningProcesses);

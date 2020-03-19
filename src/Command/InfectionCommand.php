@@ -213,7 +213,7 @@ final class InfectionCommand extends BaseCommand
             $this->container->getTestFrameworkExtraOptionsFilter()
         );
 
-        $result = $engine->execute((int) $this->input->getOption('threads'));
+        $result = $engine->execute();
 
         return $result === true ? 0 : 1;
     }
@@ -306,7 +306,8 @@ final class InfectionCommand extends BaseCommand
             $minCoveredMsi === null ? null : (float) $minCoveredMsi,
             $testFramework === '' ? null : $testFramework,
             $testFrameworkExtraOptions === '' ? null : $testFrameworkExtraOptions,
-            trim((string) $input->getOption('filter'))
+            trim((string) $input->getOption('filter')),
+            (int) $this->input->getOption('threads')
         );
     }
 

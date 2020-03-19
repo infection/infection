@@ -233,11 +233,14 @@ final class Container
                 return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
-                return new ParallelProcessRunner(static function (MutantProcess $mutantProcess) use ($container): void {
-                    $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished(
-                        MutantExecutionResult::createFromProcess($mutantProcess)
-                    ));
-                });
+                return new ParallelProcessRunner(
+                    static function (MutantProcess $mutantProcess) use ($container): void {
+                        $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished(
+                            MutantExecutionResult::createFromProcess($mutantProcess)
+                        ));
+                    },
+                    $container->getConfiguration()->getThreadCount()
+                );
             },
             TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {
                 return new TestFrameworkConfigLocator(
@@ -480,7 +483,8 @@ final class Container
         ?float $minCoveredMsi,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
-        string $filter
+        string $filter,
+        int $threadCount
     ): self {
         $clone = clone $this;
 
@@ -517,7 +521,8 @@ final class Container
                 $mutatorsInput,
                 $testFramework,
                 $testFrameworkExtraOptions,
-                $filter
+                $filter,
+                $threadCount
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -536,7 +541,8 @@ final class Container
                     $mutatorsInput,
                     $testFramework,
                     $testFrameworkExtraOptions,
-                    $filter
+                    $filter,
+                    $threadCount
                 );
             }
         );
