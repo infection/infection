@@ -44,11 +44,10 @@ use function usleep;
 
 /**
  * @internal
- * @final
  *
  * This ProcessManager is an elaborate wrapper to enable parallel processing using Symfony Process component
  */
-class ParallelProcessRunner
+final class ParallelProcessRunner implements ProcessRunner
 {
     /**
      * @var ProcessBearer[]
