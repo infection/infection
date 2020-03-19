@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+/**
+ * @internal
+ */
 final class DryProcessRunner implements ProcessRunner
 {
     public function run(iterable $processes): void

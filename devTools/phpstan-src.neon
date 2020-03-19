@@ -36,6 +36,9 @@ parameters:
             path: '../src/TestFramework/Coverage/JUnit/JUnitTestCaseSorter.php'
             message: '#array_key_exists expects int\|string, string\|null given#'
             count: 1
+        -
+            path: '../src/FileSystem/DummyFileSystem.php'
+            message: '#Infection\\FileSystem\\DummyFileSystem#'
     level: max
     paths:
         - ../src
