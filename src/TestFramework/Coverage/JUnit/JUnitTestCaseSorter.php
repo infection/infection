@@ -61,11 +61,6 @@ final class JUnitTestCaseSorter
     public const USE_BUCKET_SORT_AFTER = 15;
 
     /**
-     * Milliseconds in a second. То stop Infection from mutating a constant;
-     */
-    private const MS_IN_S = 1000;
-
-    /**
      * @param TestLocation[] $tests
      *
      * @return string[]

@@ -40,6 +40,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\JUnitTimes;
 use function iterator_to_array;
 use function log;
+use function microtime;
 use PHPUnit\Framework\TestCase;
 use function Safe\usort;
 
