@@ -33,40 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\Tracing;
+namespace Infection\Tests;
 
-use Infection\Benchmark\BlackfireInstrumentor;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use PHPUnit\Framework\TestCase;
+use function Safe\realpath;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+/**
+ * @group integration
+ */
+final class BenchmarkTest extends TestCase
+{
+    private const BENCHMARK_DIR = __DIR__ . '/../benchmark';
 
-const MAX_TRACE_COUNT_ARG = 'max-trace-count';
+    /**
+     * @var string|null
+     */
+    private $phpExecutable;
 
-$input = new ArgvInput(
-    null,
-    new InputDefinition([
-        new InputArgument(
-            MAX_TRACE_COUNT_ARG,
-            InputArgument::OPTIONAL,
-            'Maximum number of traces retrieved. Use -1 for no maximum',
-            50
-        ),
-    ])
-);
-$output = new ConsoleOutput();
-$io = new SymfonyStyle($input, $output);
+    /**
+     * @dataProvider provideBenchmarks
+     */
+    public function test_all_the_benchmarks_can_be_executed(string $path): void
+    {
+        $this->assertFileExists($path);
 
-$provideTraces = require __DIR__ . '/provide-traces-closure.php';
-/** @var int $maxTraceCount */
-$maxTraceCount = (int) $input->getArgument(MAX_TRACE_COUNT_ARG);
+        $benchmarkProcess = new Process([
+            $this->getPhpExecutable(),
+            $path,
+            '1',
+        ]);
 
-BlackfireInstrumentor::profile(
-    static function () use ($provideTraces, $maxTraceCount): void {
-        $provideTraces($maxTraceCount);
-    },
-    $io
-);
+        $benchmarkProcess->run();
+
+        if (!$benchmarkProcess->isSuccessful()) {
+            throw new ProcessFailedException($benchmarkProcess);
+        }
+    }
+
+    public function provideBenchmarks(): iterable
+    {
+        yield 'MutationGenerator' => [
+            realpath(self::BENCHMARK_DIR . '/MutationGenerator/generate-mutations.php'),
+        ];
+
+        yield 'Tracing' => [
+            realpath(self::BENCHMARK_DIR . '/Tracing/provide-traces.php'),
+        ];
+    }
+
+    private function getPhpExecutable(): string
+    {
+        return $this->phpExecutable ?? (new PhpExecutableFinder())->find();
+    }
+}

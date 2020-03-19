@@ -77,6 +77,10 @@ $generateTraces = static function (?int $maxCount) use ($container): Generator {
     }
 };
 
-return static function (?int $maxCount = null) use ($generateTraces): array {
+return static function (int $maxCount) use ($generateTraces): array {
+    if ($maxCount < 0) {
+        $maxCount = null;
+    }
+
     return iterator_to_array($generateTraces($maxCount), true);
 };
