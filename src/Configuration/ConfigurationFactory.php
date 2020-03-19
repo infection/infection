@@ -107,7 +107,8 @@ class ConfigurationFactory
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         string $filter,
-        int $threadCount
+        int $threadCount,
+        bool $dryRun
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -151,7 +152,8 @@ class ConfigurationFactory
             self::retrieveMinMsi($minMsi, $schema),
             $showMutations,
             self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
-            $threadCount
+            $threadCount,
+            $dryRun
         );
     }
 

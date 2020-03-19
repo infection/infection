@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use Infection\Process\Runner\Parallel\ProcessRunner;
 use function array_map;
 use ArrayIterator;
 use function count;
@@ -78,9 +79,9 @@ final class MutationTestingRunnerTest extends TestCase
     private $mutantFactoryMock;
 
     /**
-     * @var ParallelProcessRunner|MockObject
+     * @var ProcessRunner|MockObject
      */
-    private $parallelProcessRunnerMock;
+    private $processRunnerMock;
 
     /**
      * @var EventDispatcherCollector
@@ -101,14 +102,14 @@ final class MutationTestingRunnerTest extends TestCase
     {
         $this->processBuilderMock = $this->createMock(MutantProcessBuilder::class);
         $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
-        $this->parallelProcessRunnerMock = $this->createMock(ParallelProcessRunner::class);
+        $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
         $this->fileSystemMock = $this->createMock(Filesystem::class);
 
         $this->runner = new MutationTestingRunner(
             $this->processBuilderMock,
             $this->mutantFactoryMock,
-            $this->parallelProcessRunnerMock,
+            $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
             false
@@ -120,7 +121,7 @@ final class MutationTestingRunnerTest extends TestCase
         $mutations = [];
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
-        $this->parallelProcessRunnerMock
+        $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
             ->with($this->emptyIterable())
@@ -188,7 +189,7 @@ final class MutationTestingRunnerTest extends TestCase
             )
         ;
 
-        $this->parallelProcessRunnerMock
+        $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
             ->with($this->iterableContaining([$process0, $process1]))
@@ -257,7 +258,7 @@ final class MutationTestingRunnerTest extends TestCase
             )
         ;
 
-        $this->parallelProcessRunnerMock
+        $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
             ->with($this->iterableContaining([$process0, $process1]), )
@@ -266,7 +267,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processBuilderMock,
             $this->mutantFactoryMock,
-            $this->parallelProcessRunnerMock,
+            $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
             true
@@ -301,7 +302,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->method($this->anything())
         ;
 
-        $this->parallelProcessRunnerMock
+        $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
             ->with($this->someIterable())
@@ -310,7 +311,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processBuilderMock,
             $this->mutantFactoryMock,
-            $this->parallelProcessRunnerMock,
+            $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
             true
@@ -334,7 +335,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->method($this->anything())
         ;
 
-        $this->parallelProcessRunnerMock
+        $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
             ->with($this->emptyIterable())

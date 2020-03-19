@@ -484,7 +484,8 @@ final class Container
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         string $filter,
-        int $threadCount
+        int $threadCount,
+        bool $dryRun
     ): self {
         $clone = clone $this;
 
@@ -522,7 +523,8 @@ final class Container
                 $testFramework,
                 $testFrameworkExtraOptions,
                 $filter,
-                $threadCount
+                $threadCount,
+                $dryRun
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -542,7 +544,8 @@ final class Container
                     $testFramework,
                     $testFrameworkExtraOptions,
                     $filter,
-                    $threadCount
+                    $threadCount,
+                    $dryRun
                 );
             }
         );

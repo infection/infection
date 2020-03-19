@@ -59,7 +59,8 @@ $container = Container::create()->withDynamicParameters(
     'phpunit',
     '',
     '',
-    0
+    0,
+    true
 );
 
 $generateTraces = static function (?int $maxCount) use ($container): iterable {

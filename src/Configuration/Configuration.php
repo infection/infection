@@ -84,6 +84,7 @@ class Configuration
     private $showMutations;
     private $minCoveredMsi;
     private $threadCount;
+    private $dryRun;
 
     /**
      * @param string[] $sourceDirectories
@@ -115,7 +116,8 @@ class Configuration
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
-        int $threadCount
+        int $threadCount,
+        bool $dryRun
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::allString($sourceDirectories);
@@ -151,6 +153,7 @@ class Configuration
         $this->showMutations = $showMutations;
         $this->minCoveredMsi = $minCoveredMsi;
         $this->threadCount = $threadCount;
+        $this->dryRun = $dryRun;
     }
 
     public function getProcessTimeout(): int
@@ -285,5 +288,10 @@ class Configuration
     public function getThreadCount(): int
     {
         return $this->threadCount;
+    }
+
+    public function isDryRun(): bool
+    {
+        return $this->dryRun;
     }
 }

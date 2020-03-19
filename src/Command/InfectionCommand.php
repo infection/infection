@@ -191,6 +191,12 @@ final class InfectionCommand extends BaseCommand
                 InputOption::VALUE_NONE,
                 'Debug mode. Will not clean up Infection temporary folder.'
             )
+            ->addOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NONE,
+                'Dry run. Will not clean up Infection temporary folder.'
+            )
         ;
     }
 
@@ -307,7 +313,8 @@ final class InfectionCommand extends BaseCommand
             $testFramework === '' ? null : $testFramework,
             $testFrameworkExtraOptions === '' ? null : $testFrameworkExtraOptions,
             trim((string) $input->getOption('filter')),
-            (int) $this->input->getOption('threads')
+            (int) $this->input->getOption('threads'),
+            (bool) $this->input->getOption('dry-run')
         );
     }
 
