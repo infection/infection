@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
@@ -51,7 +52,6 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use function explode;
 
 /**
  * @internal

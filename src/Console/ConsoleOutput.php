@@ -38,8 +38,8 @@ namespace Infection\Console;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Mutant\Exception\MsiCalculationException;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use function Safe\sprintf;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @internal
