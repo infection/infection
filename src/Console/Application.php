@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use Composer\XdebugHandler\XdebugHandler;
+use function array_merge;
 use function extension_loaded;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\RunCommand;
@@ -86,9 +87,13 @@ final class Application extends BaseApplication
         try {
             $version = Versions::getVersion(self::PACKAGE_NAME);
             // @codeCoverageIgnoreStart
-        } catch (OutOfBoundsException $e) {
-            if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#', $e->getMessage()) === 0) {
-                throw $e;
+        } catch (OutOfBoundsException $exception) {
+            if (preg_match(
+                '#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#',
+                $exception->getMessage()
+                ) === 0
+            ) {
+                throw $exception;
             }
 
             // We have a bogus exception: how can Infection be not installed if we're here?
@@ -154,14 +159,15 @@ final class Application extends BaseApplication
         return parent::doRunCommand($command, $input, $output);
     }
 
-    protected function getDefaultCommands()
+    protected function getDefaultCommands(): array
     {
-        $commands = array_merge(parent::getDefaultCommands(), [
-            new ConfigureCommand(),
-            new RunCommand(),
-        ]);
-
-        return $commands;
+        return array_merge(
+            parent::getDefaultCommands(),
+            [
+                new ConfigureCommand(),
+                new RunCommand(),
+            ]
+        );
     }
 
     protected function configureIO(InputInterface $input, OutputInterface $output): void

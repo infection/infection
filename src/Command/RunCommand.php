@@ -40,10 +40,12 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
+use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
 use Infection\Container;
 use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasStarted;
+use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -199,42 +201,69 @@ final class RunCommand extends BaseCommand
         ;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
+    protected function initializeCommand(IO $io): void
     {
-        parent::initialize($input, $output);
+        $this->installTestFrameworkIfNeeded($io);
 
-        $this->installTestFrameworkIfNeeded($input, $output);
-
-        $this->initContainer($input);
+        $this->container = $this->createContainer($io->getInput());
 
         $locator = $this->container->getRootsFileOrDirectoryLocator();
 
-        if ($customConfigPath = (string) $input->getOption('configuration')) {
+        if ($customConfigPath = (string) $io->getInput()->getOption('configuration')) {
             $locator->locate($customConfigPath);
         } else {
-            $this->runConfigurationCommand($locator);
+            $this->runConfigurationCommand($locator, $io);
         }
 
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function executeCommand(IO $io): void
     {
-        $this->startUp();
+        $this->installTestFrameworkIfNeeded($io);
+
+        $container = $this->createContainer($io->getInput());
+
+        $locator = $container->getRootsFileOrDirectoryLocator();
+
+        if ($customConfigPath = (string) $io->getInput()->getOption('configuration')) {
+            $locator->locate($customConfigPath);
+        } else {
+            $this->runConfigurationCommand($locator, $io);
+        }
+
+        $consoleOutput = $this->getApplication()->getConsoleOutput();
+
+        $container->getCoverageChecker()->checkCoverageRequirements();
+
+        $config = $container->getConfiguration();
+
+        $this->includeUserBootstrap($config);
+
+        $container->getFileSystem()->mkdir($config->getTmpDir());
+
+        LogVerbosity::convertVerbosityLevel($this->input, $consoleOutput);
+
+        $container->getSubscriberBuilder()->registerSubscribers(
+            $container->getTestFrameworkAdapter(),
+            $this->output
+        );
+
+        $container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
 
         $engine = new Engine(
-            $this->container->getConfiguration(),
-            $this->container->getTestFrameworkAdapter(),
-            $this->container->getCoverageChecker(),
-            $this->container->getEventDispatcher(),
-            $this->container->getInitialTestsRunner(),
-            $this->container->getMemoryLimiter(),
-            $this->container->getMutationGenerator(),
-            $this->container->getMutationTestingRunner(),
-            $this->container->getTestRunConstraintChecker(),
+            $container->getConfiguration(),
+            $container->getTestFrameworkAdapter(),
+            $container->getCoverageChecker(),
+            $container->getEventDispatcher(),
+            $container->getInitialTestsRunner(),
+            $container->getMemoryLimiter(),
+            $container->getMutationGenerator(),
+            $container->getMutationTestingRunner(),
+            $container->getTestRunConstraintChecker(),
             $this->consoleOutput,
-            $this->container->getMetricsCalculator(),
-            $this->container->getTestFrameworkExtraOptionsFilter()
+            $container->getMetricsCalculator(),
+            $container->getTestFrameworkExtraOptionsFilter()
         );
 
         $result = $engine->execute();
@@ -242,7 +271,7 @@ final class RunCommand extends BaseCommand
         return $result === true ? 0 : 1;
     }
 
-    private function initContainer(InputInterface $input): void
+    private function createContainer(InputInterface $input): Container
     {
         // Currently the configuration is mandatory hence there is no way to
         // say "do not use a config". If this becomes possible in the future
@@ -267,7 +296,7 @@ final class RunCommand extends BaseCommand
             throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
         }
 
-        $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
+        return $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile === '' ? null : $configFile,
             trim((string) $input->getOption('mutators')),
             $input->getOption('show-mutations'),
@@ -290,21 +319,23 @@ final class RunCommand extends BaseCommand
         );
     }
 
-    private function installTestFrameworkIfNeeded(InputInterface $input, OutputInterface $output): void
+    private function installTestFrameworkIfNeeded(IO $io): void
     {
         $container = $this->getApplication()->getContainer();
 
         $installationDecider = $container->getAdapterInstallationDecider();
+
         $adapterName = trim((string) $this->input->getOption('test-framework'));
 
-        if (!$installationDecider->shouldBeInstalled($adapterName, $input, $output)) {
+        if (!$installationDecider->shouldBeInstalled($adapterName, $io)) {
             return;
         }
 
-        $output->writeln([
-            '',
-            sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
-        ]);
+        $io->newLine();
+        $io->writeln(sprintf(
+            'Installing <comment>infection/%s-adapter</comment>...',
+            $adapterName
+        ));
 
         $container->getAdapterInstaller()->install($adapterName);
     }
@@ -331,14 +362,14 @@ final class RunCommand extends BaseCommand
         $this->container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
     }
 
-    private function runConfigurationCommand(Locator $locator): void
+    private function runConfigurationCommand(Locator $locator, IO $io): void
     {
         try {
             $locator->locateOneOf([
                 SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
                 SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
             ]);
-        } catch (Exception $exception) {
+        } catch (FileNotFound|FileOrDirectoryNotFound $exception) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
@@ -346,8 +377,8 @@ final class RunCommand extends BaseCommand
             ];
 
             $newInput = new ArrayInput($args);
-            $newInput->setInteractive($this->input->isInteractive());
-            $result = $configureCommand->run($newInput, $this->output);
+            $newInput->setInteractive($io->isInteractive());
+            $result = $configureCommand->run($newInput, $io->getOutput());
 
             if ($result !== 0) {
                 throw ConfigurationException::configurationAborted();

@@ -36,14 +36,15 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Console\Application;
+use Infection\Console\IO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
+use function Safe\sprintf;
 
 /**
  * @internal
- *
- * @method Application getApplication()
  */
 abstract class BaseCommand extends Command
 {
@@ -57,11 +58,51 @@ abstract class BaseCommand extends Command
      */
     protected $output;
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        parent::initialize($input, $output);
+    /**
+     * @var IO|null
+     */
+    private $io;
 
-        $this->input = $input;
-        $this->output = $output;
+    final protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        $this->io = new IO($input, $output);
+
+        $this->initializeCommand($this->getIO());
+    }
+
+    protected function initializeCommand(IO $io): void
+    {
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $this->executeCommand($this->getIO());
+
+        return 0;
+    }
+
+    abstract protected function executeCommand(IO $io): void;
+
+    final protected function getIO(): IO {
+        Assert::notNull(
+            $this->io,
+            'Cannot retrieve the I/O before the command was initialized'
+        );
+
+        return $this->io;
+    }
+
+    final public function getApplication(): Application
+    {
+        $application = parent::getApplication();
+
+        Assert::isInstanceOf(
+            $application,
+            Application::class,
+            'Cannot access to the command application if the command has not been '
+            .'registered to the application yet'
+        );
+
+        return $application;
     }
 }

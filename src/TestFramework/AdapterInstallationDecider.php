@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Infection\Console\IO;
 use function array_key_exists;
 use function class_exists;
 use function Safe\sprintf;
@@ -60,14 +61,15 @@ final class AdapterInstallationDecider
         $this->questionHelper = $questionHelper;
     }
 
-    public function shouldBeInstalled(string $adapterName, InputInterface $input, OutputInterface $output): bool
+    public function shouldBeInstalled(string $adapterName, IO $io): bool
     {
         if (!array_key_exists($adapterName, self::ADAPTER_NAME_TO_CLASS_MAP)
-            || class_exists(self::ADAPTER_NAME_TO_CLASS_MAP[$adapterName])) {
+            || class_exists(self::ADAPTER_NAME_TO_CLASS_MAP[$adapterName])
+        ) {
             return false;
         }
 
-        $output->writeln(['']);
+        $io->newLine();
 
         $question = new ConfirmationQuestion(
             sprintf(
@@ -81,6 +83,10 @@ TEXT
             true
         );
 
-        return $this->questionHelper->ask($input, $output, $question);
+        return $this->questionHelper->ask(
+            $io->getInput(),
+            $io->getOutput(),
+            $question
+        );
     }
 }

@@ -465,7 +465,7 @@ final class Container
             TestFrameworkExtraOptionsFilter::class => static function (): TestFrameworkExtraOptionsFilter {
                 return new TestFrameworkExtraOptionsFilter();
             },
-            AdapterInstallationDecider::class => static function (self $container): AdapterInstallationDecider {
+            AdapterInstallationDecider::class => static function (): AdapterInstallationDecider {
                 return new AdapterInstallationDecider(new QuestionHelper());
             },
             AdapterInstaller::class => static function (): AdapterInstaller {
