@@ -37,12 +37,36 @@ namespace Infection\Benchmark\MutationGenerator;
 
 use Infection\Benchmark\BlackfireInstrumentor;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
+const MAX_MUTATIONS_COUNT_ARG = 'max-mutations-count';
+
+$input = new ArgvInput(
+    null,
+    new InputDefinition([
+        new InputArgument(
+            MAX_MUTATIONS_COUNT_ARG,
+            InputArgument::OPTIONAL,
+            'Maximum number of mutations retrieved. Use -1 for no maximum',
+            50
+        ),
+    ])
+);
+$output = new ConsoleOutput();
+$io = new SymfonyStyle($input, $output);
+
+$generateMutations = require __DIR__ . '/generate-mutations-closure.php';
+/** @var int $maxMutationsCount */
+$maxMutationsCount = (int) $input->getArgument(MAX_MUTATIONS_COUNT_ARG);
+
 BlackfireInstrumentor::profile(
-    require __DIR__ . '/generate-mutations-closure.php',
-    new SymfonyStyle(new ArgvInput(), new ConsoleOutput())
+    static function () use ($generateMutations, $maxMutationsCount): void {
+        $generateMutations($maxMutationsCount);
+    },
+    $io
 );

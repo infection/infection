@@ -35,4 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\MutationGenerator;
 
-(require __DIR__ . '/generate-mutations-closure.php')();
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
+
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
+const MAX_MUTATIONS_COUNT_ARG = 'max-mutations-count';
+
+$input = new ArgvInput(
+    null,
+    new InputDefinition([
+        new InputArgument(
+            MAX_MUTATIONS_COUNT_ARG,
+            InputArgument::OPTIONAL,
+            'Maximum number of mutations retrieved. Use -1 for no maximum',
+            50
+        ),
+    ])
+);
+
+(require __DIR__ . '/generate-mutations-closure.php')((int) $input->getArgument(MAX_MUTATIONS_COUNT_ARG));

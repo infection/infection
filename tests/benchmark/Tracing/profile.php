@@ -52,7 +52,7 @@ $input = new ArgvInput(
         new InputArgument(
             MAX_TRACE_COUNT_ARG,
             InputArgument::OPTIONAL,
-            'Maximum number of traces retrieved',
+            'Maximum number of traces retrieved. Use -1 for no maximum',
             50
         ),
     ])
@@ -62,7 +62,7 @@ $io = new SymfonyStyle($input, $output);
 
 $provideTraces = require __DIR__ . '/provide-traces-closure.php';
 /** @var int $maxTraceCount */
-$maxTraceCount = $input->getArgument(MAX_TRACE_COUNT_ARG);
+$maxTraceCount = (int) $input->getArgument(MAX_TRACE_COUNT_ARG);
 
 BlackfireInstrumentor::profile(
     static function () use ($provideTraces, $maxTraceCount): void {

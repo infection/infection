@@ -99,10 +99,10 @@ final class Engine
         $this->testFrameworkExtraOptionsFilter = $testFrameworkExtraOptionsFilter;
     }
 
-    public function execute(int $threads): bool
+    public function execute(): bool
     {
         $this->runInitialTestSuite();
-        $this->runMutationAnalysis($threads);
+        $this->runMutationAnalysis();
 
         return $this->checkMetrics();
     }
@@ -134,7 +134,7 @@ final class Engine
         $this->memoryLimitApplier->applyMemoryLimitFromProcess($initialTestSuitProcess, $this->adapter);
     }
 
-    private function runMutationAnalysis(int $threads): void
+    private function runMutationAnalysis(): void
     {
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
@@ -149,7 +149,7 @@ final class Engine
             ? $this->testFrameworkExtraOptionsFilter->filterForMutantProcess($actualExtraOptions, $this->adapter->getInitialRunOnlyOptions())
             : $actualExtraOptions;
 
-        $this->mutationTestingRunner->run($mutations, $threads, $filteredExtraOptionsForMutant);
+        $this->mutationTestingRunner->run($mutations, $filteredExtraOptionsForMutant);
     }
 
     private function checkMetrics(): bool
