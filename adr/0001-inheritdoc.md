@@ -1,14 +1,4 @@
-# Inheritdoc usage [(#860)](https://github.com/infection/infection/issues/860)
-
-### Decision
-
-Do not use `@inheritdoc` tags or any of its variants.
-
-
-### Status
-
-Accepted
-
+# Inheritdoc usage
 
 ### Context
 
@@ -17,9 +7,8 @@ systematically or remove it systematically had to be done.
 
 A number of points:
 
-- [PHPDoc](https://docs.phpdoc.org/guides/inheritance.html) provides inheritance of the docblocks
-  by default when appropriate
-- Static analysers such as PHPStan or Psalm can do without at the time of writting
+- [PHPDoc][phpdoc-inheritance] provides inheritance of the docblocks by default when appropriate
+- Static analysers such as PHPStan or Psalm can do without at the time of writing
 
 Also it has a very limited value.
 
@@ -27,3 +16,17 @@ Also it has a very limited value.
 ### Consequences
 
 `@inheritdoc` tags and its variants must be removed when submitting pull requests.
+
+
+### Decision
+
+Do not use `@inheritdoc` tags or any of its variants.
+
+
+### Status
+
+Accepted ([#860][860])
+
+
+[phpdoc-inheritance]: https://docs.phpdoc.org/guides/inheritance.html
+[860]: https://github.com/infection/infection/issues/860
