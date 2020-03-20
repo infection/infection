@@ -38,7 +38,7 @@ namespace Infection\Console;
 use Composer\XdebugHandler\XdebugHandler;
 use function extension_loaded;
 use Infection\Command\ConfigureCommand;
-use Infection\Command\InfectionCommand;
+use Infection\Command\RunCommand;
 use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
 use Infection\Container;
 use OutOfBoundsException;
@@ -158,7 +158,7 @@ final class Application extends BaseApplication
     {
         $commands = array_merge(parent::getDefaultCommands(), [
             new ConfigureCommand(),
-            new InfectionCommand(),
+            new RunCommand(),
         ]);
 
         return $commands;

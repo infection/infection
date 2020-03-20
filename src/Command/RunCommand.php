@@ -40,7 +40,6 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
-use Infection\Console\Exception\InfectionException;
 use Infection\Console\LogVerbosity;
 use Infection\Container;
 use Infection\Engine;
@@ -61,7 +60,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class InfectionCommand extends BaseCommand
+final class RunCommand extends BaseCommand
 {
     /**
      * @var ConsoleOutput
@@ -200,6 +199,25 @@ final class InfectionCommand extends BaseCommand
         ;
     }
 
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        parent::initialize($input, $output);
+
+        $this->installTestFrameworkIfNeeded($input, $output);
+
+        $this->initContainer($input);
+
+        $locator = $this->container->getRootsFileOrDirectoryLocator();
+
+        if ($customConfigPath = (string) $input->getOption('configuration')) {
+            $locator->locate($customConfigPath);
+        } else {
+            $this->runConfigurationCommand($locator);
+        }
+
+        $this->consoleOutput = $this->getApplication()->getConsoleOutput();
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->startUp();
@@ -222,52 +240,6 @@ final class InfectionCommand extends BaseCommand
         $result = $engine->execute();
 
         return $result === true ? 0 : 1;
-    }
-
-    /**
-     * Run configuration command if config does not exist
-     *
-     * @throws InfectionException
-     */
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        parent::initialize($input, $output);
-
-        $this->installTestFrameworkIfNeeded($input, $output);
-
-        $this->initContainer($input);
-
-        $locator = $this->container->getRootsFileOrDirectoryLocator();
-
-        if ($customConfigPath = (string) $input->getOption('configuration')) {
-            $locator->locate($customConfigPath);
-        } else {
-            $this->runConfigurationCommand($locator);
-        }
-
-        $this->consoleOutput = $this->getApplication()->getConsoleOutput();
-    }
-
-    private function startUp(): void
-    {
-        Assert::notNull($this->container);
-
-        $this->container->getCoverageChecker()->checkCoverageRequirements();
-
-        $config = $this->container->getConfiguration();
-
-        $this->includeUserBootstrap($config);
-
-        $this->container->getFileSystem()->mkdir($config->getTmpDir());
-
-        LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
-
-        $this->container->getSubscriberBuilder()->registerSubscribers(
-            $this->container->getTestFrameworkAdapter(),
-            $this->output
-        );
-
-        $this->container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
     }
 
     private function initContainer(InputInterface $input): void
@@ -318,21 +290,45 @@ final class InfectionCommand extends BaseCommand
         );
     }
 
-    private function includeUserBootstrap(Configuration $config): void
+    private function installTestFrameworkIfNeeded(InputInterface $input, OutputInterface $output): void
     {
-        $bootstrap = $config->getBootstrap();
+        $container = $this->getApplication()->getContainer();
 
-        if ($bootstrap === null) {
+        $installationDecider = $container->getAdapterInstallationDecider();
+        $adapterName = trim((string) $this->input->getOption('test-framework'));
+
+        if (!$installationDecider->shouldBeInstalled($adapterName, $input, $output)) {
             return;
         }
 
-        if (!file_exists($bootstrap)) {
-            throw FileOrDirectoryNotFound::fromFileName($bootstrap, [__DIR__]);
-        }
+        $output->writeln([
+            '',
+            sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
+        ]);
 
-        (static function (string $infectionBootstrapFile): void {
-            require_once $infectionBootstrapFile;
-        })($bootstrap);
+        $container->getAdapterInstaller()->install($adapterName);
+    }
+
+    private function startUp(): void
+    {
+        Assert::notNull($this->container);
+
+        $this->container->getCoverageChecker()->checkCoverageRequirements();
+
+        $config = $this->container->getConfiguration();
+
+        $this->includeUserBootstrap($config);
+
+        $this->container->getFileSystem()->mkdir($config->getTmpDir());
+
+        LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
+
+        $this->container->getSubscriberBuilder()->registerSubscribers(
+            $this->container->getTestFrameworkAdapter(),
+            $this->output
+        );
+
+        $this->container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
     }
 
     private function runConfigurationCommand(Locator $locator): void
@@ -359,22 +355,20 @@ final class InfectionCommand extends BaseCommand
         }
     }
 
-    private function installTestFrameworkIfNeeded(InputInterface $input, OutputInterface $output): void
+    private function includeUserBootstrap(Configuration $config): void
     {
-        $container = $this->getApplication()->getContainer();
+        $bootstrap = $config->getBootstrap();
 
-        $installationDecider = $container->getAdapterInstallationDecider();
-        $adapterName = trim((string) $this->input->getOption('test-framework'));
-
-        if (!$installationDecider->shouldBeInstalled($adapterName, $input, $output)) {
+        if ($bootstrap === null) {
             return;
         }
 
-        $output->writeln([
-            '',
-            sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
-        ]);
+        if (!file_exists($bootstrap)) {
+            throw FileOrDirectoryNotFound::fromFileName($bootstrap, [__DIR__]);
+        }
 
-        $container->getAdapterInstaller()->install($adapterName);
+        (static function (string $infectionBootstrapFile): void {
+            require_once $infectionBootstrapFile;
+        })($bootstrap);
     }
 }
