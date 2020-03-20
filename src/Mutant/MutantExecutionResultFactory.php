@@ -71,7 +71,7 @@ class MutantExecutionResultFactory
         );
     }
 
-    public function retrieveProcessOutput(Process $process): string
+    private function retrieveProcessOutput(Process $process): string
     {
         Assert::true(
             $process->isTerminated(),
@@ -84,7 +84,7 @@ class MutantExecutionResultFactory
         return $process->getOutput();
     }
 
-    public function retrieveDetectionStatus(MutantProcess $mutantProcess): string
+    private function retrieveDetectionStatus(MutantProcess $mutantProcess): string
     {
         if (!$mutantProcess->getMutant()->isCoveredByTest()) {
             return DetectionStatus::NOT_COVERED;
