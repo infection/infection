@@ -27,9 +27,5 @@ the decision is to keep the usage of `$this` over `self` in the codebase.
 Accepted ([#1061][1061])
 
 
-### Consequences
-
-We should omit the `@covers` annotation when unnecessary
-
 [phpunit-doc]: https://phpunit.de/manual/6.5/en/appendixes.assertions.html
 [1061]: https://github.com/infection/infection/pull/1061

@@ -31,10 +31,6 @@ process.
 Accepted ([#1060][1060])
 
 
-### Consequences
-
-We should omit the `@covers` annotation when unnecessary
-
 [phpunit-bridge]: https://packagist.org/packages/symfony/phpunit-bridge
 [php-cs-fixer]: https://github.com/FriendsOfPHP/PHP-CS-Fixer
 [1060]: https://github.com/infection/infection/pull/1060

@@ -13,14 +13,10 @@ A number of points:
 Also it has a very limited value.
 
 
-### Consequences
-
-`@inheritdoc` tags and its variants must be removed when submitting pull requests.
-
-
 ### Decision
 
-Do not use `@inheritdoc` tags or any of its variants.
+Do not use `@inheritdoc` tags or any of its variants. The `@inheritdoc` tags and its variants must 
+be removed when submitting pull requests.
 
 
 ### Status
