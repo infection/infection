@@ -104,7 +104,8 @@ final class ContainerTest extends TestCase
             'phpunit',
             '',
             '',
-            0
+            0,
+            true
         );
 
         $newContainer->getSchemaConfiguration();
@@ -134,7 +135,8 @@ final class ContainerTest extends TestCase
             'phpunit',
             '',
             '',
-            0
+            0,
+            true
         );
 
         $traces = $newContainer->getFilteredEnrichedTraceProvider()->provideTraces();

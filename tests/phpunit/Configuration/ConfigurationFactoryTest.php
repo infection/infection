@@ -133,6 +133,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $inputTestFrameworkExtraOptions,
         string $inputFilter,
         int $inputThreadsCount,
+        bool $inputDryRun,
         int $expectedTimeout,
         array $expectedSourceDirectories,
         array $expectedSourceFiles,
@@ -176,7 +177,8 @@ final class ConfigurationFactoryTest extends TestCase
             $inputTestFramework,
             $inputTestFrameworkExtraOptions,
             $inputFilter,
-            $inputThreadsCount
+            $inputThreadsCount,
+            $inputDryRun
         );
 
         $this->assertConfigurationStateIs(
@@ -205,7 +207,8 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedMinMsi,
             $expectedShowMutations,
             $expectedMinCoveredMsi,
-            $inputThreadsCount
+            $inputThreadsCount,
+            $inputDryRun
         );
     }
 
@@ -245,6 +248,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -625,6 +629,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             'src/Foo.php, src/Bar.php',
             0,
+            false,
             10,
             ['src/'],
             [
@@ -697,6 +702,7 @@ final class ConfigurationFactoryTest extends TestCase
             '--stop-on-failure',
             'src/Foo.php, src/Bar.php',
             4,
+            true,
             10,
             ['src/'],
             [
@@ -781,6 +787,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             $expectedTimeOut,
             [],
             [],
@@ -846,6 +853,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -912,6 +920,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -977,6 +986,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -1043,6 +1053,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -1109,6 +1120,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -1175,6 +1187,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -1243,6 +1256,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -1309,6 +1323,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -1377,6 +1392,7 @@ final class ConfigurationFactoryTest extends TestCase
             $inputTestFrameworkExtraOptions,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -1444,6 +1460,7 @@ final class ConfigurationFactoryTest extends TestCase
             $inputTestFrameworkExtraOptions,
             '',
             0,
+            false,
             10,
             [],
             [],
@@ -1513,6 +1530,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
             10,
             [],
             [],

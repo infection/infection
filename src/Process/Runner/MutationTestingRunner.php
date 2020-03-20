@@ -46,7 +46,6 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -57,7 +56,7 @@ final class MutationTestingRunner
 {
     private $processBuilder;
     private $mutantFactory;
-    private $parallelProcessManager;
+    private $processRunner;
     private $eventDispatcher;
     private $fileSystem;
     private $runConcurrently;
@@ -65,14 +64,14 @@ final class MutationTestingRunner
     public function __construct(
         MutantProcessBuilder $mutantProcessBuilder,
         MutantFactory $mutantFactory,
-        ParallelProcessRunner $parallelProcessManager,
+        ProcessRunner $processRunner,
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
         bool $runConcurrently
     ) {
         $this->processBuilder = $mutantProcessBuilder;
         $this->mutantFactory = $mutantFactory;
-        $this->parallelProcessManager = $parallelProcessManager;
+        $this->processRunner = $processRunner;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileSystem = $fileSystem;
         $this->runConcurrently = $runConcurrently;
@@ -110,7 +109,7 @@ final class MutationTestingRunner
             })
         ;
 
-        $this->parallelProcessManager->run($processes);
+        $this->processRunner->run($processes);
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }
