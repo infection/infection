@@ -10,7 +10,6 @@ Whilst "incorrect", this usage does not break anything. Besides:
 - [PHUnit documentation][phpunit-doc] itself uses this by default
 - `$this` is much more widely used than `self` in this context in the community
 - all Infection code uses `$this`
-- `phpstan-strict-rules` itself (we use PHPStan in Infection) recommends this
 
 There is not much shortcomings from using this other than the "incorrectness" of using a static
 method as a non-static one.
