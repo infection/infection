@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner\Parallel;
+namespace Infection\Process\Runner;
 
 use function array_shift;
 use Closure;
@@ -44,11 +44,10 @@ use function usleep;
 
 /**
  * @internal
- * @final
  *
  * This ProcessManager is an elaborate wrapper to enable parallel processing using Symfony Process component
  */
-class ParallelProcessRunner
+final class ParallelProcessRunner implements ProcessRunner
 {
     /**
      * @var ProcessBearer[]
@@ -70,9 +69,6 @@ class ParallelProcessRunner
         $this->poll = $poll;
     }
 
-    /**
-     * @param iterable<ProcessBearer> $processes
-     */
     public function run(iterable $processes): void
     {
         /*

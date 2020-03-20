@@ -52,6 +52,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
+use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
@@ -76,9 +77,11 @@ use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\MutantProcess;
+use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
+use Infection\Process\Runner\ParallelProcessRunner;
+use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
@@ -241,6 +244,9 @@ final class Container
                     },
                     $container->getConfiguration()->getThreadCount()
                 );
+            },
+            DryProcessRunner::class => static function (): DryProcessRunner {
+                return new DryProcessRunner();
             },
             TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {
                 return new TestFrameworkConfigLocator(
@@ -442,9 +448,11 @@ final class Container
                 return new MutationTestingRunner(
                     $container->getMutantProcessBuilder(),
                     $container->getMutantFactory(),
-                    $container->getParallelProcessRunner(),
+                    $container->getProcessRunner(),
                     $container->getEventDispatcher(),
-                    $container->getFileSystem(),
+                    $container->getConfiguration()->isDryRun()
+                        ? new DummyFileSystem()
+                        : $container->getFileSystem(),
                     $container->getConfiguration()->noProgress()
                 );
             },
@@ -484,7 +492,8 @@ final class Container
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         string $filter,
-        int $threadCount
+        int $threadCount,
+        bool $dryRun
     ): self {
         $clone = clone $this;
 
@@ -522,7 +531,8 @@ final class Container
                 $testFramework,
                 $testFrameworkExtraOptions,
                 $filter,
-                $threadCount
+                $threadCount,
+                $dryRun
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -542,7 +552,8 @@ final class Container
                     $testFramework,
                     $testFrameworkExtraOptions,
                     $filter,
-                    $threadCount
+                    $threadCount,
+                    $dryRun
                 );
             }
         );
@@ -641,9 +652,14 @@ final class Container
         return $this->get(SyncEventDispatcher::class);
     }
 
-    public function getParallelProcessRunner(): ParallelProcessRunner
+    public function getProcessRunner(): ProcessRunner
     {
-        return $this->get(ParallelProcessRunner::class);
+        $config = $this->getConfiguration();
+
+        return $config->isDryRun()
+            ? $this->get(DryProcessRunner::class)
+            : $this->get(ParallelProcessRunner::class)
+        ;
     }
 
     public function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
