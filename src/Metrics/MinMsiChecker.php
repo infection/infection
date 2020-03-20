@@ -45,15 +45,18 @@ final class MinMsiChecker
     public const MSI_FAILURE = 'min-msi';
     private const VALUE_OVER_REQUIRED_TOLERANCE = 2;
 
+    private $dryRun;
     private $ignoreMsiWithNoMutations;
     private $minMsi;
     private $minCoveredCodeMsi;
 
     public function __construct(
+        bool $dryRun,
         bool $ignoreMsiWithNoMutations,
-        float $minMsi,
-        float $minCoveredMsi
+        ?float $minMsi,
+        ?float $minCoveredMsi
     ) {
+        $this->dryRun = $dryRun;
         $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
         $this->minMsi = $minMsi;
         $this->minCoveredCodeMsi = $minCoveredMsi;
@@ -68,6 +71,10 @@ final class MinMsiChecker
         float $coveredCodeMsi,
         ConsoleOutput $consoleOutput
     ): void {
+        if ($this->dryRun) {
+            return;
+        }
+
         $this->checkMinMsi($totalMutantCount, $msi, $coveredCodeMsi);
         $this->checkIfMinMsiCanBeIncreased($msi, $coveredCodeMsi, $consoleOutput);
     }
@@ -114,17 +121,17 @@ final class MinMsiChecker
 
     private function isMsiInsufficient(float $msi): bool
     {
-        return $this->minMsi && ($msi < $this->minMsi);
+        return $this->minMsi !== null && $msi < $this->minMsi;
     }
 
     private function isCoveredCodeMsiInsufficient(float $coveredCodeMsi): bool
     {
-        return $this->minCoveredCodeMsi && ($coveredCodeMsi < $this->minCoveredCodeMsi);
+        return $this->minCoveredCodeMsi !== null && $coveredCodeMsi < $this->minCoveredCodeMsi;
     }
 
     private function canIncreaseMsi(float $msi): bool
     {
-        if ($this->minMsi === 0.0) {
+        if ($this->minMsi === null) {
             return false;
         }
 
@@ -133,7 +140,7 @@ final class MinMsiChecker
 
     private function canIncreaseCoveredCodeMsi(float $coveredCodeMsi): bool
     {
-        if ($this->minCoveredCodeMsi === 0.0) {
+        if ($this->minCoveredCodeMsi === null) {
             return false;
         }
 

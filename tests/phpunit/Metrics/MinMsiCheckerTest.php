@@ -62,7 +62,12 @@ final class MinMsiCheckerTest extends TestCase
 
     public function test_it_fails_the_check_if_the_MSI_is_lower_than_the_min_MSI(): void
     {
-        $msiChecker = new MinMsiChecker(false, 10., 5.);
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            10.,
+            5.
+        );
 
         $this->ioMock
             ->expects($this->never())
@@ -74,9 +79,30 @@ final class MinMsiCheckerTest extends TestCase
         $msiChecker->checkMetrics(2, 8., 10., $this->output);
     }
 
+    public function test_it_does_not_fail_the_check_if_no_min_MSI_is_provided(): void
+    {
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            null,
+            9.
+        );
+
+        $this->ioMock
+            ->expects($this->never())
+            ->method($this->anything());
+
+        $msiChecker->checkMetrics(2, -1, 10., $this->output);
+    }
+
     public function test_it_fails_the_check_if_the_covered_code_MSI_is_lower_than_the_min_covered_code_MSI(): void
     {
-        $msiChecker = new MinMsiChecker(false, 5., 10.);
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            5.,
+            10.
+        );
 
         $this->ioMock
             ->expects($this->never())
@@ -88,9 +114,30 @@ final class MinMsiCheckerTest extends TestCase
         $msiChecker->checkMetrics(2, 12., 8., $this->output);
     }
 
+    public function test_it_does_not_fail_the_check_if_no_covered_code_MSI_is_provided(): void
+    {
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            5.,
+            null
+        );
+
+        $this->ioMock
+            ->expects($this->never())
+            ->method($this->anything());
+
+        $msiChecker->checkMetrics(2, 5., -1, $this->output);
+    }
+
     public function test_it_suggests_to_increase_the_min_MSI_if_above_the_limit(): void
     {
-        $msiChecker = new MinMsiChecker(false, 10., 10.);
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            10.,
+            10.
+        );
 
         $this->ioMock
             ->expects($this->once())
@@ -101,9 +148,31 @@ final class MinMsiCheckerTest extends TestCase
         $msiChecker->checkMetrics(2, 80., 10., $this->output);
     }
 
+    public function test_it_does_not_suggest_to_increase_the_min_MSI_if_no_min_MSI_has_been_provided(): void
+    {
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            null,
+            10.
+        );
+
+        $this->ioMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $msiChecker->checkMetrics(2, 100., 10., $this->output);
+    }
+
     public function test_it_suggests_to_increase_the_min_covered_code_MSI_if_above_the_limit(): void
     {
-        $msiChecker = new MinMsiChecker(false, 10., 10.);
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            10.,
+            10.
+        );
 
         $this->ioMock
             ->expects($this->once())
@@ -116,7 +185,12 @@ final class MinMsiCheckerTest extends TestCase
 
     public function test_it_suggests_to_increase_the_min_MSI_and_min_covered_code_MSI_if_above_the_limit(): void
     {
-        $msiChecker = new MinMsiChecker(false, 10., 10.);
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            10.,
+            10.
+        );
 
         $this->ioMock
             ->expects($this->exactly(2))
@@ -130,9 +204,31 @@ final class MinMsiCheckerTest extends TestCase
         $msiChecker->checkMetrics(2, 80., 80., $this->output);
     }
 
+    public function test_it_does_not_suggest_to_increase_the_min_MSI_and_min_covered_code_MSI_if_above_the_limit(): void
+    {
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            10.,
+            null
+        );
+
+        $this->ioMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $msiChecker->checkMetrics(2, 10., 100., $this->output);
+    }
+
     public function test_it_does_nothing_if_the_scores_barely_passes(): void
     {
-        $msiChecker = new MinMsiChecker(false, 10., 10.);
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            10.,
+            10.
+        );
 
         $this->ioMock
             ->expects($this->never())
@@ -144,7 +240,12 @@ final class MinMsiCheckerTest extends TestCase
 
     public function test_it_does_nothing_if_the_scores_barely_passes_with_no_mutation(): void
     {
-        $msiChecker = new MinMsiChecker(false, 10., 10.);
+        $msiChecker = new MinMsiChecker(
+            false,
+            false,
+            10.,
+            10.
+        );
 
         $this->ioMock
             ->expects($this->never())
@@ -156,7 +257,12 @@ final class MinMsiCheckerTest extends TestCase
 
     public function test_it_does_nothing_if_the_MSIs_are_too_low_but_we_ignore_it_with_no_mutations_and_there_is_no_mutations(): void
     {
-        $msiChecker = new MinMsiChecker(true, 10., 10.);
+        $msiChecker = new MinMsiChecker(
+            false,
+            true,
+            10.,
+            10.
+        );
 
         $this->ioMock
             ->expects($this->never())
@@ -164,5 +270,21 @@ final class MinMsiCheckerTest extends TestCase
         ;
 
         $msiChecker->checkMetrics(0, 2, 2, $this->output);
+    }
+
+    public function test_it_nothing_if_is_in_a_dry_run(): void
+    {
+        $msiChecker = new MinMsiChecker(
+            true,
+            false,
+            10.,
+            5.
+        );
+
+        $this->ioMock
+            ->expects($this->never())
+            ->method($this->anything());
+
+        $msiChecker->checkMetrics(2, 8., 10., $this->output);
     }
 }

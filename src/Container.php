@@ -355,9 +355,10 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new MinMsiChecker(
+                    $config->isDryRun(),
                     $config->ignoreMsiWithNoMutations(),
-                    (float) $config->getMinMsi(),
-                    (float) $config->getMinCoveredMsi()
+                    $config->getMinMsi(),
+                    $config->getMinCoveredMsi()
                 );
             },
             SubscriberBuilder::class => static function (self $container): SubscriberBuilder {
