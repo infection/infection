@@ -39,7 +39,7 @@ use function in_array;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Process\Runner\Parallel\ProcessBearer;
+use Infection\Process\Runner\ProcessBearer;
 use function Safe\sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;

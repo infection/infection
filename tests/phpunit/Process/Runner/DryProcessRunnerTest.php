@@ -33,65 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\Tracing;
+namespace Infection\Tests\Process\Runner;
 
-use Generator;
-use Infection\Container;
-use function iterator_to_array;
+use Infection\Process\Runner\DryProcessRunner;
+use Infection\Tests\Fixtures\Process\FakeProcessBearer;
+use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+final class DryProcessRunnerTest extends TestCase
+{
+    public function test_it_can_iterate_over_the_processes(): void
+    {
+        $called = false;
 
-$container = Container::create()->withDynamicParameters(
-    null,
-    '',
-    false,
-    'default',
-    false,
-    false,
-    'dot',
-    false,
-    __DIR__ . '/coverage',
-    '',
-    false,
-    false,
-    .0,
-    .0,
-    'phpunit',
-    '',
-    '',
-    0,
-    true
-);
+        $processes = (static function () use (&$called) {
+            yield new FakeProcessBearer();
 
-$generateTraces = static function (?int $maxCount) use ($container): iterable {
-    $traces = $container->getFilteredEnrichedTraceProvider()->provideTraces();
+            $called = true;
 
-    if ($maxCount === null) {
-        // Avoid extra limiting generator for a simpler case
-        return $traces;
+            yield new FakeProcessBearer();
+        })();
+
+        (new DryProcessRunner())->run($processes);
+
+        $this->assertTrue($called);
     }
-
-    $i = 0;
-
-    foreach ($traces as $trace) {
-        ++$i;
-
-        if ($i === $maxCount) {
-            return;
-        }
-
-        yield $trace;
-    }
-};
-
-return static function (int $maxCount) use ($generateTraces): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
-    }
-
-    $traces = $generateTraces($maxCount);
-
-    foreach ($traces as $_) {
-        // Iterate over the generator: do not use iterator_to_array which is less GC friendly
-    }
-};
+}

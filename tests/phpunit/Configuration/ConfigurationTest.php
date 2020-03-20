@@ -82,7 +82,8 @@ final class ConfigurationTest extends TestCase
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
-        int $threadsCount
+        int $threadsCount,
+        bool $dryRun
     ): void {
         $config = new Configuration(
             $timeout,
@@ -109,7 +110,8 @@ final class ConfigurationTest extends TestCase
             $minMsi,
             $showMutations,
             $minCoveredMsi,
-            $threadsCount
+            $threadsCount,
+            $dryRun
         );
 
         $this->assertConfigurationStateIs(
@@ -138,7 +140,8 @@ final class ConfigurationTest extends TestCase
             $minMsi,
             $showMutations,
             $minCoveredMsi,
-            $threadsCount
+            $threadsCount,
+            $dryRun
         );
     }
 
@@ -170,6 +173,7 @@ final class ConfigurationTest extends TestCase
             false,
             null,
             0,
+            false,
         ];
 
         yield 'nominal' => [
@@ -209,6 +213,7 @@ final class ConfigurationTest extends TestCase
             true,
             43.,
             4,
+            true,
         ];
     }
 }

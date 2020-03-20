@@ -33,16 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner\Parallel;
-
-use Symfony\Component\Process\Process;
+namespace Infection\Process\Runner;
 
 /**
  * @internal
  */
-interface ProcessBearer
+interface ProcessRunner
 {
-    public function getProcess(): Process;
-
-    public function markAsTimedOut(): void;
+    /**
+     * @param iterable<ProcessBearer> $processes
+     */
+    public function run(iterable $processes): void;
 }
