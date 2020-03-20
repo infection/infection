@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function is_dir;
 use const PHP_OS_FAMILY;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
@@ -59,7 +60,7 @@ final class BenchmarkTest extends TestCase
     /**
      * @dataProvider provideBenchmarks
      */
-    public function test_all_the_benchmarks_can_be_executed(string $path): void
+    public function test_all_the_benchmarks_can_be_executed(string $path, string $sourcesLocation): void
     {
         if (PHP_OS_FAMILY === 'Windows') {
             $this->markTestSkipped('Not interested in profiling on Windows');
@@ -67,6 +68,10 @@ final class BenchmarkTest extends TestCase
 
         if (PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('This test requires running without PHPDBG');
+        }
+
+        if (!is_dir($sourcesLocation)) {
+            $this->markTestIncomplete('Benchmark requires uncompressed sources');
         }
 
         $this->assertFileExists($path);
@@ -88,10 +93,12 @@ final class BenchmarkTest extends TestCase
     {
         yield 'MutationGenerator' => [
             realpath(self::BENCHMARK_DIR . '/MutationGenerator/generate-mutations.php'),
+            self::BENCHMARK_DIR . '/MutationGenerator/sources',
         ];
 
         yield 'Tracing' => [
             realpath(self::BENCHMARK_DIR . '/Tracing/provide-traces.php'),
+            self::BENCHMARK_DIR . '/Tracing/sources',
         ];
     }
 
