@@ -38,7 +38,6 @@ namespace Infection\Tests\Console;
 use Infection\Console\ConsoleOutput;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\Exception\MsiCalculationException;
-use Infection\Process\Runner\MinMsiChecker;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -131,37 +130,41 @@ final class ConsoleOutputTest extends TestCase
         $minMsi = 5.0;
         $msiDifference = $actualMsi - $minMsi;
 
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('note')
+        $ioMock = $this->createMock(SymfonyStyle::class);
+        $ioMock
+            ->expects($this->once())
+            ->method('note')
             ->with(
                 'The MSI is ' . $msiDifference . '% percent points over the required MSI. ' .
-                'Consider increasing the required MSI percentage the next time you run infection.');
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+                'Consider increasing the required MSI percentage the next time you run infection.'
+            )
+        ;
 
-        $metricsCalculator->expects($this->once())->method('getMutationScoreIndicator')
-            ->willReturn($actualMsi);
-
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, MinMsiChecker::MSI_OVER_MIN_MSI);
+        (new ConsoleOutput($ioMock))->logMinMsiCanGetIncreasedNotice(
+            $minMsi,
+            $actualMsi
+        );
     }
 
     public function test_log_min_msi_can_get_increased_notice_for_covered_msi(): void
     {
-        $actualMsi = 10.0;
-        $minMsi = 5.0;
-        $msiDifference = $actualMsi - $minMsi;
+        $actualCoveredCodeMsi = 10.0;
+        $minCoveredCodeMsi = 5.0;
+        $msiDifference = $actualCoveredCodeMsi - $minCoveredCodeMsi;
 
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('note')
+        $ioMock = $this->createMock(SymfonyStyle::class);
+        $ioMock
+            ->expects($this->once())
+            ->method('note')
             ->with(
                 'The Covered Code MSI is ' . $msiDifference . '% percent points over the required Covered Code MSI. ' .
-                'Consider increasing the required Covered Code MSI percentage the next time you run infection.');
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+                'Consider increasing the required Covered Code MSI percentage the next time you run infection.'
+            )
+        ;
 
-        $metricsCalculator->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn($actualMsi);
-
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, MinMsiChecker::COVERED_MSI_OVER_MIN_MSI);
+        (new ConsoleOutput($ioMock))->logMinCoveredCodeMsiCanGetIncreasedNotice(
+            $minCoveredCodeMsi,
+            $actualCoveredCodeMsi
+        );
     }
 }

@@ -33,30 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Metrics;
+namespace Infection\Tests\Metrics;
 
-use function Safe\sprintf;
-use UnexpectedValueException;
+use Infection\Metrics\MinMsiCheckFailed;
+use PHPUnit\Framework\TestCase;
 
-final class MinMsiCheckFailed extends UnexpectedValueException
+final class MinMsiCheckFailedTest extends TestCase
 {
-    public static function createForMsi(float $minMsi, float $msi): self
+    public function test_it_can_be_created_for_min_MSI(): void
     {
-        return new self(sprintf(
-            'The minimum required MSI percentage should be %s%%, but actual is %s%%. '
-            . 'Improve your tests!',
-            $minMsi,
-            $msi
-        ));
+        $exception = MinMsiCheckFailed::createForMsi(73.26, 52.1);
+
+        $this->assertSame(
+            'The minimum required MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
+            $exception->getMessage()
+        );
     }
 
-    public static function createCoveredMsi(float $minMsi, float $coveredCodeMsi): self
+    public function test_it_can_be_created_for_min_covered_code_MSI(): void
     {
-        return new self(sprintf(
-            'The minimum required Covered Code MSI percentage should be %s%%, but actual is ' .
-            '%s%%. Improve your tests!',
-            $minMsi,
-            $coveredCodeMsi
-        ));
+        $exception = MinMsiCheckFailed::createCoveredMsi(73.26, 52.1);
+
+        $this->assertSame(
+            'The minimum required Covered Code MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
+            $exception->getMessage()
+        );
     }
 }

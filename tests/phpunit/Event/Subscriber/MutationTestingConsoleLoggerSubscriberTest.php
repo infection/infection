@@ -61,7 +61,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     private $outputFormatter;
 
     /**
-     * @var \Infection\Metrics\MetricsCalculator|MockObject
+     * @var MetricsCalculator|MockObject
      */
     private $metricsCalculator;
 

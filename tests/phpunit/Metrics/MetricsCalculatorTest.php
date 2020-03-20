@@ -130,7 +130,7 @@ final class MetricsCalculatorTest extends TestCase
 
     public function test_its_metrics_are_properly_updated_when_adding_a_new_process(): void
     {
-        $calculator = new \Infection\Metrics\MetricsCalculator();
+        $calculator = new MetricsCalculator();
 
         $this->assertSame(0, $calculator->getKilledCount());
         $this->assertSame([], $calculator->getKilledExecutionResults());

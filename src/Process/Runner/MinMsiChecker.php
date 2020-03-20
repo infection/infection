@@ -45,9 +45,7 @@ final class MinMsiChecker
 {
     public const MSI_FAILURE = 'min-msi';
     public const COVERED_MSI_FAILURE = 'min-covered-msi';
-    public const MSI_OVER_MIN_MSI = 'msi-over-min-msi';
-    public const COVERED_MSI_OVER_MIN_MSI = 'covered-msi-over-min-msi';
-    private const VALUE_OVER_REQUIRED_TOLERANCE = 0.1;
+    private const VALUE_OVER_REQUIRED_TOLERANCE = 2;
 
     private $ignoreMsiWithNoMutations;
     private $minMsi;
@@ -106,8 +104,6 @@ final class MinMsiChecker
                 $this->minMsi,
                 $msi
             );
-
-            return;
         }
 
         if ($this->canIncreaseCoveredCodeMsi($coveredCodeMsi)) {

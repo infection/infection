@@ -73,7 +73,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
 
         foreach ($calculatorPerMutator as $mutatorName => $calculator) {
             /* @var string $mutatorName */
-            /* @var \Infection\Metrics\MetricsCalculator $calculator */
+            /* @var MetricsCalculator $calculator */
             $table[] = [
                 $mutatorName,
                 (string) $calculator->getTotalMutantsCount(),

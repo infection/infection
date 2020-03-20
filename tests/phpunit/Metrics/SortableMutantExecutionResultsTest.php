@@ -52,7 +52,7 @@ final class SortableMutantExecutionResultsTest extends TestCase
      */
     public function test_it_can_sort_results(array $executionResults, array $expectedResults): void
     {
-        $sortableResults = new \Infection\Metrics\SortableMutantExecutionResults();
+        $sortableResults = new SortableMutantExecutionResults();
 
         foreach ($executionResults as $executionResult) {
             $sortableResults->add($executionResult);
