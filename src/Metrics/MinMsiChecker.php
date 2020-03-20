@@ -33,10 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Metrics;
 
 use Infection\Console\ConsoleOutput;
-use Infection\Metrics\MinMsiCheckFailed;
 
 /**
  * @internal
@@ -44,7 +43,6 @@ use Infection\Metrics\MinMsiCheckFailed;
 final class MinMsiChecker
 {
     public const MSI_FAILURE = 'min-msi';
-    public const COVERED_MSI_FAILURE = 'min-covered-msi';
     private const VALUE_OVER_REQUIRED_TOLERANCE = 2;
 
     private $ignoreMsiWithNoMutations;

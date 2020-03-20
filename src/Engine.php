@@ -35,23 +35,23 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\MinMsiChecker;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\Process\Runner\MinMsiChecker;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use function explode;
 
 /**
  * @internal

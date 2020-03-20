@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use function array_filter;
-use function array_key_exists;
 use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
@@ -62,6 +60,7 @@ use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\MinMsiChecker;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
@@ -79,7 +78,6 @@ use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\Process\Runner\MinMsiChecker;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
@@ -105,19 +103,21 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
-use function php_ini_loaded_file;
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
-use function Safe\getcwd;
-use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
+use function array_filter;
+use function array_key_exists;
+use function php_ini_loaded_file;
+use function Safe\getcwd;
+use function Safe\sprintf;
 
 /**
  * @internal
@@ -355,7 +355,6 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new MinMsiChecker(
-                    $container->getMetricsCalculator(),
                     $config->ignoreMsiWithNoMutations(),
                     (float) $config->getMinMsi(),
                     (float) $config->getMinCoveredMsi()

@@ -38,6 +38,9 @@ namespace Infection\Metrics;
 use function Safe\sprintf;
 use UnexpectedValueException;
 
+/**
+ * @internal
+ */
 final class MinMsiCheckFailed extends UnexpectedValueException
 {
     public static function createForMsi(float $minMsi, float $msi): self

@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Metrics;
 
 use Infection\Console\ConsoleOutput;
+use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
-use Infection\Process\Runner\MinMsiChecker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -50,7 +50,7 @@ final class MinMsiCheckerTest extends TestCase
     private $ioMock;
 
     /**
-     * @var ConsoleOutput|MockObject
+     * @var ConsoleOutput
      */
     private $output;
 
