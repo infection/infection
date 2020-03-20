@@ -128,9 +128,9 @@ final class CalculatorTest extends TestCase
             2,
             2,
             1,
-            78.57142857142857,
-            92.85714285714286,
-            84.61538461538461,
+            78.57,
+            92.86,
+            84.62,
         ];
 
         yield 'nominal no non-tested' => [
@@ -139,9 +139,9 @@ final class CalculatorTest extends TestCase
             2,
             2,
             0,
-            84.61538461538461,
+            84.62,
             100,
-            84.61538461538461,
+            84.62,
         ];
     }
 

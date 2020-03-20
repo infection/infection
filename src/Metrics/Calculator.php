@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
+use const PHP_ROUND_HALF_UP;
+use function round;
+
 /**
  * @internal
  */
@@ -103,7 +106,7 @@ final class Calculator
             $score = 100 * $coveredTotal / $totalCount;
         }
 
-        return $this->mutationScoreIndicator = $score;
+        return $this->mutationScoreIndicator = self::round($score);
     }
 
     /**
@@ -123,7 +126,7 @@ final class Calculator
             $coveredRate = 100 * $testedTotal / $totalCount;
         }
 
-        return $this->coverageRate = $coveredRate;
+        return $this->coverageRate = self::round($coveredRate);
     }
 
     /**
@@ -143,6 +146,11 @@ final class Calculator
             $score = 100 * $coveredTotal / $testedTotal;
         }
 
-        return $this->coveredMutationScoreIndicator = $score;
+        return $this->coveredMutationScoreIndicator = self::round($score);
+    }
+
+    private static function round(float $value): float
+    {
+        return round($value, 2, PHP_ROUND_HALF_UP);
     }
 }

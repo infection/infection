@@ -123,9 +123,9 @@ final class MetricsCalculatorTest extends TestCase
         );
 
         $this->assertSame(14, $calculator->getTotalMutantsCount());
-        $this->assertSame(78.57142857142857, $calculator->getMutationScoreIndicator());
-        $this->assertSame(92.85714285714286, $calculator->getCoverageRate());
-        $this->assertSame(84.61538461538461, $calculator->getCoveredCodeMutationScoreIndicator());
+        $this->assertSame(78.57, $calculator->getMutationScoreIndicator());
+        $this->assertSame(92.86, $calculator->getCoverageRate());
+        $this->assertSame(84.62, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
     public function test_its_metrics_are_properly_updated_when_adding_a_new_process(): void
