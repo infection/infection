@@ -39,7 +39,7 @@ use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Logger\BadgeLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Tests\Double\OndraM\CiDetector\ConfigurableEnv;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use OndraM\CiDetector\CiDetector;

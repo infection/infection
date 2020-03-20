@@ -42,7 +42,7 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -61,7 +61,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     private $outputFormatter;
 
     /**
-     * @var MetricsCalculator|MockObject
+     * @var \Infection\Metrics\MetricsCalculator|MockObject
      */
     private $metricsCalculator;
 

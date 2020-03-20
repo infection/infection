@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\Exception\MsiCalculationException;
-use Infection\Mutant\MetricsCalculator;
-use Infection\Process\Runner\TestRunConstraintChecker;
+use Infection\Process\Runner\MinMsiChecker;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -142,7 +142,7 @@ final class ConsoleOutputTest extends TestCase
             ->willReturn($actualMsi);
 
         $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::MSI_OVER_MIN_MSI);
+        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, MinMsiChecker::MSI_OVER_MIN_MSI);
     }
 
     public function test_log_min_msi_can_get_increased_notice_for_covered_msi(): void
@@ -162,6 +162,6 @@ final class ConsoleOutputTest extends TestCase
             ->willReturn($actualMsi);
 
         $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::COVERED_MSI_OVER_MIN_MSI);
+        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, MinMsiChecker::COVERED_MSI_OVER_MIN_MSI);
     }
 }

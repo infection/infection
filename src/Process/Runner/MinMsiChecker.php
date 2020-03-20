@@ -35,128 +35,114 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\Mutant\MetricsCalculator;
+use Infection\Console\ConsoleOutput;
+use Infection\Metrics\MinMsiCheckFailed;
 
 /**
  * @internal
  */
-final class TestRunConstraintChecker
+final class MinMsiChecker
 {
     public const MSI_FAILURE = 'min-msi';
-
     public const COVERED_MSI_FAILURE = 'min-covered-msi';
-
     public const MSI_OVER_MIN_MSI = 'msi-over-min-msi';
-
     public const COVERED_MSI_OVER_MIN_MSI = 'covered-msi-over-min-msi';
-
     private const VALUE_OVER_REQUIRED_TOLERANCE = 0.1;
 
-    private $metricsCalculator;
     private $ignoreMsiWithNoMutations;
     private $minMsi;
-    private $minCoveredMsi;
-    /**
-     * @var string
-     */
-    private $failureType = '';
-    /**
-     * @var string
-     */
-    private $actualOverRequiredType = '';
+    private $minCoveredCodeMsi;
 
     public function __construct(
-        MetricsCalculator $metricsCalculator,
         bool $ignoreMsiWithNoMutations,
         float $minMsi,
         float $minCoveredMsi
     ) {
-        $this->metricsCalculator = $metricsCalculator;
         $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
         $this->minMsi = $minMsi;
-        $this->minCoveredMsi = $minCoveredMsi;
+        $this->minCoveredCodeMsi = $minCoveredMsi;
     }
 
-    public function hasTestRunPassedConstraints(): bool
+    /**
+     * @throws MinMsiCheckFailed
+     */
+    public function checkMetrics(
+        int $totalMutantCount,
+        float $msi,
+        float $coveredCodeMsi,
+        ConsoleOutput $consoleOutput
+    ): void {
+        $this->checkMinMsi($totalMutantCount, $msi, $coveredCodeMsi);
+        $this->checkIfMinMsiCanBeIncreased($msi, $coveredCodeMsi, $consoleOutput);
+    }
+
+    private function checkMinMsi(int $totalMutantCount, float $msi, float $coveredCodeMsi): void
     {
-        if ($this->ignoreMsiWithNoMutations && $this->metricsCalculator->getTotalMutantsCount() === 0) {
-            return true;
+        if ($this->ignoreMsiWithNoMutations
+            && $totalMutantCount === 0
+        ) {
+            return;
         }
 
-        if ($this->hasBadMsi()) {
-            $this->failureType = self::MSI_FAILURE;
-
-            return false;
+        if ($this->isMsiInsufficient($msi)) {
+            throw MinMsiCheckFailed::createForMsi(
+                $this->minMsi,
+                $msi
+            );
         }
 
-        if ($this->hasBadCoveredMsi()) {
-            $this->failureType = self::COVERED_MSI_FAILURE;
+        if ($this->isCoveredCodeMsiInsufficient($coveredCodeMsi)) {
+            throw MinMsiCheckFailed::createCoveredMsi(
+                $this->minCoveredCodeMsi,
+                $coveredCodeMsi
+            );
+        }
+    }
 
-            return false;
+    private function checkIfMinMsiCanBeIncreased(float $msi, float $coveredCodeMsi, ConsoleOutput $output): void
+    {
+        if ($this->canIncreaseMsi($msi)) {
+            $output->logMinMsiCanGetIncreasedNotice(
+                $this->minMsi,
+                $msi
+            );
+
+            return;
         }
 
-        return true;
-    }
-
-    public function isActualOverRequired(): bool
-    {
-        if ($this->hasMsiOverRequired()) {
-            $this->actualOverRequiredType = self::MSI_OVER_MIN_MSI;
-
-            return true;
+        if ($this->canIncreaseCoveredCodeMsi($coveredCodeMsi)) {
+            $output->logMinCoveredCodeMsiCanGetIncreasedNotice(
+                $this->minCoveredCodeMsi,
+                $coveredCodeMsi
+            );
         }
-
-        if ($this->hasCoveredMsiOverRequired()) {
-            $this->actualOverRequiredType = self::COVERED_MSI_OVER_MIN_MSI;
-
-            return true;
-        }
-
-        return false;
     }
 
-    public function getErrorType(): string
+    private function isMsiInsufficient(float $msi): bool
     {
-        return $this->failureType;
+        return $this->minMsi && ($msi < $this->minMsi);
     }
 
-    public function getActualOverRequiredType(): string
+    private function isCoveredCodeMsiInsufficient(float $coveredCodeMsi): bool
     {
-        return $this->actualOverRequiredType;
+        return $this->minCoveredCodeMsi && ($coveredCodeMsi < $this->minCoveredCodeMsi);
     }
 
-    public function getMinRequiredValue(): float
-    {
-        return
-            ($this->failureType === self::MSI_FAILURE || $this->actualOverRequiredType === self::MSI_OVER_MIN_MSI)
-            ? $this->minMsi : $this->minCoveredMsi;
-    }
-
-    private function hasBadMsi(): bool
-    {
-        return $this->minMsi && ($this->metricsCalculator->getMutationScoreIndicator() < $this->minMsi);
-    }
-
-    private function hasBadCoveredMsi(): bool
-    {
-        return $this->minCoveredMsi && ($this->metricsCalculator->getCoveredCodeMutationScoreIndicator() < $this->minCoveredMsi);
-    }
-
-    private function hasMsiOverRequired(): bool
+    private function canIncreaseMsi(float $msi): bool
     {
         if ($this->minMsi === 0.0) {
             return false;
         }
 
-        return $this->metricsCalculator->getMutationScoreIndicator() > $this->minMsi + self::VALUE_OVER_REQUIRED_TOLERANCE;
+        return $msi > $this->minMsi + self::VALUE_OVER_REQUIRED_TOLERANCE;
     }
 
-    private function hasCoveredMsiOverRequired(): bool
+    private function canIncreaseCoveredCodeMsi(float $coveredCodeMsi): bool
     {
-        if ($this->minCoveredMsi === 0.0) {
+        if ($this->minCoveredCodeMsi === 0.0) {
             return false;
         }
 
-        return $this->metricsCalculator->getCoveredCodeMutationScoreIndicator() > $this->minCoveredMsi + self::VALUE_OVER_REQUIRED_TOLERANCE;
+        return $coveredCodeMsi > $this->minCoveredCodeMsi + self::VALUE_OVER_REQUIRED_TOLERANCE;
     }
 }

@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Metrics;
 
+use Infection\Metrics\SortableMutantExecutionResults;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\SortableMutantExecutionResults;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
@@ -52,7 +52,7 @@ final class SortableMutantExecutionResultsTest extends TestCase
      */
     public function test_it_can_sort_results(array $executionResults, array $expectedResults): void
     {
-        $sortableResults = new SortableMutantExecutionResults();
+        $sortableResults = new \Infection\Metrics\SortableMutantExecutionResults();
 
         foreach ($executionResults as $executionResult) {
             $sortableResults->add($executionResult);

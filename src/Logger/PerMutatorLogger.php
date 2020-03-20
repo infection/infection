@@ -39,7 +39,7 @@ use function array_fill;
 use function array_unshift;
 use function count;
 use function implode;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
@@ -73,7 +73,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
 
         foreach ($calculatorPerMutator as $mutatorName => $calculator) {
             /* @var string $mutatorName */
-            /* @var MetricsCalculator $calculator */
+            /* @var \Infection\Metrics\MetricsCalculator $calculator */
             $table[] = [
                 $mutatorName,
                 (string) $calculator->getTotalMutantsCount(),

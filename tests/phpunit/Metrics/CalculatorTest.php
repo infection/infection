@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Metrics;
 
 use function array_sum;
-use Infection\Mutant\Calculator;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\Calculator;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Tests\Logger\CreateMetricsCalculator;
 use PHPUnit\Framework\TestCase;
 

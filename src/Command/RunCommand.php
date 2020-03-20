@@ -231,15 +231,15 @@ final class RunCommand extends BaseCommand
             $this->container->getMemoryLimiter(),
             $this->container->getMutationGenerator(),
             $this->container->getMutationTestingRunner(),
-            $this->container->getTestRunConstraintChecker(),
+            $this->container->getMinMsiChecker(),
             $this->consoleOutput,
             $this->container->getMetricsCalculator(),
             $this->container->getTestFrameworkExtraOptionsFilter()
         );
 
-        $result = $engine->execute();
+        $engine->execute();
 
-        return $result === true ? 0 : 1;
+        return 0;
     }
 
     private function initContainer(InputInterface $input): void

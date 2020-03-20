@@ -33,53 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger;
+namespace Infection\Metrics;
 
-use Infection\Logger\PerMutatorLogger;
-use Infection\Metrics\MetricsCalculator;
-use PHPUnit\Framework\TestCase;
+use Infection\Mutant\MutantExecutionResult;
+use function Safe\usort;
 
-final class PerMutatorLoggerTest extends TestCase
+/**
+ * @internal
+ */
+final class SortableMutantExecutionResults
 {
-    use CreateMetricsCalculator;
-    use LineLoggerAssertions;
+    /**
+     * @var MutantExecutionResult[]
+     */
+    private $executionResults = [];
 
     /**
-     * @dataProvider metricsProvider
+     * @var bool
      */
-    public function test_it_logs_correctly_with_mutations(
-        MetricsCalculator $metricsCalculator,
-        string $expectedContents
-    ): void {
-        $logger = new PerMutatorLogger($metricsCalculator);
+    private $sorted = false;
 
-        $this->assertLoggedContentIs($expectedContents, $logger);
+    public function add(MutantExecutionResult $executionResult): void
+    {
+        $this->executionResults[] = $executionResult;
+        $this->sorted = false;
     }
 
-    public function metricsProvider(): iterable
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getSortedExecutionResults(): array
     {
-        yield 'no mutations' => [
-            new MetricsCalculator(),
-            <<<'TXT'
-# Effects per Mutator
+        if (!$this->sorted) {
+            self::sortResults($this->executionResults);
+            $this->sorted = true;
+        }
 
-| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI (%s) | Covered MSI (%s) |
-| ------- | --------- | ------ | ------- | ------ | --------- | -------- | ---------------- |
+        return $this->executionResults;
+    }
 
-TXT
-        ];
+    /**
+     * @param MutantExecutionResult[] $executionResults
+     */
+    private static function sortResults(array &$executionResults): void
+    {
+        usort(
+            $executionResults,
+            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
+                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
+                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
+                }
 
-        yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
-            <<<'TXT'
-# Effects per Mutator
-
-| Mutator   | Mutations | Killed | Escaped | Errors | Timed Out | MSI (%s) | Covered MSI (%s) |
-| --------- | --------- | ------ | ------- | ------ | --------- | -------- | ---------------- |
-| For_      |         5 |      1 |       1 |      1 |         1 |    60.00 |            75.00 |
-| PregQuote |         5 |      1 |       1 |      1 |         1 |    60.00 |            75.00 |
-
-TXT
-        ];
+                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
+            }
+        );
     }
 }

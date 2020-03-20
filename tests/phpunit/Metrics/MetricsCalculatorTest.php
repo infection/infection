@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Metrics;
 
 use function array_merge;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
@@ -130,7 +130,7 @@ final class MetricsCalculatorTest extends TestCase
 
     public function test_its_metrics_are_properly_updated_when_adding_a_new_process(): void
     {
-        $calculator = new MetricsCalculator();
+        $calculator = new \Infection\Metrics\MetricsCalculator();
 
         $this->assertSame(0, $calculator->getKilledCount());
         $this->assertSame([], $calculator->getKilledExecutionResults());

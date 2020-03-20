@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Exception\InvalidTypeException;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\Exception\MsiCalculationException;
-use Infection\Mutant\MetricsCalculator;
-use Infection\Process\Runner\TestRunConstraintChecker;
+use Infection\Process\Runner\MinMsiChecker;
 use function Safe\sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -77,9 +76,9 @@ final class ConsoleOutput
         $this->io->error(
             sprintf(
                 self::CI_FLAG_ERROR,
-                ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
+                ($type === MinMsiChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
                 $minMsi,
-                ($type === TestRunConstraintChecker::MSI_FAILURE ?
+                ($type === MinMsiChecker::MSI_FAILURE ?
                     $metricsCalculator->getMutationScoreIndicator() :
                     $metricsCalculator->getCoveredCodeMutationScoreIndicator()
                 )
@@ -87,30 +86,30 @@ final class ConsoleOutput
         );
     }
 
-    /**
-     * @throws InvalidTypeException
-     */
-    public function logMinMsiCanGetIncreasedNotice(MetricsCalculator $metricsCalculator, float $minMsi, string $type): void
+    public function logMinMsiCanGetIncreasedNotice(float $minMsi, float $msi): void
     {
-        if ($type !== TestRunConstraintChecker::MSI_OVER_MIN_MSI && $type !== TestRunConstraintChecker::COVERED_MSI_OVER_MIN_MSI) {
-            throw InvalidTypeException::create($type);
-        }
-
-        if ($type === TestRunConstraintChecker::MSI_OVER_MIN_MSI) {
-            $typeString = 'MSI';
-            $msi = $metricsCalculator->getMutationScoreIndicator();
-        } else {
-            $typeString = 'Covered Code MSI';
-            $msi = $metricsCalculator->getCoveredCodeMutationScoreIndicator();
-        }
-
-        $msiDifference = $msi - $minMsi;
+        $typeString = 'MSI';
 
         $this->io->note(
             sprintf(
                 self::MIN_MSI_CAN_GET_INCREASED_NOTICE,
                 $typeString,
-                $msiDifference,
+                $msi - $minMsi,
+                $typeString,
+                $typeString
+            )
+        );
+    }
+
+    public function logMinCoveredCodeMsiCanGetIncreasedNotice(float $minMsi, float $coveredCodeMsi): void
+    {
+        $typeString = 'Covered Code MSI';
+
+        $this->io->note(
+            sprintf(
+                self::MIN_MSI_CAN_GET_INCREASED_NOTICE,
+                $typeString,
+                $coveredCodeMsi - $minMsi,
                 $typeString,
                 $typeString
             )
