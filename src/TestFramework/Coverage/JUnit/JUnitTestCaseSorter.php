@@ -124,7 +124,7 @@ final class JUnitTestCaseSorter
         ];
 
         foreach ($uniqueTestLocations as $location) {
-            // Quicky drop off lower bits, reducing precision to 8th of a second
+            // Quick drop off lower bits, reducing precision to 8th of a second
             $msTime = $location->getExecutionTime() * 1024 >> 7; // * 1024 / 128
 
             // For anything above 4 seconds reduce precision to 4 seconds
