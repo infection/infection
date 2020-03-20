@@ -50,6 +50,7 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
@@ -99,6 +100,7 @@ final class ProjectCodeProvider
         NonExecutableFinder::class,
         AdapterInstaller::class,
         DetectionStatus::class,
+        DummyFileSystem::class,
     ];
 
     /**
