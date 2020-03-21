@@ -38,7 +38,7 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\Command\ConfigureCommand;
-use Infection\Command\InfectionCommand;
+use Infection\Command\RunCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
@@ -87,7 +87,7 @@ final class ProjectCodeProvider
      */
     public const NON_TESTED_CONCRETE_CLASSES = [
         ConfigureCommand::class,
-        InfectionCommand::class,
+        RunCommand::class,
         Application::class,
         ProgressFormatter::class,
         PhpProcess::class,
