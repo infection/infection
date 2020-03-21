@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -140,6 +141,11 @@ final class Container
     private $factories = [];
 
     /**
+     * @var string|null
+     */
+    private $defaultJUnitPath;
+
+    /**
      * @param array<class-string<object>, Closure(self): object> $values
      */
     public function __construct(array $values)
@@ -213,7 +219,7 @@ final class Container
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
                     $container->getTestFrameworkFinder(),
-                    $container->getJUnitFilePath(),
+                    $container->getDefaultJUnitFilePath(),
                     $config,
                     GeneratedExtensionsConfig::EXTENSIONS
                 );
@@ -258,7 +264,7 @@ final class Container
             },
             MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
                 return new MemoizedTestFileDataProvider(
-                    new JUnitTestFileDataProvider($container->getJUnitFilePath())
+                    new JUnitTestFileDataProvider($container->getDefaultJUnitFilePath())
                 );
             },
             Lexer::class => static function (): Lexer {
@@ -344,11 +350,16 @@ final class Container
                     $config->shouldSkipInitialTests(),
                     $config->getInitialTestsPhpOptions() ?? '',
                     $config->getCoveragePath(),
-                    $testFrameworkAdapter->hasJUnitReport()
-                        ? $container->getJUnitFilePath()
-                        : null,
+                    $testFrameworkAdapter->hasJUnitReport(),
+                    $container->getJUnitReportLocator(),
                     $testFrameworkAdapter->getName(),
                     $container->getIndexXmlCoverageReader()
+                );
+            },
+            JUnitReportLocator::class => static function (self $container): JUnitReportLocator {
+                return new JUnitReportLocator(
+                    $container->getConfiguration()->getCoveragePath(),
+                    $container->getDefaultJUnitFilePath()
                 );
             },
             TestRunConstraintChecker::class => static function (self $container): TestRunConstraintChecker {
@@ -576,15 +587,20 @@ final class Container
         return $this->get(TmpDirProvider::class);
     }
 
-    public function getJUnitFilePath(): string
+    public function getDefaultJUnitFilePath(): string
     {
-        return sprintf(
+        return $this->defaultJUnitPath ?? sprintf(
             '%s/%s',
             Path::canonicalize(
                 $this->getConfiguration()->getCoveragePath() . '/..'
             ),
             'junit.xml'
         );
+    }
+
+    public function getJUnitReportLocator(): JUnitReportLocator
+    {
+        return $this->get(JUnitReportLocator::class);
     }
 
     public function getIndexXmlCoverageParser(): IndexXmlCoverageParser
