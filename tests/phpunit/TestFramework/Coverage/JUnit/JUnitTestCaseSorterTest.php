@@ -61,11 +61,9 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         $sorter = new JUnitTestCaseSorter();
 
-        /** @var array $uniqueSortedFileNames */
         $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
 
-        $this->assertCount(1, $uniqueSortedFileNames);
-        $this->assertSame('/path/to/test-file-1', $uniqueSortedFileNames[0]);
+        $this->assertSame(['/path/to/test-file-1'], $uniqueSortedFileNames);
     }
 
     public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
