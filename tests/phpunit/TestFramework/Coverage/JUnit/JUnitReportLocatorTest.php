@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
+use function in_array;
+use function Infection\Tests\normalizePath;
 use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -44,6 +46,7 @@ use function Safe\realpath;
 use function Safe\sprintf;
 use function Safe\touch;
 use Symfony\Component\Filesystem\Filesystem;
+use const PHP_OS_FAMILY;
 
 /**
  * @group integration
@@ -80,7 +83,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     {
         touch('junit.xml');
 
-        $expected = realpath($this->tmp . '/junit.xml');
+        $expected = normalizePath(realpath($this->tmp . '/junit.xml'));
 
         $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
@@ -89,9 +92,13 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_JUnit_file_with_the_wrong_case(): void
     {
+        if (!in_array(PHP_OS_FAMILY, ['Darwin', 'Windows'], true)) {
+            $this->markTestSkipped('Cannot test this on case-sensitive OS');
+        }
+
         touch('JUNIT.XML');
 
-        $expected = realpath($this->tmp . '/junit.xml');
+        $expected = normalizePath(realpath($this->tmp . '/junit.xml'));
 
         $actual = $this->locator->locate();
 
@@ -105,7 +112,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     {
         (new Filesystem())->dumpFile($jUnitRelativePaths, '');
 
-        $expected = realpath($this->tmp . DIRECTORY_SEPARATOR . $jUnitRelativePaths);
+        $expected = normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . $jUnitRelativePaths));
 
         $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
