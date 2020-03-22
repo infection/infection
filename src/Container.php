@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -94,6 +93,7 @@ use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\FilteredEnrichedTraceProvider;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;

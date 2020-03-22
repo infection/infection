@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\FileSystem\Locator\FileNotFound;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use function count;
 use function extension_loaded;
 use function file_exists;
 use function implode;
+use Infection\FileSystem\Locator\FileNotFound;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use const PHP_EOL;
 use const PHP_SAPI;
@@ -145,7 +145,7 @@ TXT
             $this->jUnitReportLocator->locate();
         } catch (FileNotFound $exception) {
             $message = 'Could not find the JUnit file report. Please ensure that the JUnit coverage'
-                .' report has been properly generated at the right place.';
+                . ' report has been properly generated at the right place.';
 
             if ($this->frameworkAdapterName === self::PHPUNIT) {
                 $message .= sprintf(
