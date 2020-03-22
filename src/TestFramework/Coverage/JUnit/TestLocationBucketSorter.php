@@ -43,6 +43,21 @@ use function Safe\ksort;
  */
 final class TestLocationBucketSorter
 {
+    /**
+     * Pre-sort first buckets, optimistically assuming that most projects
+     * won't have tests longer than a second.
+     */
+    private const INIT_BUCKETS = [
+        0 => [],
+        1 => [],
+        2 => [],
+        3 => [],
+        4 => [],
+        5 => [],
+        6 => [],
+        7 => [],
+    ];
+
     private function __construct()
     {
     }
@@ -56,18 +71,7 @@ final class TestLocationBucketSorter
      */
     public static function bucketSort(array $uniqueTestLocations): iterable
     {
-        // Pre-sort first buckets, optimistically assuming that
-        // most projects won't have tests longer than a second
-        $buckets = [
-            0 => [],
-            1 => [],
-            2 => [],
-            3 => [],
-            4 => [],
-            5 => [],
-            6 => [],
-            7 => [],
-        ];
+        $buckets = self::INIT_BUCKETS;
 
         foreach ($uniqueTestLocations as $location) {
             // Quick drop off lower bits, reducing precision to 8th of a second
