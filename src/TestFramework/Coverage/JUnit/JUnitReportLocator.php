@@ -47,7 +47,11 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\PathUtil\Path;
 
-final class JUnitReportLocator
+/**
+ * @internal
+ * @final
+ */
+class JUnitReportLocator
 {
     private $coveragePath;
     private $defaultJUnitPath;

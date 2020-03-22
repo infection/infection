@@ -172,8 +172,15 @@ TXT
             $errors[] = sprintf('- The file "%s" could not be found', $coverageIndexFilePath);
         }
 
-        if ($this->jUnitReportLocator !== null && !file_exists($this->jUnitReportLocator)) {
-            $errors[] = sprintf('- The file "%s" could not be found', $this->jUnitReportLocator);
+        if ($this->jUnitReport) {
+            try {
+                $this->jUnitReportLocator->locate();
+            } catch (FileNotFound $exception) {
+                $errors[] = sprintf(
+                    '- The JUnit file could not be found: %s',
+                    $exception->getMessage()
+                );
+            }
         }
 
         if (count($errors) === 0) {
