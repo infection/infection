@@ -98,7 +98,7 @@ final class JUnitTestCaseSorterTest extends TestCase
                 '/path/to/test-file-4',
                 '/path/to/test-file-1',
                 '/path/to/test-file-2',
-            ], 
+            ],
             $uniqueSortedFileNames
         );
     }
