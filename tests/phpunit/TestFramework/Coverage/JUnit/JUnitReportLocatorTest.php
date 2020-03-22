@@ -35,18 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use function in_array;
-use function Infection\Tests\normalizePath;
 use const DIRECTORY_SEPARATOR;
+use function in_array;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
+use function Infection\Tests\normalizePath;
+use const PHP_OS_FAMILY;
 use function Safe\chdir;
 use function Safe\realpath;
 use function Safe\sprintf;
 use function Safe\touch;
 use Symfony\Component\Filesystem\Filesystem;
-use const PHP_OS_FAMILY;
 
 /**
  * @group integration
