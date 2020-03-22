@@ -39,7 +39,6 @@ use function array_key_exists;
 use function count;
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use function Safe\ksort;
 use function Safe\usort;
 
 /**
@@ -104,49 +103,8 @@ final class JUnitTestCaseSorter
          * For large number of tests use a more efficient algorithm.
          */
         return self::sortedLocationsGenerator(
-            self::bucketSort($uniqueTestLocations)
+            TestLocationBucketSorter::bucketSort($uniqueTestLocations)
         );
-    }
-
-    /**
-     * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
-     *
-     * @param TestLocation[] $uniqueTestLocations
-     *
-     * @return iterable<TestLocation>
-     */
-    public static function bucketSort(array $uniqueTestLocations): iterable
-    {
-        // Pre-sort first buckets, optimistically assuming that
-        // most projects won't have tests longer than a second
-        $buckets = [
-            0 => [],
-            1 => [],
-            2 => [],
-            3 => [],
-            4 => [],
-            5 => [],
-            6 => [],
-            7 => [],
-        ];
-
-        foreach ($uniqueTestLocations as $location) {
-            // Quick drop off lower bits, reducing precision to 8th of a second
-            $msTime = $location->getExecutionTime() * 1024 >> 7; // * 1024 / 128
-
-            // For anything above 4 seconds reduce precision to 4 seconds
-            if ($msTime > 32) {
-                $msTime = $msTime >> 5 << 5; // 7 + 5 = 12 bits
-            }
-
-            $buckets[$msTime][] = $location;
-        }
-
-        ksort($buckets);
-
-        foreach ($buckets as $bucket) {
-            yield from $bucket;
-        }
     }
 
     /**
