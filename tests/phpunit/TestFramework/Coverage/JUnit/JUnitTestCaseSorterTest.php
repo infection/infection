@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use function abs;
+use function array_map;
+use function array_slice;
 use function extension_loaded;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
@@ -118,27 +120,43 @@ final class JUnitTestCaseSorterTest extends TestCase
 
     /**
      * @dataProvider locationsArrayProvider
+     *
+     * @param TestLocation[] $uniqueTestLocations
      */
     public function test_it_sorts_correctly(array $uniqueTestLocations): void
     {
-        $sortedTestLocations = iterator_to_array(JUnitTestCaseSorter::bucketSort($uniqueTestLocations), false);
-        $this->assertTrue(self::isOrderConstraintsValid($sortedTestLocations), 'Bucket sort failed order check');
+        $sortedTestLocations = iterator_to_array(
+            JUnitTestCaseSorter::bucketSort($uniqueTestLocations),
+            false
+        );
+
+        $this->assertTrue(
+            self::isOrderConstraintsValid($sortedTestLocations),
+            'Bucket sort failed order check'
+        );
     }
 
     /**
      * Sanity check
      *
      * @dataProvider locationsArrayProvider
+     *
+     * @param TestLocation[] $uniqueTestLocations
      */
     public function test_quicksort_sorts_correctly(array $uniqueTestLocations): void
     {
         self::quicksort($uniqueTestLocations);
 
-        $this->assertTrue(self::isOrderConstraintsValid($uniqueTestLocations), 'Quicksort failed order check');
+        $this->assertTrue(
+            self::isOrderConstraintsValid($uniqueTestLocations),
+            'Quicksort failed order check'
+        );
     }
 
     /**
      * @dataProvider locationsArrayProvider
+     *
+     * @param TestLocation[] $uniqueTestLocations
      */
     public function test_it_sorts_faster_than_quicksort(array $uniqueTestLocations): void
     {
@@ -160,7 +178,10 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         for ($i = 0; $i < $tries; ++$i) {
             $start = microtime(true);
-            iterator_to_array(JUnitTestCaseSorter::bucketSort($uniqueTestLocations), false);
+            iterator_to_array(
+                JUnitTestCaseSorter::bucketSort($uniqueTestLocations),
+                false
+            );
             $totalBucketSort += microtime(true) - $start;
         }
 
@@ -206,10 +227,8 @@ final class JUnitTestCaseSorterTest extends TestCase
      * We assume locations should be ordered within an order of magnitude.
      *
      * @param TestLocation[] $sortedTestLocations
-     *
-     * @return bool
      */
-    private static function isOrderConstraintsValid(array $sortedTestLocations)
+    private static function isOrderConstraintsValid(array $sortedTestLocations): bool
     {
         // Minimal precision: there's no sort below this number
         $minimalPrecisionTime = 0.125;
