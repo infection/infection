@@ -74,6 +74,9 @@ final class TestLocationBucketSorter
         $buckets = self::INIT_BUCKETS;
 
         foreach ($uniqueTestLocations as $location) {
+            // @codeCoverageIgnoreStart
+            // This is a very hot path. Factoring here another method just to test this math may not be as good idea.
+
             // Quick drop off lower bits, reducing precision to 8th of a second
             $msTime = $location->getExecutionTime() * 1024 >> 7; // * 1024 / 128
 
@@ -81,6 +84,7 @@ final class TestLocationBucketSorter
             if ($msTime > 32) {
                 $msTime = $msTime >> 5 << 5; // 7 + 5 = 12 bits
             }
+            // @codeCoverageIgnoreEnd
 
             $buckets[$msTime][] = $location;
         }

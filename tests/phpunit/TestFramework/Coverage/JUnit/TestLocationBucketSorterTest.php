@@ -57,6 +57,52 @@ use function Safe\usort;
  */
 final class TestLocationBucketSorterTest extends TestCase
 {
+    public function test_it_sorts(): void
+    {
+        $testLocation = new TestLocation('', '', 0.0);
+
+        $sortedTestLocations = iterator_to_array(
+            TestLocationBucketSorter::bucketSort([$testLocation]),
+            false
+        );
+
+        $this->assertSame([$testLocation], $sortedTestLocations);
+    }
+
+    public function test_it_detects_precision_boundary(): void
+    {
+        $testLocations = [
+            new TestLocation('', '', 0.124),
+            new TestLocation('', '', 0.125),
+            new TestLocation('', '', 0.499),
+            new TestLocation('', '', 0.500),
+            new TestLocation('', '', 1.499),
+            new TestLocation('', '', 1.500),
+            new TestLocation('', '', 3.999),
+            new TestLocation('', '', 4.000),
+        ];
+
+        $sortedTestLocations = iterator_to_array(
+            TestLocationBucketSorter::bucketSort(array_reverse($testLocations)),
+            false
+        );
+
+        $this->assertSame($testLocations, $sortedTestLocations);
+    }
+
+    public function test_it_detects_second_precision_boundary(): void
+    {
+        $testLocation1 = new TestLocation('', '', 0.124);
+        $testLocation2 = new TestLocation('', '', 0.125);
+
+        $sortedTestLocations = iterator_to_array(
+            TestLocationBucketSorter::bucketSort([$testLocation2, $testLocation1]),
+            false
+            );
+
+        $this->assertSame([$testLocation1, $testLocation2], $sortedTestLocations);
+    }
+
     /**
      * @dataProvider locationsArrayProvider
      *
