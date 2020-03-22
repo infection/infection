@@ -70,7 +70,7 @@ final class TestLocationBucketSorterTest extends TestCase
         );
 
         $this->assertTrue(
-            self::isOrderConstraintsValid($sortedTestLocations),
+            self::areConstraintsOrderValid($sortedTestLocations),
             'Bucket sort failed order check'
         );
     }
@@ -87,7 +87,7 @@ final class TestLocationBucketSorterTest extends TestCase
         self::quicksort($uniqueTestLocations);
 
         $this->assertTrue(
-            self::isOrderConstraintsValid($uniqueTestLocations),
+            self::areConstraintsOrderValid($uniqueTestLocations),
             'Quicksort failed order check'
         );
     }
@@ -103,7 +103,7 @@ final class TestLocationBucketSorterTest extends TestCase
             $this->markTestSkipped('Benchmarks under xdebug or phpdbg are brittle');
         }
 
-        if (self::isOrderConstraintsValid($uniqueTestLocations) === true) {
+        if (self::areConstraintsOrderValid($uniqueTestLocations)) {
             // Ignore silently as to not pollute to the log.
             $this->addToAssertionCount(1);
 
@@ -167,7 +167,7 @@ final class TestLocationBucketSorterTest extends TestCase
      *
      * @param TestLocation[] $sortedTestLocations
      */
-    private static function isOrderConstraintsValid(array $sortedTestLocations): bool
+    private static function areConstraintsOrderValid(array $sortedTestLocations): bool
     {
         // Minimal precision: there's no sort below this number
         $minimalPrecisionTime = 0.125;
