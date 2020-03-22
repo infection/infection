@@ -85,9 +85,9 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $expected = normalizePath(realpath($this->tmp . '/junit.xml'));
 
-        $this->assertSame($expected, $this->locator->locate());
+        $this->assertSame($expected, normalizePath($this->locator->locate()));
         // Call second time to check the cached result
-        $this->assertSame($expected, $this->locator->locate());
+        $this->assertSame($expected, normalizePath($this->locator->locate()));
     }
 
     public function test_it_can_locate_the_default_JUnit_file_with_the_wrong_case(): void
@@ -100,7 +100,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $expected = normalizePath(realpath($this->tmp . '/junit.xml'));
 
-        $actual = $this->locator->locate();
+        $actual = normalizePath($this->locator->locate());
 
         $this->assertSame($expected, $actual);
     }
@@ -114,9 +114,9 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $expected = normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . $jUnitRelativePaths));
 
-        $this->assertSame($expected, $this->locator->locate());
+        $this->assertSame($expected, normalizePath($this->locator->locate()));
         // Call second time to check the cached result
-        $this->assertSame($expected, $this->locator->locate());
+        $this->assertSame($expected, normalizePath($this->locator->locate()));
     }
 
     public function test_it_cannot_locate_the_JUnit_file_if_the_result_is_ambiguous(): void
