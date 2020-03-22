@@ -59,10 +59,15 @@ final class JUnitTestCaseSorter
             /** @var TestLocation $testLocation */
             $testLocation = current($uniqueTestLocations);
 
+            /*
+             * TestLocation gets its file path and timings from TestFileTimeData.
+             * Path for TestFileTimeData is not optional. It is never a null.
+             * Therefore we don't need to make any type checks here.
+             */
+
             /** @var string $filePath */
             $filePath = $testLocation->getFilePath();
 
-            // Path for TestFileTimeData is not optional. It is never a null.
             yield $filePath;
 
             return;
