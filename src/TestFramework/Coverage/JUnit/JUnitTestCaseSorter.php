@@ -145,10 +145,7 @@ final class JUnitTestCaseSorter
         ksort($buckets);
 
         foreach ($buckets as $bucket) {
-            foreach ($bucket as $value) {
-                // not `yield from` here because it'll break order in PHP 7.3
-                yield $value;
-            }
+            yield from $bucket;
         }
     }
 

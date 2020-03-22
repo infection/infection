@@ -97,7 +97,7 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         $uniqueSortedFileNames = iterator_to_array(
             $sorter->getUniqueSortedFileNames($coverageTestCases),
-            true
+            false
         );
 
         $this->assertCount(3, $uniqueSortedFileNames);
@@ -119,7 +119,7 @@ final class JUnitTestCaseSorterTest extends TestCase
      */
     public function test_it_sorts_correctly(array $uniqueTestLocations): void
     {
-        $sortedTestLocations = iterator_to_array(JUnitTestCaseSorter::bucketSort($uniqueTestLocations));
+        $sortedTestLocations = iterator_to_array(JUnitTestCaseSorter::bucketSort($uniqueTestLocations), false);
         $this->assertTrue(self::isOrderConstraintsValid($sortedTestLocations), 'Bucket sort failed order check');
     }
 
@@ -158,7 +158,7 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         for ($i = 0; $i < $tries; ++$i) {
             $start = microtime(true);
-            iterator_to_array(JUnitTestCaseSorter::bucketSort($uniqueTestLocations));
+            iterator_to_array(JUnitTestCaseSorter::bucketSort($uniqueTestLocations), false);
             $totalBucketSort += microtime(true) - $start;
         }
 
@@ -223,6 +223,7 @@ final class JUnitTestCaseSorterTest extends TestCase
                 continue;
             }
 
+            // Previously seen time must not be 10 times as large as current
             if ($lastSeenTime / $location->getExecutionTime() > 10.) {
                 return false;
             }
