@@ -48,7 +48,7 @@ final class JUnitTestCaseSorter
     /**
      * @param TestLocation[] $tests
      *
-     * @return string[]
+     * @return iterable<string>
      */
     public function getUniqueSortedFileNames(array $tests): iterable
     {
