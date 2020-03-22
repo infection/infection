@@ -64,7 +64,7 @@ class JUnitReportLocator
     public function __construct(string $coveragePath, string $defaultJUnitPath)
     {
         $this->coveragePath = Path::canonicalize($coveragePath . '/..');
-        $this->defaultJUnitPath = $defaultJUnitPath;
+        $this->defaultJUnitPath = Path::canonicalize($defaultJUnitPath);
     }
 
     /**
@@ -100,7 +100,7 @@ class JUnitReportLocator
                     '", "',
                     array_map(
                         static function (SplFileInfo $fileInfo): string {
-                            return $fileInfo->getPathname();
+                            return Path::canonicalize($fileInfo->getPathname());
                         },
                         $files
                     )
@@ -111,7 +111,7 @@ class JUnitReportLocator
         $junitFileInfo = current($files);
 
         if ($junitFileInfo !== false) {
-            return $this->jUnitPath ?? $junitFileInfo->getPathname();
+            return $this->jUnitPath ?? Path::canonicalize($junitFileInfo->getPathname());
         }
 
         throw new FileNotFound(sprintf(

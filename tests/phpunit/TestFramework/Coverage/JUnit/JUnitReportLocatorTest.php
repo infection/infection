@@ -85,14 +85,14 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $expected = normalizePath(realpath($this->tmp . '/junit.xml'));
 
-        $this->assertSame($expected, normalizePath($this->locator->locate()));
+        $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
-        $this->assertSame($expected, normalizePath($this->locator->locate()));
+        $this->assertSame($expected, $this->locator->locate());
     }
 
     public function test_it_can_locate_the_default_JUnit_file_with_the_wrong_case(): void
     {
-        if (!in_array(PHP_OS_FAMILY, ['Darwin', 'Windows'], true)) {
+        if (PHP_OS_FAMILY !== 'Darwin') {
             $this->markTestSkipped('Cannot test this on case-sensitive OS');
         }
 
@@ -100,7 +100,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $expected = normalizePath(realpath($this->tmp . '/junit.xml'));
 
-        $actual = normalizePath($this->locator->locate());
+        $actual = $this->locator->locate();
 
         $this->assertSame($expected, $actual);
     }
@@ -114,9 +114,9 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $expected = normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . $jUnitRelativePaths));
 
-        $this->assertSame($expected, normalizePath($this->locator->locate()));
+        $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
-        $this->assertSame($expected, normalizePath($this->locator->locate()));
+        $this->assertSame($expected, $this->locator->locate());
     }
 
     public function test_it_cannot_locate_the_JUnit_file_if_the_result_is_ambiguous(): void
@@ -127,8 +127,8 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not locate the JUnit file: more than one file has been found with the pattern "*.junit.xml": "%s", "%s"',
-            realpath($this->tmp . DIRECTORY_SEPARATOR . 'phpspec.junit.xml'),
-            realpath($this->tmp . DIRECTORY_SEPARATOR . 'phpunit.junit.xml')
+            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'phpspec.junit.xml')),
+            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'phpunit.junit.xml'))
         ));
 
         $this->locator->locate();
