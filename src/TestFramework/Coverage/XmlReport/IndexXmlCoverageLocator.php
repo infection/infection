@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_map;
 use function count;
@@ -51,20 +51,20 @@ use Webmozart\PathUtil\Path;
  * @internal
  * @final
  */
-class JUnitReportLocator
+class IndexXmlCoverageLocator
 {
     private $coveragePath;
-    private $defaultJUnitPath;
+    private $defaultIndexPath;
 
     /**
      * @var string|null
      */
-    private $jUnitPath;
+    private $indexPath;
 
-    public function __construct(string $coveragePath, string $defaultJUnitPath)
+    public function __construct(string $coveragePath)
     {
         $this->coveragePath = Path::canonicalize($coveragePath . '/..');
-        $this->defaultJUnitPath = Path::canonicalize($defaultJUnitPath);
+        $this->defaultIndexPath = Path::canonicalize($coveragePath . '/index.xml');
     }
 
     /**
@@ -72,20 +72,20 @@ class JUnitReportLocator
      */
     public function locate(): string
     {
-        if ($this->jUnitPath !== null) {
-            return $this->jUnitPath;
+        if ($this->indexPath !== null) {
+            return $this->indexPath;
         }
 
-        // This is the JUnit path enforced before. It is also the one recommended by the
+        // This is the index path enforced before. It is also the one recommended by the
         // CoverageChecker hence it makes sense to try this one first before attempting any more
         // expensive lookup
-        if (file_exists($this->defaultJUnitPath)) {
-            return $this->jUnitPath ?? $this->defaultJUnitPath;
+        if (file_exists($this->defaultIndexPath)) {
+            return $this->indexPath ?? $this->defaultIndexPath;
         }
 
         if (!file_exists($this->coveragePath)) {
             throw new FileNotFound(sprintf(
-                'Could not find any file with the pattern "*.junit.xml" in "%s"',
+                'Could not find any "index.xml" file in "%s"',
                 $this->coveragePath
             ));
         }
@@ -94,15 +94,15 @@ class JUnitReportLocator
             Finder::create()
                 ->files()
                 ->in($this->coveragePath)
-                ->name('/^(.+\.)?junit\.xml$/i')
+                ->name('/^index\.xml$/i')
                 ->sortByName(),
             false
         );
 
         if (count($files) > 1) {
             throw new FileNotFound(sprintf(
-                'Could not locate the JUnit file: more than one file has been found with the'
-                . ' pattern "*.junit.xml": "%s"',
+                'Could not locate the XML coverage index file: more than one file has been '
+                . 'found: "%s"',
                 implode(
                     '", "',
                     array_map(
@@ -115,14 +115,14 @@ class JUnitReportLocator
             ));
         }
 
-        $junitFileInfo = current($files);
+        $indexFileInfo = current($files);
 
-        if ($junitFileInfo !== false) {
-            return $this->jUnitPath ?? Path::canonicalize($junitFileInfo->getPathname());
+        if ($indexFileInfo !== false) {
+            return $this->indexPath ?? Path::canonicalize($indexFileInfo->getPathname());
         }
 
         throw new FileNotFound(sprintf(
-            'Could not find any file with the pattern "*.junit.xml" in "%s"',
+            'Could not find any "index.xml" file in "%s"',
             $this->coveragePath
         ));
     }

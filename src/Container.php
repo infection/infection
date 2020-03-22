@@ -99,8 +99,8 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
@@ -195,13 +195,13 @@ final class Container
             },
             PhpUnitXmlCoverageTraceProvider::class => static function (self $container): PhpUnitXmlCoverageTraceProvider {
                 return new PhpUnitXmlCoverageTraceProvider(
-                    $container->getIndexXmlCoverageReader(),
+                    $container->getIndexXmlCoverageLocator(),
                     $container->getIndexXmlCoverageParser(),
                     $container->getXmlCoverageParser()
                 );
             },
-            IndexXmlCoverageReader::class => static function (self $container): IndexXmlCoverageReader {
-                return new IndexXmlCoverageReader(
+            IndexXmlCoverageLocator::class => static function (self $container): IndexXmlCoverageLocator {
+                return new IndexXmlCoverageLocator(
                     $container->getConfiguration()->getCoveragePath()
                 );
             },
@@ -353,7 +353,7 @@ final class Container
                     $testFrameworkAdapter->hasJUnitReport(),
                     $container->getJUnitReportLocator(),
                     $testFrameworkAdapter->getName(),
-                    $container->getIndexXmlCoverageReader()
+                    $container->getIndexXmlCoverageLocator()
                 );
             },
             JUnitReportLocator::class => static function (self $container): JUnitReportLocator {
@@ -633,9 +633,9 @@ final class Container
         return $this->get(PhpUnitXmlCoverageTraceProvider::class);
     }
 
-    public function getIndexXmlCoverageReader(): IndexXmlCoverageReader
+    public function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
     {
-        return $this->get(IndexXmlCoverageReader::class);
+        return $this->get(IndexXmlCoverageLocator::class);
     }
 
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
