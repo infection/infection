@@ -47,7 +47,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class ConsoleOutput
 {
     private const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
-    private const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
     private const MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percent points over the required %s. Consider increasing the required %s percentage the next time you run infection.';
 
     private $io;
@@ -67,34 +66,16 @@ final class ConsoleOutput
         $this->io->note('Running infection with an unknown log-verbosity option, falling back to ' . $default . ' option');
     }
 
-    public function logBadMsiErrorMessage(MetricsCalculator $metricsCalculator, float $minMsi, string $type): void
-    {
-        if (!$minMsi) {
-            throw MsiCalculationException::create('min-msi');
-        }
-
-        $this->io->error(
-            sprintf(
-                self::CI_FLAG_ERROR,
-                ($type === MinMsiChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
-                $minMsi,
-                ($type === MinMsiChecker::MSI_FAILURE ?
-                    $metricsCalculator->getMutationScoreIndicator() :
-                    $metricsCalculator->getCoveredCodeMutationScoreIndicator()
-                )
-            )
-        );
-    }
-
     public function logMinMsiCanGetIncreasedNotice(float $minMsi, float $msi): void
     {
         $typeString = 'MSI';
+        $msiDifference = $msi - $minMsi;
 
         $this->io->note(
             sprintf(
                 self::MIN_MSI_CAN_GET_INCREASED_NOTICE,
                 $typeString,
-                $msi - $minMsi,
+                $msiDifference,
                 $typeString,
                 $typeString
             )
@@ -104,12 +85,13 @@ final class ConsoleOutput
     public function logMinCoveredCodeMsiCanGetIncreasedNotice(float $minMsi, float $coveredCodeMsi): void
     {
         $typeString = 'Covered Code MSI';
+        $msiDifference = $coveredCodeMsi - $minMsi;
 
         $this->io->note(
             sprintf(
                 self::MIN_MSI_CAN_GET_INCREASED_NOTICE,
                 $typeString,
-                $coveredCodeMsi - $minMsi,
+                $msiDifference,
                 $typeString,
                 $typeString
             )

@@ -33,49 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Tests;
 
-use Infection\Mutant\Mutant;
-use Infection\Process\Runner\ProcessBearer;
-use Symfony\Component\Process\Process;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @internal
- * @final
+ * @covers \Infection\Tests\UnsupportedMethod
  */
-class MutantProcess implements ProcessBearer
+final class UnsupportedMethodTest extends TestCase
 {
-    private $process;
-    private $mutant;
-
-    /**
-     * @var bool
-     */
-    private $timedOut = false;
-
-    public function __construct(Process $process, Mutant $mutant)
+    public function test_it_can_be_instantiated_for_a_method(): void
     {
-        $this->process = $process;
-        $this->mutant = $mutant;
-    }
+        $exception = UnsupportedMethod::method('Acme\Foo', 'foo');
 
-    public function getProcess(): Process
-    {
-        return $this->process;
-    }
-
-    public function getMutant(): Mutant
-    {
-        return $this->mutant;
-    }
-
-    public function markAsTimedOut(): void
-    {
-        $this->timedOut = true;
-    }
-
-    public function isTimedOut(): bool
-    {
-        return $this->timedOut;
+        $this->assertSame('Did not expect "Acme\Foo::foo()" to be called', $exception->getMessage());
+        $this->assertSame(0, $exception->getCode());
+        $this->assertNull($exception->getPrevious());
     }
 }

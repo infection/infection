@@ -47,12 +47,16 @@ use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
+use Infection\Metrics\MinMsiCheckFailed;
 use Infection\TestFramework\TestFrameworkTypes;
+use function is_numeric;
 use function Safe\sprintf;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -202,8 +206,6 @@ final class RunCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $this->installTestFrameworkIfNeeded($input, $output);
-
         $this->initContainer($input);
 
         $locator = $this->container->getRootsFileOrDirectoryLocator();
@@ -214,11 +216,15 @@ final class RunCommand extends BaseCommand
             $this->runConfigurationCommand($locator);
         }
 
+        $this->installTestFrameworkIfNeeded($input, $output);
+
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
+
         $this->startUp();
 
         $engine = new Engine(
@@ -236,7 +242,14 @@ final class RunCommand extends BaseCommand
             $this->container->getTestFrameworkExtraOptionsFilter()
         );
 
-        $engine->execute();
+        try {
+            $engine->execute();
+        } catch (MinMsiCheckFailed $exception) {
+            // TODO: we can move that in a dedicated logger later and handle those cases in the
+            // Engine instead
+            // TODO/ do the same for TestFails
+            $io->error($exception->getMessage());
+        }
 
         return 0;
     }
@@ -253,6 +266,18 @@ final class RunCommand extends BaseCommand
         $testFramework = trim((string) $this->input->getOption('test-framework'));
         $testFrameworkExtraOptions = trim((string) $this->input->getOption('test-framework-options'));
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
+
+        $minMsi = $input->getOption('min-msi');
+
+        if ($minMsi !== null && !is_numeric($minMsi)) {
+            throw new InvalidArgumentException(sprintf('Expected min-msi to be a float. Got "%s"', $minMsi));
+        }
+
+        $minCoveredMsi = $input->getOption('min-covered-msi');
+
+        if ($minCoveredMsi !== null && !is_numeric($minCoveredMsi)) {
+            throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
+        }
 
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile === '' ? null : $configFile,
@@ -279,10 +304,10 @@ final class RunCommand extends BaseCommand
 
     private function installTestFrameworkIfNeeded(InputInterface $input, OutputInterface $output): void
     {
-        $container = $this->getApplication()->getContainer();
+        $installationDecider = $this->container->getAdapterInstallationDecider();
+        $configTestFramework = $this->container->getConfiguration()->getTestFramework();
 
-        $installationDecider = $container->getAdapterInstallationDecider();
-        $adapterName = trim((string) $this->input->getOption('test-framework'));
+        $adapterName = trim((string) $this->input->getOption('test-framework')) ?: $configTestFramework;
 
         if (!$installationDecider->shouldBeInstalled($adapterName, $input, $output)) {
             return;
@@ -293,7 +318,7 @@ final class RunCommand extends BaseCommand
             sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
         ]);
 
-        $container->getAdapterInstaller()->install($adapterName);
+        $this->container->getAdapterInstaller()->install($adapterName);
     }
 
     private function startUp(): void

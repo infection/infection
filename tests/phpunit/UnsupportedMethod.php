@@ -33,49 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Tests;
 
-use Infection\Mutant\Mutant;
-use Infection\Process\Runner\ProcessBearer;
-use Symfony\Component\Process\Process;
+use DomainException;
+use function Safe\sprintf;
 
 /**
  * @internal
- * @final
  */
-class MutantProcess implements ProcessBearer
+final class UnsupportedMethod extends DomainException
 {
-    private $process;
-    private $mutant;
-
-    /**
-     * @var bool
-     */
-    private $timedOut = false;
-
-    public function __construct(Process $process, Mutant $mutant)
+    public static function method(string $class, string $method): self
     {
-        $this->process = $process;
-        $this->mutant = $mutant;
-    }
-
-    public function getProcess(): Process
-    {
-        return $this->process;
-    }
-
-    public function getMutant(): Mutant
-    {
-        return $this->mutant;
-    }
-
-    public function markAsTimedOut(): void
-    {
-        $this->timedOut = true;
-    }
-
-    public function isTimedOut(): bool
-    {
-        return $this->timedOut;
+        return new self(sprintf(
+            'Did not expect "%s::%s()" to be called',
+            $class,
+            $method
+        ));
     }
 }

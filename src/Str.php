@@ -43,9 +43,7 @@ use function str_replace;
  */
 final class Str
 {
-    private function __construct()
-    {
-    }
+    use CannotBeInstantiated;
 
     public static function trimLineReturns(string $string): string
     {
