@@ -75,6 +75,6 @@ class MutantProcessBuilder
             $process->inheritEnvironmentVariables();
         }
 
-        return new MutantProcess($process, $mutant, $this->testFrameworkAdapter);
+        return new MutantProcess($process, $mutant);
     }
 }

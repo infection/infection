@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use function array_values;
+use Infection\CannotBeInstantiated;
 use Infection\Mutator;
 
 /**
@@ -43,6 +44,8 @@ use Infection\Mutator;
  */
 final class ProfileList
 {
+    use CannotBeInstantiated;
+
     public const ALL_PROFILES = [
         '@arithmetic' => self::ARITHMETIC_PROFILE,
         '@boolean' => self::BOOLEAN_PROFILE,
@@ -427,10 +430,6 @@ final class ProfileList
      * @var array<string, string>|null
      */
     private static $defaultProfileMutators;
-
-    private function __construct()
-    {
-    }
 
     /**
      * @return array<int, string>

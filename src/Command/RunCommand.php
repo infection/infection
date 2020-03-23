@@ -203,8 +203,6 @@ final class RunCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $this->installTestFrameworkIfNeeded($input, $output);
-
         $this->initContainer($input);
 
         $locator = $this->container->getRootsFileOrDirectoryLocator();
@@ -214,6 +212,8 @@ final class RunCommand extends BaseCommand
         } else {
             $this->runConfigurationCommand($locator);
         }
+
+        $this->installTestFrameworkIfNeeded($input, $output);
 
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
     }
@@ -292,10 +292,10 @@ final class RunCommand extends BaseCommand
 
     private function installTestFrameworkIfNeeded(InputInterface $input, OutputInterface $output): void
     {
-        $container = $this->getApplication()->getContainer();
+        $installationDecider = $this->container->getAdapterInstallationDecider();
+        $configTestFramework = $this->container->getConfiguration()->getTestFramework();
 
-        $installationDecider = $container->getAdapterInstallationDecider();
-        $adapterName = trim((string) $this->input->getOption('test-framework'));
+        $adapterName = trim((string) $this->input->getOption('test-framework')) ?: $configTestFramework;
 
         if (!$installationDecider->shouldBeInstalled($adapterName, $input, $output)) {
             return;
@@ -306,7 +306,7 @@ final class RunCommand extends BaseCommand
             sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
         ]);
 
-        $container->getAdapterInstaller()->install($adapterName);
+        $this->container->getAdapterInstaller()->install($adapterName);
     }
 
     private function startUp(): void
