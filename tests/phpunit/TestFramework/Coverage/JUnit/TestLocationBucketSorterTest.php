@@ -145,8 +145,8 @@ final class TestLocationBucketSorterTest extends TestCase
      */
     public function test_it_sorts_faster_than_quicksort(array $uniqueTestLocations): void
     {
-        if (extension_loaded('xdebug') || PHP_SAPI === 'phpdbg') {
-            $this->markTestSkipped('Benchmarks under xdebug or phpdbg are brittle');
+        if (extension_loaded('xdebug') || PHP_SAPI === 'phpdbg' || extension_loaded('pcov')) {
+            $this->markTestSkipped('Benchmarks with a coverage driver are too brittle');
         }
 
         if (self::areConstraintsOrderValid($uniqueTestLocations)) {
