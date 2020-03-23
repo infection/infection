@@ -75,6 +75,12 @@ final class JUnitTestCaseSorter
             /** @var TestLocation $testLocation */
             $testLocation = current($uniqueTestLocations);
 
+            /*
+             * TestLocation gets its file path and timings from TestFileTimeData.
+             * Path for TestFileTimeData is not optional. It is never a null.
+             * Therefore we don't need to make any type checks here.
+             */
+
             /** @var string $filePath */
             $filePath = $testLocation->getFilePath();
 
@@ -137,7 +143,7 @@ final class JUnitTestCaseSorter
             /** @var string $filePath */
             $filePath = $testLocation->getFilePath();
 
-            // isset() is 20% faster than array_key_exists()
+            // isset() is 20% faster than array_key_exists() as of PHP 7.3
             if (!isset($usedFileNames[$filePath])) {
                 $uniqueTests[] = $testLocation;
                 $usedFileNames[$filePath] = true;
