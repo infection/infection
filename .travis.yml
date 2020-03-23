@@ -4,7 +4,7 @@ sudo: false
 
 env:
   global:
-    - INFECTION_FLAGS='--threads=$(nproc) --min-msi=63.949716139497 --min-covered-msi=74 --coverage=coverage --log-verbosity=none'
+    - INFECTION_FLAGS='--threads=$(nproc) --min-msi=63.949716139497 --min-covered-msi=74 --coverage=coverage'
     - PHPUNIT_BIN='vendor/bin/phpunit --stop-on-failure --prepend=devTools/xdebug-filter.php --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml'
     - COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
     - secure: KPHUzOeWLeCWzcyPrnrDaR6grVUEXj48KlSQhJiubdkyKtGcvEs+TzZNYa2v+mSZsvrBHez9MRu4itcx05fNrb7/6M23uppv+fENH7tgZi8PXktlEXvD+Iqc9DIaDS1hQKpsnOhOZLlDNQ/kyE6TJAvoBMcbG6RfLqwLP1Abdz11t9Z65SIL7l2YpTjLjgmZUctpEVkivnQ3VQojd3soFTKZ8s9jNhdyUL2F+Rab4wu26Dy+q9xEd5y1tj2242nmVU7U/OD/spTkxRivuUPNM7jEnUvUcdEHd5DIBki702OrSkgsjrxlOlqOWcIRzVZA+A54GiE8qpnLSPN1qbc68ifXhd4lw4zKrE9KfvI8gnnFHtwQP0lhQuwG+j/VtbQRYrb0ufX1sAOUpOIDGMxYrh+Hn6j/nZnBiBh3NRF0u6PLfnAuph5TybylY0cuiGfGOWFf8UG7yz/EH+Br/D5M/IkObU8b9e3YJlUQPcjTi0BSa/+lkLpQMOOVOlQZk+LTVVRjXwSO10JcWhpqwWX74dsa5b2N/XbXOEQldVsYuQZz7re8e5Nwm5dx+B/KF/ohv2GDkQdqAA35ogOAABI3rvGlfOESDeZyGYOiJqBWX+KLKNRQ6l/KRkHNflX5J+0xeRlK4L84n0YwesyEAEFnYrYtQ+/VNd9ZP2+xXyTrePI=
