@@ -33,53 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger;
+namespace Infection\Tests;
 
-use Infection\Logger\PerMutatorLogger;
-use Infection\Metrics\MetricsCalculator;
-use PHPUnit\Framework\TestCase;
+use DomainException;
+use function Safe\sprintf;
 
-final class PerMutatorLoggerTest extends TestCase
+/**
+ * @internal
+ */
+final class UnsupportedMethod extends DomainException
 {
-    use CreateMetricsCalculator;
-    use LineLoggerAssertions;
-
-    /**
-     * @dataProvider metricsProvider
-     */
-    public function test_it_logs_correctly_with_mutations(
-        MetricsCalculator $metricsCalculator,
-        string $expectedContents
-    ): void {
-        $logger = new PerMutatorLogger($metricsCalculator);
-
-        $this->assertLoggedContentIs($expectedContents, $logger);
-    }
-
-    public function metricsProvider(): iterable
+    public static function method(string $class, string $method): self
     {
-        yield 'no mutations' => [
-            new MetricsCalculator(),
-            <<<'TXT'
-# Effects per Mutator
-
-| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI (%s) | Covered MSI (%s) |
-| ------- | --------- | ------ | ------- | ------ | --------- | -------- | ---------------- |
-
-TXT
-        ];
-
-        yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
-            <<<'TXT'
-# Effects per Mutator
-
-| Mutator   | Mutations | Killed | Escaped | Errors | Timed Out | MSI (%s) | Covered MSI (%s) |
-| --------- | --------- | ------ | ------- | ------ | --------- | -------- | ---------------- |
-| For_      |         5 |      1 |       1 |      1 |         1 |    60.00 |            75.00 |
-| PregQuote |         5 |      1 |       1 |      1 |         1 |    60.00 |            75.00 |
-
-TXT
-        ];
+        return new self(sprintf(
+            'Did not expect "%s::%s()" to be called',
+            $class,
+            $method
+        ));
     }
 }

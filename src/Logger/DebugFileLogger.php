@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function implode;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use const PHP_EOL;
 use function Safe\sprintf;

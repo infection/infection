@@ -60,7 +60,8 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\MinMsiChecker;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
@@ -80,7 +81,6 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
-use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Time\Stopwatch;
@@ -342,11 +342,10 @@ final class Container
                     $container->getIndexXmlCoverageReader()
                 );
             },
-            TestRunConstraintChecker::class => static function (self $container): TestRunConstraintChecker {
+            MinMsiChecker::class => static function (self $container): MinMsiChecker {
                 $config = $container->getConfiguration();
 
-                return new TestRunConstraintChecker(
-                    $container->getMetricsCalculator(),
+                return new MinMsiChecker(
                     $config->ignoreMsiWithNoMutations(),
                     (float) $config->getMinMsi(),
                     (float) $config->getMinCoveredMsi()
@@ -768,9 +767,9 @@ final class Container
         return $this->get(CoverageChecker::class);
     }
 
-    public function getTestRunConstraintChecker(): TestRunConstraintChecker
+    public function getMinMsiChecker(): MinMsiChecker
     {
-        return $this->get(TestRunConstraintChecker::class);
+        return $this->get(MinMsiChecker::class);
     }
 
     public function getSubscriberBuilder(): SubscriberBuilder

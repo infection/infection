@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Metrics;
 
 use function array_merge;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
