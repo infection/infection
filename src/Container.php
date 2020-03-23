@@ -50,7 +50,6 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
@@ -76,7 +75,6 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
-use Infection\Process\MutantProcess;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -236,20 +234,7 @@ final class Container
                 return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
-                $eventDispatcher = $container->getEventDispatcher();
-                $resultFactory = $container->getMutantExecutionResultFactory();
-
-                return new ParallelProcessRunner(
-                    static function (MutantProcess $mutantProcess) use (
-                        $eventDispatcher,
-                        $resultFactory
-                    ): void {
-                        $eventDispatcher->dispatch(new MutantProcessWasFinished(
-                            $resultFactory->createFromProcess($mutantProcess)
-                        ));
-                    },
-                    $container->getConfiguration()->getThreadCount()
-                );
+                return new ParallelProcessRunner($container->getConfiguration()->getThreadCount());
             },
             DryProcessRunner::class => static function (): DryProcessRunner {
                 return new DryProcessRunner();
@@ -436,7 +421,9 @@ final class Container
             MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
                 return new MutantProcessBuilder(
                     $container->getTestFrameworkAdapter(),
-                    $container->getConfiguration()->getProcessTimeout()
+                    $container->getConfiguration()->getProcessTimeout(),
+                    $container->getEventDispatcher(),
+                    $container->getMutantExecutionResultFactory()
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {

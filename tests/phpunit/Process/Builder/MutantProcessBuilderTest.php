@@ -35,24 +35,125 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Builder;
 
+use function current;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutation\Mutation;
+use Infection\Mutator\ZeroIteration\For_;
+use Infection\PhpParser\MutatedNode;
 use Infection\Process\Builder\MutantProcessBuilder;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Tests\Mutator\MutatorName;
+use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\TestCase;
 
 final class MutantProcessBuilderTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getMutantCommandLine')
-            ->willReturn(['/usr/bin/php']);
+        $mutant = new Mutant(
+            $mutantFilePath = '/path/to/mutant',
+            new Mutation(
+                $originalFilePath = 'path/to/Foo.php',
+                [],
+                MutatorName::getName(For_::class),
+                [
+                    'startLine' => $originalStartingLine = 10,
+                    'endLine' => 15,
+                    'startTokenPos' => 0,
+                    'endTokenPos' => 8,
+                    'startFilePos' => 2,
+                    'endFilePos' => 4,
+                ],
+                'Unknown',
+                MutatedNode::wrap(new Nop()),
+                0,
+                $tests = [
+                    new TestLocation(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01
+                    ),
+                ]
+            ),
+            'killed#0',
+            $mutantDiff = <<<'DIFF'
+--- Original
++++ New
+@@ @@
 
-        $builder = new MutantProcessBuilder($fwAdapter, 100);
+- echo 'original';
++ echo 'killed#0';
 
-        $process = $builder->createProcessForMutant($this->createMock(Mutant::class))->getProcess();
+DIFF
+        );
 
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertSame(100.0, $process->getTimeout());
+        $timeout = 100;
+        $testFrameworkExtraOptions = '--verbose';
+
+        $testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
+        $testFrameworkAdapterMock
+            ->method('getMutantCommandLine')
+            ->with(
+                $tests,
+                $mutantFilePath,
+                $this->isType('string'),
+                $originalFilePath,
+                $testFrameworkExtraOptions
+            )
+            ->willReturn(['/usr/bin/php', 'bin/phpunit', '--filter', '/path/to/acme/FooTest.php'])
+        ;
+
+        $eventDispatcher = new EventDispatcherCollector();
+
+        $executionResultMock = $this->createMock(MutantExecutionResult::class);
+        $executionResultMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $resultFactoryMock = $this->createMock(MutantExecutionResultFactory::class);
+        $resultFactoryMock
+            ->method('createFromProcess')
+            ->willReturn($executionResultMock)
+        ;
+
+        $builder = new MutantProcessBuilder(
+            $testFrameworkAdapterMock,
+            100,
+            $eventDispatcher,
+            $resultFactoryMock
+        );
+
+        $mutantProcess = $builder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+
+        $process = $mutantProcess->getProcess();
+
+        $this->assertSame(
+            "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
+            $process->getCommandLine()
+        );
+        $this->assertSame(100., $process->getTimeout());
+        $this->assertFalse($process->isStarted());
+
+        $this->assertSame($mutant, $mutantProcess->getMutant());
+        $this->assertFalse($mutantProcess->isTimedOut());
+
+        $this->assertSame([], $eventDispatcher->getEvents());
+
+        $mutantProcess->terminateProcess();
+
+        $eventsAfterCallbackCall = $eventDispatcher->getEvents();
+
+        $this->assertCount(1, $eventsAfterCallbackCall);
+
+        $event = current($eventsAfterCallbackCall);
+
+        $this->assertInstanceOf(MutantProcessWasFinished::class, $event);
+        $this->assertSame($executionResultMock, $event->getExecutionResult());
     }
 }

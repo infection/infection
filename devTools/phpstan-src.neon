@@ -29,10 +29,6 @@ parameters:
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
             count: 1
         -
-            path: '../src/Container.php'
-            message: '#^Parameter \#1 \$processHandler of class Infection\\Process\\Runner\\ParallelProcessRunner constructor expects Closure\(Infection\\Process\\Runner\\ProcessBearer\)\: void\, Closure\(Infection\\Process\\MutantProcess\): void given\.$#'
-            count: 1
-        -
             path: '../src/FileSystem/DummyFileSystem.php'
             message: '#Infection\\FileSystem\\DummyFileSystem#'
     level: max

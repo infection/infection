@@ -54,17 +54,14 @@ final class ParallelProcessRunner implements ProcessRunner
      */
     private $runningProcesses = [];
 
-    private $processHandler;
     private $threadCount;
     private $poll;
 
     /**
-     * @param Closure(ProcessBearer): void $processHandler
      * @param int $poll Delay (in milliseconds) to wait in-between two polls
      */
-    public function __construct(Closure $processHandler, int $threadCount, int $poll = 1000)
+    public function __construct(int $threadCount, int $poll = 1000)
     {
-        $this->processHandler = $processHandler;
         $this->threadCount = $threadCount;
         $this->poll = $poll;
     }
@@ -126,7 +123,7 @@ final class ParallelProcessRunner implements ProcessRunner
             }
 
             if (!$process->isRunning()) {
-                ($this->processHandler)($processBearer);
+                $processBearer->terminateProcess();
 
                 unset($this->runningProcesses[$index]);
 

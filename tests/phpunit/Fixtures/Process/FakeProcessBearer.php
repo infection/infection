@@ -19,4 +19,9 @@ final class FakeProcessBearer implements ProcessBearer
     {
         throw new LogicException('Did no expect to be called');
     }
+
+    public function terminateProcess(): void
+    {
+        throw new LogicException('Did no expect to be called');
+    }
 }
