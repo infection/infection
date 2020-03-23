@@ -46,6 +46,7 @@ use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
+use Infection\Metrics\MinMsiCheckFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function Safe\sprintf;
@@ -54,6 +55,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -220,6 +222,8 @@ final class RunCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
+
         $this->startUp();
 
         $engine = new Engine(
@@ -231,15 +235,22 @@ final class RunCommand extends BaseCommand
             $this->container->getMemoryLimiter(),
             $this->container->getMutationGenerator(),
             $this->container->getMutationTestingRunner(),
-            $this->container->getTestRunConstraintChecker(),
+            $this->container->getMinMsiChecker(),
             $this->consoleOutput,
             $this->container->getMetricsCalculator(),
             $this->container->getTestFrameworkExtraOptionsFilter()
         );
 
-        $result = $engine->execute();
+        try {
+            $engine->execute();
+        } catch (MinMsiCheckFailed $exception) {
+            // TODO: we can move that in a dedicated logger later and handle those cases in the
+            // Engine instead
+            // TODO/ do the same for TestFails
+            $io->error($exception->getMessage());
+        }
 
-        return $result === true ? 0 : 1;
+        return 0;
     }
 
     private function initContainer(InputInterface $input): void

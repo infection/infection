@@ -33,58 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\Metrics;
 
-use function Safe\usort;
+use Infection\Metrics\MinMsiCheckFailed;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class SortableMutantExecutionResults
+final class MinMsiCheckFailedTest extends TestCase
 {
-    /**
-     * @var MutantExecutionResult[]
-     */
-    private $executionResults = [];
-
-    /**
-     * @var bool
-     */
-    private $sorted = false;
-
-    public function add(MutantExecutionResult $executionResult): void
+    public function test_it_can_be_created_for_min_MSI(): void
     {
-        $this->executionResults[] = $executionResult;
-        $this->sorted = false;
+        $exception = MinMsiCheckFailed::createForMsi(73.26, 52.1);
+
+        $this->assertSame(
+            'The minimum required MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
+            $exception->getMessage()
+        );
     }
 
-    /**
-     * @return MutantExecutionResult[]
-     */
-    public function getSortedExecutionResults(): array
+    public function test_it_can_be_created_for_min_covered_code_MSI(): void
     {
-        if (!$this->sorted) {
-            self::sortResults($this->executionResults);
-            $this->sorted = true;
-        }
+        $exception = MinMsiCheckFailed::createCoveredMsi(73.26, 52.1);
 
-        return $this->executionResults;
-    }
-
-    /**
-     * @param MutantExecutionResult[] $executionResults
-     */
-    private static function sortResults(array &$executionResults): void
-    {
-        usort(
-            $executionResults,
-            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
-                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
-                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
-                }
-
-                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
-            }
+        $this->assertSame(
+            'The minimum required Covered Code MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
+            $exception->getMessage()
         );
     }
 }

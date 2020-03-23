@@ -40,7 +40,7 @@ use Infection\Environment\CouldNotResolveBuildContext;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\StrykerDashboardClient;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use Psr\Log\LoggerInterface;
 use function Safe\sprintf;
 
