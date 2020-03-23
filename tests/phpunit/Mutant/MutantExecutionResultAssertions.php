@@ -33,49 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Tests\Mutant;
 
-use Infection\Mutant\Mutant;
-use Infection\Process\Runner\ProcessBearer;
-use Symfony\Component\Process\Process;
+use Infection\Mutant\MutantExecutionResult;
 
-/**
- * @internal
- * @final
- */
-class MutantProcess implements ProcessBearer
+trait MutantExecutionResultAssertions
 {
-    private $process;
-    private $mutant;
-
-    /**
-     * @var bool
-     */
-    private $timedOut = false;
-
-    public function __construct(Process $process, Mutant $mutant)
-    {
-        $this->process = $process;
-        $this->mutant = $mutant;
-    }
-
-    public function getProcess(): Process
-    {
-        return $this->process;
-    }
-
-    public function getMutant(): Mutant
-    {
-        return $this->mutant;
-    }
-
-    public function markAsTimedOut(): void
-    {
-        $this->timedOut = true;
-    }
-
-    public function isTimedOut(): bool
-    {
-        return $this->timedOut;
+    private function assertResultStateIs(
+        MutantExecutionResult $result,
+        string $expectedProcessCommandLine,
+        string $expectedProcessOutput,
+        string $expectedDetectionStatus,
+        string $expectedMutantDiff,
+        string $expectedMutatorName,
+        string $expectedOriginalFilePath,
+        int $expectedOriginalStartingLine
+    ): void {
+        $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
+        $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
+        $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
+        $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
+        $this->assertSame($expectedMutatorName, $result->getMutatorName());
+        $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
+        $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());
     }
 }
