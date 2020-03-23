@@ -50,6 +50,7 @@ use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\TestCase;
+use const PHP_OS_FAMILY;
 
 final class MutantProcessBuilderTest extends TestCase
 {
@@ -134,7 +135,9 @@ DIFF
         $process = $mutantProcess->getProcess();
 
         $this->assertSame(
-            "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
+            PHP_OS_FAMILY === 'Windows' 
+                ? '"/usr/bin/php" "bin/phpunit" "--filter" "/path/to/acme/FooTest.php"'
+                : "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
             $process->getCommandLine()
         );
         $this->assertSame(100., $process->getTimeout());
