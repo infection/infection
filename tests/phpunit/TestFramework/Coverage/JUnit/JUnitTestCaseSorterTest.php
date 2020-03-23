@@ -92,12 +92,15 @@ final class JUnitTestCaseSorterTest extends TestCase
             false
         );
 
-        $this->assertSame([
-            '/path/to/test-file-3',
-            '/path/to/test-file-4',
-            '/path/to/test-file-1',
-            '/path/to/test-file-2',
-        ], $uniqueSortedFileNames);
+        $this->assertSame(
+            [
+                '/path/to/test-file-3',
+                '/path/to/test-file-4',
+                '/path/to/test-file-1',
+                '/path/to/test-file-2',
+            ], 
+            $uniqueSortedFileNames
+        );
     }
 
     public function test_it_has_correct_constants_for_bucket_sort(): void
