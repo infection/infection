@@ -22,7 +22,7 @@ For this reason, the proposal to remove the `@covers` annotations via the [PHP-C
 setting `general_phpdoc_annotation_remove` has been refused.
 
 Since no one came up with an easy or acceptable proposal to automate the process of whether a
-`@covers` annotation is necessary or not, no further action has been voted for automating this 
+`@covers` annotation is necessary or not, no further action has been voted for automating this
 process.
 
 

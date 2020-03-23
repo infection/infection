@@ -15,7 +15,7 @@ Also it has a very limited value.
 
 ### Decision
 
-Do not use `@inheritdoc` tags or any of its variants. The `@inheritdoc` tags and its variants must 
+Do not use `@inheritdoc` tags or any of its variants. The `@inheritdoc` tags and its variants must
 be removed when submitting pull requests.
 
 
