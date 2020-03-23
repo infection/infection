@@ -43,7 +43,7 @@ use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use OndraM\CiDetector\CiDetector;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;

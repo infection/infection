@@ -33,8 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Metrics;
 
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;
 use function Safe\sprintf;
 
