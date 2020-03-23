@@ -35,15 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Makefile;
 
+use function array_column;
 use function array_filter;
 use function array_key_exists;
 use function array_shift;
+use function array_unshift;
 use function current;
 use function implode;
 use PHPUnit\Framework\TestCase;
 use function Safe\array_replace;
 use function Safe\file_get_contents;
 use function Safe\sprintf;
+use function Safe\substr;
 use function shell_exec;
 use function strpos;
 use function substr_count;
@@ -73,14 +76,18 @@ final class MakefileTest extends TestCase
 # Commands
 #---------------------------------------------------------------------------[0m
 
-[33mcompile:[0m	  Bundles Infection into a PHAR
-[33mcs:[0m	  	  Runs PHP-CS-Fixer
-[33mprofile:[0m 	  Runs Blackfire
-[33mautoreview:[0m 	  Runs various checks (static analysis & AutoReview test suite)
-[33mtest:[0m		  Runs all the tests
-[33mtest-unit:[0m	  Runs the unit tests
-[33mtest-e2e:[0m 	  Runs the end-to-end tests
-[33mtest-infection:[0m   Runs Infection against itself
+[33mcompile:[0m	 	 Bundles Infection into a PHAR
+[33mcs:[0m	  	 	 Runs PHP-CS-Fixer
+[33mprofile:[0m 	 	 Runs Blackfire
+[33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)
+[33mtest:[0m		 	 Runs all the tests
+[33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
+[33mtest-unit:[0m	 	 Runs the unit tests
+[33mtest-unit-docker:[0m	 Runs the unit tests on the different Docker platforms
+[33mtest-e2e:[0m 	 	 Runs the end-to-end tests on the different Docker platforms
+[33mtest-e2e-docker:[0m 	 Runs the end-to-end tests on the different Docker platforms
+[33mtest-infection:[0m		 Runs Infection against itself
+[33mtest-infection-docker:[0m	 Runs Infection against itself on the different Docker platforms
 
 EOF;
 
@@ -215,7 +222,7 @@ EOF;
         }
     }
 
-    public function test_all_test_targets_are_properly_declared(): void
+    public function test_all_docker_test_targets_are_properly_declared(): void
     {
         $testTargets = array_filter(
             Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
@@ -223,6 +230,7 @@ EOF;
                 [$target, $dependencies] = $targetSet;
 
                 return strpos($target, 'test-') === 0
+                    && substr($target, -7) === '-docker'
                     && ([] === $dependencies
                         || strpos($dependencies[0], '## ') !== 0
                     )
@@ -231,14 +239,19 @@ EOF;
         );
 
         foreach ($testTargets as [$target, $dependencies]) {
-            $dashCount = substr_count($target, '-');
+            $dashCount = substr_count($target, '-') - 1;
 
             $subTestTargets = array_column(
                 array_filter(
                     $testTargets,
                     static function (array $targetSet) use ($target, $dashCount): bool {
-                        return strpos($targetSet[0], $target . '-') === 0
-                            && substr_count($targetSet[0], '-') === $dashCount + 1;
+                        $targetWithoutSuffix = substr($target, 0, -7);
+
+                        $subTarget = substr($targetSet[0], 0, -7);
+
+                        return strpos($subTarget, $targetWithoutSuffix . '-') === 0
+                            && substr_count($subTarget, '-') === $dashCount + 1
+                        ;
                     }
                 ),
                 0
@@ -248,7 +261,20 @@ EOF;
                 continue;
             }
 
-            $this->assertSame($subTestTargets, $dependencies);
+            if ($target === 'test-docker') {
+                array_unshift($subTestTargets, 'autoreview');
+            }
+
+            $this->assertSame(
+                $subTestTargets,
+                $dependencies,
+                sprintf(
+                    'Expected the dependencies of the "%s" target to be "%s". Found "%s" instead',
+                    $target,
+                    implode(' ', $subTestTargets),
+                    implode(' ', $dependencies)
+                )
+            );
         }
     }
 
@@ -260,6 +286,8 @@ EOF;
                 [$target, $dependencies] = $targetSet;
 
                 return strpos($target, 'test') === 0
+                    && strpos($target, 'tests/') !== 0
+                    && substr($target, -7) !== '-docker'
                     && ([] === $dependencies
                         || strpos($dependencies[0], '## ') !== 0
                     )
@@ -267,6 +295,7 @@ EOF;
             }
         );
 
+        // Exclude itself
         $testDependencies = array_shift($testTargets)[1];
 
         $rootTestTargets = array_column(
@@ -281,6 +310,40 @@ EOF;
         );
 
         $rootTestTargets = array_replace($rootTestTargets, ['test-autoreview'], ['autoreview']);
+
+        $this->assertSame($rootTestTargets, $testDependencies);
+    }
+
+    public function test_the_docker_test_target_runs_all_the_tests(): void
+    {
+        $testTargets = array_filter(
+            Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
+            static function (array $targetSet): bool {
+                [$target, $dependencies] = $targetSet;
+
+                return strpos($target, 'test') === 0
+                    && substr($target, -7) === '-docker'
+                    && ([] === $dependencies
+                        || strpos($dependencies[0], '## ') !== 0
+                    )
+                ;
+            }
+        );
+
+        $testDependencies = array_shift($testTargets)[1];
+
+        $rootTestTargets = array_column(
+            array_filter(
+                $testTargets,
+                static function (array $targetSet): bool {
+                    return strpos($targetSet[0], 'test-') === 0
+                        && substr_count($targetSet[0], '-') === 2;
+                }
+            ),
+            0
+        );
+
+        array_unshift($rootTestTargets, 'autoreview');
 
         $this->assertSame($rootTestTargets, $testDependencies);
     }
