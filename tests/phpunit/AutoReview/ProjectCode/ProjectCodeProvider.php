@@ -37,6 +37,7 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 
 use const DIRECTORY_SEPARATOR;
 use function in_array;
+use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\RunCommand;
 use Infection\Config\ConsoleHelper;
@@ -81,6 +82,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 final class ProjectCodeProvider
 {
+    use CannotBeInstantiated;
+
     /**
      * This array contains all classes that don't have tests yet, due to legacy
      * reasons. This list should never be added to, only removed from.
@@ -143,10 +146,6 @@ final class ProjectCodeProvider
      * @var string[]|null
      */
     private static $testClasses;
-
-    private function __construct()
-    {
-    }
 
     public static function provideSourceClasses(): iterable
     {
