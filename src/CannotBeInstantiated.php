@@ -33,48 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Event;
+namespace Infection;
 
-use function array_filter;
-use function array_values;
-use Infection\CannotBeInstantiated;
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use function Infection\Tests\generator_to_phpunit_data_provider;
-use function iterator_to_array;
-use ReflectionClass;
-
-final class SubscriberProvider
+/**
+ * Very simple trait which only purpose it make it a bit more explicit why the constructor is
+ * private.
+ *
+ * @internal
+ */
+trait CannotBeInstantiated
 {
-    use CannotBeInstantiated;
-
-    /**
-     * @var string[]|null
-     */
-    private static $subscriberClasses;
-
-    public static function provideSubscriberClasses(): iterable
+    private function __construct()
     {
-        if (self::$subscriberClasses !== null) {
-            yield from self::$subscriberClasses;
-
-            return;
-        }
-
-        self::$subscriberClasses = array_values(array_filter(
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
-            static function (string $class): bool {
-                return $class !== EventSubscriber::class
-                    && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class)
-                ;
-            }
-        ));
-
-        yield from self::$subscriberClasses;
-    }
-
-    public static function subscriberClassesProvider(): iterable
-    {
-        yield from generator_to_phpunit_data_provider(self::provideSubscriberClasses());
     }
 }

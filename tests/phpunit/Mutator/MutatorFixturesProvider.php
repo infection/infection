@@ -39,6 +39,7 @@ use function array_key_exists;
 use function end;
 use function explode;
 use function get_class;
+use Infection\CannotBeInstantiated;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\sprintf;
@@ -48,16 +49,14 @@ use Webmozart\PathUtil\Path;
 
 final class MutatorFixturesProvider
 {
+    use CannotBeInstantiated;
+
     private const MUTATOR_FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-fixtures';
 
     /**
      * @var array<string, string>
      */
     private static $testCaseFixtureDirMapping = [];
-
-    private function __construct()
-    {
-    }
 
     public static function getFixtureFileContent(TestCase $testCase, string $file): string
     {

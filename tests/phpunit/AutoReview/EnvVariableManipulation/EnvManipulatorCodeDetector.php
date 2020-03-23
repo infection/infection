@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
+use Infection\CannotBeInstantiated;
 use function Safe\sprintf;
 use function strpos;
 
 final class EnvManipulatorCodeDetector
 {
+    use CannotBeInstantiated;
+
     private const FUNCTIONS = [
         'putenv',
         'Safe\putenv',
@@ -49,10 +52,6 @@ final class EnvManipulatorCodeDetector
      * @var string[]|null
      */
     private static $statements;
-
-    private function __construct()
-    {
-    }
 
     public static function codeManipulatesEnvVariables(string $code): bool
     {
