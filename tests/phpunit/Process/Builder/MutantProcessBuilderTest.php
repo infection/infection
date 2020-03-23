@@ -136,7 +136,7 @@ DIFF
 
         $this->assertSame(
             PHP_OS_FAMILY === 'Windows'
-                ? '"/usr/bin/php" "bin/phpunit" "--filter" "/path/to/acme/FooTest.php"'
+                ? '"/usr/bin/php" "bin/phpunit" --filter "/path/to/acme/FooTest.php"'
                 : "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
             $process->getCommandLine()
         );
