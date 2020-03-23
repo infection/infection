@@ -48,7 +48,7 @@ final class JUnitTestCaseSorter
     /**
      * @param TestLocation[] $tests
      *
-     * @return string[]
+     * @return iterable<string>
      */
     public function getUniqueSortedFileNames(array $tests): iterable
     {
@@ -59,11 +59,16 @@ final class JUnitTestCaseSorter
             /** @var TestLocation $testLocation */
             $testLocation = current($uniqueTestLocations);
 
+            /*
+             * TestLocation gets its file path and timings from TestFileTimeData.
+             * Path for TestFileTimeData is not optional. It is never a null.
+             * Therefore we don't need to make any type checks here.
+             */
+
+            /** @var string $filePath */
             $filePath = $testLocation->getFilePath();
 
-            if ($filePath !== null) {
-                yield $filePath;
-            }
+            yield $filePath;
 
             return;
         }
@@ -73,7 +78,7 @@ final class JUnitTestCaseSorter
          * to sort them by hand: usort does that just as good.
          */
 
-        // sort tests to run the fastest first
+        // Sort tests to run the fastest first.
         usort(
             $uniqueTestLocations,
             static function (TestLocation $a, TestLocation $b) {
@@ -100,7 +105,8 @@ final class JUnitTestCaseSorter
         foreach ($testLocations as $testLocation) {
             $filePath = $testLocation->getFilePath();
 
-            if (!array_key_exists($filePath, $usedFileNames)) {
+            // isset() is 20% faster than array_key_exists() as of PHP 7.3
+            if (!isset($usedFileNames[$filePath])) {
                 $uniqueTests[] = $testLocation;
                 $usedFileNames[$filePath] = true;
             }

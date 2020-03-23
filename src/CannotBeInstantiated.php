@@ -33,49 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
-
-use Infection\Mutant\Mutant;
-use Infection\Process\Runner\ProcessBearer;
-use Symfony\Component\Process\Process;
+namespace Infection;
 
 /**
+ * Very simple trait which only purpose it make it a bit more explicit why the constructor is
+ * private.
+ *
  * @internal
- * @final
  */
-class MutantProcess implements ProcessBearer
+trait CannotBeInstantiated
 {
-    private $process;
-    private $mutant;
-
-    /**
-     * @var bool
-     */
-    private $timedOut = false;
-
-    public function __construct(Process $process, Mutant $mutant)
+    private function __construct()
     {
-        $this->process = $process;
-        $this->mutant = $mutant;
-    }
-
-    public function getProcess(): Process
-    {
-        return $this->process;
-    }
-
-    public function getMutant(): Mutant
-    {
-        return $this->mutant;
-    }
-
-    public function markAsTimedOut(): void
-    {
-        $this->timedOut = true;
-    }
-
-    public function isTimedOut(): bool
-    {
-        return $this->timedOut;
     }
 }

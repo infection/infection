@@ -35,11 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use Infection\CannotBeInstantiated;
+
 /**
  * @internal
  */
 final class MutatorCategory
 {
+    use CannotBeInstantiated;
+
     /**
      * Semantic reductions exposes unused semantics. For example:
      *
@@ -94,8 +98,4 @@ final class MutatorCategory
         self::SEMANTIC_ADDITION,
         self::ORTHOGONAL_REPLACEMENT,
     ];
-
-    private function __construct()
-    {
-    }
 }
