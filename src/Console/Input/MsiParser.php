@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console\Input;
 
+use Infection\CannotBeInstantiated;
 use const PHP_ROUND_HALF_UP;
 use function round;
 use function Safe\sprintf;
@@ -46,9 +47,7 @@ use Webmozart\Assert\Assert;
  */
 final class MsiParser
 {
-    private function __construct()
-    {
-    }
+    use CannotBeInstantiated;
 
     public static function parse(?string $value, string $optionName): ?float
     {
