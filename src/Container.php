@@ -236,10 +236,16 @@ final class Container
                 return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
+                $eventDispatcher = $container->getEventDispatcher();
+                $resultFactory = $container->getMutantExecutionResultFactory();
+
                 return new ParallelProcessRunner(
-                    static function (MutantProcess $mutantProcess) use ($container): void {
-                        $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished(
-                            $container->getMutantExecutionResultFactory()->createFromProcess($mutantProcess)
+                    static function (MutantProcess $mutantProcess) use (
+                        $eventDispatcher,
+                        $resultFactory
+                    ): void {
+                        $eventDispatcher->dispatch(new MutantProcessWasFinished(
+                            $resultFactory->createFromProcess($mutantProcess)
                         ));
                     },
                     $container->getConfiguration()->getThreadCount()
