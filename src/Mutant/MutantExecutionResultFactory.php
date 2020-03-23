@@ -97,7 +97,7 @@ class MutantExecutionResultFactory
         $process = $mutantProcess->getProcess();
 
         if ($process->getExitCode() > 100) {
-            // See Symfony\Component\Process\Process::$exitCodes
+            // See \Symfony\Component\Process\Process::$exitCodes
             return DetectionStatus::ERROR;
         }
 

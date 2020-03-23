@@ -76,7 +76,9 @@ final class MutantExecutionResultFactoryTest extends TestCase
         $processMock = $this->createMock(Process::class);
         $processMock
             ->method('getCommandLine')
-            ->willReturn($processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
+            ->willReturn(
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+            )
         ;
         $processMock
             ->method('isTerminated')
@@ -143,7 +145,9 @@ DIFF
         $processMock = $this->createMock(Process::class);
         $processMock
             ->method('getCommandLine')
-            ->willReturn($processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
+            ->willReturn(
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+            )
         ;
         $processMock
             ->method('isTerminated')
@@ -217,7 +221,9 @@ DIFF
         $processMock = $this->createMock(Process::class);
         $processMock
             ->method('getCommandLine')
-            ->willReturn($processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
+            ->willReturn(
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+            )
         ;
         $processMock
             ->method('isTerminated')
@@ -295,7 +301,9 @@ DIFF
         $processMock = $this->createMock(Process::class);
         $processMock
             ->method('getCommandLine')
-            ->willReturn($processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
+            ->willReturn(
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+            )
         ;
         $processMock
             ->method('isTerminated')
@@ -375,7 +383,9 @@ DIFF
         $processMock = $this->createMock(Process::class);
         $processMock
             ->method('getCommandLine')
-            ->willReturn($processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
+            ->willReturn(
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+            )
         ;
         $processMock
             ->method('isTerminated')
