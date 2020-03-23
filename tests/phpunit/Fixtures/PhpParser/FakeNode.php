@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\PhpParser;
 
-use Infection\UnsupportedMethod;
-use LogicException;
+use Infection\Tests\UnsupportedMethod;
 use PhpParser\Comment;
 use PhpParser\Node;
 

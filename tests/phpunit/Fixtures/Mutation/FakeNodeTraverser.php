@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\Mutation;
 
-use Infection\UnsupportedMethod;
-use LogicException;
-use PhpParser\Node;
+use Infection\Tests\UnsupportedMethod;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 

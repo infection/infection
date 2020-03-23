@@ -37,8 +37,7 @@ namespace Infection\Tests\Fixtures\Mutator;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
-use Infection\UnsupportedMethod;
-use LogicException;
+use Infection\Tests\UnsupportedMethod;
 use PhpParser\Node;
 
 final class FakeMutator implements Mutator

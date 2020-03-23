@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Tests;
 
 use DomainException;
 

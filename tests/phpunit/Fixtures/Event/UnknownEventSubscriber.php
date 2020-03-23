@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Fixtures\Event;
 
 use Infection\Event\Subscriber\EventSubscriber;
-use Infection\UnsupportedMethod;
-use LogicException;
+use Infection\Tests\UnsupportedMethod;
 
 final class UnknownEventSubscriber implements EventSubscriber
 {
