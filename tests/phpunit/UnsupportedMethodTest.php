@@ -33,32 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Fixtures\Mutator;
+namespace Infection\Tests;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\Mutator;
-use Infection\Tests\UnsupportedMethod;
-use PhpParser\Node;
+use PHPUnit\Framework\TestCase;
 
-final class FakeMutator implements Mutator
+/**
+ * @covers \Infection\Tests\UnsupportedMethod
+ */
+final class UnsupportedMethodTest extends TestCase
 {
-    public static function getDefinition(): ?Definition
+    public function test_it_can_be_instantiated_for_a_method(): void
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
-    }
+        $exception = UnsupportedMethod::method('Acme\Foo', 'foo');
 
-    public function getName(): string
-    {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
-    }
-
-    public function mutate(Node $node): iterable
-    {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        $this->assertSame('Did not expect "Acme\Foo::foo()" to be called', $exception->getMessage());
+        $this->assertSame(0, $exception->getCode());
+        $this->assertNull($exception->getPrevious());
     }
 }

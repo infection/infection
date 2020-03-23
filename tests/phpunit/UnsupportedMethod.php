@@ -33,32 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Fixtures\Mutator;
+namespace Infection\Tests;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\Mutator;
-use Infection\Tests\UnsupportedMethod;
-use PhpParser\Node;
+use DomainException;
+use function Safe\sprintf;
 
-final class FakeMutator implements Mutator
+/**
+ * @internal
+ */
+final class UnsupportedMethod extends DomainException
 {
-    public static function getDefinition(): ?Definition
+    public static function method(string $class, string $method): self
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
-    }
-
-    public function getName(): string
-    {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
-    }
-
-    public function mutate(Node $node): iterable
-    {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        return new self(sprintf(
+            'Did not expect "%s::%s()" to be called',
+            $class,
+            $method
+        ));
     }
 }
