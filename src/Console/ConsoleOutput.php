@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\MinMsiChecker;
-use Infection\Mutant\Exception\MsiCalculationException;
 use function Safe\sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 

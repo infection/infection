@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\Exception\MsiCalculationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
