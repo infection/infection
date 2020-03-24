@@ -70,7 +70,7 @@ class Mutation
     private $attributes;
     private $originalFileAst;
     private $tests;
-    private $coveredByTests;
+    private $executedByTests;
 
     /**
      * @var string|null
@@ -106,7 +106,7 @@ class Mutation
         $this->mutatedNode = $mutatedNode;
         $this->mutationByMutatorIndex = $mutationByMutatorIndex;
         $this->tests = $tests;
-        $this->coveredByTests = count($tests) > 0;
+        $this->executedByTests = count($tests) > 0;
     }
 
     public function getOriginalFilePath(): string
@@ -150,10 +150,9 @@ class Mutation
         return $this->mutatedNode;
     }
 
-    // TODO: hasTest()?
-    public function isCoveredByTest(): bool
+    public function hasTests(): bool
     {
-        return $this->coveredByTests;
+        return $this->executedByTests;
     }
 
     /**

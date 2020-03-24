@@ -58,7 +58,6 @@ final class MutantTest extends TestCase
         Mutation $mutation,
         string $mutatedCode,
         string $diff,
-        bool $expectedCoveredByTests,
         array $expectedTests
     ): void {
         $mutant = new Mutant($filePath, $mutation, $mutatedCode, $diff);
@@ -69,7 +68,6 @@ final class MutantTest extends TestCase
             $mutation,
             $mutatedCode,
             $diff,
-            $expectedCoveredByTests,
             $expectedTests
         );
     }
@@ -110,7 +108,6 @@ final class MutantTest extends TestCase
             ),
             'mutated code',
             'diff value',
-            true,
             $tests,
         ];
 
@@ -131,7 +128,6 @@ final class MutantTest extends TestCase
             ),
             'mutated code',
             'diff value',
-            false,
             [],
         ];
     }

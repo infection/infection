@@ -89,8 +89,11 @@ final class MutationTestingRunner
                 return $this->mutantFactory->create($mutation);
             })
             ->filter(function (Mutant $mutant) {
-                // It's a proxy call to Mutation, can be done one stage up
-                if ($mutant->isCoveredByTest()) {
+                // The filtering is done here since with a mutant and not earlier with a mutation
+                // since:
+                // - if pass the filtering, the mutant is going to be used
+                // - if does not pass the filtering, the mutant is used for the reports
+                if ($mutant->getMutation()->hasTests()) {
                     return true;
                 }
 

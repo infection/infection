@@ -141,7 +141,6 @@ final class MutantFactoryTest extends TestCase
             $mutation,
             'mutated code',
             'code diff',
-            true,
             $tests
         );
     }

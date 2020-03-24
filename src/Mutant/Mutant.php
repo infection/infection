@@ -81,11 +81,6 @@ class Mutant
         return $this->diff;
     }
 
-    public function isCoveredByTest(): bool
-    {
-        return $this->mutation->isCoveredByTest();
-    }
-
     /**
      * @return TestLocation[]
      */

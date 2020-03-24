@@ -68,7 +68,7 @@ class MetricsCalculator
     /**
      * @var int
      */
-    private $notCoveredByTestsCount = 0;
+    private $notExecutedByTestsCount = 0;
 
     /**
      * @var int
@@ -110,7 +110,7 @@ class MetricsCalculator
                     break;
 
                 case DetectionStatus::NOT_COVERED:
-                    $this->notCoveredByTestsCount++;
+                    $this->notExecutedByTestsCount++;
                     $this->notCoveredExecutionResults->add($executionResult);
 
                     break;
@@ -164,7 +164,7 @@ class MetricsCalculator
 
     public function getNotTestedCount(): int
     {
-        return $this->notCoveredByTestsCount;
+        return $this->notExecutedByTestsCount;
     }
 
     public function getTotalMutantsCount(): int

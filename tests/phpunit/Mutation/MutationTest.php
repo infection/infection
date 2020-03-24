@@ -66,7 +66,7 @@ final class MutationTest extends TestCase
         array $tests,
         array $expectedAttributes,
         int $expectedOriginalStartingLine,
-        bool $expectedCoveredByTests,
+        bool $expectedHasTests,
         string $expectedHash
     ): void {
         $mutation = new Mutation(
@@ -88,7 +88,7 @@ final class MutationTest extends TestCase
         $this->assertSame($mutatedNodeClass, $mutation->getMutatedNodeClass());
         $this->assertSame($mutatedNode, $mutation->getMutatedNode());
         $this->assertSame($tests, $mutation->getAllTests());
-        $this->assertSame($expectedCoveredByTests, $mutation->isCoveredByTest());
+        $this->assertSame($expectedHasTests, $mutation->hasTests());
         $this->assertSame($expectedHash, $mutation->getHash());
     }
 
