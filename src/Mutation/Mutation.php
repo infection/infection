@@ -158,7 +158,7 @@ class Mutation
     /**
      * @return TestLocation[]
      */
-    public function getAllTests(): array
+    public function getTests(): array
     {
         return $this->tests;
     }

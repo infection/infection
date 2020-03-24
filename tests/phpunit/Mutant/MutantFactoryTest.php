@@ -98,13 +98,7 @@ final class MutantFactoryTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)]
             )],
-            $tests = [
-                new TestLocation(
-                    'FooTest::test_it_can_instantiate',
-                    '/path/to/acme/FooTest.php',
-                    0.01
-                ),
-            ]
+            []
         );
 
         $expectedMutantFilePath = sprintf(
@@ -140,8 +134,7 @@ final class MutantFactoryTest extends TestCase
             $expectedMutantFilePath,
             $mutation,
             'mutated code',
-            'code diff',
-            $tests
+            'code diff'
         );
     }
 

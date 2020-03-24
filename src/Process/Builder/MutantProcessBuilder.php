@@ -70,12 +70,14 @@ class MutantProcessBuilder
 
     public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
+        $mutation = $mutant->getMutation();
+
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getTests(),
+                $mutation->getTests(),
                 $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
+                $mutation->getHash(),
+                $mutation->getOriginalFilePath(),
                 $testFrameworkExtraOptions
             )
         );

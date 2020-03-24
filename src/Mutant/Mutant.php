@@ -86,6 +86,6 @@ class Mutant
      */
     public function getTests(): array
     {
-        return $this->mutation->getAllTests();
+        return $this->mutation->getTests();
     }
 }

@@ -87,7 +87,7 @@ final class MutationTest extends TestCase
         $this->assertSame($expectedOriginalStartingLine, $mutation->getOriginalStartingLine());
         $this->assertSame($mutatedNodeClass, $mutation->getMutatedNodeClass());
         $this->assertSame($mutatedNode, $mutation->getMutatedNode());
-        $this->assertSame($tests, $mutation->getAllTests());
+        $this->assertSame($tests, $mutation->getTests());
         $this->assertSame($expectedHasTests, $mutation->hasTests());
         $this->assertSame($expectedHash, $mutation->getHash());
     }

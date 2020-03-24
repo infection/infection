@@ -35,27 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
 
 trait MutantAssertions
 {
-    /**
-     * @param TestLocation[] $expectedTests
-     */
     public function assertMutantStateIs(
         Mutant $mutant,
         string $expectedFilePath,
         Mutation $expectedMutation,
         string $expectedMutatedCode,
-        string $expectedDiff,
-        array $expectedTests
+        string $expectedDiff
     ): void {
         $this->assertSame($expectedFilePath, $mutant->getFilePath());
         $this->assertSame($expectedMutation, $mutant->getMutation());
         $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode());
         $this->assertSame($expectedDiff, $mutant->getDiff());
-        $this->assertSame($expectedTests, $mutant->getTests());
     }
 }

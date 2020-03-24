@@ -50,15 +50,12 @@ final class MutantTest extends TestCase
 
     /**
      * @dataProvider valuesProvider
-     *
-     * @param TestLocation[] $expectedTests
      */
     public function test_it_can_be_instantiated(
         string $filePath,
         Mutation $mutation,
         string $mutatedCode,
-        string $diff,
-        array $expectedTests
+        string $diff
     ): void {
         $mutant = new Mutant($filePath, $mutation, $mutatedCode, $diff);
 
@@ -67,8 +64,7 @@ final class MutantTest extends TestCase
             $filePath,
             $mutation,
             $mutatedCode,
-            $diff,
-            $expectedTests
+            $diff
         );
     }
 
@@ -108,7 +104,6 @@ final class MutantTest extends TestCase
             ),
             'mutated code',
             'diff value',
-            $tests,
         ];
 
         yield 'nominal without tests' => [
@@ -128,7 +123,6 @@ final class MutantTest extends TestCase
             ),
             'mutated code',
             'diff value',
-            [],
         ];
     }
 }
