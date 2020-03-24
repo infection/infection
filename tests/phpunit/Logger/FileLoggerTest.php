@@ -72,6 +72,7 @@ final class FileLoggerTest extends FileSystemTestCase
     {
         $expectedContent = <<<'TXT'
 foo
+
 bar
 TXT;
 
