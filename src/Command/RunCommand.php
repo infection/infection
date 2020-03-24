@@ -265,7 +265,9 @@ final class RunCommand extends BaseCommand
         $testFrameworkExtraOptions = trim((string) $this->input->getOption('test-framework-options'));
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
 
+        /** @var string|null $minMsi */
         $minMsi = $input->getOption('min-msi');
+        /** @var string|null $minCoveredMsi */
         $minCoveredMsi = $input->getOption('min-covered-msi');
 
         $precision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
