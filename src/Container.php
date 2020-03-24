@@ -597,7 +597,7 @@ final class Container
 
     public function getDefaultJUnitFilePath(): string
     {
-        return $this->defaultJUnitPath ?? sprintf(
+        return $this->defaultJUnitPath ?? $this->defaultJUnitPath = sprintf(
             '%s/%s',
             Path::canonicalize(
                 $this->getConfiguration()->getCoveragePath() . '/..'
