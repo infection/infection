@@ -33,59 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\Mutation;
 
+use Infection\Mutation\MutationCalculatedState;
+use function array_merge;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
+use Infection\Mutator\Arithmetic\Plus;
+use Infection\PhpParser\MutatedNode;
+use Infection\Tests\Mutator\MutatorName;
+use function md5;
+use PhpParser\Node;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class Mutant
+trait MutationAssertions
 {
-    private $mutantFilePath;
-    private $mutation;
-    private $mutatedCode;
-    private $diff;
-
-    public function __construct(
-        string $mutantFilePath,
+    private function assertMutationSateIs(
         Mutation $mutation,
-        string $mutatedCode,
-        string $diff
-    ) {
-        $this->mutantFilePath = $mutantFilePath;
-        $this->mutation = $mutation;
-        $this->mutatedCode = $mutatedCode;
-        $this->diff = $diff;
-    }
-
-    public function getFilePath(): string
-    {
-        return $this->mutantFilePath;
-    }
-
-    public function getMutation(): Mutation
-    {
-        return $this->mutation;
-    }
-
-    public function getMutatedCode(): string
-    {
-        return $this->mutatedCode;
-    }
-
-    public function getDiff(): string
-    {
-        return $this->diff;
-    }
-
-    /**
-     * @return TestLocation[]
-     */
-    public function getTests(): array
-    {
-        return $this->mutation->getTests();
+        string $expectedOriginalFilePath,
+        string $expectedMutatorName,
+        array $expectedTests,
+        string $expectedHash,
+        string $expectedFilePath,
+        string $expectedCode,
+        string $expectedDiff,
+        int $expectedOriginalStartingLine,
+        bool $expectedHasTests
+    ): void {
+        $this->assertSame($expectedOriginalFilePath, $mutation->getOriginalFilePath());
+        $this->assertSame($expectedMutatorName, $mutation->getMutatorName());
+        $this->assertSame($expectedOriginalStartingLine, $mutation->getOriginalStartingLine());
+        $this->assertSame($expectedTests, $mutation->getTests());
+        $this->assertSame($expectedHasTests, $mutation->hasTests());
+        $this->assertSame($expectedHash, $mutation->getHash());
+        $this->assertSame($expectedFilePath, $mutation->getFilePath());
+        $this->assertSame($expectedCode, $mutation->getMutatedCode());
+        $this->assertSame($expectedDiff, $mutation->getDiff());
     }
 }

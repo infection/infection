@@ -41,6 +41,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\MutantProcess;
@@ -94,29 +95,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
             ->method($this->anything())
         ;
 
-        $mutantProcess = new MutantProcess(
-            $processMock,
-            new Mutant(
-                '/path/to/mutant',
-                new Mutation(
-                    $originalFilePath = 'path/to/Foo.php',
-                    [],
-                    $mutatorName = MutatorName::getName(For_::class),
-                    [
-                        'startLine' => $originalStartingLine = 10,
-                        'endLine' => 15,
-                        'startTokenPos' => 0,
-                        'endTokenPos' => 8,
-                        'startFilePos' => 2,
-                        'endFilePos' => 4,
-                    ],
-                    'Unknown',
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    []
-                ),
-                'notCovered#0',
-                $mutantDiff = <<<'DIFF'
+        $mutationDiff = <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -124,7 +103,30 @@ final class MutantExecutionResultFactoryTest extends TestCase
 - echo 'original';
 + echo 'notCovered#0';
 
-DIFF
+DIFF;
+
+        $mutantProcess = new MutantProcess(
+            $processMock,
+            new Mutation(
+                $originalFilePath = 'path/to/Foo.php',
+                $mutatorName = MutatorName::getName(For_::class),
+                [
+                    'startLine' => $originalStartingLine = 10,
+                    'endLine' => 15,
+                    'startTokenPos' => 0,
+                    'endTokenPos' => 8,
+                    'startFilePos' => 2,
+                    'endFilePos' => 4,
+                ],
+                [],
+                static function () use ($mutationDiff): MutationCalculatedState {
+                    return new MutationCalculatedState(
+                        '0800f',
+                        '/path/to/mutation',
+                        'notCovered#0',
+                        $mutationDiff
+                    );
+                }
             )
         );
 
@@ -133,7 +135,7 @@ DIFF
             $processCommandLine,
             $processOutput,
             DetectionStatus::NOT_COVERED,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine
@@ -163,35 +165,7 @@ DIFF
             ->method($this->anything())
         ;
 
-        $mutantProcess = new MutantProcess(
-            $processMock,
-            new Mutant(
-                '/path/to/mutant',
-                new Mutation(
-                    $originalFilePath = 'path/to/Foo.php',
-                    [],
-                    $mutatorName = MutatorName::getName(For_::class),
-                    [
-                        'startLine' => $originalStartingLine = 10,
-                        'endLine' => 15,
-                        'startTokenPos' => 0,
-                        'endTokenPos' => 8,
-                        'startFilePos' => 2,
-                        'endFilePos' => 4,
-                    ],
-                    'Unknown',
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    [
-                        new TestLocation(
-                            'FooTest::test_it_can_instantiate',
-                            '/path/to/acme/FooTest.php',
-                            0.01
-                        ),
-                    ]
-                ),
-                'timedOut#0',
-                $mutantDiff = <<<'DIFF'
+        $mutationDiff = <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -199,9 +173,39 @@ DIFF
 - echo 'original';
 + echo 'timedOut#0';
 
-DIFF
+DIFF;
+
+        $mutantProcess = new MutantProcess(
+            $processMock,
+            new Mutation(
+                $originalFilePath = 'path/to/Foo.php',
+                $mutatorName = MutatorName::getName(For_::class),
+                [
+                    'startLine' => $originalStartingLine = 10,
+                    'endLine' => 15,
+                    'startTokenPos' => 0,
+                    'endTokenPos' => 8,
+                    'startFilePos' => 2,
+                    'endFilePos' => 4,
+                ],
+                [
+                    new TestLocation(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01
+                    ),
+                ],
+                static function () use ($mutationDiff): MutationCalculatedState {
+                    return new MutationCalculatedState(
+                        '0800f',
+                        '/path/to/mutation',
+                        'timedOut#0',
+                        $mutationDiff
+                    );
+                }
             )
         );
+
         $mutantProcess->markAsTimedOut();
 
         $this->assertResultStateIs(
@@ -209,7 +213,7 @@ DIFF
             $processCommandLine,
             $processOutput,
             DetectionStatus::TIMED_OUT,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine
@@ -244,35 +248,7 @@ DIFF
             ->method($this->anything())
         ;
 
-        $mutantProcess = new MutantProcess(
-            $processMock,
-            new Mutant(
-                '/path/to/mutant',
-                new Mutation(
-                    $originalFilePath = 'path/to/Foo.php',
-                    [],
-                    $mutatorName = MutatorName::getName(For_::class),
-                    [
-                        'startLine' => $originalStartingLine = 10,
-                        'endLine' => 15,
-                        'startTokenPos' => 0,
-                        'endTokenPos' => 8,
-                        'startFilePos' => 2,
-                        'endFilePos' => 4,
-                    ],
-                    'Unknown',
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    [
-                        new TestLocation(
-                            'FooTest::test_it_can_instantiate',
-                            '/path/to/acme/FooTest.php',
-                            0.01
-                        ),
-                    ]
-                ),
-                'errored#0',
-                $mutantDiff = <<<'DIFF'
+        $mutationDiff = <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -280,7 +256,36 @@ DIFF
 - echo 'original';
 + echo 'errored#0';
 
-DIFF
+DIFF;
+
+        $mutantProcess = new MutantProcess(
+            $processMock,
+            new Mutation(
+                $originalFilePath = 'path/to/Foo.php',
+                $mutatorName = MutatorName::getName(For_::class),
+                [
+                    'startLine' => $originalStartingLine = 10,
+                    'endLine' => 15,
+                    'startTokenPos' => 0,
+                    'endTokenPos' => 8,
+                    'startFilePos' => 2,
+                    'endFilePos' => 4,
+                ],
+                [
+                    new TestLocation(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01
+                    ),
+                ],
+                static function () use ($mutationDiff): MutationCalculatedState {
+                    return new MutationCalculatedState(
+                        '0800f',
+                        '/path/to/mutation',
+                        'errored#0',
+                        $mutationDiff
+                    );
+                }
             )
         );
 
@@ -289,7 +294,7 @@ DIFF
             $processCommandLine,
             $processOutput,
             DetectionStatus::ERROR,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine
@@ -326,35 +331,7 @@ DIFF
             ->willReturn(true)
         ;
 
-        $mutantProcess = new MutantProcess(
-            $processMock,
-            new Mutant(
-                '/path/to/mutant',
-                new Mutation(
-                    $originalFilePath = 'path/to/Foo.php',
-                    [],
-                    $mutatorName = MutatorName::getName(For_::class),
-                    [
-                        'startLine' => $originalStartingLine = 10,
-                        'endLine' => 15,
-                        'startTokenPos' => 0,
-                        'endTokenPos' => 8,
-                        'startFilePos' => 2,
-                        'endFilePos' => 4,
-                    ],
-                    'Unknown',
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    [
-                        new TestLocation(
-                            'FooTest::test_it_can_instantiate',
-                            '/path/to/acme/FooTest.php',
-                            0.01
-                        ),
-                    ]
-                ),
-                'escaped#0',
-                $mutantDiff = <<<'DIFF'
+        $mutationDiff = <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -362,7 +339,36 @@ DIFF
 - echo 'original';
 + echo 'escaped#0';
 
-DIFF
+DIFF;
+
+        $mutantProcess = new MutantProcess(
+            $processMock,
+            new Mutation(
+                $originalFilePath = 'path/to/Foo.php',
+                $mutatorName = MutatorName::getName(For_::class),
+                [
+                    'startLine' => $originalStartingLine = 10,
+                    'endLine' => 15,
+                    'startTokenPos' => 0,
+                    'endTokenPos' => 8,
+                    'startFilePos' => 2,
+                    'endFilePos' => 4,
+                ],
+                [
+                    new TestLocation(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01
+                    ),
+                ],
+                static function () use ($mutationDiff): MutationCalculatedState {
+                    return new MutationCalculatedState(
+                        '0800f',
+                        '/path/to/mutation',
+                        'escaped#0',
+                        $mutationDiff
+                    );
+                }
             )
         );
 
@@ -371,7 +377,7 @@ DIFF
             $processCommandLine,
             'Tests passed!',
             DetectionStatus::ESCAPED,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine
@@ -408,35 +414,7 @@ DIFF
             ->willReturn(false)
         ;
 
-        $mutantProcess = new MutantProcess(
-            $processMock,
-            new Mutant(
-                '/path/to/mutant',
-                new Mutation(
-                    $originalFilePath = 'path/to/Foo.php',
-                    [],
-                    $mutatorName = MutatorName::getName(For_::class),
-                    [
-                        'startLine' => $originalStartingLine = 10,
-                        'endLine' => 15,
-                        'startTokenPos' => 0,
-                        'endTokenPos' => 8,
-                        'startFilePos' => 2,
-                        'endFilePos' => 4,
-                    ],
-                    'Unknown',
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    [
-                        new TestLocation(
-                            'FooTest::test_it_can_instantiate',
-                            '/path/to/acme/FooTest.php',
-                            0.01
-                        ),
-                    ]
-                ),
-                'killed#0',
-                $mutantDiff = <<<'DIFF'
+        $mutationDiff = <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -444,7 +422,36 @@ DIFF
 - echo 'original';
 + echo 'killed#0';
 
-DIFF
+DIFF;
+
+        $mutantProcess = new MutantProcess(
+            $processMock,
+            new Mutation(
+                $originalFilePath = 'path/to/Foo.php',
+                $mutatorName = MutatorName::getName(For_::class),
+                [
+                    'startLine' => $originalStartingLine = 10,
+                    'endLine' => 15,
+                    'startTokenPos' => 0,
+                    'endTokenPos' => 8,
+                    'startFilePos' => 2,
+                    'endFilePos' => 4,
+                ],
+                [
+                    new TestLocation(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01
+                    ),
+                ],
+                static function () use ($mutationDiff): MutationCalculatedState {
+                    return new MutationCalculatedState(
+                        '0800f',
+                        '/path/to/mutation',
+                        'killed#0',
+                        $mutationDiff
+                    );
+                }
             )
         );
 
@@ -453,7 +460,7 @@ DIFF
             $processCommandLine,
             'Tests failed!',
             DetectionStatus::KILLED,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine

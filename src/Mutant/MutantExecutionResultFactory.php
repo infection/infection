@@ -85,7 +85,7 @@ class MutantExecutionResultFactory
 
     private function retrieveDetectionStatus(MutantProcess $mutantProcess): string
     {
-        if (!$mutantProcess->getMutation()->getMutation()->hasTests()) {
+        if (!$mutantProcess->getMutation()->hasTests()) {
             return DetectionStatus::NOT_COVERED;
         }
 

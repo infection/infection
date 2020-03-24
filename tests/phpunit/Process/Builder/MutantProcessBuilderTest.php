@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Builder;
 
+use Infection\Mutation\MutationCalculatedState;
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -56,33 +57,33 @@ final class MutantProcessBuilderTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
-        $mutant = new Mutant(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
-                $originalFilePath = 'path/to/Foo.php',
-                [],
-                MutatorName::getName(For_::class),
-                [
-                    'startLine' => $originalStartingLine = 10,
-                    'endLine' => 15,
-                    'startTokenPos' => 0,
-                    'endTokenPos' => 8,
-                    'startFilePos' => 2,
-                    'endFilePos' => 4,
-                ],
-                'Unknown',
-                MutatedNode::wrap(new Nop()),
-                0,
-                $tests = [
-                    new TestLocation(
-                        'FooTest::test_it_can_instantiate',
-                        '/path/to/acme/FooTest.php',
-                        0.01
-                    ),
-                ]
-            ),
-            'killed#0',
-            $mutantDiff = <<<'DIFF'
+        $hash = '0800f';
+        $mutantFilePath = '/path/to/mutation';
+
+        $mutant = new Mutation(
+            $originalFilePath = 'path/to/Foo.php',
+            MutatorName::getName(For_::class),
+            [
+                'startLine' => $originalStartingLine = 10,
+                'endLine' => 15,
+                'startTokenPos' => 0,
+                'endTokenPos' => 8,
+                'startFilePos' => 2,
+                'endFilePos' => 4,
+            ],
+            $tests = [
+                new TestLocation(
+                    'FooTest::test_it_can_instantiate',
+                    '/path/to/acme/FooTest.php',
+                    0.01
+                ),
+            ],
+            static function () use ($hash, $mutantFilePath): MutationCalculatedState {
+                return new MutationCalculatedState(
+                    $hash,
+                    $mutantFilePath,
+                    'notCovered#0',
+                    <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -91,9 +92,10 @@ final class MutantProcessBuilderTest extends TestCase
 + echo 'killed#0';
 
 DIFF
+                );
+            }
         );
 
-        $timeout = 100;
         $testFrameworkExtraOptions = '--verbose';
 
         $testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
@@ -102,7 +104,7 @@ DIFF
             ->with(
                 $tests,
                 $mutantFilePath,
-                $this->isType('string'),
+                $hash,
                 $originalFilePath,
                 $testFrameworkExtraOptions
             )

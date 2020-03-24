@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
+use Infection\Mutation\Mutation;
 use Infection\Process\MutantProcess;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -49,9 +50,9 @@ final class MutantProcessTest extends TestCase
     private $processMock;
 
     /**
-     * @var MockObject|Mutant
+     * @var MockObject|Mutation
      */
-    private $mutantMock;
+    private $mutationMock;
 
     /**
      * @var MutantProcess
@@ -61,9 +62,9 @@ final class MutantProcessTest extends TestCase
     protected function setUp(): void
     {
         $this->processMock = $this->createMock(Process::class);
-        $this->mutantMock = $this->createMock(Mutant::class);
+        $this->mutationMock = $this->createMock(Mutation::class);
 
-        $this->mutantProcess = new MutantProcess($this->processMock, $this->mutantMock);
+        $this->mutantProcess = new MutantProcess($this->processMock, $this->mutationMock);
     }
 
     public function test_it_exposes_its_state(): void
@@ -71,7 +72,7 @@ final class MutantProcessTest extends TestCase
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
             $this->processMock,
-            $this->mutantMock,
+            $this->mutationMock,
             false
         );
     }
@@ -83,7 +84,7 @@ final class MutantProcessTest extends TestCase
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
             $this->processMock,
-            $this->mutantMock,
+            $this->mutationMock,
             true
         );
     }
@@ -108,7 +109,7 @@ final class MutantProcessTest extends TestCase
     private function assertMutantProcessStateIs(
         MutantProcess $mutantProcess,
         Process $expectedProcess,
-        Mutant $expectedMutant,
+        Mutation $expectedMutant,
         bool $expectedTimedOut
     ): void {
         $this->assertSame($expectedProcess, $mutantProcess->getProcess());

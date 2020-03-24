@@ -40,6 +40,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
@@ -93,33 +94,7 @@ DIFF;
 
     public function test_it_can_be_instantiated_from_a_non_covered_mutant(): void
     {
-        $mutant = new Mutant(
-            '/path/to/mutant',
-            new Mutation(
-                $originalFilePath = 'path/to/Foo.php',
-                [],
-                $mutatorName = MutatorName::getName(For_::class),
-                [
-                    'startLine' => $originalStartingLine = 10,
-                    'endLine' => 15,
-                    'startTokenPos' => 0,
-                    'endTokenPos' => 8,
-                    'startFilePos' => 2,
-                    'endFilePos' => 4,
-                ],
-                'Unknown',
-                MutatedNode::wrap(new Nop()),
-                0,
-                [
-                    new TestLocation(
-                        'FooTest::test_it_can_instantiate',
-                        '/path/to/acme/FooTest.php',
-                        0.01
-                    ),
-                ]
-            ),
-            'notCovered#0',
-            $mutantDiff = <<<'DIFF'
+        $mutationDiff = <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -127,7 +102,34 @@ DIFF;
 - echo 'original';
 + echo 'notCovered#0';
 
-DIFF
+DIFF;
+
+        $mutant = new Mutation(
+            $originalFilePath = 'path/to/Foo.php',
+            $mutatorName = MutatorName::getName(For_::class),
+            [
+                'startLine' => $originalStartingLine = 10,
+                'endLine' => 15,
+                'startTokenPos' => 0,
+                'endTokenPos' => 8,
+                'startFilePos' => 2,
+                'endFilePos' => 4,
+            ],
+            [
+                new TestLocation(
+                    'FooTest::test_it_can_instantiate',
+                    '/path/to/acme/FooTest.php',
+                    0.01
+                ),
+            ],
+            static function () use ($mutationDiff): MutationCalculatedState {
+                return new MutationCalculatedState(
+                    '0800f',
+                    '/path/to/mutation',
+                    'notCovered#0',
+                    $mutationDiff
+                );
+            }
         );
 
         $this->assertResultStateIs(
@@ -135,7 +137,7 @@ DIFF
             '',
             '',
             DetectionStatus::NOT_COVERED,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine

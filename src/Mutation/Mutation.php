@@ -90,6 +90,7 @@ class Mutation
 
         $this->originalFilePath = $originalFilePath;
         $this->mutatorName = $mutatorName;
+        // TODO: move this up
         $this->attributes = array_intersect_key($attributes, array_flip(self::ATTRIBUTE_KEYS));
         $this->tests = $tests;
         $this->executedByTests = count($tests) > 0;

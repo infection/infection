@@ -42,16 +42,18 @@ use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationFactory;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
+use Infection\Tests\Mutation\MutationAssertions;
 use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function md5;
 use function Safe\sprintf;
 
 final class MutantFactoryTest extends TestCase
 {
-    use MutantAssertions;
+    use MutationAssertions;
 
     /**
      * @var MutantCodeFactory|MockObject
@@ -91,99 +93,114 @@ final class MutantFactoryTest extends TestCase
         );
     }
 
-    public function test_it_creates_a_mutant_instance_from_the_given_mutation(): void
+    public function test_it_creates_a_mutation(): void
     {
-        $mutation = self::createMutation(
-            $originalNodes = [new Node\Stmt\Namespace_(
-                new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
-            )],
-            []
-        );
+        $originalFilePath = '/path/to/acme/Foo.php';
+        $originalFileAst = [new Node\Stmt\Namespace_(
+            new Node\Name('Acme'),
+            [new Node\Scalar\LNumber(0)]
+        )];
+        $mutatorName = MutatorName::getName(Plus::class);
+        $attributes = [
+            'startLine' => $originalStartingLine = 3,
+            'endLine' => 5,
+            'startTokenPos' => 21,
+            'endTokenPos' => 31,
+            'startFilePos' => 43,
+            'endFilePos' => 53,
+        ];
+        $mutatedNodeClass = Node\Scalar\LNumber::class;
+        $mutatedNode = MutatedNode::wrap(new Node\Scalar\LNumber(1));
+        $mutationByMutatorIndex = 0;
+        $tests = [
+            new TestLocation(
+                'FooTest::test_it_can_instantiate',
+                '/path/to/acme/FooTest.php',
+                0.01
+            ),
+        ];
+
+        $expectedHash = md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53');
 
         $expectedMutantFilePath = sprintf(
             '/path/to/tmp/mutant.%s.infection.php',
-            $mutation->getHash()
+            $expectedHash
         );
 
         $this->codeFactoryMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('createCode')
-            ->with($mutation)
+            ->with(
+                $attributes,
+                $originalFileAst,
+                $mutatedNodeClass,
+                $mutatedNode
+            )
             ->willReturn('mutated code')
         ;
 
         $this->printerMock
             ->expects($this->once())
             ->method('prettyPrintFile')
-            ->with($originalNodes)
+            ->with($originalFileAst)
             ->willReturn('original code')
         ;
 
         $this->differMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('diff')
             ->with('original code', 'mutated code')
             ->willReturn('code diff')
         ;
 
-        $mutant = $this->mutantFactory->create($mutation);
-
-        $this->assertMutantStateIs(
-            $mutant,
-            $expectedMutantFilePath,
-            $mutation,
-            'mutated code',
-            'code diff'
-        );
-    }
-
-    public function test_it_printing_the_original_file_is_memoized(): void
-    {
-        $mutation = self::createMutation(
-            $originalNodes = [new Node\Stmt\Nop()],
-            []
-        );
-
-        $this->printerMock
-            ->expects($this->once())
-            ->method('prettyPrintFile')
-            ->with($originalNodes)
-            ->willReturn('original code')
-        ;
-
-        $this->differMock
-            ->expects($this->atLeastOnce())
-            ->method('diff')
-            ->willReturn('code diff')
-        ;
-
-        $this->mutantFactory->create($mutation);
-        $this->mutantFactory->create($mutation);
-    }
-
-    /**
-     * @param Node[] $originalNodes
-     * @param TestLocation[] $tests
-     */
-    private static function createMutation(array $originalNodes, array $tests): Mutation
-    {
-        return new Mutation(
-            '/path/to/acme/Foo.php',
-            $originalNodes,
-            MutatorName::getName(Plus::class),
-            [
-                'startLine' => 3,
-                'endLine' => 5,
-                'startTokenPos' => 21,
-                'endTokenPos' => 31,
-                'startFilePos' => 43,
-                'endFilePos' => 53,
-            ],
-            Node\Scalar\LNumber::class,
-            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-            0,
+        $mutation1 = $this->mutantFactory->create(
+            $originalFilePath,
+            $originalFileAst,
+            $mutatorName,
+            $attributes,
+            $mutatedNodeClass,
+            $mutatedNode,
+            $mutationByMutatorIndex,
             $tests
+        );
+
+        $this->assertMutationSateIs(
+            $mutation1,
+            $originalFilePath,
+            $mutatorName,
+            $tests,
+            $expectedHash,
+            $expectedMutantFilePath,
+            'mutated code',
+            'code diff',
+            $originalStartingLine,
+            true
+        );
+
+        // Check memoization
+
+        $mutation2 = $this->mutantFactory->create(
+            $originalFilePath,
+            $originalFileAst,
+            $mutatorName,
+            $attributes,
+            $mutatedNodeClass,
+            $mutatedNode,
+            $mutationByMutatorIndex,
+            $tests
+        );
+
+        $this->assertMutationSateIs(
+            $mutation2,
+            $originalFilePath,
+            $mutatorName,
+            $tests,
+            $expectedHash,
+            $expectedMutantFilePath,
+            'mutated code',
+            'code diff',
+            $originalStartingLine,
+            true
         );
     }
 }

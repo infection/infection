@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
+use Infection\Mutation\MutationCalculatedState;
 use function array_merge;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
@@ -57,36 +58,40 @@ final class MutationTest extends TestCase
      */
     public function test_it_can_be_instantiated(
         string $originalFilePath,
-        array $originalFileAst,
         string $mutatorName,
         array $attributes,
-        string $mutatedNodeClass,
-        MutatedNode $mutatedNode,
-        int $mutationByMutatorIndex,
         array $tests,
-        array $expectedAttributes,
+        string $hash,
+        string $filePath,
+        string $code,
+        string $diff,
         int $expectedOriginalStartingLine,
-        bool $expectedHasTests,
-        string $expectedHash
+        bool $expectedHasTests
     ): void {
         $mutation = new Mutation(
             $originalFilePath,
-            $originalFileAst,
             $mutatorName,
             $attributes,
-            $mutatedNodeClass,
-            $mutatedNode,
-            $mutationByMutatorIndex,
-            $tests
+            $tests,
+            static function () use ($hash, $filePath, $code, $diff): MutationCalculatedState {
+                return new MutationCalculatedState(
+                    $hash,
+                    $filePath,
+                    $code,
+                    $diff
+                );
+            }
         );
 
         $this->assertSame($originalFilePath, $mutation->getOriginalFilePath());
-        $this->assertSame($originalFileAst, $mutation->getOriginalFileAst());
         $this->assertSame($mutatorName, $mutation->getMutatorName());
         $this->assertSame($expectedOriginalStartingLine, $mutation->getOriginalStartingLine());
         $this->assertSame($tests, $mutation->getTests());
         $this->assertSame($expectedHasTests, $mutation->hasTests());
-        $this->assertSame($expectedHash, $mutation->getHash());
+        $this->assertSame($hash, $mutation->getHash());
+        $this->assertSame($filePath, $mutation->getFilePath());
+        $this->assertSame($code, $mutation->getMutatedCode());
+        $this->assertSame($diff, $mutation->getDiff());
     }
 
     public function valuesProvider(): iterable
@@ -102,30 +107,21 @@ final class MutationTest extends TestCase
 
         yield 'empty' => [
             '',
-            [],
             MutatorName::getName(Plus::class),
             $nominalAttributes,
-            Node\Scalar\LNumber::class,
-            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-            -1,
             [],
-            $nominalAttributes,
+            '',
+            '',
+            '',
+            '',
             $originalStartingLine,
             false,
-            md5('_Plus_-1_3_5_21_31_43_53'),
         ];
 
         yield 'nominal with a test' => [
             '/path/to/acme/Foo.php',
-            [new Node\Stmt\Namespace_(
-                new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
-            )],
             MutatorName::getName(Plus::class),
             $nominalAttributes,
-            Node\Scalar\LNumber::class,
-            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-            0,
             [
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
@@ -133,47 +129,27 @@ final class MutationTest extends TestCase
                     0.01
                 ),
             ],
-            $nominalAttributes,
-            $originalStartingLine,
-            true,
-            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
-        ];
+            '0800f',
+            '/path/to/mutation',
+            'notCovered#0',
+            <<<'DIFF'
+--- Original
++++ New
+@@ @@
 
-        yield 'nominal with a test with a different mutator index' => [
-            '/path/to/acme/Foo.php',
-            [new Node\Stmt\Namespace_(
-                new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
-            )],
-            MutatorName::getName(Plus::class),
-            $nominalAttributes,
-            Node\Scalar\LNumber::class,
-            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-            99,
-            [
-                new TestLocation(
-                    'FooTest::test_it_can_instantiate',
-                    '/path/to/acme/FooTest.php',
-                    0.01
-                ),
-            ],
-            $nominalAttributes,
+- echo 'original';
++ echo 'notCovered#0';
+
+DIFF
+            ,
             $originalStartingLine,
             true,
-            md5('/path/to/acme/Foo.php_Plus_99_3_5_21_31_43_53'),
         ];
 
         yield 'nominal with a test and additional attributes' => [
             '/path/to/acme/Foo.php',
-            [new Node\Stmt\Namespace_(
-                new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
-            )],
             MutatorName::getName(Plus::class),
             array_merge($nominalAttributes, ['foo' => 100, 'bar' => 1000]),
-            Node\Scalar\LNumber::class,
-            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-            0,
             [
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
@@ -181,55 +157,43 @@ final class MutationTest extends TestCase
                     0.01
                 ),
             ],
-            $nominalAttributes,
+            '0800f',
+            '/path/to/mutation',
+            'notCovered#0',
+            <<<'DIFF'
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'notCovered#0';
+
+DIFF
+            ,
             $originalStartingLine,
             true,
-            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
 
         yield 'nominal without a test' => [
             '/path/to/acme/Foo.php',
-            [new Node\Stmt\Namespace_(
-                new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
-            )],
             MutatorName::getName(Plus::class),
             $nominalAttributes,
-            Node\Scalar\LNumber::class,
-            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-            0,
             [],
-            $nominalAttributes,
+            '0800f',
+            '/path/to/mutation',
+            'notCovered#0',
+            <<<'DIFF'
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'notCovered#0';
+
+DIFF
+            ,
             $originalStartingLine,
             false,
-            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
-        ];
-
-        yield 'nominal with a test and multiple mutated nodes' => [
-            '/path/to/acme/Foo.php',
-            [new Node\Stmt\Namespace_(
-                new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
-            )],
-            MutatorName::getName(Plus::class),
-            $nominalAttributes,
-            Node\Scalar\LNumber::class,
-            MutatedNode::wrap([
-                new Node\Scalar\LNumber(1),
-                new Node\Scalar\LNumber(-1),
-            ]),
-            0,
-            [
-                new TestLocation(
-                    'FooTest::test_it_can_instantiate',
-                    '/path/to/acme/FooTest.php',
-                    0.01
-                ),
-            ],
-            $nominalAttributes,
-            $originalStartingLine,
-            true,
-            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
     }
 }

@@ -57,15 +57,19 @@ final class MutatorVisitorTest extends BaseVisitorTest
      * @dataProvider providesMutationCases
      *
      * @param Node[] $nodes
+     * @param array<string|int|float> $attributes
+     * @param class-string $mutatedNodeClass
      */
     public function test_it_mutates_the_correct_node(
         array $nodes,
-        string $expectedCodeOutput,
-        Mutation $mutation
+        array $attributes,
+        string $mutatedNodeClass,
+        MutatedNode $mutatedNode,
+        string $expectedCodeOutput
     ): void {
         $this->traverse(
             $nodes,
-            [new MutatorVisitor($mutation)]
+            [new MutatorVisitor($attributes, $mutatedNodeClass, $mutatedNode)]
         );
 
         $output = SingletonContainer::getPrinter()->prettyPrintFile($nodes);
@@ -77,7 +81,7 @@ final class MutatorVisitorTest extends BaseVisitorTest
     {
         yield 'it mutates the correct node' => (function () {
             return [
-                $nodes = $this->parseCode(<<<'PHP'
+                $this->parseCode(<<<'PHP'
 <?php
 
 class Test
@@ -93,6 +97,16 @@ class Test
 }
 PHP
                 ),
+                [
+                    'startTokenPos' => 29,
+                    'endTokenPos' => 48,
+                    'startLine' => -1,
+                    'endLine' => -1,
+                    'startFilePos' => -1,
+                    'endFilePos' => -1,
+                ],
+                ClassMethod::class,
+                MutatedNode::wrap(new Nop()),
                 <<<'PHP'
 <?php
 
@@ -106,29 +120,12 @@ class Test
 }
 PHP
                 ,
-                new Mutation(
-                    'path/to/file',
-                    $nodes,
-                    MutatorName::getName(PublicVisibility::class),
-                    [
-                        'startTokenPos' => 29,
-                        'endTokenPos' => 48,
-                        'startLine' => -1,
-                        'endLine' => -1,
-                        'startFilePos' => -1,
-                        'endFilePos' => -1,
-                    ],
-                    ClassMethod::class,
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    []
-                ),
             ];
         })();
 
         yield 'it can mutate the node with multiple-ones' => (function () {
             return [
-                $nodes = $this->parseCode(<<<'PHP'
+                $this->parseCode(<<<'PHP'
 <?php
 
 class Test
@@ -144,6 +141,16 @@ class Test
 }
 PHP
                 ),
+                [
+                    'startTokenPos' => 29,
+                    'endTokenPos' => 48,
+                    'startLine' => -1,
+                    'endLine' => -1,
+                    'startFilePos' => -1,
+                    'endFilePos' => -1,
+                ],
+                ClassMethod::class,
+                MutatedNode::wrap([new Nop(), new Nop()]),
                 <<<'PHP'
 <?php
 
@@ -158,29 +165,12 @@ class Test
 }
 PHP
                 ,
-                new Mutation(
-                    'path/to/file',
-                    $nodes,
-                    MutatorName::getName(PublicVisibility::class),
-                    [
-                        'startTokenPos' => 29,
-                        'endTokenPos' => 48,
-                        'startLine' => -1,
-                        'endLine' => -1,
-                        'startFilePos' => -1,
-                        'endFilePos' => -1,
-                    ],
-                    ClassMethod::class,
-                    MutatedNode::wrap([new Nop(), new Nop()]),
-                    0,
-                    []
-                ),
             ];
         })();
 
         yield 'it does not mutate if only one of start or end position is correctly set' => (function () {
             return [
-                $nodes = $this->parseCode(<<<'PHP'
+                $this->parseCode(<<<'PHP'
 <?php
 
 class Test
@@ -196,6 +186,16 @@ class Test
 }
 PHP
                 ),
+                [
+                    'startTokenPos' => 29,
+                    'endTokenPos' => 50,
+                    'startLine' => -1,
+                    'endLine' => -1,
+                    'startFilePos' => -1,
+                    'endFilePos' => -1,
+                ],
+                ClassMethod::class,
+                MutatedNode::wrap(new Nop()),
                 <<<'PHP'
 <?php
 
@@ -212,23 +212,6 @@ class Test
 }
 PHP
                 ,
-                new Mutation(
-                    'path/to/file',
-                    $nodes,
-                    MutatorName::getName(PublicVisibility::class),
-                    [
-                        'startTokenPos' => 29,
-                        'endTokenPos' => 50,
-                        'startLine' => -1,
-                        'endLine' => -1,
-                        'startFilePos' => -1,
-                        'endFilePos' => -1,
-                    ],
-                    ClassMethod::class,
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    []
-                ),
             ];
         })();
 
@@ -248,7 +231,7 @@ PHP
             $badParser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $badLexer);
 
             return [
-                $nodes = $badParser->parse(<<<'PHP'
+                $badParser->parse(<<<'PHP'
 <?php
 
 class Test
@@ -264,6 +247,16 @@ class Test
 }
 PHP
                 ),
+                [
+                    'startTokenPos' => 29,
+                    'endTokenPos' => 48,
+                    'startLine' => -1,
+                    'endLine' => -1,
+                    'startFilePos' => -1,
+                    'endFilePos' => -1,
+                ],
+                MutatorName::getName(PublicVisibility::class),
+                MutatedNode::wrap(new Nop()),
                 <<<'PHP'
 <?php
 
@@ -280,23 +273,6 @@ class Test
 }
 PHP
                 ,
-                new Mutation(
-                    'path/to/file',
-                    $nodes,
-                    MutatorName::getName(PublicVisibility::class),
-                    [
-                        'startTokenPos' => 29,
-                        'endTokenPos' => 48,
-                        'startLine' => -1,
-                        'endLine' => -1,
-                        'startFilePos' => -1,
-                        'endFilePos' => -1,
-                    ],
-                    MutatorName::getName(PublicVisibility::class),
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    []
-                ),
             ];
         })();
     }
