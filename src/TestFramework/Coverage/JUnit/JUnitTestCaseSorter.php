@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use function array_key_exists;
+use function count;
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use function Safe\usort;
@@ -46,43 +47,84 @@ use function Safe\usort;
 final class JUnitTestCaseSorter
 {
     /**
+     * Expected average number of buckets. Exposed for testing purposes.
+     *
+     * @var int[]
+     */
+    public const BUCKETS_COUNT = 25;
+
+    /**
+     * For 25 buckets QS becomes theoretically less efficient on average at and after 15 elements.
+     * Exposed for testing purposes.
+     */
+    public const USE_BUCKET_SORT_AFTER = 15;
+
+    /**
      * @param TestLocation[] $tests
      *
-     * @return string[]
+     * @return iterable<string>
      */
     public function getUniqueSortedFileNames(array $tests): iterable
     {
         $uniqueTestLocations = $this->uniqueByTestFile($tests);
 
-        if (count($uniqueTestLocations) === 1) {
+        $numberOfTestLocation = count($uniqueTestLocations);
+
+        if ($numberOfTestLocation === 1) {
             // Around 5% speed up compared to when without this optimization.
             /** @var TestLocation $testLocation */
             $testLocation = current($uniqueTestLocations);
 
+            /*
+             * TestLocation gets its file path and timings from TestFileTimeData.
+             * Path for TestFileTimeData is not optional. It is never a null.
+             * Therefore we don't need to make any type checks here.
+             */
+
+            /** @var string $filePath */
             $filePath = $testLocation->getFilePath();
 
-            if ($filePath !== null) {
-                yield $filePath;
-            }
-
-            return;
+            return [$filePath];
         }
 
         /*
+         * We need to sort tests to run the fastest first.
+         *
          * Two tests per file are also very frequent. Yet it doesn't make sense
          * to sort them by hand: usort does that just as good.
          */
 
-        // sort tests to run the fastest first
-        usort(
-            $uniqueTestLocations,
-            static function (TestLocation $a, TestLocation $b) {
-                return $a->getExecutionTime() <=> $b->getExecutionTime();
-            }
-        );
+        if ($numberOfTestLocation < self::USE_BUCKET_SORT_AFTER) {
+            usort(
+                $uniqueTestLocations,
+                static function (TestLocation $a, TestLocation $b) {
+                    return $a->getExecutionTime() <=> $b->getExecutionTime();
+                }
+            );
 
-        foreach ($uniqueTestLocations as $testLocation) {
-            yield $testLocation->getFilePath();
+            return self::sortedLocationsGenerator($uniqueTestLocations);
+        }
+
+        /*
+         * For large number of tests use a more efficient algorithm.
+         */
+        return self::sortedLocationsGenerator(
+            TestLocationBucketSorter::bucketSort($uniqueTestLocations)
+        );
+    }
+
+    /**
+     * @param iterable<TestLocation> $sortedTestLocations
+     *
+     * @return iterable<string>
+     */
+    private static function sortedLocationsGenerator(iterable $sortedTestLocations): iterable
+    {
+        foreach ($sortedTestLocations as $testLocation) {
+            /** @var string $filePath */
+            $filePath = $testLocation->getFilePath();
+
+            yield $filePath;
         }
     }
 
@@ -98,9 +140,11 @@ final class JUnitTestCaseSorter
         $uniqueTests = [];
 
         foreach ($testLocations as $testLocation) {
+            /** @var string $filePath */
             $filePath = $testLocation->getFilePath();
 
-            if (!array_key_exists($filePath, $usedFileNames)) {
+            // isset() is 20% faster than array_key_exists() as of PHP 7.3
+            if (!isset($usedFileNames[$filePath])) {
                 $uniqueTests[] = $testLocation;
                 $usedFileNames[$filePath] = true;
             }
