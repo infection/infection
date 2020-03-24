@@ -112,7 +112,7 @@ final class MutantProcessTest extends TestCase
         bool $expectedTimedOut
     ): void {
         $this->assertSame($expectedProcess, $mutantProcess->getProcess());
-        $this->assertSame($expectedMutant, $mutantProcess->getMutant());
+        $this->assertSame($expectedMutant, $mutantProcess->getMutation());
         $this->assertSame($expectedTimedOut, $mutantProcess->isTimedOut());
     }
 }

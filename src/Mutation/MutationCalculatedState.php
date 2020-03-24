@@ -33,36 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Mutation;
 
-use Infection\Mutation\Mutation;
-use Infection\PhpParser\Visitor\CloneVisitor;
-use Infection\PhpParser\Visitor\MutatorVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\PrettyPrinterAbstract;
-
-/**
- * @internal
- * @final
- */
-class MutantCodeFactory
+final class MutationCalculatedState
 {
-    private $printer;
+    private $mutantFilePath;
+    private $mutatedCode;
+    private $diff;
+    private $mutationHash;
 
-    public function __construct(PrettyPrinterAbstract $prettyPrinter)
-    {
-        $this->printer = $prettyPrinter;
+    public function __construct(
+        string $mutationHash,
+        string $mutantFilePath,
+        string $mutatedCode,
+        string $diff
+    ) {
+        $this->mutationHash = $mutationHash;
+        $this->mutantFilePath = $mutantFilePath;
+        $this->mutatedCode = $mutatedCode;
+        $this->diff = $diff;
     }
 
-    public function createCode(Mutation $mutation): string
+    public function getMutationHash(): string
     {
-        $traverser = new NodeTraverser();
+        return $this->mutationHash;
+    }
 
-        $traverser->addVisitor(new CloneVisitor());
-        $traverser->addVisitor(new MutatorVisitor($mutation));
+    public function getMutationFilePath(): string
+    {
+        return $this->mutantFilePath;
+    }
 
-        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
+    public function getMutatedCode(): string
+    {
+        return $this->mutatedCode;
+    }
 
-        return $this->printer->prettyPrintFile($mutatedStatements);
+    public function getDiff(): string
+    {
+        return $this->diff;
     }
 }

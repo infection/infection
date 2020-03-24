@@ -42,7 +42,6 @@ use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use function Pipeline\take;
@@ -54,7 +53,6 @@ use Symfony\Component\Filesystem\Filesystem;
 final class MutationTestingRunner
 {
     private $processBuilder;
-    private $mutantFactory;
     private $processRunner;
     private $eventDispatcher;
     private $fileSystem;
@@ -62,14 +60,12 @@ final class MutationTestingRunner
 
     public function __construct(
         MutantProcessBuilder $mutantProcessBuilder,
-        MutantFactory $mutantFactory,
         ProcessRunner $processRunner,
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
         bool $runConcurrently
     ) {
         $this->processBuilder = $mutantProcessBuilder;
-        $this->mutantFactory = $mutantFactory;
         $this->processRunner = $processRunner;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileSystem = $fileSystem;
@@ -85,28 +81,25 @@ final class MutationTestingRunner
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
         $processes = take($mutations)
-            ->map(function (Mutation $mutation): Mutant {
-                return $this->mutantFactory->create($mutation);
-            })
-            ->filter(function (Mutant $mutant) {
+            ->filter(function (Mutation $mutation) {
                 // The filtering is done here since with a mutant and not earlier with a mutation
                 // since:
                 // - if pass the filtering, the mutant is going to be used
                 // - if does not pass the filtering, the mutant is used for the reports
-                if ($mutant->getMutation()->hasTests()) {
+                if ($mutation->hasTests()) {
                     return true;
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromNonCoveredMutant($mutant)
+                    MutantExecutionResult::createFromNonCoveredMutant($mutation)
                 ));
 
                 return false;
             })
-            ->map(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
-                $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode());
+            ->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): ProcessBearer {
+                $this->fileSystem->dumpFile($mutation->getFilePath(), $mutation->getMutatedCode());
 
-                $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+                $process = $this->processBuilder->createProcessForMutant($mutation, $testFrameworkExtraOptions);
 
                 return $process;
             })

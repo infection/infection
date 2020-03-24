@@ -57,14 +57,13 @@ class MutantExecutionResultFactory
     public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
     {
         $process = $mutantProcess->getProcess();
-        $mutant = $mutantProcess->getMutant();
-        $mutation = $mutant->getMutation();
+        $mutation = $mutantProcess->getMutation();
 
         return new MutantExecutionResult(
             $process->getCommandLine(),
             $this->retrieveProcessOutput($process),
             $this->retrieveDetectionStatus($mutantProcess),
-            $mutant->getDiff(),
+            $mutation->getDiff(),
             $mutation->getMutatorName(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalStartingLine()
@@ -86,7 +85,7 @@ class MutantExecutionResultFactory
 
     private function retrieveDetectionStatus(MutantProcess $mutantProcess): string
     {
-        if (!$mutantProcess->getMutant()->getMutation()->hasTests()) {
+        if (!$mutantProcess->getMutation()->getMutation()->hasTests()) {
             return DetectionStatus::NOT_COVERED;
         }
 

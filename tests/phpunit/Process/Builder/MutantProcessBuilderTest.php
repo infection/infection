@@ -143,7 +143,7 @@ DIFF
         $this->assertSame(100., $process->getTimeout());
         $this->assertFalse($process->isStarted());
 
-        $this->assertSame($mutant, $mutantProcess->getMutant());
+        $this->assertSame($mutant, $mutantProcess->getMutation());
         $this->assertFalse($mutantProcess->isTimedOut());
 
         $this->assertSame([], $eventDispatcher->getEvents());

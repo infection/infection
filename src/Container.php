@@ -62,11 +62,11 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
-use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\MutantCodeFactory;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationFactory;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
@@ -225,8 +225,8 @@ final class Container
             MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
                 return new MutantCodeFactory($container->getPrinter());
             },
-            MutantFactory::class => static function (self $container): MutantFactory {
-                return new MutantFactory(
+            MutationFactory::class => static function (self $container): MutationFactory {
+                return new MutationFactory(
                     $container->getConfiguration()->getTmpDir(),
                     $container->getDiffer(),
                     $container->getPrinter(),
@@ -648,9 +648,9 @@ final class Container
         return $this->get(MutantCodeFactory::class);
     }
 
-    public function getMutantFactory(): MutantFactory
+    public function getMutantFactory(): MutationFactory
     {
-        return $this->get(MutantFactory::class);
+        return $this->get(MutationFactory::class);
     }
 
     public function getDiffer(): Differ

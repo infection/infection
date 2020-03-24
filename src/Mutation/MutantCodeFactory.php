@@ -33,20 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant\Exception;
+namespace Infection\Mutation;
 
-use LogicException;
-use function Safe\sprintf;
+use Infection\PhpParser\MutatedNode;
+use Infection\PhpParser\Visitor\CloneVisitor;
+use Infection\PhpParser\Visitor\MutatorVisitor;
+use PhpParser\Node;
+use PhpParser\NodeTraverser;
+use PhpParser\PrettyPrinterAbstract;
 
 /**
  * @internal
+ * @final
  */
-final class MsiCalculationException extends LogicException
+class MutantCodeFactory
 {
-    public static function create(string $type): self
+    private $printer;
+
+    public function __construct(PrettyPrinterAbstract $prettyPrinter)
     {
-        return new self(sprintf(
-            'Seems like something is wrong with calculations and %s options.', $type
-        ));
+        $this->printer = $prettyPrinter;
+    }
+
+    /**
+     * @param array<string|int|float> $attributes
+     * @param Node[] $originalFileAst
+     * @param class-string $mutatedNodeClass
+     */
+    public function createCode(
+        array $attributes,
+        array $originalFileAst,
+        string $mutatedNodeClass,
+        MutatedNode $mutatedNode
+    ): string {
+        $traverser = new NodeTraverser();
+
+        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new MutatorVisitor($attributes, $mutatedNodeClass, $mutatedNode));
+
+        $mutatedStatements = $traverser->traverse($originalFileAst);
+
+        return $this->printer->prettyPrintFile($mutatedStatements);
     }
 }

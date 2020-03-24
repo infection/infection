@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use function array_keys;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\ProfileList;
 use Webmozart\Assert\Assert;
 
@@ -74,16 +75,14 @@ class MutantExecutionResult
         $this->originalStartingLine = $originalStartingLine;
     }
 
-    public static function createFromNonCoveredMutant(Mutant $mutant): self
+    public static function createFromNonCoveredMutant(Mutation $mutation): self
     {
-        $mutation = $mutant->getMutation();
-
         return new self(
             '',
             '',
             DetectionStatus::NOT_COVERED,
-            $mutant->getDiff(),
-            $mutant->getMutation()->getMutatorName(),
+            $mutation->getDiff(),
+            $mutation->getMutatorName(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalStartingLine()
         );

@@ -37,9 +37,9 @@ namespace Infection\Tests\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
-use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutant\MutantFactory;
+use Infection\Mutation\MutantCodeFactory;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationFactory;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
@@ -69,7 +69,7 @@ final class MutantFactoryTest extends TestCase
     private $differMock;
 
     /**
-     * @var MutantFactory
+     * @var \Infection\Mutation\MutationFactory
      */
     private $mutantFactory;
 
@@ -83,7 +83,7 @@ final class MutantFactoryTest extends TestCase
 
         $this->differMock = $this->createMock(Differ::class);
 
-        $this->mutantFactory = new MutantFactory(
+        $this->mutantFactory = new MutationFactory(
             '/path/to/tmp',
             $this->differMock,
             $this->printerMock,

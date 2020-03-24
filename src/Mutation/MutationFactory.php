@@ -33,10 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Mutation;
 
+use function implode;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
-use Infection\Mutation\Mutation;
+use Infection\PhpParser\MutatedNode;
+use function md5;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use function Safe\sprintf;
@@ -45,7 +48,7 @@ use function Safe\sprintf;
  * @internal
  * @final
  */
-class MutantFactory
+class MutationFactory
 {
     private $tmpDir;
     private $differ;
@@ -69,29 +72,123 @@ class MutantFactory
         $this->mutantCodeFactory = $mutantCodeFactory;
     }
 
-    public function create(Mutation $mutation): Mutant
-    {
-        $mutantFilePath = sprintf(
-            '%s/mutant.%s.infection.php',
-            $this->tmpDir,
-            $mutation->getHash()
-        );
-
-        $mutatedCode = $this->mutantCodeFactory->createCode($mutation);
-
-        return new Mutant(
-            $mutantFilePath,
-            $mutation,
-            $mutatedCode,
-            $this->createMutantDiff($mutation, $mutatedCode)
+    /**
+     * @param Node[] $originalFileAst
+     * @param array<string|int|float> $attributes
+     * @param TestLocation[] $tests
+     */
+    public function create(
+        string $originalFilePath,
+        array $originalFileAst,
+        string $mutatorName,
+        array $attributes,
+        string $mutatedNodeClass,
+        MutatedNode $mutatedNode,
+        int $mutationByMutatorIndex,
+        array $tests
+    ): Mutation {
+        return new Mutation(
+            $originalFilePath,
+            $mutatorName,
+            $attributes,
+            $tests,
+            function () use (
+                $originalFilePath,
+                $originalFileAst,
+                $mutatorName,
+                $attributes,
+                $mutatedNodeClass,
+                $mutatedNode,
+                $mutationByMutatorIndex
+            ): MutationCalculatedState {
+                return $this->calculateState(
+                    $originalFilePath,
+                    $originalFileAst,
+                    $mutatorName,
+                    $attributes,
+                    $mutatedNodeClass,
+                    $mutatedNode,
+                    $mutationByMutatorIndex
+                );
+            }
         );
     }
 
-    private function createMutantDiff(Mutation $mutation, string $mutantCode): string
-    {
+    /**
+     * @param Node[] $originalFileAst
+     * @param array<string|int|float> $attributes
+     */
+    private function calculateState(
+        string $originalFilePath,
+        array $originalFileAst,
+        string $mutatorName,
+        array $attributes,
+        string $mutatedNodeClass,
+        MutatedNode $mutatedNode,
+        int $mutationByMutatorIndex
+    ): MutationCalculatedState {
+        $hash = self::createHash(
+            $originalFilePath,
+            $mutatorName,
+            $attributes,
+            $mutationByMutatorIndex
+        );
+
+        $mutantFilePath = sprintf(
+            '%s/mutant.%s.infection.php',
+            $this->tmpDir,
+            $hash
+        );
+
+        $mutatedCode = $this->mutantCodeFactory->createCode(
+            $attributes,
+            $originalFileAst,
+            $mutatedNodeClass,
+            $mutatedNode
+        );
+
+        return new MutationCalculatedState(
+            $hash,
+            $mutantFilePath,
+            $mutatedCode,
+            $this->createMutantDiff(
+                $originalFilePath,
+                $originalFileAst,
+                $mutatedCode
+            )
+        );
+    }
+
+    private static function createHash(
+        string $originalFilePath,
+        string $mutatorName,
+        array $attributes,
+        int $mutationByMutatorIndex
+    ): string {
+        $hashKeys = [
+            $originalFilePath,
+            $mutatorName,
+            $mutationByMutatorIndex,
+        ];
+
+        foreach ($attributes as $attribute) {
+            $hashKeys[] = $attribute;
+        }
+
+        return md5(implode('_', $hashKeys));
+    }
+
+    /**
+     * @param Node[] $originalFileAst
+     */
+    private function createMutantDiff(
+        string $originalFilePath,
+        array $originalFileAst,
+        string $mutantCode
+    ): string {
         $originalPrettyPrintedFile = $this->getOriginalPrettyPrintedFile(
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalFileAst()
+            $originalFilePath,
+            $originalFileAst
         );
 
         return $this->differ->diff($originalPrettyPrintedFile, $mutantCode);

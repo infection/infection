@@ -44,8 +44,8 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationFactory;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\Builder\MutantProcessBuilder;
@@ -73,7 +73,7 @@ final class MutationTestingRunnerTest extends TestCase
     private $processBuilderMock;
 
     /**
-     * @var MutantFactory|MockObject
+     * @var \Infection\Mutation\MutationFactory|MockObject
      */
     private $mutantFactoryMock;
 
@@ -100,7 +100,7 @@ final class MutationTestingRunnerTest extends TestCase
     protected function setUp(): void
     {
         $this->processBuilderMock = $this->createMock(MutantProcessBuilder::class);
-        $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
+        $this->mutantFactoryMock = $this->createMock(MutationFactory::class);
         $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
         $this->fileSystemMock = $this->createMock(Filesystem::class);

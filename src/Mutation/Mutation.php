@@ -37,13 +37,10 @@ namespace Infection\Mutation;
 
 use function array_intersect_key;
 use function array_keys;
+use Closure;
 use function count;
-use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
-use Infection\PhpParser\MutatedNode;
-use function md5;
-use PhpParser\Node;
 use function Safe\array_flip;
 use Webmozart\Assert\Assert;
 
@@ -64,33 +61,26 @@ class Mutation
 
     private $originalFilePath;
     private $mutatorName;
-    private $mutatedNodeClass;
-    private $mutatedNode;
-    private $mutationByMutatorIndex;
     private $attributes;
-    private $originalFileAst;
     private $tests;
     private $executedByTests;
+    private $calculateState;
 
     /**
-     * @var string|null
+     * @var MutationCalculatedState|null
      */
-    private $hash;
+    private $calculatedState;
 
     /**
-     * @param Node[] $originalFileAst
-     * @param array<string|int|float> $attributes
      * @param TestLocation[] $tests
+     * @param Closure(): MutationCalculatedState $calculateState
      */
     public function __construct(
         string $originalFilePath,
-        array $originalFileAst,
         string $mutatorName,
         array $attributes,
-        string $mutatedNodeClass,
-        MutatedNode $mutatedNode,
-        int $mutationByMutatorIndex,
-        array $tests
+        array $tests,
+        Closure $calculateState
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
@@ -99,14 +89,16 @@ class Mutation
         }
 
         $this->originalFilePath = $originalFilePath;
-        $this->originalFileAst = $originalFileAst;
         $this->mutatorName = $mutatorName;
         $this->attributes = array_intersect_key($attributes, array_flip(self::ATTRIBUTE_KEYS));
-        $this->mutatedNodeClass = $mutatedNodeClass;
-        $this->mutatedNode = $mutatedNode;
-        $this->mutationByMutatorIndex = $mutationByMutatorIndex;
         $this->tests = $tests;
         $this->executedByTests = count($tests) > 0;
+        $this->calculateState = $calculateState;
+    }
+
+    public function getFilePath(): string
+    {
+        return $this->getCalculatedState()->getMutationFilePath();
     }
 
     public function getOriginalFilePath(): string
@@ -114,25 +106,9 @@ class Mutation
         return $this->originalFilePath;
     }
 
-    /**
-     * @return Node[]
-     */
-    public function getOriginalFileAst(): array
-    {
-        return $this->originalFileAst;
-    }
-
     public function getMutatorName(): string
     {
         return $this->mutatorName;
-    }
-
-    /**
-     * @return (string|int|float)[]
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
     }
 
     public function getOriginalStartingLine(): int
@@ -140,19 +116,19 @@ class Mutation
         return (int) $this->attributes['startLine'];
     }
 
-    public function getMutatedNodeClass(): string
-    {
-        return $this->mutatedNodeClass;
-    }
-
-    public function getMutatedNode(): MutatedNode
-    {
-        return $this->mutatedNode;
-    }
-
     public function hasTests(): bool
     {
         return $this->executedByTests;
+    }
+
+    public function getMutatedCode(): string
+    {
+        return $this->getCalculatedState()->getMutatedCode();
+    }
+
+    public function getDiff(): string
+    {
+        return $this->getCalculatedState()->getDiff();
     }
 
     /**
@@ -165,21 +141,11 @@ class Mutation
 
     public function getHash(): string
     {
-        return $this->hash ?? $this->hash = $this->createHash();
+        return $this->getCalculatedState()->getMutationHash();
     }
 
-    private function createHash(): string
+    private function getCalculatedState(): MutationCalculatedState
     {
-        $hashKeys = [
-            $this->originalFilePath,
-            $this->mutatorName,
-            $this->mutationByMutatorIndex,
-        ];
-
-        foreach ($this->attributes as $attribute) {
-            $hashKeys[] = $attribute;
-        }
-
-        return md5(implode('_', $hashKeys));
+        return $this->calculatedState ?? $this->calculatedState = ($this->calculateState)();
     }
 }
