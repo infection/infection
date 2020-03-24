@@ -270,7 +270,7 @@ final class RunCommand extends BaseCommand
         /** @var string|null $minCoveredMsi */
         $minCoveredMsi = $input->getOption('min-covered-msi');
 
-        $precision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
+        $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile === '' ? null : $configFile,
@@ -285,9 +285,9 @@ final class RunCommand extends BaseCommand
             $initialTestsPhpOptions === '' ? null : $initialTestsPhpOptions,
             (bool) $input->getOption('skip-initial-tests'),
             $input->getOption('ignore-msi-with-no-mutations'),
-            MsiParser::parse($minMsi, $precision, 'min-msi'),
-            MsiParser::parse($minCoveredMsi, $precision, 'min-covered-msi'),
-            $precision,
+            MsiParser::parse($minMsi, $msiPrecision, 'min-msi'),
+            MsiParser::parse($minCoveredMsi, $msiPrecision, 'min-covered-msi'),
+            $msiPrecision,
             $testFramework === '' ? null : $testFramework,
             $testFrameworkExtraOptions === '' ? null : $testFrameworkExtraOptions,
             trim((string) $input->getOption('filter')),
