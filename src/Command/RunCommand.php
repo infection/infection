@@ -247,7 +247,6 @@ final class RunCommand extends BaseCommand
         } catch (InitialTestsFailed | MinMsiCheckFailed $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
-            // TODO/ do the same for TestFails
             $io->error($exception->getMessage());
         }
 
