@@ -19,4 +19,9 @@ final class FakeProcessBearer implements ProcessBearer
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
+
+    public function terminateProcess(): void
+    {
+        throw new LogicException('Did no expect to be called');
+    }
 }

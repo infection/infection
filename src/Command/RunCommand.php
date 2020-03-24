@@ -48,6 +48,7 @@ use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Metrics\MinMsiCheckFailed;
+use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function Safe\sprintf;
@@ -244,10 +245,9 @@ final class RunCommand extends BaseCommand
 
         try {
             $engine->execute();
-        } catch (MinMsiCheckFailed $exception) {
+        } catch (InitialTestsFailed | MinMsiCheckFailed $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
-            // TODO/ do the same for TestFails
             $io->error($exception->getMessage());
         }
 
