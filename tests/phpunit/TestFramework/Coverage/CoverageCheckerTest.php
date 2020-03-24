@@ -69,20 +69,10 @@ final class CoverageCheckerTest extends TestCase
      */
     private static $jUnit;
 
-    /**
-     * @var IndexXmlCoverageLocator|MockObject
-     */
-    private $indexXmlLocatorMock;
-
     public static function setUpBeforeClass(): void
     {
         self::$coveragePath = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/coverage/coverage-xml');
         self::$jUnit = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/junit.xml');
-    }
-
-    protected function setUp(): void
-    {
-        $this->indexXmlLocatorMock = $this->createMock(IndexXmlCoverageLocator::class);
     }
 
     public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_without_JUnit_report(): void
@@ -191,13 +181,19 @@ TXT
             $this->createInvalidIndexLocatorMock()
         );
 
-        $this->expectException(CoverageNotFound::class);
-        $this->expectExceptionMessage(
-            'Could not find the "index.xml" file. Please ensure that the XML coverage '
-            . 'report has been properly generated at the right place.'
-        );
+        try {
+            $checker->checkCoverageExists();
 
-        $checker->checkCoverageExists();
+            $this->fail();
+        } catch (CoverageNotFound $exception) {
+            $this->assertSame(
+                'Could not find the "index.xml" file. Please ensure that the XML coverage '
+                . 'report has been properly generated at the right place.',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+        }
     }
 
     public function test_it_does_not_pass_existence_check_if_XML_index_is_missing_with_PHPUnit(): void
@@ -213,14 +209,20 @@ TXT
             $this->createInvalidIndexLocatorMock()
         );
 
-        $this->expectException(CoverageNotFound::class);
-        $this->expectExceptionMessage(
-            'Could not find the "index.xml" file. Please ensure that the XML coverage '
-            . 'report has been properly generated at the right place. The PHPUnit option for the '
-            . 'path given is "--coverage-xml=/nowhere/coverage-xml"'
-        );
+        try {
+            $checker->checkCoverageExists();
 
-        $checker->checkCoverageExists();
+            $this->fail();
+        } catch (CoverageNotFound $exception) {
+            $this->assertSame(
+                'Could not find the "index.xml" file. Please ensure that the XML coverage '
+                . 'report has been properly generated at the right place. The PHPUnit option for the '
+                . 'path given is "--coverage-xml=/nowhere/coverage-xml"',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+        }
     }
 
     public function test_it_does_not_pass_existence_check_if_XML_index_is_missing_with_Codeception(): void
@@ -236,14 +238,20 @@ TXT
             $this->createInvalidIndexLocatorMock()
         );
 
-        $this->expectException(CoverageNotFound::class);
-        $this->expectExceptionMessage(
-            'Could not find the "index.xml" file. Please ensure that the XML coverage '
-            . 'report has been properly generated at the right place. The Codeception option for the'
-            . ' path given is "--coverage-phpunit=/nowhere/coverage-xml"'
-        );
+        try {
+            $checker->checkCoverageExists();
 
-        $checker->checkCoverageExists();
+            $this->fail();
+        } catch (CoverageNotFound $exception) {
+            $this->assertSame(
+                'Could not find the "index.xml" file. Please ensure that the XML coverage '
+                . 'report has been properly generated at the right place. The Codeception option for the'
+                . ' path given is "--coverage-phpunit=/nowhere/coverage-xml"',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+        }
     }
 
     public function test_it_passes_existence_check_if_XML_index_is_present_and_JUnit_file_is_missing_without_JUnit_report(): void
@@ -277,14 +285,22 @@ TXT
             $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
         );
 
-        $this->expectException(CoverageNotFound::class);
-        $this->expectExceptionMessage(sprintf(
-            'Could not find the JUnit file report. Please ensure that the JUnit coverage '
-            . 'report has been properly generated at the right place.',
-            self::$coveragePath
-        ));
+        try {
+            $checker->checkCoverageExists();
 
-        $checker->checkCoverageExists();
+            $this->fail();
+        } catch (CoverageNotFound $exception) {
+            $this->assertSame(
+                sprintf(
+                    'Could not find the JUnit file report. Please ensure that the JUnit coverage '
+                    . 'report has been properly generated at the right place.',
+                    self::$coveragePath
+                ),
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+        }
     }
 
     public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_with_JUnit_report_with_PHPUnit_test_framework_adapter(): void
@@ -303,15 +319,23 @@ TXT
             $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
         );
 
-        $this->expectException(CoverageNotFound::class);
-        $this->expectExceptionMessage(sprintf(
-            'Could not find the JUnit file report. Please ensure that the JUnit coverage '
-            . 'report has been properly generated at the right place. The PHPUnit option for the '
-            . 'path given is "--log-junit=%s/junit.xml"',
-            self::$coveragePath
-        ));
+        try {
+            $checker->checkCoverageExists();
 
-        $checker->checkCoverageExists();
+            $this->fail();
+        } catch (CoverageNotFound $exception) {
+            $this->assertSame(
+                sprintf(
+                    'Could not find the JUnit file report. Please ensure that the JUnit coverage '
+                    . 'report has been properly generated at the right place. The PHPUnit option for the '
+                    . 'path given is "--log-junit=%s/junit.xml"',
+                    self::$coveragePath
+                ),
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+        }
     }
 
     public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_with_JUnit_report_with_Codeception_test_framework_adapter(): void
@@ -327,14 +351,23 @@ TXT
             $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
         );
 
-        $this->expectException(CoverageNotFound::class);
-        $this->expectExceptionMessage(
-            'Could not find the JUnit file report. Please ensure that the JUnit coverage report has'
-            . ' been properly generated at the right place. The Codeception option for the path '
-            . 'given is "--xml"'
-        );
+        try {
+            $checker->checkCoverageExists();
 
-        $checker->checkCoverageExists();
+            $this->fail();
+        } catch (CoverageNotFound $exception) {
+            $this->assertSame(
+                sprintf(
+                    'Could not find the JUnit file report. Please ensure that the JUnit coverage report has'
+                    . ' been properly generated at the right place. The Codeception option for the path '
+                    . 'given is "--xml"',
+                    self::$coveragePath
+                ),
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+        }
     }
 
     public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found_after_tests_run_with_JUnit_report(): void
