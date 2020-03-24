@@ -101,7 +101,7 @@ class IndexXmlCoverageLocator
 
         if (count($files) > 1) {
             throw new FileNotFound(sprintf(
-                'Could not locate the XML coverage index file: more than one file has been '
+                'Could not locate the XML coverage index file. More than one file has been '
                 . 'found: "%s"',
                 implode(
                     '", "',

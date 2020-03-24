@@ -119,18 +119,15 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_cannot_locate_the_index_file_if_the_result_is_ambiguous(): void
     {
-        if (PHP_OS_FAMILY === 'Darwin') {
-            $this->markTestSkipped('Cannot test this on case-insensitive OS');
-        }
-
         touch('index.xml');
-        touch('INDEX.xml');
+        mkdir('sub-dir');
+        touch('sub-dir/index.xml');
 
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
-            'Could not locate the XML coverage index file: more than one file has been: "%s", "%s"',
+            'Could not locate the XML coverage index file. More than one file has been found: "%s", "%s"',
             normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'index.xml')),
-            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'INDEX.XML'))
+            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'sub-dir/index.xml'))
         ));
 
         $this->locator->locate();
