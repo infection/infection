@@ -103,6 +103,7 @@ class MetricsCalculator
     public function collect(MutantExecutionResult ...$executionResults): void
     {
         if (count($executionResults) > 0) {
+            // Reset the calculator if any result is added
             $this->calculator = null;
         }
 

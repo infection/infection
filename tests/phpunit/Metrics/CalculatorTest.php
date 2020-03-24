@@ -49,6 +49,7 @@ final class CalculatorTest extends TestCase
      * @dataProvider metricsProvider
      */
     public function test_it_can_calculate_the_scores(
+        int $roundingPrecision,
         int $killedCount,
         int $errorCount,
         int $escapedCount,
@@ -59,7 +60,7 @@ final class CalculatorTest extends TestCase
         float $expectedCoveredMsi
     ): void {
         $calculator = new Calculator(
-            2,
+            $roundingPrecision,
             $killedCount,
             $errorCount,
             $timedOutCount,
@@ -102,6 +103,7 @@ final class CalculatorTest extends TestCase
     public function metricsProvider(): iterable
     {
         yield 'empty' => [
+            2,
             0,
             0,
             0,
@@ -113,6 +115,7 @@ final class CalculatorTest extends TestCase
         ];
 
         yield 'int scores' => [
+            2,
             1,
             0,
             9,
@@ -124,6 +127,7 @@ final class CalculatorTest extends TestCase
         ];
 
         yield 'nominal' => [
+            2,
             7,
             2,
             2,
@@ -134,7 +138,20 @@ final class CalculatorTest extends TestCase
             84.62,
         ];
 
+        yield 'nominal with higher precision' => [
+            4,
+            7,
+            2,
+            2,
+            2,
+            1,
+            78.5714,
+            92.8571,
+            84.6154,
+        ];
+
         yield 'nominal no non-tested' => [
+            2,
             7,
             2,
             2,
@@ -156,7 +173,7 @@ final class CalculatorTest extends TestCase
         ];
 
         yield 'nominal' => [
-            $this->createCompleteMetricsCalculator(),
+            $this->createCompleteMetricsCalculator(2),
             60.,
             80.0,
             75.0,
