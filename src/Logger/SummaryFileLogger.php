@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 
 /**
  * Simple loggers recording the mutation result counts. This is mostly intended for internal

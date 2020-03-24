@@ -88,6 +88,6 @@ final class PhpUnitXmlCoverageTraceProviderTest extends TestCase
 
         $traces = $provider->provideTraces();
 
-        $this->assertSame([$proxyTraceMock], iterator_to_array($traces));
+        $this->assertSame([$proxyTraceMock], iterator_to_array($traces, true));
     }
 }

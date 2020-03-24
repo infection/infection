@@ -52,6 +52,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
+use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
@@ -60,9 +61,10 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\MinMsiChecker;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
@@ -76,10 +78,11 @@ use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\MutantProcess;
+use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Infection\Process\Runner\TestRunConstraintChecker;
+use Infection\Process\Runner\ParallelProcessRunner;
+use Infection\Process\Runner\ProcessRunner;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Time\Stopwatch;
@@ -98,7 +101,6 @@ use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\TestTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -197,9 +199,6 @@ final class Container
                     $container->getConfiguration()->getCoveragePath()
                 );
             },
-            TestTraceProvider::class => static function (): TestTraceProvider {
-                return new TestTraceProvider();
-            },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
                 return new RootsFileOrDirectoryLocator(
                     [$container->getProjectDir()],
@@ -237,11 +236,23 @@ final class Container
                 return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
-                return new ParallelProcessRunner(static function (MutantProcess $mutantProcess) use ($container): void {
-                    $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished(
-                        MutantExecutionResult::createFromProcess($mutantProcess)
-                    ));
-                });
+                $eventDispatcher = $container->getEventDispatcher();
+                $resultFactory = $container->getMutantExecutionResultFactory();
+
+                return new ParallelProcessRunner(
+                    static function (MutantProcess $mutantProcess) use (
+                        $eventDispatcher,
+                        $resultFactory
+                    ): void {
+                        $eventDispatcher->dispatch(new MutantProcessWasFinished(
+                            $resultFactory->createFromProcess($mutantProcess)
+                        ));
+                    },
+                    $container->getConfiguration()->getThreadCount()
+                );
+            },
+            DryProcessRunner::class => static function (): DryProcessRunner {
+                return new DryProcessRunner();
             },
             TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {
                 return new TestFrameworkConfigLocator(
@@ -346,11 +357,10 @@ final class Container
                     $container->getIndexXmlCoverageReader()
                 );
             },
-            TestRunConstraintChecker::class => static function (self $container): TestRunConstraintChecker {
+            MinMsiChecker::class => static function (self $container): MinMsiChecker {
                 $config = $container->getConfiguration();
 
-                return new TestRunConstraintChecker(
-                    $container->getMetricsCalculator(),
+                return new MinMsiChecker(
                     $config->ignoreMsiWithNoMutations(),
                     (float) $config->getMinMsi(),
                     (float) $config->getMinCoveredMsi()
@@ -433,7 +443,6 @@ final class Container
 
                 return new MutationGenerator(
                     $container->getFilteredEnrichedTraceProvider(),
-                    $container->getTestTraceProvider(),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
@@ -444,9 +453,11 @@ final class Container
                 return new MutationTestingRunner(
                     $container->getMutantProcessBuilder(),
                     $container->getMutantFactory(),
-                    $container->getParallelProcessRunner(),
+                    $container->getProcessRunner(),
                     $container->getEventDispatcher(),
-                    $container->getFileSystem(),
+                    $container->getConfiguration()->isDryRun()
+                        ? new DummyFileSystem()
+                        : $container->getFileSystem(),
                     $container->getConfiguration()->noProgress(),
                     $container->getConfiguration()->getProcessTimeout()
                 );
@@ -460,11 +471,14 @@ final class Container
             TestFrameworkExtraOptionsFilter::class => static function (): TestFrameworkExtraOptionsFilter {
                 return new TestFrameworkExtraOptionsFilter();
             },
-            AdapterInstallationDecider::class => static function (self $container): AdapterInstallationDecider {
+            AdapterInstallationDecider::class => static function (): AdapterInstallationDecider {
                 return new AdapterInstallationDecider(new QuestionHelper());
             },
             AdapterInstaller::class => static function (): AdapterInstaller {
                 return new AdapterInstaller(new ComposerExecutableFinder());
+            },
+            MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
+                return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
             },
         ]);
     }
@@ -486,7 +500,9 @@ final class Container
         ?float $minCoveredMsi,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
-        string $filter
+        string $filter,
+        int $threadCount,
+        bool $dryRun
     ): self {
         $clone = clone $this;
 
@@ -523,7 +539,9 @@ final class Container
                 $mutatorsInput,
                 $testFramework,
                 $testFrameworkExtraOptions,
-                $filter
+                $filter,
+                $threadCount,
+                $dryRun
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -542,7 +560,9 @@ final class Container
                     $mutatorsInput,
                     $testFramework,
                     $testFrameworkExtraOptions,
-                    $filter
+                    $filter,
+                    $threadCount,
+                    $dryRun
                 );
             }
         );
@@ -611,11 +631,6 @@ final class Container
         return $this->get(IndexXmlCoverageReader::class);
     }
 
-    public function getTestTraceProvider(): TestTraceProvider
-    {
-        return $this->get(TestTraceProvider::class);
-    }
-
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
     {
         return $this->get(RootsFileOrDirectoryLocator::class);
@@ -646,9 +661,14 @@ final class Container
         return $this->get(SyncEventDispatcher::class);
     }
 
-    public function getParallelProcessRunner(): ParallelProcessRunner
+    public function getProcessRunner(): ProcessRunner
     {
-        return $this->get(ParallelProcessRunner::class);
+        $config = $this->getConfiguration();
+
+        return $config->isDryRun()
+            ? $this->get(DryProcessRunner::class)
+            : $this->get(ParallelProcessRunner::class)
+        ;
     }
 
     public function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
@@ -761,9 +781,9 @@ final class Container
         return $this->get(CoverageChecker::class);
     }
 
-    public function getTestRunConstraintChecker(): TestRunConstraintChecker
+    public function getMinMsiChecker(): MinMsiChecker
     {
-        return $this->get(TestRunConstraintChecker::class);
+        return $this->get(MinMsiChecker::class);
     }
 
     public function getSubscriberBuilder(): SubscriberBuilder
@@ -854,6 +874,11 @@ final class Container
     public function getAdapterInstaller(): AdapterInstaller
     {
         return $this->get(AdapterInstaller::class);
+    }
+
+    public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
+    {
+        return $this->get(MutantExecutionResultFactory::class);
     }
 
     /**

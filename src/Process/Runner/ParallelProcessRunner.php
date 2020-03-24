@@ -1,0 +1,176 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Process\Runner;
+
+use function array_shift;
+use Closure;
+use function count;
+use Generator;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use function usleep;
+
+/**
+ * @internal
+ *
+ * This ProcessManager is an elaborate wrapper to enable parallel processing using Symfony Process component
+ */
+final class ParallelProcessRunner implements ProcessRunner
+{
+    /**
+     * @var ProcessBearer[]
+     */
+    private $runningProcesses = [];
+
+    private $processHandler;
+    private $threadCount;
+    private $poll;
+
+    /**
+     * @param Closure(ProcessBearer): void $processHandler
+     * @param int $poll Delay (in milliseconds) to wait in-between two polls
+     */
+    public function __construct(Closure $processHandler, int $threadCount, int $poll = 1000)
+    {
+        $this->processHandler = $processHandler;
+        $this->threadCount = $threadCount;
+        $this->poll = $poll;
+    }
+
+    public function run(iterable $processes): void
+    {
+        /*
+         * It takes about 100000 ms for a mutated process to finish, where it takes
+         * about 5000 ms to make it. Therefore instead of just waiting we can produce
+         * new processes so that when a process or several finish, we would have
+         * additional jobs on hand, without a need to wait for them to be created.
+         *
+         * For our purposes we need to make sure we only see one process only once. Thus,
+         * we use a generator here which is both non-rewindable, and will fail loudly if tried.
+         */
+        $generator = self::toGenerator($processes);
+
+        // Bucket for processes to be executed
+        $bucket = [];
+
+        // Load the first process from the queue to buy us some time.
+        self::fillBucketOnce($bucket, $generator, 1);
+
+        $threadCount = max(1, $this->threadCount);
+
+        // start the initial batch of processes
+        while ($process = array_shift($bucket)) {
+            $this->startProcess($process);
+
+            if (count($this->runningProcesses) >= $threadCount) {
+                do {
+                    // While we wait, try fetch a good amount of next processes from the queue,
+                    // reducing the poll delay with each loaded process
+                    usleep(max(0, $this->poll - self::fillBucketOnce($bucket, $generator, $threadCount)));
+                } while (!$this->freeTerminatedProcesses());
+            }
+
+            // In any case try to load at least one process to the bucket
+            self::fillBucketOnce($bucket, $generator, 1);
+        }
+
+        do {
+            usleep($this->poll);
+            $this->freeTerminatedProcesses();
+            // continue loop while there are processes being executed or waiting for execution
+        } while ($this->runningProcesses);
+    }
+
+    private function freeTerminatedProcesses(): bool
+    {
+        // remove any finished process from the stack
+        foreach ($this->runningProcesses as $index => $processBearer) {
+            $process = $processBearer->getProcess();
+
+            try {
+                $process->checkTimeout();
+            } catch (ProcessTimedOutException $exception) {
+                $processBearer->markAsTimedOut();
+            }
+
+            if (!$process->isRunning()) {
+                ($this->processHandler)($processBearer);
+
+                unset($this->runningProcesses[$index]);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function startProcess(ProcessBearer $processBearer): void
+    {
+        $processBearer->getProcess()->start();
+
+        $this->runningProcesses[] = $processBearer;
+    }
+
+    /**
+     * @param ProcessBearer[] $bucket
+     * @param Generator<ProcessBearer> $input
+     */
+    private static function fillBucketOnce(array &$bucket, Generator $input, int $threadCount): int
+    {
+        if (count($bucket) >= $threadCount || !$input->valid()) {
+            return 0;
+        }
+
+        $start = microtime(true);
+
+        if ($input->valid()) {
+            $bucket[] = $input->current();
+            $input->next();
+        }
+
+        return (int) (microtime(true) - $start) * 1000000; // ns to ms
+    }
+
+    /**
+     * @param iterable<ProcessBearer> $input
+     *
+     * @return Generator<ProcessBearer>
+     */
+    private static function toGenerator(iterable &$input): Generator
+    {
+        yield from $input;
+    }
+}

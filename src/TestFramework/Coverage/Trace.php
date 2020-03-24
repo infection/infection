@@ -36,13 +36,33 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Infection\FileSystem\SourceFileFilter;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
  */
 interface Trace
 {
+    public function getSourceFileInfo(): SplFileInfo;
+
+    /**
+     * Source file real path. This method is used for two reasons:
+     * - it allows to have a simple type-hinted method as otherwise the fileInfo one might return
+     *   false
+     * - it duck-type SplFileInfo since Trace is used in SourceFileFilter with RealPathFilterIterator
+     *
+     * Hence the name which cannot be changed for something more expressive like getSourceRealPath()
+     *
+     * @see SourceFileFilter
+     * @see RealPathFilterIterator
+     */
+    public function getRealPath(): string;
+
     public function hasTests(): bool;
+
+    public function getTests(): TestLocations;
 
     /**
      * @return iterable<TestLocation>

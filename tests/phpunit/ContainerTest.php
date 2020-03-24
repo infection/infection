@@ -103,7 +103,9 @@ final class ContainerTest extends TestCase
             .0,
             'phpunit',
             '',
-            ''
+            '',
+            0,
+            true
         );
 
         $newContainer->getSchemaConfiguration();
@@ -114,6 +116,7 @@ final class ContainerTest extends TestCase
     public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
     {
         $container = SingletonContainer::getContainer();
+
         $newContainer = $container->withDynamicParameters(
             null,
             '',
@@ -131,7 +134,9 @@ final class ContainerTest extends TestCase
             .0,
             'phpunit',
             '',
-            ''
+            '',
+            0,
+            true
         );
 
         $traces = $newContainer->getFilteredEnrichedTraceProvider()->provideTraces();

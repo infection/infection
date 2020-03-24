@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\CannotBeInstantiated;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use function is_array;
@@ -45,9 +46,7 @@ use Traversable;
 
 final class TestLocationsNormalizer
 {
-    private function __construct()
-    {
-    }
+    use CannotBeInstantiated;
 
     /**
      * @param TestLocations[]|TestLocation[] $value
@@ -91,7 +90,7 @@ final class TestLocationsNormalizer
         if ($mixed instanceof TestLocations) {
             return [
                 'byLine' => self::serializeValue($mixed->getTestsLocationsBySourceLine()),
-                'byMethod' => self::serializeValue($mixed->getSourceMethodLineRangeByMethod()),
+                'byMethod' => self::serializeValue($mixed->getSourceMethodRangeByMethod()),
             ];
         }
 

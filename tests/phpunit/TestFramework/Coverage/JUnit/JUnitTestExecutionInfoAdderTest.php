@@ -132,7 +132,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
                     'byMethod' => [],
                 ],
             ],
-            TestLocationsNormalizer::normalize([$proxyTrace->retrieveTestLocations()])
+            TestLocationsNormalizer::normalize([$proxyTrace->getTests()])
         );
     }
 }

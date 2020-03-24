@@ -39,6 +39,7 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function class_exists;
+use Infection\CannotBeInstantiated;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use function iterator_to_array;
@@ -49,14 +50,12 @@ use Webmozart\Assert\Assert;
 
 final class EnvTestCasesProvider
 {
+    use CannotBeInstantiated;
+
     /**
      * @var string[][]|null
      */
     private static $envTestCaseClassesTuple;
-
-    private function __construct()
-    {
-    }
 
     /**
      * Note that the current implementation is far from being bullet-proof. For example as of now
