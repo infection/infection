@@ -91,6 +91,7 @@ use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\FilteredEnrichedTraceProvider;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
@@ -136,6 +137,11 @@ final class Container
      * @var array<class-string<object>, Closure(self): object>
      */
     private $factories = [];
+
+    /**
+     * @var string|null
+     */
+    private $defaultJUnitPath;
 
     /**
      * @param array<class-string<object>, Closure(self): object> $values
@@ -211,7 +217,7 @@ final class Container
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
                     $container->getTestFrameworkFinder(),
-                    $container->getJUnitFilePath(),
+                    $container->getDefaultJUnitFilePath(),
                     $config,
                     GeneratedExtensionsConfig::EXTENSIONS
                 );
@@ -249,7 +255,7 @@ final class Container
             },
             MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
                 return new MemoizedTestFileDataProvider(
-                    new JUnitTestFileDataProvider($container->getJUnitFilePath())
+                    new JUnitTestFileDataProvider($container->getJUnitReportLocator())
                 );
             },
             Lexer::class => static function (): Lexer {
@@ -335,11 +341,16 @@ final class Container
                     $config->shouldSkipInitialTests(),
                     $config->getInitialTestsPhpOptions() ?? '',
                     $config->getCoveragePath(),
-                    $testFrameworkAdapter->hasJUnitReport()
-                        ? $container->getJUnitFilePath()
-                        : null,
+                    $testFrameworkAdapter->hasJUnitReport(),
+                    $container->getJUnitReportLocator(),
                     $testFrameworkAdapter->getName(),
                     $container->getIndexXmlCoverageReader()
+                );
+            },
+            JUnitReportLocator::class => static function (self $container): JUnitReportLocator {
+                return new JUnitReportLocator(
+                    $container->getConfiguration()->getCoveragePath(),
+                    $container->getDefaultJUnitFilePath()
                 );
             },
             MinMsiChecker::class => static function (self $container): MinMsiChecker {
@@ -571,15 +582,20 @@ final class Container
         return $this->get(TmpDirProvider::class);
     }
 
-    public function getJUnitFilePath(): string
+    public function getDefaultJUnitFilePath(): string
     {
-        return sprintf(
+        return $this->defaultJUnitPath ?? $this->defaultJUnitPath = sprintf(
             '%s/%s',
             Path::canonicalize(
                 $this->getConfiguration()->getCoveragePath() . '/..'
             ),
             'junit.xml'
         );
+    }
+
+    public function getJUnitReportLocator(): JUnitReportLocator
+    {
+        return $this->get(JUnitReportLocator::class);
     }
 
     public function getIndexXmlCoverageParser(): IndexXmlCoverageParser

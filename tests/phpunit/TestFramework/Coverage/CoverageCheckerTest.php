@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use function extension_loaded;
+use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageNotFound;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use const PHP_SAPI;
@@ -90,7 +92,8 @@ final class CoverageCheckerTest extends TestCase
             true,
             '',
             '',
-            null,
+            false,
+            $this->createFakeJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -116,7 +119,8 @@ final class CoverageCheckerTest extends TestCase
             true,
             '',
             '',
-            '/path/to/junit.xml',
+            true,
+            $this->createJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -146,7 +150,8 @@ final class CoverageCheckerTest extends TestCase
             false,
             '',
             '',
-            '',
+            false,
+            $this->createFakeJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -177,29 +182,8 @@ TXT
             false,
             '',
             self::$coveragePath,
-            self::$jUnit,
-            'unknown',
-            $this->indexXmlCoverageReaderMock
-        );
-
-        $this->indexXmlCoverageReaderMock
-            ->method('getIndexXmlPath')
-            ->willReturn(self::$coveragePath . '/index.xml')
-        ;
-
-        $checker->checkCoverageExists();
-
-        $this->addToAssertionCount(1);
-    }
-
-    public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found_without_JUnit_report(): void
-    {
-        $checker = new CoverageChecker(
-            false,
-            false,
-            '',
-            self::$coveragePath,
-            self::$jUnit,
+            true,
+            $this->createJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -221,7 +205,8 @@ TXT
             false,
             '',
             '/nowhere',
-            self::$jUnit,
+            true,
+            $this->createJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -247,7 +232,8 @@ TXT
             false,
             '',
             '/nowhere',
-            self::$jUnit,
+            true,
+            $this->createJUnitReportLocatorMock(),
             'phpunit',
             $this->indexXmlCoverageReaderMock
         );
@@ -274,7 +260,8 @@ TXT
             false,
             '',
             '/nowhere',
-            self::$jUnit,
+            true,
+            $this->createJUnitReportLocatorMock(),
             'codeception',
             $this->indexXmlCoverageReaderMock
         );
@@ -301,7 +288,8 @@ TXT
             false,
             '',
             self::$coveragePath,
-            null,
+            false,
+            $this->createFakeJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -323,7 +311,8 @@ TXT
             false,
             '',
             self::$coveragePath,
-            '/invalid/path/to/junit.xml',
+            true,
+            $this->createInvalidJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -335,8 +324,8 @@ TXT
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(sprintf(
-            'Could not find the file "/invalid/path/to/junit.xml". Please ensure that the '
-            . 'JUnit coverage report has been properly generated at the right place.',
+            'Could not find the JUnit file report. Please ensure that the JUnit coverage '
+            . 'report has been properly generated at the right place.',
             self::$coveragePath
         ));
 
@@ -353,7 +342,8 @@ TXT
             false,
             '',
             self::$coveragePath,
-            '/invalid/path/to/junit.xml',
+            true,
+            $this->createInvalidJUnitReportLocatorMock(),
             'phpunit',
             $this->indexXmlCoverageReaderMock
         );
@@ -365,9 +355,9 @@ TXT
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(sprintf(
-            'Could not find the file "/invalid/path/to/junit.xml". Please ensure that the '
-            . 'JUnit coverage report has been properly generated at the right place. The PHPUnit '
-            . 'option for the path given is "--log-junit=%s/junit.xml"',
+            'Could not find the JUnit file report. Please ensure that the JUnit coverage '
+            . 'report has been properly generated at the right place. The PHPUnit option for the '
+            . 'path given is "--log-junit=%s/junit.xml"',
             self::$coveragePath
         ));
 
@@ -381,7 +371,8 @@ TXT
             false,
             '',
             self::$coveragePath,
-            '/invalid/path/to/junit.xml',
+            true,
+            $this->createInvalidJUnitReportLocatorMock(),
             'codeception',
             $this->indexXmlCoverageReaderMock
         );
@@ -392,9 +383,10 @@ TXT
         ;
 
         $this->expectException(CoverageNotFound::class);
-        $this->expectExceptionMessage('Could not find the file "/invalid/path/to/junit.xml". Please'
-            . ' ensure that the JUnit coverage report has been properly generated at the right '
-            . 'place. The Codeception option for the path given is "--xml"'
+        $this->expectExceptionMessage(
+            'Could not find the JUnit file report. Please ensure that the JUnit coverage report has'
+            . ' been properly generated at the right place. The Codeception option for the path '
+            . 'given is "--xml"'
         );
 
         $checker->checkCoverageExists();
@@ -407,7 +399,8 @@ TXT
             false,
             '',
             self::$coveragePath,
-            self::$jUnit,
+            true,
+            $this->createJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -432,7 +425,8 @@ TXT
             false,
             '',
             self::$coveragePath,
-            self::$jUnit,
+            true,
+            $this->createJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -457,7 +451,8 @@ TXT
             false,
             '',
             '/nowhere',
-            self::$jUnit,
+            true,
+            $this->createJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -497,7 +492,8 @@ TXT
             false,
             '',
             $coveragePath,
-            '/invalid/path/to/junit.xml',
+            true,
+            $this->createInvalidJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -518,7 +514,7 @@ Ok!
 ```
 
 Issue(s):
-- The file "/invalid/path/to/junit.xml" could not be found
+- The JUnit file could not be found: No JUnit file found
 TXT
         );
 
@@ -535,7 +531,8 @@ TXT
             false,
             '',
             self::$coveragePath,
-            null,
+            false,
+            $this->createFakeJUnitReportLocatorMock(),
             'unknown',
             $this->indexXmlCoverageReaderMock
         );
@@ -572,5 +569,47 @@ TXT
         if (extension_loaded('pcov')) {
             $this->markTestSkipped('Test requires pcov to be disabled to run.');
         }
+    }
+
+    /**
+     * @return JUnitReportLocator|MockObject
+     */
+    private function createFakeJUnitReportLocatorMock(): JUnitReportLocator
+    {
+        $jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
+        $jUnitLocatorMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        return $jUnitLocatorMock;
+    }
+
+    /**
+     * @return JUnitReportLocator|MockObject
+     */
+    private function createInvalidJUnitReportLocatorMock(): JUnitReportLocator
+    {
+        $jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
+        $jUnitLocatorMock
+            ->method('locate')
+            ->willThrowException(new FileNotFound('No JUnit file found'))
+        ;
+
+        return $jUnitLocatorMock;
+    }
+
+    /**
+     * @return JUnitReportLocator|MockObject
+     */
+    private function createJUnitReportLocatorMock(): JUnitReportLocator
+    {
+        $jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
+        $jUnitLocatorMock
+            ->method('locate')
+            ->willReturn(self::$jUnit)
+        ;
+
+        return $jUnitLocatorMock;
     }
 }
