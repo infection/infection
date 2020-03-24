@@ -80,7 +80,7 @@ class IndexXmlCoverageLocator
         // CoverageChecker hence it makes sense to try this one first before attempting any more
         // expensive lookup
         if (file_exists($this->defaultIndexPath)) {
-            return $this->indexPath ?? $this->defaultIndexPath;
+            return $this->indexPath = $this->defaultIndexPath;
         }
 
         if (!file_exists($this->coveragePath)) {
@@ -118,7 +118,7 @@ class IndexXmlCoverageLocator
         $indexFileInfo = current($files);
 
         if ($indexFileInfo !== false) {
-            return $this->indexPath ?? Path::canonicalize($indexFileInfo->getPathname());
+            return $this->indexPath = Path::canonicalize($indexFileInfo->getPathname());
         }
 
         throw new FileNotFound(sprintf(

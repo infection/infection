@@ -50,7 +50,6 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
@@ -61,9 +60,10 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\MinMsiChecker;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
@@ -76,13 +76,11 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
-use Infection\Process\MutantProcess;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
-use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Time\Stopwatch;
@@ -242,14 +240,7 @@ final class Container
                 return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
-                return new ParallelProcessRunner(
-                    static function (MutantProcess $mutantProcess) use ($container): void {
-                        $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished(
-                            MutantExecutionResult::createFromProcess($mutantProcess)
-                        ));
-                    },
-                    $container->getConfiguration()->getThreadCount()
-                );
+                return new ParallelProcessRunner($container->getConfiguration()->getThreadCount());
             },
             DryProcessRunner::class => static function (): DryProcessRunner {
                 return new DryProcessRunner();
@@ -264,7 +255,7 @@ final class Container
             },
             MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
                 return new MemoizedTestFileDataProvider(
-                    new JUnitTestFileDataProvider($container->getDefaultJUnitFilePath())
+                    new JUnitTestFileDataProvider($container->getJUnitReportLocator())
                 );
             },
             Lexer::class => static function (): Lexer {
@@ -362,11 +353,10 @@ final class Container
                     $container->getDefaultJUnitFilePath()
                 );
             },
-            TestRunConstraintChecker::class => static function (self $container): TestRunConstraintChecker {
+            MinMsiChecker::class => static function (self $container): MinMsiChecker {
                 $config = $container->getConfiguration();
 
-                return new TestRunConstraintChecker(
-                    $container->getMetricsCalculator(),
+                return new MinMsiChecker(
                     $config->ignoreMsiWithNoMutations(),
                     (float) $config->getMinMsi(),
                     (float) $config->getMinCoveredMsi()
@@ -441,7 +431,9 @@ final class Container
             MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
                 return new MutantProcessBuilder(
                     $container->getTestFrameworkAdapter(),
-                    $container->getConfiguration()->getProcessTimeout()
+                    $container->getConfiguration()->getProcessTimeout(),
+                    $container->getEventDispatcher(),
+                    $container->getMutantExecutionResultFactory()
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {
@@ -476,11 +468,14 @@ final class Container
             TestFrameworkExtraOptionsFilter::class => static function (): TestFrameworkExtraOptionsFilter {
                 return new TestFrameworkExtraOptionsFilter();
             },
-            AdapterInstallationDecider::class => static function (self $container): AdapterInstallationDecider {
+            AdapterInstallationDecider::class => static function (): AdapterInstallationDecider {
                 return new AdapterInstallationDecider(new QuestionHelper());
             },
             AdapterInstaller::class => static function (): AdapterInstaller {
                 return new AdapterInstaller(new ComposerExecutableFinder());
+            },
+            MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
+                return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
             },
         ]);
     }
@@ -589,7 +584,7 @@ final class Container
 
     public function getDefaultJUnitFilePath(): string
     {
-        return $this->defaultJUnitPath ?? sprintf(
+        return $this->defaultJUnitPath ?? $this->defaultJUnitPath = sprintf(
             '%s/%s',
             Path::canonicalize(
                 $this->getConfiguration()->getCoveragePath() . '/..'
@@ -788,9 +783,9 @@ final class Container
         return $this->get(CoverageChecker::class);
     }
 
-    public function getTestRunConstraintChecker(): TestRunConstraintChecker
+    public function getMinMsiChecker(): MinMsiChecker
     {
-        return $this->get(TestRunConstraintChecker::class);
+        return $this->get(MinMsiChecker::class);
     }
 
     public function getSubscriberBuilder(): SubscriberBuilder
@@ -881,6 +876,11 @@ final class Container
     public function getAdapterInstaller(): AdapterInstaller
     {
         return $this->get(AdapterInstaller::class);
+    }
+
+    public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
+    {
+        return $this->get(MutantExecutionResultFactory::class);
     }
 
     /**

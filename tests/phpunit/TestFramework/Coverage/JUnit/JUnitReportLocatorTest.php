@@ -154,7 +154,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not find any file with the pattern "*.junit.xml" in "%s"',
-            $this->tmp.'/unknown'
+            $this->tmp . '/unknown'
         ));
 
         $locator->locate();
