@@ -173,7 +173,7 @@ final class CalculatorTest extends TestCase
         ];
 
         yield 'nominal' => [
-            $this->createCompleteMetricsCalculator(2),
+            $this->createCompleteMetricsCalculator(),
             60.,
             80.0,
             75.0,
