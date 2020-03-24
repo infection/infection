@@ -50,7 +50,6 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
@@ -77,7 +76,6 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
-use Infection\Process\MutantProcess;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -93,6 +91,7 @@ use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\FilteredEnrichedTraceProvider;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
@@ -138,6 +137,11 @@ final class Container
      * @var array<class-string<object>, Closure(self): object>
      */
     private $factories = [];
+
+    /**
+     * @var string|null
+     */
+    private $defaultJUnitPath;
 
     /**
      * @param array<class-string<object>, Closure(self): object> $values
@@ -213,7 +217,7 @@ final class Container
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
                     $container->getTestFrameworkFinder(),
-                    $container->getJUnitFilePath(),
+                    $container->getDefaultJUnitFilePath(),
                     $config,
                     GeneratedExtensionsConfig::EXTENSIONS
                 );
@@ -236,20 +240,7 @@ final class Container
                 return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
-                $eventDispatcher = $container->getEventDispatcher();
-                $resultFactory = $container->getMutantExecutionResultFactory();
-
-                return new ParallelProcessRunner(
-                    static function (MutantProcess $mutantProcess) use (
-                        $eventDispatcher,
-                        $resultFactory
-                    ): void {
-                        $eventDispatcher->dispatch(new MutantProcessWasFinished(
-                            $resultFactory->createFromProcess($mutantProcess)
-                        ));
-                    },
-                    $container->getConfiguration()->getThreadCount()
-                );
+                return new ParallelProcessRunner($container->getConfiguration()->getThreadCount());
             },
             DryProcessRunner::class => static function (): DryProcessRunner {
                 return new DryProcessRunner();
@@ -264,7 +255,7 @@ final class Container
             },
             MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
                 return new MemoizedTestFileDataProvider(
-                    new JUnitTestFileDataProvider($container->getJUnitFilePath())
+                    new JUnitTestFileDataProvider($container->getJUnitReportLocator())
                 );
             },
             Lexer::class => static function (): Lexer {
@@ -350,11 +341,16 @@ final class Container
                     $config->shouldSkipInitialTests(),
                     $config->getInitialTestsPhpOptions() ?? '',
                     $config->getCoveragePath(),
-                    $testFrameworkAdapter->hasJUnitReport()
-                        ? $container->getJUnitFilePath()
-                        : null,
+                    $testFrameworkAdapter->hasJUnitReport(),
+                    $container->getJUnitReportLocator(),
                     $testFrameworkAdapter->getName(),
                     $container->getIndexXmlCoverageReader()
+                );
+            },
+            JUnitReportLocator::class => static function (self $container): JUnitReportLocator {
+                return new JUnitReportLocator(
+                    $container->getConfiguration()->getCoveragePath(),
+                    $container->getDefaultJUnitFilePath()
                 );
             },
             MinMsiChecker::class => static function (self $container): MinMsiChecker {
@@ -435,7 +431,9 @@ final class Container
             MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
                 return new MutantProcessBuilder(
                     $container->getTestFrameworkAdapter(),
-                    $container->getConfiguration()->getProcessTimeout()
+                    $container->getConfiguration()->getProcessTimeout(),
+                    $container->getEventDispatcher(),
+                    $container->getMutantExecutionResultFactory()
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {
@@ -584,15 +582,20 @@ final class Container
         return $this->get(TmpDirProvider::class);
     }
 
-    public function getJUnitFilePath(): string
+    public function getDefaultJUnitFilePath(): string
     {
-        return sprintf(
+        return $this->defaultJUnitPath ?? $this->defaultJUnitPath = sprintf(
             '%s/%s',
             Path::canonicalize(
                 $this->getConfiguration()->getCoveragePath() . '/..'
             ),
             'junit.xml'
         );
+    }
+
+    public function getJUnitReportLocator(): JUnitReportLocator
+    {
+        return $this->get(JUnitReportLocator::class);
     }
 
     public function getIndexXmlCoverageParser(): IndexXmlCoverageParser

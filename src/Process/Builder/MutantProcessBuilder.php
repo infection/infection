@@ -36,7 +36,10 @@ declare(strict_types=1);
 namespace Infection\Process\Builder;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use function method_exists;
 use Symfony\Component\Process\Process;
@@ -49,11 +52,20 @@ class MutantProcessBuilder
 {
     private $testFrameworkAdapter;
     private $timeout;
+    private $eventDispatcher;
+    private $resultFactory;
 
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter, int $timeout)
-    {
+    // TODO: is it necessary for the timeout to be an int?
+    public function __construct(
+        TestFrameworkAdapter $testFrameworkAdapter,
+        int $timeout,
+        EventDispatcher $eventDispatcher,
+        MutantExecutionResultFactory $resultFactory
+    ) {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
         $this->timeout = $timeout;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->resultFactory = $resultFactory;
     }
 
     public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
@@ -75,6 +87,21 @@ class MutantProcessBuilder
             $process->inheritEnvironmentVariables();
         }
 
-        return new MutantProcess($process, $mutant);
+        $mutantProcess = new MutantProcess($process, $mutant);
+
+        $eventDispatcher = $this->eventDispatcher;
+        $resultFactory = $this->resultFactory;
+
+        $mutantProcess->registerTerminateProcessClosure(static function () use (
+            $mutantProcess,
+            $eventDispatcher,
+            $resultFactory
+        ): void {
+            $eventDispatcher->dispatch(new MutantProcessWasFinished(
+                $resultFactory->createFromProcess($mutantProcess))
+            );
+        });
+
+        return $mutantProcess;
     }
 }
