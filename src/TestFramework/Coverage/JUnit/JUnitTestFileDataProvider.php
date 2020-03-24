@@ -48,16 +48,16 @@ use Webmozart\Assert\Assert;
  */
 final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
-    private $jUnitFilePath;
+    private $jUnitLocator;
 
     /**
      * @var SafeDOMXPath|null
      */
     private $xPath;
 
-    public function __construct(string $jUnitFilePath)
+    public function __construct(JUnitReportLocator $jUnitLocator)
     {
-        $this->jUnitFilePath = $jUnitFilePath;
+        $this->jUnitLocator = $jUnitLocator;
     }
 
     /**
@@ -83,7 +83,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         if ($nodes->length === 0) {
             throw TestFileNameNotFoundException::notFoundFromFQN(
                 $fullyQualifiedClassName,
-                $this->jUnitFilePath
+                $this->jUnitLocator->locate()
             );
         }
 
@@ -112,11 +112,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
     private function getXPath(): SafeDOMXPath
     {
-        if (!$this->xPath) {
-            $this->xPath = self::createXPath($this->jUnitFilePath);
-        }
-
-        return $this->xPath;
+        return $this->xPath ?? $this->xPath = self::createXPath($this->jUnitLocator->locate());
     }
 
     private static function createXPath(string $jUnitPath): SafeDOMXPath

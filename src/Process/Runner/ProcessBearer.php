@@ -45,4 +45,6 @@ interface ProcessBearer
     public function getProcess(): Process;
 
     public function markAsTimedOut(): void;
+
+    public function terminateProcess(): void;
 }
