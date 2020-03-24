@@ -104,6 +104,6 @@ final class BenchmarkTest extends TestCase
 
     private function getPhpExecutable(): string
     {
-        return $this->phpExecutable ?? (new PhpExecutableFinder())->find();
+        return $this->phpExecutable ?? $this->phpExecutable = (new PhpExecutableFinder())->find();
     }
 }
