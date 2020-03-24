@@ -44,7 +44,7 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\Process\Builder\MutantProcessBuilder;
+use Infection\Process\Builder\MutantProcessFactory;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -53,7 +53,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class MutationTestingRunner
 {
-    private $processBuilder;
+    private $processFactory;
     private $mutantFactory;
     private $processRunner;
     private $eventDispatcher;
@@ -61,14 +61,14 @@ final class MutationTestingRunner
     private $runConcurrently;
 
     public function __construct(
-        MutantProcessBuilder $mutantProcessBuilder,
+        MutantProcessFactory $processFactory,
         MutantFactory $mutantFactory,
         ProcessRunner $processRunner,
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
         bool $runConcurrently
     ) {
-        $this->processBuilder = $mutantProcessBuilder;
+        $this->processFactory = $processFactory;
         $this->mutantFactory = $mutantFactory;
         $this->processRunner = $processRunner;
         $this->eventDispatcher = $eventDispatcher;
@@ -103,7 +103,7 @@ final class MutationTestingRunner
             ->map(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode());
 
-                $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+                $process = $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
                 return $process;
             })
