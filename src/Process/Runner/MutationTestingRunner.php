@@ -45,7 +45,6 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
-use Infection\Process\MutantProcess;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -104,18 +103,7 @@ final class MutationTestingRunner
 
                 return false;
             })
-            ->filter(function (Mutant $mutant) {
-                if ($mutant->getMutation()->getTimeToTest() < $this->timeout) {
-                    return true;
-                }
-
-                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromTimeConstrainedMutant($mutant)
-                ));
-
-                return false;
-            })
-            ->map(function (Mutant $mutant) use ($testFrameworkExtraOptions): MutantProcess {
+            ->map(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode());
 
                 $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);

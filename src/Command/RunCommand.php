@@ -47,6 +47,7 @@ use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Metrics\MinMsiCheckFailed;
+use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function Safe\sprintf;
@@ -243,10 +244,9 @@ final class RunCommand extends BaseCommand
 
         try {
             $engine->execute();
-        } catch (MinMsiCheckFailed $exception) {
+        } catch (InitialTestsFailed | MinMsiCheckFailed $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
-            // TODO/ do the same for TestFails
             $io->error($exception->getMessage());
         }
 
@@ -266,12 +266,14 @@ final class RunCommand extends BaseCommand
         $testFrameworkExtraOptions = trim((string) $this->input->getOption('test-framework-options'));
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
 
+        /** @var string|null $minMsi */
         $minMsi = $input->getOption('min-msi');
 
         if ($minMsi !== null && !is_numeric($minMsi)) {
             throw new InvalidArgumentException(sprintf('Expected min-msi to be a float. Got "%s"', $minMsi));
         }
 
+        /** @var string|null $minCoveredMsi */
         $minCoveredMsi = $input->getOption('min-covered-msi');
 
         if ($minCoveredMsi !== null && !is_numeric($minCoveredMsi)) {

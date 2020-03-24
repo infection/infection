@@ -43,6 +43,7 @@ use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
+use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -99,6 +100,10 @@ final class Engine
         $this->testFrameworkExtraOptionsFilter = $testFrameworkExtraOptionsFilter;
     }
 
+    /**
+     * @throws InitialTestsFailed
+     * @throws MinMsiCheckFailed
+     */
     public function execute(): void
     {
         $this->runInitialTestSuite();
