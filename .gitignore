@@ -6,7 +6,6 @@
 /.box_dump/
 /.ci/keys.asc
 /.composer/
-/.dockerignore
 /.idea
 /.php_cs.cache
 /.tools/
