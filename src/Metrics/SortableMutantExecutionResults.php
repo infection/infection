@@ -33,48 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Event;
+namespace Infection\Metrics;
 
-use function array_filter;
-use function array_values;
-use Infection\CannotBeInstantiated;
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use function Infection\Tests\generator_to_phpunit_data_provider;
-use function iterator_to_array;
-use ReflectionClass;
+use Infection\Mutant\MutantExecutionResult;
+use function Safe\usort;
 
-final class SubscriberProvider
+/**
+ * @internal
+ */
+final class SortableMutantExecutionResults
 {
-    use CannotBeInstantiated;
+    /**
+     * @var MutantExecutionResult[]
+     */
+    private $executionResults = [];
 
     /**
-     * @var string[]|null
+     * @var bool
      */
-    private static $subscriberClasses;
+    private $sorted = false;
 
-    public static function provideSubscriberClasses(): iterable
+    public function add(MutantExecutionResult $executionResult): void
     {
-        if (self::$subscriberClasses !== null) {
-            yield from self::$subscriberClasses;
-
-            return;
-        }
-
-        self::$subscriberClasses = array_values(array_filter(
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
-            static function (string $class): bool {
-                return $class !== EventSubscriber::class
-                    && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class)
-                ;
-            }
-        ));
-
-        yield from self::$subscriberClasses;
+        $this->executionResults[] = $executionResult;
+        $this->sorted = false;
     }
 
-    public static function subscriberClassesProvider(): iterable
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getSortedExecutionResults(): array
     {
-        yield from generator_to_phpunit_data_provider(self::provideSubscriberClasses());
+        if (!$this->sorted) {
+            self::sortResults($this->executionResults);
+            $this->sorted = true;
+        }
+
+        return $this->executionResults;
+    }
+
+    /**
+     * @param MutantExecutionResult[] $executionResults
+     */
+    private static function sortResults(array &$executionResults): void
+    {
+        usort(
+            $executionResults,
+            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
+                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
+                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
+                }
+
+                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
+            }
+        );
     }
 }

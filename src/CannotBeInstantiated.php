@@ -33,58 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
-
-use function Safe\usort;
+namespace Infection;
 
 /**
+ * Very simple trait which only purpose it make it a bit more explicit why the constructor is
+ * private.
+ *
  * @internal
  */
-final class SortableMutantExecutionResults
+trait CannotBeInstantiated
 {
-    /**
-     * @var MutantExecutionResult[]
-     */
-    private $executionResults = [];
-
-    /**
-     * @var bool
-     */
-    private $sorted = false;
-
-    public function add(MutantExecutionResult $executionResult): void
+    private function __construct()
     {
-        $this->executionResults[] = $executionResult;
-        $this->sorted = false;
-    }
-
-    /**
-     * @return MutantExecutionResult[]
-     */
-    public function getSortedExecutionResults(): array
-    {
-        if (!$this->sorted) {
-            self::sortResults($this->executionResults);
-            $this->sorted = true;
-        }
-
-        return $this->executionResults;
-    }
-
-    /**
-     * @param MutantExecutionResult[] $executionResults
-     */
-    private static function sortResults(array &$executionResults): void
-    {
-        usort(
-            $executionResults,
-            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
-                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
-                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
-                }
-
-                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
-            }
-        );
     }
 }

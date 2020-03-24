@@ -32,11 +32,11 @@ function test_something(): void {
 
 ### Decision
 
-As recommended by [Sebastian Bergmann][sebastian-bergmann] in 
+As recommended by [Sebastian Bergmann][sebastian-bergmann] in
 [this article][phpunit-exception-best-practices], since in both cases a PHPUnit specific API is
 necessary, the decision taken is to leverage the `expectException*()` API when possible.
 
-A pull request to fix this practice in the whole codebase may be done but has not been made 
+A pull request to fix this practice in the whole codebase may be done but has not been made
 mandatory. New pull requests though should stick to this practice.
 
 

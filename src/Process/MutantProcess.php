@@ -35,14 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use function in_array;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Mutant\DetectionStatus;
+use Closure;
 use Infection\Mutant\Mutant;
 use Infection\Process\Runner\ProcessBearer;
-use function Safe\sprintf;
 use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -50,33 +46,20 @@ use Webmozart\Assert\Assert;
  */
 class MutantProcess implements ProcessBearer
 {
-    private const PROCESS_OK = 0;
-    private const PROCESS_GENERAL_ERROR = 1;
-    private const PROCESS_MISUSE_SHELL_BUILTINS = 2;
-
-    private const NOT_FATAL_ERROR_CODES = [
-        self::PROCESS_OK,
-        self::PROCESS_GENERAL_ERROR,
-        self::PROCESS_MISUSE_SHELL_BUILTINS,
-    ];
-
     private $process;
     private $mutant;
+    private $callback;
 
     /**
      * @var bool
      */
-    private $timeout = false;
-    private $testFrameworkAdapter;
+    private $timedOut = false;
 
-    public function __construct(
-        Process $process,
-        Mutant $mutant,
-        TestFrameworkAdapter $testFrameworkAdapter
-    ) {
+    public function __construct(Process $process, Mutant $mutant)
+    {
         $this->process = $process;
         $this->mutant = $mutant;
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
+        $this->callback = static function (): void {};
     }
 
     public function getProcess(): Process
@@ -91,40 +74,24 @@ class MutantProcess implements ProcessBearer
 
     public function markAsTimedOut(): void
     {
-        $this->timeout = true;
+        $this->timedOut = true;
     }
 
-    public function retrieveProcessOutput(): string
+    public function isTimedOut(): bool
     {
-        Assert::true(
-            $this->process->isTerminated(),
-            sprintf(
-                'Cannot retrieve a non-terminated process output. Got "%s"',
-                $this->process->getStatus()
-            )
-        );
-
-        return $this->process->getOutput();
+        return $this->timedOut;
     }
 
-    public function retrieveDetectionStatus(): string
+    /**
+     * @param Closure(): void $callback
+     */
+    public function registerTerminateProcessClosure(Closure $callback): void
     {
-        if (!$this->mutant->isCoveredByTest()) {
-            return DetectionStatus::NOT_COVERED;
-        }
+        $this->callback = $callback;
+    }
 
-        if ($this->timeout) {
-            return DetectionStatus::TIMED_OUT;
-        }
-
-        if (!in_array($this->getProcess()->getExitCode(), self::NOT_FATAL_ERROR_CODES, true)) {
-            return DetectionStatus::ERROR;
-        }
-
-        if ($this->testFrameworkAdapter->testsPass($this->retrieveProcessOutput())) {
-            return DetectionStatus::ESCAPED;
-        }
-
-        return DetectionStatus::KILLED;
+    public function terminateProcess(): void
+    {
+        ($this->callback)();
     }
 }

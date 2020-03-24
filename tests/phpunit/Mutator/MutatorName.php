@@ -35,15 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\CannotBeInstantiated;
 use Infection\Mutator\ProfileList;
 use function Safe\array_flip;
 use Webmozart\Assert\Assert;
 
 final class MutatorName
 {
-    private function __construct()
-    {
-    }
+    use CannotBeInstantiated;
 
     public static function getName(string $mutatorClass): string
     {

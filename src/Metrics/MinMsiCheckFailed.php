@@ -33,48 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Event;
+namespace Infection\Metrics;
 
-use function array_filter;
-use function array_values;
-use Infection\CannotBeInstantiated;
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use function Infection\Tests\generator_to_phpunit_data_provider;
-use function iterator_to_array;
-use ReflectionClass;
+use function Safe\sprintf;
+use UnexpectedValueException;
 
-final class SubscriberProvider
+/**
+ * @internal
+ */
+final class MinMsiCheckFailed extends UnexpectedValueException
 {
-    use CannotBeInstantiated;
-
-    /**
-     * @var string[]|null
-     */
-    private static $subscriberClasses;
-
-    public static function provideSubscriberClasses(): iterable
+    public static function createForMsi(float $minMsi, float $msi): self
     {
-        if (self::$subscriberClasses !== null) {
-            yield from self::$subscriberClasses;
-
-            return;
-        }
-
-        self::$subscriberClasses = array_values(array_filter(
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
-            static function (string $class): bool {
-                return $class !== EventSubscriber::class
-                    && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class)
-                ;
-            }
+        return new self(sprintf(
+            'The minimum required MSI percentage should be %s%%, but actual is %s%%. '
+            . 'Improve your tests!',
+            $minMsi,
+            $msi
         ));
-
-        yield from self::$subscriberClasses;
     }
 
-    public static function subscriberClassesProvider(): iterable
+    public static function createCoveredMsi(float $minMsi, float $coveredCodeMsi): self
     {
-        yield from generator_to_phpunit_data_provider(self::provideSubscriberClasses());
+        return new self(sprintf(
+            'The minimum required Covered Code MSI percentage should be %s%%, but actual is ' .
+            '%s%%. Improve your tests!',
+            $minMsi,
+            $coveredCodeMsi
+        ));
     }
 }

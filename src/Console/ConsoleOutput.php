@@ -35,10 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Exception\InvalidTypeException;
-use Infection\Mutant\Exception\MsiCalculationException;
-use Infection\Mutant\MetricsCalculator;
-use Infection\Process\Runner\TestRunConstraintChecker;
 use function Safe\sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -48,7 +44,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class ConsoleOutput
 {
     private const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
-    private const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
     private const MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percent points over the required %s. Consider increasing the required %s percentage the next time you run infection.';
 
     private $io;
@@ -68,43 +63,26 @@ final class ConsoleOutput
         $this->io->note('Running infection with an unknown log-verbosity option, falling back to ' . $default . ' option');
     }
 
-    public function logBadMsiErrorMessage(MetricsCalculator $metricsCalculator, float $minMsi, string $type): void
+    public function logMinMsiCanGetIncreasedNotice(float $minMsi, float $msi): void
     {
-        if (!$minMsi) {
-            throw MsiCalculationException::create('min-msi');
-        }
+        $typeString = 'MSI';
+        $msiDifference = $msi - $minMsi;
 
-        $this->io->error(
+        $this->io->note(
             sprintf(
-                self::CI_FLAG_ERROR,
-                ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
-                $minMsi,
-                ($type === TestRunConstraintChecker::MSI_FAILURE ?
-                    $metricsCalculator->getMutationScoreIndicator() :
-                    $metricsCalculator->getCoveredCodeMutationScoreIndicator()
-                )
+                self::MIN_MSI_CAN_GET_INCREASED_NOTICE,
+                $typeString,
+                $msiDifference,
+                $typeString,
+                $typeString
             )
         );
     }
 
-    /**
-     * @throws InvalidTypeException
-     */
-    public function logMinMsiCanGetIncreasedNotice(MetricsCalculator $metricsCalculator, float $minMsi, string $type): void
+    public function logMinCoveredCodeMsiCanGetIncreasedNotice(float $minMsi, float $coveredCodeMsi): void
     {
-        if ($type !== TestRunConstraintChecker::MSI_OVER_MIN_MSI && $type !== TestRunConstraintChecker::COVERED_MSI_OVER_MIN_MSI) {
-            throw InvalidTypeException::create($type);
-        }
-
-        if ($type === TestRunConstraintChecker::MSI_OVER_MIN_MSI) {
-            $typeString = 'MSI';
-            $msi = $metricsCalculator->getMutationScoreIndicator();
-        } else {
-            $typeString = 'Covered Code MSI';
-            $msi = $metricsCalculator->getCoveredCodeMutationScoreIndicator();
-        }
-
-        $msiDifference = $msi - $minMsi;
+        $typeString = 'Covered Code MSI';
+        $msiDifference = $coveredCodeMsi - $minMsi;
 
         $this->io->note(
             sprintf(

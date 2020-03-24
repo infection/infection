@@ -33,48 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Event;
+namespace Infection\Tests\Metrics;
 
-use function array_filter;
-use function array_values;
-use Infection\CannotBeInstantiated;
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use function Infection\Tests\generator_to_phpunit_data_provider;
-use function iterator_to_array;
-use ReflectionClass;
+use Infection\Metrics\MinMsiCheckFailed;
+use PHPUnit\Framework\TestCase;
 
-final class SubscriberProvider
+final class MinMsiCheckFailedTest extends TestCase
 {
-    use CannotBeInstantiated;
-
-    /**
-     * @var string[]|null
-     */
-    private static $subscriberClasses;
-
-    public static function provideSubscriberClasses(): iterable
+    public function test_it_can_be_created_for_min_MSI(): void
     {
-        if (self::$subscriberClasses !== null) {
-            yield from self::$subscriberClasses;
+        $exception = MinMsiCheckFailed::createForMsi(73.26, 52.1);
 
-            return;
-        }
-
-        self::$subscriberClasses = array_values(array_filter(
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
-            static function (string $class): bool {
-                return $class !== EventSubscriber::class
-                    && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class)
-                ;
-            }
-        ));
-
-        yield from self::$subscriberClasses;
+        $this->assertSame(
+            'The minimum required MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
+            $exception->getMessage()
+        );
     }
 
-    public static function subscriberClassesProvider(): iterable
+    public function test_it_can_be_created_for_min_covered_code_MSI(): void
     {
-        yield from generator_to_phpunit_data_provider(self::provideSubscriberClasses());
+        $exception = MinMsiCheckFailed::createCoveredMsi(73.26, 52.1);
+
+        $this->assertSame(
+            'The minimum required Covered Code MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
+            $exception->getMessage()
+        );
     }
 }
