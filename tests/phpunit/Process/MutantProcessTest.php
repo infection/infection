@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -46,144 +44,58 @@ use Symfony\Component\Process\Process;
 final class MutantProcessTest extends TestCase
 {
     /**
-     * @var MutantProcess
-     */
-    private $mutantProcess;
-
-    /**
      * @var MockObject|Process
      */
-    private $process;
+    private $processMock;
 
     /**
      * @var MockObject|Mutant
      */
-    private $mutant;
+    private $mutantMock;
 
     /**
-     * @var MockObject|AbstractTestFrameworkAdapter
+     * @var MutantProcess
      */
-    private $adapter;
+    private $mutantProcess;
 
     protected function setUp(): void
     {
-        $this->process = $this->createMock(Process::class);
-        $this->mutant = $this->createMock(Mutant::class);
-        $this->adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $this->processMock = $this->createMock(Process::class);
+        $this->mutantMock = $this->createMock(Mutant::class);
 
-        $this->mutantProcess = new MutantProcess($this->process, $this->mutant, $this->adapter);
+        $this->mutantProcess = new MutantProcess($this->processMock, $this->mutantMock);
     }
 
-    public function test_it_handles_not_covered_mutant(): void
+    public function test_it_exposes_its_state(): void
     {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(false);
-
-        $this->assertSame(
-            DetectionStatus::NOT_COVERED,
-            $this->mutantProcess->retrieveDetectionStatus()
+        $this->assertMutantProcessStateIs(
+            $this->mutantProcess,
+            $this->processMock,
+            $this->mutantMock,
+            false
         );
     }
 
-    public function test_it_handles_timeout(): void
+    public function test_it_can_be_marked_as_timed_out(): void
     {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
         $this->mutantProcess->markAsTimedOut();
 
-        $this->assertSame(
-            DetectionStatus::TIMED_OUT,
-            $this->mutantProcess->retrieveDetectionStatus()
+        $this->assertMutantProcessStateIs(
+            $this->mutantProcess,
+            $this->processMock,
+            $this->mutantMock,
+            true
         );
     }
 
-    public function test_it_handles_error(): void
-    {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
-        $this->process
-            ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(126);
-
-        $this->assertSame(
-            DetectionStatus::ERROR,
-            $this->mutantProcess->retrieveDetectionStatus()
-        );
-    }
-
-    public function test_it_handles_escaped_mutant(): void
-    {
-        $this->process
-            ->method('isTerminated')
-            ->willReturn(true)
-        ;
-
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
-        $this->process
-            ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(0);
-
-        $this->process
-            ->expects($this->once())
-            ->method('getOutput')
-            ->willReturn('...');
-
-        $this->adapter
-            ->expects($this->once())
-            ->method('testsPass')
-            ->willReturn(true);
-
-        $this->assertSame(
-            DetectionStatus::ESCAPED,
-            $this->mutantProcess->retrieveDetectionStatus()
-        );
-    }
-
-    public function test_it_handles_killed_mutant(): void
-    {
-        $this->process
-            ->method('isTerminated')
-            ->willReturn(true)
-        ;
-
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
-        $this->process
-            ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(0);
-
-        $this->process
-            ->expects($this->once())
-            ->method('getOutput')
-            ->willReturn('...');
-
-        $this->adapter
-            ->expects($this->once())
-            ->method('testsPass')
-            ->willReturn(false);
-
-        $this->assertSame(
-            DetectionStatus::KILLED,
-            $this->mutantProcess->retrieveDetectionStatus()
-        );
-        $this->assertSame($this->mutant, $this->mutantProcess->getMutant());
+    private function assertMutantProcessStateIs(
+        MutantProcess $mutantProcess,
+        Process $expectedProcess,
+        Mutant $expectedMutant,
+        bool $expectedTimedOut
+    ): void {
+        $this->assertSame($expectedProcess, $mutantProcess->getProcess());
+        $this->assertSame($expectedMutant, $mutantProcess->getMutant());
+        $this->assertSame($expectedTimedOut, $mutantProcess->isTimedOut());
     }
 }

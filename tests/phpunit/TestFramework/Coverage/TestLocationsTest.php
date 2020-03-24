@@ -47,7 +47,7 @@ final class TestLocationsTest extends TestCase
         $testLocations = new TestLocations();
 
         $this->assertSame([], $testLocations->getTestsLocationsBySourceLine());
-        $this->assertSame([], $testLocations->getSourceMethodLineRangeByMethod());
+        $this->assertSame([], $testLocations->getSourceMethodRangeByMethod());
     }
 
     public function test_it_can_be_instantiated(): void

@@ -46,7 +46,6 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -57,7 +56,7 @@ final class MutationTestingRunner
 {
     private $processBuilder;
     private $mutantFactory;
-    private $parallelProcessManager;
+    private $processRunner;
     private $eventDispatcher;
     private $fileSystem;
     private $runConcurrently;
@@ -66,7 +65,7 @@ final class MutationTestingRunner
     public function __construct(
         MutantProcessBuilder $mutantProcessBuilder,
         MutantFactory $mutantFactory,
-        ParallelProcessRunner $parallelProcessManager,
+        ProcessRunner $processRunner,
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
         bool $runConcurrently,
@@ -74,7 +73,7 @@ final class MutationTestingRunner
     ) {
         $this->processBuilder = $mutantProcessBuilder;
         $this->mutantFactory = $mutantFactory;
-        $this->parallelProcessManager = $parallelProcessManager;
+        $this->processRunner = $processRunner;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileSystem = $fileSystem;
         $this->runConcurrently = $runConcurrently;
@@ -84,7 +83,7 @@ final class MutationTestingRunner
     /**
      * @param iterable<Mutation> $mutations
      */
-    public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
+    public function run(iterable $mutations, string $testFrameworkExtraOptions): void
     {
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
@@ -94,6 +93,7 @@ final class MutationTestingRunner
                 return $this->mutantFactory->create($mutation);
             })
             ->filter(function (Mutant $mutant) {
+                // It's a proxy call to Mutation, can be done one stage up
                 if ($mutant->isCoveredByTest()) {
                     return true;
                 }
@@ -124,7 +124,7 @@ final class MutationTestingRunner
             })
         ;
 
-        $this->parallelProcessManager->run($processes, $threadCount);
+        $this->processRunner->run($processes);
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }

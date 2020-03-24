@@ -85,11 +85,11 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
     }
 
     /**
-     * @return iterable<ProxyTrace>
+     * @return iterable<Trace>
      */
     public function provideTraces(): iterable
     {
-        /** @var iterable<ProxyTrace> $traces */
+        /** @var iterable<Trace> $traces */
         $traces = $this->filter->filter(
             $this->primaryTraceProvider->provideTraces()
         );
@@ -112,20 +112,22 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
     /**
      * Adds to the queue uncovered files found on disk.
      *
-     * @param iterable<ProxyTrace> $traces
+     * @param iterable<Trace> $traces
      *
-     * @return iterable<ProxyTrace>
+     * @return iterable<Trace>
      */
     private function appendUncoveredFiles(iterable $traces): iterable
     {
         $filesSeen = [];
 
+        /** @var Trace $trace */
         foreach ($traces as $trace) {
-            $filesSeen[$trace->getSplFileInfo()->getRealPath()] = self::SEEN;
+            $filesSeen[$trace->getSourceFileInfo()->getRealPath()] = self::SEEN;
 
             yield $trace;
         }
 
+        /** @var iterable<SplFileInfo> $filteredSourceFiles */
         $filteredSourceFiles = $this->filter->filter(
             $this->sourceFiles
         );

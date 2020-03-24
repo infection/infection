@@ -45,7 +45,6 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
@@ -90,25 +89,26 @@ final class FileMutationGeneratorTest extends TestCase
 
     public function test_it_generates_mutations_for_a_given_file(): void
     {
-        $traceMock = $this->createMock(Trace::class);
-
+        $traceMock = $this->createTraceMock(
+            self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php',
+            '',
+            ''
+        );
+        $traceMock
+            ->expects($this->never())
+            ->method('hasTests')
+        ;
         $traceMock
             ->expects($this->once())
             ->method('getAllTestsForMutation')
             ->willReturn([])
         ;
 
-        $traceMock
-            ->expects($this->never())
-            ->method('hasTests')
-        ;
-
         $mutationGenerator = SingletonContainer::getContainer()->getFileMutationGenerator();
 
         $mutations = $mutationGenerator->generate(
-            $this->createProxyTraceMock(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
-            false,
             $traceMock,
+            false,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             []
         );
@@ -135,9 +135,8 @@ final class FileMutationGeneratorTest extends TestCase
      * @dataProvider parsedFilesProvider
      */
     public function test_it_attempts_to_generate_mutations_for_the_file_if_covered_or_not_only_covered_code(
-        ProxyTrace $proxyTrace,
-        bool $onlyCovered,
         Trace $trace,
+        bool $onlyCovered,
         string $expectedFilePath
     ): void {
         $nodeIgnorers = [new FakeIgnorer()];
@@ -167,9 +166,8 @@ final class FileMutationGeneratorTest extends TestCase
         ;
 
         $mutations = $this->mutationGenerator->generate(
-            $proxyTrace,
-            $onlyCovered,
             $trace,
+            $onlyCovered,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             $nodeIgnorers
         );
@@ -183,7 +181,7 @@ final class FileMutationGeneratorTest extends TestCase
      * @dataProvider skippedFilesProvider
      */
     public function test_it_skips_the_mutation_generation_if_checks_only_covered_code_and_the_file_has_no_tests(
-        ProxyTrace $proxyTrace
+        Trace $trace
     ): void {
         $this->fileParserMock
             ->expects($this->never())
@@ -202,11 +200,8 @@ final class FileMutationGeneratorTest extends TestCase
         );
 
         $mutations = $mutationGenerator->generate(
-            $proxyTrace,
+            $trace,
             true,
-            $this->createTraceMock(
-                false
-            ),
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             []
         );
@@ -225,11 +220,13 @@ final class FileMutationGeneratorTest extends TestCase
             );
 
             yield $title => [
-                $this->createProxyTraceMock('/path/to/file', 'relativePath', 'relativePathName'),
-                false,
                 $this->createTraceMock(
+                    '/path/to/file',
+                    'relativePath',
+                    'relativePathName',
                     true
                 ),
+                false,
                 '/path/to/file',
             ];
         }
@@ -241,30 +238,36 @@ final class FileMutationGeneratorTest extends TestCase
             );
 
             yield $title => [
-                $this->createProxyTraceMock(__FILE__, 'relativePath', 'relativePathName'),
-                false,
                 $this->createTraceMock(
+                    __FILE__,
+                    'relativePath',
+                    'relativePathName',
                     true
                 ),
+                false,
                 __FILE__,
             ];
         }
 
         yield 'path - only covered: true - has tests: %s' => [
-            $this->createProxyTraceMock('/path/to/file', 'relativePath', 'relativePathName'),
-            true,
             $this->createTraceMock(
+                '/path/to/file',
+                'relativePath',
+                'relativePathName',
                 true
             ),
+            true,
             '/path/to/file',
         ];
 
         yield 'real path - only covered: true - has tests: %s' => [
-            $this->createProxyTraceMock(__FILE__, 'relativePath', 'relativePathName'),
-            true,
             $this->createTraceMock(
+                __FILE__,
+                'relativePath',
+                'relativePathName',
                 true
             ),
+            true,
             __FILE__,
         ];
     }
@@ -272,18 +275,20 @@ final class FileMutationGeneratorTest extends TestCase
     public function skippedFilesProvider(): iterable
     {
         yield 'path - only covered: true - has tests: %s' => [
-            $this->createProxyTraceMock(
+            $this->createTraceMock(
                 '/path/to/file',
                 'relativePath',
-                'relativePathName'
+                'relativePathName',
+                false
             ),
         ];
 
         yield 'real path - only covered: true - has tests: %s' => [
-            $this->createProxyTraceMock(
+            $this->createTraceMock(
                 __FILE__,
                 'relativePath',
-                'relativePathName'
+                'relativePathName',
+                false
             ),
         ];
     }
@@ -293,33 +298,28 @@ final class FileMutationGeneratorTest extends TestCase
         yield from [true, false];
     }
 
-    private function createProxyTraceMock(
-        string $file,
-        string $relativePath,
-        string $relativePathname
-    ): ProxyTrace {
-        // TODO: rename this once FileMutationGenerator no longer depends on ProxyTrace; same for
-        //  the whole class
-        $proxyTraceMock = $this->createMock(ProxyTrace::class);
-        $proxyTraceMock
-            ->method('getSplFileInfo')
-            ->willReturn(new SplFileInfo($file, $relativePath, $relativePathname))
-        ;
-
-        return $proxyTraceMock;
-    }
-
     /**
      * @return Trace|MockObject
      */
-    private function createTraceMock(bool $tests)
-    {
-        $traceMock = $this->createMock(Trace::class);
-        $traceMock
-            ->method('hasTests')
-            ->willReturn($tests)
+    private function createTraceMock(
+        string $file,
+        string $relativePath,
+        string $relativePathname,
+        ?bool $hasTests = null
+    ): Trace {
+        $proxyTraceMock = $this->createMock(Trace::class);
+        $proxyTraceMock
+            ->method('getSourceFileInfo')
+            ->willReturn(new SplFileInfo($file, $relativePath, $relativePathname))
         ;
 
-        return $traceMock;
+        if ($hasTests !== null) {
+            $proxyTraceMock
+                ->method('hasTests')
+                ->willReturn($hasTests)
+            ;
+        }
+
+        return $proxyTraceMock;
     }
 }

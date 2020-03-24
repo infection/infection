@@ -106,7 +106,9 @@ class ConfigurationFactory
         string $mutatorsInput,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
-        string $filter
+        string $filter,
+        int $threadCount,
+        bool $dryRun
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -149,7 +151,9 @@ class ConfigurationFactory
             self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
             self::retrieveMinMsi($minMsi, $schema),
             $showMutations,
-            self::retrieveMinCoveredMsi($minCoveredMsi, $schema)
+            self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
+            $threadCount,
+            $dryRun
         );
     }
 

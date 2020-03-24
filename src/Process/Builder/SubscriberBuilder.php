@@ -51,7 +51,7 @@ use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Logger\LoggerFactory;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;

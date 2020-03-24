@@ -37,6 +37,7 @@ namespace Infection\Tests\AutoReview\Mutator;
 
 use function array_column;
 use function in_array;
+use Infection\CannotBeInstantiated;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
@@ -55,6 +56,8 @@ use function Safe\class_implements;
  */
 final class MutatorProvider
 {
+    use CannotBeInstantiated;
+
     /**
      * @var string[]|null
      */
@@ -69,10 +72,6 @@ final class MutatorProvider
      * @var string[]|null
      */
     private static $configurableMutatorClasses;
-
-    private function __construct()
-    {
-    }
 
     public static function provideMutatorClasses(): iterable
     {

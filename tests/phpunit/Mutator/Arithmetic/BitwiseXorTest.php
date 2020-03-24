@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class BitwiseXorTest extends AbstractMutatorTestCase
+final class BitwiseXorTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider

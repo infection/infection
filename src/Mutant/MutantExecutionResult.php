@@ -37,7 +37,6 @@ namespace Infection\Mutant;
 
 use function array_keys;
 use Infection\Mutator\ProfileList;
-use Infection\Process\MutantProcess;
 use Webmozart\Assert\Assert;
 
 /**
@@ -83,23 +82,6 @@ class MutantExecutionResult
     public static function createFromTimeConstrainedMutant(Mutant $mutant): self
     {
         return self::createFromMutant($mutant, DetectionStatus::TIMED_OUT);
-    }
-
-    public static function createFromProcess(MutantProcess $mutantProcess): self
-    {
-        $process = $mutantProcess->getProcess();
-        $mutant = $mutantProcess->getMutant();
-        $mutation = $mutant->getMutation();
-
-        return new self(
-            $process->getCommandLine(),
-            $mutantProcess->retrieveProcessOutput(),
-            $mutantProcess->retrieveDetectionStatus(),
-            $mutant->getDiff(),
-            $mutation->getMutatorName(),
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalStartingLine()
-        );
     }
 
     public function getProcessCommandLine(): string

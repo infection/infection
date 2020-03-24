@@ -37,8 +37,9 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 
 use const DIRECTORY_SEPARATOR;
 use function in_array;
+use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
-use Infection\Command\InfectionCommand;
+use Infection\Command\RunCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
@@ -50,13 +51,14 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
@@ -80,13 +82,15 @@ use Symfony\Component\Finder\SplFileInfo;
 
 final class ProjectCodeProvider
 {
+    use CannotBeInstantiated;
+
     /**
      * This array contains all classes that don't have tests yet, due to legacy
      * reasons. This list should never be added to, only removed from.
      */
     public const NON_TESTED_CONCRETE_CLASSES = [
         ConfigureCommand::class,
-        InfectionCommand::class,
+        RunCommand::class,
         Application::class,
         ProgressFormatter::class,
         PhpProcess::class,
@@ -99,6 +103,7 @@ final class ProjectCodeProvider
         NonExecutableFinder::class,
         AdapterInstaller::class,
         DetectionStatus::class,
+        DummyFileSystem::class,
     ];
 
     /**
@@ -141,10 +146,6 @@ final class ProjectCodeProvider
      * @var string[]|null
      */
     private static $testClasses;
-
-    private function __construct()
-    {
-    }
 
     public static function provideSourceClasses(): iterable
     {
@@ -253,6 +254,8 @@ final class ProjectCodeProvider
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
             ->exclude([
+                'autoloaded',
+                'benchmark',
                 'e2e',
                 'Fixtures',
             ])

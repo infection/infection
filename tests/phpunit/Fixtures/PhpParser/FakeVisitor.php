@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\PhpParser;
 
-use LogicException;
+use Infection\Tests\UnsupportedMethod;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 
@@ -12,21 +12,21 @@ final class FakeVisitor implements NodeVisitor
 {
     public function beforeTraverse(array $nodes)
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function enterNode(Node $node)
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function leaveNode(Node $node)
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function afterTraverse(array $nodes)
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 }
