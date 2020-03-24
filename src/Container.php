@@ -270,7 +270,7 @@ final class Container
             },
             MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
                 return new MemoizedTestFileDataProvider(
-                    new JUnitTestFileDataProvider($container->getDefaultJUnitFilePath())
+                    new JUnitTestFileDataProvider($container->getJUnitReportLocator())
                 );
             },
             Lexer::class => static function (): Lexer {

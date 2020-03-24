@@ -80,7 +80,7 @@ class JUnitReportLocator
         // CoverageChecker hence it makes sense to try this one first before attempting any more
         // expensive lookup
         if (file_exists($this->defaultJUnitPath)) {
-            return $this->jUnitPath ?? $this->defaultJUnitPath;
+            return $this->jUnitPath = $this->defaultJUnitPath;
         }
 
         $files = iterator_to_array(
@@ -111,7 +111,7 @@ class JUnitReportLocator
         $junitFileInfo = current($files);
 
         if ($junitFileInfo !== false) {
-            return $this->jUnitPath ?? Path::canonicalize($junitFileInfo->getPathname());
+            return $this->jUnitPath = Path::canonicalize($junitFileInfo->getPathname());
         }
 
         throw new FileNotFound(sprintf(

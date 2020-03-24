@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_put_contents;
 use function Safe\tempnam;
@@ -52,14 +54,26 @@ final class JUnitTestFileDataProviderTest extends TestCase
     private const JUNIT_FEATURE_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_feature.xml';
 
     /**
+     * @var JUnitReportLocator|MockObject
+     */
+    private $jUnitLocatorMock;
+
+    /**
      * @var JUnitTestFileDataProvider
      */
     private $provider;
+
+    /**
+     * @var string
+     */
     private $tempfile;
 
     protected function setUp(): void
     {
-        $this->provider = new JUnitTestFileDataProvider(self::JUNIT);
+        $this->jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
+
+        $this->provider = new JUnitTestFileDataProvider($this->jUnitLocatorMock);
+
         $this->tempfile = tempnam('', '');
     }
 
@@ -70,6 +84,11 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
     public function test_it_returns_time_and_path(): void
     {
+        $this->jUnitLocatorMock
+            ->method('locate')
+            ->willReturn(self::JUNIT)
+        ;
+
         $testFileInfo = $this->provider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
 
         $this->assertSame('/project/tests/Config/InfectionConfigTest.php', $testFileInfo->path);
@@ -78,6 +97,11 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
     public function test_it_returns_the_same_result_on_consecutive_calls(): void
     {
+        $this->jUnitLocatorMock
+            ->method('locate')
+            ->willReturn(self::JUNIT)
+        ;
+
         $testFileInfo0 = $this->provider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
         $testFileInfo1 = $this->provider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
 
@@ -87,27 +111,36 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
     public function test_it_throws_an_exception_if_the_junit_file_is_invalid_xml(): void
     {
-        $provider = new JUnitTestFileDataProvider($this->tempfile);
+        $this->jUnitLocatorMock
+            ->method('locate')
+            ->willReturn($this->tempfile)
+        ;
 
         $this->expectException(InvalidArgumentException::class);
 
-        $provider->getTestFileInfo('Foo\BarTest');
+        $this->provider->getTestFileInfo('Foo\BarTest');
     }
 
     public function test_it_works_with_different_junit_format(): void
     {
-        $provider = new JUnitTestFileDataProvider(self::JUNIT_DIFF_FORMAT);
+        $this->jUnitLocatorMock
+            ->method('locate')
+            ->willReturn(self::JUNIT_DIFF_FORMAT)
+        ;
 
-        $testFileInfo = $provider->getTestFileInfo('App\Tests\unit\SourceClassTest');
+        $testFileInfo = $this->provider->getTestFileInfo('App\Tests\unit\SourceClassTest');
 
         $this->assertSame('/codeception/tests/unit/SourceClassTest.php', $testFileInfo->path);
     }
 
     public function test_it_works_with_feature_junit_format(): void
     {
-        $provider = new JUnitTestFileDataProvider(self::JUNIT_FEATURE_FORMAT);
+        $this->jUnitLocatorMock
+            ->method('locate')
+            ->willReturn(self::JUNIT_FEATURE_FORMAT)
+        ;
 
-        $testFileInfo = $provider->getTestFileInfo('FeatureA:Scenario A1');
+        $testFileInfo = $this->provider->getTestFileInfo('FeatureA:Scenario A1');
 
         $this->assertSame('/codeception/tests/bdd/FeatureA.feature', $testFileInfo->path);
     }
@@ -119,8 +152,13 @@ final class JUnitTestFileDataProviderTest extends TestCase
     {
         file_put_contents($this->tempfile, $xml);
 
-        $provider = new JUnitTestFileDataProvider($this->tempfile);
-        $provider->getTestFileInfo('ExampleTest');
+        $this->jUnitLocatorMock
+            ->method('locate')
+            ->willReturn($this->tempfile)
+        ;
+
+        $this->provider->getTestFileInfo('ExampleTest');
+
         $this->addToAssertionCount(1);
     }
 
