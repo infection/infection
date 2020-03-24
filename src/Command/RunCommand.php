@@ -50,9 +50,7 @@ use Infection\FileSystem\Locator\Locator;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_numeric;
 use function Safe\sprintf;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -268,16 +266,9 @@ final class RunCommand extends BaseCommand
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
 
         $minMsi = $input->getOption('min-msi');
-
-        if ($minMsi !== null && !is_numeric($minMsi)) {
-            throw new InvalidArgumentException(sprintf('Expected min-msi to be a float. Got "%s"', $minMsi));
-        }
-
         $minCoveredMsi = $input->getOption('min-covered-msi');
 
-        if ($minCoveredMsi !== null && !is_numeric($minCoveredMsi)) {
-            throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
-        }
+        $precision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile === '' ? null : $configFile,
@@ -292,8 +283,9 @@ final class RunCommand extends BaseCommand
             $initialTestsPhpOptions === '' ? null : $initialTestsPhpOptions,
             (bool) $input->getOption('skip-initial-tests'),
             $input->getOption('ignore-msi-with-no-mutations'),
-            MsiParser::parse($input->getOption('min-msi'), 'min-msi'),
-            MsiParser::parse($input->getOption('min-covered-msi'), 'min-covered-msi'),
+            MsiParser::parse($minMsi, $precision, 'min-msi'),
+            MsiParser::parse($minCoveredMsi, $precision, 'min-covered-msi'),
+            $precision,
             $testFramework === '' ? null : $testFramework,
             $testFrameworkExtraOptions === '' ? null : $testFrameworkExtraOptions,
             trim((string) $input->getOption('filter')),

@@ -42,11 +42,25 @@ use PHPUnit\Framework\TestCase;
 final class MsiParserTest extends TestCase
 {
     /**
+     * @dataProvider precisionProvider
+     *
+     * @param array<string | null> $values
+     */
+    public function test_it_can_detect_the_precision_of_the_given_values(
+        array $values,
+        int $expected
+    ): void {
+        $actual = MsiParser::detectPrecision(...$values);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
      * @dataProvider validValueProvider
      */
     public function test_it_can_parse_valid_values(?string $value, ?float $expected): void
     {
-        $actual = MsiParser::parse($value, 'min-msi');
+        $actual = MsiParser::parse($value, 2, 'min-msi');
 
         $this->assertSame($expected, $actual);
     }
@@ -61,7 +75,77 @@ final class MsiParserTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedErrorMessage);
 
-        MsiParser::parse($value, 'min-msi');
+        MsiParser::parse($value, 2, 'min-msi');
+    }
+
+    public static function precisionProvider(): iterable
+    {
+        yield 'no value' => [
+            [null],
+            2,
+        ];
+
+        yield 'empty string' => [
+            [''],
+            2,
+        ];
+
+        yield 'empty untrimmed string' => [
+            [' '],
+            2,
+        ];
+
+        yield 'integer' => [
+            ['18'],
+            2,
+        ];
+
+        yield 'untrimmed integer' => [
+            [' 18 '],
+            2,
+        ];
+
+        yield '0 digit past decimal point float' => [
+            ['18.'],
+            2,
+        ];
+
+        yield '1 digit past decimal point float' => [
+            ['18.2'],
+            2,
+        ];
+
+        yield '2 digits past decimal point float' => [
+            ['18.21'],
+            2,
+        ];
+
+        yield '3 digits past decimal point float' => [
+            ['18.212'],
+            3,
+        ];
+
+        yield 'untrimmed 3 digits past decimal point float' => [
+            [' 18.212 '],
+            3,
+        ];
+
+        yield 'multiple' => [
+            [
+                null,
+                '',
+                ' ',
+                '18.21',
+                '18.212',
+                ' 18.2124 ',
+            ],
+            4,
+        ];
+
+        yield 'invalid' => [
+            ['1.2.3'],
+            2,
+        ];
     }
 
     public static function validValueProvider(): iterable

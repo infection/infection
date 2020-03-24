@@ -49,7 +49,7 @@ final class MetricsCalculatorTest extends TestCase
 
     public function test_it_shows_zero_values_by_default(): void
     {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator(2);
 
         $this->assertSame(0, $calculator->getKilledCount());
         $this->assertSame(0, $calculator->getErrorCount());
@@ -72,7 +72,7 @@ final class MetricsCalculatorTest extends TestCase
 
     public function test_it_collects_all_values(): void
     {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator(2);
 
         $expectedKilledResults = $this->addMutantExecutionResult(
             $calculator,
@@ -130,7 +130,7 @@ final class MetricsCalculatorTest extends TestCase
 
     public function test_its_metrics_are_properly_updated_when_adding_a_new_process(): void
     {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator(2);
 
         $this->assertSame(0, $calculator->getKilledCount());
         $this->assertSame([], $calculator->getKilledExecutionResults());

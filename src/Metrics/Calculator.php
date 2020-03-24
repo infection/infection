@@ -43,6 +43,7 @@ use function round;
  */
 final class Calculator
 {
+    private $roundingPrecision;
     private $killedCount;
     private $errorCount;
     private $timedOutCount;
@@ -65,12 +66,14 @@ final class Calculator
     private $coveredMutationScoreIndicator;
 
     public function __construct(
+        int $roundingPrecision,
         int $killedCount,
         int $errorCount,
         int $timedOutCount,
         int $notTestedCount,
         int $totalCount
     ) {
+        $this->roundingPrecision = $roundingPrecision;
         $this->killedCount = $killedCount;
         $this->errorCount = $errorCount;
         $this->timedOutCount = $timedOutCount;
@@ -81,6 +84,7 @@ final class Calculator
     public static function fromMetrics(MetricsCalculator $calculator): self
     {
         return new self(
+            $calculator->getRoundingPrecision(),
             $calculator->getKilledCount(),
             $calculator->getErrorCount(),
             $calculator->getTimedOutCount(),
@@ -106,7 +110,7 @@ final class Calculator
             $score = 100 * $coveredTotal / $totalCount;
         }
 
-        return $this->mutationScoreIndicator = self::round($score);
+        return $this->mutationScoreIndicator = $this->round($score);
     }
 
     /**
@@ -126,7 +130,7 @@ final class Calculator
             $coveredRate = 100 * $testedTotal / $totalCount;
         }
 
-        return $this->coverageRate = self::round($coveredRate);
+        return $this->coverageRate = $this->round($coveredRate);
     }
 
     /**
@@ -146,11 +150,11 @@ final class Calculator
             $score = 100 * $coveredTotal / $testedTotal;
         }
 
-        return $this->coveredMutationScoreIndicator = self::round($score);
+        return $this->coveredMutationScoreIndicator = $this->round($score);
     }
 
-    private static function round(float $value): float
+    private function round(float $value): float
     {
-        return round($value, 2, PHP_ROUND_HALF_UP);
+        return round($value, $this->roundingPrecision, PHP_ROUND_HALF_UP);
     }
 }

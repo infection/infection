@@ -59,6 +59,7 @@ final class CalculatorTest extends TestCase
         float $expectedCoveredMsi
     ): void {
         $calculator = new Calculator(
+            2,
             $killedCount,
             $errorCount,
             $timedOutCount,
@@ -148,7 +149,7 @@ final class CalculatorTest extends TestCase
     public function metricsCalculatorProvider(): iterable
     {
         yield 'empty' => [
-            new MetricsCalculator(),
+            new MetricsCalculator(2),
             0.,
             0.,
             0.,
