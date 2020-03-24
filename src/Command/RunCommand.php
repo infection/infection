@@ -266,12 +266,14 @@ final class RunCommand extends BaseCommand
         $testFrameworkExtraOptions = trim((string) $this->input->getOption('test-framework-options'));
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
 
+        /** @var string|null $minMsi */
         $minMsi = $input->getOption('min-msi');
 
         if ($minMsi !== null && !is_numeric($minMsi)) {
             throw new InvalidArgumentException(sprintf('Expected min-msi to be a float. Got "%s"', $minMsi));
         }
 
+        /** @var string|null $minCoveredMsi */
         $minCoveredMsi = $input->getOption('min-covered-msi');
 
         if ($minCoveredMsi !== null && !is_numeric($minCoveredMsi)) {
