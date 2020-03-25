@@ -106,7 +106,7 @@ final class SubscriberBuilderTest extends TestCase
         int $addSubscriber,
         int $getLogs = 1
     ): SubscriberBuilder {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator(2);
 
         $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher

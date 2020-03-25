@@ -82,6 +82,7 @@ final class ConfigurationTest extends TestCase
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
+        int $msiPrecision,
         int $threadsCount,
         bool $dryRun
     ): void {
@@ -110,6 +111,7 @@ final class ConfigurationTest extends TestCase
             $minMsi,
             $showMutations,
             $minCoveredMsi,
+            $msiPrecision,
             $threadsCount,
             $dryRun
         );
@@ -140,6 +142,7 @@ final class ConfigurationTest extends TestCase
             $minMsi,
             $showMutations,
             $minCoveredMsi,
+            $msiPrecision,
             $threadsCount,
             $dryRun
         );
@@ -172,6 +175,7 @@ final class ConfigurationTest extends TestCase
             null,
             false,
             null,
+            2,
             0,
             false,
         ];
@@ -211,7 +215,8 @@ final class ConfigurationTest extends TestCase
             true,
             43.,
             true,
-            43.,
+            45.,
+            2,
             4,
             true,
         ];

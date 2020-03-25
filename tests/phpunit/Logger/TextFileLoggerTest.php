@@ -54,7 +54,7 @@ final class TextFileLoggerTest extends TestCase
         string $expectedContents
     ): void {
         $logger = new TextFileLogger(
-            new MetricsCalculator(),
+            new MetricsCalculator(2),
             $debugVerbosity,
             $onlyCoveredMode,
             $debugMode

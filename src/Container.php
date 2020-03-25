@@ -275,8 +275,8 @@ final class Container
             PrettyPrinterAbstract::class => static function (): Standard {
                 return new Standard();
             },
-            MetricsCalculator::class => static function (): MetricsCalculator {
-                return new MetricsCalculator();
+            MetricsCalculator::class => static function (self $container): MetricsCalculator {
+                return new MetricsCalculator($container->getConfiguration()->getMsiPrecision());
             },
             Stopwatch::class => static function (): Stopwatch {
                 return new Stopwatch();
@@ -495,6 +495,7 @@ final class Container
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         ?float $minCoveredMsi,
+        int $msiPrecision,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         string $filter,
@@ -533,6 +534,7 @@ final class Container
                 $minMsi,
                 $showMutations,
                 $minCoveredMsi,
+                $msiPrecision,
                 $mutatorsInput,
                 $testFramework,
                 $testFrameworkExtraOptions,
@@ -554,6 +556,7 @@ final class Container
                     $minMsi,
                     $showMutations,
                     $minCoveredMsi,
+                    $msiPrecision,
                     $mutatorsInput,
                     $testFramework,
                     $testFrameworkExtraOptions,
