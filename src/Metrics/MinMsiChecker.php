@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Metrics;
 
 use Infection\Console\ConsoleOutput;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -87,6 +88,8 @@ final class MinMsiChecker
         }
 
         if ($this->isMsiInsufficient($msi)) {
+            Assert::notNull($this->minMsi);
+
             throw MinMsiCheckFailed::createForMsi(
                 $this->minMsi,
                 $msi
@@ -94,6 +97,8 @@ final class MinMsiChecker
         }
 
         if ($this->isCoveredCodeMsiInsufficient($coveredCodeMsi)) {
+            Assert::notNull($this->minCoveredCodeMsi);
+
             throw MinMsiCheckFailed::createCoveredMsi(
                 $this->minCoveredCodeMsi,
                 $coveredCodeMsi
@@ -104,6 +109,8 @@ final class MinMsiChecker
     private function checkIfMinMsiCanBeIncreased(float $msi, float $coveredCodeMsi, ConsoleOutput $output): void
     {
         if ($this->canIncreaseMsi($msi)) {
+            Assert::notNull($this->minMsi);
+
             $output->logMinMsiCanGetIncreasedNotice(
                 $this->minMsi,
                 $msi
@@ -111,6 +118,8 @@ final class MinMsiChecker
         }
 
         if ($this->canIncreaseCoveredCodeMsi($coveredCodeMsi)) {
+            Assert::notNull($this->minCoveredCodeMsi);
+
             $output->logMinCoveredCodeMsiCanGetIncreasedNotice(
                 $this->minCoveredCodeMsi,
                 $coveredCodeMsi
