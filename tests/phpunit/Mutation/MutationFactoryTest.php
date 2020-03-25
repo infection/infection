@@ -69,7 +69,7 @@ final class MutationFactoryTest extends TestCase
     private $differMock;
 
     /**
-     * @var \Infection\Mutation\MutationFactory
+     * @var MutationFactory
      */
     private $mutationFactory;
 

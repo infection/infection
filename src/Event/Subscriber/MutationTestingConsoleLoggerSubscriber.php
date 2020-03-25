@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use Infection\Mutation\MutationExecutionResult;
 use function floor;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
@@ -87,7 +88,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->outputFormatter->start($this->mutationCount);
     }
 
-    public function onMutantProcessWasFinished(MutationProcessWasFinished $event): void
+    public function onMutationProcessWasFinished(MutationProcessWasFinished $event): void
     {
         $executionResult = $event->getExecutionResult();
 
@@ -112,7 +113,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     }
 
     /**
-     * @param \Infection\Mutation\MutationExecutionResult[] $executionResults
+     * @param MutationExecutionResult[] $executionResults
      */
     private function showMutations(array $executionResults, string $headlinePrefix): void
     {

@@ -72,7 +72,7 @@ final class MutationTestingRunnerTest extends TestCase
     private $processFactoryMock;
 
     /**
-     * @var \Infection\Mutation\MutationFactory|MockObject
+     * @var MutationFactory|MockObject
      */
     private $mutationFactoryMock;
 

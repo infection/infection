@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
+use Infection\Mutation\MutationCodeFactory;
 use Infection\PhpParser\MutatedNode;
 use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
@@ -43,7 +44,7 @@ use PHPUnit\Framework\TestCase;
 final class MutationCodeFactoryTest extends TestCase
 {
     /**
-     * @var \Infection\Mutation\MutationCodeFactory
+     * @var MutationCodeFactory
      */
     private $codeFactory;
 

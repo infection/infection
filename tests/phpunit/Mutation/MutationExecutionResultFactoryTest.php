@@ -58,7 +58,7 @@ final class MutationExecutionResultFactoryTest extends TestCase
     private $testFrameworkAdapterMock;
 
     /**
-     * @var \Infection\Mutation\MutationExecutionResultFactory
+     * @var MutationExecutionResultFactory
      */
     private $resultFactory;
 
@@ -131,7 +131,7 @@ DIFF;
             $this->resultFactory->createFromProcess($mutationProcess),
             $processCommandLine,
             $processOutput,
-            \Infection\Mutation\DetectionStatus::NOT_COVERED,
+            DetectionStatus::NOT_COVERED,
             $mutationDiff,
             $mutatorName,
             $originalFilePath,
@@ -209,7 +209,7 @@ DIFF;
             $this->resultFactory->createFromProcess($mutationProcess),
             $processCommandLine,
             $processOutput,
-            \Infection\Mutation\DetectionStatus::TIMED_OUT,
+            DetectionStatus::TIMED_OUT,
             $mutationDiff,
             $mutatorName,
             $originalFilePath,

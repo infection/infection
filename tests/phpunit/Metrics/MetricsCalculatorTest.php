@@ -154,7 +154,7 @@ final class MetricsCalculatorTest extends TestCase
     }
 
     /**
-     * @return \Infection\Mutation\MutationExecutionResult[]
+     * @return MutationExecutionResult[]
      */
     private function addMutationExecutionResult(
         MetricsCalculator $calculator,

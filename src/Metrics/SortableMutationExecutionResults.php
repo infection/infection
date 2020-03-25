@@ -44,7 +44,7 @@ use function Safe\usort;
 final class SortableMutationExecutionResults
 {
     /**
-     * @var \Infection\Mutation\MutationExecutionResult[]
+     * @var MutationExecutionResult[]
      */
     private $executionResults = [];
 
@@ -60,7 +60,7 @@ final class SortableMutationExecutionResults
     }
 
     /**
-     * @return \Infection\Mutation\MutationExecutionResult[]
+     * @return MutationExecutionResult[]
      */
     public function getSortedExecutionResults(): array
     {
@@ -73,7 +73,7 @@ final class SortableMutationExecutionResults
     }
 
     /**
-     * @param \Infection\Mutation\MutationExecutionResult[] $executionResults
+     * @param MutationExecutionResult[] $executionResults
      */
     private static function sortResults(array &$executionResults): void
     {

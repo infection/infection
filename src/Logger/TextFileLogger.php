@@ -112,7 +112,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     }
 
     /**
-     * @param \Infection\Mutation\MutationExecutionResult[] $executionResults
+     * @param MutationExecutionResult[] $executionResults
      */
     private function getResultsLine(
         array $executionResults,

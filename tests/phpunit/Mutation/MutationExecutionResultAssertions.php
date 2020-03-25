@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
+use Infection\Mutation\MutationExecutionResult;
+
 trait MutationExecutionResultAssertions
 {
     private function assertResultStateIs(
-        \Infection\Mutation\MutationExecutionResult $result,
+        MutationExecutionResult $result,
         string $expectedProcessCommandLine,
         string $expectedProcessOutput,
         string $expectedDetectionStatus,

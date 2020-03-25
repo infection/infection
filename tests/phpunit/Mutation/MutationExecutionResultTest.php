@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Mutation\DetectionStatus;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutation\MutationExecutionResult;
@@ -49,7 +50,7 @@ final class MutationExecutionResultTest extends TestCase
     {
         $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"';
         $processOutput = 'Passed!';
-        $processResultCode = \Infection\Mutation\DetectionStatus::ESCAPED;
+        $processResultCode = DetectionStatus::ESCAPED;
         $mutationDiff = <<<'DIFF'
 --- Original
 +++ New
@@ -64,7 +65,7 @@ DIFF;
         $originalFilePath = 'path/to/Foo.php';
         $originalStartingLine = 10;
 
-        $result = new \Infection\Mutation\MutationExecutionResult(
+        $result = new MutationExecutionResult(
             $processCommandLine,
             $processOutput,
             $processResultCode,
@@ -130,7 +131,7 @@ DIFF;
             MutationExecutionResult::createFromNonCoveredMutation($mutation),
             '',
             '',
-            \Infection\Mutation\DetectionStatus::NOT_COVERED,
+            DetectionStatus::NOT_COVERED,
             $mutationDiff,
             $mutatorName,
             $originalFilePath,
