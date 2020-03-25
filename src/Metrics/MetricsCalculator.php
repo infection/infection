@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
+use function count;
 use Infection\Mutation\DetectionStatus;
 use Infection\Mutation\MutationExecutionResult;
 use InvalidArgumentException;
@@ -45,6 +46,14 @@ use function Safe\sprintf;
  */
 class MetricsCalculator
 {
+    private $roundingPrecision;
+    private $killedExecutionResults;
+    private $errorExecutionResults;
+    private $escapedExecutionResults;
+    private $timedOutExecutionResults;
+    private $notCoveredExecutionResults;
+    private $allExecutionResults;
+
     /**
      * @var int
      */
@@ -74,20 +83,15 @@ class MetricsCalculator
      * @var int
      */
     private $totalMutantsCount = 0;
-    private $killedExecutionResults;
-    private $errorExecutionResults;
-    private $escapedExecutionResults;
-    private $timedOutExecutionResults;
-    private $notCoveredExecutionResults;
-    private $allExecutionResults;
 
     /**
      * @var Calculator|null
      */
     private $calculator;
 
-    public function __construct()
+    public function __construct(int $roundingPrecision)
     {
+        $this->roundingPrecision = $roundingPrecision;
         $this->killedExecutionResults = new SortableMutationExecutionResults();
         $this->errorExecutionResults = new SortableMutationExecutionResults();
         $this->escapedExecutionResults = new SortableMutationExecutionResults();
@@ -98,6 +102,11 @@ class MetricsCalculator
 
     public function collect(MutationExecutionResult ...$executionResults): void
     {
+        if (count($executionResults) > 0) {
+            // Reset the calculator if any result is added
+            $this->calculator = null;
+        }
+
         foreach ($executionResults as $executionResult) {
             ++$this->totalMutantsCount;
             $this->allExecutionResults->add($executionResult);
@@ -142,34 +151,9 @@ class MetricsCalculator
         }
     }
 
-    public function getKilledCount(): int
+    public function getRoundingPrecision(): int
     {
-        return $this->killedCount;
-    }
-
-    public function getErrorCount(): int
-    {
-        return $this->errorCount;
-    }
-
-    public function getEscapedCount(): int
-    {
-        return $this->escapedCount;
-    }
-
-    public function getTimedOutCount(): int
-    {
-        return $this->timedOutCount;
-    }
-
-    public function getNotTestedCount(): int
-    {
-        return $this->notExecutedByTestsCount;
-    }
-
-    public function getTotalMutationsCount(): int
-    {
-        return $this->totalMutantsCount;
+        return $this->roundingPrecision;
     }
 
     /**
@@ -220,6 +204,36 @@ class MetricsCalculator
         return $this->allExecutionResults->getSortedExecutionResults();
     }
 
+    public function getKilledCount(): int
+    {
+        return $this->killedCount;
+    }
+
+    public function getErrorCount(): int
+    {
+        return $this->errorCount;
+    }
+
+    public function getEscapedCount(): int
+    {
+        return $this->escapedCount;
+    }
+
+    public function getTimedOutCount(): int
+    {
+        return $this->timedOutCount;
+    }
+
+    public function getNotTestedCount(): int
+    {
+        return $this->notExecutedByTestsCount;
+    }
+
+    public function getTotalMutationsCount(): int
+    {
+        return $this->totalMutantsCount;
+    }
+
     /**
      * Mutation Score Indicator (MSI)
      */
@@ -246,6 +260,6 @@ class MetricsCalculator
 
     private function getCalculator(): Calculator
     {
-        return $this->calculator ?? Calculator::fromMetrics($this);
+        return $this->calculator ?? $this->calculator = Calculator::fromMetrics($this);
     }
 }

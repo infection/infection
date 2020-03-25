@@ -40,6 +40,7 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
+use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container;
 use Infection\Engine;
@@ -49,9 +50,7 @@ use Infection\FileSystem\Locator\Locator;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_numeric;
 use function Safe\sprintf;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -268,17 +267,10 @@ final class RunCommand extends BaseCommand
 
         /** @var string|null $minMsi */
         $minMsi = $input->getOption('min-msi');
-
-        if ($minMsi !== null && !is_numeric($minMsi)) {
-            throw new InvalidArgumentException(sprintf('Expected min-msi to be a float. Got "%s"', $minMsi));
-        }
-
         /** @var string|null $minCoveredMsi */
         $minCoveredMsi = $input->getOption('min-covered-msi');
 
-        if ($minCoveredMsi !== null && !is_numeric($minCoveredMsi)) {
-            throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
-        }
+        $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile === '' ? null : $configFile,
@@ -293,8 +285,9 @@ final class RunCommand extends BaseCommand
             $initialTestsPhpOptions === '' ? null : $initialTestsPhpOptions,
             (bool) $input->getOption('skip-initial-tests'),
             $input->getOption('ignore-msi-with-no-mutations'),
-            $minMsi === null ? null : (float) $minMsi,
-            $minCoveredMsi === null ? null : (float) $minCoveredMsi,
+            MsiParser::parse($minMsi, $msiPrecision, 'min-msi'),
+            MsiParser::parse($minCoveredMsi, $msiPrecision, 'min-covered-msi'),
+            $msiPrecision,
             $testFramework === '' ? null : $testFramework,
             $testFrameworkExtraOptions === '' ? null : $testFrameworkExtraOptions,
             trim((string) $input->getOption('filter')),

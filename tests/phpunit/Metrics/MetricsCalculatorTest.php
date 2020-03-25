@@ -49,7 +49,7 @@ final class MetricsCalculatorTest extends TestCase
 
     public function test_it_shows_zero_values_by_default(): void
     {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator(2);
 
         $this->assertSame(0, $calculator->getKilledCount());
         $this->assertSame(0, $calculator->getErrorCount());
@@ -72,7 +72,7 @@ final class MetricsCalculatorTest extends TestCase
 
     public function test_it_collects_all_values(): void
     {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator(2);
 
         $expectedKilledResults = $this->addMutationExecutionResult(
             $calculator,
@@ -123,14 +123,14 @@ final class MetricsCalculatorTest extends TestCase
         );
 
         $this->assertSame(14, $calculator->getTotalMutationsCount());
-        $this->assertSame(78.57142857142857, $calculator->getMutationScoreIndicator());
-        $this->assertSame(92.85714285714286, $calculator->getCoverageRate());
-        $this->assertSame(84.61538461538461, $calculator->getCoveredCodeMutationScoreIndicator());
+        $this->assertSame(78.57, $calculator->getMutationScoreIndicator());
+        $this->assertSame(92.86, $calculator->getCoverageRate());
+        $this->assertSame(84.62, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
     public function test_its_metrics_are_properly_updated_when_adding_a_new_process(): void
     {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator(2);
 
         $this->assertSame(0, $calculator->getKilledCount());
         $this->assertSame([], $calculator->getKilledExecutionResults());

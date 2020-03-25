@@ -33,53 +33,71 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger;
+namespace Infection\Console\Input;
 
-use Infection\Logger\PerMutatorLogger;
-use Infection\Metrics\MetricsCalculator;
-use PHPUnit\Framework\TestCase;
+use function count;
+use function explode;
+use Infection\CannotBeInstantiated;
+use function max;
+use const PHP_ROUND_HALF_UP;
+use function round;
+use function Safe\sprintf;
+use function strlen;
+use function trim;
+use Webmozart\Assert\Assert;
 
-final class PerMutatorLoggerTest extends TestCase
+/**
+ * @internal
+ */
+final class MsiParser
 {
-    use CreateMetricsCalculator;
-    use LineLoggerAssertions;
+    use CannotBeInstantiated;
 
-    /**
-     * @dataProvider metricsProvider
-     */
-    public function test_it_logs_correctly_with_mutations(
-        MetricsCalculator $metricsCalculator,
-        string $expectedContents
-    ): void {
-        $logger = new PerMutatorLogger($metricsCalculator);
+    public static function detectPrecision(?string ...$values): int
+    {
+        $precisions = [2];
 
-        $this->assertLoggedContentIs($expectedContents, $logger);
+        foreach ($values as $value) {
+            $value = trim((string) $value);
+
+            if ($value === '') {
+                continue;
+            }
+
+            $valueParts = explode('.', $value);
+
+            if (count($valueParts) !== 2) {
+                continue;
+            }
+
+            $precisions[] = strlen($valueParts[1]);
+        }
+
+        return max($precisions);
     }
 
-    public function metricsProvider(): iterable
+    public static function parse(?string $value, int $precision, string $optionName): ?float
     {
-        yield 'no mutations' => [
-            new MetricsCalculator(2),
-            <<<'TXT'
-# Effects per Mutator
+        $value = trim((string) $value);
 
-| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI (%s) | Covered MSI (%s) |
-| ------- | --------- | ------ | ------- | ------ | --------- | -------- | ---------------- |
+        if ($value === '') {
+            return null;
+        }
 
-TXT
-        ];
+        Assert::numeric(
+            $value,
+            sprintf('Expected %s to be a float. Got "%s"', $optionName, $value)
+        );
 
-        yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
-            <<<'TXT'
-# Effects per Mutator
+        $roundedValue = round((float) $value, $precision, PHP_ROUND_HALF_UP);
 
-| Mutator   | Mutations | Killed | Escaped | Errors | Timed Out | MSI (%s) | Covered MSI (%s) |
-| --------- | --------- | ------ | ------- | ------ | --------- | -------- | ---------------- |
-| For_      |         5 |      1 |       1 |      1 |         1 |    60.00 |            75.00 |
-| PregQuote |         5 |      1 |       1 |      1 |         1 |    60.00 |            75.00 |
+        Assert::range(
+            $roundedValue,
+            0,
+            100,
+            sprintf('Expected %s to be an element of [0;100]. Got %%s', $optionName)
+        );
 
-TXT
-        ];
+        return $roundedValue;
     }
 }

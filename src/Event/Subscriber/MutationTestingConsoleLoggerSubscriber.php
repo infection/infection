@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Mutation\MutationExecutionResult;
 use function floor;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
@@ -43,6 +42,7 @@ use Infection\Event\MutationProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Mutation\MutationExecutionResult;
 use function Safe\sprintf;
 use function str_pad;
 use function str_repeat;
