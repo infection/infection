@@ -5,54 +5,53 @@ declare(strict_types=1);
 namespace Infection\Tests\Fixtures;
 
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationAttributeKeys;
+use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\MutatedNode;
+use Infection\Tests\UnsupportedMethod;
 use PhpParser\Node;
 
 class SimpleMutation extends Mutation
 {
-    /**
-     * @var Mutator
-     */
-    private $mutator;
-
-    /**
-     * @var Node[]
-     */
     private $originalFileAst;
-
-    /**
-     * @var MutatedNode
-     */
+    private $mutator;
     private $mutatedNode;
-    /**
-     * @var array
-     */
-    private $originalStartingLine;
-    /**
-     * @var string
-     */
+    private $attributes;
     private $mutatedNodeClass;
 
+    /**
+     * @param Node[]       $originalFileAst
+     * @param class-string $mutatorName
+     * @param array<string|int|float> $attributes
+     * @param class-string      $mutatedNodeClass
+     */
     public function __construct(
         array $originalFileAst,
-        Mutator $mutator,
-        $mutatedNode,
+        string $mutatorName,
+        MutatedNode $mutatedNode,
         array $attributes,
         string $mutatedNodeClass
     ) {
+        parent::__construct(
+            '/path/to/Foo.php',
+            $mutatorName,
+            (int) $attributes[MutationAttributeKeys::START_LINE],
+            [],
+            static function (): MutationCalculatedState {
+                throw UnsupportedMethod::method(Mutation::class, 'calculateState');
+            }
+        );
+
         $this->originalFileAst = $originalFileAst;
-        $this->mutator = $mutator;
         $this->mutatedNode = $mutatedNode;
-        $this->originalStartingLine = $attributes;
+        $this->attributes = $attributes;
         $this->mutatedNodeClass = $mutatedNodeClass;
     }
 
-    public function getMutator(): Mutator
-    {
-        return $this->mutator;
-    }
-
+    /**
+     * @return Node[]
+     */
     public function getOriginalFileAst(): array
     {
         return $this->originalFileAst;
@@ -63,9 +62,12 @@ class SimpleMutation extends Mutation
         return $this->mutatedNode;
     }
 
-    public function getOriginalStartingLine(): array
+    /**
+     * @return array<string|int|float>
+     */
+    public function getAttributes(): array
     {
-        return $this->originalStartingLine;
+        return $this->attributes;
     }
 
     public function getMutatedNodeClass(): string

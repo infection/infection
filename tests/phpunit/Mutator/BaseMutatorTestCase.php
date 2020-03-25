@@ -40,12 +40,12 @@ use function count;
 use function escapeshellarg;
 use function exec;
 use function get_class;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
-use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
@@ -138,7 +138,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
         foreach ($mutations as $mutation) {
             $mutatorVisitor = new MutatorVisitor(
-                $mutation->getOriginalStartingLine(),
+                $mutation->getAttributes(),
                 $mutation->getMutatedNodeClass(),
                 $mutation->getMutatedNode()
             );
@@ -156,7 +156,7 @@ abstract class BaseMutatorTestCase extends TestCase
     }
 
     /**
-     * @return SimpleMutation[]
+     * @return Mutation[]
      */
     private function getMutationsFromCode(string $code, array $settings): array
     {
