@@ -171,8 +171,8 @@ class Mutation
      */
     public function getTimeToTest(): float
     {
-        return $this->timeToTest ?? $this->timeToTest = array_sum(array_map(static function (TestLocation $data) {
-            return $data->getExecutionTime();
+        return $this->timeToTest ?? $this->timeToTest = array_sum(array_map(static function (TestLocation $testLocation) {
+            return $testLocation->getExecutionTime();
         }, $this->tests));
     }
 
