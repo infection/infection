@@ -44,13 +44,6 @@ use Infection\TestFramework\SafeDOMXPath;
  */
 class IndexXmlCoverageParser
 {
-    private $coverageDir;
-
-    public function __construct(string $coverageDir)
-    {
-        $this->coverageDir = $coverageDir;
-    }
-
     /**
      * Parses the given PHPUnit XML coverage index report (index.xml) to collect the information
      * needed to parse general coverage data. Note that this data is likely incomplete an will
@@ -60,20 +53,26 @@ class IndexXmlCoverageParser
      *
      * @return iterable<SourceFileInfoProvider>
      */
-    public function parse(string $coverageIndexPath, string $xmlIndexCoverageContent): iterable
-    {
+    public function parse(
+        string $coverageIndexPath,
+        string $xmlIndexCoverageContent,
+        string $coverageBasePath
+    ): iterable {
         $xPath = XPathFactory::createXPath($xmlIndexCoverageContent);
 
         self::assertHasExecutedLines($xPath);
 
-        return $this->parseNodes($coverageIndexPath, $xPath);
+        return $this->parseNodes($coverageIndexPath, $coverageBasePath, $xPath);
     }
 
     /**
      * @return iterable<SourceFileInfoProvider>
      */
-    private function parseNodes(string $coverageIndexPath, SafeDOMXPath $xPath): iterable
-    {
+    private function parseNodes(
+        string $coverageIndexPath,
+        string $coverageBasePath,
+        SafeDOMXPath $xPath
+    ): iterable {
         $projectSource = self::getProjectSource($xPath);
 
         foreach ($xPath->query('//file') as $node) {
@@ -81,7 +80,7 @@ class IndexXmlCoverageParser
 
             yield new SourceFileInfoProvider(
                 $coverageIndexPath,
-                $this->coverageDir,
+                $coverageBasePath,
                 $relativeCoverageFilePath,
                 $projectSource
             );

@@ -66,7 +66,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         chdir($this->tmp);
 
         $this->locator = new JUnitReportLocator(
-            $this->tmp . '/coverage-xml',
+            $this->tmp,
             $this->tmp . '/junit.xml'
         );
     }
@@ -147,14 +147,14 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     public function test_it_cannot_locate_the_JUnit_file_in_a_non_existent_coverage_directory(): void
     {
         $locator = new JUnitReportLocator(
-            $this->tmp . '/unknown/sub-dir',
+            $this->tmp . '/unknown-dir',
             $this->tmp . '/junit.xml'
         );
 
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not find any file with the pattern "*.junit.xml" in "%s"',
-            $this->tmp . '/unknown'
+            $this->tmp . '/unknown-dir'
         ));
 
         $locator->locate();
