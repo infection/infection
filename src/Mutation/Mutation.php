@@ -39,7 +39,6 @@ use function array_intersect_key;
 use function array_keys;
 use function array_map;
 use function array_sum;
-use function count;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
@@ -73,6 +72,7 @@ class Mutation
     private $originalFileAst;
     private $tests;
     private $coveredByTests;
+    private $timeToTest;
 
     /**
      * @var string|null
@@ -108,7 +108,7 @@ class Mutation
         $this->mutatedNode = $mutatedNode;
         $this->mutationByMutatorIndex = $mutationByMutatorIndex;
         $this->tests = $tests;
-        $this->coveredByTests = count($tests) > 0;
+        $this->coveredByTests = $tests !== [];
     }
 
     public function getOriginalFilePath(): string
@@ -171,9 +171,7 @@ class Mutation
      */
     public function getTimeToTest(): float
     {
-        // TODO this needs to be memoized
-
-        return array_sum(array_map(static function (TestLocation $data) {
+        return $this->timeToTest ?? $this->timeToTest = array_sum(array_map(static function (TestLocation $data) {
             return $data->getExecutionTime();
         }, $this->tests));
     }

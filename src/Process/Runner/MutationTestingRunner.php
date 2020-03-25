@@ -68,7 +68,7 @@ final class MutationTestingRunner
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
         bool $runConcurrently,
-        int $timeout
+        float $timeout
     ) {
         $this->processFactory = $processFactory;
         $this->mutantFactory = $mutantFactory;
@@ -99,6 +99,17 @@ final class MutationTestingRunner
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
                     MutantExecutionResult::createFromNonCoveredMutant($mutant)
+                ));
+
+                return false;
+            })
+            ->filter(function (Mutant $mutant) {
+                if ($mutant->getMutation()->getTimeToTest() < $this->timeout) {
+                    return true;
+                }
+
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromTimeConstrainedMutant($mutant)
                 ));
 
                 return false;

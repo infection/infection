@@ -66,7 +66,8 @@ final class DotFormatter extends AbstractOutputFormatter
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>S</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
-            . '<timeout>T</timeout>: timed out',
+            . '<timeout>T</timeout>: timed out, '
+            . '<constrained>C</constrained>: constrained',
             '',
         ]);
     }
@@ -90,6 +91,10 @@ final class DotFormatter extends AbstractOutputFormatter
                 break;
             case DetectionStatus::TIMED_OUT:
                 $this->output->write('<timeout>T</timeout>');
+
+                break;
+            case DetectionStatus::CONSTRAINED:
+                $this->output->write('<constrained>C</constrained>');
 
                 break;
             case DetectionStatus::ERROR:

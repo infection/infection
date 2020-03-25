@@ -58,7 +58,7 @@ class MutantProcessFactory
     // TODO: is it necessary for the timeout to be an int?
     public function __construct(
         TestFrameworkAdapter $testFrameworkAdapter,
-        int $timeout,
+        float $timeout,
         EventDispatcher $eventDispatcher,
         MutantExecutionResultFactory $resultFactory
     ) {

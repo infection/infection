@@ -67,6 +67,11 @@ class MetricsCalculator
     /**
      * @var int
      */
+    private $constrainedCount = 0;
+
+    /**
+     * @var int
+     */
     private $escapedCount = 0;
 
     /**
@@ -132,6 +137,12 @@ class MetricsCalculator
 
                 case DetectionStatus::TIMED_OUT:
                     $this->timedOutCount++;
+                    $this->timedOutExecutionResults->add($executionResult);
+
+                    break;
+
+                case DetectionStatus::CONSTRAINED:
+                    $this->constrainedCount++;
                     $this->timedOutExecutionResults->add($executionResult);
 
                     break;
@@ -214,6 +225,11 @@ class MetricsCalculator
         return $this->errorCount;
     }
 
+    public function getConstrainedCount(): int
+    {
+        return $this->constrainedCount;
+    }
+
     public function getEscapedCount(): int
     {
         return $this->escapedCount;
@@ -232,6 +248,11 @@ class MetricsCalculator
     public function getTotalMutantsCount(): int
     {
         return $this->totalMutantsCount;
+    }
+
+    public function getTestedMutantsCount(): int
+    {
+        return $this->totalMutantsCount - $this->constrainedCount;
     }
 
     /**

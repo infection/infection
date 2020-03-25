@@ -81,7 +81,7 @@ class MutantExecutionResult
 
     public static function createFromTimeConstrainedMutant(Mutant $mutant): self
     {
-        return self::createFromMutant($mutant, DetectionStatus::TIMED_OUT);
+        return self::createFromMutant($mutant, DetectionStatus::CONSTRAINED);
     }
 
     public function getProcessCommandLine(): string
