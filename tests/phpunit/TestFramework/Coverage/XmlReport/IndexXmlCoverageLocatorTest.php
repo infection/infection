@@ -33,15 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\Locator\FileNotFound;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
 use const PHP_OS_FAMILY;
 use function Safe\chdir;
+use function Safe\mkdir;
 use function Safe\realpath;
 use function Safe\sprintf;
 use function Safe\touch;
@@ -50,10 +51,10 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @group integration
  */
-final class JUnitReportLocatorTest extends FileSystemTestCase
+final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 {
     /**
-     * @var JUnitReportLocator
+     * @var IndexXmlCoverageLocator
      */
     private $locator;
 
@@ -64,11 +65,9 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         // Move to the temporary directory: we want to make sure the setUp closures are executed
         // there since they do not have access to the tmp yet, so their paths are relative
         chdir($this->tmp);
+        mkdir($this->tmp . '/coverage-xml');
 
-        $this->locator = new JUnitReportLocator(
-            $this->tmp . '/coverage-xml',
-            $this->tmp . '/junit.xml'
-        );
+        $this->locator = new IndexXmlCoverageLocator($this->tmp . '/coverage-xml');
     }
 
     protected function tearDown(): void
@@ -78,26 +77,26 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         parent::tearDown();
     }
 
-    public function test_it_can_locate_the_default_JUnit_file(): void
+    public function test_it_can_locate_the_default_index_file(): void
     {
-        touch('junit.xml');
+        touch('coverage-xml/index.xml');
 
-        $expected = normalizePath(realpath($this->tmp . '/junit.xml'));
+        $expected = normalizePath(realpath($this->tmp . '/coverage-xml/index.xml'));
 
         $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
         $this->assertSame($expected, $this->locator->locate());
     }
 
-    public function test_it_can_locate_the_default_JUnit_file_with_the_wrong_case(): void
+    public function test_it_can_locate_the_default_index_file_with_the_wrong_case(): void
     {
         if (PHP_OS_FAMILY !== 'Darwin') {
             $this->markTestSkipped('Cannot test this on case-sensitive OS');
         }
 
-        touch('JUNIT.XML');
+        touch('coverage-xml/INDEX.XML');
 
-        $expected = normalizePath(realpath($this->tmp . '/junit.xml'));
+        $expected = normalizePath(realpath($this->tmp . '/coverage-xml/index.xml'));
 
         $actual = $this->locator->locate();
 
@@ -105,73 +104,63 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider jUnitPathsProvider
+     * @dataProvider indexPathsProvider
      */
-    public function test_it_can_find_more_exotic_JUnit_file_names(string $jUnitRelativePaths): void
+    public function test_it_can_find_more_exotic_index_file_names(string $indexRelativePath): void
     {
-        (new Filesystem())->dumpFile($jUnitRelativePaths, '');
+        (new Filesystem())->dumpFile($indexRelativePath, '');
 
-        $expected = normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . $jUnitRelativePaths));
+        $expected = normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . $indexRelativePath));
 
         $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
         $this->assertSame($expected, $this->locator->locate());
     }
 
-    public function test_it_cannot_locate_the_JUnit_file_if_the_result_is_ambiguous(): void
+    public function test_it_cannot_locate_the_index_file_if_the_result_is_ambiguous(): void
     {
-        touch('phpunit.junit.xml');
-        touch('phpspec.junit.xml');
+        touch('index.xml');
+        mkdir('sub-dir');
+        touch('sub-dir/index.xml');
 
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
-            'Could not locate the JUnit file: more than one file has been found with the pattern "*.junit.xml": "%s", "%s"',
-            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'phpspec.junit.xml')),
-            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'phpunit.junit.xml'))
+            'Could not locate the XML coverage index file. More than one file has been found: "%s", "%s"',
+            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'index.xml')),
+            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'sub-dir/index.xml'))
         ));
 
         $this->locator->locate();
     }
 
-    public function test_it_cannot_locate_the_JUnit_file_if_none_found(): void
+    public function test_it_cannot_locate_the_index_file_if_none_found(): void
     {
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
-            'Could not find any file with the pattern "*.junit.xml" in "%s"',
+            'Could not find any "index.xml" file in "%s"',
             $this->tmp
         ));
 
         $this->locator->locate();
     }
 
-    public function test_it_cannot_locate_the_JUnit_file_in_a_non_existent_coverage_directory(): void
+    public function test_it_cannot_locate_the_index_file_in_a_non_existent_coverage_directory(): void
     {
-        $locator = new JUnitReportLocator(
-            $this->tmp . '/unknown/sub-dir',
-            $this->tmp . '/junit.xml'
-        );
+        $this->locator = new IndexXmlCoverageLocator($this->tmp . '/unknown/sub-dir');
 
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
-            'Could not find any file with the pattern "*.junit.xml" in "%s"',
+            'Could not find any "index.xml" file in "%s"',
             $this->tmp . '/unknown'
         ));
 
-        $locator->locate();
+        $this->locator->locate();
     }
 
-    public static function jUnitPathsProvider(): iterable
+    public static function indexPathsProvider(): iterable
     {
-        yield 'outdated doc' => ['phpunit.junit.xml'];
+        yield 'nominal' => ['coverage-xml/index.xml'];
 
-        yield 'non conventional name' => ['foo2.junit.xml'];
-
-        yield 'in sub-directory' => ['sub-dir/junit.xml'];
-
-        yield 'outdated doc in sub-directory' => ['sub-dir/phpunit.junit.xml'];
-
-        yield 'non conventional name in sub-directory' => ['sub-dir/foo2.junit.xml'];
-
-        yield 'all caps in sub-directory' => ['sub-dir/JUNIT.XML'];
+        yield 'sub-dir' => ['coverage-xml/sub-dir/index.xml'];
     }
 }
