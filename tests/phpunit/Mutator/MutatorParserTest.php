@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\MutatorParser;
 use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
 final class MutatorParserTest extends TestCase
 {
@@ -62,6 +63,14 @@ final class MutatorParserTest extends TestCase
         $parsedMutators = $this->mutatorParser->parse($mutatorInput);
 
         $this->assertSame($expectedMutators, $parsedMutators);
+    }
+
+    public function test_it_cannot_parse_unknown_mutator(): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected "Unknown" to be a known mutator or profile. See "https://infection.github.io/guide/mutators.html" and "https://infection.github.io/guide/profiles.html" for the list of available mutations and profiles.');
+
+        $this->mutatorParser->parse('Unknown');
     }
 
     public function mutatorInputProvider(): iterable

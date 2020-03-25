@@ -78,9 +78,7 @@ final class MutationFactoryTest extends TestCase
         parent::setUp();
 
         $this->codeFactoryMock = $this->createMock(MutationCodeFactory::class);
-
         $this->printerMock = $this->createMock(PrettyPrinterAbstract::class);
-
         $this->differMock = $this->createMock(Differ::class);
 
         $this->mutationFactory = new MutationFactory(

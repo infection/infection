@@ -5,6 +5,7 @@ namespace Infection\Tests\Fixtures\TestFramework;
 use ErrorException;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\Tests\UnsupportedMethod;
 
 class FakeAwareAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
 {
@@ -22,12 +23,12 @@ class FakeAwareAdapter extends AbstractTestFrameworkAdapter implements MemoryUsa
 
     public function testsPass(string $output): bool
     {
-        throw new ErrorException('this should never be called');
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getName(): string
     {
-        throw new ErrorException('this should never be called');
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     /**

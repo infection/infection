@@ -450,7 +450,6 @@ final class Container
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 return new MutationTestingRunner(
                     $container->getMutationProcessFactory(),
-                    $container->getMutationFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
                     $container->getConfiguration()->isDryRun()
