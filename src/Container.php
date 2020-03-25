@@ -66,7 +66,7 @@ use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
@@ -259,7 +259,7 @@ final class Container
                 );
             },
             Lexer::class => static function (): Lexer {
-                $attributes = Mutation::ATTRIBUTE_KEYS;
+                $attributes = MutationAttributeKeys::ALL;
                 $attributes[] = 'comments';
 
                 return new Lexer\Emulative(['usedAttributes' => $attributes]);
