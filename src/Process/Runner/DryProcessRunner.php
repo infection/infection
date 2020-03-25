@@ -42,8 +42,9 @@ final class DryProcessRunner implements ProcessRunner
 {
     public function run(iterable $processes): void
     {
-        foreach ($processes as $_) {
+        foreach ($processes as $process) {
             // Do nothing: we just want to make sure we trigger the iterable
+            // not even trigger the callback process
         }
     }
 }

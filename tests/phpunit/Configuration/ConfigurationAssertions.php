@@ -78,6 +78,7 @@ trait ConfigurationAssertions
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
         ?float $expectedMinCoveredMsi,
+        int $expectedMsiPrecision,
         int $expectedThreadCount,
         bool $expectedDryRyn
     ): void {
@@ -122,6 +123,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi());
         $this->assertSame($expectedShowMutations, $configuration->showMutations());
         $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi());
+        $this->assertSame($expectedMsiPrecision, $configuration->getMsiPrecision());
         $this->assertSame($expectedThreadCount, $configuration->getThreadCount());
         $this->assertSame($expectedDryRyn, $configuration->isDryRun());
     }

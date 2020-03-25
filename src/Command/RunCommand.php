@@ -47,12 +47,15 @@ use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
+use Infection\Metrics\MinMsiCheckFailed;
+use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -202,8 +205,6 @@ final class RunCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $this->installTestFrameworkIfNeeded($input, $output);
-
         $this->initContainer($input);
 
         $locator = $this->container->getRootsFileOrDirectoryLocator();
@@ -214,11 +215,15 @@ final class RunCommand extends BaseCommand
             $this->runConfigurationCommand($locator);
         }
 
+        $this->installTestFrameworkIfNeeded($input, $output);
+
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
+
         $this->startUp();
 
         $engine = new Engine(
@@ -236,7 +241,13 @@ final class RunCommand extends BaseCommand
             $this->container->getTestFrameworkExtraOptionsFilter()
         );
 
-        $engine->execute();
+        try {
+            $engine->execute();
+        } catch (InitialTestsFailed | MinMsiCheckFailed $exception) {
+            // TODO: we can move that in a dedicated logger later and handle those cases in the
+            // Engine instead
+            $io->error($exception->getMessage());
+        }
 
         return 0;
     }
@@ -254,6 +265,13 @@ final class RunCommand extends BaseCommand
         $testFrameworkExtraOptions = trim((string) $this->input->getOption('test-framework-options'));
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
 
+        /** @var string|null $minMsi */
+        $minMsi = $input->getOption('min-msi');
+        /** @var string|null $minCoveredMsi */
+        $minCoveredMsi = $input->getOption('min-covered-msi');
+
+        $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
+
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile === '' ? null : $configFile,
             trim((string) $input->getOption('mutators')),
@@ -267,8 +285,9 @@ final class RunCommand extends BaseCommand
             $initialTestsPhpOptions === '' ? null : $initialTestsPhpOptions,
             (bool) $input->getOption('skip-initial-tests'),
             $input->getOption('ignore-msi-with-no-mutations'),
-            MsiParser::parse($input->getOption('min-msi'), 'min-msi'),
-            MsiParser::parse($input->getOption('min-covered-msi'), 'min-covered-msi'),
+            MsiParser::parse($minMsi, $msiPrecision, 'min-msi'),
+            MsiParser::parse($minCoveredMsi, $msiPrecision, 'min-covered-msi'),
+            $msiPrecision,
             $testFramework === '' ? null : $testFramework,
             $testFrameworkExtraOptions === '' ? null : $testFrameworkExtraOptions,
             trim((string) $input->getOption('filter')),
@@ -279,10 +298,10 @@ final class RunCommand extends BaseCommand
 
     private function installTestFrameworkIfNeeded(InputInterface $input, OutputInterface $output): void
     {
-        $container = $this->getApplication()->getContainer();
+        $installationDecider = $this->container->getAdapterInstallationDecider();
+        $configTestFramework = $this->container->getConfiguration()->getTestFramework();
 
-        $installationDecider = $container->getAdapterInstallationDecider();
-        $adapterName = trim((string) $this->input->getOption('test-framework'));
+        $adapterName = trim((string) $this->input->getOption('test-framework')) ?: $configTestFramework;
 
         if (!$installationDecider->shouldBeInstalled($adapterName, $input, $output)) {
             return;
@@ -293,7 +312,7 @@ final class RunCommand extends BaseCommand
             sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
         ]);
 
-        $container->getAdapterInstaller()->install($adapterName);
+        $this->container->getAdapterInstaller()->install($adapterName);
     }
 
     private function startUp(): void

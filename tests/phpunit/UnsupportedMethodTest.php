@@ -33,31 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant\Exception;
+namespace Infection\Tests;
 
-use Infection\Mutant\Exception\MsiCalculationException;
-use LogicException;
 use PHPUnit\Framework\TestCase;
 
-final class MsiCalculationExceptionTest extends TestCase
+/**
+ * @covers \Infection\Tests\UnsupportedMethod
+ */
+final class UnsupportedMethodTest extends TestCase
 {
-    public function test_it_is_instance_of_logic_exception(): void
+    public function test_it_can_be_instantiated_for_a_method(): void
     {
-        $exception = MsiCalculationException::create('');
+        $exception = UnsupportedMethod::method('Acme\Foo', 'foo');
 
-        $this->assertInstanceOf(
-            LogicException::class,
-            $exception
-        );
-    }
-
-    public function test_it_has_correct_error_message(): void
-    {
-        $exception = MsiCalculationException::create('min-msi');
-        $this->assertSame(
-            'Seems like something is wrong with calculations and min-msi options.',
-            $exception->getMessage(),
-            'The error message was incorrectly parsed.'
-        );
+        $this->assertSame('Did not expect "Acme\Foo::foo()" to be called', $exception->getMessage());
+        $this->assertSame(0, $exception->getCode());
+        $this->assertNull($exception->getPrevious());
     }
 }

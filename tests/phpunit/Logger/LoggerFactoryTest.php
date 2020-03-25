@@ -78,7 +78,7 @@ final class LoggerFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->metricsCalculator = new MetricsCalculator();
+        $this->metricsCalculator = new MetricsCalculator(2);
         $this->fileSystemMock = $this->createMock(Filesystem::class);
         $this->outputMock = $this->createMock(OutputInterface::class);
     }

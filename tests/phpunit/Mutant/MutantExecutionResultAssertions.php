@@ -33,48 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Builder;
+namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Mutant\Mutant;
-use Infection\Process\MutantProcess;
-use function method_exists;
-use Symfony\Component\Process\Process;
+use Infection\Mutant\MutantExecutionResult;
 
-/**
- * @internal
- * @final
- */
-class MutantProcessBuilder
+trait MutantExecutionResultAssertions
 {
-    private $testFrameworkAdapter;
-    private $timeout;
-
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter, int $timeout)
-    {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-        $this->timeout = $timeout;
-    }
-
-    public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
-    {
-        $process = new Process(
-            $this->testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $testFrameworkExtraOptions
-            )
-        );
-
-        $process->setTimeout((float) $this->timeout);
-
-        if (method_exists($process, 'inheritEnvironmentVariables')) {
-            // in version 4.4.0 this method is deprecated and removed in 5.0.0
-            $process->inheritEnvironmentVariables();
-        }
-
-        return new MutantProcess($process, $mutant, $this->testFrameworkAdapter);
+    private function assertResultStateIs(
+        MutantExecutionResult $result,
+        string $expectedProcessCommandLine,
+        string $expectedProcessOutput,
+        string $expectedDetectionStatus,
+        string $expectedMutantDiff,
+        string $expectedMutatorName,
+        string $expectedOriginalFilePath,
+        int $expectedOriginalStartingLine
+    ): void {
+        $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
+        $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
+        $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
+        $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
+        $this->assertSame($expectedMutatorName, $result->getMutatorName());
+        $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
+        $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());
     }
 }

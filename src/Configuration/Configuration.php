@@ -83,6 +83,7 @@ class Configuration
     private $minMsi;
     private $showMutations;
     private $minCoveredMsi;
+    private $msiPrecision;
     private $threadCount;
     private $dryRun;
 
@@ -116,6 +117,7 @@ class Configuration
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
+        int $msiPrecision,
         int $threadCount,
         bool $dryRun
     ) {
@@ -152,6 +154,7 @@ class Configuration
         $this->minMsi = $minMsi;
         $this->showMutations = $showMutations;
         $this->minCoveredMsi = $minCoveredMsi;
+        $this->msiPrecision = $msiPrecision;
         $this->threadCount = $threadCount;
         $this->dryRun = $dryRun;
     }
@@ -283,6 +286,11 @@ class Configuration
     public function getMinCoveredMsi(): ?float
     {
         return $this->minCoveredMsi;
+    }
+
+    public function getMsiPrecision(): int
+    {
+        return $this->msiPrecision;
     }
 
     public function getThreadCount(): int

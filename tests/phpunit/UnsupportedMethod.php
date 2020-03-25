@@ -33,26 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Builder;
+namespace Infection\Tests;
 
-use Infection\Mutant\Mutant;
-use Infection\Process\Builder\MutantProcessBuilder;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\TestCase;
+use DomainException;
+use function Safe\sprintf;
 
-final class MutantProcessBuilderTest extends TestCase
+/**
+ * @internal
+ */
+final class UnsupportedMethod extends DomainException
 {
-    public function test_it_creates_a_process_with_timeout(): void
+    public static function method(string $class, string $method): self
     {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getMutantCommandLine')
-            ->willReturn(['/usr/bin/php']);
-
-        $builder = new MutantProcessBuilder($fwAdapter, 100);
-
-        $process = $builder->createProcessForMutant($this->createMock(Mutant::class))->getProcess();
-
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertSame(100.0, $process->getTimeout());
+        return new self(sprintf(
+            'Did not expect "%s::%s()" to be called',
+            $class,
+            $method
+        ));
     }
 }

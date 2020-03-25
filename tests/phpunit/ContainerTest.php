@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use Infection\Container;
+use Infection\FileSystem\Locator\FileNotFound;
 use InvalidArgumentException;
-use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -101,6 +101,7 @@ final class ContainerTest extends TestCase
             false,
             .0,
             .0,
+            2,
             'phpunit',
             '',
             '',
@@ -132,6 +133,7 @@ final class ContainerTest extends TestCase
             false,
             .0,
             .0,
+            2,
             'phpunit',
             '',
             '',
@@ -143,8 +145,8 @@ final class ContainerTest extends TestCase
 
         $this->assertIsIterable($traces);
 
-        $this->expectException(Warning::class);
-        $this->expectExceptionMessage('No such file or directory');
+        $this->expectException(FileNotFound::class);
+        $this->expectExceptionMessage('Could not find any "index.xml" file in "/path/to/coverage"');
 
         foreach ($traces as $trace) {
             $this->fail();

@@ -103,6 +103,7 @@ class ConfigurationFactory
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
+        int $msiPrecision,
         string $mutatorsInput,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
@@ -152,6 +153,7 @@ class ConfigurationFactory
             self::retrieveMinMsi($minMsi, $schema),
             $showMutations,
             self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
+            $msiPrecision,
             $threadCount,
             $dryRun
         );

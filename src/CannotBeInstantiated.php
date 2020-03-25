@@ -33,36 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
-
-use const DIRECTORY_SEPARATOR;
-use function Safe\file_get_contents;
-use Webmozart\PathUtil\Path;
+namespace Infection;
 
 /**
+ * Very simple trait which only purpose it make it a bit more explicit why the constructor is
+ * private.
+ *
  * @internal
- * @final
  */
-class IndexXmlCoverageReader
+trait CannotBeInstantiated
 {
-    private const COVERAGE_INDEX_FILE_NAME = 'index.xml';
-
-    private $path;
-
-    public function __construct(string $coverageDir)
+    private function __construct()
     {
-        $this->path = Path::canonicalize(
-            $coverageDir . DIRECTORY_SEPARATOR . self::COVERAGE_INDEX_FILE_NAME
-        );
-    }
-
-    public function getIndexXmlPath(): string
-    {
-        return $this->path;
-    }
-
-    public function getIndexXmlContent(): string
-    {
-        return file_get_contents($this->path);
     }
 }

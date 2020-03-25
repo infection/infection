@@ -35,9 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Console\Input;
 
+use function count;
+use function explode;
+use Infection\CannotBeInstantiated;
+use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
 use function Safe\sprintf;
+use function strlen;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -46,11 +51,32 @@ use Webmozart\Assert\Assert;
  */
 final class MsiParser
 {
-    private function __construct()
+    use CannotBeInstantiated;
+
+    public static function detectPrecision(?string ...$values): int
     {
+        $precisions = [2];
+
+        foreach ($values as $value) {
+            $value = trim((string) $value);
+
+            if ($value === '') {
+                continue;
+            }
+
+            $valueParts = explode('.', $value);
+
+            if (count($valueParts) !== 2) {
+                continue;
+            }
+
+            $precisions[] = strlen($valueParts[1]);
+        }
+
+        return max($precisions);
     }
 
-    public static function parse(?string $value, string $optionName): ?float
+    public static function parse(?string $value, int $precision, string $optionName): ?float
     {
         $value = trim((string) $value);
 
@@ -63,7 +89,7 @@ final class MsiParser
             sprintf('Expected %s to be a float. Got "%s"', $optionName, $value)
         );
 
-        $roundedValue = round((float) $value, 2, PHP_ROUND_HALF_UP);
+        $roundedValue = round((float) $value, $precision, PHP_ROUND_HALF_UP);
 
         Assert::range(
             $roundedValue,
