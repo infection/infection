@@ -45,14 +45,14 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Process\Builder\MutantProcessBuilder;
+use Infection\Process\Builder\MutantProcessFactory;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutator\MutatorName;
 use const PHP_OS_FAMILY;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\TestCase;
 
-final class MutantProcessBuilderTest extends TestCase
+final class MutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
@@ -123,14 +123,14 @@ DIFF
             ->willReturn($executionResultMock)
         ;
 
-        $builder = new MutantProcessBuilder(
+        $factory = new MutantProcessFactory(
             $testFrameworkAdapterMock,
             100,
             $eventDispatcher,
             $resultFactoryMock
         );
 
-        $mutantProcess = $builder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+        $mutantProcess = $factory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
         $process = $mutantProcess->getProcess();
 

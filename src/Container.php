@@ -74,7 +74,7 @@ use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Process\Builder\MutantProcessBuilder;
+use Infection\Process\Builder\MutantProcessFactory;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -428,8 +428,8 @@ final class Container
                     $container->getEventDispatcher()
                 );
             },
-            MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
-                return new MutantProcessBuilder(
+            MutantProcessFactory::class => static function (self $container): MutantProcessFactory {
+                return new MutantProcessFactory(
                     $container->getTestFrameworkAdapter(),
                     $container->getConfiguration()->getProcessTimeout(),
                     $container->getEventDispatcher(),
@@ -449,7 +449,7 @@ final class Container
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 return new MutationTestingRunner(
-                    $container->getMutantProcessBuilder(),
+                    $container->getMutantProcessFactory(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -828,9 +828,9 @@ final class Container
         return $this->get(InitialTestsRunner::class);
     }
 
-    public function getMutantProcessBuilder(): MutantProcessBuilder
+    public function getMutantProcessFactory(): MutantProcessFactory
     {
-        return $this->get(MutantProcessBuilder::class);
+        return $this->get(MutantProcessFactory::class);
     }
 
     public function getMutationGenerator(): MutationGenerator
