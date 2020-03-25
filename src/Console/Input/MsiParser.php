@@ -33,36 +33,71 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Console\Input;
 
-use const DIRECTORY_SEPARATOR;
-use function Safe\file_get_contents;
-use Webmozart\PathUtil\Path;
+use function count;
+use function explode;
+use Infection\CannotBeInstantiated;
+use function max;
+use const PHP_ROUND_HALF_UP;
+use function round;
+use function Safe\sprintf;
+use function strlen;
+use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class IndexXmlCoverageReader
+final class MsiParser
 {
-    private const COVERAGE_INDEX_FILE_NAME = 'index.xml';
+    use CannotBeInstantiated;
 
-    private $path;
-
-    public function __construct(string $coverageDir)
+    public static function detectPrecision(?string ...$values): int
     {
-        $this->path = Path::canonicalize(
-            $coverageDir . DIRECTORY_SEPARATOR . self::COVERAGE_INDEX_FILE_NAME
+        $precisions = [2];
+
+        foreach ($values as $value) {
+            $value = trim((string) $value);
+
+            if ($value === '') {
+                continue;
+            }
+
+            $valueParts = explode('.', $value);
+
+            if (count($valueParts) !== 2) {
+                continue;
+            }
+
+            $precisions[] = strlen($valueParts[1]);
+        }
+
+        return max($precisions);
+    }
+
+    public static function parse(?string $value, int $precision, string $optionName): ?float
+    {
+        $value = trim((string) $value);
+
+        if ($value === '') {
+            return null;
+        }
+
+        Assert::numeric(
+            $value,
+            sprintf('Expected %s to be a float. Got "%s"', $optionName, $value)
         );
-    }
 
-    public function getIndexXmlPath(): string
-    {
-        return $this->path;
-    }
+        $roundedValue = round((float) $value, $precision, PHP_ROUND_HALF_UP);
 
-    public function getIndexXmlContent(): string
-    {
-        return file_get_contents($this->path);
+        Assert::range(
+            $roundedValue,
+            0,
+            100,
+            sprintf('Expected %s to be an element of [0;100]. Got %%s', $optionName)
+        );
+
+        return $roundedValue;
     }
 }

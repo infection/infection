@@ -74,7 +74,7 @@ use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Process\Builder\MutantProcessBuilder;
+use Infection\Process\Builder\MutantProcessFactory;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -97,8 +97,8 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
@@ -193,13 +193,13 @@ final class Container
             },
             PhpUnitXmlCoverageTraceProvider::class => static function (self $container): PhpUnitXmlCoverageTraceProvider {
                 return new PhpUnitXmlCoverageTraceProvider(
-                    $container->getIndexXmlCoverageReader(),
+                    $container->getIndexXmlCoverageLocator(),
                     $container->getIndexXmlCoverageParser(),
                     $container->getXmlCoverageParser()
                 );
             },
-            IndexXmlCoverageReader::class => static function (self $container): IndexXmlCoverageReader {
-                return new IndexXmlCoverageReader(
+            IndexXmlCoverageLocator::class => static function (self $container): IndexXmlCoverageLocator {
+                return new IndexXmlCoverageLocator(
                     $container->getConfiguration()->getCoveragePath()
                 );
             },
@@ -275,8 +275,8 @@ final class Container
             PrettyPrinterAbstract::class => static function (): Standard {
                 return new Standard();
             },
-            MetricsCalculator::class => static function (): MetricsCalculator {
-                return new MetricsCalculator();
+            MetricsCalculator::class => static function (self $container): MetricsCalculator {
+                return new MetricsCalculator($container->getConfiguration()->getMsiPrecision());
             },
             Stopwatch::class => static function (): Stopwatch {
                 return new Stopwatch();
@@ -344,7 +344,7 @@ final class Container
                     $testFrameworkAdapter->hasJUnitReport(),
                     $container->getJUnitReportLocator(),
                     $testFrameworkAdapter->getName(),
-                    $container->getIndexXmlCoverageReader()
+                    $container->getIndexXmlCoverageLocator()
                 );
             },
             JUnitReportLocator::class => static function (self $container): JUnitReportLocator {
@@ -428,8 +428,8 @@ final class Container
                     $container->getEventDispatcher()
                 );
             },
-            MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
-                return new MutantProcessBuilder(
+            MutantProcessFactory::class => static function (self $container): MutantProcessFactory {
+                return new MutantProcessFactory(
                     $container->getTestFrameworkAdapter(),
                     $container->getConfiguration()->getProcessTimeout(),
                     $container->getEventDispatcher(),
@@ -449,7 +449,7 @@ final class Container
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 return new MutationTestingRunner(
-                    $container->getMutantProcessBuilder(),
+                    $container->getMutantProcessFactory(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -496,6 +496,7 @@ final class Container
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         ?float $minCoveredMsi,
+        int $msiPrecision,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         string $filter,
@@ -534,6 +535,7 @@ final class Container
                 $minMsi,
                 $showMutations,
                 $minCoveredMsi,
+                $msiPrecision,
                 $mutatorsInput,
                 $testFramework,
                 $testFrameworkExtraOptions,
@@ -555,6 +557,7 @@ final class Container
                     $minMsi,
                     $showMutations,
                     $minCoveredMsi,
+                    $msiPrecision,
                     $mutatorsInput,
                     $testFramework,
                     $testFrameworkExtraOptions,
@@ -629,9 +632,9 @@ final class Container
         return $this->get(PhpUnitXmlCoverageTraceProvider::class);
     }
 
-    public function getIndexXmlCoverageReader(): IndexXmlCoverageReader
+    public function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
     {
-        return $this->get(IndexXmlCoverageReader::class);
+        return $this->get(IndexXmlCoverageLocator::class);
     }
 
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
@@ -829,9 +832,9 @@ final class Container
         return $this->get(InitialTestsRunner::class);
     }
 
-    public function getMutantProcessBuilder(): MutantProcessBuilder
+    public function getMutantProcessFactory(): MutantProcessFactory
     {
-        return $this->get(MutantProcessBuilder::class);
+        return $this->get(MutantProcessFactory::class);
     }
 
     public function getMutationGenerator(): MutationGenerator

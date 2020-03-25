@@ -48,7 +48,7 @@ trait CreateMetricsCalculator
 {
     private function createCompleteMetricsCalculator(): MetricsCalculator
     {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator(2);
 
         $calculator->collect(
             $this->createMutantExecutionResult(

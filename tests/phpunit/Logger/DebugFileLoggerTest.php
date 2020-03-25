@@ -60,7 +60,7 @@ final class DebugFileLoggerTest extends TestCase
     public function metricsProvider(): iterable
     {
         yield 'no mutations' => [
-            new MetricsCalculator(),
+            new MetricsCalculator(2),
             false,
             <<<'TXT'
 Total: 0

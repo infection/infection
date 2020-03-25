@@ -184,7 +184,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
         $calculatorPerMutator = [];
 
         foreach ($processPerMutator as $mutator => $executionResults) {
-            $calculator = new MetricsCalculator();
+            $calculator = new MetricsCalculator($this->metricsCalculator->getRoundingPrecision());
             $calculator->collect(...$executionResults);
 
             $calculatorPerMutator[$mutator] = $calculator;

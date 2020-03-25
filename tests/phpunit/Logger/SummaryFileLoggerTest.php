@@ -59,7 +59,7 @@ final class SummaryFileLoggerTest extends TestCase
     public function metricsProvider(): iterable
     {
         yield 'no mutations' => [
-            new MetricsCalculator(),
+            new MetricsCalculator(2),
             <<<'TXT'
 Total: 0
 
