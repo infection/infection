@@ -55,6 +55,7 @@ final class MinMsiChecker
         ?float $minMsi,
         ?float $minCoveredMsi
     ) {
+        $this->dryRun = $dryRun;
         $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
         $this->minMsi = $minMsi;
         $this->minCoveredCodeMsi = $minCoveredMsi;

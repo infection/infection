@@ -71,7 +71,8 @@ final class MinMsiCheckerTest extends TestCase
 
         $this->ioMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->expectException(MinMsiCheckFailed::class);
         $this->expectExceptionMessage('The minimum required MSI percentage should be 10%, but actual is 8%. Improve your tests!');
@@ -90,7 +91,8 @@ final class MinMsiCheckerTest extends TestCase
 
         $this->ioMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $msiChecker->checkMetrics(2, -1, 10., $this->output);
     }
@@ -106,7 +108,8 @@ final class MinMsiCheckerTest extends TestCase
 
         $this->ioMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->expectException(MinMsiCheckFailed::class);
         $this->expectExceptionMessage('The minimum required Covered Code MSI percentage should be 10%, but actual is 8%. Improve your tests!');
@@ -125,7 +128,8 @@ final class MinMsiCheckerTest extends TestCase
 
         $this->ioMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $msiChecker->checkMetrics(2, 5., -1, $this->output);
     }
@@ -283,7 +287,8 @@ final class MinMsiCheckerTest extends TestCase
 
         $this->ioMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $msiChecker->checkMetrics(2, 8., 10., $this->output);
     }
