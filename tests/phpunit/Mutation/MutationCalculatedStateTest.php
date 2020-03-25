@@ -40,8 +40,6 @@ use PHPUnit\Framework\TestCase;
 
 final class MutationCalculatedStateTest extends TestCase
 {
-    use MutationCalculatedStateAssertions;
-
     public function test_it_can_be_instantiated(): void
     {
         $state = new MutationCalculatedState(

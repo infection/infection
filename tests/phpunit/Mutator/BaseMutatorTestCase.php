@@ -81,19 +81,19 @@ abstract class BaseMutatorTestCase extends TestCase
             $this->fail('Input code cant be the same as mutated code');
         }
 
-        $mutations = $this->mutate($inputCode, $settings);
+        $mutatedCodes = $this->mutate($inputCode, $settings);
 
         $this->assertCount(
-            count($mutations),
+            count($mutatedCodes),
             $expectedCodeSamples,
             sprintf(
                 'Failed asserting that the number of code samples (%d) equals the number of mutations (%d) created by the mutator.',
                 count($expectedCodeSamples),
-                count($mutations)
+                count($mutatedCodes)
             )
         );
 
-        foreach ($mutations as $realMutatedCode) {
+        foreach ($mutatedCodes as $realMutatedCode) {
             /** @var string|null $expectedCodeSample */
             $expectedCodeSample = array_shift($expectedCodeSamples);
 
@@ -134,21 +134,25 @@ abstract class BaseMutatorTestCase extends TestCase
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new CloneVisitor());
 
-        $mutations = [];
+        $mutatedCodes = [];
 
         foreach ($mutations as $mutation) {
-            $mutatorVisitor = new MutatorVisitor($mutation);
+            $mutatorVisitor = new MutatorVisitor(
+                $mutation->getAttributes(),
+                $mutation->getMutatedNodeClass(),
+                $mutation->getMutatedNode()
+            );
 
             $traverser->addVisitor($mutatorVisitor);
 
             $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
-            $mutations[] = SingletonContainer::getPrinter()->prettyPrintFile($mutatedStatements);
+            $mutatedCodes[] = SingletonContainer::getPrinter()->prettyPrintFile($mutatedStatements);
 
             $traverser->removeVisitor($mutatorVisitor);
         }
 
-        return $mutations;
+        return $mutatedCodes;
     }
 
     /**

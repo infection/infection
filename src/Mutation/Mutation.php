@@ -72,6 +72,7 @@ class Mutation
     private $calculatedState;
 
     /**
+     * @param array<string|int|float> $attributes
      * @param TestLocation[] $tests
      * @param Closure(): MutationCalculatedState $calculateState
      */

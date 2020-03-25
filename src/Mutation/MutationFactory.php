@@ -75,6 +75,7 @@ class MutationFactory
     /**
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
+     * @param class-string $mutatedNodeClass
      * @param TestLocation[] $tests
      */
     public function create(
@@ -117,6 +118,7 @@ class MutationFactory
     /**
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
+     * @param class-string $mutatedNodeClass
      */
     private function calculateState(
         string $originalFilePath,
@@ -159,6 +161,9 @@ class MutationFactory
         );
     }
 
+    /**
+     * @param array<string|int|float> $attributes
+     */
     private static function createHash(
         string $originalFilePath,
         string $mutatorName,

@@ -38,6 +38,7 @@ namespace Infection\Mutator;
 use function count;
 use function get_class;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationFactory;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
@@ -61,6 +62,7 @@ class NodeMutationGenerator
     private $trace;
     private $onlyCovered;
     private $lineRangeCalculator;
+    private $mutationFactory;
 
     /**
      * @param Mutator[] $mutators
@@ -72,7 +74,8 @@ class NodeMutationGenerator
         array $fileNodes,
         Trace $trace,
         bool $onlyCovered,
-        LineRangeCalculator $lineRangeCalculator
+        LineRangeCalculator $lineRangeCalculator,
+        MutationFactory $mutationFactory
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -82,6 +85,7 @@ class NodeMutationGenerator
         $this->trace = $trace;
         $this->onlyCovered = $onlyCovered;
         $this->lineRangeCalculator = $lineRangeCalculator;
+        $this->mutationFactory = $mutationFactory;
     }
 
     /**
@@ -135,7 +139,7 @@ class NodeMutationGenerator
         $mutationByMutatorIndex = 0;
 
         foreach ($mutator->mutate($node) as $mutatedNode) {
-            yield new Mutation(
+            yield $this->mutationFactory->create(
                 $this->filePath,
                 $this->fileNodes,
                 $mutator->getName(),

@@ -55,15 +55,18 @@ class FileMutationGenerator
     private $parser;
     private $traverserFactory;
     private $lineRangeCalculator;
+    private $mutationFactory;
 
     public function __construct(
         FileParser $parser,
         NodeTraverserFactory $traverserFactory,
-        LineRangeCalculator $lineRangeCalculator
+        LineRangeCalculator $lineRangeCalculator,
+        MutationFactory $mutationFactory
     ) {
         $this->parser = $parser;
         $this->traverserFactory = $traverserFactory;
         $this->lineRangeCalculator = $lineRangeCalculator;
+        $this->mutationFactory = $mutationFactory;
     }
 
     /**
@@ -98,7 +101,8 @@ class FileMutationGenerator
                 $initialStatements,
                 $trace,
                 $onlyCovered,
-                $this->lineRangeCalculator
+                $this->lineRangeCalculator,
+                $this->mutationFactory
             )
         );
 

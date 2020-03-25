@@ -395,7 +395,8 @@ final class Container
                 return new FileMutationGenerator(
                     $container->getFileParser(),
                     $container->getNodeTraverserFactory(),
-                    $container->getLineRangeCalculator()
+                    $container->getLineRangeCalculator(),
+                    $container->getMutationFactory()
                 );
             },
             LoggerFactory::class => static function (self $container): LoggerFactory {

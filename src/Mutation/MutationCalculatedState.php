@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+/**
+ * @internal
+ */
 final class MutationCalculatedState
 {
     private $mutationFilePath;
