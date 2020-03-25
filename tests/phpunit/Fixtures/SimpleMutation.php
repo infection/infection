@@ -28,7 +28,7 @@ class SimpleMutation extends Mutation
     /**
      * @var array
      */
-    private $attributes;
+    private $originalStartingLine;
     /**
      * @var string
      */
@@ -44,7 +44,7 @@ class SimpleMutation extends Mutation
         $this->originalFileAst = $originalFileAst;
         $this->mutator = $mutator;
         $this->mutatedNode = $mutatedNode;
-        $this->attributes = $attributes;
+        $this->originalStartingLine = $attributes;
         $this->mutatedNodeClass = $mutatedNodeClass;
     }
 
@@ -63,9 +63,9 @@ class SimpleMutation extends Mutation
         return $this->mutatedNode;
     }
 
-    public function getAttributes(): array
+    public function getOriginalStartingLine(): array
     {
-        return $this->attributes;
+        return $this->originalStartingLine;
     }
 
     public function getMutatedNodeClass(): string

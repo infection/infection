@@ -415,14 +415,7 @@ final class MutationTestingRunnerTest extends TestCase
         return new Mutation(
             'path/to/Foo' . $i . '.php',
             MutatorName::getName(For_::class),
-            [
-                'startLine' => $i,
-                'endLine' => 15,
-                'startTokenPos' => 0,
-                'endTokenPos' => 8,
-                'startFilePos' => 2,
-                'endFilePos' => 4,
-            ],
+            10,
             [
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',

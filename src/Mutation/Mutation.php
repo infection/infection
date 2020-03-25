@@ -35,13 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function array_intersect_key;
 use function array_keys;
 use Closure;
 use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
-use function Safe\array_flip;
 use Webmozart\Assert\Assert;
 
 /**
@@ -50,18 +48,9 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
-    public const ATTRIBUTE_KEYS = [
-        'startLine',
-        'endLine',
-        'startTokenPos',
-        'endTokenPos',
-        'startFilePos',
-        'endFilePos',
-    ];
-
     private $originalFilePath;
     private $mutatorName;
-    private $attributes;
+    private $originalStartingLine;
     private $tests;
     private $executedByTests;
     private $calculateState;
@@ -72,27 +61,21 @@ class Mutation
     private $calculatedState;
 
     /**
-     * @param array<string|int|float> $attributes
      * @param TestLocation[] $tests
      * @param Closure(): MutationCalculatedState $calculateState
      */
     public function __construct(
         string $originalFilePath,
         string $mutatorName,
-        array $attributes,
+        int $originalStartingLine,
         array $tests,
         Closure $calculateState
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
-        foreach (self::ATTRIBUTE_KEYS as $key) {
-            Assert::keyExists($attributes, $key);
-        }
-
         $this->originalFilePath = $originalFilePath;
         $this->mutatorName = $mutatorName;
-        // TODO: move this up
-        $this->attributes = array_intersect_key($attributes, array_flip(self::ATTRIBUTE_KEYS));
+        $this->originalStartingLine = $originalStartingLine;
         $this->tests = $tests;
         $this->executedByTests = count($tests) > 0;
         $this->calculateState = $calculateState;
@@ -115,7 +98,7 @@ class Mutation
 
     public function getOriginalStartingLine(): int
     {
-        return (int) $this->attributes['startLine'];
+        return $this->originalStartingLine;
     }
 
     public function hasTests(): bool

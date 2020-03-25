@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use function array_merge;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationCalculatedState;
@@ -48,25 +47,23 @@ final class MutationTest extends TestCase
     /**
      * @dataProvider valuesProvider
      *
-     * @param array<string|int|float> $attributes
      * @param TestLocation[] $tests
      */
     public function test_it_can_be_instantiated(
         string $originalFilePath,
         string $mutatorName,
-        array $attributes,
+        int $originalStartingLine,
         array $tests,
         string $hash,
         string $filePath,
         string $code,
         string $diff,
-        int $expectedOriginalStartingLine,
         bool $expectedHasTests
     ): void {
         $mutation = new Mutation(
             $originalFilePath,
             $mutatorName,
-            $attributes,
+            $originalStartingLine,
             $tests,
             static function () use ($hash, $filePath, $code, $diff): MutationCalculatedState {
                 return new MutationCalculatedState(
@@ -80,7 +77,7 @@ final class MutationTest extends TestCase
 
         $this->assertSame($originalFilePath, $mutation->getOriginalFilePath());
         $this->assertSame($mutatorName, $mutation->getMutatorName());
-        $this->assertSame($expectedOriginalStartingLine, $mutation->getOriginalStartingLine());
+        $this->assertSame($originalStartingLine, $mutation->getOriginalStartingLine());
         $this->assertSame($tests, $mutation->getTests());
         $this->assertSame($expectedHasTests, $mutation->hasTests());
         $this->assertSame($hash, $mutation->getHash());
@@ -91,32 +88,22 @@ final class MutationTest extends TestCase
 
     public function valuesProvider(): iterable
     {
-        $nominalAttributes = [
-            'startLine' => $originalStartingLine = 3,
-            'endLine' => 5,
-            'startTokenPos' => 21,
-            'endTokenPos' => 31,
-            'startFilePos' => 43,
-            'endFilePos' => 53,
-        ];
-
         yield 'empty' => [
             '',
             MutatorName::getName(Plus::class),
-            $nominalAttributes,
+            3,
             [],
             '',
             '',
             '',
             '',
-            $originalStartingLine,
             false,
         ];
 
         yield 'nominal with a test' => [
             '/path/to/acme/Foo.php',
             MutatorName::getName(Plus::class),
-            $nominalAttributes,
+            3,
             [
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
@@ -137,42 +124,13 @@ final class MutationTest extends TestCase
 
 DIFF
             ,
-            $originalStartingLine,
-            true,
-        ];
-
-        yield 'nominal with a test and additional attributes' => [
-            '/path/to/acme/Foo.php',
-            MutatorName::getName(Plus::class),
-            array_merge($nominalAttributes, ['foo' => 100, 'bar' => 1000]),
-            [
-                new TestLocation(
-                    'FooTest::test_it_can_instantiate',
-                    '/path/to/acme/FooTest.php',
-                    0.01
-                ),
-            ],
-            '0800f',
-            '/path/to/mutation',
-            'notCovered#0',
-            <<<'DIFF'
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#0';
-
-DIFF
-            ,
-            $originalStartingLine,
             true,
         ];
 
         yield 'nominal without a test' => [
             '/path/to/acme/Foo.php',
             MutatorName::getName(Plus::class),
-            $nominalAttributes,
+            3,
             [],
             '0800f',
             '/path/to/mutation',
@@ -187,7 +145,6 @@ DIFF
 
 DIFF
             ,
-            $originalStartingLine,
             false,
         ];
     }

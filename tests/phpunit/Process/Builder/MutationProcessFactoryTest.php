@@ -60,14 +60,7 @@ final class MutationProcessFactoryTest extends TestCase
         $mutation = new Mutation(
             $originalFilePath = 'path/to/Foo.php',
             MutatorName::getName(For_::class),
-            [
-                'startLine' => $originalStartingLine = 10,
-                'endLine' => 15,
-                'startTokenPos' => 0,
-                'endTokenPos' => 8,
-                'startFilePos' => 2,
-                'endFilePos' => 4,
-            ],
+            10,
             $tests = [
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',

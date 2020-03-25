@@ -102,14 +102,7 @@ DIFF;
         $mutation = new Mutation(
             $originalFilePath = 'path/to/Foo.php',
             $mutatorName = MutatorName::getName(For_::class),
-            [
-                'startLine' => $originalStartingLine = 10,
-                'endLine' => 15,
-                'startTokenPos' => 0,
-                'endTokenPos' => 8,
-                'startFilePos' => 2,
-                'endFilePos' => 4,
-            ],
+            $originalStartingLine = 10,
             [
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',

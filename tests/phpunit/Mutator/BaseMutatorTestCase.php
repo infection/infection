@@ -138,7 +138,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
         foreach ($mutations as $mutation) {
             $mutatorVisitor = new MutatorVisitor(
-                $mutation->getAttributes(),
+                $mutation->getOriginalStartingLine(),
                 $mutation->getMutatedNodeClass(),
                 $mutation->getMutatedNode()
             );

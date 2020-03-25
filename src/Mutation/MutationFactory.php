@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use function array_intersect_key;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
@@ -42,7 +43,9 @@ use Infection\PhpParser\MutatedNode;
 use function md5;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
+use function Safe\array_flip;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -88,10 +91,16 @@ class MutationFactory
         int $mutationByMutatorIndex,
         array $tests
     ): Mutation {
+        foreach (MutationAttributeKeys::ALL as $key) {
+            Assert::keyExists($attributes, $key);
+        }
+
+        $attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
+
         return new Mutation(
             $originalFilePath,
             $mutatorName,
-            $attributes,
+            (int) $attributes[MutationAttributeKeys::START_LINE],
             $tests,
             function () use (
                 $originalFilePath,

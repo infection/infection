@@ -37,24 +37,23 @@ namespace Infection\Mutation;
 
 use Infection\CannotBeInstantiated;
 
-/**
- * @internal
- */
-final class DetectionStatus
+final class MutationAttributeKeys
 {
     use CannotBeInstantiated;
 
-    public const KILLED = 'killed';
-    public const ESCAPED = 'escaped';
-    public const ERROR = 'error';
-    public const TIMED_OUT = 'timed out';
-    public const NOT_COVERED = 'not covered';
+    public const START_LINE = 'startLine';
+    public const END_LINE = 'endLine';
+    public const START_TOKEN_POS = 'startTokenPos';
+    public const END_TOKEN_POS = 'endTokenPos';
+    public const START_FILE_POS = 'startFilePos';
+    public const END_FILE_POS = 'endFilePos';
 
     public const ALL = [
-        self::KILLED,
-        self::ESCAPED,
-        self::ERROR,
-        self::TIMED_OUT,
-        self::NOT_COVERED,
+        self::START_LINE,
+        self::END_LINE,
+        self::START_TOKEN_POS,
+        self::END_TOKEN_POS,
+        self::START_FILE_POS,
+        self::END_FILE_POS,
     ];
 }

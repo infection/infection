@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
+use function array_merge;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
 use Infection\Mutation\MutationCodeFactory;
@@ -89,45 +90,34 @@ final class MutationFactoryTest extends TestCase
         );
     }
 
-    public function test_it_creates_a_mutation(): void
-    {
-        $originalFilePath = '/path/to/acme/Foo.php';
-        $originalFileAst = [new Node\Stmt\Namespace_(
-            new Node\Name('Acme'),
-            [new Node\Scalar\LNumber(0)]
-        )];
-        $mutatorName = MutatorName::getName(Plus::class);
-        $attributes = [
-            'startLine' => $originalStartingLine = 3,
-            'endLine' => 5,
-            'startTokenPos' => 21,
-            'endTokenPos' => 31,
-            'startFilePos' => 43,
-            'endFilePos' => 53,
-        ];
-        $mutatedNodeClass = Node\Scalar\LNumber::class;
-        $mutatedNode = MutatedNode::wrap(new Node\Scalar\LNumber(1));
-        $mutationByMutatorIndex = 0;
-        $tests = [
-            new TestLocation(
-                'FooTest::test_it_can_instantiate',
-                '/path/to/acme/FooTest.php',
-                0.01
-            ),
-        ];
-
-        $expectedHash = md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53');
-
-        $expectedMutationFilePath = sprintf(
-            '/path/to/tmp/mutation.%s.infection.php',
-            $expectedHash
-        );
-
+    /**
+     * @dataProvider valuesProvider
+     *
+     * @param Node[] $originalFileAst
+     * @param array<string|int|float> $attributes
+     * @param class-string $mutatedNodeClass
+     * @param TestLocation[] $tests
+     * @param array<string|int|float> $expectedFilteredAttributes
+     */
+    public function test_it_creates_a_mutation(
+        string $originalFilePath,
+        array $originalFileAst,
+        string $mutatorName,
+        array $attributes,
+        string $mutatedNodeClass,
+        MutatedNode $mutatedNode,
+        int $mutationByMutatorIndex,
+        array $tests,
+        array $expectedFilteredAttributes,
+        string $expectedHash,
+        string $expectedMutationFilePath,
+        int $expectedOriginalStartingLine
+    ): void {
         $this->codeFactoryMock
             ->expects($this->exactly(2))
             ->method('createCode')
             ->with(
-                $attributes,
+                $expectedFilteredAttributes,
                 $originalFileAst,
                 $mutatedNodeClass,
                 $mutatedNode
@@ -169,7 +159,7 @@ final class MutationFactoryTest extends TestCase
             $expectedMutationFilePath,
             'mutated code',
             'code diff',
-            $originalStartingLine,
+            $expectedOriginalStartingLine,
             true
         );
 
@@ -195,8 +185,92 @@ final class MutationFactoryTest extends TestCase
             $expectedMutationFilePath,
             'mutated code',
             'code diff',
-            $originalStartingLine,
+            $expectedOriginalStartingLine,
             true
         );
+    }
+
+    public static function valuesProvider(): iterable
+    {
+        $nominalAttributes = [
+            'startLine' => $originalStartingLine = 3,
+            'endLine' => 5,
+            'startTokenPos' => 21,
+            'endTokenPos' => 31,
+            'startFilePos' => 43,
+            'endFilePos' => 53,
+        ];
+
+        yield 'nominal' => (static function () use (
+            $nominalAttributes,
+            $originalStartingLine
+        ): array {
+            $expectedHash = md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53');
+
+            return [
+                '/path/to/acme/Foo.php',
+                [
+                    new Node\Stmt\Namespace_(
+                        new Node\Name('Acme'),
+                        [new Node\Scalar\LNumber(0)]
+                    ),
+                ],
+                MutatorName::getName(Plus::class),
+                $nominalAttributes,
+                Node\Scalar\LNumber::class,
+                MutatedNode::wrap(new Node\Scalar\LNumber(1)),
+                0,
+                [
+                    new TestLocation(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01
+                    ),
+                ],
+                $nominalAttributes,
+                $expectedHash,
+                sprintf(
+                    '/path/to/tmp/mutation.%s.infection.php',
+                    $expectedHash
+                ),
+                $originalStartingLine,
+            ];
+        })();
+
+        yield 'with additional attributes' => (static function () use (
+            $nominalAttributes,
+            $originalStartingLine
+        ): array {
+            $expectedHash = md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53');
+
+            return [
+                '/path/to/acme/Foo.php',
+                [
+                    new Node\Stmt\Namespace_(
+                        new Node\Name('Acme'),
+                        [new Node\Scalar\LNumber(0)]
+                    ),
+                ],
+                MutatorName::getName(Plus::class),
+                array_merge($nominalAttributes, ['foo' => 100, 'bar' => 1000]),
+                Node\Scalar\LNumber::class,
+                MutatedNode::wrap(new Node\Scalar\LNumber(1)),
+                0,
+                [
+                    new TestLocation(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01
+                    ),
+                ],
+                $nominalAttributes,
+                $expectedHash,
+                sprintf(
+                    '/path/to/tmp/mutation.%s.infection.php',
+                    $expectedHash
+                ),
+                $originalStartingLine,
+            ];
+        })();
     }
 }
