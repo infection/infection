@@ -62,8 +62,7 @@ abstract class MutationConfigBuilder
         string $interceptorPath,
         string $originalFilePath,
         string $mutationFilePath
-    ): string
-    {
+    ): string {
         $infectionPhar = '';
 
         if (strpos(__FILE__, 'phar:') === 0) {

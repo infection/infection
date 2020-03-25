@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use function array_keys;
 use Infection\Mutator\ProfileList;
 use Webmozart\Assert\Assert;
-use function array_keys;
 
 /**
  * @internal

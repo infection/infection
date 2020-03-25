@@ -35,15 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use Infection\Mutation\MutationCalculatedState;
 use function array_merge;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
-use function md5;
-use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
 
 final class MutationTest extends TestCase
@@ -51,9 +48,7 @@ final class MutationTest extends TestCase
     /**
      * @dataProvider valuesProvider
      *
-     * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
-     * @param array<string|int|float> $expectedAttributes
      * @param TestLocation[] $tests
      */
     public function test_it_can_be_instantiated(

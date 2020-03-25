@@ -41,8 +41,8 @@ use Infection\Event\MutationProcessWasFinished;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Process\MutationProcess;
-use Symfony\Component\Process\Process;
 use function method_exists;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal

@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Metrics\MetricsCalculator;
-use Infection\Mutation\MutationExecutionResult;
-use Infection\Str;
 use function array_map;
 use function explode;
 use function implode;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Mutation\MutationExecutionResult;
+use Infection\Str;
+use const PHP_EOL;
 use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
-use const PHP_EOL;
 
 /**
  * @internal

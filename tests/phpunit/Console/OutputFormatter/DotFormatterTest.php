@@ -38,11 +38,11 @@ namespace Infection\Tests\Console\OutputFormatter;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Mutation\DetectionStatus;
 use Infection\Mutation\MutationExecutionResult;
+use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
+use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use function strip_tags;
-use const PHP_EOL;
 
 final class DotFormatterTest extends TestCase
 {

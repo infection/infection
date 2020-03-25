@@ -51,8 +51,7 @@ final class TestFrameworkExtraOptionsFilter
     public function filterForMutationProcess(
         string $actualExtraOptions,
         array $initialRunOnlyOptions
-    ): string
-    {
+    ): string {
         foreach ($initialRunOnlyOptions as $initialRunOnlyOption) {
             $actualExtraOptions = preg_replace(
                 sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption),

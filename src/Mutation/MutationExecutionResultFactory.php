@@ -37,9 +37,9 @@ namespace Infection\Mutation;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutationProcess;
+use function Safe\sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
-use function Safe\sprintf;
 
 /**
  * @internal

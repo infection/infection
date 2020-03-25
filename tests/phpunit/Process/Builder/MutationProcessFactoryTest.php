@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Builder;
 
+use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\MutationProcessWasFinished;
@@ -46,9 +47,8 @@ use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\Builder\MutationProcessFactory;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutator\MutatorName;
-use PHPUnit\Framework\TestCase;
-use function current;
 use const PHP_OS_FAMILY;
+use PHPUnit\Framework\TestCase;
 
 final class MutationProcessFactoryTest extends TestCase
 {

@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function implode;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutation\MutationExecutionResult;
-use function implode;
+use const PHP_EOL;
 use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
-use const PHP_EOL;
 
 /**
  * Simple loggers recording the mutation names and original first line. This is mostly intended for

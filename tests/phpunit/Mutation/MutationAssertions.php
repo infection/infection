@@ -35,16 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use Infection\Mutation\MutationCalculatedState;
-use function array_merge;
-use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
-use Infection\Mutator\Arithmetic\Plus;
-use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
-use function md5;
-use PhpParser\Node;
-use PHPUnit\Framework\TestCase;
 
 trait MutationAssertions
 {

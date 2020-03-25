@@ -43,8 +43,8 @@ use Infection\IterableCounter;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationExecutionResult;
 use Infection\Process\Builder\MutationProcessFactory;
-use Symfony\Component\Filesystem\Filesystem;
 use function Pipeline\take;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal

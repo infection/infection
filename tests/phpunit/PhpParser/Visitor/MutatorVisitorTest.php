@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\Mutation\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\MutatorVisitor;

@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
+use function array_merge;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutation\DetectionStatus;
 use Infection\Mutation\MutationExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
-use function array_merge;
 
 final class MetricsCalculatorTest extends TestCase
 {

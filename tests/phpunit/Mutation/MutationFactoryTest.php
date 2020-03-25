@@ -42,11 +42,11 @@ use Infection\Mutation\MutationFactory;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
+use function md5;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function md5;
 use function Safe\sprintf;
 
 final class MutationFactoryTest extends TestCase
