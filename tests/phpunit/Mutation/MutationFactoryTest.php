@@ -33,16 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Mutation;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
-use Infection\Mutation\MutantCodeFactory;
-use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationCodeFactory;
 use Infection\Mutation\MutationFactory;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutation\MutationAssertions;
 use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
@@ -51,12 +49,12 @@ use PHPUnit\Framework\TestCase;
 use function md5;
 use function Safe\sprintf;
 
-final class MutantFactoryTest extends TestCase
+final class MutationFactoryTest extends TestCase
 {
     use MutationAssertions;
 
     /**
-     * @var MutantCodeFactory|MockObject
+     * @var MutationCodeFactory|MockObject
      */
     private $codeFactoryMock;
 
@@ -79,7 +77,7 @@ final class MutantFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->codeFactoryMock = $this->createMock(MutantCodeFactory::class);
+        $this->codeFactoryMock = $this->createMock(MutationCodeFactory::class);
 
         $this->printerMock = $this->createMock(PrettyPrinterAbstract::class);
 

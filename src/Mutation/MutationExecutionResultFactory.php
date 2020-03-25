@@ -33,19 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Mutation;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
-use function Safe\sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
+use function Safe\sprintf;
 
 /**
  * @internal
  * @final
  */
-class MutantExecutionResultFactory
+class MutationExecutionResultFactory
 {
     private $testFrameworkAdapter;
 
@@ -54,12 +54,12 @@ class MutantExecutionResultFactory
         $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
+    public function createFromProcess(MutantProcess $mutantProcess): MutationExecutionResult
     {
         $process = $mutantProcess->getProcess();
         $mutation = $mutantProcess->getMutation();
 
-        return new MutantExecutionResult(
+        return new MutationExecutionResult(
             $process->getCommandLine(),
             $this->retrieveProcessOutput($process),
             $this->retrieveDetectionStatus($mutantProcess),

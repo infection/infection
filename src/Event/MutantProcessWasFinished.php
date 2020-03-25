@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event;
 
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\MutationExecutionResult;
 
 /**
  * @internal
@@ -44,12 +44,12 @@ final class MutantProcessWasFinished
 {
     private $executionResult;
 
-    public function __construct(MutantExecutionResult $executionResult)
+    public function __construct(MutationExecutionResult $executionResult)
     {
         $this->executionResult = $executionResult;
     }
 
-    public function getExecutionResult(): MutantExecutionResult
+    public function getExecutionResult(): MutationExecutionResult
     {
         return $this->executionResult;
     }

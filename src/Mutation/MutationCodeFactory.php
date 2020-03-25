@@ -33,36 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Mutation;
 
-use const DIRECTORY_SEPARATOR;
-use function Safe\file_get_contents;
-use Webmozart\PathUtil\Path;
+use Infection\PhpParser\MutatedNode;
+use Infection\PhpParser\Visitor\CloneVisitor;
+use Infection\PhpParser\Visitor\MutatorVisitor;
+use PhpParser\Node;
+use PhpParser\NodeTraverser;
+use PhpParser\PrettyPrinterAbstract;
 
 /**
  * @internal
  * @final
  */
-class IndexXmlCoverageReader
+class MutationCodeFactory
 {
-    private const COVERAGE_INDEX_FILE_NAME = 'index.xml';
+    private $printer;
 
-    private $path;
-
-    public function __construct(string $coverageDir)
+    public function __construct(PrettyPrinterAbstract $prettyPrinter)
     {
-        $this->path = Path::canonicalize(
-            $coverageDir . DIRECTORY_SEPARATOR . self::COVERAGE_INDEX_FILE_NAME
-        );
+        $this->printer = $prettyPrinter;
     }
 
-    public function getIndexXmlPath(): string
-    {
-        return $this->path;
-    }
+    /**
+     * @param array<string|int|float> $attributes
+     * @param Node[] $originalFileAst
+     * @param class-string $mutatedNodeClass
+     */
+    public function createCode(
+        array $attributes,
+        array $originalFileAst,
+        string $mutatedNodeClass,
+        MutatedNode $mutatedNode
+    ): string {
+        $traverser = new NodeTraverser();
 
-    public function getIndexXmlContent(): string
-    {
-        return file_get_contents($this->path);
+        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new MutatorVisitor($attributes, $mutatedNodeClass, $mutatedNode));
+
+        $mutatedStatements = $traverser->traverse($originalFileAst);
+
+        return $this->printer->prettyPrintFile($mutatedStatements);
     }
 }

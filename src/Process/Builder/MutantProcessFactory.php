@@ -38,17 +38,17 @@ namespace Infection\Process\Builder;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Process\MutantProcess;
-use function method_exists;
 use Symfony\Component\Process\Process;
+use function method_exists;
 
 /**
  * @internal
  * @final
  */
-class MutantProcessBuilder
+class MutantProcessFactory
 {
     private $testFrameworkAdapter;
     private $timeout;
@@ -60,7 +60,7 @@ class MutantProcessBuilder
         TestFrameworkAdapter $testFrameworkAdapter,
         int $timeout,
         EventDispatcher $eventDispatcher,
-        MutantExecutionResultFactory $resultFactory
+        MutationExecutionResultFactory $resultFactory
     ) {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
         $this->timeout = $timeout;

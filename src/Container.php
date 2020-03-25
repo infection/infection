@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use function array_filter;
-use function array_key_exists;
 use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
@@ -62,10 +60,10 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\MutantCodeFactory;
+use Infection\Mutation\MutationCodeFactory;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Mutation\MutationFactory;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
@@ -74,7 +72,7 @@ use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Process\Builder\MutantProcessBuilder;
+use Infection\Process\Builder\MutantProcessFactory;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -97,26 +95,28 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
-use function php_ini_loaded_file;
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
-use function Safe\getcwd;
-use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
+use function array_filter;
+use function array_key_exists;
+use function php_ini_loaded_file;
+use function Safe\getcwd;
+use function Safe\sprintf;
 
 /**
  * @internal
@@ -193,13 +193,13 @@ final class Container
             },
             PhpUnitXmlCoverageTraceProvider::class => static function (self $container): PhpUnitXmlCoverageTraceProvider {
                 return new PhpUnitXmlCoverageTraceProvider(
-                    $container->getIndexXmlCoverageReader(),
+                    $container->getIndexXmlCoverageLocator(),
                     $container->getIndexXmlCoverageParser(),
                     $container->getXmlCoverageParser()
                 );
             },
-            IndexXmlCoverageReader::class => static function (self $container): IndexXmlCoverageReader {
-                return new IndexXmlCoverageReader(
+            IndexXmlCoverageLocator::class => static function (self $container): IndexXmlCoverageLocator {
+                return new IndexXmlCoverageLocator(
                     $container->getConfiguration()->getCoveragePath()
                 );
             },
@@ -222,8 +222,8 @@ final class Container
                     GeneratedExtensionsConfig::EXTENSIONS
                 );
             },
-            MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
-                return new MutantCodeFactory($container->getPrinter());
+            MutationCodeFactory::class => static function (self $container): MutationCodeFactory {
+                return new MutationCodeFactory($container->getPrinter());
             },
             MutationFactory::class => static function (self $container): MutationFactory {
                 return new MutationFactory(
@@ -344,7 +344,7 @@ final class Container
                     $testFrameworkAdapter->hasJUnitReport(),
                     $container->getJUnitReportLocator(),
                     $testFrameworkAdapter->getName(),
-                    $container->getIndexXmlCoverageReader()
+                    $container->getIndexXmlCoverageLocator()
                 );
             },
             JUnitReportLocator::class => static function (self $container): JUnitReportLocator {
@@ -428,8 +428,8 @@ final class Container
                     $container->getEventDispatcher()
                 );
             },
-            MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
-                return new MutantProcessBuilder(
+            MutantProcessFactory::class => static function (self $container): MutantProcessFactory {
+                return new MutantProcessFactory(
                     $container->getTestFrameworkAdapter(),
                     $container->getConfiguration()->getProcessTimeout(),
                     $container->getEventDispatcher(),
@@ -449,7 +449,7 @@ final class Container
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 return new MutationTestingRunner(
-                    $container->getMutantProcessBuilder(),
+                    $container->getMutantProcessFactory(),
                     $container->getMutationFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -474,8 +474,8 @@ final class Container
             AdapterInstaller::class => static function (): AdapterInstaller {
                 return new AdapterInstaller(new ComposerExecutableFinder());
             },
-            MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
-                return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
+            MutationExecutionResultFactory::class => static function (self $container): MutationExecutionResultFactory {
+                return new MutationExecutionResultFactory($container->getTestFrameworkAdapter());
             },
         ]);
     }
@@ -628,9 +628,9 @@ final class Container
         return $this->get(PhpUnitXmlCoverageTraceProvider::class);
     }
 
-    public function getIndexXmlCoverageReader(): IndexXmlCoverageReader
+    public function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
     {
-        return $this->get(IndexXmlCoverageReader::class);
+        return $this->get(IndexXmlCoverageLocator::class);
     }
 
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
@@ -643,9 +643,9 @@ final class Container
         return $this->get(Factory::class);
     }
 
-    public function getMutantCodeFactory(): MutantCodeFactory
+    public function getMutantCodeFactory(): MutationCodeFactory
     {
-        return $this->get(MutantCodeFactory::class);
+        return $this->get(MutationCodeFactory::class);
     }
 
     public function getMutationFactory(): MutationFactory
@@ -828,9 +828,9 @@ final class Container
         return $this->get(InitialTestsRunner::class);
     }
 
-    public function getMutantProcessBuilder(): MutantProcessBuilder
+    public function getMutantProcessFactory(): MutantProcessFactory
     {
-        return $this->get(MutantProcessBuilder::class);
+        return $this->get(MutantProcessFactory::class);
     }
 
     public function getMutationGenerator(): MutationGenerator
@@ -878,9 +878,9 @@ final class Container
         return $this->get(AdapterInstaller::class);
     }
 
-    public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
+    public function getMutantExecutionResultFactory(): MutationExecutionResultFactory
     {
-        return $this->get(MutantExecutionResultFactory::class);
+        return $this->get(MutationExecutionResultFactory::class);
     }
 
     /**

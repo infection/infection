@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\DetectionStatus;
+use Infection\Mutation\MutationExecutionResult;
+use Symfony\Component\Console\Output\OutputInterface;
 use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -71,7 +71,7 @@ final class DotFormatter extends AbstractOutputFormatter
         ]);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function advance(MutationExecutionResult $executionResult, int $mutationCount): void
     {
         parent::advance($executionResult, $mutationCount);
 

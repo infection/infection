@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use const DIRECTORY_SEPARATOR;
-use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\RunCommand;
@@ -58,7 +56,7 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\DetectionStatus;
+use Infection\Mutation\DetectionStatus;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
@@ -71,14 +69,16 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUn
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
-use function Infection\Tests\generator_to_phpunit_data_provider;
-use function iterator_to_array;
 use ReflectionClass;
-use function Safe\sort;
-use function Safe\sprintf;
-use const SORT_STRING;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use function in_array;
+use function Infection\Tests\generator_to_phpunit_data_provider;
+use function iterator_to_array;
+use function Safe\sort;
+use function Safe\sprintf;
+use const DIRECTORY_SEPARATOR;
+use const SORT_STRING;
 
 final class ProjectCodeProvider
 {

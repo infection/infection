@@ -64,7 +64,7 @@ class MutationFactory
         string $tmpDir,
         Differ $differ,
         PrettyPrinterAbstract $printer,
-        MutantCodeFactory $mutantCodeFactory
+        MutationCodeFactory $mutantCodeFactory
     ) {
         $this->tmpDir = $tmpDir;
         $this->differ = $differ;

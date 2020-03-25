@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\MutationExecutionResult;
 use function Safe\usort;
 
 /**
@@ -44,7 +44,7 @@ use function Safe\usort;
 final class SortableMutantExecutionResults
 {
     /**
-     * @var MutantExecutionResult[]
+     * @var \Infection\Mutation\MutationExecutionResult[]
      */
     private $executionResults = [];
 
@@ -53,14 +53,14 @@ final class SortableMutantExecutionResults
      */
     private $sorted = false;
 
-    public function add(MutantExecutionResult $executionResult): void
+    public function add(MutationExecutionResult $executionResult): void
     {
         $this->executionResults[] = $executionResult;
         $this->sorted = false;
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return \Infection\Mutation\MutationExecutionResult[]
      */
     public function getSortedExecutionResults(): array
     {
@@ -73,13 +73,13 @@ final class SortableMutantExecutionResults
     }
 
     /**
-     * @param MutantExecutionResult[] $executionResults
+     * @param \Infection\Mutation\MutationExecutionResult[] $executionResults
      */
     private static function sortResults(array &$executionResults): void
     {
         usort(
             $executionResults,
-            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
+            static function (MutationExecutionResult $a, MutationExecutionResult $b): int {
                 if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
                     return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
                 }

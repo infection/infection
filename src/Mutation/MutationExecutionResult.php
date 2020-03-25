@@ -33,18 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Mutation;
 
-use function array_keys;
-use Infection\Mutation\Mutation;
 use Infection\Mutator\ProfileList;
 use Webmozart\Assert\Assert;
+use function array_keys;
 
 /**
  * @internal
  * @final
  */
-class MutantExecutionResult
+class MutationExecutionResult
 {
     private $processCommandLine;
     private $processOutput;

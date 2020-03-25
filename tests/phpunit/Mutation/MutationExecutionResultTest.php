@@ -33,29 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Mutation;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationCalculatedState;
+use Infection\Mutation\MutationExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
-use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\TestCase;
 
-final class MutantExecutionResultTest extends TestCase
+final class MutationExecutionResultTest extends TestCase
 {
-    use MutantExecutionResultAssertions;
-
     public function test_it_can_be_instantiated(): void
     {
         $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"';
         $processOutput = 'Passed!';
-        $processResultCode = DetectionStatus::ESCAPED;
+        $processResultCode = \Infection\Mutation\DetectionStatus::ESCAPED;
         $mutantDiff = <<<'DIFF'
 --- Original
 +++ New
@@ -70,7 +65,7 @@ DIFF;
         $originalFilePath = 'path/to/Foo.php';
         $originalStartingLine = 10;
 
-        $result = new MutantExecutionResult(
+        $result = new \Infection\Mutation\MutationExecutionResult(
             $processCommandLine,
             $processOutput,
             $processResultCode,
@@ -133,10 +128,10 @@ DIFF;
         );
 
         $this->assertResultStateIs(
-            MutantExecutionResult::createFromNonCoveredMutant($mutant),
+            MutationExecutionResult::createFromNonCoveredMutant($mutant),
             '',
             '',
-            DetectionStatus::NOT_COVERED,
+            \Infection\Mutation\DetectionStatus::NOT_COVERED,
             $mutationDiff,
             $mutatorName,
             $originalFilePath,
@@ -145,7 +140,7 @@ DIFF;
     }
 
     private function assertResultStateIs(
-        MutantExecutionResult $result,
+        MutationExecutionResult $result,
         string $expectedProcessCommandLine,
         string $expectedProcessOutput,
         string $expectedDetectionStatus,

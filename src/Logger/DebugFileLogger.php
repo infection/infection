@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use function implode;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\MutantExecutionResult;
-use const PHP_EOL;
+use Infection\Mutation\MutationExecutionResult;
+use function implode;
 use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
+use const PHP_EOL;
 
 /**
  * Simple loggers recording the mutation names and original first line. This is mostly intended for
@@ -105,7 +105,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
     }
 
     /**
-     * @param MutantExecutionResult[] $executionResults
+     * @param MutationExecutionResult[] $executionResults
      */
     private function getResultsLine(
         array $executionResults,

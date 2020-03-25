@@ -41,31 +41,31 @@ use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
-use Infection\Process\Builder\MutantProcessBuilder;
-use function Pipeline\take;
+use Infection\Mutation\MutationExecutionResult;
+use Infection\Process\Builder\MutantProcessFactory;
 use Symfony\Component\Filesystem\Filesystem;
+use function Pipeline\take;
 
 /**
  * @internal
  */
 final class MutationTestingRunner
 {
-    private $processBuilder;
+    private $processFactory;
     private $processRunner;
     private $eventDispatcher;
     private $fileSystem;
     private $runConcurrently;
 
     public function __construct(
-        MutantProcessBuilder $mutantProcessBuilder,
+        MutantProcessFactory $processFactory,
         ProcessRunner $processRunner,
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
         bool $runConcurrently
     ) {
-        $this->processBuilder = $mutantProcessBuilder;
+        $this->processFactory = $processFactory;
         $this->processRunner = $processRunner;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileSystem = $fileSystem;
@@ -91,7 +91,7 @@ final class MutationTestingRunner
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromNonCoveredMutant($mutation)
+                    MutationExecutionResult::createFromNonCoveredMutant($mutation)
                 ));
 
                 return false;
@@ -99,7 +99,10 @@ final class MutationTestingRunner
             ->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): ProcessBearer {
                 $this->fileSystem->dumpFile($mutation->getFilePath(), $mutation->getMutatedCode());
 
-                $process = $this->processBuilder->createProcessForMutant($mutation, $testFrameworkExtraOptions);
+                $process = $this->processFactory->createProcessForMutant(
+                    $mutation,
+                    $testFrameworkExtraOptions
+                );
 
                 return $process;
             })

@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
-use function array_merge;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\DetectionStatus;
+use Infection\Mutation\MutationExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
+use function array_merge;
 
 final class MetricsCalculatorTest extends TestCase
 {
@@ -154,7 +154,7 @@ final class MetricsCalculatorTest extends TestCase
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return \Infection\Mutation\MutationExecutionResult[]
      */
     private function addMutantExecutionResult(
         MetricsCalculator $calculator,
@@ -172,12 +172,12 @@ final class MetricsCalculatorTest extends TestCase
         return $executionResults;
     }
 
-    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
+    private function createMutantExecutionResult(string $detectionStatus): MutationExecutionResult
     {
         $id = $this->id;
         ++$this->id;
 
-        return new MutantExecutionResult(
+        return new MutationExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
             $detectionStatus,

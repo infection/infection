@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Metrics;
 
 use Infection\Metrics\SortableMutantExecutionResults;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\DetectionStatus;
+use Infection\Mutation\MutationExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
@@ -47,8 +47,8 @@ final class SortableMutantExecutionResultsTest extends TestCase
     /**
      * @dataProvider resultsProvider
      *
-     * @param MutantExecutionResult[] $executionResults
-     * @param MutantExecutionResult[] $expectedResults
+     * @param MutationExecutionResult[] $executionResults
+     * @param MutationExecutionResult[] $expectedResults
      */
     public function test_it_can_sort_results(array $executionResults, array $expectedResults): void
     {
@@ -186,8 +186,8 @@ final class SortableMutantExecutionResultsTest extends TestCase
         int $id,
         string $originalFilePath,
         int $originalStartingLine
-    ): MutantExecutionResult {
-        return new MutantExecutionResult(
+    ): MutationExecutionResult {
+        return new MutationExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'Passed!',
             DetectionStatus::ESCAPED,

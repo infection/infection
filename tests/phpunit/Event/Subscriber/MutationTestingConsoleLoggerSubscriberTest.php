@@ -43,7 +43,7 @@ use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\MutationExecutionResult;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -117,7 +117,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher->dispatch(
             new MutantProcessWasFinished(
-                $this->createMock(MutantExecutionResult::class)
+                $this->createMock(MutationExecutionResult::class)
             )
         );
     }

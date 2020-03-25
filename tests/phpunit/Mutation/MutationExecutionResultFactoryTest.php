@@ -33,25 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Mutation;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutation\DetectionStatus;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationCalculatedState;
+use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\PhpParser\MutatedNode;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
-use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-final class MutantExecutionResultFactoryTest extends TestCase
+final class MutationExecutionResultFactoryTest extends TestCase
 {
     use MutantExecutionResultAssertions;
 
@@ -61,7 +59,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
     private $testFrameworkAdapterMock;
 
     /**
-     * @var MutantExecutionResultFactory
+     * @var \Infection\Mutation\MutationExecutionResultFactory
      */
     private $resultFactory;
 
@@ -69,7 +67,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
     {
         $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
 
-        $this->resultFactory = new MutantExecutionResultFactory($this->testFrameworkAdapterMock);
+        $this->resultFactory = new MutationExecutionResultFactory($this->testFrameworkAdapterMock);
     }
 
     public function test_it_can_create_a_result_from_a_non_covered_mutant_process(): void
@@ -134,7 +132,7 @@ DIFF;
             $this->resultFactory->createFromProcess($mutantProcess),
             $processCommandLine,
             $processOutput,
-            DetectionStatus::NOT_COVERED,
+            \Infection\Mutation\DetectionStatus::NOT_COVERED,
             $mutationDiff,
             $mutatorName,
             $originalFilePath,
@@ -212,7 +210,7 @@ DIFF;
             $this->resultFactory->createFromProcess($mutantProcess),
             $processCommandLine,
             $processOutput,
-            DetectionStatus::TIMED_OUT,
+            \Infection\Mutation\DetectionStatus::TIMED_OUT,
             $mutationDiff,
             $mutatorName,
             $originalFilePath,

@@ -36,13 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Console\OutputFormatter;
 
 use Infection\Console\OutputFormatter\DotFormatter;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
-use const PHP_EOL;
+use Infection\Mutation\DetectionStatus;
+use Infection\Mutation\MutationExecutionResult;
 use PHPUnit\Framework\TestCase;
-use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use function strip_tags;
+use const PHP_EOL;
 
 final class DotFormatterTest extends TestCase
 {
@@ -212,7 +212,7 @@ TXT
         $executionResults = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $executionResult = $this->createMock(MutantExecutionResult::class);
+            $executionResult = $this->createMock(MutationExecutionResult::class);
             $executionResult
                 ->expects($this->once())
                 ->method('getDetectionStatus')

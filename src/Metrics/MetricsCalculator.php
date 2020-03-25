@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\DetectionStatus;
+use Infection\Mutation\MutationExecutionResult;
 use InvalidArgumentException;
 use function Safe\sprintf;
 
@@ -96,7 +96,7 @@ class MetricsCalculator
         $this->allExecutionResults = new SortableMutantExecutionResults();
     }
 
-    public function collect(MutantExecutionResult ...$executionResults): void
+    public function collect(MutationExecutionResult ...$executionResults): void
     {
         foreach ($executionResults as $executionResult) {
             ++$this->totalMutantsCount;
@@ -173,7 +173,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return MutationExecutionResult[]
      */
     public function getKilledExecutionResults(): array
     {
@@ -181,7 +181,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return MutationExecutionResult[]
      */
     public function getErrorExecutionResults(): array
     {
@@ -189,7 +189,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return MutationExecutionResult[]
      */
     public function getEscapedExecutionResults(): array
     {
@@ -197,7 +197,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return MutationExecutionResult[]
      */
     public function getTimedOutExecutionResults(): array
     {
@@ -205,7 +205,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return MutationExecutionResult[]
      */
     public function getNotCoveredExecutionResults(): array
     {
@@ -213,7 +213,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return MutationExecutionResult[]
      */
     public function getAllExecutionResults(): array
     {

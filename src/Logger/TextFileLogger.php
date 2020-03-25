@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Infection\Metrics\MetricsCalculator;
+use Infection\Mutation\MutationExecutionResult;
+use Infection\Str;
 use function array_map;
 use function explode;
 use function implode;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Str;
-use const PHP_EOL;
 use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
+use const PHP_EOL;
 
 /**
  * @internal
@@ -112,7 +112,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     }
 
     /**
-     * @param MutantExecutionResult[] $executionResults
+     * @param \Infection\Mutation\MutationExecutionResult[] $executionResults
      */
     private function getResultsLine(
         array $executionResults,
@@ -173,7 +173,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
         );
     }
 
-    private static function getMutatorLine(int $index, MutantExecutionResult $mutantProcess): string
+    private static function getMutatorLine(int $index, MutationExecutionResult $mutantProcess): string
     {
         return sprintf(
             '%d) %s:%d    [M] %s',

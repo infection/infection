@@ -33,20 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Mutation;
 
-use Infection\Mutation\Mutation;
-use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
 
-final class MutantCodeFactoryTest extends TestCase
+final class MutationCodeFactoryTest extends TestCase
 {
     /**
-     * @var \Infection\Mutation\MutantCodeFactory
+     * @var \Infection\Mutation\MutationCodeFactory
      */
     private $codeFactory;
 

@@ -35,25 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Builder;
 
-use Infection\Mutation\MutationCalculatedState;
-use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationCalculatedState;
+use Infection\Mutation\MutationExecutionResult;
+use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\PhpParser\MutatedNode;
-use Infection\Process\Builder\MutantProcessBuilder;
+use Infection\Process\Builder\MutantProcessFactory;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutator\MutatorName;
-use const PHP_OS_FAMILY;
-use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\TestCase;
+use function current;
+use const PHP_OS_FAMILY;
 
-final class MutantProcessBuilderTest extends TestCase
+final class MutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
@@ -113,26 +111,26 @@ DIFF
 
         $eventDispatcher = new EventDispatcherCollector();
 
-        $executionResultMock = $this->createMock(MutantExecutionResult::class);
+        $executionResultMock = $this->createMock(MutationExecutionResult::class);
         $executionResultMock
             ->expects($this->never())
             ->method($this->anything())
         ;
 
-        $resultFactoryMock = $this->createMock(MutantExecutionResultFactory::class);
+        $resultFactoryMock = $this->createMock(MutationExecutionResultFactory::class);
         $resultFactoryMock
             ->method('createFromProcess')
             ->willReturn($executionResultMock)
         ;
 
-        $builder = new MutantProcessBuilder(
+        $factory = new MutantProcessFactory(
             $testFrameworkAdapterMock,
             100,
             $eventDispatcher,
             $resultFactoryMock
         );
 
-        $mutantProcess = $builder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+        $mutantProcess = $factory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
         $process = $mutantProcess->getProcess();
 

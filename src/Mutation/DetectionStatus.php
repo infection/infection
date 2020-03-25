@@ -33,31 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant\Exception;
+namespace Infection\Mutation;
 
-use Infection\Mutant\Exception\MsiCalculationException;
-use LogicException;
-use PHPUnit\Framework\TestCase;
-
-final class MsiCalculationExceptionTest extends TestCase
+/**
+ * @internal
+ */
+final class DetectionStatus
 {
-    public function test_it_is_instance_of_logic_exception(): void
-    {
-        $exception = MsiCalculationException::create('');
+    public const KILLED = 'killed';
+    public const ESCAPED = 'escaped';
+    public const ERROR = 'error';
+    public const TIMED_OUT = 'timed out';
+    public const NOT_COVERED = 'not covered';
 
-        $this->assertInstanceOf(
-            LogicException::class,
-            $exception
-        );
-    }
-
-    public function test_it_has_correct_error_message(): void
-    {
-        $exception = MsiCalculationException::create('min-msi');
-        $this->assertSame(
-            'Seems like something is wrong with calculations and min-msi options.',
-            $exception->getMessage(),
-            'The error message was incorrectly parsed.'
-        );
-    }
+    public const ALL = [
+        self::KILLED,
+        self::ESCAPED,
+        self::ERROR,
+        self::TIMED_OUT,
+        self::NOT_COVERED,
+    ];
 }
