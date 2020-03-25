@@ -37,6 +37,9 @@ namespace Infection\Mutation;
 
 use Infection\CannotBeInstantiated;
 
+/**
+ * @internal
+ */
 final class MutationAttributeKeys
 {
     use CannotBeInstantiated;

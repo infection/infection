@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\Mutation\MutationAttributeKeys;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
@@ -104,6 +105,7 @@ final class ProjectCodeProvider
         AdapterInstaller::class,
         DetectionStatus::class,
         DummyFileSystem::class,
+        MutationAttributeKeys::class,
     ];
 
     /**

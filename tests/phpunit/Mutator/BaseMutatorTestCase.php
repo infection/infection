@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Tests\Fixtures\SimpleMutation;
 use function array_shift;
 use function count;
 use function escapeshellarg;
@@ -156,7 +157,7 @@ abstract class BaseMutatorTestCase extends TestCase
     }
 
     /**
-     * @return Mutation[]
+     * @return SimpleMutation[]
      */
     private function getMutationsFromCode(string $code, array $settings): array
     {
