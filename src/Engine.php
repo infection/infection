@@ -110,7 +110,7 @@ final class Engine
         $this->runMutationAnalysis();
 
         $this->minMsiChecker->checkMetrics(
-            $this->metricsCalculator->getTotalMutantsCount(),
+            $this->metricsCalculator->getTotalMutationsCount(),
             $this->metricsCalculator->getMutationScoreIndicator(),
             $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
             $this->consoleOutput
@@ -155,12 +155,15 @@ final class Engine
                 : []
         );
 
-        $actualExtraOptions = $this->config->getTestFrameworkExtraOptions();
+        $extraOptions = $this->config->getTestFrameworkExtraOptions();
 
-        $filteredExtraOptionsForMutant = $this->adapter instanceof ProvidesInitialRunOnlyOptions
-            ? $this->testFrameworkExtraOptionsFilter->filterForMutantProcess($actualExtraOptions, $this->adapter->getInitialRunOnlyOptions())
-            : $actualExtraOptions;
+        $mutationExtraOptions = $this->adapter instanceof ProvidesInitialRunOnlyOptions
+            ? $this->testFrameworkExtraOptionsFilter->filterForMutationProcess(
+                $extraOptions,
+                $this->adapter->getInitialRunOnlyOptions()
+            )
+            : $extraOptions;
 
-        $this->mutationTestingRunner->run($mutations, $filteredExtraOptionsForMutant);
+        $this->mutationTestingRunner->run($mutations, $mutationExtraOptions);
     }
 }

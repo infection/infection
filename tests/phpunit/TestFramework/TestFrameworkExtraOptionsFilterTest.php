@@ -41,18 +41,19 @@ use PHPUnit\Framework\TestCase;
 final class TestFrameworkExtraOptionsFilterTest extends TestCase
 {
     /**
-     * @dataProvider mutantProcessProvider
+     * @dataProvider mutationProcessProvider
      */
-    public function test_it_skips_filter_for_mutant_process(string $actualExtraOptions, string $expectedExtraOptions): void
+    public function test_it_skips_filter_for_mutation_process(string $actualExtraOptions, string $expectedExtraOptions): void
     {
-        $filter = new TestFrameworkExtraOptionsFilter();
-
-        $filteredOptions = $filter->filterForMutantProcess($actualExtraOptions, ['--configuration', '--filter', '--testsuite']);
+        $filteredOptions = (new TestFrameworkExtraOptionsFilter())->filterForMutationProcess(
+            $actualExtraOptions,
+            ['--configuration', '--filter', '--testsuite']
+        );
 
         $this->assertSame($expectedExtraOptions, $filteredOptions);
     }
 
-    public function mutantProcessProvider(): iterable
+    public function mutationProcessProvider(): iterable
     {
         yield ['--filter=someTest#2 --a --b=value', '--a --b=value'];
 

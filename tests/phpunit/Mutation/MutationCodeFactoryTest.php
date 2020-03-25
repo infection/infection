@@ -49,7 +49,7 @@ final class MutationCodeFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->codeFactory = SingletonContainer::getContainer()->getMutantCodeFactory();
+        $this->codeFactory = SingletonContainer::getContainer()->getMutationCodeFactory();
     }
 
     /**
@@ -59,12 +59,12 @@ final class MutationCodeFactoryTest extends TestCase
      * @param Node[] $originalFileAst
      * @param class-string $mutatedNodeClass
      */
-    public function test_it_creates_the_mutant_code_from_the_given_mutation(
+    public function test_it_creates_the_mutation_code_from_the_given_mutation(
         array $attributes,
         array $originalFileAst,
         string $mutatedNodeClass,
         MutatedNode $mutatedNode,
-        string $expectedMutantCode
+        string $expectedMutationCode
     ): void {
         $mutationCode = $this->codeFactory->createCode(
             $attributes,
@@ -73,7 +73,7 @@ final class MutationCodeFactoryTest extends TestCase
             $mutatedNode
         );
 
-        $this->assertSame($expectedMutantCode, $mutationCode);
+        $this->assertSame($expectedMutationCode, $mutationCode);
     }
 
     /**
@@ -83,7 +83,7 @@ final class MutationCodeFactoryTest extends TestCase
      * @param Node[] $originalFileAst
      * @param class-string $mutatedNodeClass
      */
-    public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
+    public function test_it_creates_the_mutation_code_without_altering_the_original_nodes(
         array $attributes,
         array $originalFileAst,
         string $mutatedNodeClass,

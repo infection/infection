@@ -77,7 +77,7 @@ final class DotFormatterTest extends TestCase
         $dot = new DotFormatter($outputKilled);
         $dot->start(10);
         $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0],
+            $this->createMutationExecutionResultsOfType(DetectionStatus::KILLED)[0],
             10
         );
     }
@@ -94,7 +94,7 @@ final class DotFormatterTest extends TestCase
         $dot = new DotFormatter($outputEscaped);
         $dot->start(10);
         $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::ESCAPED)[0],
+            $this->createMutationExecutionResultsOfType(DetectionStatus::ESCAPED)[0],
             10
         );
     }
@@ -111,7 +111,7 @@ final class DotFormatterTest extends TestCase
         $dot = new DotFormatter($outputErrored);
         $dot->start(10);
         $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::ERROR)[0],
+            $this->createMutationExecutionResultsOfType(DetectionStatus::ERROR)[0],
             10
         );
     }
@@ -128,7 +128,7 @@ final class DotFormatterTest extends TestCase
         $dot = new DotFormatter($outputTimedOut);
         $dot->start(10);
         $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::TIMED_OUT)[0],
+            $this->createMutationExecutionResultsOfType(DetectionStatus::TIMED_OUT)[0],
             10
         );
     }
@@ -145,7 +145,7 @@ final class DotFormatterTest extends TestCase
         $dot = new DotFormatter($outputNotCovered);
         $dot->start(10);
         $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::NOT_COVERED)[0],
+            $this->createMutationExecutionResultsOfType(DetectionStatus::NOT_COVERED)[0],
             10
         );
     }
@@ -159,7 +159,7 @@ final class DotFormatterTest extends TestCase
         $dot->start($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $dot->advance($this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0], $totalMutations);
+            $dot->advance($this->createMutationExecutionResultsOfType(DetectionStatus::KILLED)[0], $totalMutations);
         }
 
         $this->assertSame(str_replace("\n", PHP_EOL,
@@ -186,7 +186,7 @@ TXT
 
         for ($i = 0; $i < $totalMutations; ++$i) {
             $dot->advance(
-                $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0],
+                $this->createMutationExecutionResultsOfType(DetectionStatus::KILLED)[0],
                 0
             );
         }
@@ -205,7 +205,7 @@ TXT
         );
     }
 
-    private function createMutantExecutionResultsOfType(
+    private function createMutationExecutionResultsOfType(
         string $detectionStatus,
         int $count = 1
     ): array {

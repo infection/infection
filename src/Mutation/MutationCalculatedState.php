@@ -37,19 +37,19 @@ namespace Infection\Mutation;
 
 final class MutationCalculatedState
 {
-    private $mutantFilePath;
+    private $mutationFilePath;
     private $mutatedCode;
     private $diff;
     private $mutationHash;
 
     public function __construct(
         string $mutationHash,
-        string $mutantFilePath,
+        string $mutationFilePath,
         string $mutatedCode,
         string $diff
     ) {
         $this->mutationHash = $mutationHash;
-        $this->mutantFilePath = $mutantFilePath;
+        $this->mutationFilePath = $mutationFilePath;
         $this->mutatedCode = $mutatedCode;
         $this->diff = $diff;
     }
@@ -61,7 +61,7 @@ final class MutationCalculatedState
 
     public function getMutationFilePath(): string
     {
-        return $this->mutantFilePath;
+        return $this->mutationFilePath;
     }
 
     public function getMutatedCode(): string

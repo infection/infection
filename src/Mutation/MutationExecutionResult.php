@@ -48,7 +48,7 @@ class MutationExecutionResult
     private $processCommandLine;
     private $processOutput;
     private $detectionStatus;
-    private $mutantDiff;
+    private $mutationDiff;
     private $mutatorName;
     private $originalFilePath;
     private $originalStartingLine;
@@ -57,7 +57,7 @@ class MutationExecutionResult
         string $processCommandLine,
         string $processOutput,
         string $detectionStatus,
-        string $mutantDiff,
+        string $mutationDiff,
         string $mutatorName,
         string $originalFilePath,
         int $originalStartingLine
@@ -68,13 +68,13 @@ class MutationExecutionResult
         $this->processCommandLine = $processCommandLine;
         $this->processOutput = $processOutput;
         $this->detectionStatus = $detectionStatus;
-        $this->mutantDiff = $mutantDiff;
+        $this->mutationDiff = $mutationDiff;
         $this->mutatorName = $mutatorName;
         $this->originalFilePath = $originalFilePath;
         $this->originalStartingLine = $originalStartingLine;
     }
 
-    public static function createFromNonCoveredMutant(Mutation $mutation): self
+    public static function createFromNonCoveredMutation(Mutation $mutation): self
     {
         return new self(
             '',
@@ -102,9 +102,9 @@ class MutationExecutionResult
         return $this->detectionStatus;
     }
 
-    public function getMutantDiff(): string
+    public function getMutationDiff(): string
     {
-        return $this->mutantDiff;
+        return $this->mutationDiff;
     }
 
     public function getMutatorName(): string

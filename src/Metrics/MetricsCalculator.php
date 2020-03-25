@@ -88,12 +88,12 @@ class MetricsCalculator
 
     public function __construct()
     {
-        $this->killedExecutionResults = new SortableMutantExecutionResults();
-        $this->errorExecutionResults = new SortableMutantExecutionResults();
-        $this->escapedExecutionResults = new SortableMutantExecutionResults();
-        $this->timedOutExecutionResults = new SortableMutantExecutionResults();
-        $this->notCoveredExecutionResults = new SortableMutantExecutionResults();
-        $this->allExecutionResults = new SortableMutantExecutionResults();
+        $this->killedExecutionResults = new SortableMutationExecutionResults();
+        $this->errorExecutionResults = new SortableMutationExecutionResults();
+        $this->escapedExecutionResults = new SortableMutationExecutionResults();
+        $this->timedOutExecutionResults = new SortableMutationExecutionResults();
+        $this->notCoveredExecutionResults = new SortableMutationExecutionResults();
+        $this->allExecutionResults = new SortableMutationExecutionResults();
     }
 
     public function collect(MutationExecutionResult ...$executionResults): void
@@ -167,7 +167,7 @@ class MetricsCalculator
         return $this->notExecutedByTestsCount;
     }
 
-    public function getTotalMutantsCount(): int
+    public function getTotalMutationsCount(): int
     {
         return $this->totalMutantsCount;
     }

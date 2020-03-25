@@ -89,7 +89,7 @@ class MutationConfigBuilder extends ConfigBuilder
      */
     public function build(
         array $tests,
-        string $mutantFilePath,
+        string $mutationFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath
     ): string {
@@ -125,7 +125,7 @@ class MutationConfigBuilder extends ConfigBuilder
             $customAutoloadFilePath,
             $this->createCustomAutoloadWithInterceptor(
                 $mutationOriginalFilePath,
-                $mutantFilePath,
+                $mutationFilePath,
                 $originalBootstrapFile
             )
         );
@@ -155,7 +155,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function createCustomAutoloadWithInterceptor(
         string $originalFilePath,
-        string $mutantFilePath,
+        string $mutationFilePath,
         string $originalAutoloadFile
     ): string {
         $interceptorPath = IncludeInterceptor::LOCATION;
@@ -172,7 +172,7 @@ require_once '%s';
 
 PHP
             ,
-            $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath),
+            $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutationFilePath),
             $originalAutoloadFile
         );
     }

@@ -62,7 +62,7 @@ final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
             ->method('writeln')
             ->with([
                 '',
-                'Generate mutants...',
+                'Generate mutations...',
                 '',
                 'Processing source code files: 123',
             ]);

@@ -89,7 +89,7 @@ final class MutatorParser
             throw new UnexpectedValueException(
                 sprintf(
                     'Expected "%s" to be a known mutator or profile. See "%s" and "%s" for '
-                    . 'the list of available mutants and profiles.',
+                    . 'the list of available mutations and profiles.',
                     $profileOrMutator,
                     'https://infection.github.io/guide/mutators.html',
                     'https://infection.github.io/guide/profiles.html'

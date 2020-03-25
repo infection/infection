@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutation\MutationExecutionResult;
@@ -51,7 +50,7 @@ final class MutationExecutionResultTest extends TestCase
         $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"';
         $processOutput = 'Passed!';
         $processResultCode = \Infection\Mutation\DetectionStatus::ESCAPED;
-        $mutantDiff = <<<'DIFF'
+        $mutationDiff = <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -69,7 +68,7 @@ DIFF;
             $processCommandLine,
             $processOutput,
             $processResultCode,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine
@@ -80,14 +79,14 @@ DIFF;
             $processCommandLine,
             $processOutput,
             $processResultCode,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine
         );
     }
 
-    public function test_it_can_be_instantiated_from_a_non_covered_mutant(): void
+    public function test_it_can_be_instantiated_from_a_non_covered_mutation(): void
     {
         $mutationDiff = <<<'DIFF'
 --- Original
@@ -99,7 +98,7 @@ DIFF;
 
 DIFF;
 
-        $mutant = new Mutation(
+        $mutation = new Mutation(
             $originalFilePath = 'path/to/Foo.php',
             $mutatorName = MutatorName::getName(For_::class),
             [
@@ -128,7 +127,7 @@ DIFF;
         );
 
         $this->assertResultStateIs(
-            MutationExecutionResult::createFromNonCoveredMutant($mutant),
+            MutationExecutionResult::createFromNonCoveredMutation($mutation),
             '',
             '',
             \Infection\Mutation\DetectionStatus::NOT_COVERED,
@@ -144,7 +143,7 @@ DIFF;
         string $expectedProcessCommandLine,
         string $expectedProcessOutput,
         string $expectedDetectionStatus,
-        string $expectedMutantDiff,
+        string $expectedMutationDiff,
         string $expectedMutatorName,
         string $expectedOriginalFilePath,
         int $expectedOriginalStartingLine
@@ -152,7 +151,7 @@ DIFF;
         $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
         $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
-        $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
+        $this->assertSame($expectedMutationDiff, $result->getMutationDiff());
         $this->assertSame($expectedMutatorName, $result->getMutatorName());
         $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
         $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());

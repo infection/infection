@@ -53,12 +53,16 @@ abstract class MutationConfigBuilder
      */
     abstract public function build(
         array $tests,
-        string $mutantFilePath,
+        string $mutationFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath
     ): string;
 
-    protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutantFilePath): string
+    protected function getInterceptorFileContent(
+        string $interceptorPath,
+        string $originalFilePath,
+        string $mutationFilePath
+    ): string
     {
         $infectionPhar = '';
 
@@ -78,7 +82,7 @@ require_once '{$interceptorPath}';
 
 use {$namespacePrefix}Infection\StreamWrapper\IncludeInterceptor;
 
-IncludeInterceptor::intercept('{$originalFilePath}', '{$mutantFilePath}');
+IncludeInterceptor::intercept('{$originalFilePath}', '{$mutationFilePath}');
 IncludeInterceptor::enable();
 CONTENT;
     }

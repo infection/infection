@@ -56,7 +56,7 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0, $calculator->getEscapedCount());
         $this->assertSame(0, $calculator->getTimedOutCount());
         $this->assertSame(0, $calculator->getNotTestedCount());
-        $this->assertSame(0, $calculator->getTotalMutantsCount());
+        $this->assertSame(0, $calculator->getTotalMutationsCount());
 
         $this->assertSame([], $calculator->getKilledExecutionResults());
         $this->assertSame([], $calculator->getErrorExecutionResults());
@@ -74,27 +74,27 @@ final class MetricsCalculatorTest extends TestCase
     {
         $calculator = new MetricsCalculator();
 
-        $expectedKilledResults = $this->addMutantExecutionResult(
+        $expectedKilledResults = $this->addMutationExecutionResult(
             $calculator,
             DetectionStatus::KILLED,
             7
         );
-        $expectedErrorResults = $this->addMutantExecutionResult(
+        $expectedErrorResults = $this->addMutationExecutionResult(
             $calculator,
             DetectionStatus::ERROR,
             2
         );
-        $expectedEscapedResults = $this->addMutantExecutionResult(
+        $expectedEscapedResults = $this->addMutationExecutionResult(
             $calculator,
             DetectionStatus::ESCAPED,
             2
         );
-        $expectedTimedOutResults = $this->addMutantExecutionResult(
+        $expectedTimedOutResults = $this->addMutationExecutionResult(
             $calculator,
             DetectionStatus::TIMED_OUT,
             2
         );
-        $expectedNotCoveredResults = $this->addMutantExecutionResult(
+        $expectedNotCoveredResults = $this->addMutationExecutionResult(
             $calculator,
             DetectionStatus::NOT_COVERED,
             1
@@ -122,7 +122,7 @@ final class MetricsCalculatorTest extends TestCase
             $calculator->getAllExecutionResults()
         );
 
-        $this->assertSame(14, $calculator->getTotalMutantsCount());
+        $this->assertSame(14, $calculator->getTotalMutationsCount());
         $this->assertSame(78.57142857142857, $calculator->getMutationScoreIndicator());
         $this->assertSame(92.85714285714286, $calculator->getCoverageRate());
         $this->assertSame(84.61538461538461, $calculator->getCoveredCodeMutationScoreIndicator());
@@ -139,7 +139,7 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0.0, $calculator->getCoverageRate());
         $this->assertSame(0.0, $calculator->getCoveredCodeMutationScoreIndicator());
 
-        $expectedKilledResults = $this->addMutantExecutionResult(
+        $expectedKilledResults = $this->addMutationExecutionResult(
             $calculator,
             DetectionStatus::KILLED,
             1
@@ -156,7 +156,7 @@ final class MetricsCalculatorTest extends TestCase
     /**
      * @return \Infection\Mutation\MutationExecutionResult[]
      */
-    private function addMutantExecutionResult(
+    private function addMutationExecutionResult(
         MetricsCalculator $calculator,
         string $detectionStatus,
         int $count
@@ -164,7 +164,7 @@ final class MetricsCalculatorTest extends TestCase
         $executionResults = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $executionResults[] = $this->createMutantExecutionResult($detectionStatus);
+            $executionResults[] = $this->createMutationExecutionResult($detectionStatus);
         }
 
         $calculator->collect(...$executionResults);
@@ -172,7 +172,7 @@ final class MetricsCalculatorTest extends TestCase
         return $executionResults;
     }
 
-    private function createMutantExecutionResult(string $detectionStatus): MutationExecutionResult
+    private function createMutationExecutionResult(string $detectionStatus): MutationExecutionResult
     {
         $id = $this->id;
         ++$this->id;

@@ -33,26 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation;
+namespace Infection\Metrics;
 
-trait MutantExecutionResultAssertions
+use Infection\Mutation\MutationExecutionResult;
+use function Safe\usort;
+
+/**
+ * @internal
+ */
+final class SortableMutationExecutionResults
 {
-    private function assertResultStateIs(
-        \Infection\Mutation\MutationExecutionResult $result,
-        string $expectedProcessCommandLine,
-        string $expectedProcessOutput,
-        string $expectedDetectionStatus,
-        string $expectedMutantDiff,
-        string $expectedMutatorName,
-        string $expectedOriginalFilePath,
-        int $expectedOriginalStartingLine
-    ): void {
-        $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
-        $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
-        $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
-        $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
-        $this->assertSame($expectedMutatorName, $result->getMutatorName());
-        $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
-        $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());
+    /**
+     * @var \Infection\Mutation\MutationExecutionResult[]
+     */
+    private $executionResults = [];
+
+    /**
+     * @var bool
+     */
+    private $sorted = false;
+
+    public function add(MutationExecutionResult $executionResult): void
+    {
+        $this->executionResults[] = $executionResult;
+        $this->sorted = false;
+    }
+
+    /**
+     * @return \Infection\Mutation\MutationExecutionResult[]
+     */
+    public function getSortedExecutionResults(): array
+    {
+        if (!$this->sorted) {
+            self::sortResults($this->executionResults);
+            $this->sorted = true;
+        }
+
+        return $this->executionResults;
+    }
+
+    /**
+     * @param \Infection\Mutation\MutationExecutionResult[] $executionResults
+     */
+    private static function sortResults(array &$executionResults): void
+    {
+        usort(
+            $executionResults,
+            static function (MutationExecutionResult $a, MutationExecutionResult $b): int {
+                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
+                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
+                }
+
+                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
+            }
+        );
     }
 }

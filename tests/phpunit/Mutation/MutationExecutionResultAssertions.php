@@ -33,59 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Metrics;
+namespace Infection\Tests\Mutation;
 
-use Infection\Mutation\MutationExecutionResult;
-use function Safe\usort;
-
-/**
- * @internal
- */
-final class SortableMutantExecutionResults
+trait MutationExecutionResultAssertions
 {
-    /**
-     * @var \Infection\Mutation\MutationExecutionResult[]
-     */
-    private $executionResults = [];
-
-    /**
-     * @var bool
-     */
-    private $sorted = false;
-
-    public function add(MutationExecutionResult $executionResult): void
-    {
-        $this->executionResults[] = $executionResult;
-        $this->sorted = false;
-    }
-
-    /**
-     * @return \Infection\Mutation\MutationExecutionResult[]
-     */
-    public function getSortedExecutionResults(): array
-    {
-        if (!$this->sorted) {
-            self::sortResults($this->executionResults);
-            $this->sorted = true;
-        }
-
-        return $this->executionResults;
-    }
-
-    /**
-     * @param \Infection\Mutation\MutationExecutionResult[] $executionResults
-     */
-    private static function sortResults(array &$executionResults): void
-    {
-        usort(
-            $executionResults,
-            static function (MutationExecutionResult $a, MutationExecutionResult $b): int {
-                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
-                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
-                }
-
-                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
-            }
-        );
+    private function assertResultStateIs(
+        \Infection\Mutation\MutationExecutionResult $result,
+        string $expectedProcessCommandLine,
+        string $expectedProcessOutput,
+        string $expectedDetectionStatus,
+        string $expectedMutationDiff,
+        string $expectedMutatorName,
+        string $expectedOriginalFilePath,
+        int $expectedOriginalStartingLine
+    ): void {
+        $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
+        $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
+        $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
+        $this->assertSame($expectedMutationDiff, $result->getMutationDiff());
+        $this->assertSame($expectedMutatorName, $result->getMutatorName());
+        $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
+        $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());
     }
 }

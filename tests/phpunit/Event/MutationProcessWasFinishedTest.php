@@ -33,24 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Tests\Event;
 
+use Infection\Event\MutationProcessWasFinished;
 use Infection\Mutation\MutationExecutionResult;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class MutantProcessWasFinished
+final class MutationProcessWasFinishedTest extends TestCase
 {
-    private $executionResult;
-
-    public function __construct(MutationExecutionResult $executionResult)
+    public function test_it_exposes_its_mutation_process(): void
     {
-        $this->executionResult = $executionResult;
-    }
+        $executionResultMock = $this->createMock(MutationExecutionResult::class);
 
-    public function getExecutionResult(): MutationExecutionResult
-    {
-        return $this->executionResult;
+        $event = new MutationProcessWasFinished($executionResultMock);
+
+        $this->assertSame($executionResultMock, $event->getExecutionResult());
     }
 }

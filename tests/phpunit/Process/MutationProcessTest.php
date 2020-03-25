@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
-use Infection\Process\MutantProcess;
+use Infection\Process\MutationProcess;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-final class MutantProcessTest extends TestCase
+final class MutationProcessTest extends TestCase
 {
     /**
      * @var MockObject|Process
@@ -55,22 +54,22 @@ final class MutantProcessTest extends TestCase
     private $mutationMock;
 
     /**
-     * @var MutantProcess
+     * @var MutationProcess
      */
-    private $mutantProcess;
+    private $mutationProcess;
 
     protected function setUp(): void
     {
         $this->processMock = $this->createMock(Process::class);
         $this->mutationMock = $this->createMock(Mutation::class);
 
-        $this->mutantProcess = new MutantProcess($this->processMock, $this->mutationMock);
+        $this->mutationProcess = new MutationProcess($this->processMock, $this->mutationMock);
     }
 
     public function test_it_exposes_its_state(): void
     {
-        $this->assertMutantProcessStateIs(
-            $this->mutantProcess,
+        $this->assertMutationProcessStateIs(
+            $this->mutationProcess,
             $this->processMock,
             $this->mutationMock,
             false
@@ -79,10 +78,10 @@ final class MutantProcessTest extends TestCase
 
     public function test_it_can_be_marked_as_timed_out(): void
     {
-        $this->mutantProcess->markAsTimedOut();
+        $this->mutationProcess->markAsTimedOut();
 
-        $this->assertMutantProcessStateIs(
-            $this->mutantProcess,
+        $this->assertMutationProcessStateIs(
+            $this->mutationProcess,
             $this->processMock,
             $this->mutationMock,
             true
@@ -93,7 +92,7 @@ final class MutantProcessTest extends TestCase
     {
         $called = false;
 
-        $this->mutantProcess->registerTerminateProcessClosure(
+        $this->mutationProcess->registerTerminateProcessClosure(
             static function () use (&$called): void {
                 $called = true;
             }
@@ -101,19 +100,19 @@ final class MutantProcessTest extends TestCase
 
         $this->assertFalse($called);
 
-        $this->mutantProcess->terminateProcess();
+        $this->mutationProcess->terminateProcess();
 
         $this->assertTrue($called);
     }
 
-    private function assertMutantProcessStateIs(
-        MutantProcess $mutantProcess,
+    private function assertMutationProcessStateIs(
+        MutationProcess $mutationProcess,
         Process $expectedProcess,
-        Mutation $expectedMutant,
+        Mutation $expectedMutation,
         bool $expectedTimedOut
     ): void {
-        $this->assertSame($expectedProcess, $mutantProcess->getProcess());
-        $this->assertSame($expectedMutant, $mutantProcess->getMutation());
-        $this->assertSame($expectedTimedOut, $mutantProcess->isTimedOut());
+        $this->assertSame($expectedProcess, $mutationProcess->getProcess());
+        $this->assertSame($expectedMutation, $mutationProcess->getMutation());
+        $this->assertSame($expectedTimedOut, $mutationProcess->isTimedOut());
     }
 }

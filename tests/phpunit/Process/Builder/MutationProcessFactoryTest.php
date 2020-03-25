@@ -37,28 +37,27 @@ namespace Infection\Tests\Process\Builder;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\MutantProcessWasFinished;
-use Infection\Mutant\Mutant;
+use Infection\Event\MutationProcessWasFinished;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutation\MutationExecutionResult;
 use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\Builder\MutantProcessFactory;
+use Infection\Process\Builder\MutationProcessFactory;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 use function current;
 use const PHP_OS_FAMILY;
 
-final class MutantProcessFactoryTest extends TestCase
+final class MutationProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
         $hash = '0800f';
-        $mutantFilePath = '/path/to/mutation';
+        $mutationFilePath = '/path/to/mutation';
 
-        $mutant = new Mutation(
+        $mutation = new Mutation(
             $originalFilePath = 'path/to/Foo.php',
             MutatorName::getName(For_::class),
             [
@@ -76,10 +75,10 @@ final class MutantProcessFactoryTest extends TestCase
                     0.01
                 ),
             ],
-            static function () use ($hash, $mutantFilePath): MutationCalculatedState {
+            static function () use ($hash, $mutationFilePath): MutationCalculatedState {
                 return new MutationCalculatedState(
                     $hash,
-                    $mutantFilePath,
+                    $mutationFilePath,
                     'notCovered#0',
                     <<<'DIFF'
 --- Original
@@ -101,7 +100,7 @@ DIFF
             ->method('getMutantCommandLine')
             ->with(
                 $tests,
-                $mutantFilePath,
+                $mutationFilePath,
                 $hash,
                 $originalFilePath,
                 $testFrameworkExtraOptions
@@ -123,16 +122,16 @@ DIFF
             ->willReturn($executionResultMock)
         ;
 
-        $factory = new MutantProcessFactory(
+        $factory = new MutationProcessFactory(
             $testFrameworkAdapterMock,
             100,
             $eventDispatcher,
             $resultFactoryMock
         );
 
-        $mutantProcess = $factory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+        $mutationProcess = $factory->createProcessForMutation($mutation, $testFrameworkExtraOptions);
 
-        $process = $mutantProcess->getProcess();
+        $process = $mutationProcess->getProcess();
 
         $this->assertSame(
             PHP_OS_FAMILY === 'Windows'
@@ -143,12 +142,12 @@ DIFF
         $this->assertSame(100., $process->getTimeout());
         $this->assertFalse($process->isStarted());
 
-        $this->assertSame($mutant, $mutantProcess->getMutation());
-        $this->assertFalse($mutantProcess->isTimedOut());
+        $this->assertSame($mutation, $mutationProcess->getMutation());
+        $this->assertFalse($mutationProcess->isTimedOut());
 
         $this->assertSame([], $eventDispatcher->getEvents());
 
-        $mutantProcess->terminateProcess();
+        $mutationProcess->terminateProcess();
 
         $eventsAfterCallbackCall = $eventDispatcher->getEvents();
 
@@ -156,7 +155,7 @@ DIFF
 
         $event = current($eventsAfterCallbackCall);
 
-        $this->assertInstanceOf(MutantProcessWasFinished::class, $event);
+        $this->assertInstanceOf(MutationProcessWasFinished::class, $event);
         $this->assertSame($executionResultMock, $event->getExecutionResult());
     }
 }

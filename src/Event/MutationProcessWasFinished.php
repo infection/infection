@@ -33,65 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Event;
 
-use Closure;
-use Infection\Mutation\Mutation;
-use Infection\Process\Runner\ProcessBearer;
-use Symfony\Component\Process\Process;
+use Infection\Mutation\MutationExecutionResult;
 
 /**
  * @internal
- * @final
  */
-class MutantProcess implements ProcessBearer
+final class MutationProcessWasFinished
 {
-    private $process;
-    private $mutation;
-    private $callback;
+    private $executionResult;
 
-    /**
-     * @var bool
-     */
-    private $timedOut = false;
-
-    public function __construct(Process $process, Mutation $mutation)
+    public function __construct(MutationExecutionResult $executionResult)
     {
-        $this->process = $process;
-        $this->mutation = $mutation;
-        $this->callback = static function (): void {};
+        $this->executionResult = $executionResult;
     }
 
-    public function getProcess(): Process
+    public function getExecutionResult(): MutationExecutionResult
     {
-        return $this->process;
-    }
-
-    public function getMutation(): Mutation
-    {
-        return $this->mutation;
-    }
-
-    public function markAsTimedOut(): void
-    {
-        $this->timedOut = true;
-    }
-
-    public function isTimedOut(): bool
-    {
-        return $this->timedOut;
-    }
-
-    /**
-     * @param Closure(): void $callback
-     */
-    public function registerTerminateProcessClosure(Closure $callback): void
-    {
-        $this->callback = $callback;
-    }
-
-    public function terminateProcess(): void
-    {
-        ($this->callback)();
+        return $this->executionResult;
     }
 }

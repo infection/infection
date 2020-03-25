@@ -63,7 +63,7 @@ final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
         $this->testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
     }
 
-    public function test_it_reacts_on_mutants_creating_event(): void
+    public function test_it_reacts_on_mutations_creating_event(): void
     {
         $this->output->expects($this->once())
             ->method('writeln')

@@ -66,7 +66,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
 
         $logs = [];
 
-        $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
+        $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutationsCount();
         $logs[] = '';
         $logs[] = $this->getResultsLine(
             $this->metricsCalculator->getKilledExecutionResults(),

@@ -58,18 +58,18 @@ class MutationFactory
      * @var string[]
      */
     private $printedFileCache = [];
-    private $mutantCodeFactory;
+    private $mutationCodeFactory;
 
     public function __construct(
         string $tmpDir,
         Differ $differ,
         PrettyPrinterAbstract $printer,
-        MutationCodeFactory $mutantCodeFactory
+        MutationCodeFactory $mutationCodeFactory
     ) {
         $this->tmpDir = $tmpDir;
         $this->differ = $differ;
         $this->printer = $printer;
-        $this->mutantCodeFactory = $mutantCodeFactory;
+        $this->mutationCodeFactory = $mutationCodeFactory;
     }
 
     /**
@@ -134,13 +134,13 @@ class MutationFactory
             $mutationByMutatorIndex
         );
 
-        $mutantFilePath = sprintf(
-            '%s/mutant.%s.infection.php',
+        $mutationFilePath = sprintf(
+            '%s/mutation.%s.infection.php',
             $this->tmpDir,
             $hash
         );
 
-        $mutatedCode = $this->mutantCodeFactory->createCode(
+        $mutatedCode = $this->mutationCodeFactory->createCode(
             $attributes,
             $originalFileAst,
             $mutatedNodeClass,
@@ -149,9 +149,9 @@ class MutationFactory
 
         return new MutationCalculatedState(
             $hash,
-            $mutantFilePath,
+            $mutationFilePath,
             $mutatedCode,
-            $this->createMutantDiff(
+            $this->createMutationDiff(
                 $originalFilePath,
                 $originalFileAst,
                 $mutatedCode
@@ -181,17 +181,17 @@ class MutationFactory
     /**
      * @param Node[] $originalFileAst
      */
-    private function createMutantDiff(
+    private function createMutationDiff(
         string $originalFilePath,
         array $originalFileAst,
-        string $mutantCode
+        string $mutationCode
     ): string {
         $originalPrettyPrintedFile = $this->getOriginalPrettyPrintedFile(
             $originalFilePath,
             $originalFileAst
         );
 
-        return $this->differ->diff($originalPrettyPrintedFile, $mutantCode);
+        return $this->differ->diff($originalPrettyPrintedFile, $mutationCode);
     }
 
     /**

@@ -71,7 +71,7 @@ final class MutationFactoryTest extends TestCase
     /**
      * @var \Infection\Mutation\MutationFactory
      */
-    private $mutantFactory;
+    private $mutationFactory;
 
     protected function setUp(): void
     {
@@ -83,7 +83,7 @@ final class MutationFactoryTest extends TestCase
 
         $this->differMock = $this->createMock(Differ::class);
 
-        $this->mutantFactory = new MutationFactory(
+        $this->mutationFactory = new MutationFactory(
             '/path/to/tmp',
             $this->differMock,
             $this->printerMock,
@@ -120,8 +120,8 @@ final class MutationFactoryTest extends TestCase
 
         $expectedHash = md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53');
 
-        $expectedMutantFilePath = sprintf(
-            '/path/to/tmp/mutant.%s.infection.php',
+        $expectedMutationFilePath = sprintf(
+            '/path/to/tmp/mutation.%s.infection.php',
             $expectedHash
         );
 
@@ -151,7 +151,7 @@ final class MutationFactoryTest extends TestCase
             ->willReturn('code diff')
         ;
 
-        $mutation1 = $this->mutantFactory->create(
+        $mutation1 = $this->mutationFactory->create(
             $originalFilePath,
             $originalFileAst,
             $mutatorName,
@@ -168,7 +168,7 @@ final class MutationFactoryTest extends TestCase
             $mutatorName,
             $tests,
             $expectedHash,
-            $expectedMutantFilePath,
+            $expectedMutationFilePath,
             'mutated code',
             'code diff',
             $originalStartingLine,
@@ -177,7 +177,7 @@ final class MutationFactoryTest extends TestCase
 
         // Check memoization
 
-        $mutation2 = $this->mutantFactory->create(
+        $mutation2 = $this->mutationFactory->create(
             $originalFilePath,
             $originalFileAst,
             $mutatorName,
@@ -194,7 +194,7 @@ final class MutationFactoryTest extends TestCase
             $mutatorName,
             $tests,
             $expectedHash,
-            $expectedMutantFilePath,
+            $expectedMutationFilePath,
             'mutated code',
             'code diff',
             $originalStartingLine,

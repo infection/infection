@@ -37,10 +37,10 @@ namespace Infection\Process\Builder;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\MutationProcessWasFinished;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationExecutionResultFactory;
-use Infection\Process\MutantProcess;
+use Infection\Process\MutationProcess;
 use Symfony\Component\Process\Process;
 use function method_exists;
 
@@ -48,7 +48,7 @@ use function method_exists;
  * @internal
  * @final
  */
-class MutantProcessFactory
+class MutationProcessFactory
 {
     private $testFrameworkAdapter;
     private $timeout;
@@ -68,7 +68,7 @@ class MutantProcessFactory
         $this->resultFactory = $resultFactory;
     }
 
-    public function createProcessForMutant(Mutation $mutation, string $testFrameworkExtraOptions = ''): MutantProcess
+    public function createProcessForMutation(Mutation $mutation, string $testFrameworkExtraOptions = ''): MutationProcess
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
@@ -87,21 +87,21 @@ class MutantProcessFactory
             $process->inheritEnvironmentVariables();
         }
 
-        $mutantProcess = new MutantProcess($process, $mutation);
+        $mutationProcess = new MutationProcess($process, $mutation);
 
         $eventDispatcher = $this->eventDispatcher;
         $resultFactory = $this->resultFactory;
 
-        $mutantProcess->registerTerminateProcessClosure(static function () use (
-            $mutantProcess,
+        $mutationProcess->registerTerminateProcessClosure(static function () use (
+            $mutationProcess,
             $eventDispatcher,
             $resultFactory
         ): void {
-            $eventDispatcher->dispatch(new MutantProcessWasFinished(
-                $resultFactory->createFromProcess($mutantProcess))
+            $eventDispatcher->dispatch(new MutationProcessWasFinished(
+                $resultFactory->createFromProcess($mutationProcess))
             );
         });
 
-        return $mutantProcess;
+        return $mutationProcess;
     }
 }

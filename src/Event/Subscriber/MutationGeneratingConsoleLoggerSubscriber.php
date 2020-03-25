@@ -59,7 +59,7 @@ final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
 
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        $this->output->writeln(['', '', 'Generate mutants...', '']);
+        $this->output->writeln(['', '', 'Generate mutations...', '']);
         $this->progressBar->start($event->getMutableFilesCount());
     }
 

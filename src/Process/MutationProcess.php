@@ -33,20 +33,65 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\Process;
 
-use Infection\Event\MutantProcessWasFinished;
-use Infection\Mutation\MutationExecutionResult;
-use PHPUnit\Framework\TestCase;
+use Closure;
+use Infection\Mutation\Mutation;
+use Infection\Process\Runner\ProcessBearer;
+use Symfony\Component\Process\Process;
 
-final class MutantProcessWasFinishedTest extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class MutationProcess implements ProcessBearer
 {
-    public function test_it_exposes_its_mutant_process(): void
+    private $process;
+    private $mutation;
+    private $callback;
+
+    /**
+     * @var bool
+     */
+    private $timedOut = false;
+
+    public function __construct(Process $process, Mutation $mutation)
     {
-        $executionResultMock = $this->createMock(MutationExecutionResult::class);
+        $this->process = $process;
+        $this->mutation = $mutation;
+        $this->callback = static function (): void {};
+    }
 
-        $event = new MutantProcessWasFinished($executionResultMock);
+    public function getProcess(): Process
+    {
+        return $this->process;
+    }
 
-        $this->assertSame($executionResultMock, $event->getExecutionResult());
+    public function getMutation(): Mutation
+    {
+        return $this->mutation;
+    }
+
+    public function markAsTimedOut(): void
+    {
+        $this->timedOut = true;
+    }
+
+    public function isTimedOut(): bool
+    {
+        return $this->timedOut;
+    }
+
+    /**
+     * @param Closure(): void $callback
+     */
+    public function registerTerminateProcessClosure(Closure $callback): void
+    {
+        $this->callback = $callback;
+    }
+
+    public function terminateProcess(): void
+    {
+        ($this->callback)();
     }
 }

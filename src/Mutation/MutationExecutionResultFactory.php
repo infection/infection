@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\MutantProcess;
+use Infection\Process\MutationProcess;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 use function Safe\sprintf;
@@ -54,15 +54,15 @@ class MutationExecutionResultFactory
         $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    public function createFromProcess(MutantProcess $mutantProcess): MutationExecutionResult
+    public function createFromProcess(MutationProcess $mutationProcess): MutationExecutionResult
     {
-        $process = $mutantProcess->getProcess();
-        $mutation = $mutantProcess->getMutation();
+        $process = $mutationProcess->getProcess();
+        $mutation = $mutationProcess->getMutation();
 
         return new MutationExecutionResult(
             $process->getCommandLine(),
             $this->retrieveProcessOutput($process),
-            $this->retrieveDetectionStatus($mutantProcess),
+            $this->retrieveDetectionStatus($mutationProcess),
             $mutation->getDiff(),
             $mutation->getMutatorName(),
             $mutation->getOriginalFilePath(),
@@ -83,17 +83,17 @@ class MutationExecutionResultFactory
         return $process->getOutput();
     }
 
-    private function retrieveDetectionStatus(MutantProcess $mutantProcess): string
+    private function retrieveDetectionStatus(MutationProcess $mutationProcess): string
     {
-        if (!$mutantProcess->getMutation()->hasTests()) {
+        if (!$mutationProcess->getMutation()->hasTests()) {
             return DetectionStatus::NOT_COVERED;
         }
 
-        if ($mutantProcess->isTimedOut()) {
+        if ($mutationProcess->isTimedOut()) {
             return DetectionStatus::TIMED_OUT;
         }
 
-        $process = $mutantProcess->getProcess();
+        $process = $mutationProcess->getProcess();
 
         if ($process->getExitCode() > 100) {
             // See \Symfony\Component\Process\Process::$exitCodes
