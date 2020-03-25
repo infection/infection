@@ -233,8 +233,6 @@ class ConfigurationFactory
         string $configDir,
         string $tmpDir
     ): string {
-        Assert::nullOrStringNotEmpty($existingCoveragePath);
-
         if ($existingCoveragePath === null) {
             return $tmpDir;
         }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use Infection\Mutation\MutationAttributeKeys;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
@@ -60,6 +59,7 @@ use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutation\DetectionStatus;
+use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;

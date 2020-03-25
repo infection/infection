@@ -33,7 +33,7 @@ Process of creating a mutant from the original program.
 
 ### Mutant
 
-New program that differs from the original by applying a mutation. 
+New program that differs from the original by applying a mutation.
 
 
 ### Mutation
@@ -45,8 +45,8 @@ The result of applying a mutator to the AST of a subject and represents a change
 
 Define a possible transformation, which applied to the AST of a subject will result in a mutation.
 
-In the Mutation Testing literature, mutators are also known as "mutant operator", 
-"mutagenic operator", "mutagen" and "mutation rule". 
+In the Mutation Testing literature, mutators are also known as "mutant operator",
+"mutagenic operator", "mutagen" and "mutation rule".
 
 
 ## S

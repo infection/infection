@@ -35,18 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Tests\Fixtures\SimpleMutation;
 use function array_shift;
 use function count;
 use function escapeshellarg;
 use function exec;
 use function get_class;
-use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
+use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
