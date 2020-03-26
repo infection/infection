@@ -71,7 +71,7 @@ final class CoverageCheckerTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$coveragePath = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/coverage/coverage-xml');
+        self::$coveragePath = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/coverage');
         self::$jUnit = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/junit.xml');
     }
 

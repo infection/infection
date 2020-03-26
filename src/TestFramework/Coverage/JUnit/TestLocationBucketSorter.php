@@ -33,30 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
+namespace Infection\TestFramework\Coverage\JUnit;
 
-use Infection\CannotBeInstantiated;
-
-use Infection\CannotBeInstantiated;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use function Safe\ksort;
 
 /**
  * @internal
  */
-final class DetectionStatus
+final class TestLocationBucketSorter
 {
-    use CannotBeInstantiated;
-
-    public const KILLED = 'killed';
-    public const ESCAPED = 'escaped';
-    public const ERROR = 'error';
-    public const TIMED_OUT = 'timed out';
-    public const NOT_COVERED = 'not covered';
-
-    public const ALL = [
-        self::KILLED,
-        self::ESCAPED,
-        self::ERROR,
-        self::TIMED_OUT,
-        self::NOT_COVERED,
+    /**
+     * Pre-sort first buckets, optimistically assuming that most projects
+     * won't have tests longer than a second.
+     */
+    private const INIT_BUCKETS = [
+        0 => [],
+        1 => [],
+        2 => [],
+        3 => [],
+        4 => [],
+        5 => [],
+        6 => [],
+        7 => [],
     ];
+
+    private function __construct()
+    {
+    }
+
+    /**
+     * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
+     *
+     * @param TestLocation[] $uniqueTestLocations
+     *
+     * @return iterable<TestLocation>
+     */
+    public static function bucketSort(array $uniqueTestLocations): iterable
+    {
+        $buckets = self::INIT_BUCKETS;
+
+        foreach ($uniqueTestLocations as $location) {
+            // @codeCoverageIgnoreStart
+            // This is a very hot path. Factoring here another method just to test this math may not be as good idea.
+
+            // Quick drop off lower bits, reducing precision to 8th of a second
+            $msTime = $location->getExecutionTime() * 1024 >> 7; // * 1024 / 128
+
+            // For anything above 4 seconds reduce precision to 4 seconds
+            if ($msTime > 32) {
+                $msTime = $msTime >> 5 << 5; // 7 + 5 = 12 bits
+            }
+            // @codeCoverageIgnoreEnd
+
+            $buckets[$msTime][] = $location;
+        }
+
+        ksort($buckets);
+
+        foreach ($buckets as $bucket) {
+            yield from $bucket;
+        }
+    }
 }
