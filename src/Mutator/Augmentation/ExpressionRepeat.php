@@ -51,8 +51,8 @@ final class ExpressionRepeat implements Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Duplicates an expression statement.',
-            MutatorCategory::SEMANTIC_REDUCTION,
+            'Duplicates an expression statement, provided it can have side-effects.',
+            MutatorCategory::SEMANTIC_ADDITION,
             null
         );
     }
