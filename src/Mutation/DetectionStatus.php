@@ -37,8 +37,6 @@ namespace Infection\Mutation;
 
 use Infection\CannotBeInstantiated;
 
-use Infection\CannotBeInstantiated;
-
 /**
  * @internal
  */
