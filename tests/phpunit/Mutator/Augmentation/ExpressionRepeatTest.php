@@ -91,6 +91,28 @@ $z = $b::bar() + [1 => $c::foo()] && strpos('a', 'b');
 PHP
         ];
 
+        yield 'It does not mutate assignments with a function call right on the right' => [
+            <<<'PHP'
+<?php
+
+$this->z = bar($a->bar())->z()->q();
+PHP
+        ];
+
+        yield 'It does not mutate statements with new instance created' => [
+            <<<'PHP'
+<?php
+$this->z = $a ?? new A($this->b());
+PHP
+        ];
+
+        yield 'It does not mutate assignments with a static call right on the right' => [
+            <<<'PHP'
+<?php
+$this->z = self::foo($a->bar());
+PHP
+        ];
+
         yield 'It does not mutate scalar assignments' => [
             <<<'PHP'
 <?php
@@ -112,6 +134,14 @@ PHP
 <?php
 
 $a = $b;
+PHP
+        ];
+
+        yield 'It does not mutate array value assignments' => [
+            <<<'PHP'
+<?php
+
+$a = $b['foo']['bar'];
 PHP
         ];
 

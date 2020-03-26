@@ -74,6 +74,7 @@ final class ExpressionRepeat implements Mutator
             return false;
         }
 
+        // Skip statements with almost no side effects.
         return $node->getAttribute(SideEffectPredictorVisitor::HAS_NODES_WITH_SIDE_EFFECTS_KEY, false);
     }
 }

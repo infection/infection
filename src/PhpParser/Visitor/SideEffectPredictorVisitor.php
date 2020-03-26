@@ -48,13 +48,24 @@ final class SideEffectPredictorVisitor extends NodeVisitorAbstract
     /**
      * @var bool
      */
-    private $hasNodesWithSideEffects = false;
+    private $seenMethodCall = false;
+
+    /**
+     * @var bool
+     */
+    private $seenNonMethodCall = false;
 
     public function enterNode(Node $node): ?Node
     {
-        if ($this->hasNodesWithSideEffects === false) {
-            // For now we only track method calls as having side effects.
-            $this->hasNodesWithSideEffects = $node instanceof Node\Expr\MethodCall;
+        if ($this->seenMethodCall === false) {
+            $this->seenMethodCall = $node instanceof Node\Expr\MethodCall;
+        }
+
+        if ($this->seenNonMethodCall === false) {
+            $this->seenNonMethodCall = $node instanceof Node\Expr\FuncCall
+                || $node instanceof Node\Expr\StaticCall
+                || $node instanceof Node\Expr\New_
+            ;
         }
 
         return null;
@@ -63,8 +74,12 @@ final class SideEffectPredictorVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node): ?Node
     {
         if ($node instanceof Node\Stmt\Expression) {
-            $node->setAttribute(self::HAS_NODES_WITH_SIDE_EFFECTS_KEY, $this->hasNodesWithSideEffects);
-            $this->hasNodesWithSideEffects = false;
+            $node->setAttribute(
+                self::HAS_NODES_WITH_SIDE_EFFECTS_KEY,
+                $this->seenMethodCall && !$this->seenNonMethodCall
+            );
+            $this->seenMethodCall = false;
+            $this->seenNonMethodCall = false;
         }
 
         return null;
