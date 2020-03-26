@@ -129,6 +129,14 @@ $a = null;
 PHP
         ];
 
+        yield 'It does not mutate array assignments' => [
+            <<<'PHP'
+<?php
+
+$a = [];
+PHP
+        ];
+
         yield 'It does not mutate variable assignments' => [
             <<<'PHP'
 <?php
