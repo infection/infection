@@ -41,7 +41,6 @@ use const PHP_EOL;
 use function Safe\sprintf;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -52,9 +51,6 @@ final class MemoryLimiter
     private $phpIniPath;
     private $environment;
 
-    /**
-     * @param string|false $phpIniPath
-     */
     public function __construct(
         Filesystem $fileSystem,
         string $phpIniPath,

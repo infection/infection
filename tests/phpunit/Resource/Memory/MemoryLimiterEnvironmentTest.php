@@ -37,12 +37,11 @@ namespace Infection\Tests\Resource\Memory;
 
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
-use function ini_set;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\ini_get;
-use function Safe\sprintf;
+use function Safe\ini_set;
 
 /**
  * @group integration
@@ -76,13 +75,7 @@ final class MemoryLimiterEnvironmentTest extends TestCase
      */
     public function test_it_can_detect_if_a_memory_limit_is_set(string $memoryLimit, bool $expected): void
     {
-        $result = ini_set('memory_limit', $memoryLimit);
-
-        // Sanity check
-        $this->assertNotFalse(
-            $result,
-            sprintf('Expected to be able to set the memory limit to "%s"', $memoryLimit)
-        );
+        ini_set('memory_limit', $memoryLimit);
 
         $this->assertSame($expected, $this->environment->hasMemoryLimitSet());
     }
