@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Exception;
+use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
@@ -83,7 +84,10 @@ final class RunCommand extends BaseCommand
                 'test-framework',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Name of the Test framework to use (' . implode(', ', TestFrameworkTypes::TYPES) . ')',
+                sprintf(
+                    'Name of the Test framework to use ("%s")',
+                    implode('", "', TestFrameworkTypes::TYPES)
+                ),
                 ''
             )
             ->addOption(
@@ -96,7 +100,7 @@ final class RunCommand extends BaseCommand
                 'threads',
                 'j',
                 InputOption::VALUE_REQUIRED,
-                'Threads count',
+                'Number of threads to use by the runner when executing the mutations',
                 '1'
             )
             ->addOption(
@@ -109,7 +113,7 @@ final class RunCommand extends BaseCommand
                 'show-mutations',
                 's',
                 InputOption::VALUE_NONE,
-                'Show mutations to the console'
+                'Show escaped (and non-covered in verbose mode) mutations to the console'
             )
             ->addOption(
                 'no-progress',
@@ -121,19 +125,19 @@ final class RunCommand extends BaseCommand
                 'configuration',
                 'c',
                 InputOption::VALUE_REQUIRED,
-                'Custom configuration file path'
+                'Path to the configuration file to use'
             )
             ->addOption(
                 'coverage',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Path to existing coverage (`xml` and `junit` reports are required)'
+                'Path to existing coverage directory'
             )
             ->addOption(
                 'mutators',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Specify particular mutators. Example: --mutators=Plus,PublicVisibility'
+                'Specify particular mutators, e.g. "--mutators=Plus,PublicVisibility"'
             )
             ->addOption(
                 'filter',
@@ -146,39 +150,39 @@ final class RunCommand extends BaseCommand
                 'formatter',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Output formatter. Possible values: dot, progress',
+                '"dot" or "progress"',
                 'dot'
             )
             ->addOption(
                 'min-msi',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Minimum Mutation Score Indicator (MSI) percentage value. Should be used in CI server.'
+                'Minimum Mutation Score Indicator (MSI) percentage value'
             )
             ->addOption(
                 'min-covered-msi',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Minimum Covered Code Mutation Score Indicator (MSI) percentage value. Should be used in CI server.'
+                'Minimum Covered Code Mutation Score Indicator (MSI) percentage value'
             )
             ->addOption(
                 'log-verbosity',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Log verbosity level. \'all\' - full logs format, \'default\' - short logs format, \'none\' - no logs.',
+                '"all" - full logs format, "default" - short logs format, "none" - no logs',
                 LogVerbosity::NORMAL
             )
             ->addOption(
                 'initial-tests-php-options',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Extra php options for the initial test runner. Will be ignored if --coverage option presented.'
+                'PHP options passed to the PHP executable when executing the initial tests. Will be ignored if "--coverage" option presented'
             )
             ->addOption(
                 'skip-initial-tests',
                 null,
                 InputOption::VALUE_NONE,
-                'Skips the initial test runs - requires the coverage to be provided via the --coverage option.'
+                'Skips the initial test runs. Requires the coverage to be provided via the "--coverage" option'
             )
             ->addOption(
                 'ignore-msi-with-no-mutations',
@@ -190,13 +194,13 @@ final class RunCommand extends BaseCommand
                 'debug',
                 null,
                 InputOption::VALUE_NONE,
-                'Debug mode. Will not clean up Infection temporary folder.'
+                'Will not clean up Infection temporary folder'
             )
             ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
-                'Dry run. Will not clean up Infection temporary folder.'
+                'Will not apply the mutations'
             )
         ;
     }
