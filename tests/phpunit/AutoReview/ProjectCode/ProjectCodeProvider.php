@@ -59,6 +59,7 @@ use Infection\Http\StrykerCurlClient;
 use Infection\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
@@ -104,6 +105,7 @@ final class ProjectCodeProvider
         AdapterInstaller::class,
         DetectionStatus::class,
         DummyFileSystem::class,
+        MutationAttributeKeys::class,
     ];
 
     /**
