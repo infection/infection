@@ -110,7 +110,7 @@ final class Application extends BaseApplication
         return self::LOGO . parent::getHelp();
     }
 
-    protected function getDefaultCommands()
+    protected function getDefaultCommands(): array
     {
         $commands = array_merge(
             parent::getDefaultCommands(),

@@ -41,6 +41,7 @@ use function Safe\ini_get;
 
 /**
  * @internal
+ * @final
  */
 class MemoryLimiterEnvironment
 {
