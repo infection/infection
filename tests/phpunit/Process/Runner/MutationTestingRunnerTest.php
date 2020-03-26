@@ -48,7 +48,7 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Process\Builder\MutantProcessFactory;
+use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
@@ -68,7 +68,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class MutationTestingRunnerTest extends TestCase
 {
     /**
-     * @var MutantProcessFactory|MockObject
+     * @var \Infection\Process\Factory\MutantProcessFactory|MockObject
      */
     private $processFactoryMock;
 

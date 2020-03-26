@@ -33,25 +33,55 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Builder;
+namespace Infection\Process\Factory;
 
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\TestCase;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Process\XdebugProcess;
+use function method_exists;
+use Symfony\Component\Process\Process;
 
-final class InitialTestRunProcessBuilderTest extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class InitialTestRunProcessFactory
 {
-    public function test_it_creates_a_process_with_no_timeout(): void
+    private $testFrameworkAdapter;
+
+    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
     {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getInitialTestRunCommandLine')
-            ->willReturn(['/usr/bin/php']);
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
+    }
 
-        $builder = new InitialTestRunProcessBuilder($fwAdapter);
+    /**
+     * Creates process with enabled debugger as test framework is going to use in the code coverage.
+     *
+     * @param string[] $phpExtraOptions
+     */
+    public function createProcess(
+        string $testFrameworkExtraOptions,
+        bool $skipCoverage,
+        array $phpExtraOptions = []
+    ): Process {
+        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
+        $processType = $skipCoverage ? Process::class : XdebugProcess::class;
 
-        $process = $builder->createProcess('', false);
+        /** @var Process $process */
+        $process = new $processType(
+            $this->testFrameworkAdapter->getInitialTestRunCommandLine(
+                $testFrameworkExtraOptions,
+                $phpExtraOptions,
+                $skipCoverage
+            )
+        );
 
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertNull($process->getTimeout());
+        $process->setTimeout(null); // Ignore the default timeout of 60 seconds
+
+        if (method_exists($process, 'inheritEnvironmentVariables')) {
+            // In version 4.4.0 this method is deprecated and removed in 5.0.0
+            $process->inheritEnvironmentVariables();
+        }
+
+        return $process;
     }
 }

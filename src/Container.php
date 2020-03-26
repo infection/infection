@@ -73,9 +73,9 @@ use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Process\Builder\MutantProcessFactory;
 use Infection\Process\Builder\SubscriberBuilder;
+use Infection\Process\Factory\InitialTestRunProcessFactory;
+use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -420,8 +420,8 @@ final class Container
                     $config->shouldSkipCoverage()
                 );
             },
-            InitialTestRunProcessBuilder::class => static function (self $container): InitialTestRunProcessBuilder {
-                return new InitialTestRunProcessBuilder(
+            InitialTestRunProcessFactory::class => static function (self $container): InitialTestRunProcessFactory {
+                return new InitialTestRunProcessFactory(
                     $container->getTestFrameworkAdapter()
                 );
             },
@@ -824,9 +824,9 @@ final class Container
         return $this->get(TestFrameworkAdapter::class);
     }
 
-    public function getInitialTestRunProcessBuilder(): InitialTestRunProcessBuilder
+    public function getInitialTestRunProcessBuilder(): InitialTestRunProcessFactory
     {
-        return $this->get(InitialTestRunProcessBuilder::class);
+        return $this->get(InitialTestRunProcessFactory::class);
     }
 
     public function getInitialTestsRunner(): InitialTestsRunner

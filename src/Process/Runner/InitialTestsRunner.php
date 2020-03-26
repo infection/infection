@@ -39,7 +39,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\Process\Factory\InitialTestRunProcessFactory;
 use Symfony\Component\Process\Process;
 
 /**
@@ -50,7 +50,7 @@ final class InitialTestsRunner
     private $processBuilder;
     private $eventDispatcher;
 
-    public function __construct(InitialTestRunProcessBuilder $processBuilder, EventDispatcher $eventDispatcher)
+    public function __construct(InitialTestRunProcessFactory $processBuilder, EventDispatcher $eventDispatcher)
     {
         $this->processBuilder = $processBuilder;
         $this->eventDispatcher = $eventDispatcher;
