@@ -65,7 +65,7 @@ class InitialTestRunProcessBuilder
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
         $processType = $skipCoverage ? Process::class : XdebugProcess::class;
 
-        /** @var XdebugProcess|Process $process */
+        /** @var Process $process */
         $process = new $processType(
             $this->testFrameworkAdapter->getInitialTestRunCommandLine(
                 $testFrameworkExtraOptions,
