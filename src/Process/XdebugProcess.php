@@ -49,6 +49,9 @@ use Symfony\Component\Process\Process;
  */
 final class XdebugProcess extends Process
 {
+    /**
+     * @param array<string|bool>|null $env
+     */
     public function start(?callable $callback = null, ?array $env = null): void
     {
         $phpConfig = new PhpConfig();
