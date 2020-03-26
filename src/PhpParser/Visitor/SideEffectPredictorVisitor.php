@@ -33,47 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Augmentation;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\SideEffectPredictorVisitor;
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
  */
-final class ExpressionRepeat implements Mutator
+final class SideEffectPredictorVisitor extends NodeVisitorAbstract
 {
-    use GetMutatorName;
-
-    public static function getDefinition(): ?Definition
-    {
-        return new Definition(
-            'Duplicates an expression statement, provided it can have side-effects.',
-            MutatorCategory::SEMANTIC_ADDITION,
-            null
-        );
-    }
+    public const HAS_NODES_WITH_SIDE_EFFECTS_KEY = 'withSideEffects';
 
     /**
-     * @param Node\Stmt\Expression $node
-     *
-     * @return iterable<array<Node\Stmt\Expression>>
+     * @var bool
      */
-    public function mutate(Node $node): iterable
-    {
-        yield [$node, $node];
-    }
+    private $hasNodesWithSideEffects = false;
 
-    public function canMutate(Node $node): bool
+    public function enterNode(Node $node): ?Node
     {
-        if (!$node instanceof Node\Stmt\Expression) {
-            return false;
+        if ($this->hasNodesWithSideEffects === false) {
+            // For now we only track method calls as having side effects.
+            $this->hasNodesWithSideEffects = $node instanceof Node\Expr\MethodCall;
         }
 
-        return $node->getAttribute(SideEffectPredictorVisitor::HAS_NODES_WITH_SIDE_EFFECTS_KEY, false);
+        return null;
+    }
+
+    public function leaveNode(Node $node): ?Node
+    {
+        if ($node instanceof Node\Stmt\Expression) {
+            $node->setAttribute(self::HAS_NODES_WITH_SIDE_EFFECTS_KEY, $this->hasNodesWithSideEffects);
+            $this->hasNodesWithSideEffects = false;
+        }
+
+        return null;
     }
 }

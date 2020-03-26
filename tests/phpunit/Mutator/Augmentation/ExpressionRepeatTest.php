@@ -83,6 +83,14 @@ PHP
             ,
         ];
 
+        yield 'It does not mutate complex statement without method calls' => [
+            <<<'PHP'
+<?php
+
+$z = $b::bar() + [1 => $c::foo()] && strpos('a', 'b');
+PHP
+        ];
+
         yield 'It does not mutate scalar assignments' => [
             <<<'PHP'
 <?php

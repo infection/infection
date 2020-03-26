@@ -42,6 +42,7 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\SideEffectPredictorVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
@@ -74,6 +75,7 @@ class NodeTraverserFactory
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
+        $traverser->addVisitor(new SideEffectPredictorVisitor());
         $traverser->addVisitor($mutationVisitor);
 
         return $traverser;
