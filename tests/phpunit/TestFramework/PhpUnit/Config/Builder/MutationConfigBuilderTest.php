@@ -532,12 +532,12 @@ PHP
                 new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #5',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                    0.086178
+                    0.861780
                 ),
                 new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #6',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                    0.086178
+                    0.861780
                 ),
                 new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_id',
@@ -561,12 +561,12 @@ PHP
                 new TestLocation(
                     'Path\\To\\A::test_a',
                     '/path/to/A.php',
-                    0.186178
+                    0.586178
                 ),
                 new TestLocation(
                     'Path\\To\\B::test_b',
                     '/path/to/B.php',
-                    0.086178
+                    0.186178
                 ),
                 new TestLocation(
                     'Path\\To\\C::test_c',

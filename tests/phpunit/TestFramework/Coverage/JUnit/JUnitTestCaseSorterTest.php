@@ -37,6 +37,8 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
+use function iterator_to_array;
+use function log;
 use PHPUnit\Framework\TestCase;
 
 final class JUnitTestCaseSorterTest extends TestCase
@@ -53,12 +55,9 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         $sorter = new JUnitTestCaseSorter();
 
-        $uniqueSortedFileNames = iterator_to_array(
-            $sorter->getUniqueSortedFileNames($coverageTestCases)
-        );
+        $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
 
-        $this->assertCount(1, $uniqueSortedFileNames);
-        $this->assertSame('/path/to/test-file-1', $uniqueSortedFileNames[0]);
+        $this->assertSame(['/path/to/test-file-1'], $uniqueSortedFileNames);
     }
 
     public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
@@ -67,12 +66,12 @@ final class JUnitTestCaseSorterTest extends TestCase
             new TestLocation(
                 'testMethod1',
                 '/path/to/test-file-1',
-                0.000234
+                0.500234
             ),
             new TestLocation(
                 'testMethod2',
                 '/path/to/test-file-2',
-                0.600221
+                0.900221
             ),
             new TestLocation(
                 'testMethod3_1',
@@ -81,8 +80,8 @@ final class JUnitTestCaseSorterTest extends TestCase
             ),
             new TestLocation(
                 'testMethod3_2',
-                '/path/to/test-file-3',
-                0.010022
+                '/path/to/test-file-4',
+                0.210022
             ),
         ];
 
@@ -90,10 +89,27 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         $uniqueSortedFileNames = iterator_to_array(
             $sorter->getUniqueSortedFileNames($coverageTestCases),
-            true
+            false
         );
 
-        $this->assertCount(3, $uniqueSortedFileNames);
-        $this->assertSame('/path/to/test-file-3', $uniqueSortedFileNames[0]);
+        $this->assertSame(
+            [
+                '/path/to/test-file-3',
+                '/path/to/test-file-4',
+                '/path/to/test-file-1',
+                '/path/to/test-file-2',
+            ],
+            $uniqueSortedFileNames
+        );
+    }
+
+    public function test_it_has_correct_constants_for_bucket_sort(): void
+    {
+        $this->assertLessThan(
+            // Quicksort's average O(n log n)
+            JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * log(JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER),
+            // Bucket Sort's average O(n + k)
+            JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER + JUnitTestCaseSorter::BUCKETS_COUNT
+        );
     }
 }
