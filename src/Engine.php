@@ -64,7 +64,7 @@ final class Engine
     private $coverageChecker;
     private $eventDispatcher;
     private $initialTestsRunner;
-    private $memoryLimitApplier;
+    private $memoryLimiter;
     private $mutationGenerator;
     private $mutationTestingRunner;
     private $minMsiChecker;
@@ -78,7 +78,7 @@ final class Engine
         CoverageChecker $coverageChecker,
         EventDispatcher $eventDispatcher,
         InitialTestsRunner $initialTestsRunner,
-        MemoryLimiter $memoryLimitApplier,
+        MemoryLimiter $memoryLimiter,
         MutationGenerator $mutationGenerator,
         MutationTestingRunner $mutationTestingRunner,
         MinMsiChecker $minMsiChecker,
@@ -91,7 +91,7 @@ final class Engine
         $this->coverageChecker = $coverageChecker;
         $this->eventDispatcher = $eventDispatcher;
         $this->initialTestsRunner = $initialTestsRunner;
-        $this->memoryLimitApplier = $memoryLimitApplier;
+        $this->memoryLimiter = $memoryLimiter;
         $this->mutationGenerator = $mutationGenerator;
         $this->mutationTestingRunner = $mutationTestingRunner;
         $this->minMsiChecker = $minMsiChecker;
@@ -143,7 +143,9 @@ final class Engine
             $initialTestSuitProcess->getOutput()
         );
 
-        $this->memoryLimitApplier->applyMemoryLimitFromProcess($initialTestSuitProcess, $this->adapter);
+        // Limit the memory used for the mutation processes based on the memory used for the initial
+        // test run
+        $this->memoryLimiter->limitMemory($initialTestSuitProcess->getOutput(), $this->adapter);
     }
 
     private function runMutationAnalysis(): void

@@ -35,18 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Memory;
 
-use Composer\XdebugHandler\XdebugHandler;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use function is_string;
 use const PHP_EOL;
-use const PHP_SAPI;
-use function Safe\ini_get;
 use function Safe\sprintf;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -54,33 +49,32 @@ use Webmozart\Assert\Assert;
 final class MemoryLimiter
 {
     private $fileSystem;
-    private $iniLocation;
+    private $phpIniPath;
     private $environment;
 
     /**
-     * @param string|false $iniLocation
+     * @param string|false $phpIniPath
      */
-    public function __construct(Filesystem $fileSystem, $iniLocation, ?MemoryLimiterEnvironment $environment = null)
-    {
-        if (!is_string($iniLocation)) {
-            Assert::false(
-                $iniLocation,
-                'Expected the iniLocation to either be a string or false. Got "%s"'
-            );
-        }
-
+    public function __construct(
+        Filesystem $fileSystem,
+        string $phpIniPath,
+        MemoryLimiterEnvironment $environment
+    ) {
         $this->fileSystem = $fileSystem;
-        $this->iniLocation = (string) $iniLocation;
-        $this->environment = $environment ?? new MemoryLimiterEnvironment();
+        $this->phpIniPath = $phpIniPath;
+        $this->environment = $environment;
     }
 
-    public function applyMemoryLimitFromProcess(Process $process, TestFrameworkAdapter $adapter): void
+    public function limitMemory(string $processOutput, TestFrameworkAdapter $adapter): void
     {
-        if (!$adapter instanceof MemoryUsageAware || $this->environment->hasMemoryLimitSet() || $this->environment->isUsingSystemIni()) {
+        if (!$adapter instanceof MemoryUsageAware
+            || $this->environment->hasMemoryLimitSet()
+            || $this->environment->isUsingSystemIni()
+        ) {
             return;
         }
 
-        $tmpConfigPath = $this->iniLocation;
+        $tmpConfigPath = $this->phpIniPath;
 
         if ($tmpConfigPath === '') {
             // Cannot add a memory limit: there is no php.ini file
@@ -92,9 +86,9 @@ final class MemoryLimiter
             return;
         }
 
-        $memoryLimit = $adapter->getMemoryUsed($process->getOutput());
+        $memoryLimit = $adapter->getMemoryUsed($processOutput);
 
-        if ($memoryLimit < 0) {
+        if ($memoryLimit === -1.) {
             // Cannot detect memory used, not setting any limits
             return;
         }
@@ -115,22 +109,8 @@ final class MemoryLimiter
                 $tmpConfigPath,
                 PHP_EOL . sprintf('memory_limit = %dM', $memoryLimit)
             );
-        } catch (IOException $e) {
+        } catch (IOException $exception) {
             // Cannot add a memory limit: file is not writable
         }
-    }
-
-    private function hasMemoryLimitSet(): bool
-    {
-        // -1 means no memory limit. Anything else means the user has set their own limits, which we
-        // don't want to mess with
-        return ini_get('memory_limit') !== '-1';
-    }
-
-    private function isUsingSystemIni(): bool
-    {
-        // Under phpdbg we're using a system php.ini and we can't add a memory limit there. If there
-        // is no skipped version of xdebug handler we are also using the system php ini
-        return PHP_SAPI === 'phpdbg' || XdebugHandler::getSkippedVersion() === '';
     }
 }
