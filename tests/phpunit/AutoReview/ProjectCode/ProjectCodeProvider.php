@@ -49,6 +49,7 @@ use Infection\Console\Application;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
+use Infection\Console\XdebugHandler;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\FileSystem\DummyFileSystem;
@@ -106,6 +107,7 @@ final class ProjectCodeProvider
         DetectionStatus::class,
         DummyFileSystem::class,
         MutationAttributeKeys::class,
+        XdebugHandler::class,
     ];
 
     /**

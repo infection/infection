@@ -43,6 +43,7 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
+use Infection\Console\XdebugHandler;
 use Infection\Container;
 use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasStarted;
@@ -55,6 +56,7 @@ use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
@@ -226,6 +228,8 @@ final class RunCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        XdebugHandler::check(new ConsoleLogger($output));
+
         $io = new SymfonyStyle($input, $output);
 
         $this->startUp();

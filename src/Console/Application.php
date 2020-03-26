@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Composer\XdebugHandler\XdebugHandler;
 use function extension_loaded;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\RunCommand;
@@ -63,8 +62,6 @@ final class Application extends BaseApplication
     private const NAME = 'Infection - PHP Mutation Testing Framework';
 
     private const PACKAGE_NAME = 'infection/infection';
-
-    private const INFECTION_PREFIX = 'INFECTION';
 
     private const LOGO = '
     ____      ____          __  _
@@ -129,10 +126,6 @@ final class Application extends BaseApplication
 
             return parent::run($input, $output);
         }
-
-        (new XdebugHandler(self::INFECTION_PREFIX, '--ansi'))
-            ->setPersistent()
-            ->check();
 
         return parent::run($input, $output);
     }
