@@ -44,7 +44,7 @@ use Symfony\Component\Process\Process;
  * @internal
  * @final
  */
-class InitialTestRunProcessFactory
+class InitialTestsRunProcessFactory
 {
     private $testFrameworkAdapter;
 
@@ -60,8 +60,8 @@ class InitialTestRunProcessFactory
      */
     public function createProcess(
         string $testFrameworkExtraOptions,
-        bool $skipCoverage,
-        array $phpExtraOptions = []
+        array $phpExtraOptions,
+        bool $skipCoverage
     ): Process {
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
         $processType = $skipCoverage ? Process::class : XdebugProcess::class;

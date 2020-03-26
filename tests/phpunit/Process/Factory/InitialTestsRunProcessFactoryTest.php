@@ -36,13 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\Factory\InitialTestRunProcessFactory;
+use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\XdebugProcess;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-final class InitialTestRunProcessFactoryTest extends TestCase
+final class InitialTestsRunProcessFactoryTest extends TestCase
 {
     /**
      * @var TestFrameworkAdapter|MockObject
@@ -50,7 +50,7 @@ final class InitialTestRunProcessFactoryTest extends TestCase
     private $testFrameworkAdapterMock;
 
     /**
-     * @var InitialTestRunProcessFactory
+     * @var InitialTestsRunProcessFactory
      */
     private $factory;
 
@@ -58,7 +58,7 @@ final class InitialTestRunProcessFactoryTest extends TestCase
     {
         $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
 
-        $this->factory = new InitialTestRunProcessFactory($this->testFrameworkAdapterMock);
+        $this->factory = new InitialTestsRunProcessFactory($this->testFrameworkAdapterMock);
     }
 
     public function test_it_creates_a_process_with_coverage_skipped(): void
@@ -74,8 +74,8 @@ final class InitialTestRunProcessFactoryTest extends TestCase
 
         $process = $this->factory->createProcess(
             $testFrameworkExtraOptions,
-            true,
-            $phpExtraOptions
+            $phpExtraOptions,
+            true
         );
 
         if (PHP_OS_FAMILY === 'Windows') {
@@ -101,8 +101,8 @@ final class InitialTestRunProcessFactoryTest extends TestCase
 
         $process = $this->factory->createProcess(
             $testFrameworkExtraOptions,
-            false,
-            $phpExtraOptions
+            $phpExtraOptions,
+            false
         );
 
         if (PHP_OS_FAMILY === 'Windows') {

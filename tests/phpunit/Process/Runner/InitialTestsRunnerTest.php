@@ -35,50 +35,128 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
+use function array_map;
 use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
-use Infection\Process\Factory\InitialTestRunProcessFactory;
+use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\InputStream;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
+/**
+ * @group integration
+ */
 final class InitialTestsRunnerTest extends TestCase
 {
-    public function test_it_dispatches_events(): void
+    /**
+     * @var string
+     */
+    private static $phpBin;
+
+    /**
+     * @var InitialTestsRunProcessFactory|MockObject
+     */
+    private $processFactoryMock;
+
+    /**
+     * @var EventDispatcherCollector
+     */
+    private $eventDispatcher;
+
+    /**
+     * @var InitialTestsRunner
+     */
+    private $runner;
+
+    public static function setUpBeforeClass(): void
     {
-        /** @var MockObject|Process $process */
-        $process = $this->createMock(Process::class);
+        self::$phpBin = (new PhpExecutableFinder())->find();
+    }
 
-        $process->expects($this->once())
-            ->method('run')
-            ->with($this->callback(static function ($processCallback): bool {
-                $processCallback(Process::OUT);
+    protected function setUp(): void
+    {
+        $this->processFactoryMock = $this->createMock(InitialTestsRunProcessFactory::class);
 
-                return true;
-            }));
-        $process->expects($this->once())
-            ->method('getOutput')
-            ->willReturn('foo');
+        $this->eventDispatcher = new EventDispatcherCollector();
 
-        $processBuilder = $this->createMock(InitialTestRunProcessFactory::class);
-        $processBuilder->method('createProcess')
-            ->with('', false, [])
-            ->willReturn($process);
+        $this->runner = new InitialTestsRunner($this->processFactoryMock, $this->eventDispatcher);
+    }
 
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher->expects($this->exactly(3))
-            ->method('dispatch')
-            ->withConsecutive(
-                [$this->isInstanceOf(InitialTestSuiteWasStarted::class)],
-                [$this->isInstanceOf(InitialTestCaseWasCompleted::class)],
-                [$this->isInstanceOf(InitialTestSuiteWasFinished::class)]
-            );
+    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
+    {
+        $testFrameworkExtraOptions = '--stop-on-failure';
+        $phpExtraOptions = ['-d memory_limit=-1'];
+        $skipCoverage = false;
 
-        $testRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
+        $process = $this->createProcessForCode(<<<STR
+echo 'ping';
+sleep(1);
+echo 'pong';
+STR
+        );
 
-        $testRunner->run('', false);
+        $this->processFactoryMock
+            ->method('createProcess')
+            ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
+            ->willReturn($process)
+        ;
+
+        $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+
+        $this->assertSame(
+            [
+                InitialTestSuiteWasStarted::class,
+                InitialTestCaseWasCompleted::class,
+                InitialTestCaseWasCompleted::class,
+                InitialTestSuiteWasFinished::class,
+            ],
+            array_map('get_class', $this->eventDispatcher->getEvents())
+        );
+    }
+
+    public function test_it_stops_the_process_execution_on_the_first_error(): void
+    {
+        $testFrameworkExtraOptions = '--stop-on-failure';
+        $phpExtraOptions = ['-d memory_limit=-1'];
+        $skipCoverage = false;
+
+        $input = new InputStream();
+
+        $process = $this->createProcessForCode(<<<STR
+fwrite(STDOUT, 123);
+fwrite(STDERR, 321);
+fwrite(STDOUT, 123);
+fwrite(STDERR, 321);
+STR
+        );
+        $process->setInput($input);
+
+        $this->processFactoryMock
+            ->method('createProcess')
+            ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
+            ->willReturn($process)
+        ;
+
+        $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+
+        $this->assertSame(
+            [
+                InitialTestSuiteWasStarted::class,
+                InitialTestCaseWasCompleted::class,
+                InitialTestCaseWasCompleted::class,
+                InitialTestSuiteWasFinished::class,
+            ],
+            array_map('get_class', $this->eventDispatcher->getEvents())
+        );
+    }
+
+    private function createProcessForCode(string $code): Process
+    {
+        return new Process([self::$phpBin, '-r', $code]);
     }
 }
