@@ -162,10 +162,8 @@ final class Container
             TmpDirProvider::class => static function (): TmpDirProvider {
                 return new TmpDirProvider();
             },
-            IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
-                return new IndexXmlCoverageParser(
-                    $container->getConfiguration()->getCoveragePath(),
-                );
+            IndexXmlCoverageParser::class => static function (): IndexXmlCoverageParser {
+                return new IndexXmlCoverageParser();
             },
             XmlCoverageParser::class => static function (): XmlCoverageParser {
                 // TODO XmlCoverageParser might want to notify ProcessRunner if it can't parse another file due to lack of RAM
@@ -590,7 +588,7 @@ final class Container
         return $this->defaultJUnitPath ?? $this->defaultJUnitPath = sprintf(
             '%s/%s',
             Path::canonicalize(
-                $this->getConfiguration()->getCoveragePath() . '/..'
+                $this->getConfiguration()->getCoveragePath()
             ),
             'junit.xml'
         );

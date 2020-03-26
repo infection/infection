@@ -42,7 +42,6 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
 use const PHP_OS_FAMILY;
 use function Safe\chdir;
-use function Safe\mkdir;
 use function Safe\realpath;
 use function Safe\sprintf;
 use function Safe\touch;
@@ -65,9 +64,8 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         // Move to the temporary directory: we want to make sure the setUp closures are executed
         // there since they do not have access to the tmp yet, so their paths are relative
         chdir($this->tmp);
-        mkdir($this->tmp . '/coverage-xml');
 
-        $this->locator = new IndexXmlCoverageLocator($this->tmp . '/coverage-xml');
+        $this->locator = new IndexXmlCoverageLocator($this->tmp);
     }
 
     protected function tearDown(): void
@@ -79,7 +77,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_index_file(): void
     {
-        touch('coverage-xml/index.xml');
+        (new Filesystem())->dumpFile('coverage-xml/index.xml', '');
 
         $expected = normalizePath(realpath($this->tmp . '/coverage-xml/index.xml'));
 
@@ -94,7 +92,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
             $this->markTestSkipped('Cannot test this on case-sensitive OS');
         }
 
-        touch('coverage-xml/INDEX.XML');
+        (new Filesystem())->dumpFile('coverage-xml/INDEX.XML', '');
 
         $expected = normalizePath(realpath($this->tmp . '/coverage-xml/index.xml'));
 
@@ -120,8 +118,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     public function test_it_cannot_locate_the_index_file_if_the_result_is_ambiguous(): void
     {
         touch('index.xml');
-        mkdir('sub-dir');
-        touch('sub-dir/index.xml');
+        (new Filesystem())->dumpFile('sub-dir/index.xml', '');
 
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
@@ -146,12 +143,12 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_cannot_locate_the_index_file_in_a_non_existent_coverage_directory(): void
     {
-        $this->locator = new IndexXmlCoverageLocator($this->tmp . '/unknown/sub-dir');
+        $this->locator = new IndexXmlCoverageLocator($this->tmp . '/unknown-dir');
 
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not find any "index.xml" file in "%s"',
-            $this->tmp . '/unknown'
+            $this->tmp . '/unknown-dir'
         ));
 
         $this->locator->locate();

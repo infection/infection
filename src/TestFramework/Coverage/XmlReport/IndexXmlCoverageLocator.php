@@ -63,8 +63,8 @@ class IndexXmlCoverageLocator
 
     public function __construct(string $coveragePath)
     {
-        $this->coveragePath = Path::canonicalize($coveragePath . '/..');
-        $this->defaultIndexPath = Path::canonicalize($coveragePath . '/index.xml');
+        $this->coveragePath = $coveragePath;
+        $this->defaultIndexPath = Path::canonicalize($coveragePath . '/coverage-xml/index.xml');
     }
 
     /**

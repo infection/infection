@@ -63,12 +63,6 @@ class ConfigurationFactory
      */
     private const DEFAULT_TIMEOUT = 10;
 
-    private const TEST_FRAMEWORK_COVERAGE_DIRECTORY = [
-        TestFrameworkTypes::PHPUNIT => 'coverage-xml',
-        TestFrameworkTypes::PHPSPEC => TestFrameworkTypes::PHPSPEC . '-coverage-xml',
-        TestFrameworkTypes::CODECEPTION => TestFrameworkTypes::CODECEPTION . '-coverage-xml',
-    ];
-
     private $tmpDirProvider;
     private $mutatorResolver;
     private $mutatorFactory;
@@ -142,7 +136,7 @@ class ConfigurationFactory
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
-            self::retrieveCoveragePath($coverageBasePath, $testFramework),
+            $coverageBasePath,
             $skipCoverage,
             $skipInitialTests,
             $debug,
@@ -212,19 +206,6 @@ class ConfigurationFactory
 
         return $this->mutatorFactory->create(
             $this->mutatorResolver->resolve($mutatorsList)
-        );
-    }
-
-    private static function retrieveCoveragePath(
-        string $coverageBasePath,
-        string $testFramework
-    ): string {
-        Assert::keyExists(self::TEST_FRAMEWORK_COVERAGE_DIRECTORY, $testFramework);
-
-        return sprintf(
-            '%s/%s',
-            $coverageBasePath,
-            self::TEST_FRAMEWORK_COVERAGE_DIRECTORY[$testFramework]
         );
     }
 
