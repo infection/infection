@@ -43,6 +43,7 @@ use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\SideEffectPredictorVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
@@ -74,6 +75,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 ParentConnectorVisitor::class,
                 FullyQualifiedClassNameVisitor::class,
                 ReflectionVisitor::class,
+                SideEffectPredictorVisitor::class,
                 FakeVisitor::class,
             ],
             $visitors
@@ -101,6 +103,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 ParentConnectorVisitor::class,
                 FullyQualifiedClassNameVisitor::class,
                 ReflectionVisitor::class,
+                SideEffectPredictorVisitor::class,
                 FakeVisitor::class,
             ],
             $visitorClasses
