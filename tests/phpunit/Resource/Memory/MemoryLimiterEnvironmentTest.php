@@ -39,36 +39,116 @@ use Composer\XdebugHandler\XdebugHandler;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use function Safe\ini_get;
+use function Safe\ini_set;
 
 /**
  * @group integration
  */
 final class MemoryLimiterEnvironmentTest extends TestCase
 {
-    public function test_it_recognizes_memory_limit(): void
+    /**
+     * @var string|null
+     */
+    private $originalMemoryLimit;
+
+    /**
+     * @var MemoryLimiterEnvironment
+     */
+    private $environment;
+
+    protected function setUp(): void
     {
-        $environment = new MemoryLimiterEnvironment();
-        $this->assertSame(ini_get('memory_limit') !== '-1', $environment->hasMemoryLimitSet());
+        $this->originalMemoryLimit = ini_get('memory_limit');
+
+        $this->environment = new MemoryLimiterEnvironment();
     }
 
-    public function test_it_detects_phpdbg(): void
+    protected function tearDown(): void
+    {
+        ini_set('memory_limit', $this->originalMemoryLimit);
+    }
+
+    /**
+     * @dataProvider memoryLimitProvider
+     */
+    public function test_it_can_detect_if_a_memory_limit_is_set(string $memoryLimit, bool $expected): void
+    {
+        ini_set('memory_limit', $memoryLimit);
+
+        $this->assertSame($expected, $this->environment->hasMemoryLimitSet());
+    }
+
+    public function test_it_uses_the_system_ini_if_PHPDBG_is_enabled(): void
     {
         if (PHP_SAPI !== 'phpdbg') {
             $this->markTestSkipped('This test requires PHPDBG');
         }
 
-        $environment = new MemoryLimiterEnvironment();
-        $this->assertTrue($environment->isUsingSystemIni());
+        $this->assertTrue($this->environment->isUsingSystemIni());
     }
 
-    public function test_it_detects_xdebug_handler(): void
+    public function test_it_uses_the_system_ini_if_Xdebug_handler_is_not_detected(): void
     {
         if (PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('This test requires running without PHPDBG');
         }
 
-        $environment = new MemoryLimiterEnvironment();
-        $this->assertSame(XdebugHandler::getSkippedVersion() === '', $environment->isUsingSystemIni());
+        // We don't expect the Xdebug handler to be executed for the tests hence
+        // there is no need to disable it here
+        $this->assertTrue($this->environment->isUsingSystemIni());
+    }
+
+    public function test_it_uses_the_system_ini_if_PHPDBG_is_enabled_and_Xdebug_handler_is_not_detected(): void
+    {
+        if (PHP_SAPI !== 'phpdbg') {
+            $this->markTestSkipped('This test requires PHPDBG');
+        }
+
+        // We don't expect the Xdebug handler to be executed for the tests hence
+        // there is no need to disable it here
+        $this->assertTrue($this->environment->isUsingSystemIni());
+    }
+
+    public function test_it_does_not_use_the_system_ini_if_PHPDBG_is_disabled_and_Xdebug_handler_is_detected(): void
+    {
+        if (PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('This test requires running without PHPDBG');
+        }
+
+        $skipped = (new ReflectionClass(XdebugHandler::class))->getProperty('skipped');
+        $skipped->setAccessible(true);
+        $skipped->setValue('infection-fake');
+
+        try {
+            $this->assertFalse($this->environment->isUsingSystemIni());
+        } finally {
+            // Restore original value
+            $skipped->setValue(null);
+        }
+    }
+
+    public static function memoryLimitProvider(): iterable
+    {
+        yield 'no limit' => [
+            '-1',
+            false,
+        ];
+
+        yield 'limit' => [
+            '512M',
+            true,
+        ];
+
+        yield 'invalid limit' => [
+            '-512M',
+            true,
+        ];
+
+        yield 'limit without unit' => [
+            '268435456',    // 256M
+            true,
+        ];
     }
 }

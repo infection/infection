@@ -85,7 +85,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
             return (float) $match[1];
         }
 
-        return -1;
+        return -1.;
     }
 
     public function getName(): string
