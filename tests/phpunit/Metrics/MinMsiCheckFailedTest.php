@@ -33,31 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant\Exception;
+namespace Infection\Tests\Metrics;
 
-use Infection\Mutant\Exception\MsiCalculationException;
-use LogicException;
+use Infection\Metrics\MinMsiCheckFailed;
 use PHPUnit\Framework\TestCase;
 
-final class MsiCalculationExceptionTest extends TestCase
+final class MinMsiCheckFailedTest extends TestCase
 {
-    public function test_it_is_instance_of_logic_exception(): void
+    public function test_it_can_be_created_for_min_MSI(): void
     {
-        $exception = MsiCalculationException::create('');
+        $exception = MinMsiCheckFailed::createForMsi(73.26, 52.1);
 
-        $this->assertInstanceOf(
-            LogicException::class,
-            $exception
+        $this->assertSame(
+            'The minimum required MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
+            $exception->getMessage()
         );
     }
 
-    public function test_it_has_correct_error_message(): void
+    public function test_it_can_be_created_for_min_covered_code_MSI(): void
     {
-        $exception = MsiCalculationException::create('min-msi');
+        $exception = MinMsiCheckFailed::createCoveredMsi(73.26, 52.1);
+
         $this->assertSame(
-            'Seems like something is wrong with calculations and min-msi options.',
-            $exception->getMessage(),
-            'The error message was incorrectly parsed.'
+            'The minimum required Covered Code MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
+            $exception->getMessage()
         );
     }
 }

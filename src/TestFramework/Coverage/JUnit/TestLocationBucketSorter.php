@@ -33,46 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
-use function Infection\Tests\normalizePath;
-use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function Safe\realpath;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use function Safe\ksort;
 
 /**
- * @group integration
+ * @internal
  */
-final class IndexXmlCoverageReaderTest extends TestCase
+final class TestLocationBucketSorter
 {
-    private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
+    /**
+     * Pre-sort first buckets, optimistically assuming that most projects
+     * won't have tests longer than a second.
+     */
+    private const INIT_BUCKETS = [
+        0 => [],
+        1 => [],
+        2 => [],
+        3 => [],
+        4 => [],
+        5 => [],
+        6 => [],
+        7 => [],
+    ];
 
-    public function test_it_can_provide_the_PHPUnit_XML_report_index_file_path(): void
+    private function __construct()
     {
-        $reader = new IndexXmlCoverageReader(self::COVERAGE_DIR);
-
-        $expectedIndexPath = normalizePath(realpath(self::COVERAGE_DIR . '/index.xml'));
-
-        $this->assertSame(
-            $expectedIndexPath,
-            $reader->getIndexXmlPath()
-        );
     }
 
-    public function test_it_does_not_check_the_file_existence_when_retrieving_the_index_file_path(): void
+    /**
+     * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
+     *
+     * @param TestLocation[] $uniqueTestLocations
+     *
+     * @return iterable<TestLocation>
+     */
+    public static function bucketSort(array $uniqueTestLocations): iterable
     {
-        $reader = new IndexXmlCoverageReader('/nowhere');
+        $buckets = self::INIT_BUCKETS;
 
-        $this->assertSame('/nowhere/index.xml', $reader->getIndexXmlPath());
-    }
+        foreach ($uniqueTestLocations as $location) {
+            // @codeCoverageIgnoreStart
+            // This is a very hot path. Factoring here another method just to test this math may not be as good idea.
 
-    public function test_it_can_provide_the_PHPUnit_XML_report_index_file_content(): void
-    {
-        $reader = new IndexXmlCoverageReader(self::COVERAGE_DIR);
+            // Quick drop off lower bits, reducing precision to 8th of a second
+            $msTime = $location->getExecutionTime() * 1024 >> 7; // * 1024 / 128
 
-        $expectedContents = file_get_contents(self::COVERAGE_DIR . '/index.xml');
+            // For anything above 4 seconds reduce precision to 4 seconds
+            if ($msTime > 32) {
+                $msTime = $msTime >> 5 << 5; // 7 + 5 = 12 bits
+            }
+            // @codeCoverageIgnoreEnd
 
-        $this->assertSame($expectedContents, $reader->getIndexXmlContent());
+            $buckets[$msTime][] = $location;
+        }
+
+        ksort($buckets);
+
+        foreach ($buckets as $bucket) {
+            yield from $bucket;
+        }
     }
 }

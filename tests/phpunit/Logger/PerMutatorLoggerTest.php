@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\PerMutatorLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
 
 final class PerMutatorLoggerTest extends TestCase
@@ -59,7 +59,7 @@ final class PerMutatorLoggerTest extends TestCase
     public function metricsProvider(): iterable
     {
         yield 'no mutations' => [
-            new MetricsCalculator(),
+            new MetricsCalculator(2),
             <<<'TXT'
 # Effects per Mutator
 

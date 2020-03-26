@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\SummaryFileLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
 
 final class SummaryFileLoggerTest extends TestCase
@@ -59,7 +59,7 @@ final class SummaryFileLoggerTest extends TestCase
     public function metricsProvider(): iterable
     {
         yield 'no mutations' => [
-            new MetricsCalculator(),
+            new MetricsCalculator(2),
             <<<'TXT'
 Total: 0
 

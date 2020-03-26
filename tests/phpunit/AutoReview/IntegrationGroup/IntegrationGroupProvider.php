@@ -39,6 +39,7 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function class_exists;
+use Infection\CannotBeInstantiated;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\Console\E2ETest;
@@ -51,6 +52,8 @@ use Webmozart\Assert\Assert;
 
 final class IntegrationGroupProvider
 {
+    use CannotBeInstantiated;
+
     /**
      * List of known integrational tests that must be treated as such.
      *
@@ -64,10 +67,6 @@ final class IntegrationGroupProvider
      * @var string[][]|null
      */
     private static $ioTestCaseClassesTuple;
-
-    private function __construct()
-    {
-    }
 
     /**
      * Note that the current implementation is far from being bullet-proof. For example as of now

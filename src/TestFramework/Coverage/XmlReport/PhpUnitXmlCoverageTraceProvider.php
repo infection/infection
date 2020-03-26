@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
+use function dirname;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
+use function Safe\file_get_contents;
 
 /**
  * Provides the traces based on the PHPUnit XML coverage collected.
@@ -46,16 +48,16 @@ use Infection\TestFramework\Coverage\TraceProvider;
  */
 class PhpUnitXmlCoverageTraceProvider implements TraceProvider
 {
-    private $indexReader;
+    private $indexLocator;
     private $indexParser;
     private $parser;
 
     public function __construct(
-        IndexXmlCoverageReader $indexReader,
+        IndexXmlCoverageLocator $indexCoverageLocator,
         IndexXmlCoverageParser $indexCoverageXmlParser,
         XmlCoverageParser $coverageXmlParser
     ) {
-        $this->indexReader = $indexReader;
+        $this->indexLocator = $indexCoverageLocator;
         $this->indexParser = $indexCoverageXmlParser;
         $this->parser = $coverageXmlParser;
     }
@@ -65,9 +67,16 @@ class PhpUnitXmlCoverageTraceProvider implements TraceProvider
      */
     public function provideTraces(): iterable
     {
+        // The existence of the file should have already been checked. Hence in theory we should not
+        // have to deal with a FileNotFound exception here so we skip any friendly error handling
+        $indexPath = $this->indexLocator->locate();
+        $coverageBasePath = dirname($indexPath);
+        $indexContents = file_get_contents($indexPath);
+
         foreach ($this->indexParser->parse(
-            $this->indexReader->getIndexXmlPath(),
-            $this->indexReader->getIndexXmlContent()
+            $indexPath,
+            $indexContents,
+            $coverageBasePath
         ) as $infoProvider) {
             // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
             yield $this->parser->parse($infoProvider);

@@ -33,20 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant\Exception;
+namespace Infection\Tests;
 
-use LogicException;
-use function Safe\sprintf;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @internal
+ * @covers \Infection\Tests\UnsupportedMethod
  */
-final class MsiCalculationException extends LogicException
+final class UnsupportedMethodTest extends TestCase
 {
-    public static function create(string $type): self
+    public function test_it_can_be_instantiated_for_a_method(): void
     {
-        return new self(sprintf(
-            'Seems like something is wrong with calculations and %s options.', $type
-        ));
+        $exception = UnsupportedMethod::method('Acme\Foo', 'foo');
+
+        $this->assertSame('Did not expect "Acme\Foo::foo()" to be called', $exception->getMessage());
+        $this->assertSame(0, $exception->getCode());
+        $this->assertNull($exception->getPrevious());
     }
 }

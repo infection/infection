@@ -33,26 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Builder;
+namespace Infection\Metrics;
 
-use Infection\Mutant\Mutant;
-use Infection\Process\Builder\MutantProcessBuilder;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\TestCase;
+use Infection\Mutant\MutantExecutionResult;
+use function Safe\usort;
 
-final class MutantProcessBuilderTest extends TestCase
+/**
+ * @internal
+ */
+final class SortableMutantExecutionResults
 {
-    public function test_it_creates_a_process_with_timeout(): void
+    /**
+     * @var MutantExecutionResult[]
+     */
+    private $executionResults = [];
+
+    /**
+     * @var bool
+     */
+    private $sorted = false;
+
+    public function add(MutantExecutionResult $executionResult): void
     {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getMutantCommandLine')
-            ->willReturn(['/usr/bin/php']);
+        $this->executionResults[] = $executionResult;
+        $this->sorted = false;
+    }
 
-        $builder = new MutantProcessBuilder($fwAdapter, 100);
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getSortedExecutionResults(): array
+    {
+        if (!$this->sorted) {
+            self::sortResults($this->executionResults);
+            $this->sorted = true;
+        }
 
-        $process = $builder->createProcessForMutant($this->createMock(Mutant::class))->getProcess();
+        return $this->executionResults;
+    }
 
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertSame(100.0, $process->getTimeout());
+    /**
+     * @param MutantExecutionResult[] $executionResults
+     */
+    private static function sortResults(array &$executionResults): void
+    {
+        usort(
+            $executionResults,
+            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
+                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
+                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
+                }
+
+                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
+            }
+        );
     }
 }

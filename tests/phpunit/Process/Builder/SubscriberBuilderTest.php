@@ -40,7 +40,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Logger\LoggerFactory;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;
@@ -106,7 +106,7 @@ final class SubscriberBuilderTest extends TestCase
         int $addSubscriber,
         int $getLogs = 1
     ): SubscriberBuilder {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator(2);
 
         $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher

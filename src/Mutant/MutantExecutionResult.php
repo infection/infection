@@ -37,7 +37,6 @@ namespace Infection\Mutant;
 
 use function array_keys;
 use Infection\Mutator\ProfileList;
-use Infection\Process\MutantProcess;
 use Webmozart\Assert\Assert;
 
 /**
@@ -85,23 +84,6 @@ class MutantExecutionResult
             DetectionStatus::NOT_COVERED,
             $mutant->getDiff(),
             $mutant->getMutation()->getMutatorName(),
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalStartingLine()
-        );
-    }
-
-    public static function createFromProcess(MutantProcess $mutantProcess): self
-    {
-        $process = $mutantProcess->getProcess();
-        $mutant = $mutantProcess->getMutant();
-        $mutation = $mutant->getMutation();
-
-        return new self(
-            $process->getCommandLine(),
-            $mutantProcess->retrieveProcessOutput(),
-            $mutantProcess->retrieveDetectionStatus(),
-            $mutant->getDiff(),
-            $mutation->getMutatorName(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalStartingLine()
         );

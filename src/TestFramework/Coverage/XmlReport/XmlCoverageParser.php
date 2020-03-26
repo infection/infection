@@ -41,6 +41,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\SafeDOMXPath;
 use Webmozart\Assert\Assert;
 
@@ -54,7 +55,7 @@ class XmlCoverageParser
     {
     }
 
-    public function parse(SourceFileInfoProvider $provider): ProxyTrace
+    public function parse(SourceFileInfoProvider $provider): Trace
     {
         return new ProxyTrace(
             $provider->provideFileInfo(),

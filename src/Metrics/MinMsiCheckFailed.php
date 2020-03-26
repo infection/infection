@@ -33,58 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Metrics;
 
-use function Safe\usort;
+use function Safe\sprintf;
+use UnexpectedValueException;
 
 /**
  * @internal
  */
-final class SortableMutantExecutionResults
+final class MinMsiCheckFailed extends UnexpectedValueException
 {
-    /**
-     * @var MutantExecutionResult[]
-     */
-    private $executionResults = [];
-
-    /**
-     * @var bool
-     */
-    private $sorted = false;
-
-    public function add(MutantExecutionResult $executionResult): void
+    public static function createForMsi(float $minMsi, float $msi): self
     {
-        $this->executionResults[] = $executionResult;
-        $this->sorted = false;
+        return new self(sprintf(
+            'The minimum required MSI percentage should be %s%%, but actual is %s%%. '
+            . 'Improve your tests!',
+            $minMsi,
+            $msi
+        ));
     }
 
-    /**
-     * @return MutantExecutionResult[]
-     */
-    public function getSortedExecutionResults(): array
+    public static function createCoveredMsi(float $minMsi, float $coveredCodeMsi): self
     {
-        if (!$this->sorted) {
-            self::sortResults($this->executionResults);
-            $this->sorted = true;
-        }
-
-        return $this->executionResults;
-    }
-
-    /**
-     * @param MutantExecutionResult[] $executionResults
-     */
-    private static function sortResults(array &$executionResults): void
-    {
-        usort(
-            $executionResults,
-            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
-                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
-                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
-                }
-
-                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
-            }
-        );
+        return new self(sprintf(
+            'The minimum required Covered Code MSI percentage should be %s%%, but actual is ' .
+            '%s%%. Improve your tests!',
+            $minMsi,
+            $coveredCodeMsi
+        ));
     }
 }

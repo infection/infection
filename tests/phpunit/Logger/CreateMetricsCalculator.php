@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
@@ -48,7 +48,7 @@ trait CreateMetricsCalculator
 {
     private function createCompleteMetricsCalculator(): MetricsCalculator
     {
-        $calculator = new MetricsCalculator();
+        $calculator = new MetricsCalculator(2);
 
         $calculator->collect(
             $this->createMutantExecutionResult(

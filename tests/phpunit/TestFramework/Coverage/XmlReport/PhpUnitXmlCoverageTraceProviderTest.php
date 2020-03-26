@@ -35,59 +35,63 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\Trace;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageReader;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
-use PHPUnit\Framework\TestCase;
+use Infection\Tests\FileSystem\FileSystemTestCase;
+use function Safe\file_put_contents;
 
-final class PhpUnitXmlCoverageTraceProviderTest extends TestCase
+/**
+ * @group integration
+ */
+final class PhpUnitXmlCoverageTraceProviderTest extends FileSystemTestCase
 {
     public function test_it_can_parse_coverage_data(): void
     {
-        $reader = $this->createMock(IndexXmlCoverageReader::class);
-        $reader
-            ->expects($this->once())
-            ->method('getIndexXmlPath')
-            ->willReturn('foo/index.xml')
+        $indexPath = $this->tmp . '/index.xml';
+        $indexContents = 'index contents';
+
+        file_put_contents($indexPath, $indexContents);
+
+        $indexLocatorMock = $this->createMock(IndexXmlCoverageLocator::class);
+        $indexLocatorMock
+            ->method('locate')
+            ->willReturn($indexPath)
         ;
 
-        $reader
-            ->expects($this->once())
-            ->method('getIndexXmlContent')
-            ->willReturn('<xml><placeholder /></xml>')
-        ;
-
-        $providerMock = $this->createMock(SourceFileInfoProvider::class);
+        $sourceFileInfoProviderMock = $this->createMock(SourceFileInfoProvider::class);
 
         $indexXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $indexXmlParserMock
-            ->expects($this->once())
             ->method('parse')
-            ->with('foo/index.xml', '<xml><placeholder /></xml>')
-            ->willReturn([$providerMock])
+            ->with($indexPath, $indexContents, $this->tmp)
+            ->willReturn([$sourceFileInfoProviderMock])
         ;
 
-        $proxyTraceMock = $this->createMock(ProxyTrace::class);
+        $traceMock = $this->createMock(Trace::class);
+        $traceMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
 
         $coverageXmlParserMock = $this->createMock(XmlCoverageParser::class);
         $coverageXmlParserMock
-            ->expects($this->once())
             ->method('parse')
-            ->with($providerMock)
-            ->willReturn($proxyTraceMock)
+            ->with($sourceFileInfoProviderMock)
+            ->willReturn($traceMock)
         ;
 
         $provider = new PhpUnitXmlCoverageTraceProvider(
-            $reader,
+            $indexLocatorMock,
             $indexXmlParserMock,
             $coverageXmlParserMock
         );
 
         $traces = $provider->provideTraces();
 
-        $this->assertSame([$proxyTraceMock], iterator_to_array($traces, true));
+        $this->assertSame([$traceMock], iterator_to_array($traces, true));
     }
 }
