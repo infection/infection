@@ -223,7 +223,7 @@ final class RunCommand extends BaseCommand
 
     protected function executeCommand(IO $io): void
     {
-        $this->startUp();
+        $container = $this->startUp();
 
         $engine = new Engine(
             $this->container->getConfiguration(),
@@ -313,7 +313,7 @@ final class RunCommand extends BaseCommand
         $this->container->getAdapterInstaller()->install($adapterName);
     }
 
-    private function startUp(): void
+    private function startUp(IO $io): void
     {
         Assert::notNull($this->container);
 
@@ -325,11 +325,11 @@ final class RunCommand extends BaseCommand
 
         $this->container->getFileSystem()->mkdir($config->getTmpDir());
 
-        LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
+        LogVerbosity::convertVerbosityLevel($io->getInput(), $this->consoleOutput);
 
         $this->container->getSubscriberBuilder()->registerSubscribers(
             $this->container->getTestFrameworkAdapter(),
-            $this->output
+            $io->getOutput()
         );
 
         $this->container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
