@@ -68,7 +68,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class MutationTestingRunnerTest extends TestCase
 {
     /**
-     * @var \Infection\Process\Factory\MutantProcessFactory|MockObject
+     * @var MutantProcessFactory|MockObject
      */
     private $processFactoryMock;
 
