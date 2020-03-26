@@ -125,7 +125,7 @@ final class RunCommand extends BaseCommand
                 'configuration',
                 'c',
                 InputOption::VALUE_REQUIRED,
-                'Path to the configuration file path to use'
+                'Path to the configuration file to use'
             )
             ->addOption(
                 'coverage',
@@ -176,7 +176,7 @@ final class RunCommand extends BaseCommand
                 'initial-tests-php-options',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'PHP options passe to the PHP executable when executing the initial tests. Will be ignored if "--coverage" option presented'
+                'PHP options passed to the PHP executable when executing the initial tests. Will be ignored if "--coverage" option presented'
             )
             ->addOption(
                 'skip-initial-tests',
