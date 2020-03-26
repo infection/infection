@@ -33,54 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Builder;
+namespace Infection\Tests\Process;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\XdebugProcess;
-use function method_exists;
-use Symfony\Component\Process\Process;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-class InitialTestRunProcessBuilder
+final class XdebugProcessTest extends TestCase
 {
-    private $testFrameworkAdapter;
-
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
-    {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-    }
-
-    /**
-     * Creates process with enabled debugger as test framework is going to use in the code coverage.
-     *
-     * @param string[] $phpExtraOptions
-     */
-    public function createProcess(
-        string $testFrameworkExtraOptions,
-        bool $skipCoverage,
-        array $phpExtraOptions = []
-    ): Process {
-        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processType = $skipCoverage ? Process::class : XdebugProcess::class;
-
-        /** @var XdebugProcess|Process $process */
-        $process = new $processType(
-            $this->testFrameworkAdapter->getInitialTestRunCommandLine(
-                $testFrameworkExtraOptions,
-                $phpExtraOptions,
-                $skipCoverage
-            )
-        );
-
-        $process->setTimeout(null); // ignore the default timeout of 60 seconds
-
-        if (method_exists($process, 'inheritEnvironmentVariables')) {
-            // in version 4.4.0 this method is deprecated and removed in 5.0.0
-            $process->inheritEnvironmentVariables();
-        }
-
-        return $process;
-    }
 }
