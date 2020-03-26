@@ -102,6 +102,21 @@ final class SideEffectPredictorVisitorTest extends TestCase
         $visitor->leaveNode($expressionMock);
     }
 
+    public function test_it_updates_attribute_to_true_after_seeing_unnamed_function_call(): void
+    {
+        $visitor = new SideEffectPredictorVisitor();
+
+        $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
+        $visitor->enterNode($expressionMock);
+
+        $functionCallMock = $this->createNotExpectingAnythingNodeMock(Node\Expr\FuncCall::class);
+        $functionCallMock->name = null;
+        $visitor->enterNode($functionCallMock);
+
+        $expressionMock = $this->createExpressionMock(true);
+        $visitor->leaveNode($expressionMock);
+    }
+
     /**
      * @dataProvider provideRestrictedNodeClassNames
      */
@@ -172,6 +187,10 @@ final class SideEffectPredictorVisitorTest extends TestCase
             ->expects($this->never())
             ->method($this->anything())
         ;
+
+        if ($nodeMock instanceof Node\Expr\FuncCall) {
+            $nodeMock->name = new Node\Name('example');
+        }
 
         return $nodeMock;
     }

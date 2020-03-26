@@ -83,6 +83,22 @@ PHP
             ,
         ];
 
+        yield 'It duplicates closure calls' => [
+            <<<'PHP'
+<?php
+
+$a = ($this->closure)();
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = ($this->closure)();
+$a = ($this->closure)();
+PHP
+            ,
+        ];
+
         yield 'It does not mutate complex statement without method calls' => [
             <<<'PHP'
 <?php

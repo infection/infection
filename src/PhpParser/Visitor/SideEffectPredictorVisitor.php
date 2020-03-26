@@ -78,14 +78,11 @@ final class SideEffectPredictorVisitor extends NodeVisitorAbstract
         }
 
         if ($this->seenMethodCall[$this->depth] === false) {
-            $this->seenMethodCall[$this->depth] = $node instanceof Node\Expr\MethodCall;
+            $this->seenMethodCall[$this->depth] = self::nodeIsDynamicCall($node);
         }
 
         if ($this->seenNonMethodCall[$this->depth] === false) {
-            $this->seenNonMethodCall[$this->depth] = $node instanceof Node\Expr\FuncCall
-                || $node instanceof Node\Expr\StaticCall
-                || $node instanceof Node\Expr\New_
-            ;
+            $this->seenNonMethodCall[$this->depth] = self::nodeIsNonMethodCall($node);
         }
 
         return null;
@@ -103,5 +100,36 @@ final class SideEffectPredictorVisitor extends NodeVisitorAbstract
         }
 
         return null;
+    }
+
+    private static function nodeIsDynamicCall(Node $node): bool
+    {
+        if ($node instanceof Node\Expr\MethodCall) {
+            return true;
+        }
+
+        if ($node instanceof Node\Expr\FuncCall && !$node->name instanceof Node\Name) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static function nodeIsNonMethodCall(Node $node): bool
+    {
+        if ($node instanceof Node\Expr\StaticCall) {
+            return true;
+        }
+
+        if ($node instanceof Node\Expr\New_) {
+            return true;
+        }
+
+        // Only named function calls are accounted here.
+        if ($node instanceof Node\Expr\FuncCall && $node->name instanceof Node\Name) {
+            return true;
+        }
+
+        return false;
     }
 }
