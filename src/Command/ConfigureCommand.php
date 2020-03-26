@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use function array_filter;
+use function count;
 use function file_exists;
 use function implode;
 use Infection\Config\ConsoleHelper;
@@ -46,6 +46,8 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
+use Infection\Console\Exception\ConfigurationException;
+use Infection\Console\IO;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -56,9 +58,7 @@ use function Safe\json_decode;
 use function Safe\json_encode;
 use function Safe\sprintf;
 use stdClass;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -69,35 +69,38 @@ final class ConfigureCommand extends BaseCommand
 
     protected function configure(): void
     {
-        $this->setName('configure')
+        $this
+            ->setName('configure')
             ->setDescription('Create Infection config')
             ->addOption(
                 'test-framework',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Name of the Test framework to use (' . implode(', ', TestFrameworkTypes::TYPES) . ')',
+                sprintf(
+                    'Name of the Test framework to use ("%s")',
+                    implode('", "', TestFrameworkTypes::TYPES)
+                ),
                 TestFrameworkTypes::PHPUNIT
-            );
+            )
+        ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function executeCommand(IO $io): void
     {
-        if (!$input->isInteractive()) {
-            $output->writeln(self::NONINTERACTIVE_MODE_ERROR);
+        if (!$io->isInteractive()) {
+            $io->writeln(self::NONINTERACTIVE_MODE_ERROR);
 
-            return 1;
+            throw ConfigurationException::configurationAborted();
         }
 
         $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
-        $consoleHelper->writeSection($output, 'Welcome to the Infection config generator');
+        $consoleHelper->writeSection($io->getOutput(), 'Welcome to the Infection config generator');
 
-        $output->writeln([
-            '',
-            'We did not find a configuration file. The following questions will help us to generate it for you.',
-            '',
-        ]);
+        $io->newLine();
+        $io->writeln('We did not find a configuration file. The following questions will help us to generate it for you.');
+        $io->newLine();
 
-        $dirsInCurrentDir = array_filter(glob('*'), 'is_dir');
+        $dirsInCurrentDir = glob('*', GLOB_ONLYDIR);
         $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
 
         $questionHelper = $this->getHelper('question');
@@ -113,10 +116,10 @@ final class ConfigureCommand extends BaseCommand
         $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper, $sourceDirGuesser);
         $sourceDirs = $sourceDirsProvider->get($input, $output, $dirsInCurrentDir);
 
-        if (empty($sourceDirs)) {
+        if (count($sourceDirs) === 0) {
             $output->writeln('A source directory was not provided. Unable to generate "infection.json.dist".');
 
-            return 1;
+            throw ConfigurationException::configurationAborted();
         }
 
         $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
@@ -141,16 +144,12 @@ final class ConfigureCommand extends BaseCommand
 
         $this->saveConfig($sourceDirs, $excludedDirs, $phpUnitConfigPath, $phpUnitCustomExecutablePath, $textLogFilePath);
 
-        $output->writeln([
-            '',
-            sprintf(
-                'Configuration file "<comment>%s</comment>" was created.',
-                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE
-            ),
-            '',
-        ]);
-
-        return 0;
+        $io->newLine();
+        $output->writeln(sprintf(
+            'Configuration file "<comment>%s</comment>" was created.',
+            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE
+        ));
+        $io->newLine();
     }
 
     /**

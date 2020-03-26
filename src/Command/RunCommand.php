@@ -35,13 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Exception;
 use function file_exists;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
-use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
@@ -58,8 +56,6 @@ use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -346,7 +342,7 @@ final class RunCommand extends BaseCommand
                 SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
                 SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
             ]);
-        } catch (FileNotFound|FileOrDirectoryNotFound $exception) {
+        } catch (FileNotFound | FileOrDirectoryNotFound $exception) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
@@ -355,11 +351,7 @@ final class RunCommand extends BaseCommand
 
             $newInput = new ArrayInput($args);
             $newInput->setInteractive($io->isInteractive());
-            $result = $configureCommand->run($newInput, $io->getOutput());
-
-            if ($result !== 0) {
-                throw ConfigurationException::configurationAborted();
-            }
+            $configureCommand->run($newInput, $io->getOutput());
         }
     }
 

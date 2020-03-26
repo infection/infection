@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Composer\XdebugHandler\XdebugHandler;
 use function array_merge;
+use Composer\XdebugHandler\XdebugHandler;
 use function extension_loaded;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\RunCommand;

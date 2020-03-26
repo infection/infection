@@ -41,7 +41,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
-use function Safe\sprintf;
 
 /**
  * @internal
@@ -63,6 +62,20 @@ abstract class BaseCommand extends Command
      */
     private $io;
 
+    final public function getApplication(): Application
+    {
+        $application = parent::getApplication();
+
+        Assert::isInstanceOf(
+            $application,
+            Application::class,
+            'Cannot access to the command application if the command has not been '
+            . 'registered to the application yet'
+        );
+
+        return $application;
+    }
+
     final protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->io = new IO($input, $output);
@@ -83,26 +96,13 @@ abstract class BaseCommand extends Command
 
     abstract protected function executeCommand(IO $io): void;
 
-    final protected function getIO(): IO {
+    final protected function getIO(): IO
+    {
         Assert::notNull(
             $this->io,
             'Cannot retrieve the I/O before the command was initialized'
         );
 
         return $this->io;
-    }
-
-    final public function getApplication(): Application
-    {
-        $application = parent::getApplication();
-
-        Assert::isInstanceOf(
-            $application,
-            Application::class,
-            'Cannot access to the command application if the command has not been '
-            .'registered to the application yet'
-        );
-
-        return $application;
     }
 }

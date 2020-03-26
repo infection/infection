@@ -35,13 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Infection\Console\IO;
 use function array_key_exists;
 use function class_exists;
+use Infection\Console\IO;
 use function Safe\sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
