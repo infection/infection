@@ -77,9 +77,23 @@ final class SideEffectPredictorVisitorTest extends TestCase
         $visitor->leaveNode($expressionMock);
     }
 
+    public function test_it_updates_attribute_with_default_value(): void
+    {
+        $visitor = new SideEffectPredictorVisitor();
+
+        $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
+        $visitor->enterNode($expressionMock);
+
+        $expressionMock = $this->createExpressionMock(false);
+        $visitor->leaveNode($expressionMock);
+    }
+
     public function test_it_updates_attribute_to_true_after_seeing_method_call(): void
     {
         $visitor = new SideEffectPredictorVisitor();
+
+        $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
+        $visitor->enterNode($expressionMock);
 
         $methodCallMock = $this->createNotExpectingAnythingNodeMock(Node\Expr\MethodCall::class);
         $visitor->enterNode($methodCallMock);
@@ -95,13 +109,50 @@ final class SideEffectPredictorVisitorTest extends TestCase
     {
         $visitor = new SideEffectPredictorVisitor();
 
+        $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
+        $visitor->enterNode($expressionMock);
+
         $methodCallMock = $this->createNotExpectingAnythingNodeMock(Node\Expr\MethodCall::class);
         $visitor->enterNode($methodCallMock);
 
         $methodCallMock = $this->createNotExpectingAnythingNodeMock($nodeClassName);
         $visitor->enterNode($methodCallMock);
 
+        $methodCallMock = $this->createNotExpectingAnythingNodeMock();
+        $visitor->enterNode($methodCallMock);
+
         $expressionMock = $this->createExpressionMock(false);
+        $visitor->leaveNode($expressionMock);
+    }
+
+    /**
+     * @dataProvider provideRestrictedNodeClassNames
+     */
+    public function test_it_keeps_attribute_at_true_after_seeing_restricted_node_on_level_above(string $nodeClassName): void
+    {
+        $visitor = new SideEffectPredictorVisitor();
+
+        $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
+        $visitor->enterNode($expressionMock);
+
+        $methodCallMock = $this->createNotExpectingAnythingNodeMock(Node\Expr\MethodCall::class);
+        $visitor->enterNode($methodCallMock);
+
+        for ($i = 1; $i < 4; ++$i) {
+            $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
+            $visitor->enterNode($expressionMock);
+
+            $methodCallMock = $this->createNotExpectingAnythingNodeMock(Node\Expr\MethodCall::class);
+            $visitor->enterNode($methodCallMock);
+
+            $methodCallMock = $this->createNotExpectingAnythingNodeMock($nodeClassName);
+            $visitor->enterNode($methodCallMock);
+
+            $expressionMock = $this->createExpressionMock(false);
+            $visitor->leaveNode($expressionMock);
+        }
+
+        $expressionMock = $this->createExpressionMock(true);
         $visitor->leaveNode($expressionMock);
     }
 

@@ -45,24 +45,44 @@ final class SideEffectPredictorVisitor extends NodeVisitorAbstract
 {
     public const HAS_NODES_WITH_SIDE_EFFECTS_KEY = 'withSideEffects';
 
-    /**
-     * @var bool
-     */
-    private $seenMethodCall = false;
+    private const INITIAL_DEPTH = 0;
 
     /**
-     * @var bool
+     * @var bool[]
      */
-    private $seenNonMethodCall = false;
+    private $seenMethodCall = [];
+
+    /**
+     * @var bool[]
+     */
+    private $seenNonMethodCall = [];
+
+    /**
+     * @var int
+     */
+    private $depth = self::INITIAL_DEPTH;
 
     public function enterNode(Node $node): ?Node
     {
-        if ($this->seenMethodCall === false) {
-            $this->seenMethodCall = $node instanceof Node\Expr\MethodCall;
+        if ($node instanceof Node\Stmt\Expression) {
+            ++$this->depth;
+            $this->seenMethodCall[$this->depth] = false;
+            $this->seenNonMethodCall[$this->depth] = false;
+
+            return null;
         }
 
-        if ($this->seenNonMethodCall === false) {
-            $this->seenNonMethodCall = $node instanceof Node\Expr\FuncCall
+        if ($this->depth === self::INITIAL_DEPTH) {
+            // Not inside a statement.
+            return null;
+        }
+
+        if ($this->seenMethodCall[$this->depth] === false) {
+            $this->seenMethodCall[$this->depth] = $node instanceof Node\Expr\MethodCall;
+        }
+
+        if ($this->seenNonMethodCall[$this->depth] === false) {
+            $this->seenNonMethodCall[$this->depth] = $node instanceof Node\Expr\FuncCall
                 || $node instanceof Node\Expr\StaticCall
                 || $node instanceof Node\Expr\New_
             ;
@@ -74,12 +94,12 @@ final class SideEffectPredictorVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node): ?Node
     {
         if ($node instanceof Node\Stmt\Expression) {
+            --$this->depth;
+
             $node->setAttribute(
                 self::HAS_NODES_WITH_SIDE_EFFECTS_KEY,
-                $this->seenMethodCall && !$this->seenNonMethodCall
+                array_pop($this->seenMethodCall) && !array_pop($this->seenNonMethodCall)
             );
-            $this->seenMethodCall = false;
-            $this->seenNonMethodCall = false;
         }
 
         return null;
