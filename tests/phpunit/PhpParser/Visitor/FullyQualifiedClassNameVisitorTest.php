@@ -63,7 +63,7 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
             ]
         );
 
-        $actualProcessedNodesFqcn = array_map(
+        $actual = array_map(
             static function (Node $node): array {
                 return [
                     $node->getType(),
@@ -73,7 +73,7 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
             $spyVisitor->getCollectedNodes()
         );
 
-        $this->assertSame($expected, $actualProcessedNodesFqcn);
+        $this->assertSame($expected, $actual);
     }
 
     public function codeProvider(): iterable
