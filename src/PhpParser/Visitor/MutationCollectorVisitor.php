@@ -43,10 +43,10 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * @internal
  */
-final class MutationsCollectorVisitor extends NodeVisitorAbstract
+final class MutationCollectorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var iterable[]
+     * @var iterable<Mutation>[]
      */
     private $mutationChunks = [];
 
@@ -76,8 +76,8 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
      */
     public function getMutations(): iterable
     {
-        foreach ($this->mutationChunks as $mutationChunk) {
-            yield from $mutationChunk;
+        foreach ($this->mutationChunks as $mutations) {
+            yield from $mutations;
         }
     }
 }
