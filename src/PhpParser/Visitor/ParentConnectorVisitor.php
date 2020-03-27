@@ -46,7 +46,7 @@ use Webmozart\Assert\Assert;
  */
 final class ParentConnectorVisitor implements NodeVisitor
 {
-    public const PARENT_KEY = 'parent';
+    private const PARENT_ATTRIBUTE = 'parent';
 
     /**
      * @var Node[]
@@ -55,14 +55,14 @@ final class ParentConnectorVisitor implements NodeVisitor
 
     public static function getParent(Node $node): Node
     {
-        Assert::true($node->hasAttribute(self::PARENT_KEY));
+        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
 
-        return $node->getAttribute(self::PARENT_KEY);
+        return $node->getAttribute(self::PARENT_ATTRIBUTE);
     }
 
     public static function findParent(Node $node): ?Node
     {
-        return $node->getAttribute(self::PARENT_KEY, null);
+        return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
     }
 
     public function beforeTraverse(array $nodes): ?array
@@ -82,7 +82,7 @@ final class ParentConnectorVisitor implements NodeVisitor
         $stackCount = count($this->stack);
 
         if ($stackCount !== 0) {
-            $node->setAttribute(self::PARENT_KEY, $this->stack[$stackCount - 1]);
+            $node->setAttribute(self::PARENT_ATTRIBUTE, $this->stack[$stackCount - 1]);
         }
 
         $this->stack[] = $node;
