@@ -53,23 +53,23 @@ class Mutation
     private $originalStartingLine;
     private $tests;
     private $executedByTests;
-    private $calculateState;
-
-    /**
-     * @var MutationCalculatedState|null
-     */
-    private $calculatedState;
+    private $mutationHash;
+    private $mutationFilePath;
+    private $mutatedCode;
+    private $diff;
 
     /**
      * @param TestLocation[] $tests
-     * @param Closure(): MutationCalculatedState $calculateState
      */
     public function __construct(
         string $originalFilePath,
         string $mutatorName,
         int $originalStartingLine,
         array $tests,
-        Closure $calculateState
+        string $mutationHash,
+        string $mutationFilePath,
+        string $mutatedCode,
+        string $diff
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
@@ -78,12 +78,10 @@ class Mutation
         $this->originalStartingLine = $originalStartingLine;
         $this->tests = $tests;
         $this->executedByTests = count($tests) > 0;
-        $this->calculateState = $calculateState;
-    }
-
-    public function getFilePath(): string
-    {
-        return $this->getCalculatedState()->getMutationFilePath();
+        $this->mutationHash = $mutationHash;
+        $this->mutationFilePath = $mutationFilePath;
+        $this->mutatedCode = $mutatedCode;
+        $this->diff = $diff;
     }
 
     public function getOriginalFilePath(): string
@@ -106,16 +104,6 @@ class Mutation
         return $this->executedByTests;
     }
 
-    public function getMutatedCode(): string
-    {
-        return $this->getCalculatedState()->getMutatedCode();
-    }
-
-    public function getDiff(): string
-    {
-        return $this->getCalculatedState()->getDiff();
-    }
-
     /**
      * @return TestLocation[]
      */
@@ -126,11 +114,21 @@ class Mutation
 
     public function getHash(): string
     {
-        return $this->getCalculatedState()->getMutationHash();
+        return $this->mutationHash;
     }
 
-    private function getCalculatedState(): MutationCalculatedState
+    public function getFilePath(): string
     {
-        return $this->calculatedState ?? $this->calculatedState = ($this->calculateState)();
+        return $this->mutationFilePath;
+    }
+
+    public function getMutatedCode(): string
+    {
+        return $this->mutatedCode;
+    }
+
+    public function getDiff(): string
+    {
+        return $this->diff;
     }
 }

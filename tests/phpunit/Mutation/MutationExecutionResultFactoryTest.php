@@ -39,7 +39,6 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutation\DetectionStatus;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutationProcess;
@@ -109,14 +108,10 @@ DIFF;
                 $mutatorName = MutatorName::getName(For_::class),
                 $originalStartingLine = 10,
                 [],
-                static function () use ($mutationDiff): MutationCalculatedState {
-                    return new MutationCalculatedState(
-                        '0800f',
-                        '/path/to/mutation',
-                        'notCovered#0',
-                        $mutationDiff
-                    );
-                }
+                '0800f',
+                '/path/to/mutation',
+                'notCovered#0',
+                $mutationDiff
             )
         );
 
@@ -178,14 +173,10 @@ DIFF;
                         0.01
                     ),
                 ],
-                static function () use ($mutationDiff): MutationCalculatedState {
-                    return new MutationCalculatedState(
-                        '0800f',
-                        '/path/to/mutation',
-                        'timedOut#0',
-                        $mutationDiff
-                    );
-                }
+                '0800f',
+                '/path/to/mutation',
+                'timedOut#0',
+                $mutationDiff
             )
         );
 
@@ -254,14 +245,10 @@ DIFF;
                         0.01
                     ),
                 ],
-                static function () use ($mutationDiff): MutationCalculatedState {
-                    return new MutationCalculatedState(
-                        '0800f',
-                        '/path/to/mutation',
-                        'errored#0',
-                        $mutationDiff
-                    );
-                }
+                '0800f',
+                '/path/to/mutation',
+                'errored#0',
+                $mutationDiff
             )
         );
 
@@ -330,14 +317,10 @@ DIFF;
                         0.01
                     ),
                 ],
-                static function () use ($mutationDiff): MutationCalculatedState {
-                    return new MutationCalculatedState(
-                        '0800f',
-                        '/path/to/mutation',
-                        'escaped#0',
-                        $mutationDiff
-                    );
-                }
+                '0800f',
+                '/path/to/mutation',
+                'escaped#0',
+                $mutationDiff
             )
         );
 
@@ -406,14 +389,10 @@ DIFF;
                         0.01
                     ),
                 ],
-                static function () use ($mutationDiff): MutationCalculatedState {
-                    return new MutationCalculatedState(
-                        '0800f',
-                        '/path/to/mutation',
-                        'killed#0',
-                        $mutationDiff
-                    );
-                }
+                '0800f',
+                '/path/to/mutation',
+                'killed#0',
+                $mutationDiff
             )
         );
 

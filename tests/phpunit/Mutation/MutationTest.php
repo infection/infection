@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutation;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
@@ -65,14 +64,10 @@ final class MutationTest extends TestCase
             $mutatorName,
             $originalStartingLine,
             $tests,
-            static function () use ($hash, $filePath, $code, $diff): MutationCalculatedState {
-                return new MutationCalculatedState(
-                    $hash,
-                    $filePath,
-                    $code,
-                    $diff
-                );
-            }
+            $hash,
+            $filePath,
+            $code,
+            $diff
         );
 
         $this->assertSame($originalFilePath, $mutation->getOriginalFilePath());

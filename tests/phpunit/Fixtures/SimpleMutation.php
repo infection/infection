@@ -6,16 +6,12 @@ namespace Infection\Tests\Fixtures;
 
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationAttributeKeys;
-use Infection\Mutation\MutationCalculatedState;
-use Infection\Mutator\Mutator;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\UnsupportedMethod;
 use PhpParser\Node;
 
 class SimpleMutation extends Mutation
 {
     private $originalFileAst;
-    private $mutator;
     private $mutatedNode;
     private $attributes;
     private $mutatedNodeClass;
@@ -38,9 +34,10 @@ class SimpleMutation extends Mutation
             $mutatorName,
             (int) $attributes[MutationAttributeKeys::START_LINE],
             [],
-            static function (): MutationCalculatedState {
-                throw UnsupportedMethod::method(Mutation::class, 'calculateState');
-            }
+            'hash',
+            '/path/to/MutatedFoo.php',
+            'mutatedCode',
+            'diff'
         );
 
         $this->originalFileAst = $originalFileAst;

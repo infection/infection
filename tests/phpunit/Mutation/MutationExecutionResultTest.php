@@ -38,7 +38,6 @@ namespace Infection\Tests\Mutation;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\DetectionStatus;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutation\MutationExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
@@ -110,14 +109,10 @@ DIFF;
                     0.01
                 ),
             ],
-            static function () use ($mutationDiff): MutationCalculatedState {
-                return new MutationCalculatedState(
-                    '0800f',
-                    '/path/to/mutation',
-                    'notCovered#0',
-                    $mutationDiff
-                );
-            }
+            '0800f',
+            '/path/to/mutation',
+            'notCovered#0',
+            $mutationDiff
         );
 
         $this->assertResultStateIs(

@@ -40,7 +40,6 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\MutationProcessWasFinished;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutation\MutationExecutionResult;
 use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Mutator\ZeroIteration\For_;
@@ -68,12 +67,10 @@ final class MutationProcessFactoryTest extends TestCase
                     0.01
                 ),
             ],
-            static function () use ($hash, $mutationFilePath): MutationCalculatedState {
-                return new MutationCalculatedState(
-                    $hash,
-                    $mutationFilePath,
-                    'notCovered#0',
-                    <<<'DIFF'
+            $hash,
+            $mutationFilePath,
+            'notCovered#0',
+            <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -82,8 +79,6 @@ final class MutationProcessFactoryTest extends TestCase
 + echo 'killed#0';
 
 DIFF
-                );
-            }
         );
 
         $testFrameworkExtraOptions = '--verbose';

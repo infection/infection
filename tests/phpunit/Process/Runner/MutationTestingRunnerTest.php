@@ -44,7 +44,6 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationCalculatedState;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\Builder\MutationProcessFactory;
 use Infection\Process\MutationProcess;
@@ -423,14 +422,10 @@ final class MutationTestingRunnerTest extends TestCase
                     0.01
                 ),
             ],
-            static function () use ($i): MutationCalculatedState {
-                return new MutationCalculatedState(
-                    'mutationHash#' . $i,
-                    '/path/to/mutation' . $i . '.php',
-                    'mutated code ' . $i,
-                    'diff'
-                );
-            }
+            'mutationHash#' . $i,
+            '/path/to/mutation' . $i . '.php',
+            'mutated code ' . $i,
+            'diff'
         );
     }
 }

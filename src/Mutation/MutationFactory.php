@@ -97,47 +97,6 @@ class MutationFactory
 
         $attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
 
-        return new Mutation(
-            $originalFilePath,
-            $mutatorName,
-            (int) $attributes[MutationAttributeKeys::START_LINE],
-            $tests,
-            function () use (
-                $originalFilePath,
-                $originalFileAst,
-                $mutatorName,
-                $attributes,
-                $mutatedNodeClass,
-                $mutatedNode,
-                $mutationByMutatorIndex
-            ): MutationCalculatedState {
-                return $this->calculateState(
-                    $originalFilePath,
-                    $originalFileAst,
-                    $mutatorName,
-                    $attributes,
-                    $mutatedNodeClass,
-                    $mutatedNode,
-                    $mutationByMutatorIndex
-                );
-            }
-        );
-    }
-
-    /**
-     * @param Node[] $originalFileAst
-     * @param array<string|int|float> $attributes
-     * @param class-string $mutatedNodeClass
-     */
-    private function calculateState(
-        string $originalFilePath,
-        array $originalFileAst,
-        string $mutatorName,
-        array $attributes,
-        string $mutatedNodeClass,
-        MutatedNode $mutatedNode,
-        int $mutationByMutatorIndex
-    ): MutationCalculatedState {
         $hash = self::createHash(
             $originalFilePath,
             $mutatorName,
@@ -158,7 +117,11 @@ class MutationFactory
             $mutatedNode
         );
 
-        return new MutationCalculatedState(
+        return new Mutation(
+            $originalFilePath,
+            $mutatorName,
+            (int) $attributes[MutationAttributeKeys::START_LINE],
+            $tests,
             $hash,
             $mutationFilePath,
             $mutatedCode,
