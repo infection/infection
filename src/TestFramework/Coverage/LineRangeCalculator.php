@@ -62,7 +62,9 @@ final class LineRangeCalculator
             if ($node instanceof Node\Expr\Array_) {
                 $outerMostArrayParent = $node;
             }
-        } while ($node = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
+
+            $node = ParentConnectorVisitor::findParent($node);
+        } while ($node !== null);
 
         return $outerMostArrayParent;
     }

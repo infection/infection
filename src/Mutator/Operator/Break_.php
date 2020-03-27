@@ -77,8 +77,8 @@ TXT
             return false;
         }
 
-        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+        $parentNode = ParentConnectorVisitor::findParent($node);
 
-        return !$parentNode instanceof Node\Stmt\Case_;
+        return !($parentNode instanceof Node\Stmt\Case_);
     }
 }

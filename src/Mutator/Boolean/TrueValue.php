@@ -92,8 +92,8 @@ final class TrueValue implements ConfigurableMutator
             return false;
         }
 
-        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
-        $grandParentNode = $parentNode !== null ? $parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY) : null;
+        $parentNode = ParentConnectorVisitor::findParent($node);
+        $grandParentNode = $parentNode !== null ? ParentConnectorVisitor::findParent($parentNode) : null;
 
         if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
             return true;

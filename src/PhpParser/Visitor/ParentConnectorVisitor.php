@@ -38,12 +38,13 @@ namespace Infection\PhpParser\Visitor;
 use function array_pop;
 use function count;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\NodeVisitor;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class ParentConnectorVisitor extends NodeVisitorAbstract
+final class ParentConnectorVisitor implements NodeVisitor
 {
     public const PARENT_KEY = 'parent';
 
@@ -52,6 +53,18 @@ final class ParentConnectorVisitor extends NodeVisitorAbstract
      */
     private $stack = [];
 
+    public static function getParent(Node $node): Node
+    {
+        Assert::true($node->hasAttribute(self::PARENT_KEY));
+
+        return $node->getAttribute(self::PARENT_KEY);
+    }
+
+    public static function findParent(Node $node): ?Node
+    {
+        return $node->getAttribute(self::PARENT_KEY, null);
+    }
+
     public function beforeTraverse(array $nodes): ?array
     {
         $this->stack = [];
@@ -59,7 +72,12 @@ final class ParentConnectorVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    public function enterNode(Node $node): ?Node
+    public function afterTraverse(array $nodes): ?array
+    {
+        return null;
+    }
+
+    public function enterNode(Node $node)
     {
         $stackCount = count($this->stack);
 
@@ -72,7 +90,7 @@ final class ParentConnectorVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    public function leaveNode(Node $node): ?Node
+    public function leaveNode(Node $node)
     {
         array_pop($this->stack);
 
