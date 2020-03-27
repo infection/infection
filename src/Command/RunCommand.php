@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Exception;
+use function extension_loaded;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -43,18 +43,22 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
+use Infection\Console\XdebugHandler;
 use Infection\Container;
 use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasStarted;
+use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
+use const PHP_SAPI;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
@@ -221,14 +225,16 @@ final class RunCommand extends BaseCommand
 
         $this->installTestFrameworkIfNeeded($input, $output);
 
-        $this->consoleOutput = $this->getApplication()->getConsoleOutput();
+        $this->consoleOutput = new ConsoleOutput(new SymfonyStyle($input, $output));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        XdebugHandler::check(new ConsoleLogger($output));
+
         $io = new SymfonyStyle($input, $output);
 
-        $this->startUp();
+        $this->startUp($io);
 
         $engine = new Engine(
             $this->container->getConfiguration(),
@@ -319,9 +325,22 @@ final class RunCommand extends BaseCommand
         $this->container->getAdapterInstaller()->install($adapterName);
     }
 
-    private function startUp(): void
+    private function startUp(SymfonyStyle $io): void
     {
         Assert::notNull($this->container);
+
+        $io->writeln($this->getApplication()->getHelp());
+        $io->newLine();
+
+        $this->logRunningWithDebugger();
+
+        if (!$this->getApplication()->isAutoExitEnabled()) {
+            // When we're not in control of exit codes, that means it's the caller
+            // responsibility to disable xdebug if it isn't needed. As of writing
+            // that's only the case during E2E testing. Show a warning nevertheless.
+
+            $this->consoleOutput->logNotInControlOfExitCodes();
+        }
 
         $this->container->getCoverageChecker()->checkCoverageRequirements();
 
@@ -348,7 +367,7 @@ final class RunCommand extends BaseCommand
                 SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
                 SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
             ]);
-        } catch (Exception $exception) {
+        } catch (FileNotFound | FileOrDirectoryNotFound $exception) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
@@ -380,5 +399,16 @@ final class RunCommand extends BaseCommand
         (static function (string $infectionBootstrapFile): void {
             require_once $infectionBootstrapFile;
         })($bootstrap);
+    }
+
+    private function logRunningWithDebugger(): void
+    {
+        if (PHP_SAPI === 'phpdbg') {
+            $this->consoleOutput->logRunningWithDebugger(PHP_SAPI);
+        } elseif (extension_loaded('xdebug')) {
+            $this->consoleOutput->logRunningWithDebugger('Xdebug');
+        } elseif (extension_loaded('pcov')) {
+            $this->consoleOutput->logRunningWithDebugger('PCOV');
+        }
     }
 }
