@@ -56,13 +56,10 @@ use Infection\TestFramework\TestFrameworkTypes;
 use const PHP_SAPI;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -209,32 +206,11 @@ final class RunCommand extends BaseCommand
         ;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
+    protected function execute(): int
     {
-        parent::initialize($input, $output);
+        XdebugHandler::check(new ConsoleLogger($this->output));
 
-        $this->initContainer($input);
-
-        $locator = $this->container->getRootsFileOrDirectoryLocator();
-
-        if ($customConfigPath = (string) $input->getOption('configuration')) {
-            $locator->locate($customConfigPath);
-        } else {
-            $this->runConfigurationCommand($locator);
-        }
-
-        $this->installTestFrameworkIfNeeded($input, $output);
-
-        $this->consoleOutput = new ConsoleOutput(new SymfonyStyle($input, $output));
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        XdebugHandler::check(new ConsoleLogger($output));
-
-        $io = new SymfonyStyle($input, $output);
-
-        $this->startUp($io);
+        $this->startUp();
 
         $engine = new Engine(
             $this->container->getConfiguration(),
@@ -256,68 +232,68 @@ final class RunCommand extends BaseCommand
         } catch (InitialTestsFailed | MinMsiCheckFailed $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
-            $io->error($exception->getMessage());
+            $this->io->error($exception->getMessage());
         }
 
         return 0;
     }
 
-    private function initContainer(InputInterface $input): void
+    private function initContainer(): void
     {
         // Currently the configuration is mandatory hence there is no way to
         // say "do not use a config". If this becomes possible in the future
         // though, it will likely be a `--no-config` option rather than relying
         // on this value to be set to an empty string.
-        $configFile = trim((string) $input->getOption('configuration'));
+        $configFile = trim((string) $this->input->getOption('configuration'));
 
-        $coverage = trim((string) $input->getOption('coverage'));
+        $coverage = trim((string) $this->input->getOption('coverage'));
         $testFramework = trim((string) $this->input->getOption('test-framework'));
         $testFrameworkExtraOptions = trim((string) $this->input->getOption('test-framework-options'));
-        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
+        $initialTestsPhpOptions = trim((string) $this->input->getOption('initial-tests-php-options'));
 
         /** @var string|null $minMsi */
-        $minMsi = $input->getOption('min-msi');
+        $minMsi = $this->input->getOption('min-msi');
         /** @var string|null $minCoveredMsi */
-        $minCoveredMsi = $input->getOption('min-covered-msi');
+        $minCoveredMsi = $this->input->getOption('min-covered-msi');
 
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile === '' ? null : $configFile,
-            trim((string) $input->getOption('mutators')),
-            $input->getOption('show-mutations'),
-            trim((string) $input->getOption('log-verbosity')),
-            $input->getOption('debug'),
-            $input->getOption('only-covered'),
-            trim((string) $input->getOption('formatter')),
-            $input->getOption('no-progress'),
+            trim((string) $this->input->getOption('mutators')),
+            $this->input->getOption('show-mutations'),
+            trim((string) $this->input->getOption('log-verbosity')),
+            $this->input->getOption('debug'),
+            $this->input->getOption('only-covered'),
+            trim((string) $this->input->getOption('formatter')),
+            $this->input->getOption('no-progress'),
             $coverage === '' ? null : $coverage,
             $initialTestsPhpOptions === '' ? null : $initialTestsPhpOptions,
-            (bool) $input->getOption('skip-initial-tests'),
-            $input->getOption('ignore-msi-with-no-mutations'),
+            (bool) $this->input->getOption('skip-initial-tests'),
+            $this->input->getOption('ignore-msi-with-no-mutations'),
             MsiParser::parse($minMsi, $msiPrecision, 'min-msi'),
             MsiParser::parse($minCoveredMsi, $msiPrecision, 'min-covered-msi'),
             $msiPrecision,
             $testFramework === '' ? null : $testFramework,
             $testFrameworkExtraOptions === '' ? null : $testFrameworkExtraOptions,
-            trim((string) $input->getOption('filter')),
+            trim((string) $this->input->getOption('filter')),
             (int) $this->input->getOption('threads'),
             (bool) $this->input->getOption('dry-run')
         );
     }
 
-    private function installTestFrameworkIfNeeded(InputInterface $input, OutputInterface $output): void
+    private function installTestFrameworkIfNeeded(): void
     {
         $installationDecider = $this->container->getAdapterInstallationDecider();
         $configTestFramework = $this->container->getConfiguration()->getTestFramework();
 
         $adapterName = trim((string) $this->input->getOption('test-framework')) ?: $configTestFramework;
 
-        if (!$installationDecider->shouldBeInstalled($adapterName, $input, $output)) {
+        if (!$installationDecider->shouldBeInstalled($adapterName, $this->input, $this->output)) {
             return;
         }
 
-        $output->writeln([
+        $this->output->writeln([
             '',
             sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
         ]);
@@ -325,12 +301,24 @@ final class RunCommand extends BaseCommand
         $this->container->getAdapterInstaller()->install($adapterName);
     }
 
-    private function startUp(SymfonyStyle $io): void
+    private function startUp(): void
     {
-        Assert::notNull($this->container);
+        $this->initContainer();
 
-        $io->writeln($this->getApplication()->getHelp());
-        $io->newLine();
+        $locator = $this->container->getRootsFileOrDirectoryLocator();
+
+        if ($customConfigPath = (string) $this->input->getOption('configuration')) {
+            $locator->locate($customConfigPath);
+        } else {
+            $this->runConfigurationCommand($locator);
+        }
+
+        $this->installTestFrameworkIfNeeded();
+
+        $this->consoleOutput = new ConsoleOutput(new SymfonyStyle($this->input, $this->output));
+
+        $this->io->writeln($this->getApplication()->getHelp());
+        $this->io->newLine();
 
         $this->logRunningWithDebugger();
 
