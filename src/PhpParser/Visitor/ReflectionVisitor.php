@@ -186,13 +186,13 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     private function getClassReflectionForNode(Node\Stmt\ClassLike $node): ClassReflection
     {
-        /** @var Node\Name|null $fqn */
-        $fqn = $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY);
+        $fqn = FullyQualifiedClassNameManipulator::getFqcn($node);
 
-        if ($fqn instanceof Node\Name) {
+        if ($fqn !== null) {
             return CoreClassReflection::fromClassName($fqn->toString());
         }
 
+        // TODO: check against interfaces
         Assert::isInstanceOf($node, Node\Stmt\Class_::class);
         $extends = $node->extends;
 

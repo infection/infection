@@ -35,37 +35,34 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
+use Infection\CannotBeInstantiated;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node\Name\FullyQualified;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
- *
- * Enrich class-like node declarations with their resolved FQCN
  */
-final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
+final class FullyQualifiedClassNameManipulator
 {
-    /**
-     * @var Node\Name|null
-     */
-    private $namespace;
+    use CannotBeInstantiated;
 
-    public function enterNode(Node $node): ?Node
+    private const FQN_ATTRIBUTE = 'fullyQualifiedClassName';
+
+    public static function hasFqcn(Node $node): bool
     {
-        if ($node instanceof Node\Stmt\Namespace_) {
-            $this->namespace = $node->name;
-        } elseif ($node instanceof Node\Stmt\ClassLike) {
-            FullyQualifiedClassNameManipulator::setFqcn(
-                $node,
-                $node->name !== null
-                    // Name will be null for anonymous classes
-                    // Also a class-like name is an Identifier so it needs to be casted to string to
-                    // be usable as a name
-                    ? Node\Name\FullyQualified::concat($this->namespace, $node->name->toString())
-                    : null
-            );
-        }
+        return $node->hasAttribute(self::FQN_ATTRIBUTE);
+    }
 
-        return null;
+    public static function getFqcn(Node $node): ?FullyQualified
+    {
+        Assert::true(self::hasFqcn($node));
+
+        return $node->getAttribute(self::FQN_ATTRIBUTE);
+    }
+
+    public static function setFqcn(Node $node, ?FullyQualified $fqcn): void
+    {
+        $node->setAttribute(self::FQN_ATTRIBUTE, $fqcn);
     }
 }
