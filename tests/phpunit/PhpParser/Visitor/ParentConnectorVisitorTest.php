@@ -71,11 +71,6 @@ PHP;
             ]
         );
 
-//        $this->assertSame(
-//            SingletonContainer::getNodeDumper()->dump($stackSpyVisitor->getCollectedNodes()),
-//            SingletonContainer::getNodeDumper()->dump($parentSpyVisitor->getCollectedNodes()),
-//        );
-
         $dumper = SingletonContainer::getNodeDumper();
 
         // Sanity check: just make sure the structure is the one we expect it to be
