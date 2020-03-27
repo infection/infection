@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use function array_keys;
-use Closure;
 use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
