@@ -56,8 +56,10 @@ use Infection\TestFramework\TestFrameworkTypes;
 use const PHP_SAPI;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
 
@@ -206,7 +208,7 @@ final class RunCommand extends BaseCommand
         ;
     }
 
-    protected function execute(): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         XdebugHandler::check(new ConsoleLogger($this->output));
 

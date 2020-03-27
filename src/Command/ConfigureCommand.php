@@ -56,7 +56,9 @@ use function Safe\json_decode;
 use function Safe\json_encode;
 use function Safe\sprintf;
 use stdClass;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -83,7 +85,7 @@ final class ConfigureCommand extends BaseCommand
         ;
     }
 
-    protected function execute(): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->input->isInteractive()) {
             $this->output->writeln(self::NONINTERACTIVE_MODE_ERROR);
