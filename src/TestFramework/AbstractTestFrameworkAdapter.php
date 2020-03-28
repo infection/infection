@@ -202,7 +202,9 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         } catch (InvalidVersion $exception) {
             throw new UnsupportedTestFrameworkVersion(sprintf(
                 'Could not identify the test framework version: "%s"',
-                $exception->getMessage()
+                $exception->getMessage(),
+                0,
+                $exception
             ));
         }
     }
