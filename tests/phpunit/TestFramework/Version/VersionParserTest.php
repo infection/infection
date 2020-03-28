@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
-use Infection\TestFramework\VersionParser;
-use InvalidArgumentException;
+use Infection\TestFramework\InvalidVersion;
+use Infection\TestFramework\Version\VersionParser;
 use PHPUnit\Framework\TestCase;
 
 final class VersionParserTest extends TestCase
@@ -63,16 +63,10 @@ final class VersionParserTest extends TestCase
 
     public function test_it_throws_exception_when_content_has_no_version_substring(): void
     {
-        try {
-            $this->versionParser->parse('abc');
+        $this->expectException(InvalidVersion::class);
+        $this->expectExceptionMessage('Expected "abc" to be contain a valid SemVer (sub)string value.');
 
-            $this->fail();
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Expected "abc" to be contain a valid SemVer (sub)string value.',
-                $exception->getMessage()
-            );
-        }
+        $this->versionParser->parse('abc');
     }
 
     public function versionProvider(): iterable
