@@ -39,7 +39,8 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use InvalidArgumentException;
+use Infection\TestFramework\Version\InvalidVersion;
+use Infection\TestFramework\Version\VersionParser;
 use function Safe\sprintf;
 use Symfony\Component\Process\Process;
 
@@ -123,33 +124,18 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         );
     }
 
+    /**
+     * @throws UnsupportedTestFrameworkVersion
+     */
     public function getVersion(): string
     {
-        if ($this->version !== null) {
-            return $this->version;
-        }
-
-        $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
-            $this->testFrameworkExecutable,
-            [],
-            ['--version']
-        );
-
-        $process = new Process($testFrameworkVersionExecutable);
-        $process->mustRun();
-
-        $version = 'unknown';
-
-        try {
-            $version = $this->versionParser->parse($process->getOutput());
-        } catch (InvalidArgumentException $e) {
-            $version = 'unknown';
-        } finally {
-            $this->version = $version;
-        }
-
-        return $this->version;
+        return $this->version ?? $this->version = $this->retrieveVersion();
     }
+
+    /**
+     * @throws UnsupportedTestFrameworkVersion
+     */
+    abstract public function checkVersion(): void;
 
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
@@ -190,6 +176,34 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     ): array {
         $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
 
-        return $this->commandLineBuilder->build($this->testFrameworkExecutable, $phpExtraArgs, $frameworkArgs);
+        return $this->commandLineBuilder->build(
+            $this->testFrameworkExecutable,
+            $phpExtraArgs,
+            $frameworkArgs
+        );
+    }
+
+    /**
+     * @throws UnsupportedTestFrameworkVersion
+     */
+    private function retrieveVersion(): string
+    {
+        $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
+            $this->testFrameworkExecutable,
+            [],
+            ['--version']
+        );
+
+        $process = new Process($testFrameworkVersionExecutable);
+        $process->mustRun();
+
+        try {
+            return $this->versionParser->parse($process->getOutput());
+        } catch (InvalidVersion $exception) {
+            throw new UnsupportedTestFrameworkVersion(sprintf(
+                'Could not identify the test framework version: "%s"',
+                $exception->getMessage()
+            ));
+        }
     }
 }

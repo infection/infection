@@ -33,13 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\TestFramework;
 
-use RuntimeException;
+use Error;
+use Infection\TestFramework\UnsupportedTestFrameworkVersion;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class UnsupportedTestFrameworkVersion extends RuntimeException
+final class UnsupportedTestFrameworkVersionTest extends TestCase
 {
+    public function test_it_can_be_instantiated(): void
+    {
+        $error = new Error();
+        $exception = new UnsupportedTestFrameworkVersion('Foo', 0, $error);
+
+        $this->assertSame('Foo', $exception->getMessage());
+        $this->assertSame(0, $exception->getCode());
+        $this->assertSame($error, $exception->getPrevious());
+    }
 }

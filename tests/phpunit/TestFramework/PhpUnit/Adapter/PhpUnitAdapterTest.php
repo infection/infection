@@ -42,7 +42,7 @@ use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
-use Infection\TestFramework\VersionParser;
+use Infection\TestFramework\Version\VersionParser;
 use PHPUnit\Framework\TestCase;
 
 final class PhpUnitAdapterTest extends TestCase

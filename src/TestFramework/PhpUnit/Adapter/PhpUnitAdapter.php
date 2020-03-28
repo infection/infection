@@ -40,6 +40,7 @@ use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
+use Infection\TestFramework\UnsupportedTestFrameworkVersion;
 use function Safe\preg_match;
 use function Safe\sprintf;
 use function version_compare;
@@ -51,6 +52,8 @@ use function version_compare;
 class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditionalNodes, MemoryUsageAware, ProvidesInitialRunOnlyOptions
 {
     public const COVERAGE_DIR = 'coverage-xml';
+
+    private const MINIMUM_SUPPORTED_VERSION = '6.0.0';
 
     public function hasJUnitReport(): bool
     {
@@ -91,6 +94,19 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
     public function getName(): string
     {
         return 'PHPUnit';
+    }
+
+    public function checkVersion(): void
+    {
+        if (version_compare($this->getVersion(), self::MINIMUM_SUPPORTED_VERSION, '>=')) {
+            return;
+        }
+
+        throw new UnsupportedTestFrameworkVersion(sprintf(
+            'The PHPUnit version "%s" is not supported. The oldest version supported is "%s"',
+            $this->getVersion(),
+            self::MINIMUM_SUPPORTED_VERSION
+        ));
     }
 
     public function getInitialTestsFailRecommendations(string $commandLine): string

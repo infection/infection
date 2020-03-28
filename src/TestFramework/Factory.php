@@ -86,6 +86,15 @@ final class Factory
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
+        $adapter = $this->constructAdapter($adapterName, $skipCoverage);
+
+        $adapter->checkVersion();
+
+        return $adapter;
+    }
+
+    private function constructAdapter(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
+    {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
