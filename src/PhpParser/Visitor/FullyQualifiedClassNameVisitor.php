@@ -54,7 +54,11 @@ final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
     {
         if ($node instanceof Node\Stmt\Namespace_) {
             $this->namespace = $node->name;
-        } elseif ($node instanceof Node\Stmt\ClassLike) {
+
+            return null;
+        }
+
+        if ($node instanceof Node\Stmt\ClassLike) {
             FullyQualifiedClassNameManipulator::setFqcn(
                 $node,
                 $node->name !== null
