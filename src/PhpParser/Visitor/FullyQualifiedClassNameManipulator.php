@@ -33,56 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Config\Exception;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Config\Exception\InvalidConfigException;
-use PHPUnit\Framework\TestCase;
-use RuntimeException;
-use function Safe\sprintf;
+use Infection\CannotBeInstantiated;
+use PhpParser\Node;
+use PhpParser\Node\Name\FullyQualified;
+use Webmozart\Assert\Assert;
 
-final class InvalidConfigExceptionTest extends TestCase
+/**
+ * @internal
+ */
+final class FullyQualifiedClassNameManipulator
 {
-    public function test_extends_runtime_exception(): void
-    {
-        $exception = new InvalidConfigException();
+    use CannotBeInstantiated;
 
-        $this->assertInstanceOf(RuntimeException::class, $exception);
+    private const FQN_ATTRIBUTE = 'fullyQualifiedClassName';
+
+    public static function hasFqcn(Node $node): bool
+    {
+        return $node->hasAttribute(self::FQN_ATTRIBUTE);
     }
 
-    public function test_invalid_mutator_creates_exception(): void
+    public static function getFqcn(Node $node): ?FullyQualified
     {
-        $wrongMutator = 'NonExistent Mutator';
+        Assert::true(self::hasFqcn($node));
 
-        $exception = InvalidConfigException::invalidMutator($wrongMutator);
-
-        $this->assertInstanceOf(InvalidConfigException::class, $exception);
-
-        $expected = sprintf(
-            'The "%s" mutator/profile was not recognized.',
-            $wrongMutator
-        );
-
-        $this->assertSame($expected, $exception->getMessage());
+        return $node->getAttribute(self::FQN_ATTRIBUTE);
     }
 
-    public function test_invalid_profile_creates_exception(): void
+    public static function setFqcn(Node $node, ?FullyQualified $fqcn): void
     {
-        $configFile = '@hello';
-        $errorMessage = 'Wrong Mutator';
-
-        $exception = InvalidConfigException::invalidProfile(
-            $configFile,
-            $errorMessage
-        );
-
-        $this->assertInstanceOf(InvalidConfigException::class, $exception);
-
-        $expected = sprintf(
-            'The "%s" profile contains the "%s" mutator which was not recognized.',
-            $configFile,
-            $errorMessage
-        );
-
-        $this->assertSame($expected, $exception->getMessage());
+        $node->setAttribute(self::FQN_ATTRIBUTE, $fqcn);
     }
 }

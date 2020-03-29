@@ -83,6 +83,7 @@ use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\TestFramework\AdapterInstallationDecider;
@@ -286,7 +287,11 @@ final class Container
                 return new MemoryFormatter();
             },
             MemoryLimiter::class => static function (self $container): MemoryLimiter {
-                return new MemoryLimiter($container->getFileSystem(), php_ini_loaded_file());
+                return new MemoryLimiter(
+                    $container->getFileSystem(),
+                    (string) php_ini_loaded_file(),
+                    new MemoryLimiterEnvironment()
+                );
             },
             SchemaConfigurationLoader::class => static function (self $container): SchemaConfigurationLoader {
                 return new SchemaConfigurationLoader(
