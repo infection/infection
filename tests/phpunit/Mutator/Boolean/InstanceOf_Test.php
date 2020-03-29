@@ -58,20 +58,12 @@ final class InstanceOf_Test extends BaseMutatorTestCase
 return $example instanceof Example;
 PHP
             ,
-            [
-                <<<'PHP'
+            <<<'PHP'
 <?php
 
-return true;
+return !$example instanceof Example;
 PHP
-                ,
-                <<<'PHP'
-<?php
-
-return false;
-PHP
-                ,
-            ],
+            ,
         ];
 
         yield 'It mutates an instanceof comparison with a variable to true and false' => [
@@ -81,20 +73,12 @@ PHP
 return $example instanceof $foo;
 PHP
             ,
-            [
-                <<<'PHP'
+            <<<'PHP'
 <?php
-
-return true;
+   
+return !$example instanceof $foo;
 PHP
-                ,
-                <<<'PHP'
-<?php
-
-return false;
-PHP
-                ,
-            ],
+            ,
         ];
     }
 }
