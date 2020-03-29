@@ -166,6 +166,7 @@
                 "EqualIdentical": { "$ref": "#/definitions/default-mutator-config" },
                 "FalseValue": { "$ref": "#/definitions/default-mutator-config" },
                 "IdenticalEqual": { "$ref": "#/definitions/default-mutator-config" },
+                "InstanceOf_": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalAnd": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalLowerAnd": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalLowerOr": { "$ref": "#/definitions/default-mutator-config" },
