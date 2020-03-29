@@ -54,6 +54,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\sprintf;
+use stdClass;
 
 final class MutatorFactoryTest extends TestCase
 {
@@ -137,6 +138,18 @@ final class MutatorFactoryTest extends TestCase
         ]);
 
         $this->assertSameMutatorsByClass([Plus::class], $mutators);
+    }
+
+    public function test_it_can_create_the_mutators_with_settings_as_std_class(): void
+    {
+        $settings = new stdClass();
+        $settings->in_array = false;
+
+        $mutators = $this->mutatorFactory->create([
+            TrueValue::class => ['settings' => $settings],
+        ]);
+
+        $this->assertSameMutatorsByClass([TrueValue::class], $mutators);
     }
 
     public function test_it_cannot_create_an_unknown_mutator(): void
