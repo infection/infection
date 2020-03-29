@@ -51,20 +51,20 @@ final class InstanceOf_ implements Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Negates an `instanceof` comparison.',
+            'Replaces an instanceof comparison with `true` and `false`.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );
     }
 
     /**
-     * @param Node\Expr\Instanceof_ $node
-     *
-     * @return iterable<Node\Expr\BooleanNot>
+     * @return iterable<Node\Expr\ConstFetch>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BooleanNot($node);
+        yield new Node\Expr\ConstFetch(new Node\Name('true'));
+
+        yield new Node\Expr\ConstFetch(new Node\Name('false'));
     }
 
     public function canMutate(Node $node): bool
