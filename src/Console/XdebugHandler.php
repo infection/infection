@@ -33,30 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\Exception;
+namespace Infection\Console;
 
-use RuntimeException;
-use function Safe\sprintf;
+use Composer\XdebugHandler\XdebugHandler as ComposerXdebugHandler;
+use Infection\CannotBeInstantiated;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
  */
-final class InvalidConfigException extends RuntimeException
+final class XdebugHandler
 {
-    public static function invalidMutator(string $mutator): self
-    {
-        return new self(sprintf(
-           'The "%s" mutator/profile was not recognized.',
-           $mutator
-        ));
-    }
+    use CannotBeInstantiated;
 
-    public static function invalidProfile(string $profile, string $mutator): self
+    private const PREFIX = 'INFECTION';
+
+    public static function check(LoggerInterface $logger): void
     {
-        return new self(sprintf(
-            'The "%s" profile contains the "%s" mutator which was not recognized.',
-            $profile,
-            $mutator
-        ));
+        // We force the color option unconditionally since it is able to detect the --no-ansi option
+        // to disable it if necessary
+        (new ComposerXdebugHandler(self::PREFIX, '--ansi'))
+            ->setLogger($logger)
+            ->setPersistent()
+            ->check()
+        ;
     }
 }

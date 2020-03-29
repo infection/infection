@@ -41,6 +41,7 @@ use function class_exists;
 use function count;
 use InvalidArgumentException;
 use function Safe\sprintf;
+use stdClass;
 
 /**
  * @internal
@@ -54,7 +55,7 @@ final class MutatorResolver
      * and profiles into a hashmap of mutator raw settings by their mutator
      * class name.
      *
-     * @param array<string, bool|mixed[]> $mutatorSettings
+     * @param array<string, bool|stdClass> $mutatorSettings
      *
      * @return array<string, mixed[]>
      */
@@ -77,12 +78,12 @@ final class MutatorResolver
         }
 
         foreach ($mutatorSettings as $mutatorOrProfile => $setting) {
-            $setting = self::resolveSettings($setting, $globalSettings);
+            $resolvedSettings = self::resolveSettings($setting, $globalSettings);
 
             if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
                 self::registerFromProfile(
                     $mutatorOrProfile,
-                    $setting,
+                    $resolvedSettings,
                     $mutators
                 );
 
@@ -92,7 +93,7 @@ final class MutatorResolver
             if (array_key_exists($mutatorOrProfile, ProfileList::ALL_MUTATORS)) {
                 self::registerFromName(
                     $mutatorOrProfile,
-                    $setting,
+                    $resolvedSettings,
                     $mutators
                 );
 
@@ -109,15 +110,19 @@ final class MutatorResolver
     }
 
     /**
-     * @param mixed[]|bool $settings
+     * @param stdClass|bool $settings
      * @param array<string, string[]> $globalSettings
      *
      * @return array<string, mixed[]>|bool
      */
     private static function resolveSettings($settings, array $globalSettings)
     {
-        if ($settings === false || count($globalSettings) === 0) {
-            return $settings;
+        if ($settings === false) {
+            return false;
+        }
+
+        if (count($globalSettings) === 0) {
+            return (array) $settings;
         }
 
         if ($settings === true) {

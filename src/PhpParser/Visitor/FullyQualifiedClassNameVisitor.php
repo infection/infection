@@ -36,21 +36,15 @@ declare(strict_types=1);
 namespace Infection\PhpParser\Visitor;
 
 use PhpParser\Node;
-use PhpParser\Node\Name;
-use PhpParser\Node\Stmt;
 use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
  *
- * Adds FullyQualifiedClassName (FQCN) string to class node:
- *      $node->name                                                  // Plus
- *      $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY) // Infection\Mutator\Plus
+ * Enrich class-like node declarations with their resolved FQCN
  */
 final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 {
-    public const FQN_KEY = 'fullyQualifiedClassName';
-
     /**
      * @var Node\Name|null
      */
@@ -58,11 +52,22 @@ final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): ?Node
     {
-        if ($node instanceof Stmt\Namespace_) {
+        if ($node instanceof Node\Stmt\Namespace_) {
             $this->namespace = $node->name;
-        } elseif ($node instanceof Stmt\ClassLike) {
-            // TODO: check the cases of multiple namespaces
-            $node->setAttribute(self::FQN_KEY, $node->name ? Name::concat($this->namespace, $node->name->name) : null);
+
+            return null;
+        }
+
+        if ($node instanceof Node\Stmt\ClassLike) {
+            FullyQualifiedClassNameManipulator::setFqcn(
+                $node,
+                $node->name !== null
+                    // Name will be null for anonymous classes
+                    // Also a class-like name is an Identifier so it needs to be casted to string to
+                    // be usable as a name
+                    ? Node\Name\FullyQualified::concat($this->namespace, $node->name->toString())
+                    : null
+            );
         }
 
         return null;
