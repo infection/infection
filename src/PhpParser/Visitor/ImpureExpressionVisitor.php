@@ -41,7 +41,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * @internal
  */
-final class SideEffectPredictorVisitor extends NodeVisitorAbstract
+final class ImpureExpressionVisitor extends NodeVisitorAbstract
 {
     public const HAS_NODES_WITH_SIDE_EFFECTS_KEY = 'withSideEffects';
 

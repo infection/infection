@@ -39,7 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\SideEffectPredictorVisitor;
+use Infection\PhpParser\Visitor\ImpureExpressionVisitor;
 use PhpParser\Node;
 
 /**
@@ -75,6 +75,6 @@ final class ExpressionRepeat implements Mutator
         }
 
         // Skip statements with almost no side effects.
-        return $node->getAttribute(SideEffectPredictorVisitor::HAS_NODES_WITH_SIDE_EFFECTS_KEY);
+        return $node->getAttribute(ImpureExpressionVisitor::HAS_NODES_WITH_SIDE_EFFECTS_KEY);
     }
 }

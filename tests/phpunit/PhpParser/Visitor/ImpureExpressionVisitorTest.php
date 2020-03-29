@@ -35,15 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\PhpParser\Visitor\SideEffectPredictorVisitor;
+use Infection\PhpParser\Visitor\ImpureExpressionVisitor;
 use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
 
-final class SideEffectPredictorVisitorTest extends TestCase
+final class ImpureExpressionVisitorTest extends TestCase
 {
     public function test_it_returns_null_when_entering_node(): void
     {
-        $visitor = new SideEffectPredictorVisitor();
+        $visitor = new ImpureExpressionVisitor();
 
         $nodeMock = $this->createNotExpectingAnythingNodeMock();
 
@@ -52,7 +52,7 @@ final class SideEffectPredictorVisitorTest extends TestCase
 
     public function test_it_returns_null_when_leaving_node(): void
     {
-        $visitor = new SideEffectPredictorVisitor();
+        $visitor = new ImpureExpressionVisitor();
 
         $nodeMock = $this->createNotExpectingAnythingNodeMock();
 
@@ -61,7 +61,7 @@ final class SideEffectPredictorVisitorTest extends TestCase
 
     public function test_it_does_not_update_attribute_for_non_expressions(): void
     {
-        $visitor = new SideEffectPredictorVisitor();
+        $visitor = new ImpureExpressionVisitor();
 
         $nodeMock = $this->createNotExpectingAnythingNodeMock();
 
@@ -70,7 +70,7 @@ final class SideEffectPredictorVisitorTest extends TestCase
 
     public function test_it_updates_attribute_for_expression(): void
     {
-        $visitor = new SideEffectPredictorVisitor();
+        $visitor = new ImpureExpressionVisitor();
 
         $expressionMock = $this->createExpressionMock(false);
 
@@ -79,7 +79,7 @@ final class SideEffectPredictorVisitorTest extends TestCase
 
     public function test_it_updates_attribute_with_default_value(): void
     {
-        $visitor = new SideEffectPredictorVisitor();
+        $visitor = new ImpureExpressionVisitor();
 
         $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
         $visitor->enterNode($expressionMock);
@@ -90,7 +90,7 @@ final class SideEffectPredictorVisitorTest extends TestCase
 
     public function test_it_updates_attribute_to_true_after_seeing_method_call(): void
     {
-        $visitor = new SideEffectPredictorVisitor();
+        $visitor = new ImpureExpressionVisitor();
 
         $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
         $visitor->enterNode($expressionMock);
@@ -104,7 +104,7 @@ final class SideEffectPredictorVisitorTest extends TestCase
 
     public function test_it_updates_attribute_to_true_after_seeing_unnamed_function_call(): void
     {
-        $visitor = new SideEffectPredictorVisitor();
+        $visitor = new ImpureExpressionVisitor();
 
         $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
         $visitor->enterNode($expressionMock);
@@ -122,7 +122,7 @@ final class SideEffectPredictorVisitorTest extends TestCase
      */
     public function test_it_updates_attribute_to_false_after_seeing_restricted_node(string $nodeClassName): void
     {
-        $visitor = new SideEffectPredictorVisitor();
+        $visitor = new ImpureExpressionVisitor();
 
         $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
         $visitor->enterNode($expressionMock);
@@ -145,7 +145,7 @@ final class SideEffectPredictorVisitorTest extends TestCase
      */
     public function test_it_keeps_attribute_at_true_after_seeing_restricted_node_on_level_above(string $nodeClassName): void
     {
-        $visitor = new SideEffectPredictorVisitor();
+        $visitor = new ImpureExpressionVisitor();
 
         $expressionMock = $this->createNotExpectingAnythingNodeMock(Node\Stmt\Expression::class);
         $visitor->enterNode($expressionMock);
@@ -202,7 +202,7 @@ final class SideEffectPredictorVisitorTest extends TestCase
             ->expects($this->once())
             ->method('setAttribute')
             ->with(
-                SideEffectPredictorVisitor::HAS_NODES_WITH_SIDE_EFFECTS_KEY,
+                ImpureExpressionVisitor::HAS_NODES_WITH_SIDE_EFFECTS_KEY,
                 $attributeValue
             )
         ;
