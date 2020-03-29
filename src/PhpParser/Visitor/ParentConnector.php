@@ -35,23 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use function array_pop;
-use function count;
+use Infection\CannotBeInstantiated;
 use PhpParser\Node;
-use PhpParser\NodeVisitor;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class ParentConnectorVisitor implements NodeVisitor
+final class ParentConnector
 {
+    use CannotBeInstantiated;
+
     private const PARENT_ATTRIBUTE = 'parent';
 
-    /**
-     * @var Node[]
-     */
-    private $stack = [];
+    public static function setParent(Node $node, ?Node $parent): void
+    {
+        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent);
+    }
 
     public static function getParent(Node $node): Node
     {
@@ -63,37 +63,5 @@ final class ParentConnectorVisitor implements NodeVisitor
     public static function findParent(Node $node): ?Node
     {
         return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
-    }
-
-    public function beforeTraverse(array $nodes): ?array
-    {
-        $this->stack = [];
-
-        return null;
-    }
-
-    public function afterTraverse(array $nodes): ?array
-    {
-        return null;
-    }
-
-    public function enterNode(Node $node)
-    {
-        $stackCount = count($this->stack);
-
-        if ($stackCount !== 0) {
-            $node->setAttribute(self::PARENT_ATTRIBUTE, $this->stack[$stackCount - 1]);
-        }
-
-        $this->stack[] = $node;
-
-        return null;
-    }
-
-    public function leaveNode(Node $node)
-    {
-        array_pop($this->stack);
-
-        return null;
     }
 }

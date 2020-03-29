@@ -39,31 +39,16 @@ use function array_pop;
 use function count;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class ParentConnectorVisitor implements NodeVisitor
 {
-    private const PARENT_ATTRIBUTE = 'parent';
-
     /**
      * @var Node[]
      */
     private $stack = [];
-
-    public static function getParent(Node $node): Node
-    {
-        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
-
-        return $node->getAttribute(self::PARENT_ATTRIBUTE);
-    }
-
-    public static function findParent(Node $node): ?Node
-    {
-        return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
-    }
 
     public function beforeTraverse(array $nodes): ?array
     {
@@ -81,9 +66,7 @@ final class ParentConnectorVisitor implements NodeVisitor
     {
         $stackCount = count($this->stack);
 
-        if ($stackCount !== 0) {
-            $node->setAttribute(self::PARENT_ATTRIBUTE, $this->stack[$stackCount - 1]);
-        }
+        ParentConnector::setParent($node, $this->stack[$stackCount - 1] ?? null);
 
         $this->stack[] = $node;
 

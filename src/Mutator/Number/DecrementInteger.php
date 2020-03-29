@@ -39,7 +39,7 @@ use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -96,7 +96,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return true;
         }
 
-        $parentNode = ParentConnectorVisitor::getParent($node);
+        $parentNode = ParentConnector::getParent($node);
 
         if (!$this->isComparison($parentNode)) {
             return true;

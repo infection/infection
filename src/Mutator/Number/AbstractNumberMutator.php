@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Number;
 
 use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -46,7 +46,7 @@ abstract class AbstractNumberMutator implements Mutator
 {
     protected function isPartOfSizeComparison(Node $node): bool
     {
-        $parent = ParentConnectorVisitor::findParent($node);
+        $parent = ParentConnector::findParent($node);
 
         return $this->isSizeComparison($parent);
     }
@@ -58,7 +58,7 @@ abstract class AbstractNumberMutator implements Mutator
         }
 
         if ($node instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison(ParentConnectorVisitor::findParent($node));
+            return $this->isSizeComparison(ParentConnector::findParent($node));
         }
 
         return $node instanceof Node\Expr\BinaryOp\Greater

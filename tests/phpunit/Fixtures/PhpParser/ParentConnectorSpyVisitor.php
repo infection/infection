@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\PhpParser;
 
+use Infection\PhpParser\Visitor\ParentConnector;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -20,7 +21,7 @@ final class ParentConnectorSpyVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): void
     {
-        $this->nodes[] = ParentConnectorVisitor::findParent($node);
+        $this->nodes[] = ParentConnector::findParent($node);
     }
 
     public function leaveNode(Node $node): void

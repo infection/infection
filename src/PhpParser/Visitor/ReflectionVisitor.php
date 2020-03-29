@@ -140,7 +140,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             return true;
         }
 
-        $parent = ParentConnectorVisitor::findParent($node);
+        $parent = ParentConnector::findParent($node);
 
         return $parent !== null && ($parent instanceof Node\Param || $node instanceof Node\Param);
     }
@@ -150,7 +150,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
      */
     private function isInsideFunction(Node $node): bool
     {
-        $parent = ParentConnectorVisitor::findParent($node);
+        $parent = ParentConnector::findParent($node);
 
         if ($parent === null) {
             return false;

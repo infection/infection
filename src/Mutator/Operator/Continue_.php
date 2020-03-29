@@ -39,7 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -77,7 +77,7 @@ TXT
             return false;
         }
 
-        $parentNode = ParentConnectorVisitor::findParent($node);
+        $parentNode = ParentConnector::findParent($node);
 
         return !($parentNode instanceof Node\Stmt\Case_);
     }
