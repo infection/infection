@@ -41,9 +41,33 @@ final class StrykerReportFactory
 
     public function create(MetricsCalculator $calculator): string
     {
-        $resultsByPath = self::retrieveResultsByPath($calculator);
-        $basePath = Path::getLongestCommonBasePath(array_keys($resultsByPath));
+        $files = [];
 
+        if ($calculator->getTotalMutantsCount() !== 0) {
+            $resultsByPath = self::retrieveResultsByPath($calculator);
+            $basePath = Path::getLongestCommonBasePath(array_keys($resultsByPath));
+
+            $files = self::retrieveFiles($resultsByPath, $basePath);
+        }
+
+        return json_encode(
+            [
+                'schemaVersion' => 1,
+                'mutationScore' => $calculator->getMutationScoreIndicator(),
+                'thresholds' => [
+                    'low' => 20,
+                    'high' => 80,
+                ],
+                'files' => $files,
+            ]
+        );
+    }
+
+    /**
+     * @param  array<string, MutantExecutionResult[]> $resultsByPath
+     */
+    private static function retrieveFiles(array $resultsByPath, string $basePath): array
+    {
         $files = [];
 
         foreach ($resultsByPath as $path => $results) {
@@ -59,17 +83,7 @@ final class StrykerReportFactory
             ];
         }
 
-        return json_encode(
-            [
-                'schemaVersion' => 1,
-                'mutationScore' => $calculator->getMutationScoreIndicator(),
-                'thresholds' => [
-                    'low' => 20,
-                    'high' => 80,
-                ],
-                'files' => $files,
-            ]
-        );
+        return $files;
     }
 
     /**

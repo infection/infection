@@ -13,16 +13,16 @@
                 {
                     "id": "49e4c033e82152deffaff902aa51ac0e",
                     "mutatorName": "FalseValue",
-                    "replacement": "true",
+                    "replacement": "        $separateSections = true;",
                     "description": "yo",
                     "location": {
                         "start": {
                             "line": 73,
-                            "column": 29
+                            "column": 9
                         },
                         "end": {
                             "line": 73,
-                            "column": 34
+                            "column": 35
                         }
                     },
                     "status": "Killed"
