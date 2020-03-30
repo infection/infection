@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Builder;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Console\Util\PhpProcess;
+use Infection\Process\OriginalPhpProcess;
 use function method_exists;
 use Symfony\Component\Process\Process;
 
@@ -63,9 +63,9 @@ class InitialTestRunProcessBuilder
         array $phpExtraOptions = []
     ): Process {
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processType = $skipCoverage ? Process::class : PhpProcess::class;
+        $processType = $skipCoverage ? Process::class : OriginalPhpProcess::class;
 
-        /** @var PhpProcess|Process $process */
+        /** @var Process $process */
         $process = new $processType(
             $this->testFrameworkAdapter->getInitialTestRunCommandLine(
                 $testFrameworkExtraOptions,

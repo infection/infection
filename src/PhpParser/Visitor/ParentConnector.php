@@ -33,38 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\Util;
+namespace Infection\PhpParser\Visitor;
 
-use Composer\XdebugHandler\PhpConfig;
-use Symfony\Component\Process\Process;
+use Infection\CannotBeInstantiated;
+use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class PhpProcess extends Process
+final class ParentConnector
 {
-    /**
-     * Runs a PHP process with xdebug loaded
-     *
-     * If xdebug was loaded in the main process, it will have been restarted
-     * without xdebug and configured to keep xdebug out of PHP sub-processes.
-     *
-     * This method allows a sub-process to run with xdebug enabled (if it was
-     * originally loaded), then restores the xdebug-free environment.
-     *
-     * This means that we can use xdebug when it is required and not have to
-     * worry about it for the bulk of other processes, which do not need it and
-     * work better without it.
-     *
-     * @param array<string|bool>|null $env
-     */
-    public function start(?callable $callback = null, ?array $env = null): void
+    use CannotBeInstantiated;
+
+    private const PARENT_ATTRIBUTE = 'parent';
+
+    public static function setParent(Node $node, ?Node $parent): void
     {
-        $phpConfig = new PhpConfig();
-        $phpConfig->useOriginal();
+        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent);
+    }
 
-        parent::start($callback, $env ?? []);
+    public static function getParent(Node $node): Node
+    {
+        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
 
-        $phpConfig->usePersistent();
+        return $node->getAttribute(self::PARENT_ATTRIBUTE);
+    }
+
+    public static function findParent(Node $node): ?Node
+    {
+        return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
     }
 }

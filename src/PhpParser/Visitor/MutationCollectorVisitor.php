@@ -33,52 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\Mutation\Mutation;
+use Infection\Mutator\NodeMutationGenerator;
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
  */
-final class Break_ implements Mutator
+final class MutationCollectorVisitor extends NodeVisitorAbstract
 {
-    use GetMutatorName;
+    /**
+     * @var iterable<Mutation>[]
+     */
+    private $mutationChunks = [];
 
-    public static function getDefinition(): ?Definition
+    private $mutationGenerator;
+
+    public function __construct(NodeMutationGenerator $mutationGenerator)
     {
-        return new Definition(
-            <<<'TXT'
-Replaces a break statement (`break`) with its counterpart continue statement (`continue`).
-TXT
-            ,
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
-        );
+        $this->mutationGenerator = $mutationGenerator;
+    }
+
+    public function beforeTraverse(array $nodes): ?array
+    {
+        $this->mutationChunks = [];
+
+        return null;
+    }
+
+    public function leaveNode(Node $node): ?Node
+    {
+        $this->mutationChunks[] = $this->mutationGenerator->generate($node);
+
+        return null;
     }
 
     /**
-     * @param Node\Stmt\Break_ $node
-     *
-     * @return iterable<Node\Stmt\Continue_>
+     * @return iterable<Mutation>
      */
-    public function mutate(Node $node): iterable
+    public function getMutations(): iterable
     {
-        yield new Node\Stmt\Continue_();
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        if (!$node instanceof Node\Stmt\Break_) {
-            return false;
+        foreach ($this->mutationChunks as $mutations) {
+            yield from $mutations;
         }
-
-        $parentNode = ParentConnector::findParent($node);
-
-        return !($parentNode instanceof Node\Stmt\Case_);
     }
 }

@@ -140,11 +140,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             return true;
         }
 
-        if (!$node->hasAttribute(ParentConnectorVisitor::PARENT_KEY)) {
+        $parent = ParentConnector::findParent($node);
+
+        if ($parent === null) {
             return false;
         }
-
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
         return $parent instanceof Node\Param || $node instanceof Node\Param;
     }
@@ -154,11 +154,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
      */
     private function isInsideFunction(Node $node): bool
     {
-        if (!$node->hasAttribute(ParentConnectorVisitor::PARENT_KEY)) {
+        $parent = ParentConnector::findParent($node);
+
+        if ($parent === null) {
             return false;
         }
-
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
         if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY)) {
             return true;
