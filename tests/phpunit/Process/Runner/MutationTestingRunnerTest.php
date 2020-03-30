@@ -41,6 +41,7 @@ use function count;
 use function get_class;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\Mutant;
@@ -54,6 +55,7 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutator\MutatorName;
+use function is_subclass_of;
 use Iterator;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Constraint\Callback;
@@ -111,7 +113,8 @@ final class MutationTestingRunnerTest extends TestCase
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
-            false
+            false,
+            100.0
         );
     }
 
@@ -142,6 +145,7 @@ final class MutationTestingRunnerTest extends TestCase
         $mutations = [
             $mutation0 = $this->createMutation(0),
             $mutation1 = $this->createMutation(1),
+            $mutation2 = $this->createMutation(2, 1000.0),
         ];
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
@@ -149,7 +153,8 @@ final class MutationTestingRunnerTest extends TestCase
             ->method('create')
             ->withConsecutive(
                 [$mutation0],
-                [$mutation1]
+                [$mutation1],
+                [$mutation2]
             )
             ->willReturnOnConsecutiveCalls(
                 $mutant0 = new Mutant(
@@ -162,6 +167,12 @@ final class MutationTestingRunnerTest extends TestCase
                     '/path/to/mutant1',
                     $mutation1,
                     'mutated code 1',
+                    'diff1'
+                ),
+                new Mutant(
+                    '/path/to/mutant2',
+                    $mutation2,
+                    'mutated code 2',
                     'diff1'
                 )
             )
@@ -198,7 +209,8 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(2),
+                new MutationTestingWasStarted(3),
+                $this->createMock(MutantProcessWasFinished::class),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -269,7 +281,8 @@ final class MutationTestingRunnerTest extends TestCase
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
-            true
+            true,
+            100.0
         );
 
         $this->runner->run($mutations, $testFrameworkExtraOptions);
@@ -313,7 +326,8 @@ final class MutationTestingRunnerTest extends TestCase
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
-            true
+            true,
+            100.0
         );
 
         $this->runner->run($mutations, '');
@@ -360,6 +374,7 @@ final class MutationTestingRunnerTest extends TestCase
         $expectedClasses = [
             MutationTestingWasStarted::class,
             MutationTestingWasFinished::class,
+            MutantProcessWasFinished::class,
         ];
 
         $assertionErrorMessage = sprintf(
@@ -372,16 +387,24 @@ final class MutationTestingRunnerTest extends TestCase
             $this->assertIsInstanceOfAny($expectedClasses, $expectedEvent);
             $this->assertArrayHasKey($index, $actualEvents, $assertionErrorMessage);
 
+            $exepectedEventClass = get_class($expectedEvent);
+
+            foreach ($expectedClasses as $expectedClassName) {
+                if (is_subclass_of($expectedEvent, $expectedClassName)) {
+                    $exepectedEventClass = $expectedClassName;
+                }
+            }
+
             $event = $actualEvents[$index];
             $this->assertInstanceOf(
-                get_class($expectedEvent),
+                $exepectedEventClass,
                 $event,
                 $assertionErrorMessage
             );
 
             if ($expectedEvent instanceof MutationTestingWasStarted) {
                 /* @var MutationTestingWasStarted $event */
-                $this->assertSame($expectedEvent->getMutationCount(), $event->getMutationCount());
+                $this->assertSame($expectedEvent->getMutationCount(), $event->getMutationCount(), 'Mutation count is not matching');
             }
         }
 
@@ -475,7 +498,7 @@ final class MutationTestingRunnerTest extends TestCase
         });
     }
 
-    private function createMutation(int $i): Mutation
+    private function createMutation(int $i, float $time = 0.01): Mutation
     {
         return new Mutation(
             'path/to/Foo' . $i . '.php',
@@ -496,7 +519,7 @@ final class MutationTestingRunnerTest extends TestCase
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
-                    0.01
+                    $time
                 ),
             ]
         );
