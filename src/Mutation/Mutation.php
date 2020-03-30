@@ -63,7 +63,10 @@ class Mutation
     private $originalFileAst;
     private $tests;
     private $coveredByTests;
-    private $timeToTest;
+    /**
+     * @var float|null
+     */
+    private $nominalTimeToTest;
 
     /**
      * @var string|null
@@ -162,7 +165,7 @@ class Mutation
      */
     public function getNominalTestExecutionTime(): float
     {
-        return $this->timeToTest ?? $this->timeToTest = array_sum(array_map(
+        return $this->nominalTimeToTest ?? $this->nominalTimeToTest = array_sum(array_map(
             static function (TestLocation $testLocation) {
                 return $testLocation->getExecutionTime();
             },

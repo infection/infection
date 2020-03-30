@@ -79,9 +79,9 @@ class MutantExecutionResult
         return self::createFromMutant($mutant, DetectionStatus::NOT_COVERED);
     }
 
-    public static function createFromTimeConstrainedMutant(Mutant $mutant): self
+    public static function createFromTimeSkippedMutant(Mutant $mutant): self
     {
-        return self::createFromMutant($mutant, DetectionStatus::CONSTRAINED);
+        return self::createFromMutant($mutant, DetectionStatus::SKIPPED);
     }
 
     public function getProcessCommandLine(): string

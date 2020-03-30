@@ -109,7 +109,7 @@ final class MutationTestingRunner
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromTimeConstrainedMutant($mutant)
+                    MutantExecutionResult::createFromTimeSkippedMutant($mutant)
                 ));
 
                 return false;

@@ -132,7 +132,7 @@ final class Application extends BaseApplication
         $output->getFormatter()->setStyle('timeout', new OutputFormatterStyle('yellow'));
         $output->getFormatter()->setStyle('escaped', new OutputFormatterStyle('red', null, ['bold']));
         $output->getFormatter()->setStyle('killed', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('constrained', new OutputFormatterStyle('magenta'));
+        $output->getFormatter()->setStyle('skipped', new OutputFormatterStyle('magenta'));
 
         $output->getFormatter()->setStyle('code', new OutputFormatterStyle('white'));
 
