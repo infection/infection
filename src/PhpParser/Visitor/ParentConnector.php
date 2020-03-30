@@ -33,52 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\CannotBeInstantiated;
 use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class Break_ implements Mutator
+final class ParentConnector
 {
-    use GetMutatorName;
+    use CannotBeInstantiated;
 
-    public static function getDefinition(): ?Definition
+    private const PARENT_ATTRIBUTE = 'parent';
+
+    public static function setParent(Node $node, ?Node $parent): void
     {
-        return new Definition(
-            <<<'TXT'
-Replaces a break statement (`break`) with its counterpart continue statement (`continue`).
-TXT
-            ,
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
-        );
+        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent);
     }
 
-    /**
-     * @param Node\Stmt\Break_ $node
-     *
-     * @return iterable<Node\Stmt\Continue_>
-     */
-    public function mutate(Node $node): iterable
+    public static function getParent(Node $node): Node
     {
-        yield new Node\Stmt\Continue_();
+        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
+
+        return $node->getAttribute(self::PARENT_ATTRIBUTE);
     }
 
-    public function canMutate(Node $node): bool
+    public static function findParent(Node $node): ?Node
     {
-        if (!$node instanceof Node\Stmt\Break_) {
-            return false;
-        }
-
-        $parentNode = ParentConnector::findParent($node);
-
-        return !($parentNode instanceof Node\Stmt\Case_);
+        return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
     }
 }
