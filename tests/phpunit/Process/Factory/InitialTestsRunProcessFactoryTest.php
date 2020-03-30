@@ -37,7 +37,7 @@ namespace Infection\Tests\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
-use Infection\Process\XdebugProcess;
+use Infection\Process\OriginalPhpProcess;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -85,7 +85,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         }
 
         $this->assertNull($process->getTimeout());
-        $this->assertNotInstanceOf(XdebugProcess::class, $process);
+        $this->assertNotInstanceOf(OriginalPhpProcess::class, $process);
     }
 
     public function test_it_creates_a_process_with_coverage(): void
@@ -112,6 +112,6 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         }
 
         $this->assertNull($process->getTimeout());
-        $this->assertInstanceOf(XdebugProcess::class, $process);
+        $this->assertInstanceOf(OriginalPhpProcess::class, $process);
     }
 }
