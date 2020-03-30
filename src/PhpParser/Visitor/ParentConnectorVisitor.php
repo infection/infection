@@ -38,15 +38,13 @@ namespace Infection\PhpParser\Visitor;
 use function array_pop;
 use function count;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\NodeVisitor;
 
 /**
  * @internal
  */
-final class ParentConnectorVisitor extends NodeVisitorAbstract
+final class ParentConnectorVisitor implements NodeVisitor
 {
-    public const PARENT_KEY = 'parent';
-
     /**
      * @var Node[]
      */
@@ -59,20 +57,23 @@ final class ParentConnectorVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    public function enterNode(Node $node): ?Node
+    public function afterTraverse(array $nodes): ?array
+    {
+        return null;
+    }
+
+    public function enterNode(Node $node)
     {
         $stackCount = count($this->stack);
 
-        if ($stackCount !== 0) {
-            $node->setAttribute(self::PARENT_KEY, $this->stack[$stackCount - 1]);
-        }
+        ParentConnector::setParent($node, $this->stack[$stackCount - 1] ?? null);
 
         $this->stack[] = $node;
 
         return null;
     }
 
-    public function leaveNode(Node $node): ?Node
+    public function leaveNode(Node $node)
     {
         array_pop($this->stack);
 

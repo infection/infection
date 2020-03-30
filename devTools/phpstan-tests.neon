@@ -10,10 +10,6 @@ parameters:
         - '#^Cannot call method (willReturn|shouldBeCalledTimes)\(\) on iterable<Infection\\Mutation\\Mutation>\.$#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
         -
-            path: '../tests/phpunit/PhpParser/Visitor/MutationsCollectorVisitorTest.php'
-            message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
-            count: 2
-        -
             path: '../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php'
             message: '#Function simplexml_load_string is unsafe to use#'
             count: 1

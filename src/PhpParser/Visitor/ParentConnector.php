@@ -35,49 +35,33 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use Infection\Mutation\Mutation;
-use Infection\Mutator\NodeMutationGenerator;
+use Infection\CannotBeInstantiated;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class MutationsCollectorVisitor extends NodeVisitorAbstract
+final class ParentConnector
 {
-    /**
-     * @var iterable[]
-     */
-    private $mutationChunks = [];
+    use CannotBeInstantiated;
 
-    private $mutationGenerator;
+    private const PARENT_ATTRIBUTE = 'parent';
 
-    public function __construct(NodeMutationGenerator $mutationGenerator)
+    public static function setParent(Node $node, ?Node $parent): void
     {
-        $this->mutationGenerator = $mutationGenerator;
+        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent);
     }
 
-    public function beforeTraverse(array $nodes): ?array
+    public static function getParent(Node $node): Node
     {
-        $this->mutationChunks = [];
+        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
 
-        return null;
+        return $node->getAttribute(self::PARENT_ATTRIBUTE);
     }
 
-    public function leaveNode(Node $node): ?Node
+    public static function findParent(Node $node): ?Node
     {
-        $this->mutationChunks[] = $this->mutationGenerator->generate($node);
-
-        return null;
-    }
-
-    /**
-     * @return iterable<Mutation>
-     */
-    public function getMutations(): iterable
-    {
-        foreach ($this->mutationChunks as $mutationChunk) {
-            yield from $mutationChunk;
-        }
+        return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
     }
 }

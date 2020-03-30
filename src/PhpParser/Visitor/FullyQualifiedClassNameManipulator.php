@@ -49,6 +49,11 @@ final class FullyQualifiedClassNameManipulator
 
     private const FQN_ATTRIBUTE = 'fullyQualifiedClassName';
 
+    public static function setFqcn(Node $node, ?FullyQualified $fqcn): void
+    {
+        $node->setAttribute(self::FQN_ATTRIBUTE, $fqcn);
+    }
+
     public static function hasFqcn(Node $node): bool
     {
         return $node->hasAttribute(self::FQN_ATTRIBUTE);
@@ -59,10 +64,5 @@ final class FullyQualifiedClassNameManipulator
         Assert::true(self::hasFqcn($node));
 
         return $node->getAttribute(self::FQN_ATTRIBUTE);
-    }
-
-    public static function setFqcn(Node $node, ?FullyQualified $fqcn): void
-    {
-        $node->setAttribute(self::FQN_ATTRIBUTE, $fqcn);
     }
 }
