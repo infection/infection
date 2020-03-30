@@ -62,7 +62,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Process\XdebugProcess;
+use Infection\Process\OriginalPhpProcess;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -94,7 +94,7 @@ final class ProjectCodeProvider
         RunCommand::class,
         Application::class,
         ProgressFormatter::class,
-        XdebugProcess::class,
+        OriginalPhpProcess::class,
         ComposerExecutableFinder::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,

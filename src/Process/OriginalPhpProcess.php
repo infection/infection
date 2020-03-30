@@ -47,7 +47,7 @@ use Symfony\Component\Process\Process;
  * For example, if infection is launched with Xdebug, we usually restart the process without xdebug.
  * However, we may still require Xdebug for getting the coverage reports from the initial test run.
  */
-final class XdebugProcess extends Process
+final class OriginalPhpProcess extends Process
 {
     /**
      * @param array<string|bool>|null $env
