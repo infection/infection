@@ -55,7 +55,6 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutator\MutatorName;
-use function is_subclass_of;
 use Iterator;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Constraint\Callback;
@@ -389,8 +388,9 @@ final class MutationTestingRunnerTest extends TestCase
 
             $exepectedEventClass = get_class($expectedEvent);
 
+            // Handle mocks
             foreach ($expectedClasses as $expectedClassName) {
-                if (is_subclass_of($expectedEvent, $expectedClassName)) {
+                if ($expectedEvent instanceof $expectedClassName) {
                     $exepectedEventClass = $expectedClassName;
                 }
             }
