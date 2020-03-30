@@ -104,7 +104,7 @@ final class MutationTestingRunner
                 return false;
             })
             ->filter(function (Mutant $mutant) {
-                if ($mutant->getMutation()->getTimeToTest() < $this->timeout) {
+                if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
                     return true;
                 }
 

@@ -160,7 +160,7 @@ class Mutation
     /**
      * Overall time needed to run known tests for a mutation, excluding dependencies.
      */
-    public function getTimeToTest(): float
+    public function getNominalTestExecutionTime(): float
     {
         return $this->timeToTest ?? $this->timeToTest = array_sum(array_map(
             static function (TestLocation $testLocation) {
