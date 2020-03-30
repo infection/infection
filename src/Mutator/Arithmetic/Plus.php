@@ -72,7 +72,7 @@ TXT
 
     public function canMutate(Node $node): bool
     {
-        if (!($node instanceof Node\Expr\BinaryOp\Plus)) {
+        if (!$node instanceof Node\Expr\BinaryOp\Plus) {
             return false;
         }
 

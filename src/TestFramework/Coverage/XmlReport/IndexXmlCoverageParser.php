@@ -95,7 +95,7 @@ class IndexXmlCoverageParser
         $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
 
         if (
-            !($lineCoverage instanceof DOMElement)
+            !$lineCoverage instanceof DOMElement
             || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
             || $coverageCount === ''
         ) {
