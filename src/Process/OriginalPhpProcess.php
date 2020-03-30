@@ -33,22 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Exception;
+namespace Infection\Process;
 
-use Infection\Exception\InvalidTypeException;
-use PHPUnit\Framework\TestCase;
+use Composer\XdebugHandler\PhpConfig;
+use Symfony\Component\Process\Process;
 
-final class InvalidTypeExceptionTest extends TestCase
+/**
+ * @internal
+ *
+ * Process which is aware of the XdebugHandler configuration. This allows to start the sub-process
+ * with the original configuration.
+ *
+ * For example, if infection is launched with Xdebug, we usually restart the process without xdebug.
+ * However, we may still require Xdebug for getting the coverage reports from the initial test run.
+ */
+final class OriginalPhpProcess extends Process
 {
-    public function test_it_has_correct_user_facing_message(): void
+    /**
+     * @param array<string|bool>|null $env
+     */
+    public function start(?callable $callback = null, ?array $env = null): void
     {
-        $type = 'FooType';
+        $phpConfig = new PhpConfig();
+        $phpConfig->useOriginal();
 
-        $exception = InvalidTypeException::create($type);
+        parent::start($callback, $env ?? []);
 
-        $this->assertSame(
-            'Invalid type "' . $type . '" passed.',
-            $exception->getMessage()
-        );
+        $phpConfig->usePersistent();
     }
 }

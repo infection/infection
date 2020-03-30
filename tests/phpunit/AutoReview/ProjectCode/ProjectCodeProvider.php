@@ -48,6 +48,7 @@ use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Application;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
+use Infection\Console\XdebugHandler;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\FileSystem\DummyFileSystem;
@@ -60,7 +61,8 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Process\XdebugProcess;
+use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\Process\OriginalPhpProcess;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -92,7 +94,7 @@ final class ProjectCodeProvider
         RunCommand::class,
         Application::class,
         ProgressFormatter::class,
-        XdebugProcess::class,
+        OriginalPhpProcess::class,
         ComposerExecutableFinder::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
@@ -104,6 +106,7 @@ final class ProjectCodeProvider
         DetectionStatus::class,
         DummyFileSystem::class,
         MutationAttributeKeys::class,
+        XdebugHandler::class,
     ];
 
     /**
@@ -116,6 +119,7 @@ final class ProjectCodeProvider
         TestFrameworkFinder::class,
         StrykerDashboardClient::class,
         MetricsCalculator::class,
+        InitialTestRunProcessBuilder::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
     ];
