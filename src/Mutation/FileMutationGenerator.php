@@ -41,7 +41,7 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
+use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use Webmozart\Assert\Assert;
@@ -91,7 +91,7 @@ class FileMutationGenerator
 
         $initialStatements = $this->parser->parse($fileInfo);
 
-        $mutationsCollectorVisitor = new MutationsCollectorVisitor(
+        $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 $mutators,
                 $fileInfo->getPathname(),
@@ -102,10 +102,10 @@ class FileMutationGenerator
             )
         );
 
-        $traverser = $this->traverserFactory->create($mutationsCollectorVisitor, $nodeIgnorers);
+        $traverser = $this->traverserFactory->create($mutationCollectorVisitor, $nodeIgnorers);
 
         $traverser->traverse($initialStatements);
 
-        yield from $mutationsCollectorVisitor->getMutations();
+        yield from $mutationCollectorVisitor->getMutations();
     }
 }
