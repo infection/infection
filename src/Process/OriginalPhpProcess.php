@@ -33,29 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\Util;
+namespace Infection\Process;
 
 use Composer\XdebugHandler\PhpConfig;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ *
+ * Process which is aware of the XdebugHandler configuration. This allows to start the sub-process
+ * with the original configuration.
+ *
+ * For example, if infection is launched with Xdebug, we usually restart the process without xdebug.
+ * However, we may still require Xdebug for getting the coverage reports from the initial test run.
  */
-final class PhpProcess extends Process
+final class OriginalPhpProcess extends Process
 {
     /**
-     * Runs a PHP process with xdebug loaded
-     *
-     * If xdebug was loaded in the main process, it will have been restarted
-     * without xdebug and configured to keep xdebug out of PHP sub-processes.
-     *
-     * This method allows a sub-process to run with xdebug enabled (if it was
-     * originally loaded), then restores the xdebug-free environment.
-     *
-     * This means that we can use xdebug when it is required and not have to
-     * worry about it for the bulk of other processes, which do not need it and
-     * work better without it.
-     *
      * @param array<string|bool>|null $env
      */
     public function start(?callable $callback = null, ?array $env = null): void
