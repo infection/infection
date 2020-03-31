@@ -42,6 +42,7 @@ use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use const PHP_SAPI;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\InputStream;
@@ -80,6 +81,10 @@ final class InitialTestsRunnerTest extends TestCase
 
     protected function setUp(): void
     {
+        if (PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('The processes do not work the same way in PGPDBG');
+        }
+
         $this->processFactoryMock = $this->createMock(InitialTestsRunProcessFactory::class);
 
         $this->eventDispatcher = new EventDispatcherCollector();
