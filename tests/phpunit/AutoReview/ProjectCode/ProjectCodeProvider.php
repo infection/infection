@@ -61,7 +61,6 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\OriginalPhpProcess;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
@@ -119,7 +118,6 @@ final class ProjectCodeProvider
         TestFrameworkFinder::class,
         StrykerDashboardClient::class,
         MetricsCalculator::class,
-        InitialTestRunProcessBuilder::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
     ];
