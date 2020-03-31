@@ -33,38 +33,55 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\Util;
+namespace Infection\Process\Factory;
 
-use Composer\XdebugHandler\PhpConfig;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Process\OriginalPhpProcess;
+use function method_exists;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class PhpProcess extends Process
+class InitialTestsRunProcessFactory
 {
-    /**
-     * Runs a PHP process with xdebug loaded
-     *
-     * If xdebug was loaded in the main process, it will have been restarted
-     * without xdebug and configured to keep xdebug out of PHP sub-processes.
-     *
-     * This method allows a sub-process to run with xdebug enabled (if it was
-     * originally loaded), then restores the xdebug-free environment.
-     *
-     * This means that we can use xdebug when it is required and not have to
-     * worry about it for the bulk of other processes, which do not need it and
-     * work better without it.
-     *
-     * @param array<string|bool>|null $env
-     */
-    public function start(?callable $callback = null, ?array $env = null): void
+    private $testFrameworkAdapter;
+
+    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
     {
-        $phpConfig = new PhpConfig();
-        $phpConfig->useOriginal();
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
+    }
 
-        parent::start($callback, $env ?? []);
+    /**
+     * Creates process with enabled debugger as test framework is going to use in the code coverage.
+     *
+     * @param string[] $phpExtraOptions
+     */
+    public function createProcess(
+        string $testFrameworkExtraOptions,
+        array $phpExtraOptions,
+        bool $skipCoverage
+    ): Process {
+        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
+        $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
 
-        $phpConfig->usePersistent();
+        /** @var Process $process */
+        $process = new $processClass(
+            $this->testFrameworkAdapter->getInitialTestRunCommandLine(
+                $testFrameworkExtraOptions,
+                $phpExtraOptions,
+                $skipCoverage
+            )
+        );
+
+        $process->setTimeout(null); // Ignore the default timeout of 60 seconds
+
+        if (method_exists($process, 'inheritEnvironmentVariables')) {
+            // In version 4.4.0 this method is deprecated and removed in 5.0.0
+            $process->inheritEnvironmentVariables();
+        }
+
+        return $process;
     }
 }

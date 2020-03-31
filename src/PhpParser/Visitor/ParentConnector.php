@@ -33,25 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Builder;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\TestCase;
+use Infection\CannotBeInstantiated;
+use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
-final class InitialTestRunProcessBuilderTest extends TestCase
+/**
+ * @internal
+ */
+final class ParentConnector
 {
-    public function test_it_creates_a_process_with_no_timeout(): void
+    use CannotBeInstantiated;
+
+    private const PARENT_ATTRIBUTE = 'parent';
+
+    public static function setParent(Node $node, ?Node $parent): void
     {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getInitialTestRunCommandLine')
-            ->willReturn(['/usr/bin/php']);
+        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent);
+    }
 
-        $builder = new InitialTestRunProcessBuilder($fwAdapter);
+    public static function getParent(Node $node): Node
+    {
+        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
 
-        $process = $builder->createProcess('', false);
+        return $node->getAttribute(self::PARENT_ATTRIBUTE);
+    }
 
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertNull($process->getTimeout());
+    public static function findParent(Node $node): ?Node
+    {
+        return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
     }
 }
