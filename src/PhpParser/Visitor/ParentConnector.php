@@ -33,22 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Exception;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Exception\InvalidTypeException;
-use PHPUnit\Framework\TestCase;
+use Infection\CannotBeInstantiated;
+use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
-final class InvalidTypeExceptionTest extends TestCase
+/**
+ * @internal
+ */
+final class ParentConnector
 {
-    public function test_it_has_correct_user_facing_message(): void
+    use CannotBeInstantiated;
+
+    private const PARENT_ATTRIBUTE = 'parent';
+
+    public static function setParent(Node $node, ?Node $parent): void
     {
-        $type = 'FooType';
+        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent);
+    }
 
-        $exception = InvalidTypeException::create($type);
+    public static function getParent(Node $node): Node
+    {
+        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
 
-        $this->assertSame(
-            'Invalid type "' . $type . '" passed.',
-            $exception->getMessage()
-        );
+        return $node->getAttribute(self::PARENT_ATTRIBUTE);
+    }
+
+    public static function findParent(Node $node): ?Node
+    {
+        return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
     }
 }

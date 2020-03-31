@@ -33,20 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Exception;
+namespace Infection\Process;
 
-use Exception;
-use function Safe\sprintf;
+use Composer\XdebugHandler\PhpConfig;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ *
+ * Process which is aware of the XdebugHandler configuration. This allows to start the sub-process
+ * with the original configuration.
+ *
+ * For example, if infection is launched with Xdebug, we usually restart the process without xdebug.
+ * However, we may still require Xdebug for getting the coverage reports from the initial test run.
  */
-final class InvalidTypeException extends Exception
+final class OriginalPhpProcess extends Process
 {
-    public static function create(string $type): self
+    /**
+     * @param array<string|bool>|null $env
+     */
+    public function start(?callable $callback = null, ?array $env = null): void
     {
-        return new self(
-            sprintf('Invalid type "%s" passed.', $type)
-        );
+        $phpConfig = new PhpConfig();
+        $phpConfig->useOriginal();
+
+        parent::start($callback, $env ?? []);
+
+        $phpConfig->usePersistent();
     }
 }

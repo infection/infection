@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Memory;
 
-use function floor;
 use function log;
 use function number_format;
+use function round;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
@@ -66,7 +66,7 @@ final class MemoryFormatter
             'Expected a positive or null amount of bytes. Got: %s'
         );
 
-        $power = $bytes > 0 ? (int) floor(log($bytes, 1024)) : 0;
+        $power = $bytes > 0 ? round(log($bytes, 1023)) : 0;
 
         return sprintf(
             '%s%s',

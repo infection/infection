@@ -35,25 +35,30 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Exception;
+use function extension_loaded;
+use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
+use Infection\Console\XdebugHandler;
 use Infection\Container;
 use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasStarted;
+use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
+use const PHP_SAPI;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
@@ -83,7 +88,10 @@ final class RunCommand extends BaseCommand
                 'test-framework',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Name of the Test framework to use (' . implode(', ', TestFrameworkTypes::TYPES) . ')',
+                sprintf(
+                    'Name of the Test framework to use ("%s")',
+                    implode('", "', TestFrameworkTypes::TYPES)
+                ),
                 ''
             )
             ->addOption(
@@ -96,7 +104,7 @@ final class RunCommand extends BaseCommand
                 'threads',
                 'j',
                 InputOption::VALUE_REQUIRED,
-                'Threads count',
+                'Number of threads to use by the runner when executing the mutations',
                 '1'
             )
             ->addOption(
@@ -109,7 +117,7 @@ final class RunCommand extends BaseCommand
                 'show-mutations',
                 's',
                 InputOption::VALUE_NONE,
-                'Show mutations to the console'
+                'Show escaped (and non-covered in verbose mode) mutations to the console'
             )
             ->addOption(
                 'no-progress',
@@ -121,19 +129,19 @@ final class RunCommand extends BaseCommand
                 'configuration',
                 'c',
                 InputOption::VALUE_REQUIRED,
-                'Custom configuration file path'
+                'Path to the configuration file to use'
             )
             ->addOption(
                 'coverage',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Path to existing coverage (`xml` and `junit` reports are required)'
+                'Path to existing coverage directory'
             )
             ->addOption(
                 'mutators',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Specify particular mutators. Example: --mutators=Plus,PublicVisibility'
+                'Specify particular mutators, e.g. "--mutators=Plus,PublicVisibility"'
             )
             ->addOption(
                 'filter',
@@ -146,39 +154,39 @@ final class RunCommand extends BaseCommand
                 'formatter',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Output formatter. Possible values: dot, progress',
+                '"dot" or "progress"',
                 'dot'
             )
             ->addOption(
                 'min-msi',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Minimum Mutation Score Indicator (MSI) percentage value. Should be used in CI server.'
+                'Minimum Mutation Score Indicator (MSI) percentage value'
             )
             ->addOption(
                 'min-covered-msi',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Minimum Covered Code Mutation Score Indicator (MSI) percentage value. Should be used in CI server.'
+                'Minimum Covered Code Mutation Score Indicator (MSI) percentage value'
             )
             ->addOption(
                 'log-verbosity',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Log verbosity level. \'all\' - full logs format, \'default\' - short logs format, \'none\' - no logs.',
+                '"all" - full logs format, "default" - short logs format, "none" - no logs',
                 LogVerbosity::NORMAL
             )
             ->addOption(
                 'initial-tests-php-options',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Extra php options for the initial test runner. Will be ignored if --coverage option presented.'
+                'PHP options passed to the PHP executable when executing the initial tests. Will be ignored if "--coverage" option presented'
             )
             ->addOption(
                 'skip-initial-tests',
                 null,
                 InputOption::VALUE_NONE,
-                'Skips the initial test runs - requires the coverage to be provided via the --coverage option.'
+                'Skips the initial test runs. Requires the coverage to be provided via the "--coverage" option'
             )
             ->addOption(
                 'ignore-msi-with-no-mutations',
@@ -190,13 +198,13 @@ final class RunCommand extends BaseCommand
                 'debug',
                 null,
                 InputOption::VALUE_NONE,
-                'Debug mode. Will not clean up Infection temporary folder.'
+                'Will not clean up Infection temporary folder'
             )
             ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
-                'Dry run. Will not clean up Infection temporary folder.'
+                'Will not apply the mutations'
             )
         ;
     }
@@ -217,14 +225,16 @@ final class RunCommand extends BaseCommand
 
         $this->installTestFrameworkIfNeeded($input, $output);
 
-        $this->consoleOutput = $this->getApplication()->getConsoleOutput();
+        $this->consoleOutput = new ConsoleOutput(new SymfonyStyle($input, $output));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        XdebugHandler::check(new ConsoleLogger($output));
+
         $io = new SymfonyStyle($input, $output);
 
-        $this->startUp();
+        $this->startUp($io);
 
         $engine = new Engine(
             $this->container->getConfiguration(),
@@ -315,9 +325,22 @@ final class RunCommand extends BaseCommand
         $this->container->getAdapterInstaller()->install($adapterName);
     }
 
-    private function startUp(): void
+    private function startUp(SymfonyStyle $io): void
     {
         Assert::notNull($this->container);
+
+        $io->writeln($this->getApplication()->getHelp());
+        $io->newLine();
+
+        $this->logRunningWithDebugger();
+
+        if (!$this->getApplication()->isAutoExitEnabled()) {
+            // When we're not in control of exit codes, that means it's the caller
+            // responsibility to disable xdebug if it isn't needed. As of writing
+            // that's only the case during E2E testing. Show a warning nevertheless.
+
+            $this->consoleOutput->logNotInControlOfExitCodes();
+        }
 
         $this->container->getCoverageChecker()->checkCoverageRequirements();
 
@@ -344,7 +367,7 @@ final class RunCommand extends BaseCommand
                 SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
                 SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
             ]);
-        } catch (Exception $exception) {
+        } catch (FileNotFound | FileOrDirectoryNotFound $exception) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
@@ -376,5 +399,16 @@ final class RunCommand extends BaseCommand
         (static function (string $infectionBootstrapFile): void {
             require_once $infectionBootstrapFile;
         })($bootstrap);
+    }
+
+    private function logRunningWithDebugger(): void
+    {
+        if (PHP_SAPI === 'phpdbg') {
+            $this->consoleOutput->logRunningWithDebugger(PHP_SAPI);
+        } elseif (extension_loaded('xdebug')) {
+            $this->consoleOutput->logRunningWithDebugger('Xdebug');
+        } elseif (extension_loaded('pcov')) {
+            $this->consoleOutput->logRunningWithDebugger('PCOV');
+        }
     }
 }

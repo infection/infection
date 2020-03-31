@@ -66,7 +66,7 @@ use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
@@ -83,6 +83,7 @@ use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\TestFramework\AdapterInstallationDecider;
@@ -162,10 +163,8 @@ final class Container
             TmpDirProvider::class => static function (): TmpDirProvider {
                 return new TmpDirProvider();
             },
-            IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
-                return new IndexXmlCoverageParser(
-                    $container->getConfiguration()->getCoveragePath(),
-                );
+            IndexXmlCoverageParser::class => static function (): IndexXmlCoverageParser {
+                return new IndexXmlCoverageParser();
             },
             XmlCoverageParser::class => static function (): XmlCoverageParser {
                 // TODO XmlCoverageParser might want to notify ProcessRunner if it can't parse another file due to lack of RAM
@@ -259,7 +258,7 @@ final class Container
                 );
             },
             Lexer::class => static function (): Lexer {
-                $attributes = Mutation::ATTRIBUTE_KEYS;
+                $attributes = MutationAttributeKeys::ALL;
                 $attributes[] = 'comments';
 
                 return new Lexer\Emulative(['usedAttributes' => $attributes]);
@@ -288,7 +287,11 @@ final class Container
                 return new MemoryFormatter();
             },
             MemoryLimiter::class => static function (self $container): MemoryLimiter {
-                return new MemoryLimiter($container->getFileSystem(), php_ini_loaded_file());
+                return new MemoryLimiter(
+                    $container->getFileSystem(),
+                    (string) php_ini_loaded_file(),
+                    new MemoryLimiterEnvironment()
+                );
             },
             SchemaConfigurationLoader::class => static function (self $container): SchemaConfigurationLoader {
                 return new SchemaConfigurationLoader(
@@ -591,7 +594,7 @@ final class Container
         return $this->defaultJUnitPath ?? $this->defaultJUnitPath = sprintf(
             '%s/%s',
             Path::canonicalize(
-                $this->getConfiguration()->getCoveragePath() . '/..'
+                $this->getConfiguration()->getCoveragePath()
             ),
             'junit.xml'
         );

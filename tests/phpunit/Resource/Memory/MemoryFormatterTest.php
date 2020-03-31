@@ -81,6 +81,10 @@ final class MemoryFormatterTest extends TestCase
 
         yield [10., '10.00B'];
 
+        yield [512., '0.50KB'];
+
+        yield [768., '0.75KB'];
+
         yield [1024., '1.00KB'];
 
         yield [1024 ** 2, '1.00MB'];

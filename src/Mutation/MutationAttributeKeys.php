@@ -33,18 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Mutation;
 
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Infection\CannotBeInstantiated;
 
 /**
  * @internal
  */
-final class CloneVisitor extends NodeVisitorAbstract
+final class MutationAttributeKeys
 {
-    public function enterNode(Node $node): Node
-    {
-        return clone $node;
-    }
+    use CannotBeInstantiated;
+
+    public const START_LINE = 'startLine';
+    public const END_LINE = 'endLine';
+    public const START_TOKEN_POS = 'startTokenPos';
+    public const END_TOKEN_POS = 'endTokenPos';
+    public const START_FILE_POS = 'startFilePos';
+    public const END_FILE_POS = 'endFilePos';
+
+    public const ALL = [
+        self::START_LINE,
+        self::END_LINE,
+        self::START_TOKEN_POS,
+        self::END_TOKEN_POS,
+        self::START_FILE_POS,
+        self::END_FILE_POS,
+    ];
 }

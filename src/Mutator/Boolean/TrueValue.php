@@ -41,7 +41,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 use function Safe\array_flip;
 
@@ -92,8 +92,8 @@ final class TrueValue implements ConfigurableMutator
             return false;
         }
 
-        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
-        $grandParentNode = $parentNode !== null ? $parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY) : null;
+        $parentNode = ParentConnector::findParent($node);
+        $grandParentNode = $parentNode !== null ? ParentConnector::findParent($parentNode) : null;
 
         if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
             return true;

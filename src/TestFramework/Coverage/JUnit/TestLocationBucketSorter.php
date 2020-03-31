@@ -33,30 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\Exception;
+namespace Infection\TestFramework\Coverage\JUnit;
 
-use RuntimeException;
-use function Safe\sprintf;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use function Safe\ksort;
 
 /**
  * @internal
  */
-final class InvalidConfigException extends RuntimeException
+final class TestLocationBucketSorter
 {
-    public static function invalidMutator(string $mutator): self
+    /**
+     * Pre-sort first buckets, optimistically assuming that most projects
+     * won't have tests longer than a second.
+     */
+    private const INIT_BUCKETS = [
+        0 => [],
+        1 => [],
+        2 => [],
+        3 => [],
+        4 => [],
+        5 => [],
+        6 => [],
+        7 => [],
+    ];
+
+    private function __construct()
     {
-        return new self(sprintf(
-           'The "%s" mutator/profile was not recognized.',
-           $mutator
-        ));
     }
 
-    public static function invalidProfile(string $profile, string $mutator): self
+    /**
+     * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
+     *
+     * @param TestLocation[] $uniqueTestLocations
+     *
+     * @return iterable<TestLocation>
+     */
+    public static function bucketSort(array $uniqueTestLocations): iterable
     {
-        return new self(sprintf(
-            'The "%s" profile contains the "%s" mutator which was not recognized.',
-            $profile,
-            $mutator
-        ));
+        $buckets = self::INIT_BUCKETS;
+
+        foreach ($uniqueTestLocations as $location) {
+            // @codeCoverageIgnoreStart
+            // This is a very hot path. Factoring here another method just to test this math may not be as good idea.
+
+            // Quick drop off lower bits, reducing precision to 8th of a second
+            $msTime = $location->getExecutionTime() * 1024 >> 7; // * 1024 / 128
+
+            // For anything above 4 seconds reduce precision to 4 seconds
+            if ($msTime > 32) {
+                $msTime = $msTime >> 5 << 5; // 7 + 5 = 12 bits
+            }
+            // @codeCoverageIgnoreEnd
+
+            $buckets[$msTime][] = $location;
+        }
+
+        ksort($buckets);
+
+        foreach ($buckets as $bucket) {
+            yield from $bucket;
+        }
     }
 }

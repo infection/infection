@@ -54,15 +54,6 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
-    public const ATTRIBUTE_KEYS = [
-        'startLine',
-        'endLine',
-        'startTokenPos',
-        'endTokenPos',
-        'startFilePos',
-        'endFilePos',
-    ];
-
     private $originalFilePath;
     private $mutatorName;
     private $mutatedNodeClass;
@@ -96,14 +87,14 @@ class Mutation
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
-        foreach (self::ATTRIBUTE_KEYS as $key) {
+        foreach (MutationAttributeKeys::ALL as $key) {
             Assert::keyExists($attributes, $key);
         }
 
         $this->originalFilePath = $originalFilePath;
         $this->originalFileAst = $originalFileAst;
         $this->mutatorName = $mutatorName;
-        $this->attributes = array_intersect_key($attributes, array_flip(self::ATTRIBUTE_KEYS));
+        $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
         $this->mutatedNodeClass = $mutatedNodeClass;
         $this->mutatedNode = $mutatedNode;
         $this->mutationByMutatorIndex = $mutationByMutatorIndex;

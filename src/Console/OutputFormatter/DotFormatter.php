@@ -64,7 +64,7 @@ final class DotFormatter extends AbstractOutputFormatter
             '',
             '<killed>.</killed>: killed, '
             . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>S</uncovered>: uncovered, '
+            . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
             . '<timeout>T</timeout>: timed out, '
             . '<constrained>C</constrained>: constrained',
@@ -82,7 +82,7 @@ final class DotFormatter extends AbstractOutputFormatter
 
                 break;
             case DetectionStatus::NOT_COVERED:
-                $this->output->write('<uncovered>S</uncovered>');
+                $this->output->write('<uncovered>U</uncovered>');
 
                 break;
             case DetectionStatus::ESCAPED:

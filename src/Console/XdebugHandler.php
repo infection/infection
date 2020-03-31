@@ -33,56 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Config\Exception;
+namespace Infection\Console;
 
-use Infection\Config\Exception\InvalidConfigException;
-use PHPUnit\Framework\TestCase;
-use RuntimeException;
-use function Safe\sprintf;
+use Composer\XdebugHandler\XdebugHandler as ComposerXdebugHandler;
+use Infection\CannotBeInstantiated;
+use Psr\Log\LoggerInterface;
 
-final class InvalidConfigExceptionTest extends TestCase
+/**
+ * @internal
+ */
+final class XdebugHandler
 {
-    public function test_extends_runtime_exception(): void
+    use CannotBeInstantiated;
+
+    private const PREFIX = 'INFECTION';
+
+    public static function check(LoggerInterface $logger): void
     {
-        $exception = new InvalidConfigException();
-
-        $this->assertInstanceOf(RuntimeException::class, $exception);
-    }
-
-    public function test_invalid_mutator_creates_exception(): void
-    {
-        $wrongMutator = 'NonExistent Mutator';
-
-        $exception = InvalidConfigException::invalidMutator($wrongMutator);
-
-        $this->assertInstanceOf(InvalidConfigException::class, $exception);
-
-        $expected = sprintf(
-            'The "%s" mutator/profile was not recognized.',
-            $wrongMutator
-        );
-
-        $this->assertSame($expected, $exception->getMessage());
-    }
-
-    public function test_invalid_profile_creates_exception(): void
-    {
-        $configFile = '@hello';
-        $errorMessage = 'Wrong Mutator';
-
-        $exception = InvalidConfigException::invalidProfile(
-            $configFile,
-            $errorMessage
-        );
-
-        $this->assertInstanceOf(InvalidConfigException::class, $exception);
-
-        $expected = sprintf(
-            'The "%s" profile contains the "%s" mutator which was not recognized.',
-            $configFile,
-            $errorMessage
-        );
-
-        $this->assertSame($expected, $exception->getMessage());
+        // We force the color option unconditionally since it is able to detect the --no-ansi option
+        // to disable it if necessary
+        (new ComposerXdebugHandler(self::PREFIX, '--ansi'))
+            ->setLogger($logger)
+            ->setPersistent()
+            ->check()
+        ;
     }
 }
