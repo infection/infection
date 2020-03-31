@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Builder;
+namespace Infection\Tests\Process\Factory;
 
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -45,7 +45,7 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Process\Builder\MutantProcessFactory;
+use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutator\MutatorName;
 use const PHP_OS_FAMILY;
@@ -93,7 +93,6 @@ final class MutantProcessFactoryTest extends TestCase
 DIFF
         );
 
-        $timeout = 100;
         $testFrameworkExtraOptions = '--verbose';
 
         $testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
