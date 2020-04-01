@@ -79,6 +79,6 @@ TXT
 
         $parentNode = ParentConnector::findParent($node);
 
-        return !($parentNode instanceof Node\Stmt\Case_);
+        return !$parentNode instanceof Node\Stmt\Case_;
     }
 }

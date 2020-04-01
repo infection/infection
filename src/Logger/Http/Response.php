@@ -33,43 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Http;
+namespace Infection\Logger\Http;
 
-use Infection\Http\Response;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
-final class ResponseTest extends TestCase
+/**
+ * @internal
+ */
+final class Response
 {
-    /**
-     * @dataProvider valueProvider
-     */
-    public function test_it_can_be_instantiated(int $statusCode, string $body): void
-    {
-        $response = new Response($statusCode, $body);
+    public const CREATED_RESPONSE_CODE = 201;
 
-        $this->assertSame($statusCode, $response->getStatusCode());
-        $this->assertSame($body, $response->getBody());
+    private $statusCode;
+    private $body;
+
+    public function __construct(int $statusCode, string $body)
+    {
+        Assert::range(
+            $statusCode,
+            200,
+            599,
+            'Expected an HTTP status code. Got "%s"'
+        );
+
+        $this->statusCode = $statusCode;
+        $this->body = $body;
     }
 
-    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_HTTP_status_code(): void
+    public function getStatusCode(): int
     {
-        try {
-            new Response(102, '');
-
-            $this->fail();
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Expected an HTTP status code. Got "102"',
-                $exception->getMessage()
-            );
-        }
+        return $this->statusCode;
     }
 
-    public function valueProvider(): iterable
+    public function getBody(): string
     {
-        yield 'empty' => [200, ''];
-
-        yield 'nominal' => [200, 'body'];
+        return $this->body;
     }
 }
