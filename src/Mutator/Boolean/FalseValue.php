@@ -69,7 +69,7 @@ final class FalseValue implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        if (!($node instanceof Node\Expr\ConstFetch)) {
+        if (!$node instanceof Node\Expr\ConstFetch) {
             return false;
         }
 
