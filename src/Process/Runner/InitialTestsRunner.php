@@ -41,20 +41,18 @@ use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Symfony\Component\Process\Process;
+use function time;
 
 /**
  * @internal
  */
 final class InitialTestsRunner
 {
-    private const ERROR_TIMEOUT = 10;
+    private const ERROR_TIMEOUT = 10; // Time To Allow Errors To Exit (Seconds)
 
     private $processBuilder;
     private $eventDispatcher;
 
-    /**
-     * InitialTestsRunner constructor.
-     */
     public function __construct(
         InitialTestsRunProcessFactory $processFactory,
         EventDispatcher $eventDispatcher
@@ -71,32 +69,29 @@ final class InitialTestsRunner
         array $phpExtraOptions,
         bool $skipCoverage
     ): Process {
-        /** @var Process $process */
         $process = $this->processBuilder->createProcess(
             $testFrameworkExtraOptions,
             $phpExtraOptions,
             $skipCoverage
         );
 
-        //Tracking Process Error Exit
-        $expirationData = (object) [
-            'time' => null,
-        ];
+        // Tracking Process Error Exit
+        $expirationTime = null;
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
 
-        $process->run(function (string $type) use ($process, $expirationData): void {
+        $process->run(function (string $type) use ($process, &$expirationTime): void {
             if ($process::ERR === $type) {
-                //If already started, do not start again and let parent one run - prevent infinite loop.
-                //->isRunning calls the callback again every time there is any updated output.
-                if ($expirationData->time !== null) {
+                // If already started, do not start again and let parent one run - prevent infinite loop.
+                // ->isRunning calls the callback again every time there is any updated output.
+                if ($expirationTime !== null) {
                     return;
                 }
 
-                //Give The Error Processing Time To Fully Output
-                $expirationData->time = time() + self::ERROR_TIMEOUT;
+                // Give The Error Processing Time To Fully Output
+                $expirationTime = time() + self::ERROR_TIMEOUT;
 
-                while ($process->isRunning() && time() < $expirationData->time) {
+                while ($process->isRunning() && time() < $expirationTime) {
                     usleep(100);
                 }
 

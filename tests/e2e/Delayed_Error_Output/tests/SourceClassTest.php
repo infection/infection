@@ -9,13 +9,13 @@ class SourceClassTest extends TestCase
 {
     public function test_hello()
     {
-        $outHandle = fopen('php://stderr', 'w');
-        fwrite($outHandle, 'Start Of Error');
+        $stderrHandle = fopen('php://stderr', 'w');
+        fwrite($stderrHandle, 'Start Of Error');
 
         sleep(5);
 
-        fwrite($outHandle, 'End Of Error');
-        fclose($outHandle);
+        fwrite($stderrHandle, 'End Of Error');
+        fclose($stderrHandle);
 
         $this->assertFalse(true);
     }

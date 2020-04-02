@@ -3167,5 +3167,6 @@
     },
     "platform-overrides": {
         "php": "7.3.12"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }
