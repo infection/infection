@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutation\Mutation;
-use Infection\Process\MutationProcess;
+use Infection\Process\MutantProcess;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-final class MutationProcessTest extends TestCase
+final class MutantProcessTest extends TestCase
 {
     /**
      * @var MockObject|Process
@@ -54,7 +54,7 @@ final class MutationProcessTest extends TestCase
     private $mutationMock;
 
     /**
-     * @var MutationProcess
+     * @var MutantProcess
      */
     private $mutationProcess;
 
@@ -63,7 +63,7 @@ final class MutationProcessTest extends TestCase
         $this->processMock = $this->createMock(Process::class);
         $this->mutationMock = $this->createMock(Mutation::class);
 
-        $this->mutationProcess = new MutationProcess($this->processMock, $this->mutationMock);
+        $this->mutationProcess = new MutantProcess($this->processMock, $this->mutationMock);
     }
 
     public function test_it_exposes_its_state(): void
@@ -106,7 +106,7 @@ final class MutationProcessTest extends TestCase
     }
 
     private function assertMutationProcessStateIs(
-        MutationProcess $mutationProcess,
+        MutantProcess $mutationProcess,
         Process $expectedProcess,
         Mutation $expectedMutation,
         bool $expectedTimedOut

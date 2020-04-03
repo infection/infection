@@ -39,7 +39,7 @@ use function array_map;
 use function explode;
 use function implode;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutation\MutationExecutionResult;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Str;
 use const PHP_EOL;
 use function Safe\sprintf;
@@ -112,7 +112,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     }
 
     /**
-     * @param MutationExecutionResult[] $executionResults
+     * @param MutantExecutionResult[] $executionResults
      */
     private function getResultsLine(
         array $executionResults,
@@ -173,7 +173,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
         );
     }
 
-    private static function getMutatorLine(int $index, MutationExecutionResult $mutantProcess): string
+    private static function getMutatorLine(int $index, MutantExecutionResult $mutantProcess): string
     {
         return sprintf(
             '%d) %s:%d    [M] %s',

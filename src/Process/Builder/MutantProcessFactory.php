@@ -37,10 +37,10 @@ namespace Infection\Process\Builder;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutationProcessWasFinished;
+use Infection\Event\MutantProcessWasFinished;
+use Infection\Mutation\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationExecutionResultFactory;
-use Infection\Process\MutationProcess;
+use Infection\Process\MutantProcess;
 use function method_exists;
 use Symfony\Component\Process\Process;
 
@@ -48,7 +48,7 @@ use Symfony\Component\Process\Process;
  * @internal
  * @final
  */
-class MutationProcessFactory
+class MutantProcessFactory
 {
     private $testFrameworkAdapter;
     private $timeout;
@@ -60,7 +60,7 @@ class MutationProcessFactory
         TestFrameworkAdapter $testFrameworkAdapter,
         int $timeout,
         EventDispatcher $eventDispatcher,
-        MutationExecutionResultFactory $resultFactory
+        MutantExecutionResultFactory $resultFactory
     ) {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
         $this->timeout = $timeout;
@@ -68,7 +68,7 @@ class MutationProcessFactory
         $this->resultFactory = $resultFactory;
     }
 
-    public function createProcessForMutation(Mutation $mutation, string $testFrameworkExtraOptions = ''): MutationProcess
+    public function createProcessForMutation(Mutation $mutation, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
@@ -87,21 +87,21 @@ class MutationProcessFactory
             $process->inheritEnvironmentVariables();
         }
 
-        $mutationProcess = new MutationProcess($process, $mutation);
+        $mutantProcess = new MutantProcess($process, $mutation);
 
         $eventDispatcher = $this->eventDispatcher;
         $resultFactory = $this->resultFactory;
 
-        $mutationProcess->registerTerminateProcessClosure(static function () use (
-            $mutationProcess,
+        $mutantProcess->registerTerminateProcessClosure(static function () use (
+            $mutantProcess,
             $eventDispatcher,
             $resultFactory
         ): void {
-            $eventDispatcher->dispatch(new MutationProcessWasFinished(
-                $resultFactory->createFromProcess($mutationProcess))
+            $eventDispatcher->dispatch(new MutantProcessWasFinished(
+                $resultFactory->createFromProcess($mutantProcess))
             );
         });
 
-        return $mutationProcess;
+        return $mutantProcess;
     }
 }

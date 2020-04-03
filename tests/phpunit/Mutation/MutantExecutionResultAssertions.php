@@ -35,100 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutation\DetectionStatus;
-use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationExecutionResult;
-use Infection\Mutator\ZeroIteration\For_;
-use Infection\Tests\Mutator\MutatorName;
-use PHPUnit\Framework\TestCase;
+use Infection\Mutant\MutantExecutionResult;
 
-final class MutationExecutionResultTest extends TestCase
+trait MutantExecutionResultAssertions
 {
-    public function test_it_can_be_instantiated(): void
-    {
-        $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"';
-        $processOutput = 'Passed!';
-        $processResultCode = DetectionStatus::ESCAPED;
-        $mutationDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#0';
-
-DIFF;
-
-        $mutatorName = MutatorName::getName(For_::class);
-        $originalFilePath = 'path/to/Foo.php';
-        $originalStartingLine = 10;
-
-        $result = new MutationExecutionResult(
-            $processCommandLine,
-            $processOutput,
-            $processResultCode,
-            $mutationDiff,
-            $mutatorName,
-            $originalFilePath,
-            $originalStartingLine
-        );
-
-        $this->assertResultStateIs(
-            $result,
-            $processCommandLine,
-            $processOutput,
-            $processResultCode,
-            $mutationDiff,
-            $mutatorName,
-            $originalFilePath,
-            $originalStartingLine
-        );
-    }
-
-    public function test_it_can_be_instantiated_from_a_mutation_non_executed_by_tests(): void
-    {
-        $mutationDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#0';
-
-DIFF;
-
-        $mutation = new Mutation(
-            $originalFilePath = 'path/to/Foo.php',
-            $mutatorName = MutatorName::getName(For_::class),
-            $originalStartingLine = 10,
-            [
-                new TestLocation(
-                    'FooTest::test_it_can_instantiate',
-                    '/path/to/acme/FooTest.php',
-                    0.01
-                ),
-            ],
-            '0800f',
-            '/path/to/mutation',
-            'notCovered#0',
-            $mutationDiff
-        );
-
-        $this->assertResultStateIs(
-            MutationExecutionResult::createFromNonExecutedByTestsMutation($mutation),
-            '',
-            '',
-            DetectionStatus::NOT_COVERED,
-            $mutationDiff,
-            $mutatorName,
-            $originalFilePath,
-            $originalStartingLine
-        );
-    }
-
     private function assertResultStateIs(
-        MutationExecutionResult $result,
+        MutantExecutionResult $result,
         string $expectedProcessCommandLine,
         string $expectedProcessOutput,
         string $expectedDetectionStatus,

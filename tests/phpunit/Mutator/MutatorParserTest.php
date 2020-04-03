@@ -68,7 +68,7 @@ final class MutatorParserTest extends TestCase
     public function test_it_cannot_parse_unknown_mutator(): void
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected "Unknown" to be a known mutator or profile. See "https://infection.github.io/guide/mutators.html" and "https://infection.github.io/guide/profiles.html" for the list of available mutations and profiles.');
+        $this->expectExceptionMessage('Expected "Unknown" to be a known mutator or profile. See "https://infection.github.io/guide/mutators.html" and "https://infection.github.io/guide/profiles.html" for the list of available mutants and profiles.');
 
         $this->mutatorParser->parse('Unknown');
     }

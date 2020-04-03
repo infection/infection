@@ -98,7 +98,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     }
 
     /**
-     * Returns array of arguments to pass them into the Mutation Symfony's process
+     * Returns array of arguments to pass them into the Mutant Symfony's process
      *
      * @param TestLocation[] $tests
      *
@@ -106,7 +106,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
      */
     public function getMutantCommandLine(
         array $tests,
-        string $mutationFilePath,
+        string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath,
         string $extraOptions
@@ -114,7 +114,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         return $this->getCommandLine(
             $this->buildMutationConfigFile(
                 $tests,
-                $mutationFilePath,
+                $mutantFilePath,
                 $mutationHash,
                 $mutationOriginalFilePath
             ),
@@ -166,13 +166,13 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
      */
     protected function buildMutationConfigFile(
        array $tests,
-       string $mutationFilePath,
+       string $mutantFilePath,
        string $mutationHash,
        string $mutationOriginalFilePath
     ): string {
         return $this->mutationConfigBuilder->build(
             $tests,
-            $mutationFilePath,
+            $mutantFilePath,
             $mutationHash,
             $mutationOriginalFilePath
         );

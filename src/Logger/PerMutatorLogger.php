@@ -76,7 +76,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
             /* @var MetricsCalculator $calculator */
             $table[] = [
                 $mutatorName,
-                (string) $calculator->getTotalMutationsCount(),
+                (string) $calculator->getTotalMutantsCount(),
                 (string) $calculator->getKilledCount(),
                 (string) $calculator->getEscapedCount(),
                 (string) $calculator->getErrorCount(),

@@ -55,7 +55,7 @@ final class SummaryFileLogger implements LineMutationTestingResultsLogger
     public function getLogLines(): array
     {
         return [
-            'Total: ' . $this->metricsCalculator->getTotalMutationsCount(),
+            'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
             '',
             'Killed: ' . $this->metricsCalculator->getKilledCount(),
             'Errored: ' . $this->metricsCalculator->getErrorCount(),

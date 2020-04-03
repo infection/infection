@@ -39,6 +39,7 @@ use function array_intersect_key;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
+use Infection\Mutant\MutantCodeFactory;
 use Infection\PhpParser\MutatedNode;
 use function md5;
 use PhpParser\Node;
@@ -61,18 +62,18 @@ class MutationFactory
      * @var string[]
      */
     private $printedFileCache = [];
-    private $mutationCodeFactory;
+    private $codeFactory;
 
     public function __construct(
         string $tmpDir,
         Differ $differ,
         PrettyPrinterAbstract $printer,
-        MutationCodeFactory $mutationCodeFactory
+        MutantCodeFactory $mutantCodeFactory
     ) {
         $this->tmpDir = $tmpDir;
         $this->differ = $differ;
         $this->printer = $printer;
-        $this->mutationCodeFactory = $mutationCodeFactory;
+        $this->codeFactory = $mutantCodeFactory;
     }
 
     /**
@@ -110,7 +111,7 @@ class MutationFactory
             $hash
         );
 
-        $mutatedCode = $this->mutationCodeFactory->createCode(
+        $mutatedCode = $this->codeFactory->createCode(
             $attributes,
             $originalFileAst,
             $mutatedNodeClass,

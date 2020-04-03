@@ -37,8 +37,8 @@ namespace Infection\Tests\Metrics;
 
 use function array_merge;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutation\DetectionStatus;
-use Infection\Mutation\MutationExecutionResult;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
@@ -56,7 +56,7 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0, $calculator->getEscapedCount());
         $this->assertSame(0, $calculator->getTimedOutCount());
         $this->assertSame(0, $calculator->getNotTestedCount());
-        $this->assertSame(0, $calculator->getTotalMutationsCount());
+        $this->assertSame(0, $calculator->getTotalMutantsCount());
 
         $this->assertSame([], $calculator->getKilledExecutionResults());
         $this->assertSame([], $calculator->getErrorExecutionResults());
@@ -122,7 +122,7 @@ final class MetricsCalculatorTest extends TestCase
             $calculator->getAllExecutionResults()
         );
 
-        $this->assertSame(14, $calculator->getTotalMutationsCount());
+        $this->assertSame(14, $calculator->getTotalMutantsCount());
         $this->assertSame(78.57, $calculator->getMutationScoreIndicator());
         $this->assertSame(92.86, $calculator->getCoverageRate());
         $this->assertSame(84.62, $calculator->getCoveredCodeMutationScoreIndicator());
@@ -154,7 +154,7 @@ final class MetricsCalculatorTest extends TestCase
     }
 
     /**
-     * @return MutationExecutionResult[]
+     * @return MutantExecutionResult[]
      */
     private function addMutationExecutionResult(
         MetricsCalculator $calculator,
@@ -172,12 +172,12 @@ final class MetricsCalculatorTest extends TestCase
         return $executionResults;
     }
 
-    private function createMutationExecutionResult(string $detectionStatus): MutationExecutionResult
+    private function createMutationExecutionResult(string $detectionStatus): MutantExecutionResult
     {
         $id = $this->id;
         ++$this->id;
 
-        return new MutationExecutionResult(
+        return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
             $detectionStatus,

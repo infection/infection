@@ -37,19 +37,19 @@ namespace Infection\Tests\Mutation;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Mutation\DetectionStatus;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutation\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\MutationProcess;
+use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-final class MutationExecutionResultFactoryTest extends TestCase
+final class MutantExecutionResultFactoryTest extends TestCase
 {
-    use MutationExecutionResultAssertions;
+    use MutantExecutionResultAssertions;
 
     /**
      * @var TestFrameworkAdapter|MockObject
@@ -57,7 +57,7 @@ final class MutationExecutionResultFactoryTest extends TestCase
     private $testFrameworkAdapterMock;
 
     /**
-     * @var MutationExecutionResultFactory
+     * @var MutantExecutionResultFactory
      */
     private $resultFactory;
 
@@ -65,10 +65,10 @@ final class MutationExecutionResultFactoryTest extends TestCase
     {
         $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
 
-        $this->resultFactory = new MutationExecutionResultFactory($this->testFrameworkAdapterMock);
+        $this->resultFactory = new MutantExecutionResultFactory($this->testFrameworkAdapterMock);
     }
 
-    public function test_it_can_create_a_result_from_a_non_covered_mutation_process(): void
+    public function test_it_can_create_a_result_from_a_non_covered_mutant_process(): void
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -101,7 +101,7 @@ final class MutationExecutionResultFactoryTest extends TestCase
 
 DIFF;
 
-        $mutationProcess = new MutationProcess(
+        $mutantProcess = new MutantProcess(
             $processMock,
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
@@ -116,7 +116,7 @@ DIFF;
         );
 
         $this->assertResultStateIs(
-            $this->resultFactory->createFromProcess($mutationProcess),
+            $this->resultFactory->createFromProcess($mutantProcess),
             $processCommandLine,
             $processOutput,
             DetectionStatus::NOT_COVERED,
@@ -127,7 +127,7 @@ DIFF;
         );
     }
 
-    public function test_it_can_create_a_result_from_a_timed_out_mutation_process(): void
+    public function test_it_can_create_a_result_from_a_timed_out_mutant_process(): void
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -160,7 +160,7 @@ DIFF;
 
 DIFF;
 
-        $mutationProcess = new MutationProcess(
+        $mutantProcess = new MutantProcess(
             $processMock,
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
@@ -180,10 +180,10 @@ DIFF;
             )
         );
 
-        $mutationProcess->markAsTimedOut();
+        $mutantProcess->markAsTimedOut();
 
         $this->assertResultStateIs(
-            $this->resultFactory->createFromProcess($mutationProcess),
+            $this->resultFactory->createFromProcess($mutantProcess),
             $processCommandLine,
             $processOutput,
             DetectionStatus::TIMED_OUT,
@@ -194,7 +194,7 @@ DIFF;
         );
     }
 
-    public function test_it_can_create_a_result_from_an_errored_mutation_process(): void
+    public function test_it_can_create_a_result_from_an_errored_mutant_process(): void
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -232,7 +232,7 @@ DIFF;
 
 DIFF;
 
-        $mutationProcess = new MutationProcess(
+        $mutantProcess = new MutantProcess(
             $processMock,
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
@@ -253,7 +253,7 @@ DIFF;
         );
 
         $this->assertResultStateIs(
-            $this->resultFactory->createFromProcess($mutationProcess),
+            $this->resultFactory->createFromProcess($mutantProcess),
             $processCommandLine,
             $processOutput,
             DetectionStatus::ERROR,
@@ -264,7 +264,7 @@ DIFF;
         );
     }
 
-    public function test_it_can_crate_a_result_from_an_escaped_mutation_process(): void
+    public function test_it_can_crate_a_result_from_an_escaped_mutant_process(): void
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -304,7 +304,7 @@ DIFF;
 
 DIFF;
 
-        $mutationProcess = new MutationProcess(
+        $mutantProcess = new MutantProcess(
             $processMock,
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
@@ -325,7 +325,7 @@ DIFF;
         );
 
         $this->assertResultStateIs(
-            $this->resultFactory->createFromProcess($mutationProcess),
+            $this->resultFactory->createFromProcess($mutantProcess),
             $processCommandLine,
             'Tests passed!',
             DetectionStatus::ESCAPED,
@@ -336,7 +336,7 @@ DIFF;
         );
     }
 
-    public function test_it_can_crate_a_result_from_a_killed_mutation_process(): void
+    public function test_it_can_crate_a_result_from_a_killed_mutant_process(): void
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -376,7 +376,7 @@ DIFF;
 
 DIFF;
 
-        $mutationProcess = new MutationProcess(
+        $mutantProcess = new MutantProcess(
             $processMock,
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
@@ -397,7 +397,7 @@ DIFF;
         );
 
         $this->assertResultStateIs(
-            $this->resultFactory->createFromProcess($mutationProcess),
+            $this->resultFactory->createFromProcess($mutantProcess),
             $processCommandLine,
             'Tests failed!',
             DetectionStatus::KILLED,

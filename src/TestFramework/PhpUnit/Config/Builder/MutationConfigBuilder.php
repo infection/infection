@@ -78,7 +78,6 @@ class MutationConfigBuilder extends ConfigBuilder
     ) {
         $this->tmpDir = $tmpDir;
         $this->projectDir = $projectDir;
-
         $this->originalXmlConfigContent = $originalXmlConfigContent;
         $this->configManipulator = $configManipulator;
         $this->jUnitTestCaseSorter = $jUnitTestCaseSorter;
@@ -89,7 +88,7 @@ class MutationConfigBuilder extends ConfigBuilder
      */
     public function build(
         array $tests,
-        string $mutationFilePath,
+        string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath
     ): string {
@@ -125,7 +124,7 @@ class MutationConfigBuilder extends ConfigBuilder
             $customAutoloadFilePath,
             $this->createCustomAutoloadWithInterceptor(
                 $mutationOriginalFilePath,
-                $mutationFilePath,
+                $mutantFilePath,
                 $originalBootstrapFile
             )
         );

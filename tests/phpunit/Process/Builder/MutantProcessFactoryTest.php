@@ -38,18 +38,18 @@ namespace Infection\Tests\Process\Builder;
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\MutationProcessWasFinished;
+use Infection\Event\MutantProcessWasFinished;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationExecutionResult;
-use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\Builder\MutationProcessFactory;
+use Infection\Process\Builder\MutantProcessFactory;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutator\MutatorName;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\TestCase;
 
-final class MutationProcessFactoryTest extends TestCase
+final class MutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
@@ -98,19 +98,19 @@ DIFF
 
         $eventDispatcher = new EventDispatcherCollector();
 
-        $executionResultMock = $this->createMock(MutationExecutionResult::class);
+        $executionResultMock = $this->createMock(MutantExecutionResult::class);
         $executionResultMock
             ->expects($this->never())
             ->method($this->anything())
         ;
 
-        $resultFactoryMock = $this->createMock(MutationExecutionResultFactory::class);
+        $resultFactoryMock = $this->createMock(MutantExecutionResultFactory::class);
         $resultFactoryMock
             ->method('createFromProcess')
             ->willReturn($executionResultMock)
         ;
 
-        $factory = new MutationProcessFactory(
+        $factory = new MutantProcessFactory(
             $testFrameworkAdapterMock,
             100,
             $eventDispatcher,
@@ -143,7 +143,7 @@ DIFF
 
         $event = current($eventsAfterCallbackCall);
 
-        $this->assertInstanceOf(MutationProcessWasFinished::class, $event);
+        $this->assertInstanceOf(MutantProcessWasFinished::class, $event);
         $this->assertSame($executionResultMock, $event->getExecutionResult());
     }
 }

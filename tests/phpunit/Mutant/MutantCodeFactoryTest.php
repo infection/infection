@@ -33,24 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation;
+namespace Infection\Tests\Mutant;
 
-use Infection\Mutation\MutationCodeFactory;
+use Infection\Mutant\MutantCodeFactory;
 use Infection\PhpParser\MutatedNode;
 use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
 
-final class MutationCodeFactoryTest extends TestCase
+final class MutantCodeFactoryTest extends TestCase
 {
     /**
-     * @var MutationCodeFactory
+     * @var MutantCodeFactory
      */
     private $codeFactory;
 
     protected function setUp(): void
     {
-        $this->codeFactory = SingletonContainer::getContainer()->getMutationCodeFactory();
+        $this->codeFactory = SingletonContainer::getContainer()->getMutantCodeFactory();
     }
 
     /**
@@ -60,7 +60,7 @@ final class MutationCodeFactoryTest extends TestCase
      * @param Node[] $originalFileAst
      * @param class-string $mutatedNodeClass
      */
-    public function test_it_creates_the_mutation_code_from_the_given_mutation(
+    public function test_it_creates_the_mutation_code_from_the_given_nodes(
         array $attributes,
         array $originalFileAst,
         string $mutatedNodeClass,

@@ -41,11 +41,11 @@ use PHPUnit\Framework\TestCase;
 final class TestFrameworkExtraOptionsFilterTest extends TestCase
 {
     /**
-     * @dataProvider mutationProcessProvider
+     * @dataProvider mutantProcessProvider
      */
-    public function test_it_skips_filter_for_mutation_process(string $actualExtraOptions, string $expectedExtraOptions): void
+    public function test_it_skips_filter_for_mutant_process(string $actualExtraOptions, string $expectedExtraOptions): void
     {
-        $filteredOptions = (new TestFrameworkExtraOptionsFilter())->filterForMutationProcess(
+        $filteredOptions = (new TestFrameworkExtraOptionsFilter())->filterForMutantProcess(
             $actualExtraOptions,
             ['--configuration', '--filter', '--testsuite']
         );
@@ -53,7 +53,7 @@ final class TestFrameworkExtraOptionsFilterTest extends TestCase
         $this->assertSame($expectedExtraOptions, $filteredOptions);
     }
 
-    public function mutationProcessProvider(): iterable
+    public function mutantProcessProvider(): iterable
     {
         yield ['--filter=someTest#2 --a --b=value', '--a --b=value'];
 

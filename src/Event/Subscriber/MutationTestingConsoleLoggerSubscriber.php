@@ -38,11 +38,11 @@ namespace Infection\Event\Subscriber;
 use function floor;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\MutationProcessWasFinished;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutation\MutationExecutionResult;
+use Infection\Mutant\MutantExecutionResult;
 use function Safe\sprintf;
 use function str_pad;
 use function str_repeat;
@@ -81,14 +81,14 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->diffColorizer = $diffColorizer;
     }
 
-    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
+    public function onMutationProcessWasFinished(MutationTestingWasStarted $event): void
     {
         $this->mutationCount = $event->getMutationCount();
 
         $this->outputFormatter->start($this->mutationCount);
     }
 
-    public function onMutationProcessWasFinished(MutationProcessWasFinished $event): void
+    public function MutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
         $executionResult = $event->getExecutionResult();
 
@@ -113,11 +113,11 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     }
 
     /**
-     * @param MutationExecutionResult[] $executionResults
+     * @param MutantExecutionResult[] $executionResults
      */
     private function showMutations(array $executionResults, string $headlinePrefix): void
     {
-        $headline = sprintf('%s mutations:', $headlinePrefix);
+        $headline = sprintf('%s mutants:', $headlinePrefix);
 
         $this->output->writeln([
             '',
@@ -145,7 +145,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     private function showMetrics(): void
     {
         $this->output->writeln(['', '']);
-        $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutationsCount() . '</options=bold> mutations were generated:');
+        $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotTestedCount()) . '</options=bold> mutants were not covered by tests');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');

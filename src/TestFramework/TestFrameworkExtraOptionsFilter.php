@@ -48,7 +48,7 @@ final class TestFrameworkExtraOptionsFilter
     /**
      * @param string[] $initialRunOnlyOptions
      */
-    public function filterForMutationProcess(
+    public function filterForMutantProcess(
         string $actualExtraOptions,
         array $initialRunOnlyOptions
     ): string {

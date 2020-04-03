@@ -38,12 +38,12 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutationProcessWasFinished;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutation\MutationExecutionResult;
+use Infection\Mutant\MutantExecutionResult;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -116,8 +116,8 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         ));
 
         $dispatcher->dispatch(
-            new MutationProcessWasFinished(
-                $this->createMock(MutationExecutionResult::class)
+            new MutantProcessWasFinished(
+                $this->createMock(MutantExecutionResult::class)
             )
         );
     }

@@ -33,28 +33,65 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
+namespace Infection\Process;
 
-use Infection\CannotBeInstantiated;
+use Closure;
+use Infection\Mutation\Mutation;
+use Infection\Process\Runner\ProcessBearer;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class DetectionStatus
+class MutantProcess implements ProcessBearer
 {
-    use CannotBeInstantiated;
+    private $process;
+    private $mutation;
+    private $callback;
 
-    public const KILLED = 'killed';
-    public const ESCAPED = 'escaped';
-    public const ERROR = 'error';
-    public const TIMED_OUT = 'timed out';
-    public const NOT_COVERED = 'not covered';
+    /**
+     * @var bool
+     */
+    private $timedOut = false;
 
-    public const ALL = [
-        self::KILLED,
-        self::ESCAPED,
-        self::ERROR,
-        self::TIMED_OUT,
-        self::NOT_COVERED,
-    ];
+    public function __construct(Process $process, Mutation $mutation)
+    {
+        $this->process = $process;
+        $this->mutation = $mutation;
+        $this->callback = static function (): void {};
+    }
+
+    public function getProcess(): Process
+    {
+        return $this->process;
+    }
+
+    public function getMutation(): Mutation
+    {
+        return $this->mutation;
+    }
+
+    public function markAsTimedOut(): void
+    {
+        $this->timedOut = true;
+    }
+
+    public function isTimedOut(): bool
+    {
+        return $this->timedOut;
+    }
+
+    /**
+     * @param Closure(): void $callback
+     */
+    public function registerTerminateProcessClosure(Closure $callback): void
+    {
+        $this->callback = $callback;
+    }
+
+    public function terminateProcess(): void
+    {
+        ($this->callback)();
+    }
 }

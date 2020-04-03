@@ -33,20 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\Metrics;
 
-use Infection\Event\MutationProcessWasFinished;
-use Infection\Mutation\MutationExecutionResult;
-use PHPUnit\Framework\TestCase;
+use Infection\Mutant\MutantExecutionResult;
+use function Safe\usort;
 
-final class MutationProcessWasFinishedTest extends TestCase
+/**
+ * @internal
+ */
+final class SortableMutantExecutionResults
 {
-    public function test_it_exposes_its_mutation_process(): void
+    /**
+     * @var MutantExecutionResult[]
+     */
+    private $executionResults = [];
+
+    /**
+     * @var bool
+     */
+    private $sorted = false;
+
+    public function add(MutantExecutionResult $executionResult): void
     {
-        $executionResultMock = $this->createMock(MutationExecutionResult::class);
+        $this->executionResults[] = $executionResult;
+        $this->sorted = false;
+    }
 
-        $event = new MutationProcessWasFinished($executionResultMock);
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getSortedExecutionResults(): array
+    {
+        if (!$this->sorted) {
+            self::sortResults($this->executionResults);
+            $this->sorted = true;
+        }
 
-        $this->assertSame($executionResultMock, $event->getExecutionResult());
+        return $this->executionResults;
+    }
+
+    /**
+     * @param MutantExecutionResult[] $executionResults
+     */
+    private static function sortResults(array &$executionResults): void
+    {
+        usort(
+            $executionResults,
+            static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
+                if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
+                    return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
+                }
+
+                return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
+            }
+        );
     }
 }

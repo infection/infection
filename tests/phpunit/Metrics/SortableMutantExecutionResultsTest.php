@@ -35,24 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
-use Infection\Metrics\SortableMutationExecutionResults;
-use Infection\Mutation\DetectionStatus;
-use Infection\Mutation\MutationExecutionResult;
+use Infection\Metrics\SortableMutantExecutionResults;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 
-final class SortableMutationExecutionResultsTest extends TestCase
+final class SortableMutantExecutionResultsTest extends TestCase
 {
     /**
      * @dataProvider resultsProvider
      *
-     * @param MutationExecutionResult[] $executionResults
-     * @param MutationExecutionResult[] $expectedResults
+     * @param MutantExecutionResult[] $executionResults
+     * @param MutantExecutionResult[] $expectedResults
      */
     public function test_it_can_sort_results(array $executionResults, array $expectedResults): void
     {
-        $sortableResults = new SortableMutationExecutionResults();
+        $sortableResults = new SortableMutantExecutionResults();
 
         foreach ($executionResults as $executionResult) {
             $sortableResults->add($executionResult);
@@ -63,7 +63,7 @@ final class SortableMutationExecutionResultsTest extends TestCase
 
     public function test_it_keeps_results_sorted_as_they_are_added(): void
     {
-        $sortableResults = new SortableMutationExecutionResults();
+        $sortableResults = new SortableMutantExecutionResults();
 
         $result0 = $this->createExecutionResult(
             0,
@@ -186,8 +186,8 @@ final class SortableMutationExecutionResultsTest extends TestCase
         int $id,
         string $originalFilePath,
         int $originalStartingLine
-    ): MutationExecutionResult {
-        return new MutationExecutionResult(
+    ): MutantExecutionResult {
+        return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'Passed!',
             DetectionStatus::ESCAPED,

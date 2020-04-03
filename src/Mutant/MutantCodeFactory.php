@@ -33,28 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation;
+namespace Infection\Mutant;
 
-use Infection\Mutation\MutationExecutionResult;
+use Infection\PhpParser\MutatedNode;
+use Infection\PhpParser\Visitor\CloneVisitor;
+use Infection\PhpParser\Visitor\MutatorVisitor;
+use PhpParser\Node;
+use PhpParser\NodeTraverser;
+use PhpParser\PrettyPrinterAbstract;
 
-trait MutationExecutionResultAssertions
+/**
+ * @internal
+ * @final
+ */
+class MutantCodeFactory
 {
-    private function assertResultStateIs(
-        MutationExecutionResult $result,
-        string $expectedProcessCommandLine,
-        string $expectedProcessOutput,
-        string $expectedDetectionStatus,
-        string $expectedMutationDiff,
-        string $expectedMutatorName,
-        string $expectedOriginalFilePath,
-        int $expectedOriginalStartingLine
-    ): void {
-        $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
-        $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
-        $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
-        $this->assertSame($expectedMutationDiff, $result->getMutationDiff());
-        $this->assertSame($expectedMutatorName, $result->getMutatorName());
-        $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
-        $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());
+    private $printer;
+
+    public function __construct(PrettyPrinterAbstract $prettyPrinter)
+    {
+        $this->printer = $prettyPrinter;
+    }
+
+    /**
+     * @param array<string|int|float> $attributes
+     * @param Node[] $originalFileAst
+     * @param class-string $mutatedNodeClass
+     */
+    public function createCode(
+        array $attributes,
+        array $originalFileAst,
+        string $mutatedNodeClass,
+        MutatedNode $mutatedNode
+    ): string {
+        $traverser = new NodeTraverser();
+
+        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new MutatorVisitor($attributes, $mutatedNodeClass, $mutatedNode));
+
+        $mutatedStatements = $traverser->traverse($originalFileAst);
+
+        return $this->printer->prettyPrintFile($mutatedStatements);
     }
 }

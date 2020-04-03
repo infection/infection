@@ -45,8 +45,8 @@ use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\Builder\MutationProcessFactory;
-use Infection\Process\MutationProcess;
+use Infection\Process\Builder\MutantProcessFactory;
+use Infection\Process\MutantProcess;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -65,7 +65,7 @@ use Symfony\Component\Process\Process;
 final class MutationTestingRunnerTest extends TestCase
 {
     /**
-     * @var MutationProcessFactory|MockObject
+     * @var MutantProcessFactory|MockObject
      */
     private $processFactoryMock;
 
@@ -91,7 +91,7 @@ final class MutationTestingRunnerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->processFactoryMock = $this->createMock(MutationProcessFactory::class);
+        $this->processFactoryMock = $this->createMock(MutantProcessFactory::class);
         $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
         $this->fileSystemMock = $this->createMock(Filesystem::class);
@@ -363,7 +363,7 @@ final class MutationTestingRunnerTest extends TestCase
         );
     }
 
-    private function buildCoveredMutationProcess(Mutation $mutation): MutationProcess
+    private function buildCoveredMutationProcess(Mutation $mutation): MutantProcess
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -371,7 +371,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->method($this->anything())
         ;
 
-        return new MutationProcess($processMock, $mutation);
+        return new MutantProcess($processMock, $mutation);
     }
 
     private function someIterable(?callable $callback = null): Callback

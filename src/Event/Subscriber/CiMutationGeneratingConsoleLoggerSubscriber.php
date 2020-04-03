@@ -55,7 +55,7 @@ final class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscrib
     {
         $this->output->writeln([
             '',
-            'Generate mutations...',
+            'Generate mutants...',
             '',
             sprintf('Processing source code files: %s', $event->getMutableFilesCount()),
         ]);

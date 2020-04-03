@@ -53,7 +53,7 @@ abstract class MutationConfigBuilder
      */
     abstract public function build(
         array $tests,
-        string $mutationFilePath,
+        string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath
     ): string;

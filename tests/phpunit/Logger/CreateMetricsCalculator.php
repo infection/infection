@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutation\DetectionStatus;
-use Infection\Mutation\MutationExecutionResult;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
@@ -121,8 +121,8 @@ trait CreateMetricsCalculator
         string $mutatorClassName,
         string $detectionStatus,
         string $echoMutatedMessage
-    ): MutationExecutionResult {
-        return new MutationExecutionResult(
+    ): MutantExecutionResult {
+        return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
             $detectionStatus,

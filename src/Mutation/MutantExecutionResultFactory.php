@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\MutationProcess;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\MutantProcess;
 use function Safe\sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
@@ -45,7 +47,7 @@ use Webmozart\Assert\Assert;
  * @internal
  * @final
  */
-class MutationExecutionResultFactory
+class MutantExecutionResultFactory
 {
     private $testFrameworkAdapter;
 
@@ -54,12 +56,12 @@ class MutationExecutionResultFactory
         $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    public function createFromProcess(MutationProcess $mutationProcess): MutationExecutionResult
+    public function createFromProcess(MutantProcess $mutationProcess): MutantExecutionResult
     {
         $process = $mutationProcess->getProcess();
         $mutation = $mutationProcess->getMutation();
 
-        return new MutationExecutionResult(
+        return new MutantExecutionResult(
             $process->getCommandLine(),
             $this->retrieveProcessOutput($process),
             $this->retrieveDetectionStatus($mutationProcess),
@@ -83,17 +85,17 @@ class MutationExecutionResultFactory
         return $process->getOutput();
     }
 
-    private function retrieveDetectionStatus(MutationProcess $mutationProcess): string
+    private function retrieveDetectionStatus(MutantProcess $mutantProcess): string
     {
-        if (!$mutationProcess->getMutation()->hasTests()) {
+        if (!$mutantProcess->getMutation()->hasTests()) {
             return DetectionStatus::NOT_COVERED;
         }
 
-        if ($mutationProcess->isTimedOut()) {
+        if ($mutantProcess->isTimedOut()) {
             return DetectionStatus::TIMED_OUT;
         }
 
-        $process = $mutationProcess->getProcess();
+        $process = $mutantProcess->getProcess();
 
         if ($process->getExitCode() > 100) {
             // See \Symfony\Component\Process\Process::$exitCodes

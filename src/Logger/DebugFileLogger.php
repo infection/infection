@@ -37,7 +37,7 @@ namespace Infection\Logger;
 
 use function implode;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutation\MutationExecutionResult;
+use Infection\Mutant\MutantExecutionResult;
 use const PHP_EOL;
 use function Safe\sprintf;
 use function str_repeat;
@@ -66,7 +66,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
 
         $logs = [];
 
-        $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutationsCount();
+        $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
         $logs[] = '';
         $logs[] = $this->getResultsLine(
             $this->metricsCalculator->getKilledExecutionResults(),
@@ -105,7 +105,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
     }
 
     /**
-     * @param MutationExecutionResult[] $executionResults
+     * @param MutantExecutionResult[] $executionResults
      */
     private function getResultsLine(
         array $executionResults,

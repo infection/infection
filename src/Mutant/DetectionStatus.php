@@ -33,24 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Mutant;
 
-use Infection\Mutation\MutationExecutionResult;
+use Infection\CannotBeInstantiated;
 
 /**
  * @internal
  */
-final class MutationProcessWasFinished
+final class DetectionStatus
 {
-    private $executionResult;
+    use CannotBeInstantiated;
 
-    public function __construct(MutationExecutionResult $executionResult)
-    {
-        $this->executionResult = $executionResult;
-    }
+    public const KILLED = 'killed';
+    public const ESCAPED = 'escaped';
+    public const ERROR = 'error';
+    public const TIMED_OUT = 'timed out';
+    public const NOT_COVERED = 'not covered';
 
-    public function getExecutionResult(): MutationExecutionResult
-    {
-        return $this->executionResult;
-    }
+    public const ALL = [
+        self::KILLED,
+        self::ESCAPED,
+        self::ERROR,
+        self::TIMED_OUT,
+        self::NOT_COVERED,
+    ];
 }

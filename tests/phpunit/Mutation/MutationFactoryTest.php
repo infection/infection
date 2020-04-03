@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutation;
 use function array_merge;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
-use Infection\Mutation\MutationCodeFactory;
+use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutation\MutationFactory;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
@@ -55,7 +55,7 @@ final class MutationFactoryTest extends TestCase
     use MutationAssertions;
 
     /**
-     * @var MutationCodeFactory|MockObject
+     * @var MutantCodeFactory|MockObject
      */
     private $codeFactoryMock;
 
@@ -78,7 +78,7 @@ final class MutationFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->codeFactoryMock = $this->createMock(MutationCodeFactory::class);
+        $this->codeFactoryMock = $this->createMock(MutantCodeFactory::class);
         $this->printerMock = $this->createMock(PrettyPrinterAbstract::class);
         $this->differMock = $this->createMock(Differ::class);
 

@@ -62,10 +62,10 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
+use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\MutantExecutionResultFactory;
 use Infection\Mutation\MutationAttributeKeys;
-use Infection\Mutation\MutationCodeFactory;
-use Infection\Mutation\MutationExecutionResultFactory;
 use Infection\Mutation\MutationFactory;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
@@ -74,7 +74,7 @@ use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Process\Builder\MutationProcessFactory;
+use Infection\Process\Builder\MutantProcessFactory;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -221,15 +221,15 @@ final class Container
                     GeneratedExtensionsConfig::EXTENSIONS
                 );
             },
-            MutationCodeFactory::class => static function (self $container): MutationCodeFactory {
-                return new MutationCodeFactory($container->getPrinter());
+            MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
+                return new MutantCodeFactory($container->getPrinter());
             },
             MutationFactory::class => static function (self $container): MutationFactory {
                 return new MutationFactory(
                     $container->getConfiguration()->getTmpDir(),
                     $container->getDiffer(),
                     $container->getPrinter(),
-                    $container->getMutationCodeFactory()
+                    $container->getMutantCodeFactory()
                 );
             },
             Differ::class => static function (): Differ {
@@ -432,8 +432,8 @@ final class Container
                     $container->getEventDispatcher()
                 );
             },
-            MutationProcessFactory::class => static function (self $container): MutationProcessFactory {
-                return new MutationProcessFactory(
+            MutantProcessFactory::class => static function (self $container): MutantProcessFactory {
+                return new MutantProcessFactory(
                     $container->getTestFrameworkAdapter(),
                     $container->getConfiguration()->getProcessTimeout(),
                     $container->getEventDispatcher(),
@@ -477,8 +477,8 @@ final class Container
             AdapterInstaller::class => static function (): AdapterInstaller {
                 return new AdapterInstaller(new ComposerExecutableFinder());
             },
-            MutationExecutionResultFactory::class => static function (self $container): MutationExecutionResultFactory {
-                return new MutationExecutionResultFactory($container->getTestFrameworkAdapter());
+            MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
+                return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
             },
         ]);
     }
@@ -649,9 +649,9 @@ final class Container
         return $this->get(Factory::class);
     }
 
-    public function getMutationCodeFactory(): MutationCodeFactory
+    public function getMutantCodeFactory(): MutantCodeFactory
     {
-        return $this->get(MutationCodeFactory::class);
+        return $this->get(MutantCodeFactory::class);
     }
 
     public function getMutationFactory(): MutationFactory
@@ -834,9 +834,9 @@ final class Container
         return $this->get(InitialTestsRunner::class);
     }
 
-    public function getMutationProcessFactory(): MutationProcessFactory
+    public function getMutationProcessFactory(): MutantProcessFactory
     {
-        return $this->get(MutationProcessFactory::class);
+        return $this->get(MutantProcessFactory::class);
     }
 
     public function getMutationGenerator(): MutationGenerator
@@ -884,9 +884,9 @@ final class Container
         return $this->get(AdapterInstaller::class);
     }
 
-    public function getMutationExecutionResultFactory(): MutationExecutionResultFactory
+    public function getMutationExecutionResultFactory(): MutantExecutionResultFactory
     {
-        return $this->get(MutationExecutionResultFactory::class);
+        return $this->get(MutantExecutionResultFactory::class);
     }
 
     /**

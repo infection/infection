@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Metrics;
 
 use function count;
-use Infection\Mutation\DetectionStatus;
-use Infection\Mutation\MutationExecutionResult;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;
 use function Safe\sprintf;
 
@@ -77,7 +77,7 @@ class MetricsCalculator
     /**
      * @var int
      */
-    private $notExecutedByTestsCount = 0;
+    private $notCoveredByTestsCount = 0;
 
     /**
      * @var int
@@ -92,15 +92,15 @@ class MetricsCalculator
     public function __construct(int $roundingPrecision)
     {
         $this->roundingPrecision = $roundingPrecision;
-        $this->killedExecutionResults = new SortableMutationExecutionResults();
-        $this->errorExecutionResults = new SortableMutationExecutionResults();
-        $this->escapedExecutionResults = new SortableMutationExecutionResults();
-        $this->timedOutExecutionResults = new SortableMutationExecutionResults();
-        $this->notCoveredExecutionResults = new SortableMutationExecutionResults();
-        $this->allExecutionResults = new SortableMutationExecutionResults();
+        $this->killedExecutionResults = new SortableMutantExecutionResults();
+        $this->errorExecutionResults = new SortableMutantExecutionResults();
+        $this->escapedExecutionResults = new SortableMutantExecutionResults();
+        $this->timedOutExecutionResults = new SortableMutantExecutionResults();
+        $this->notCoveredExecutionResults = new SortableMutantExecutionResults();
+        $this->allExecutionResults = new SortableMutantExecutionResults();
     }
 
-    public function collect(MutationExecutionResult ...$executionResults): void
+    public function collect(MutantExecutionResult ...$executionResults): void
     {
         if (count($executionResults) > 0) {
             // Reset the calculator if any result is added
@@ -119,7 +119,7 @@ class MetricsCalculator
                     break;
 
                 case DetectionStatus::NOT_COVERED:
-                    $this->notExecutedByTestsCount++;
+                    $this->notCoveredByTestsCount++;
                     $this->notCoveredExecutionResults->add($executionResult);
 
                     break;
@@ -157,7 +157,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutationExecutionResult[]
+     * @return MutantExecutionResult[]
      */
     public function getKilledExecutionResults(): array
     {
@@ -165,7 +165,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutationExecutionResult[]
+     * @return MutantExecutionResult[]
      */
     public function getErrorExecutionResults(): array
     {
@@ -173,7 +173,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutationExecutionResult[]
+     * @return MutantExecutionResult[]
      */
     public function getEscapedExecutionResults(): array
     {
@@ -181,7 +181,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutationExecutionResult[]
+     * @return MutantExecutionResult[]
      */
     public function getTimedOutExecutionResults(): array
     {
@@ -189,7 +189,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutationExecutionResult[]
+     * @return MutantExecutionResult[]
      */
     public function getNotCoveredExecutionResults(): array
     {
@@ -197,7 +197,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutationExecutionResult[]
+     * @return MutantExecutionResult[]
      */
     public function getAllExecutionResults(): array
     {
@@ -226,10 +226,10 @@ class MetricsCalculator
 
     public function getNotTestedCount(): int
     {
-        return $this->notExecutedByTestsCount;
+        return $this->notCoveredByTestsCount;
     }
 
-    public function getTotalMutationsCount(): int
+    public function getTotalMutantsCount(): int
     {
         return $this->totalMutantsCount;
     }

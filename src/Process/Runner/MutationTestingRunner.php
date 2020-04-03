@@ -36,13 +36,13 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutationProcessWasFinished;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationExecutionResult;
-use Infection\Process\Builder\MutationProcessFactory;
+use Infection\Process\Builder\MutantProcessFactory;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -58,7 +58,7 @@ final class MutationTestingRunner
     private $runConcurrently;
 
     public function __construct(
-        MutationProcessFactory $processFactory,
+        MutantProcessFactory $processFactory,
         ProcessRunner $processRunner,
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
@@ -85,8 +85,8 @@ final class MutationTestingRunner
                     return true;
                 }
 
-                $this->eventDispatcher->dispatch(new MutationProcessWasFinished(
-                    MutationExecutionResult::createFromNonExecutedByTestsMutation($mutation)
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromNonExecutedByTestsMutation($mutation)
                 ));
 
                 return false;
