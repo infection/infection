@@ -109,7 +109,10 @@ final class SubscriberTest extends TestCase
         $this->assertSame(
             $expectedSubscriptionMethodName,
             $method->getName(),
-            'Expected the subscription method to follow the project naming convention'
+            sprintf(
+                'Expected the subscription method of "%s" to follow the project naming convention',
+                $subscriberClass
+            )
         );
     }
 }
