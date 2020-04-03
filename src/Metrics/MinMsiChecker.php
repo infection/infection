@@ -42,7 +42,6 @@ use Infection\Console\ConsoleOutput;
  */
 final class MinMsiChecker
 {
-    public const MSI_FAILURE = 'min-msi';
     private const VALUE_OVER_REQUIRED_TOLERANCE = 2;
 
     private $ignoreMsiWithNoMutations;
