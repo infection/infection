@@ -49,7 +49,6 @@ use Infection\Mutator\MutatorResolver;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
-use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -214,8 +213,6 @@ class ConfigurationFactory
         string $configDir,
         string $tmpDir
     ): string {
-        Assert::nullOrStringNotEmpty($existingCoveragePath);
-
         if ($existingCoveragePath === null) {
             return $tmpDir;
         }
