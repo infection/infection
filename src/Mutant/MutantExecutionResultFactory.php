@@ -33,11 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
+namespace Infection\Mutant;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use function Safe\sprintf;
 use Symfony\Component\Process\Process;
@@ -56,15 +54,15 @@ class MutantExecutionResultFactory
         $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    public function createFromProcess(MutantProcess $mutationProcess): MutantExecutionResult
+    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
     {
-        $process = $mutationProcess->getProcess();
-        $mutation = $mutationProcess->getMutation();
+        $process = $mutantProcess->getProcess();
+        $mutation = $mutantProcess->getMutation();
 
         return new MutantExecutionResult(
             $process->getCommandLine(),
             $this->retrieveProcessOutput($process),
-            $this->retrieveDetectionStatus($mutationProcess),
+            $this->retrieveDetectionStatus($mutantProcess),
             $mutation->getDiff(),
             $mutation->getMutatorName(),
             $mutation->getOriginalFilePath(),

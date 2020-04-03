@@ -38,7 +38,7 @@ namespace Infection\Process\Builder;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
-use Infection\Mutation\MutantExecutionResultFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\MutantProcess;
 use function method_exists;

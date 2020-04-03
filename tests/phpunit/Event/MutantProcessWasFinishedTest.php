@@ -41,7 +41,7 @@ use PHPUnit\Framework\TestCase;
 
 final class MutantProcessWasFinishedTest extends TestCase
 {
-    public function test_it_exposes_its_mutation_process(): void
+    public function test_it_exposes_its_execution_result(): void
     {
         $executionResultMock = $this->createMock(MutantExecutionResult::class);
 

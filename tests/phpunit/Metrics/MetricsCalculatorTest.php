@@ -164,7 +164,7 @@ final class MetricsCalculatorTest extends TestCase
         $executionResults = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $executionResults[] = $this->createMutationExecutionResult($detectionStatus);
+            $executionResults[] = $this->createMutantExecutionResult($detectionStatus);
         }
 
         $calculator->collect(...$executionResults);
@@ -172,7 +172,7 @@ final class MetricsCalculatorTest extends TestCase
         return $executionResults;
     }
 
-    private function createMutationExecutionResult(string $detectionStatus): MutantExecutionResult
+    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
     {
         $id = $this->id;
         ++$this->id;

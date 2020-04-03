@@ -75,7 +75,7 @@ class MutantExecutionResult
         $this->originalStartingLine = $originalStartingLine;
     }
 
-    public static function createFromNonExecutedByTestsMutation(Mutation $mutation): self
+    public static function createFromNonCoveredByTestsMutation(Mutation $mutation): self
     {
         return new self(
             '',

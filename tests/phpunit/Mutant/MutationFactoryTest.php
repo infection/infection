@@ -33,15 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation;
+namespace Infection\Tests\Mutant;
 
 use function array_merge;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutation\MutationFactory;
+use Infection\Mutant\MutationFactory;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
+use Infection\Tests\Mutation\MutationAssertions;
 use Infection\Tests\Mutator\MutatorName;
 use function md5;
 use PhpParser\Node;

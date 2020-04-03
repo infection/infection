@@ -63,10 +63,10 @@ use Infection\Logger\LoggerFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Mutant\MutantCodeFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\MutationFactory;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\MutantExecutionResultFactory;
 use Infection\Mutation\MutationAttributeKeys;
-use Infection\Mutation\MutationFactory;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
@@ -437,7 +437,7 @@ final class Container
                     $container->getTestFrameworkAdapter(),
                     $container->getConfiguration()->getProcessTimeout(),
                     $container->getEventDispatcher(),
-                    $container->getMutationExecutionResultFactory()
+                    $container->getMutantExecutionResultFactory()
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {
@@ -453,7 +453,7 @@ final class Container
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 return new MutationTestingRunner(
-                    $container->getMutationProcessFactory(),
+                    $container->getMutantProcessFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
                     $container->getConfiguration()->isDryRun()
@@ -834,7 +834,7 @@ final class Container
         return $this->get(InitialTestsRunner::class);
     }
 
-    public function getMutationProcessFactory(): MutantProcessFactory
+    public function getMutantProcessFactory(): MutantProcessFactory
     {
         return $this->get(MutantProcessFactory::class);
     }
@@ -884,7 +884,7 @@ final class Container
         return $this->get(AdapterInstaller::class);
     }
 
-    public function getMutationExecutionResultFactory(): MutantExecutionResultFactory
+    public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
     {
         return $this->get(MutantExecutionResultFactory::class);
     }

@@ -33,13 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
+namespace Infection\Mutant;
 
 use function array_intersect_key;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
-use Infection\Mutant\MutantCodeFactory;
+use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationAttributeKeys;
 use Infection\PhpParser\MutatedNode;
 use function md5;
 use PhpParser\Node;

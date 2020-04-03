@@ -37,8 +37,8 @@ namespace Infection\Mutator;
 
 use function count;
 use function get_class;
+use Infection\Mutant\MutationFactory;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationFactory;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;

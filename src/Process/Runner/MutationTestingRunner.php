@@ -86,7 +86,7 @@ final class MutationTestingRunner
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromNonExecutedByTestsMutation($mutation)
+                    MutantExecutionResult::createFromNonCoveredByTestsMutation($mutation)
                 ));
 
                 return false;

@@ -40,7 +40,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutation\MutantExecutionResultFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\Builder\MutantProcessFactory;
@@ -117,9 +117,9 @@ DIFF
             $resultFactoryMock
         );
 
-        $mutationProcess = $factory->createProcessForMutation($mutation, $testFrameworkExtraOptions);
+        $mutantProcess = $factory->createProcessForMutation($mutation, $testFrameworkExtraOptions);
 
-        $process = $mutationProcess->getProcess();
+        $process = $mutantProcess->getProcess();
 
         $this->assertSame(
             PHP_OS_FAMILY === 'Windows'
@@ -130,12 +130,12 @@ DIFF
         $this->assertSame(100., $process->getTimeout());
         $this->assertFalse($process->isStarted());
 
-        $this->assertSame($mutation, $mutationProcess->getMutation());
-        $this->assertFalse($mutationProcess->isTimedOut());
+        $this->assertSame($mutation, $mutantProcess->getMutation());
+        $this->assertFalse($mutantProcess->isTimedOut());
 
         $this->assertSame([], $eventDispatcher->getEvents());
 
-        $mutationProcess->terminateProcess();
+        $mutantProcess->terminateProcess();
 
         $eventsAfterCallbackCall = $eventDispatcher->getEvents();
 

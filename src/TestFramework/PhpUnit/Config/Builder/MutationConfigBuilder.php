@@ -154,7 +154,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function createCustomAutoloadWithInterceptor(
         string $originalFilePath,
-        string $mutationFilePath,
+        string $mutantFilePath,
         string $originalAutoloadFile
     ): string {
         $interceptorPath = IncludeInterceptor::LOCATION;
@@ -171,7 +171,7 @@ require_once '%s';
 
 PHP
             ,
-            $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutationFilePath),
+            $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath),
             $originalAutoloadFile
         );
     }

@@ -151,8 +151,8 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation1, $testFrameworkExtraOptions]
             )
             ->willReturnOnConsecutiveCalls(
-                $process0 = $this->buildCoveredMutationProcess($mutation0),
-                $process1 = $this->buildCoveredMutationProcess($mutation1)
+                $process0 = $this->buildCoveredMutantProcess($mutation0),
+                $process1 = $this->buildCoveredMutantProcess($mutation1)
             )
         ;
 
@@ -198,8 +198,8 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation1, $testFrameworkExtraOptions]
             )
             ->willReturnOnConsecutiveCalls(
-                $process0 = $this->buildCoveredMutationProcess($mutation0),
-                $process1 = $this->buildCoveredMutationProcess($mutation1)
+                $process0 = $this->buildCoveredMutantProcess($mutation0),
+                $process1 = $this->buildCoveredMutantProcess($mutation1)
             )
         ;
 
@@ -363,7 +363,7 @@ final class MutationTestingRunnerTest extends TestCase
         );
     }
 
-    private function buildCoveredMutationProcess(Mutation $mutation): MutantProcess
+    private function buildCoveredMutantProcess(Mutation $mutation): MutantProcess
     {
         $processMock = $this->createMock(Process::class);
         $processMock

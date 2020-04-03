@@ -86,7 +86,7 @@ DIFF;
         );
     }
 
-    public function test_it_can_be_instantiated_from_a_mutation_non_executed_by_tests(): void
+    public function test_it_can_be_instantiated_from_a_mutation_non_covered_by_tests(): void
     {
         $mutationDiff = <<<'DIFF'
 --- Original
@@ -116,7 +116,7 @@ DIFF;
         );
 
         $this->assertResultStateIs(
-            MutantExecutionResult::createFromNonExecutedByTestsMutation($mutation),
+            MutantExecutionResult::createFromNonCoveredByTestsMutation($mutation),
             '',
             '',
             DetectionStatus::NOT_COVERED,

@@ -39,7 +39,6 @@ use function current;
 use Infection\Container;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\MutationFactory;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
@@ -72,7 +71,7 @@ final class FileMutationGeneratorTest extends TestCase
     private $traverserFactoryMock;
 
     /**
-     * @var MutationFactory|MockObject
+     * @var \Infection\Mutant\MutationFactory|MockObject
      */
     private $mutationFactoryMock;
 
@@ -85,7 +84,7 @@ final class FileMutationGeneratorTest extends TestCase
     {
         $this->fileParserMock = $this->createMock(FileParser::class);
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
-        $this->mutationFactoryMock = $this->createMock(MutationFactory::class);
+        $this->mutationFactoryMock = $this->createMock(\Infection\Mutant\MutationFactory::class);
 
         $this->mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
