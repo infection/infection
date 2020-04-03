@@ -33,43 +33,68 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Http;
+namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Http\Response;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class ResponseTest extends TestCase
+final class InstanceOf_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider valueProvider
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_it_can_be_instantiated(int $statusCode, string $body): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $response = new Response($statusCode, $body);
-
-        $this->assertSame($statusCode, $response->getStatusCode());
-        $this->assertSame($body, $response->getBody());
+        $this->doTest($input, $expected);
     }
 
-    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_HTTP_status_code(): void
+    public function mutationsProvider(): iterable
     {
-        try {
-            new Response(102, '');
+        yield 'It mutates an instanceof comparison with a class literal to true and false' => [
+            <<<'PHP'
+<?php
 
-            $this->fail();
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Expected an HTTP status code. Got "102"',
-                $exception->getMessage()
-            );
-        }
-    }
+return $example instanceof Example;
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
 
-    public function valueProvider(): iterable
-    {
-        yield 'empty' => [200, ''];
+return true;
+PHP
+                ,
+                <<<'PHP'
+<?php
 
-        yield 'nominal' => [200, 'body'];
+return false;
+PHP
+                ,
+            ],
+        ];
+
+        yield 'It mutates an instanceof comparison with a variable to true and false' => [
+            <<<'PHP'
+<?php
+
+return $example instanceof $foo;
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+return true;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+return false;
+PHP
+                ,
+            ],
+        ];
     }
 }

@@ -33,58 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+namespace Infection\PhpParser\Visitor;
 
-use function count;
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\Mutation\Mutation;
+use Infection\Mutator\NodeMutationGenerator;
 use PhpParser\Node;
-use Webmozart\Assert\Assert;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
  */
-final class Finally_ implements Mutator
+final class MutationCollectorVisitor extends NodeVisitorAbstract
 {
-    use GetMutatorName;
+    /**
+     * @var iterable<Mutation>[]
+     */
+    private $mutationChunks = [];
 
-    public static function getDefinition(): ?Definition
+    private $mutationGenerator;
+
+    public function __construct(NodeMutationGenerator $mutationGenerator)
     {
-        return new Definition(
-            'Removes the `finally` block.',
-            MutatorCategory::SEMANTIC_REDUCTION,
-            null
-        );
+        $this->mutationGenerator = $mutationGenerator;
+    }
+
+    public function beforeTraverse(array $nodes): ?array
+    {
+        $this->mutationChunks = [];
+
+        return null;
+    }
+
+    public function leaveNode(Node $node): ?Node
+    {
+        $this->mutationChunks[] = $this->mutationGenerator->generate($node);
+
+        return null;
     }
 
     /**
-     * @param Node\Stmt\Finally_ $node
-     *
-     * @return iterable<Node\Stmt\Nop>
+     * @return iterable<Mutation>
      */
-    public function mutate(Node $node): iterable
+    public function getMutations(): iterable
     {
-        yield new Node\Stmt\Nop();
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        if (!$node instanceof Node\Stmt\Finally_) {
-            return false;
+        foreach ($this->mutationChunks as $mutations) {
+            yield from $mutations;
         }
-
-        return $this->hasAtLeastOneCatchBlock($node);
-    }
-
-    private function hasAtLeastOneCatchBlock(Node $node): bool
-    {
-        /** @var Node\Stmt\TryCatch $parentNode */
-        $parentNode = ParentConnector::getParent($node);
-        Assert::isInstanceOf($parentNode, Node\Stmt\TryCatch::class);
-
-        return count($parentNode->catches) > 0;
     }
 }

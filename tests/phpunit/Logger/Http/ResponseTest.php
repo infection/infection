@@ -33,58 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+namespace Infection\Tests\Logger\Http;
 
-use function count;
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
-use PhpParser\Node;
-use Webmozart\Assert\Assert;
+use Infection\Logger\Http\Response;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class Finally_ implements Mutator
+final class ResponseTest extends TestCase
 {
-    use GetMutatorName;
-
-    public static function getDefinition(): ?Definition
-    {
-        return new Definition(
-            'Removes the `finally` block.',
-            MutatorCategory::SEMANTIC_REDUCTION,
-            null
-        );
-    }
-
     /**
-     * @param Node\Stmt\Finally_ $node
-     *
-     * @return iterable<Node\Stmt\Nop>
+     * @dataProvider valueProvider
      */
-    public function mutate(Node $node): iterable
+    public function test_it_can_be_instantiated(int $statusCode, string $body): void
     {
-        yield new Node\Stmt\Nop();
+        $response = new Response($statusCode, $body);
+
+        $this->assertSame($statusCode, $response->getStatusCode());
+        $this->assertSame($body, $response->getBody());
     }
 
-    public function canMutate(Node $node): bool
+    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_HTTP_status_code(): void
     {
-        if (!$node instanceof Node\Stmt\Finally_) {
-            return false;
+        try {
+            new Response(102, '');
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected an HTTP status code. Got "102"',
+                $exception->getMessage()
+            );
         }
-
-        return $this->hasAtLeastOneCatchBlock($node);
     }
 
-    private function hasAtLeastOneCatchBlock(Node $node): bool
+    public function valueProvider(): iterable
     {
-        /** @var Node\Stmt\TryCatch $parentNode */
-        $parentNode = ParentConnector::getParent($node);
-        Assert::isInstanceOf($parentNode, Node\Stmt\TryCatch::class);
+        yield 'empty' => [200, ''];
 
-        return count($parentNode->catches) > 0;
+        yield 'nominal' => [200, 'body'];
     }
 }

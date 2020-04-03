@@ -39,7 +39,7 @@ use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -96,17 +96,18 @@ final class DecrementInteger extends AbstractNumberMutator
             return true;
         }
 
-        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+        $parentNode = ParentConnector::getParent($node);
 
         if (!$this->isComparison($parentNode)) {
             return true;
         }
-
+        /** @var Node\Expr\BinaryOp $parentNode */
         if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
             && in_array(
                 $parentNode->left->name->toLowerString(),
                 self::COUNT_NAMES,
-                true)
+                true
+            )
         ) {
             return false;
         }
@@ -115,7 +116,8 @@ final class DecrementInteger extends AbstractNumberMutator
             && in_array(
                 $parentNode->right->name->toLowerString(),
                 self::COUNT_NAMES,
-                true)
+                true
+            )
         ) {
             return false;
         }
@@ -132,6 +134,7 @@ final class DecrementInteger extends AbstractNumberMutator
             || $parentNode instanceof Node\Expr\BinaryOp\Greater
             || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
             || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual
+        ;
     }
 }

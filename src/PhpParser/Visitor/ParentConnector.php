@@ -33,40 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Http;
+namespace Infection\PhpParser\Visitor;
 
+use Infection\CannotBeInstantiated;
+use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class Response
+final class ParentConnector
 {
-    public const CREATED_RESPONSE_CODE = 201;
+    use CannotBeInstantiated;
 
-    private $statusCode;
-    private $body;
+    private const PARENT_ATTRIBUTE = 'parent';
 
-    public function __construct(int $statusCode, string $body)
+    public static function setParent(Node $node, ?Node $parent): void
     {
-        Assert::range(
-            $statusCode,
-            200,
-            599,
-            'Expected an HTTP status code. Got "%s"'
-        );
-
-        $this->statusCode = $statusCode;
-        $this->body = $body;
+        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent);
     }
 
-    public function getStatusCode(): int
+    public static function getParent(Node $node): Node
     {
-        return $this->statusCode;
+        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
+
+        return $node->getAttribute(self::PARENT_ATTRIBUTE);
     }
 
-    public function getBody(): string
+    public static function findParent(Node $node): ?Node
     {
-        return $this->body;
+        return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
     }
 }

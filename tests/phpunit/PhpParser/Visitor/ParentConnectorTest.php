@@ -33,58 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+namespace Infection\Tests\PhpParser\Visitor;
 
-use function count;
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
-use PhpParser\Node;
-use Webmozart\Assert\Assert;
+use InvalidArgumentException;
+use PhpParser\Node\Stmt\Nop;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class Finally_ implements Mutator
+final class ParentConnectorTest extends TestCase
 {
-    use GetMutatorName;
-
-    public static function getDefinition(): ?Definition
+    public function test_it_can_provide_the_node_parent(): void
     {
-        return new Definition(
-            'Removes the `finally` block.',
-            MutatorCategory::SEMANTIC_REDUCTION,
-            null
-        );
+        $parent = new Nop();
+
+        $node = new Nop(['parent' => $parent]);
+
+        $this->assertSame($parent, ParentConnector::getParent($node));
+        $this->assertSame($parent, ParentConnector::findParent($node));
     }
 
-    /**
-     * @param Node\Stmt\Finally_ $node
-     *
-     * @return iterable<Node\Stmt\Nop>
-     */
-    public function mutate(Node $node): iterable
+    public function test_it_can_look_for_the_node_parent(): void
     {
-        yield new Node\Stmt\Nop();
+        $parent = new Nop();
+
+        $node1 = new Nop(['parent' => $parent]);
+        $node2 = new Nop(['parent' => null]);
+        $node3 = new Nop();
+
+        $this->assertSame($parent, ParentConnector::findParent($node1));
+        $this->assertNull(ParentConnector::findParent($node2));
+        $this->assertNull(ParentConnector::findParent($node3));
     }
 
-    public function canMutate(Node $node): bool
+    public function test_it_cannot_provide_the_node_parent_if_has_not_be_set_yet(): void
     {
-        if (!$node instanceof Node\Stmt\Finally_) {
-            return false;
-        }
+        $node = new Nop();
 
-        return $this->hasAtLeastOneCatchBlock($node);
+        $this->expectException(InvalidArgumentException::class);
+
+        // We are not interested in a more helpful message here since it would be the result of
+        // a misconfiguration on our part rather than a user one. Plus this would require some
+        // extra processing on a part which is quite a hot path.
+
+        ParentConnector::getParent($node);
     }
 
-    private function hasAtLeastOneCatchBlock(Node $node): bool
+    public function test_it_can_set_a_node_parent(): void
     {
-        /** @var Node\Stmt\TryCatch $parentNode */
-        $parentNode = ParentConnector::getParent($node);
-        Assert::isInstanceOf($parentNode, Node\Stmt\TryCatch::class);
+        $parent = new Nop();
+        $node = new Nop();
 
-        return count($parentNode->catches) > 0;
+        ParentConnector::setParent($node, $parent);
+
+        $this->assertSame($parent, ParentConnector::getParent($node));
+
+        ParentConnector::setParent($node, null);
+
+        $this->assertNull(ParentConnector::findParent($node));
     }
 }

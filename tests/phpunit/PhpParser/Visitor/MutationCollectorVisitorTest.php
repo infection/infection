@@ -35,18 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
-use PhpParser\Node;
-use Prophecy\Argument;
-use Prophecy\Argument\Token\TokenInterface;
-use Prophecy\Prophecy\ObjectProphecy;
-use stdClass;
+use Infection\PhpParser\Visitor\MutationCollectorVisitor;
+use function iterator_to_array;
 
 /**
  * @group integration
  */
-final class MutationsCollectorVisitorTest extends BaseVisitorTest
+final class MutationCollectorVisitorTest extends BaseVisitorTest
 {
     private const CODE = <<<'PHP'
 <?php
@@ -57,71 +54,89 @@ PHP;
 
     public function test_it_collects_the_generated_mutations(): void
     {
+        $mutation0 = $this->createMock(Mutation::class);
+        $mutation1 = $this->createMock(Mutation::class);
+        $mutation2 = $this->createMock(Mutation::class);
+        $mutation3 = $this->createMock(Mutation::class);
+        $mutation4 = $this->createMock(Mutation::class);
+
         $nodeMutationGeneratorMock = $this->createMock(NodeMutationGenerator::class);
         $nodeMutationGeneratorMock
-            ->expects($this->exactly(2))
             ->method('generate')
-            ->willReturn([$mutation = new stdClass()])
+            ->willReturnOnConsecutiveCalls(
+                [$mutation0, $mutation1],
+                [$mutation2],
+                [$mutation3, $mutation4]
+            )
         ;
 
-        $visitor = new MutationsCollectorVisitor($nodeMutationGeneratorMock);
+        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorMock);
 
         $this->traverse(
             $this->parseCode(self::CODE),
             [$visitor]
         );
 
-        $this->assertSame([$mutation, $mutation], iterator_to_array($visitor->getMutations(), false));
+        $this->assertSame(
+            [
+                $mutation0,
+                $mutation1,
+                $mutation2,
+                // We only expect 2 calls here – because of the code parsed: hence even if the
+                // generator can produce _more_ mutations, we only call it as many times as we need
+                // it, not as many times it can create mutations
+            ],
+            iterator_to_array($visitor->getMutations(), false)
+        );
     }
 
     public function test_it_resets_its_state_between_two_traverse(): void
     {
-        /** @var ObjectProphecy|NodeMutationGenerator $nodeMutationGeneratorProphecy */
-        $nodeMutationGeneratorProphecy = $this->prophesize(NodeMutationGenerator::class);
+        $mutation0 = $this->createMock(Mutation::class);
+        $mutation1 = $this->createMock(Mutation::class);
+        $mutation2 = $this->createMock(Mutation::class);
+        $mutation3 = $this->createMock(Mutation::class);
+        $mutation4 = $this->createMock(Mutation::class);
 
-        $node0 = $this->createMock(Node::class);
-        $node1 = $this->createMock(Node::class);
-        $node2 = $this->createMock(Node::class);
-        $node3 = $this->createMock(Node::class);
-
-        $nodeMutationGeneratorProphecy
-            ->generate(self::createExactArgument($node0))
-            ->willReturn([$mutation0 = new stdClass()])
-        ;
-        $nodeMutationGeneratorProphecy
-            ->generate(self::createExactArgument($node1))
-            ->willReturn([])
-        ;
-        $nodeMutationGeneratorProphecy
-            ->generate(self::createExactArgument($node2))
-            ->willReturn([$mutation2 = new stdClass()])
-        ;
-        $nodeMutationGeneratorProphecy
-            ->generate(self::createExactArgument($node3))
-            ->willReturn([$mutation3 = new stdClass()])
+        $nodeMutationGeneratorMock = $this->createMock(NodeMutationGenerator::class);
+        $nodeMutationGeneratorMock
+            ->method('generate')
+            ->willReturnOnConsecutiveCalls(
+                [$mutation0, $mutation1],
+                [$mutation2],
+                [$mutation3, $mutation4],
+                []
+            )
         ;
 
-        $visitor = new MutationsCollectorVisitor($nodeMutationGeneratorProphecy->reveal());
+        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorMock);
 
         $this->traverse(
-            [$node0, $node1],
+            $this->parseCode(self::CODE),
             [$visitor]
         );
 
-        $this->assertSame([$mutation0], iterator_to_array($visitor->getMutations(), false));
+        // Sanity check
+        $this->assertSame(
+            [
+                $mutation0,
+                $mutation1,
+                $mutation2,
+            ],
+            iterator_to_array($visitor->getMutations(), false)
+        );
 
         $this->traverse(
-            [$node2, $node3],
+            $this->parseCode(self::CODE),
             [$visitor]
         );
 
-        $this->assertSame([$mutation2, $mutation3], iterator_to_array($visitor->getMutations(), false));
-    }
-
-    private static function createExactArgument(object $value): TokenInterface
-    {
-        return Argument::that(static function ($arg) use ($value): bool {
-            return $arg === $value;
-        });
+        $this->assertSame(
+            [
+                $mutation3,
+                $mutation4,
+            ],
+            iterator_to_array($visitor->getMutations(), false)
+        );
     }
 }

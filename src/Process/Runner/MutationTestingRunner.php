@@ -42,7 +42,7 @@ use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
-use Infection\Process\Builder\MutantProcessFactory;
+use Infection\Process\Factory\MutantProcessFactory;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 

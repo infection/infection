@@ -33,58 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+namespace Infection\Mutator\Boolean;
 
-use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class Finally_ implements Mutator
+final class InstanceOf_ implements Mutator
 {
     use GetMutatorName;
 
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Removes the `finally` block.',
-            MutatorCategory::SEMANTIC_REDUCTION,
+            'Replaces an instanceof comparison with `true` and `false`.',
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );
     }
 
     /**
-     * @param Node\Stmt\Finally_ $node
-     *
-     * @return iterable<Node\Stmt\Nop>
+     * @return iterable<Node\Expr\ConstFetch>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Stmt\Nop();
+        yield new Node\Expr\ConstFetch(new Node\Name('true'));
+
+        yield new Node\Expr\ConstFetch(new Node\Name('false'));
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Stmt\Finally_) {
-            return false;
-        }
-
-        return $this->hasAtLeastOneCatchBlock($node);
-    }
-
-    private function hasAtLeastOneCatchBlock(Node $node): bool
-    {
-        /** @var Node\Stmt\TryCatch $parentNode */
-        $parentNode = ParentConnector::getParent($node);
-        Assert::isInstanceOf($parentNode, Node\Stmt\TryCatch::class);
-
-        return count($parentNode->catches) > 0;
+        return $node instanceof Node\Expr\Instanceof_;
     }
 }

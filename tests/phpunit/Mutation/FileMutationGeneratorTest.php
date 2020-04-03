@@ -44,7 +44,7 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
+use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
@@ -189,7 +189,7 @@ final class FileMutationGeneratorTest extends TestCase
         $this->traverserFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with($this->isInstanceOf(MutationsCollectorVisitor::class), $nodeIgnorers)
+            ->with($this->isInstanceOf(MutationCollectorVisitor::class), $nodeIgnorers)
             ->willReturn($traverserMock)
         ;
 
