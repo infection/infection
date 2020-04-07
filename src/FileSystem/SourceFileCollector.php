@@ -66,6 +66,10 @@ class SourceFileCollector
             ->name('*.php')
         ;
 
+        foreach ($excludeDirectories as $excludeDirectory) {
+            $finder->notPath($excludeDirectory);
+        }
+
         // Generator here to make sure these files used only once
         yield from $finder;
     }

@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
 use Infection\TestFramework\SafeDOMXPath;
+use function strpos;
 
 /**
  * @internal
@@ -78,6 +79,11 @@ class IndexXmlCoverageParser
 
         foreach ($xPath->query('//file') as $node) {
             $relativeCoverageFilePath = $node->getAttribute('href');
+
+            // TODO here we need somehow to respect excluded files. Below is not a solid solution, just to check it works
+            if (strpos($relativeCoverageFilePath, 'Kernel.php') !== false) {
+                continue;
+            }
 
             yield new SourceFileInfoProvider(
                 $coverageIndexPath,
