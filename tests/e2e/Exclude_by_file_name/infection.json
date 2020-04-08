@@ -1,0 +1,15 @@
+{
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "src"
+        ],
+        "excludes": [
+            "Kernel.php"
+        ]
+    },
+    "logs": {
+        "summary": "infection.log"
+    },
+    "tmpDir": "."
+}

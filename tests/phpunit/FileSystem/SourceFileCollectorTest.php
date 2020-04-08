@@ -140,6 +140,14 @@ final class SourceFileCollectorTest extends TestCase
                 'case1/a.php',
             ],
         ];
+
+        yield 'exclude file by its name' => [
+            [self::FIXTURES . '/case1'],
+            ['a.php'],
+            [
+                'case1/sub-dir/b.php',
+            ],
+        ];
     }
 
     /**
