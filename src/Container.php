@@ -178,7 +178,8 @@ final class Container
             },
             SourceFileFilter::class => static function (self $container): SourceFileFilter {
                 return new SourceFileFilter(
-                    $container->getConfiguration()->getSourceFilesFilter()
+                    $container->getConfiguration()->getSourceFilesFilter(),
+                    $container->getSchemaConfiguration()->getSource()->getExcludes()
                 );
             },
             JUnitTestExecutionInfoAdder::class => static function (self $container): JUnitTestExecutionInfoAdder {
