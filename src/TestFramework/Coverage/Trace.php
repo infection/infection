@@ -60,6 +60,8 @@ interface Trace
      */
     public function getRealPath(): string;
 
+    public function getRelativePathname(): string;
+
     public function hasTests(): bool;
 
     public function getTests(): TestLocations;
