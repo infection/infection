@@ -1,0 +1,17 @@
+{
+    "autoload": {
+        "psr-4": {
+            "PhpUnit_DataProvider\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PhpUnit_DataProvider\\Test\\": "tests/"
+        }
+    },
+    "require": {
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    }
+}
