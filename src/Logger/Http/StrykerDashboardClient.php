@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Http;
+namespace Infection\Logger\Http;
 
 use Psr\Log\LoggerInterface;
 use function Safe\json_encode;

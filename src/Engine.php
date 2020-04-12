@@ -130,8 +130,8 @@ final class Engine
 
         $initialTestSuitProcess = $this->initialTestsRunner->run(
             $this->config->getTestFrameworkExtraOptions(),
-            $this->config->shouldSkipCoverage(),
-            explode(' ', (string) $this->config->getInitialTestsPhpOptions())
+            explode(' ', (string) $this->config->getInitialTestsPhpOptions()),
+            $this->config->shouldSkipCoverage()
         );
 
         if (!$initialTestSuitProcess->isSuccessful()) {

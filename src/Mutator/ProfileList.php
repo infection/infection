@@ -98,6 +98,7 @@ final class ProfileList
         // EqualIdentical disabled from the default boolean profile
         Mutator\Boolean\FalseValue::class,
         // IdenticalEqual disabled from the default boolean profile
+        Mutator\Boolean\InstanceOf_::class,
         Mutator\Boolean\LogicalAnd::class,
         Mutator\Boolean\LogicalLowerAnd::class,
         Mutator\Boolean\LogicalLowerOr::class,
@@ -298,6 +299,7 @@ final class ProfileList
         'EqualIdentical' => Mutator\Boolean\EqualIdentical::class,
         'FalseValue' => Mutator\Boolean\FalseValue::class,
         'IdenticalEqual' => Mutator\Boolean\IdenticalEqual::class,
+        'InstanceOf_' => Mutator\Boolean\InstanceOf_::class,
         'LogicalAnd' => Mutator\Boolean\LogicalAnd::class,
         'LogicalLowerAnd' => Mutator\Boolean\LogicalLowerAnd::class,
         'LogicalLowerOr' => Mutator\Boolean\LogicalLowerOr::class,

@@ -33,54 +33,75 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Builder;
+namespace Infection\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Console\Util\PhpProcess;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutantProcessWasFinished;
+use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\MutantProcess;
 use function method_exists;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-class InitialTestRunProcessBuilder
+class MutantProcessFactory
 {
     private $testFrameworkAdapter;
+    private $timeout;
+    private $eventDispatcher;
+    private $resultFactory;
 
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
-    {
+    // TODO: is it necessary for the timeout to be an int?
+    public function __construct(
+        TestFrameworkAdapter $testFrameworkAdapter,
+        int $timeout,
+        EventDispatcher $eventDispatcher,
+        MutantExecutionResultFactory $resultFactory
+    ) {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
+        $this->timeout = $timeout;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->resultFactory = $resultFactory;
     }
 
-    /**
-     * Creates process with enabled debugger as test framework is going to use in the code coverage.
-     *
-     * @param string[] $phpExtraOptions
-     */
-    public function createProcess(
-        string $testFrameworkExtraOptions,
-        bool $skipCoverage,
-        array $phpExtraOptions = []
-    ): Process {
-        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processType = $skipCoverage ? Process::class : PhpProcess::class;
-
-        /** @var PhpProcess|Process $process */
-        $process = new $processType(
-            $this->testFrameworkAdapter->getInitialTestRunCommandLine(
-                $testFrameworkExtraOptions,
-                $phpExtraOptions,
-                $skipCoverage
+    public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    {
+        $process = new Process(
+            $this->testFrameworkAdapter->getMutantCommandLine(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                $testFrameworkExtraOptions
             )
         );
 
-        $process->setTimeout(null); // ignore the default timeout of 60 seconds
+        $process->setTimeout((float) $this->timeout);
 
         if (method_exists($process, 'inheritEnvironmentVariables')) {
             // in version 4.4.0 this method is deprecated and removed in 5.0.0
             $process->inheritEnvironmentVariables();
         }
 
-        return $process;
+        $mutantProcess = new MutantProcess($process, $mutant);
+
+        $eventDispatcher = $this->eventDispatcher;
+        $resultFactory = $this->resultFactory;
+
+        $mutantProcess->registerTerminateProcessClosure(static function () use (
+            $mutantProcess,
+            $eventDispatcher,
+            $resultFactory
+        ): void {
+            $eventDispatcher->dispatch(new MutantProcessWasFinished(
+                $resultFactory->createFromProcess($mutantProcess))
+            );
+        });
+
+        return $mutantProcess;
     }
 }

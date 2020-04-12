@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Http;
+namespace Infection\Logger\Http;
 
 use function curl_close;
 use function Safe\curl_exec;

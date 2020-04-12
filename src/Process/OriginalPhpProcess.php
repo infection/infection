@@ -33,51 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Process;
 
-use Infection\Mutation\Mutation;
-use Infection\Mutator\NodeMutationGenerator;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Composer\XdebugHandler\PhpConfig;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ *
+ * Process which is aware of the XdebugHandler configuration. This allows to start the sub-process
+ * with the original configuration.
+ *
+ * For example, if infection is launched with Xdebug, we usually restart the process without xdebug.
+ * However, we may still require Xdebug for getting the coverage reports from the initial test run.
  */
-final class MutationsCollectorVisitor extends NodeVisitorAbstract
+final class OriginalPhpProcess extends Process
 {
     /**
-     * @var iterable[]
+     * @param array<string|bool>|null $env
      */
-    private $mutationChunks = [];
-
-    private $mutationGenerator;
-
-    public function __construct(NodeMutationGenerator $mutationGenerator)
+    public function start(?callable $callback = null, ?array $env = null): void
     {
-        $this->mutationGenerator = $mutationGenerator;
-    }
+        $phpConfig = new PhpConfig();
+        $phpConfig->useOriginal();
 
-    public function beforeTraverse(array $nodes): ?array
-    {
-        $this->mutationChunks = [];
+        parent::start($callback, $env ?? []);
 
-        return null;
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
-        $this->mutationChunks[] = $this->mutationGenerator->generate($node);
-
-        return null;
-    }
-
-    /**
-     * @return iterable<Mutation>
-     */
-    public function getMutations(): iterable
-    {
-        foreach ($this->mutationChunks as $mutationChunk) {
-            yield from $mutationChunk;
-        }
+        $phpConfig->usePersistent();
     }
 }

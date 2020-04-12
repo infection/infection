@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Http;
+namespace Infection\Tests\Logger\Http;
 
-use Infection\Http\Response;
-use Infection\Http\StrykerCurlClient;
-use Infection\Http\StrykerDashboardClient;
+use Infection\Logger\Http\Response;
+use Infection\Logger\Http\StrykerCurlClient;
+use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Tests\Logger\DummyLogger;
 use function Infection\Tests\normalizeLineReturn;
 use PHPUnit\Framework\MockObject\MockObject;

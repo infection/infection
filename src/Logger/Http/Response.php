@@ -33,38 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\Util;
+namespace Infection\Logger\Http;
 
-use Composer\XdebugHandler\PhpConfig;
-use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class PhpProcess extends Process
+final class Response
 {
-    /**
-     * Runs a PHP process with xdebug loaded
-     *
-     * If xdebug was loaded in the main process, it will have been restarted
-     * without xdebug and configured to keep xdebug out of PHP sub-processes.
-     *
-     * This method allows a sub-process to run with xdebug enabled (if it was
-     * originally loaded), then restores the xdebug-free environment.
-     *
-     * This means that we can use xdebug when it is required and not have to
-     * worry about it for the bulk of other processes, which do not need it and
-     * work better without it.
-     *
-     * @param array<string|bool>|null $env
-     */
-    public function start(?callable $callback = null, ?array $env = null): void
+    public const CREATED_RESPONSE_CODE = 201;
+
+    private $statusCode;
+    private $body;
+
+    public function __construct(int $statusCode, string $body)
     {
-        $phpConfig = new PhpConfig();
-        $phpConfig->useOriginal();
+        Assert::range(
+            $statusCode,
+            200,
+            599,
+            'Expected an HTTP status code. Got "%s"'
+        );
 
-        parent::start($callback, $env ?? []);
+        $this->statusCode = $statusCode;
+        $this->body = $body;
+    }
 
-        $phpConfig->usePersistent();
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
+    }
+
+    public function getBody(): string
+    {
+        return $this->body;
     }
 }
