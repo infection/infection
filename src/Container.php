@@ -38,6 +38,7 @@ namespace Infection;
 use function array_filter;
 use function array_key_exists;
 use Closure;
+use function getenv;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
@@ -50,6 +51,14 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
+use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
+use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
+use Infection\Event\Subscriber\SubscriberFactoryRegistry;
+use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
@@ -73,7 +82,6 @@ use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Process\Runner\DryProcessRunner;
@@ -366,24 +374,74 @@ final class Container
                     (float) $config->getMinCoveredMsi()
                 );
             },
-            SubscriberBuilder::class => static function (self $container): SubscriberBuilder {
+            SubscriberRegisterer::class => static function (self $container): SubscriberRegisterer {
+                return new SubscriberRegisterer(
+                    $container->getEventDispatcher(),
+                    $container->getSubscriberFactoryRegistry()
+                );
+            },
+            SubscriberFactoryRegistry::class => static function (self $container): SubscriberFactoryRegistry {
+                return new SubscriberFactoryRegistry(
+                    $container->getInitialTestsConsoleLoggerSubscriberFactory(),
+                    $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
+                    $container->getMutationTestingConsoleLoggerSubscriberFactory(),
+                    $container->getMutationTestingResultsLoggerSubscriberFactory(),
+                    $container->getPerformanceLoggerSubscriberFactory(),
+                    $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory()
+                );
+            },
+            CleanUpAfterMutationTestingFinishedSubscriberFactory::class => static function (self $container): CleanUpAfterMutationTestingFinishedSubscriberFactory {
                 $config = $container->getConfiguration();
 
-                return new SubscriberBuilder(
-                    $config->showMutations(),
+                return new CleanUpAfterMutationTestingFinishedSubscriberFactory(
                     $config->isDebugEnabled(),
-                    $config->getFormatter(),
-                    $config->noProgress(),
-                    $container->getMetricsCalculator(),
-                    $container->getEventDispatcher(),
-                    $container->getDiffColorizer(),
-                    $config,
                     $container->getFileSystem(),
-                    $config->getTmpDir(),
+                    $config->getTmpDir()
+                );
+            },
+            InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
+                $config = $container->getConfiguration();
+
+                $skipProgressBar = $container->getConfiguration()->noProgress()
+                    || getenv('CI') === 'true'
+                    || getenv('CONTINUOUS_INTEGRATION') === 'true'
+                ;
+
+                return new InitialTestsConsoleLoggerSubscriberFactory(
+                    $skipProgressBar,
+                    $container->getTestFrameworkAdapter(),
+                    $config->isDebugEnabled()
+                );
+            },
+            MutationGeneratingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationGeneratingConsoleLoggerSubscriberFactory {
+                $skipProgressBar = $container->getConfiguration()->noProgress()
+                    || getenv('CI') === 'true'
+                    || getenv('CONTINUOUS_INTEGRATION') === 'true'
+                ;
+
+                return new MutationGeneratingConsoleLoggerSubscriberFactory($skipProgressBar);
+            },
+            MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
+                $config = $container->getConfiguration();
+
+                return new MutationTestingConsoleLoggerSubscriberFactory(
+                    $container->getMetricsCalculator(),
+                    $container->getDiffColorizer(),
+                    $config->showMutations(),
+                    $config->getFormatter()
+                );
+            },
+            MutationTestingResultsLoggerSubscriberFactory::class => static function (self $container): MutationTestingResultsLoggerSubscriberFactory {
+                return new MutationTestingResultsLoggerSubscriberFactory(
+                    $container->getLoggerFactory(),
+                    $container->getConfiguration()->getLogs()
+                );
+            },
+            PerformanceLoggerSubscriberFactory::class => static function (self $container): PerformanceLoggerSubscriberFactory {
+                return new PerformanceLoggerSubscriberFactory(
                     $container->getStopwatch(),
                     $container->getTimeFormatter(),
-                    $container->getMemoryFormatter(),
-                    $container->getLoggerFactory()
+                    $container->getMemoryFormatter()
                 );
             },
             CommandLineBuilder::class => static function (): CommandLineBuilder {
@@ -795,9 +853,44 @@ final class Container
         return $this->get(MinMsiChecker::class);
     }
 
-    public function getSubscriberBuilder(): SubscriberBuilder
+    public function getSubscriberRegisterer(): SubscriberRegisterer
     {
-        return $this->get(SubscriberBuilder::class);
+        return $this->get(SubscriberRegisterer::class);
+    }
+
+    public function getSubscriberFactoryRegistry(): SubscriberFactoryRegistry
+    {
+        return $this->get(SubscriberFactoryRegistry::class);
+    }
+
+    public function getCleanUpAfterMutationTestingFinishedSubscriberFactory(): CleanUpAfterMutationTestingFinishedSubscriberFactory
+    {
+        return $this->get(CleanUpAfterMutationTestingFinishedSubscriberFactory::class);
+    }
+
+    public function getInitialTestsConsoleLoggerSubscriberFactory(): InitialTestsConsoleLoggerSubscriberFactory
+    {
+        return $this->get(InitialTestsConsoleLoggerSubscriberFactory::class);
+    }
+
+    public function getMutationGeneratingConsoleLoggerSubscriberFactory(): MutationGeneratingConsoleLoggerSubscriberFactory
+    {
+        return $this->get(MutationGeneratingConsoleLoggerSubscriberFactory::class);
+    }
+
+    public function getMutationTestingConsoleLoggerSubscriberFactory(): MutationTestingConsoleLoggerSubscriberFactory
+    {
+        return $this->get(MutationTestingConsoleLoggerSubscriberFactory::class);
+    }
+
+    public function getMutationTestingResultsLoggerSubscriberFactory(): MutationTestingResultsLoggerSubscriberFactory
+    {
+        return $this->get(MutationTestingResultsLoggerSubscriberFactory::class);
+    }
+
+    public function getPerformanceLoggerSubscriberFactory(): PerformanceLoggerSubscriberFactory
+    {
+        return $this->get(PerformanceLoggerSubscriberFactory::class);
     }
 
     public function getSourceFileCollector(): SourceFileCollector
