@@ -196,7 +196,7 @@ TXT
         }
     }
 
-    public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_with__php_unit(): void
+    public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_with_phpunit(): void
     {
         $checker = new CoverageChecker(
             false,
