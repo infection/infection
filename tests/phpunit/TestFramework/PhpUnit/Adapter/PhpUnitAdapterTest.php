@@ -73,7 +73,7 @@ final class PhpUnitAdapterTest extends TestCase
         $this->assertSame('PHPUnit', $this->adapter->getName());
     }
 
-    public function test_it_supports_JUnit_reports(): void
+    public function test_it_supports_junit_reports(): void
     {
         $this->assertTrue($this->adapter->hasJUnitReport());
     }

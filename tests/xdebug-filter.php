@@ -33,30 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Metrics;
-
-use Infection\Metrics\MinMsiCheckFailed;
-use PHPUnit\Framework\TestCase;
-
-final class MinMsiCheckFailedTest extends TestCase
-{
-    public function test_it_can_be_created_for_min_msi(): void
-    {
-        $exception = MinMsiCheckFailed::createForMsi(73.26, 52.1);
-
-        $this->assertSame(
-            'The minimum required MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
-            $exception->getMessage()
-        );
-    }
-
-    public function test_it_can_be_created_for_min_covered_code_msi(): void
-    {
-        $exception = MinMsiCheckFailed::createCoveredMsi(73.26, 52.1);
-
-        $this->assertSame(
-            'The minimum required Covered Code MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
-            $exception->getMessage()
-        );
-    }
+if (!function_exists('xdebug_set_filter')) {
+    return;
 }
+
+// See https://xdebug.org/docs/all_functions
+xdebug_set_filter(
+    XDEBUG_FILTER_CODE_COVERAGE,
+    XDEBUG_PATH_WHITELIST,
+    [dirname(__DIR__) . '/src/']
+);

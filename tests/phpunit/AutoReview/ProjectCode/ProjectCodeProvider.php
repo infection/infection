@@ -253,6 +253,7 @@ final class ProjectCodeProvider
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
+            ->notPath('xdebug-filter.php')
             ->exclude([
                 'autoloaded',
                 'benchmark',
