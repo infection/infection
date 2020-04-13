@@ -33,44 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem;
-
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
-
-/**
- * @final
- *
- * @internal
- */
-class SourceFileCollector
-{
-    /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludeDirectories
-     *
-     * @return iterable<SplFileInfo>
-     */
-    public function collectFiles(
-        array $sourceDirectories,
-        array $excludeDirectories
-    ): iterable {
-        if ([] === $sourceDirectories) {
-            return;
-        }
-
-        $finder = Finder::create()
-            ->exclude($excludeDirectories)
-            ->in($sourceDirectories)
-            ->files()
-            ->name('*.php')
-        ;
-
-        foreach ($excludeDirectories as $excludeDirectory) {
-            $finder->notPath($excludeDirectory);
-        }
-
-        // Generator here to make sure these files used only once
-        yield from $finder;
-    }
+if (!function_exists('xdebug_set_filter')) {
+    return;
 }
+
+// See https://xdebug.org/docs/all_functions
+xdebug_set_filter(
+    XDEBUG_FILTER_CODE_COVERAGE,
+    XDEBUG_PATH_WHITELIST,
+    [dirname(__DIR__) . '/src/']
+);

@@ -88,7 +88,7 @@ final class InvalidFileTest extends TestCase
     /**
      * @dataProvider jsonErrorProvider
      */
-    public function test_it_can_be_created_for_file_with_invalid_JSON_content(
+    public function test_it_can_be_created_for_file_with_invalid_json_content(
         SchemaConfigurationFile $config,
         string $error,
         Throwable $previous,

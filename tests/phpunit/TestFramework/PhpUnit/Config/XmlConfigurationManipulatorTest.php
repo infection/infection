@@ -485,7 +485,7 @@ XML
         );
     }
 
-    public function test_it_cannot_validate_invalid_PHPUnit_XML_configuration(): void
+    public function test_it_cannot_validate_invalid_phpunit_xml_configuration(): void
     {
         $xPath = $this->createXPath('<invalid></invalid>');
 
@@ -495,7 +495,7 @@ XML
         $this->configManipulator->validate('/path/to/phpunit.xml', $xPath);
     }
 
-    public function test_it_consider_as_valid_a_PHPUnit_XML_configuration_without_XSD(): void
+    public function test_it_consider_as_valid_a_phpunit_xml_configuration_without_xsd(): void
     {
         $xPath = $this->createXPath(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -510,7 +510,7 @@ XML
     /**
      * @dataProvider invalidSchemaProvider
      */
-    public function test_it_cannot_validates_XML_if_schema_file_is_invalid(
+    public function test_it_cannot_validates_xml_if_schema_file_is_invalid(
         string $xsdSchema,
         string $errorMessage
     ): void {
@@ -552,7 +552,7 @@ XML
      *
      * @group integration Might require an external connection to download the XSD
      */
-    public function test_it_validates_XML_by_XSD(string $xsdSchema): void
+    public function test_it_validates_xml_by_xsd(string $xsdSchema): void
     {
         $xPath = $this->createXPath(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -603,7 +603,7 @@ EOF
      *
      * @group integration Might require an external connection to download the XSD
      */
-    public function test_it_passes_validation_by_XSD(string $xsdSchema): void
+    public function test_it_passes_validation_by_xsd(string $xsdSchema): void
     {
         $xPath = $this->createXPath(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -618,7 +618,7 @@ XML
         $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
     }
 
-    public function test_it_uses_the_configured_PHPUnit_config_dir_to_build_schema_paths(): void
+    public function test_it_uses_the_configured_phpunit_config_dir_to_build_schema_paths(): void
     {
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(new Filesystem()),

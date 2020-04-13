@@ -40,7 +40,7 @@ use PHPUnit\Framework\TestCase;
 
 final class MinMsiCheckFailedTest extends TestCase
 {
-    public function test_it_can_be_created_for_min_MSI(): void
+    public function test_it_can_be_created_for_min_msi(): void
     {
         $exception = MinMsiCheckFailed::createForMsi(73.26, 52.1);
 
@@ -50,7 +50,7 @@ final class MinMsiCheckFailedTest extends TestCase
         );
     }
 
-    public function test_it_can_be_created_for_min_covered_code_MSI(): void
+    public function test_it_can_be_created_for_min_covered_code_msi(): void
     {
         $exception = MinMsiCheckFailed::createCoveredMsi(73.26, 52.1);
 

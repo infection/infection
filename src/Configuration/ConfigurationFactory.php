@@ -126,6 +126,7 @@ class ConfigurationFactory
                 $schema->getSource()->getExcludes()
             ),
             $filter,
+            $schema->getSource()->getExcludes(),
             $schema->getLogs(),
             $logVerbosity,
             $namespacedTmpDir,

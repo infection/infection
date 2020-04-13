@@ -72,7 +72,7 @@ final class SourceFileInfoProviderTest extends TestCase
         $this->assertSame($xPath, $xPathAgain);
     }
 
-    public function test_it_errors_when_the_XML_file_could_not_be_found(): void
+    public function test_it_errors_when_the_xml_file_could_not_be_found(): void
     {
         $provider = new SourceFileInfoProvider(
             '/path/to/index.xml',
