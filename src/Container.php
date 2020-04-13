@@ -402,6 +402,7 @@ final class Container
             InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
 
+                // TODO: this should be moved to the config & config factory instead
                 $skipProgressBar = $container->getConfiguration()->noProgress()
                     || getenv('CI') === 'true'
                     || getenv('CONTINUOUS_INTEGRATION') === 'true'
@@ -414,6 +415,7 @@ final class Container
                 );
             },
             MutationGeneratingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationGeneratingConsoleLoggerSubscriberFactory {
+                // TODO: this should be moved to the config & config factory instead
                 $skipProgressBar = $container->getConfiguration()->noProgress()
                     || getenv('CI') === 'true'
                     || getenv('CONTINUOUS_INTEGRATION') === 'true'
