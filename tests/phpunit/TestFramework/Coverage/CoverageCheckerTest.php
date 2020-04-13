@@ -75,7 +75,7 @@ final class CoverageCheckerTest extends TestCase
         self::$jUnit = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/junit.xml');
     }
 
-    public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_without_JUnit_report(): void
+    public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_without_junit_report(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -97,7 +97,7 @@ final class CoverageCheckerTest extends TestCase
         $checker->checkCoverageRequirements();
     }
 
-    public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_with_JUnit_report(): void
+    public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_with_junit_report(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -150,7 +150,7 @@ TXT
         $checker->checkCoverageRequirements();
     }
 
-    public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found_with_JUnit_report(): void
+    public function test_it_passes_existence_check_if_xml_index_and_junit_files_are_found_with_junit_report(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -168,7 +168,7 @@ TXT
         $this->addToAssertionCount(1);
     }
 
-    public function test_it_does_not_pass_existence_check_if_XML_index_is_missing_with_lambda_test_framework_adapter(): void
+    public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_with_lambda_test_framework_adapter(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -196,7 +196,7 @@ TXT
         }
     }
 
-    public function test_it_does_not_pass_existence_check_if_XML_index_is_missing_with_PHPUnit(): void
+    public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_with__php_unit(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -225,7 +225,7 @@ TXT
         }
     }
 
-    public function test_it_does_not_pass_existence_check_if_XML_index_is_missing_with_Codeception(): void
+    public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_with_codeception(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -254,7 +254,7 @@ TXT
         }
     }
 
-    public function test_it_passes_existence_check_if_XML_index_is_present_and_JUnit_file_is_missing_without_JUnit_report(): void
+    public function test_it_passes_existence_check_if_xml_index_is_present_and_junit_file_is_missing_without_junit_report(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -272,7 +272,7 @@ TXT
         $this->addToAssertionCount(1);
     }
 
-    public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_with_JUnit_report_with_lambda_test_framework_adapter(): void
+    public function test_it_does_not_pass_existence_check_if_junit_file_is_missing_with_junit_report_with_lambda_test_framework_adapter(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -303,7 +303,7 @@ TXT
         }
     }
 
-    public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_with_JUnit_report_with_PHPUnit_test_framework_adapter(): void
+    public function test_it_does_not_pass_existence_check_if_junit_file_is_missing_with_junit_report_with_phpunit_test_framework_adapter(): void
     {
         $phpUnitAdapterMock = $this->createMock(PhpUnitAdapter::class);
         $phpUnitAdapterMock->method('hasJUnitReport')->willReturn(true);
@@ -338,7 +338,7 @@ TXT
         }
     }
 
-    public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_with_JUnit_report_with_Codeception_test_framework_adapter(): void
+    public function test_it_does_not_pass_existence_check_if_junit_file_is_missing_with_junit_report_with_codeception_test_framework_adapter(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -370,7 +370,7 @@ TXT
         }
     }
 
-    public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found_after_tests_run_with_JUnit_report(): void
+    public function test_it_passes_existence_check_if_xml_index_and_junit_files_are_found_after_tests_run_with_junit_report(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -391,7 +391,7 @@ TXT
         $this->addToAssertionCount(1);
     }
 
-    public function test_it_passes_existence_check_if_XML_index_and_JUnit_files_are_found_after_tests_run_without_JUnit_report(): void
+    public function test_it_passes_existence_check_if_xml_index_and_junit_files_are_found_after_tests_run_without_junit_report(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -412,7 +412,7 @@ TXT
         $this->addToAssertionCount(1);
     }
 
-    public function test_it_does_not_pass_existence_check_if_XML_index_is_missing_after_tests_run(): void
+    public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_after_tests_run(): void
     {
         $checker = new CoverageChecker(
             false,
@@ -446,7 +446,7 @@ TXT
         );
     }
 
-    public function test_it_does_not_pass_existence_check_if_JUnit_file_is_missing_after_tests_run_with_JUnit_report(): void
+    public function test_it_does_not_pass_existence_check_if_junit_file_is_missing_after_tests_run_with_junit_report(): void
     {
         $coveragePath = Path::canonicalize(self::$coveragePath);
 
@@ -482,7 +482,7 @@ TXT
         );
     }
 
-    public function test_it_passes_existence_check_if_XML_index_is_found_and_JUnit_file_is_missing_after_tests_run_without_JUnit_report(): void
+    public function test_it_passes_existence_check_if_xml_index_is_found_and_junit_file_is_missing_after_tests_run_without_junit_report(): void
     {
         $checker = new CoverageChecker(
             false,

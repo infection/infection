@@ -60,7 +60,7 @@ final class MinMsiCheckerTest extends TestCase
         $this->output = new ConsoleOutput($this->ioMock);
     }
 
-    public function test_it_fails_the_check_if_the_MSI_is_lower_than_the_min_MSI(): void
+    public function test_it_fails_the_check_if_the_msi_is_lower_than_the_min_msi(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 5.);
 
@@ -75,7 +75,7 @@ final class MinMsiCheckerTest extends TestCase
         $msiChecker->checkMetrics(2, 8., 10., $this->output);
     }
 
-    public function test_it_fails_the_check_if_the_covered_code_MSI_is_lower_than_the_min_covered_code_MSI(): void
+    public function test_it_fails_the_check_if_the_covered_code_msi_is_lower_than_the_min_covered_code__msi(): void
     {
         $msiChecker = new MinMsiChecker(false, 5., 10.);
 
@@ -90,7 +90,7 @@ final class MinMsiCheckerTest extends TestCase
         $msiChecker->checkMetrics(2, 12., 8., $this->output);
     }
 
-    public function test_it_suggests_to_increase_the_min_MSI_if_above_the_limit(): void
+    public function test_it_suggests_to_increase_the_min_msi_if_above_the_limit(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 10.);
 
@@ -103,7 +103,7 @@ final class MinMsiCheckerTest extends TestCase
         $msiChecker->checkMetrics(2, 80., 10., $this->output);
     }
 
-    public function test_it_suggests_to_increase_the_min_covered_code_MSI_if_above_the_limit(): void
+    public function test_it_suggests_to_increase_the_min_covered_code_msi_if_above_the_limit(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 10.);
 
@@ -116,7 +116,7 @@ final class MinMsiCheckerTest extends TestCase
         $msiChecker->checkMetrics(2, 10., 80., $this->output);
     }
 
-    public function test_it_suggests_to_increase_the_min_MSI_and_min_covered_code_MSI_if_above_the_limit(): void
+    public function test_it_suggests_to_increase_the_min_msi_and_min_covered_code_msi_if_above_the_limit(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 10.);
 
@@ -156,7 +156,7 @@ final class MinMsiCheckerTest extends TestCase
         $msiChecker->checkMetrics(0, 10.2, 10.2, $this->output);
     }
 
-    public function test_it_does_nothing_if_the_MSIs_are_too_low_but_we_ignore_it_with_no_mutations_and_there_is_no_mutations(): void
+    public function test_it_does_nothing_if_the__ms_is_are_too_low_but_we_ignore_it_with_no_mutations_and_there_is_no_mutations(): void
     {
         $msiChecker = new MinMsiChecker(true, 10., 10.);
 

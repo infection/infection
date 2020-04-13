@@ -47,14 +47,14 @@ final class FullyQualifiedClassNameManipulatorTest extends TestCase
     /**
      * @dataProvider hasFqcnProvider
      */
-    public function test_it_can_determine_if_the_given_node_has_a_FQCN_attribute(
+    public function test_it_can_determine_if_the_given_node_has_a_fqcn_attribute(
         Node $node,
         bool $expected
     ): void {
         $this->assertSame($expected, FullyQualifiedClassNameManipulator::hasFqcn($node));
     }
 
-    public function test_it_can_provide_the_node_FQCN(): void
+    public function test_it_can_provide_the_node_fqcn(): void
     {
         $fqcn = new FullyQualified('Acme\Foo');
         $node = new Nop(['fullyQualifiedClassName' => $fqcn]);
@@ -62,14 +62,14 @@ final class FullyQualifiedClassNameManipulatorTest extends TestCase
         $this->assertSame($fqcn, FullyQualifiedClassNameManipulator::getFqcn($node));
     }
 
-    public function test_it_can_provide_the_node_FQCN_for_an_anonymous_class(): void
+    public function test_it_can_provide_the_node_fqcn_for_an_anonymous_class(): void
     {
         $node = new Nop(['fullyQualifiedClassName' => null]);
 
         $this->assertNull(FullyQualifiedClassNameManipulator::getFqcn($node));
     }
 
-    public function test_it_cannot_provide_the_node_FQCN_if_has_not_be_set_yet(): void
+    public function test_it_cannot_provide_the_node_fqcn_if_has_not_be_set_yet(): void
     {
         $node = new Nop();
 
@@ -82,7 +82,7 @@ final class FullyQualifiedClassNameManipulatorTest extends TestCase
         FullyQualifiedClassNameManipulator::getFqcn($node);
     }
 
-    public function test_it_can_set_a_node_FQCN(): void
+    public function test_it_can_set_a_node_fqcn(): void
     {
         $fqcn = new FullyQualified('Acme\Foo');
         $node = new Nop();
@@ -92,7 +92,7 @@ final class FullyQualifiedClassNameManipulatorTest extends TestCase
         $this->assertSame($fqcn, FullyQualifiedClassNameManipulator::getFqcn($node));
     }
 
-    public function test_it_can_set_a_node_FQCN_for_an_anonymous_class(): void
+    public function test_it_can_set_a_node_fqcn_for_an_anonymous_class(): void
     {
         $node = new Nop();
 
