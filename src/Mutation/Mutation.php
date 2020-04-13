@@ -51,7 +51,7 @@ class Mutation
     private $mutatorName;
     private $originalStartingLine;
     private $tests;
-    private $executedByTests;
+    private $coveredByTests;
     private $mutationHash;
     private $mutationFilePath;
     private $mutatedCode;
@@ -76,7 +76,7 @@ class Mutation
         $this->mutatorName = $mutatorName;
         $this->originalStartingLine = $originalStartingLine;
         $this->tests = $tests;
-        $this->executedByTests = count($tests) > 0;
+        $this->coveredByTests = count($tests) > 0;
         $this->mutationHash = $mutationHash;
         $this->mutationFilePath = $mutationFilePath;
         $this->mutatedCode = $mutatedCode;
@@ -98,15 +98,15 @@ class Mutation
         return $this->originalStartingLine;
     }
 
-    public function hasTests(): bool
+    public function isCoveredByTest(): bool
     {
-        return $this->executedByTests;
+        return $this->coveredByTests;
     }
 
     /**
      * @return TestLocation[]
      */
-    public function getTests(): array
+    public function getAllTests(): array
     {
         return $this->tests;
     }

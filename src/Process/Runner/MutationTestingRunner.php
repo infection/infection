@@ -81,7 +81,7 @@ final class MutationTestingRunner
 
         $processes = take($mutations)
             ->filter(function (Mutation $mutation) {
-                if ($mutation->hasTests()) {
+                if ($mutation->isCoveredByTest()) {
                     return true;
                 }
 

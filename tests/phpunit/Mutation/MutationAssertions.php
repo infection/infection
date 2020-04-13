@@ -54,8 +54,8 @@ trait MutationAssertions
         $this->assertSame($expectedOriginalFilePath, $mutation->getOriginalFilePath());
         $this->assertSame($expectedMutatorName, $mutation->getMutatorName());
         $this->assertSame($expectedOriginalStartingLine, $mutation->getOriginalStartingLine());
-        $this->assertSame($expectedTests, $mutation->getTests());
-        $this->assertSame($expectedHasTests, $mutation->hasTests());
+        $this->assertSame($expectedTests, $mutation->getAllTests());
+        $this->assertSame($expectedHasTests, $mutation->isCoveredByTest());
         $this->assertSame($expectedHash, $mutation->getHash());
         $this->assertSame($expectedFilePath, $mutation->getFilePath());
         $this->assertSame($expectedCode, $mutation->getMutatedCode());

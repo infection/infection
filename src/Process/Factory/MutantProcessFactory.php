@@ -72,7 +72,7 @@ class MutantProcessFactory
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
-                $mutation->getTests(),
+                $mutation->getAllTests(),
                 $mutation->getFilePath(),
                 $mutation->getHash(),
                 $mutation->getOriginalFilePath(),
