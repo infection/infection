@@ -35,8 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use function array_filter;
+use function count;
 use function file_exists;
+use const GLOB_ONLYDIR;
 use function implode;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
@@ -69,18 +70,22 @@ final class ConfigureCommand extends BaseCommand
 
     protected function configure(): void
     {
-        $this->setName('configure')
+        $this
+            ->setName('configure')
             ->setDescription('Create Infection config')
             ->addOption(
                 'test-framework',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Name of the Test framework to use (' . implode(', ', TestFrameworkTypes::TYPES) . ')',
+                sprintf(
+                    'Name of the Test framework to use ("%s")',
+                    implode('", "', TestFrameworkTypes::TYPES)
+                ),
                 TestFrameworkTypes::PHPUNIT
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$input->isInteractive()) {
             $output->writeln(self::NONINTERACTIVE_MODE_ERROR);
@@ -97,7 +102,7 @@ final class ConfigureCommand extends BaseCommand
             '',
         ]);
 
-        $dirsInCurrentDir = array_filter(glob('*'), 'is_dir');
+        $dirsInCurrentDir = glob('*', GLOB_ONLYDIR);
         $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
 
         $questionHelper = $this->getHelper('question');
@@ -113,7 +118,7 @@ final class ConfigureCommand extends BaseCommand
         $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper, $sourceDirGuesser);
         $sourceDirs = $sourceDirsProvider->get($input, $output, $dirsInCurrentDir);
 
-        if (empty($sourceDirs)) {
+        if (count($sourceDirs) === 0) {
             $output->writeln('A source directory was not provided. Unable to generate "infection.json.dist".');
 
             return 1;
