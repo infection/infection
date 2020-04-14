@@ -80,7 +80,7 @@ final class MemoryLimiterEnvironmentTest extends TestCase
         $this->assertSame($expected, $this->environment->hasMemoryLimitSet());
     }
 
-    public function test_it_uses_the_system_ini_if_PHPDBG_is_enabled(): void
+    public function test_it_uses_the_system_ini_if_phpdbg_is_enabled(): void
     {
         if (PHP_SAPI !== 'phpdbg') {
             $this->markTestSkipped('This test requires PHPDBG');
@@ -89,7 +89,7 @@ final class MemoryLimiterEnvironmentTest extends TestCase
         $this->assertTrue($this->environment->isUsingSystemIni());
     }
 
-    public function test_it_uses_the_system_ini_if_Xdebug_handler_is_not_detected(): void
+    public function test_it_uses_the_system_ini_if_xdebug_handler_is_not_detected(): void
     {
         if (PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('This test requires running without PHPDBG');
@@ -100,7 +100,7 @@ final class MemoryLimiterEnvironmentTest extends TestCase
         $this->assertTrue($this->environment->isUsingSystemIni());
     }
 
-    public function test_it_uses_the_system_ini_if_PHPDBG_is_enabled_and_Xdebug_handler_is_not_detected(): void
+    public function test_it_uses_the_system_ini_if_phpdbg_is_enabled_and_xdebug_handler_is_not_detected(): void
     {
         if (PHP_SAPI !== 'phpdbg') {
             $this->markTestSkipped('This test requires PHPDBG');
@@ -111,7 +111,7 @@ final class MemoryLimiterEnvironmentTest extends TestCase
         $this->assertTrue($this->environment->isUsingSystemIni());
     }
 
-    public function test_it_does_not_use_the_system_ini_if_PHPDBG_is_disabled_and_Xdebug_handler_is_detected(): void
+    public function test_it_does_not_use_the_system_ini_if_phpdbg_is_disabled_and_xdebug_handler_is_detected(): void
     {
         if (PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('This test requires running without PHPDBG');

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -62,7 +62,9 @@ final class LineRangeCalculator
             if ($node instanceof Node\Expr\Array_) {
                 $outerMostArrayParent = $node;
             }
-        } while ($node = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
+
+            $node = ParentConnector::findParent($node);
+        } while ($node !== null);
 
         return $outerMostArrayParent;
     }

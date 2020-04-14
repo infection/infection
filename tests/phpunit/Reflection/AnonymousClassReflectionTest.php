@@ -42,7 +42,7 @@ final class AnonymousClassReflectionTest extends ClassReflectionTestCase
 {
     public function test_it_has_no_name(): void
     {
-        $reflection = AnonymousClassReflection::fromClassName(get_class($this));
+        $reflection = AnonymousClassReflection::fromClassName(self::class);
         $this->assertSame('', $reflection->getName());
     }
 

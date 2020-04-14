@@ -115,7 +115,7 @@ final class Factory
 
         $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT];
 
-        foreach ($this->installedExtensions as $packageName => $installedExtension) {
+        foreach ($this->installedExtensions as $installedExtension) {
             $factory = $installedExtension['extra']['class'];
 
             Assert::classExists($factory);

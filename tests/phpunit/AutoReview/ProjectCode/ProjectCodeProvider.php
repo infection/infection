@@ -48,7 +48,6 @@ use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Application;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
-use Infection\Console\Util\PhpProcess;
 use Infection\Console\XdebugHandler;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
@@ -56,13 +55,13 @@ use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Http\StrykerCurlClient;
-use Infection\Http\StrykerDashboardClient;
+use Infection\Logger\Http\StrykerCurlClient;
+use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\Process\OriginalPhpProcess;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -94,7 +93,7 @@ final class ProjectCodeProvider
         RunCommand::class,
         Application::class,
         ProgressFormatter::class,
-        PhpProcess::class,
+        OriginalPhpProcess::class,
         ComposerExecutableFinder::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
@@ -119,7 +118,6 @@ final class ProjectCodeProvider
         TestFrameworkFinder::class,
         StrykerDashboardClient::class,
         MetricsCalculator::class,
-        InitialTestRunProcessBuilder::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
     ];
@@ -255,6 +253,7 @@ final class ProjectCodeProvider
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
+            ->notPath('xdebug-filter.php')
             ->exclude([
                 'autoloaded',
                 'benchmark',
