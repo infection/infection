@@ -248,7 +248,7 @@ PHP
 
         // If there is no `testsuites` node, append to root
         if (!$nodeToAppendTestSuite) {
-            $nodeToAppendTestSuite = $testSuites = $xPath->query('/phpunit')->item(0);
+            $nodeToAppendTestSuite = $xPath->query('/phpunit')->item(0);
         }
 
         $testSuite = $dom->createElement('testsuite');
