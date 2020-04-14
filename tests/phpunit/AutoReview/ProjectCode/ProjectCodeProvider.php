@@ -51,6 +51,7 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\XdebugHandler;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\NullSubscriber;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
@@ -106,6 +107,7 @@ final class ProjectCodeProvider
         DummyFileSystem::class,
         MutationAttributeKeys::class,
         XdebugHandler::class,
+        NullSubscriber::class,
     ];
 
     /**

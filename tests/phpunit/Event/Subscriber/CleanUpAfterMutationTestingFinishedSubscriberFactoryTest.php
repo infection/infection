@@ -43,6 +43,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration
+ */
 final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends TestCase
 {
     /**

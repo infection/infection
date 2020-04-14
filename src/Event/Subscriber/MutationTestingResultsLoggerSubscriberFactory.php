@@ -39,6 +39,9 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Logger\LoggerFactory;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
 {
     private $loggerFactory;

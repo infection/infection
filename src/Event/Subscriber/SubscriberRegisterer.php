@@ -38,6 +38,9 @@ namespace Infection\Event\Subscriber;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 final class SubscriberRegisterer
 {
     private $eventDispatcher;

@@ -37,6 +37,9 @@ namespace Infection\Event\Subscriber;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 interface SubscriberFactory
 {
     public function create(OutputInterface $output): EventSubscriber;

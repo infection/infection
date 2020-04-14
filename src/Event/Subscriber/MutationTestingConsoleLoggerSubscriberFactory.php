@@ -44,6 +44,9 @@ use InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
     private $metricsCalculator;

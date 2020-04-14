@@ -37,6 +37,9 @@ namespace Infection\Event\Subscriber;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 final class MutationGeneratingConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
     private $skipProgressBar;

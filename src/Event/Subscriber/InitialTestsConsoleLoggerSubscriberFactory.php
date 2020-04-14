@@ -38,6 +38,9 @@ namespace Infection\Event\Subscriber;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 final class InitialTestsConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
     private $skipProgressBar;

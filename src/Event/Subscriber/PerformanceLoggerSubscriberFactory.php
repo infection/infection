@@ -41,6 +41,9 @@ use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 final class PerformanceLoggerSubscriberFactory implements SubscriberFactory
 {
     private $stopwatch;
