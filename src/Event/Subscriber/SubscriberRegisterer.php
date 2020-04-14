@@ -48,7 +48,7 @@ final class SubscriberRegisterer
 
     public function __construct(
         EventDispatcher $eventDispatcher,
-        SubscriberFactoryRegistry $subscriberRegistry
+        ChainSubscriberFactory $subscriberRegistry
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->subscriberRegistry = $subscriberRegistry;

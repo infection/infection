@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\Subscriber\SubscriberFactoryRegistry;
+use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use Infection\Tests\Fixtures\Event\DummySubscriberFactory;
 use Infection\Tests\Fixtures\Event\IONullSubscriber;
@@ -43,13 +43,13 @@ use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use Traversable;
 
-final class SubscriberFactoryRegistryTest extends TestCase
+final class ChainSubscriberFactoryTest extends TestCase
 {
     public function test_it_does_not_create_any_subscriber_if_no_factory_was_given(): void
     {
-        $registry = new SubscriberFactoryRegistry();
+        $factory = new ChainSubscriberFactory();
 
-        $subscribers = $registry->create(new FakeOutput());
+        $subscribers = $factory->create(new FakeOutput());
 
         $this->assertCount(
             0,
@@ -67,13 +67,13 @@ final class SubscriberFactoryRegistryTest extends TestCase
         $subscriber2 = new IONullSubscriber($output);
         $subscriber3 = new IONullSubscriber($output);
 
-        $registry = new SubscriberFactoryRegistry(
+        $factory = new ChainSubscriberFactory(
             new DummySubscriberFactory($subscriber1),
             new DummySubscriberFactory($subscriber2),
             new DummySubscriberFactory($subscriber3)
         );
 
-        $subscribers = $registry->create($output);
+        $subscribers = $factory->create($output);
 
         if ($subscribers instanceof Traversable) {
             $subscribers = iterator_to_array($subscribers, false);

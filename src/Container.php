@@ -51,13 +51,13 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
 use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
-use Infection\Event\Subscriber\SubscriberFactoryRegistry;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
@@ -380,8 +380,8 @@ final class Container
                     $container->getSubscriberFactoryRegistry()
                 );
             },
-            SubscriberFactoryRegistry::class => static function (self $container): SubscriberFactoryRegistry {
-                return new SubscriberFactoryRegistry(
+            ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
+                return new ChainSubscriberFactory(
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
                     $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
                     $container->getMutationTestingConsoleLoggerSubscriberFactory(),
@@ -860,9 +860,9 @@ final class Container
         return $this->get(SubscriberRegisterer::class);
     }
 
-    public function getSubscriberFactoryRegistry(): SubscriberFactoryRegistry
+    public function getSubscriberFactoryRegistry(): ChainSubscriberFactory
     {
-        return $this->get(SubscriberFactoryRegistry::class);
+        return $this->get(ChainSubscriberFactory::class);
     }
 
     public function getCleanUpAfterMutationTestingFinishedSubscriberFactory(): CleanUpAfterMutationTestingFinishedSubscriberFactory

@@ -40,7 +40,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class SubscriberFactoryRegistry
+final class ChainSubscriberFactory
 {
     private $factories;
 

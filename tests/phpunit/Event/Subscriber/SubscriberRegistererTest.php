@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
+use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\NullSubscriber;
-use Infection\Event\Subscriber\SubscriberFactoryRegistry;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use Infection\Tests\Fixtures\Event\DummySubscriberFactory;
@@ -61,13 +61,13 @@ final class SubscriberRegistererTest extends TestCase
         $subscriber1 = new NullSubscriber();
         $subscriber2 = new NullSubscriber();
 
-        $registry = new SubscriberFactoryRegistry(
+        $factory = new ChainSubscriberFactory(
             new DummySubscriberFactory($subscriber0),
             new DummySubscriberFactory($subscriber1),
             new DummySubscriberFactory($subscriber2)
         );
 
-        $registerer = new SubscriberRegisterer($this->eventDispatcher, $registry);
+        $registerer = new SubscriberRegisterer($this->eventDispatcher, $factory);
 
         // Sanity check
         $this->assertCount(0, $this->eventDispatcher->getSubscribers());
@@ -88,7 +88,7 @@ final class SubscriberRegistererTest extends TestCase
     {
         $registerer = new SubscriberRegisterer(
             $this->eventDispatcher,
-            new SubscriberFactoryRegistry()
+            new ChainSubscriberFactory()
         );
 
         // Sanity check
