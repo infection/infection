@@ -33,15 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
-
-/**
- * @internal
- */
-interface MemoryUsageAware
-{
-    /**
-     * Reports memory used by a test suite, or -1 if it cant detect the memory usage.
-     */
-    public function getMemoryUsed(string $output): float;
+if (!function_exists('xdebug_set_filter')) {
+    return;
 }
+
+// See https://xdebug.org/docs/all_functions
+xdebug_set_filter(
+    XDEBUG_FILTER_CODE_COVERAGE,
+    XDEBUG_PATH_WHITELIST,
+    [dirname(__DIR__) . '/src/']
+);

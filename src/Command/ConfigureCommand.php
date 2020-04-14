@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function count;
 use function file_exists;
 use const GLOB_ONLYDIR;
 use function implode;
@@ -81,8 +82,7 @@ final class ConfigureCommand extends BaseCommand
                     implode('", "', TestFrameworkTypes::TYPES)
                 ),
                 TestFrameworkTypes::PHPUNIT
-            )
-        ;
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -39,7 +39,6 @@ use function array_shift;
 use function count;
 use function escapeshellarg;
 use function exec;
-use function get_class;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
@@ -113,7 +112,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
     final protected function createMutator(array $settings = []): Mutator
     {
-        $mutatorClassName = SourceTestClassNameScheme::getSourceClassName(get_class($this));
+        $mutatorClassName = SourceTestClassNameScheme::getSourceClassName(static::class);
 
         // TODO: this is a bit ridicule...
         return SingletonContainer::getContainer()

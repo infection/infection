@@ -45,7 +45,7 @@ final class IoCodeDetectorTest extends TestCase
     /**
      * @dataProvider codeProvider
      */
-    public function test_it_can_detect_IO_operations(string $code, bool $expected): void
+    public function test_it_can_detect_io_operations(string $code, bool $expected): void
     {
         $actual = IoCodeDetector::codeContainsIoOperations($code);
 

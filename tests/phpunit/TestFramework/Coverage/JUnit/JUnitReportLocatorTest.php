@@ -78,7 +78,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         parent::tearDown();
     }
 
-    public function test_it_can_locate_the_default_JUnit_file(): void
+    public function test_it_can_locate_the_default_junit_file(): void
     {
         touch('junit.xml');
 
@@ -89,7 +89,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->assertSame($expected, $this->locator->locate());
     }
 
-    public function test_it_can_locate_the_default_JUnit_file_with_the_wrong_case(): void
+    public function test_it_can_locate_the_default_junit_file_with_the_wrong_case(): void
     {
         if (PHP_OS_FAMILY !== 'Darwin') {
             $this->markTestSkipped('Cannot test this on case-sensitive OS');
@@ -107,7 +107,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     /**
      * @dataProvider jUnitPathsProvider
      */
-    public function test_it_can_find_more_exotic_JUnit_file_names(string $jUnitRelativePaths): void
+    public function test_it_can_find_more_exotic_junit_file_names(string $jUnitRelativePaths): void
     {
         (new Filesystem())->dumpFile($jUnitRelativePaths, '');
 
@@ -118,7 +118,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->assertSame($expected, $this->locator->locate());
     }
 
-    public function test_it_cannot_locate_the_JUnit_file_if_the_result_is_ambiguous(): void
+    public function test_it_cannot_locate_the_junit_file_if_the_result_is_ambiguous(): void
     {
         touch('phpunit.junit.xml');
         touch('phpspec.junit.xml');
@@ -133,7 +133,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->locator->locate();
     }
 
-    public function test_it_cannot_locate_the_JUnit_file_if_none_found(): void
+    public function test_it_cannot_locate_the_junit_file_if_none_found(): void
     {
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
@@ -144,7 +144,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->locator->locate();
     }
 
-    public function test_it_cannot_locate_the_JUnit_file_in_a_non_existent_coverage_directory(): void
+    public function test_it_cannot_locate_the_junit_file_in_a_non_existent_coverage_directory(): void
     {
         $locator = new JUnitReportLocator(
             $this->tmp . '/unknown-dir',

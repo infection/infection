@@ -77,7 +77,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->builder = $this->createConfigBuilder();
     }
 
-    public function test_it_builds_and_dump_the_XML_configuration(): void
+    public function test_it_builds_and_dump_the_xml_configuration(): void
     {
         $configurationPath = $this->builder->build('6.5');
 
@@ -111,7 +111,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         );
     }
 
-    public function test_the_original_XML_config_must_be_a_valid_XML_file(): void
+    public function test_the_original_xml_config_must_be_a_valid_xml_file(): void
     {
         try {
             $this->createConfigBuilder(
@@ -128,7 +128,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         }
     }
 
-    public function test_the_original_XML_config_must_be_a_valid_PHPUnit_config_file(): void
+    public function test_the_original_xml_config_must_be_a_valid_phpunit_config_file(): void
     {
         $builder = $this->createConfigBuilder(
             self::FIXTURES . '/invalid/invalid-phpunit.xml',
