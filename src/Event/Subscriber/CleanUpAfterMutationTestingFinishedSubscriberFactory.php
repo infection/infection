@@ -38,6 +38,9 @@ namespace Infection\Event\Subscriber;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @internal
+ */
 final class CleanUpAfterMutationTestingFinishedSubscriberFactory implements SubscriberFactory
 {
     private $debug;
@@ -54,11 +57,11 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactory implements Subs
     public function create(OutputInterface $output): EventSubscriber
     {
         return $this->debug
-            ? new CleanUpAfterMutationTestingFinishedSubscriber(
+            ? new NullSubscriber()
+            : new CleanUpAfterMutationTestingFinishedSubscriber(
                 $this->fileSystem,
                 $this->tmpDir
             )
-            : new NullSubscriber()
         ;
     }
 }
