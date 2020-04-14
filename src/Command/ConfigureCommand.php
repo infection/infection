@@ -87,20 +87,23 @@ final class ConfigureCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!$input->isInteractive()) {
-            $output->writeln(self::NONINTERACTIVE_MODE_ERROR);
+        if (!$this->input->isInteractive()) {
+            $this->output->writeln(self::NONINTERACTIVE_MODE_ERROR);
 
             return 1;
         }
 
         $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
-        $consoleHelper->writeSection($output, 'Welcome to the Infection config generator');
+        $consoleHelper->writeSection(
+            $this->output,
+            'Welcome to the Infection config generator'
+        );
 
-        $output->writeln([
-            '',
+        $this->io->newLine();
+        $this->output->writeln(
             'We did not find a configuration file. The following questions will help us to generate it for you.',
-            '',
-        ]);
+        );
+        $this->io->newLine();
 
         $dirsInCurrentDir = glob('*', GLOB_ONLYDIR);
         $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
@@ -116,10 +119,10 @@ final class ConfigureCommand extends BaseCommand
         }
 
         $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper, $sourceDirGuesser);
-        $sourceDirs = $sourceDirsProvider->get($input, $output, $dirsInCurrentDir);
+        $sourceDirs = $sourceDirsProvider->get($this->input, $this->output, $dirsInCurrentDir);
 
         if (count($sourceDirs) === 0) {
-            $output->writeln('A source directory was not provided. Unable to generate "infection.json.dist".');
+            $this->output->writeln('A source directory was not provided. Unable to generate "infection.json.dist".');
 
             return 1;
         }
@@ -132,28 +135,26 @@ final class ConfigureCommand extends BaseCommand
             $fileSystem
         );
 
-        $excludedDirs = $excludeDirsProvider->get($input, $output, $dirsInCurrentDir, $sourceDirs);
+        $excludedDirs = $excludeDirsProvider->get($this->input, $this->output, $dirsInCurrentDir, $sourceDirs);
 
         $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $consoleHelper, $questionHelper);
-        $phpUnitConfigPath = $phpUnitConfigPathProvider->get($input, $output, $dirsInCurrentDir, $input->getOption('test-framework'));
+        $phpUnitConfigPath = $phpUnitConfigPathProvider->get($this->input, $this->output, $dirsInCurrentDir, $this->input->getOption('test-framework'));
 
         $phpUnitExecutableFinder = new TestFrameworkFinder();
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
-        $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($input, $output);
+        $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($this->input, $this->output);
 
         $textLogFileProvider = new TextLogFileProvider($consoleHelper, $questionHelper);
-        $textLogFilePath = $textLogFileProvider->get($input, $output, $dirsInCurrentDir);
+        $textLogFilePath = $textLogFileProvider->get($this->input, $this->output, $dirsInCurrentDir);
 
         $this->saveConfig($sourceDirs, $excludedDirs, $phpUnitConfigPath, $phpUnitCustomExecutablePath, $textLogFilePath);
 
-        $output->writeln([
-            '',
-            sprintf(
-                'Configuration file "<comment>%s</comment>" was created.',
-                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE
-            ),
-            '',
-        ]);
+        $this->io->newLine();
+        $this->output->writeln(sprintf(
+            'Configuration file "<comment>%s</comment>" was created.',
+            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE
+        ));
+        $this->io->newLine();
 
         return 0;
     }
