@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\EventDispatcher;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber;
 use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
 use Infection\Tests\Fixtures\Event\UserEventSubscriber;
 use Infection\Tests\Fixtures\Event\UserWasCreated;
+use Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber;
 use PHPUnit\Framework\TestCase;
 
 final class SyncEventDispatcherTest extends TestCase
