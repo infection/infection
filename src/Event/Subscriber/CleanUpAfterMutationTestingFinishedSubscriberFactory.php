@@ -33,35 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
-use Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
-final class SyncEventDispatcherTest extends TestCase
+/**
+ * @internal
+ */
+final class CleanUpAfterMutationTestingFinishedSubscriberFactory implements SubscriberFactory
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    private $debug;
+    private $fileSystem;
+    private $tmpDir;
+
+    public function __construct(bool $debug, Filesystem $fileSystem, string $tmpDir)
     {
-        $userSubscriber = new UserEventSubscriber();
-        $userWasAddedCounterSubscriber = new UserWasCreatedCounterSubscriber(new UserWasCreated());
+        $this->debug = $debug;
+        $this->fileSystem = $fileSystem;
+        $this->tmpDir = $tmpDir;
+    }
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($userWasAddedCounterSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
-
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
-
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
-
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+    public function create(OutputInterface $output): EventSubscriber
+    {
+        return $this->debug
+            ? new NullSubscriber()
+            : new CleanUpAfterMutationTestingFinishedSubscriber(
+                $this->fileSystem,
+                $this->tmpDir
+            )
+        ;
     }
 }

@@ -52,8 +52,9 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
+ * @final
  */
-final class LoggerFactory
+class LoggerFactory
 {
     private $metricsCalculator;
     private $filesystem;

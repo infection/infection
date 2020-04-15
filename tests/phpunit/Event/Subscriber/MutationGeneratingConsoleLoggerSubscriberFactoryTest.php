@@ -33,35 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
-use Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber;
+use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
+use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 
-final class SyncEventDispatcherTest extends TestCase
+final class MutationGeneratingConsoleLoggerSubscriberFactoryTest extends TestCase
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    public function test_it_creates_a_ci_subscriber_if_skips_the_progress_bar(): void
     {
-        $userSubscriber = new UserEventSubscriber();
-        $userWasAddedCounterSubscriber = new UserWasCreatedCounterSubscriber(new UserWasCreated());
+        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(true);
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($userWasAddedCounterSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
+        $subscriber = $factory->create(new FakeOutput());
 
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+        $this->assertInstanceOf(CiMutationGeneratingConsoleLoggerSubscriber::class, $subscriber);
+    }
 
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
+    public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(): void
+    {
+        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(false);
 
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock
+            ->method('isDecorated')
+            ->willReturn(false)
+        ;
+
+        $subscriber = $factory->create($outputMock);
+
+        $this->assertInstanceOf(MutationGeneratingConsoleLoggerSubscriber::class, $subscriber);
     }
 }

@@ -33,35 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
-use Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber;
+use Infection\Event\Subscriber\ChainSubscriberFactory;
+use Infection\Tests\Fixtures\Console\FakeOutput;
+use Infection\Tests\Fixtures\Event\DummySubscriberFactory;
+use Infection\Tests\Fixtures\Event\IONullSubscriber;
+use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
+use Traversable;
 
-final class SyncEventDispatcherTest extends TestCase
+final class ChainSubscriberFactoryTest extends TestCase
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    public function test_it_does_not_create_any_subscriber_if_no_factory_was_given(): void
     {
-        $userSubscriber = new UserEventSubscriber();
-        $userWasAddedCounterSubscriber = new UserWasCreatedCounterSubscriber(new UserWasCreated());
+        $factory = new ChainSubscriberFactory();
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($userWasAddedCounterSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
+        $subscribers = $factory->create(new FakeOutput());
 
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+        $this->assertCount(
+            0,
+            $subscribers instanceof Traversable
+                ? iterator_to_array($subscribers, false)
+                : $subscribers
+        );
+    }
 
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
+    public function test_it_creates_subscribers_from_each_factory_given(): void
+    {
+        $output = new FakeOutput();
 
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+        $subscriber1 = new IONullSubscriber($output);
+        $subscriber2 = new IONullSubscriber($output);
+        $subscriber3 = new IONullSubscriber($output);
+
+        $factory = new ChainSubscriberFactory(
+            new DummySubscriberFactory($subscriber1),
+            new DummySubscriberFactory($subscriber2),
+            new DummySubscriberFactory($subscriber3)
+        );
+
+        $subscribers = $factory->create($output);
+
+        if ($subscribers instanceof Traversable) {
+            $subscribers = iterator_to_array($subscribers, false);
+        }
+
+        $this->assertSame(
+            [
+                $subscriber1,
+                $subscriber2,
+                $subscriber3,
+            ],
+            $subscribers
+        );
     }
 }

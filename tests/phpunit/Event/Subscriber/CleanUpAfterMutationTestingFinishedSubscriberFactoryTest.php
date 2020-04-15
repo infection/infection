@@ -33,35 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
-use Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber;
+use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
+use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
+use Infection\Event\Subscriber\NullSubscriber;
+use Infection\Tests\Fixtures\Console\FakeOutput;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
-final class SyncEventDispatcherTest extends TestCase
+/**
+ * @group integration
+ */
+final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends TestCase
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    /**
+     * @var Filesystem|MockObject
+     */
+    private $fileSystemMock;
+
+    protected function setUp(): void
     {
-        $userSubscriber = new UserEventSubscriber();
-        $userWasAddedCounterSubscriber = new UserWasCreatedCounterSubscriber(new UserWasCreated());
+        $this->fileSystemMock = $this->createMock(Filesystem::class);
+        $this->fileSystemMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+    }
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($userWasAddedCounterSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
+    public function test_it_creates_a_cleanup_subscriber_if_debug_is_disabled(): void
+    {
+        $factory = new CleanUpAfterMutationTestingFinishedSubscriberFactory(
+            false,
+            $this->fileSystemMock,
+            '/path/to/tmp'
+        );
 
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+        $subscriber = $factory->create(new FakeOutput());
 
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
+        $this->assertInstanceOf(CleanUpAfterMutationTestingFinishedSubscriber::class, $subscriber);
+    }
 
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+    public function test_it_creates_an_null_subscriber_if_debug_is_enabled(): void
+    {
+        $factory = new CleanUpAfterMutationTestingFinishedSubscriberFactory(
+            true,
+            $this->fileSystemMock,
+            '/path/to/tmp'
+        );
+
+        $subscriber = $factory->create(new FakeOutput());
+
+        $this->assertInstanceOf(NullSubscriber::class, $subscriber);
     }
 }
