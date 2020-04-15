@@ -60,8 +60,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -208,6 +208,25 @@ final class RunCommand extends BaseCommand
         ;
     }
 
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        parent::initialize($input, $output);
+
+        $this->initContainer();
+
+        $locator = $this->container->getRootsFileOrDirectoryLocator();
+
+        if ($customConfigPath = (string) $this->input->getOption('configuration')) {
+            $locator->locate($customConfigPath);
+        } else {
+            $this->runConfigurationCommand($locator);
+        }
+
+        $this->installTestFrameworkIfNeeded();
+
+        $this->consoleOutput = new ConsoleOutput($this->io);
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         XdebugHandler::check(new ConsoleLogger($this->output));
@@ -295,29 +314,18 @@ final class RunCommand extends BaseCommand
             return;
         }
 
-        $this->output->writeln([
-            '',
-            sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
-        ]);
+        $this->io->newLine();
+        $this->output->writeln(sprintf(
+            'Installing <comment>infection/%s-adapter</comment>...',
+            $adapterName
+        ));
 
         $this->container->getAdapterInstaller()->install($adapterName);
     }
 
     private function startUp(): void
     {
-        $this->initContainer();
-
-        $locator = $this->container->getRootsFileOrDirectoryLocator();
-
-        if ($customConfigPath = (string) $this->input->getOption('configuration')) {
-            $locator->locate($customConfigPath);
-        } else {
-            $this->runConfigurationCommand($locator);
-        }
-
-        $this->installTestFrameworkIfNeeded();
-
-        $this->consoleOutput = new ConsoleOutput(new SymfonyStyle($this->input, $this->output));
+        Assert::notNull($this->container);
 
         $this->io->writeln($this->getApplication()->getHelp());
         $this->io->newLine();

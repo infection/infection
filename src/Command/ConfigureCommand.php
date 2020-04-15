@@ -94,11 +94,14 @@ final class ConfigureCommand extends BaseCommand
         }
 
         $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
-        $consoleHelper->writeSection($this->output, 'Welcome to the Infection config generator');
+        $consoleHelper->writeSection(
+            $this->output,
+            'Welcome to the Infection config generator'
+        );
 
         $this->io->newLine();
         $this->output->writeln(
-            'We did not find a configuration file. The following questions will help us to generate it for you.'
+            'We did not find a configuration file. The following questions will help us to generate it for you.',
         );
         $this->io->newLine();
 
