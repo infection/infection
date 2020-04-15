@@ -202,8 +202,9 @@ final class RunCommand extends BaseCommand
         XdebugHandler::check(new ConsoleLogger($this->output));
 
         $container = $this->createContainer();
+        $consoleOutput = new ConsoleOutput($this->io);
 
-        $this->startUp($container);
+        $this->startUp($container, $consoleOutput);
 
         $engine = new Engine(
             $container->getConfiguration(),
@@ -215,7 +216,7 @@ final class RunCommand extends BaseCommand
             $container->getMutationGenerator(),
             $container->getMutationTestingRunner(),
             $container->getMinMsiChecker(),
-            new ConsoleOutput($this->io),
+            $consoleOutput,
             $container->getMetricsCalculator(),
             $container->getTestFrameworkExtraOptionsFilter()
         );
@@ -295,7 +296,7 @@ final class RunCommand extends BaseCommand
         $container->getAdapterInstaller()->install($adapterName);
     }
 
-    private function startUp(Container $container): void
+    private function startUp(Container $container, ConsoleOutput $consoleOutput): void
     {
         $locator = $container->getRootsFileOrDirectoryLocator();
 
@@ -306,8 +307,6 @@ final class RunCommand extends BaseCommand
         }
 
         $this->installTestFrameworkIfNeeded($container);
-
-        $consoleOutput = new ConsoleOutput($this->io);
 
         $application = $this->getApplication();
 
