@@ -53,7 +53,6 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use const PHP_SAPI;
-use RuntimeException;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
