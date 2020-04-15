@@ -210,6 +210,20 @@ final class RunCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->initContainer();
+
+        $locator = $this->container->getRootsFileOrDirectoryLocator();
+
+        if ($customConfigPath = (string) $this->input->getOption('configuration')) {
+            $locator->locate($customConfigPath);
+        } else {
+            $this->runConfigurationCommand($locator);
+        }
+
+        $this->installTestFrameworkIfNeeded();
+
+        $this->consoleOutput = new ConsoleOutput($this->io);
+
         XdebugHandler::check(new ConsoleLogger($this->output));
 
         $this->startUp();
@@ -306,20 +320,6 @@ final class RunCommand extends BaseCommand
 
     private function startUp(): void
     {
-        $this->initContainer();
-
-        $locator = $this->container->getRootsFileOrDirectoryLocator();
-
-        if ($customConfigPath = (string) $this->input->getOption('configuration')) {
-            $locator->locate($customConfigPath);
-        } else {
-            $this->runConfigurationCommand($locator);
-        }
-
-        $this->installTestFrameworkIfNeeded();
-
-        $this->consoleOutput = new ConsoleOutput($this->io);
-
         Assert::notNull($this->container);
 
         $this->io->writeln($this->getApplication()->getHelp());
