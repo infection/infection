@@ -53,6 +53,7 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use const PHP_SAPI;
+use RuntimeException;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -358,7 +359,7 @@ final class RunCommand extends BaseCommand
             $result = $configureCommand->run($newInput, $this->output);
 
             if ($result !== 0) {
-                throw ConfigurationException::configurationAborted();
+                throw new RuntimeException('Configuration generation aborted');
             }
         }
     }
