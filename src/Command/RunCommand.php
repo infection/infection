@@ -208,25 +208,6 @@ final class RunCommand extends BaseCommand
         ;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        parent::initialize($input, $output);
-
-        $this->initContainer();
-
-        $locator = $this->container->getRootsFileOrDirectoryLocator();
-
-        if ($customConfigPath = (string) $this->input->getOption('configuration')) {
-            $locator->locate($customConfigPath);
-        } else {
-            $this->runConfigurationCommand($locator);
-        }
-
-        $this->installTestFrameworkIfNeeded();
-
-        $this->consoleOutput = new ConsoleOutput($this->io);
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         XdebugHandler::check(new ConsoleLogger($this->output));
@@ -325,6 +306,20 @@ final class RunCommand extends BaseCommand
 
     private function startUp(): void
     {
+        $this->initContainer();
+
+        $locator = $this->container->getRootsFileOrDirectoryLocator();
+
+        if ($customConfigPath = (string) $this->input->getOption('configuration')) {
+            $locator->locate($customConfigPath);
+        } else {
+            $this->runConfigurationCommand($locator);
+        }
+
+        $this->installTestFrameworkIfNeeded();
+
+        $this->consoleOutput = new ConsoleOutput($this->io);
+
         Assert::notNull($this->container);
 
         $this->io->writeln($this->getApplication()->getHelp());
