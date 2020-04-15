@@ -61,23 +61,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class RunCommand extends BaseCommand
 {
-    /**
-     * @var ConsoleOutput
-     */
-    private $consoleOutput;
-
-    /**
-     * @var Container
-     */
-    private $container;
-
     protected function configure(): void
     {
         $this
@@ -212,21 +201,23 @@ final class RunCommand extends BaseCommand
     {
         XdebugHandler::check(new ConsoleLogger($this->output));
 
-        $this->startUp();
+        $container = $this->createContainer();
+
+        $this->startUp($container);
 
         $engine = new Engine(
-            $this->container->getConfiguration(),
-            $this->container->getTestFrameworkAdapter(),
-            $this->container->getCoverageChecker(),
-            $this->container->getEventDispatcher(),
-            $this->container->getInitialTestsRunner(),
-            $this->container->getMemoryLimiter(),
-            $this->container->getMutationGenerator(),
-            $this->container->getMutationTestingRunner(),
-            $this->container->getMinMsiChecker(),
-            $this->consoleOutput,
-            $this->container->getMetricsCalculator(),
-            $this->container->getTestFrameworkExtraOptionsFilter()
+            $container->getConfiguration(),
+            $container->getTestFrameworkAdapter(),
+            $container->getCoverageChecker(),
+            $container->getEventDispatcher(),
+            $container->getInitialTestsRunner(),
+            $container->getMemoryLimiter(),
+            $container->getMutationGenerator(),
+            $container->getMutationTestingRunner(),
+            $container->getMinMsiChecker(),
+            $consoleOutput,
+            $container->getMetricsCalculator(),
+            $container->getTestFrameworkExtraOptionsFilter()
         );
 
         try {
@@ -240,7 +231,7 @@ final class RunCommand extends BaseCommand
         return 0;
     }
 
-    private function initContainer(): void
+    private function createContainer(): Container
     {
         // Currently the configuration is mandatory hence there is no way to
         // say "do not use a config". If this becomes possible in the future
@@ -260,7 +251,7 @@ final class RunCommand extends BaseCommand
 
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
-        $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
+        return $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile === '' ? null : $configFile,
             trim((string) $this->input->getOption('mutators')),
             $this->input->getOption('show-mutations'),
@@ -284,10 +275,10 @@ final class RunCommand extends BaseCommand
         );
     }
 
-    private function installTestFrameworkIfNeeded(): void
+    private function installTestFrameworkIfNeeded(Container $container): void
     {
-        $installationDecider = $this->container->getAdapterInstallationDecider();
-        $configTestFramework = $this->container->getConfiguration()->getTestFramework();
+        $installationDecider = $container->getAdapterInstallationDecider();
+        $configTestFramework = $container->getConfiguration()->getTestFramework();
 
         $adapterName = trim((string) $this->input->getOption('test-framework')) ?: $configTestFramework;
 
@@ -301,14 +292,12 @@ final class RunCommand extends BaseCommand
             $adapterName
         ));
 
-        $this->container->getAdapterInstaller()->install($adapterName);
+        $container->getAdapterInstaller()->install($adapterName);
     }
 
-    private function startUp(): void
+    private function startUp(Container $container): void
     {
-        $this->initContainer();
-
-        $locator = $this->container->getRootsFileOrDirectoryLocator();
+        $locator = $container->getRootsFileOrDirectoryLocator();
 
         if ($customConfigPath = (string) $this->input->getOption('configuration')) {
             $locator->locate($customConfigPath);
@@ -316,41 +305,41 @@ final class RunCommand extends BaseCommand
             $this->runConfigurationCommand($locator);
         }
 
-        $this->installTestFrameworkIfNeeded();
+        $this->installTestFrameworkIfNeeded($container);
 
-        $this->consoleOutput = new ConsoleOutput($this->io);
+        $consoleOutput = new ConsoleOutput($this->io);
 
-        Assert::notNull($this->container);
+        $application = $this->getApplication();
 
-        $this->io->writeln($this->getApplication()->getHelp());
+        $this->io->writeln($application->getHelp());
         $this->io->newLine();
 
-        $this->logRunningWithDebugger();
+        $this->logRunningWithDebugger($consoleOutput);
 
-        if (!$this->getApplication()->isAutoExitEnabled()) {
+        if (!$application->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
             // responsibility to disable xdebug if it isn't needed. As of writing
             // that's only the case during E2E testing. Show a warning nevertheless.
 
-            $this->consoleOutput->logNotInControlOfExitCodes();
+            $consoleOutput->logNotInControlOfExitCodes();
         }
 
-        $this->container->getCoverageChecker()->checkCoverageRequirements();
+        $container->getCoverageChecker()->checkCoverageRequirements();
 
-        $config = $this->container->getConfiguration();
+        $config = $container->getConfiguration();
 
         $this->includeUserBootstrap($config);
 
-        $this->container->getFileSystem()->mkdir($config->getTmpDir());
+        $container->getFileSystem()->mkdir($config->getTmpDir());
 
-        LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
+        LogVerbosity::convertVerbosityLevel($this->input, $consoleOutput);
 
-        $this->container->getSubscriberBuilder()->registerSubscribers(
-            $this->container->getTestFrameworkAdapter(),
+        $container->getSubscriberBuilder()->registerSubscribers(
+            $container->getTestFrameworkAdapter(),
             $this->output
         );
 
-        $this->container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
+        $container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
     }
 
     private function runConfigurationCommand(Locator $locator): void
@@ -394,14 +383,14 @@ final class RunCommand extends BaseCommand
         })($bootstrap);
     }
 
-    private function logRunningWithDebugger(): void
+    private function logRunningWithDebugger(ConsoleOutput $consoleOutput): void
     {
         if (PHP_SAPI === 'phpdbg') {
-            $this->consoleOutput->logRunningWithDebugger(PHP_SAPI);
+            $consoleOutput->logRunningWithDebugger(PHP_SAPI);
         } elseif (extension_loaded('xdebug')) {
-            $this->consoleOutput->logRunningWithDebugger('Xdebug');
+            $consoleOutput->logRunningWithDebugger('Xdebug');
         } elseif (extension_loaded('pcov')) {
-            $this->consoleOutput->logRunningWithDebugger('PCOV');
+            $consoleOutput->logRunningWithDebugger('PCOV');
         }
     }
 }
