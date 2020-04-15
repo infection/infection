@@ -199,8 +199,6 @@ final class RunCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        XdebugHandler::check(new ConsoleLogger($this->output));
-
         $container = $this->createContainer();
         $consoleOutput = new ConsoleOutput($this->io);
 
@@ -307,6 +305,10 @@ final class RunCommand extends BaseCommand
         }
 
         $this->installTestFrameworkIfNeeded($container);
+
+        // Check if the application needs a restart _after_ configuring the command or adding
+        // a missing test framework
+        XdebugHandler::check(new ConsoleLogger($this->output));
 
         $application = $this->getApplication();
 
