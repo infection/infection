@@ -33,35 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
-use Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber;
-use PHPUnit\Framework\TestCase;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Symfony\Component\Console\Output\OutputInterface;
 
-final class SyncEventDispatcherTest extends TestCase
+/**
+ * @internal
+ */
+final class InitialTestsConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    private $skipProgressBar;
+    private $testFrameworkAdapter;
+    private $debug;
+
+    public function __construct(
+        bool $skipProgressBar,
+        TestFrameworkAdapter $testFrameworkAdapter,
+        bool $debug
+    ) {
+        $this->skipProgressBar = $skipProgressBar;
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
+        $this->debug = $debug;
+    }
+
+    public function create(OutputInterface $output): EventSubscriber
     {
-        $userSubscriber = new UserEventSubscriber();
-        $userWasAddedCounterSubscriber = new UserWasCreatedCounterSubscriber(new UserWasCreated());
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($userWasAddedCounterSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
-
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
-
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
-
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+        return $this->skipProgressBar
+            ? new CiInitialTestsConsoleLoggerSubscriber($output, $this->testFrameworkAdapter)
+            : new InitialTestsConsoleLoggerSubscriber(
+                $output,
+                $this->testFrameworkAdapter,
+                $this->debug
+            )
+        ;
     }
 }

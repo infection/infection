@@ -33,35 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Tests\Logger;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
-use Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber;
-use PHPUnit\Framework\TestCase;
+use Infection\Logger\MutationTestingResultsLogger;
+use Infection\Tests\UnsupportedMethod;
 
-final class SyncEventDispatcherTest extends TestCase
+final class FakeMutationTestingResultsLogger implements MutationTestingResultsLogger
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    public function log(): void
     {
-        $userSubscriber = new UserEventSubscriber();
-        $userWasAddedCounterSubscriber = new UserWasCreatedCounterSubscriber(new UserWasCreated());
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($userWasAddedCounterSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
-
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
-
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
-
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 }

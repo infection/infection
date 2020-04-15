@@ -40,7 +40,6 @@ use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
-use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Console\XdebugHandler;
@@ -54,6 +53,7 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use const PHP_SAPI;
+use RuntimeException;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -335,10 +335,7 @@ final class RunCommand extends BaseCommand
 
         LogVerbosity::convertVerbosityLevel($this->input, $consoleOutput);
 
-        $container->getSubscriberBuilder()->registerSubscribers(
-            $container->getTestFrameworkAdapter(),
-            $this->output
-        );
+        $container->getSubscriberRegisterer()->registerSubscribers($this->output);
 
         $container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
     }

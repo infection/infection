@@ -33,35 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserEventSubscriber;
-use Infection\Tests\Fixtures\Event\UserWasCreated;
-use Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber;
+use Infection\Configuration\Entry\Logs;
+use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
+use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
+use Infection\Logger\LoggerFactory;
+use Infection\Tests\Fixtures\Console\FakeOutput;
+use Infection\Tests\Logger\FakeMutationTestingResultsLogger;
 use PHPUnit\Framework\TestCase;
 
-final class SyncEventDispatcherTest extends TestCase
+final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
 {
-    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
+    public function test_it_can_create_a_subscriber(): void
     {
-        $userSubscriber = new UserEventSubscriber();
-        $userWasAddedCounterSubscriber = new UserWasCreatedCounterSubscriber(new UserWasCreated());
+        $logsConfig = Logs::createEmpty();
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($userSubscriber);
-        $dispatcher->addSubscriber($userWasAddedCounterSubscriber);
-        $dispatcher->addSubscriber(new UnknownEventSubscriber());
+        $output = new FakeOutput();
 
-        // Sanity check
-        $this->assertSame(0, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+        $loggerFactoryMock = $this->createMock(LoggerFactory::class);
+        $loggerFactoryMock
+            ->method('createFromLogEntries')
+            ->with($logsConfig, $output)
+            ->willReturn(new FakeMutationTestingResultsLogger())
+        ;
 
-        $dispatcher->dispatch(new UserWasCreated());
-        $dispatcher->dispatch(new UserWasCreated());
+        $factory = new MutationTestingResultsLoggerSubscriberFactory(
+            $loggerFactoryMock,
+            $logsConfig
+        );
 
-        $this->assertSame(2, $userSubscriber->count);
-        $this->assertSame(1, $userWasAddedCounterSubscriber->getCount());
+        $subscriber = $factory->create($output);
+
+        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
     }
 }
