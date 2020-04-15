@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Psr\Log\LoggerInterface;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
@@ -62,6 +63,7 @@ final class Factory
      * @var array<string, array<string, mixed>>
      */
     private $installedExtensions;
+    private $logger;
 
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
@@ -73,7 +75,8 @@ final class Factory
         TestFrameworkFinder $testFrameworkFinder,
         string $jUnitFilePath,
         Configuration $infectionConfig,
-        array $installedExtensions
+        array $installedExtensions,
+        LoggerInterface $logger
     ) {
         $this->tmpDir = $tmpDir;
         $this->configLocator = $configLocator;
@@ -82,6 +85,7 @@ final class Factory
         $this->infectionConfig = $infectionConfig;
         $this->testFrameworkFinder = $testFrameworkFinder;
         $this->installedExtensions = $installedExtensions;
+        $this->logger = $logger;
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
