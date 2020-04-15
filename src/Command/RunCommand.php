@@ -215,7 +215,7 @@ final class RunCommand extends BaseCommand
             $container->getMutationGenerator(),
             $container->getMutationTestingRunner(),
             $container->getMinMsiChecker(),
-            $consoleOutput,
+            new ConsoleOutput($this->io),
             $container->getMetricsCalculator(),
             $container->getTestFrameworkExtraOptionsFilter()
         );
