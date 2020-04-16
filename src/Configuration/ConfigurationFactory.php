@@ -47,7 +47,7 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\TestFramework\TestFrameworkTypes;
-use function getenv;
+use OndraM\CiDetector\CiDetector;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
@@ -68,19 +68,22 @@ class ConfigurationFactory
     private $mutatorFactory;
     private $mutatorParser;
     private $sourceFileCollector;
+    private $ciDetector;
 
     public function __construct(
         TmpDirProvider $tmpDirProvider,
         MutatorResolver $mutatorResolver,
         MutatorFactory $mutatorFactory,
         MutatorParser $mutatorParser,
-        SourceFileCollector $sourceFileCollector
+        SourceFileCollector $sourceFileCollector,
+        CiDetector $ciDetector
     ) {
         $this->tmpDirProvider = $tmpDirProvider;
         $this->mutatorResolver = $mutatorResolver;
         $this->mutatorFactory = $mutatorFactory;
         $this->mutatorParser = $mutatorParser;
         $this->sourceFileCollector = $sourceFileCollector;
+        $this->ciDetector = $ciDetector;
     }
 
     public function create(
@@ -143,7 +146,7 @@ class ConfigurationFactory
             $debug,
             $onlyCovered,
             $formatter,
-            self::retrieveNoProgress($noProgress),
+            $this->retrieveNoProgress($noProgress),
             self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
             self::retrieveMinMsi($minMsi, $schema),
             $showMutations,
@@ -233,12 +236,9 @@ class ConfigurationFactory
         return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
     }
 
-    private static function retrieveNoProgress(bool $noProgress): bool
+    private function retrieveNoProgress(bool $noProgress): bool
     {
-        return $noProgress
-            || getenv('CI') === 'true'
-            || getenv('CONTINUOUS_INTEGRATION') === 'true'
-        ;
+        return $noProgress || $this->ciDetector->isCiDetected();
     }
 
     private static function retrieveIgnoreMsiWithNoMutations(

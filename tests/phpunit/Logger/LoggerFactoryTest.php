@@ -50,6 +50,7 @@ use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Tests\Fixtures\FakeCiDetector;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -238,7 +239,8 @@ final class LoggerFactoryTest extends TestCase
             $this->fileSystemMock,
             $logVerbosity,
             $debugMode,
-            $onlyCoveredCode
+            $onlyCoveredCode,
+            new FakeCiDetector()
         );
     }
 
