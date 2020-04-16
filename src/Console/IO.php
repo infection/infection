@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -53,6 +55,14 @@ final class IO extends SymfonyStyle
 
         $this->input = $input;
         $this->output = $output;
+    }
+
+    public static function createNull(): self
+    {
+        return new self(
+            new StringInput(''),
+            new NullOutput()
+        );
     }
 
     public function getInput(): InputInterface

@@ -68,4 +68,14 @@ final class IOTest extends TestCase
 
         $this->assertFalse($io->isInteractive());
     }
+
+    public function test_it_can_create_a_null_io(): void
+    {
+        $io = IO::createNull();
+
+        $this->assertCount(0, $io->getInput()->getArguments());
+        $this->assertCount(0, $io->getInput()->getOptions());
+
+        $this->assertInstanceOf(NullOutput::class, $io->getOutput());
+    }
 }

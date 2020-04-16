@@ -41,47 +41,57 @@ use function Safe\fopen;
 use function Safe\fwrite;
 use function Safe\rewind;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\StreamableInputInterface;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\StreamOutput;
+use Webmozart\Assert\Assert;
 
-abstract class AbstractBaseProviderTest extends TestCase
+abstract class BaseProviderTest extends TestCase
 {
     protected static $stty;
 
-    protected function getQuestionHelper(): QuestionHelper
+    final protected function getQuestionHelper(): QuestionHelper
     {
         return new QuestionHelper();
     }
 
-    protected function getInputStream(string $input)
+    /**
+     * @return resource
+     */
+    final protected function getInputStream(string $input)
     {
-        $stream = fopen('php://memory', 'r+', false);
+        $stream = fopen('php://memory', 'rb+', false);
         fwrite($stream, $input);
         rewind($stream);
 
         return $stream;
     }
 
-    protected function createOutputInterface(): StreamOutput
+    final protected function createStreamOutput(): StreamOutput
     {
-        return new StreamOutput(fopen('php://memory', 'r+', false));
+        return new StreamOutput(fopen('php://memory', 'rb+', false));
     }
 
-    protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
-    {
-        $mock = $this->createMock(StreamableInputInterface::class);
-        $mock->method('isInteractive')
-            ->willReturn($interactive);
+    /**
+     * @param resource $stream
+     */
+    final protected function createStreamableInput(
+        $stream,
+        bool $interactive = true
+    ): InputInterface {
+        Assert::resource($stream);
 
-        if ($stream) {
-            $mock->method('getStream')
-                ->willReturn($stream);
-        }
+        $input = new StringInput('');
+        $input->setStream($stream);
+        $input->setInteractive($interactive);
 
-        return $mock;
+        return $input;
     }
 
-    protected function hasSttyAvailable(): bool
+    /**
+     * @see \Symfony\Component\Console\Terminal::hasSttyAvailable()
+     */
+    final protected function hasSttyAvailable(): bool
     {
         if (self::$stty !== null) {
             return self::$stty;
