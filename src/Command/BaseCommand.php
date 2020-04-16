@@ -76,17 +76,6 @@ abstract class BaseCommand extends Command
         return $application;
     }
 
-    final protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        $this->io = new IO($input, $output);
-
-        $this->initializeCommand($this->getIO());
-    }
-
-    protected function initializeCommand(IO $io): void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->executeCommand($this->getIO());
@@ -100,7 +89,7 @@ abstract class BaseCommand extends Command
     {
         Assert::notNull(
             $this->io,
-            'Cannot retrieve the I/O before the command was initialized'
+            'Cannot retrieve the IO object before the command was initialized'
         );
 
         return $this->io;
