@@ -47,6 +47,7 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\TestFramework\TestFrameworkTypes;
+use function getenv;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
@@ -142,7 +143,7 @@ class ConfigurationFactory
             $debug,
             $onlyCovered,
             $formatter,
-            $noProgress,
+            self::retrieveNoProgress($noProgress),
             self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
             self::retrieveMinMsi($minMsi, $schema),
             $showMutations,
@@ -230,6 +231,14 @@ class ConfigurationFactory
         SchemaConfiguration $schema
     ): string {
         return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
+    }
+
+    private static function retrieveNoProgress(bool $noProgress): bool
+    {
+        return $noProgress
+            || getenv('CI') === 'true'
+            || getenv('CONTINUOUS_INTEGRATION') === 'true'
+        ;
     }
 
     private static function retrieveIgnoreMsiWithNoMutations(
