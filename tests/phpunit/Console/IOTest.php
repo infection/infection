@@ -33,40 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console;
+namespace Infection\Tests\Console;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Infection\Console\IO;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
 
-/**
- * @internal
- */
-final class IO extends SymfonyStyle
+final class IOTest extends TestCase
 {
-    private $input;
-    private $output;
-
-    public function __construct(InputInterface $input, OutputInterface $output)
+    public function test_it_exposes_its_input_and_output(): void
     {
-        parent::__construct($input, $output);
+        $input = new StringInput('');
+        $output = new NullOutput();
 
-        $this->input = $input;
-        $this->output = $output;
+        $io = new IO($input, $output);
+
+        $this->assertSame($input, $io->getInput());
+        $this->assertSame($output, $io->getOutput());
     }
 
-    public function getInput(): InputInterface
+    public function test_it_exposes_if_its_input_is_interactive(): void
     {
-        return $this->input;
-    }
+        $input = new StringInput('');
+        $output = new NullOutput();
 
-    public function isInteractive(): bool
-    {
-        return $this->input->isInteractive();
-    }
+        $io = new IO($input, $output);
 
-    public function getOutput(): OutputInterface
-    {
-        return $this->output;
+        $input->setInteractive(true);
+
+        $this->assertTrue($io->isInteractive());
+
+        $input->setInteractive(false);
+
+        $this->assertFalse($io->isInteractive());
     }
 }

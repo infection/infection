@@ -36,25 +36,19 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function array_merge;
-use Composer\XdebugHandler\XdebugHandler;
-use function extension_loaded;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\RunCommand;
-use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
 use Infection\Container;
 use OutOfBoundsException;
 use PackageVersions\Versions;
-use const PHP_SAPI;
 use function preg_quote;
 use function Safe\preg_match;
+use function Safe\sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use function trim;
 
 /**
  * @internal
@@ -65,35 +59,25 @@ final class Application extends BaseApplication
 
     private const PACKAGE_NAME = 'infection/infection';
 
-    private const INFECTION_PREFIX = 'INFECTION';
-
     private const LOGO = '
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____
    / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
  _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
 /___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
+
 ';
 
     private $container;
-
-    /**
-     * @var InfectionConsoleOutput
-     */
-    private $consoleOutput;
 
     public function __construct(Container $container)
     {
         try {
             $version = Versions::getVersion(self::PACKAGE_NAME);
             // @codeCoverageIgnoreStart
-        } catch (OutOfBoundsException $exception) {
-            if (preg_match(
-                '#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#',
-                $exception->getMessage()
-                ) === 0
-            ) {
-                throw $exception;
+        } catch (OutOfBoundsException $e) {
+            if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#', $e->getMessage()) === 0) {
+                throw $e;
             }
 
             // We have a bogus exception: how can Infection be not installed if we're here?
@@ -107,67 +91,36 @@ final class Application extends BaseApplication
         $this->setDefaultCommand('run');
     }
 
-    public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
-    {
-        if ($input === null) {
-            $input = new ArgvInput();
-        }
-
-        if ($output === null) {
-            $output = new ConsoleOutput();
-        }
-
-        $this->consoleOutput = new InfectionConsoleOutput(new SymfonyStyle($input, $output));
-
-        if ($input->hasParameterOption(['--quiet', '-q'], true)) {
-            $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-        }
-
-        $this->logRunningWithDebugger();
-
-        if (!$this->isAutoExitEnabled()) {
-            // When we're not in control of exit codes, that means it's the caller
-            // responsibility to disable xdebug if it isn't needed. As of writing
-            // that's only the case during E2E testing. Show a warning nevertheless.
-
-            $this->consoleOutput->logNotInControlOfExitCodes();
-
-            return parent::run($input, $output);
-        }
-
-        (new XdebugHandler(self::INFECTION_PREFIX, '--ansi'))
-            ->setPersistent()
-            ->check();
-
-        return parent::run($input, $output);
-    }
-
     public function getContainer(): Container
     {
         return $this->container;
     }
 
-    public function getConsoleOutput(): InfectionConsoleOutput
+    public function getLongVersion(): string
     {
-        return $this->consoleOutput;
+        return trim(sprintf(
+            '<info>%s</info> version <comment>%s</comment>',
+            $this->getName(),
+            $this->getVersion()
+        ));
     }
 
-    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    public function getHelp(): string
     {
-        $output->writeln([self::LOGO, $this->getLongVersion()]);
-
-        return parent::doRunCommand($command, $input, $output);
+        return self::LOGO . parent::getHelp();
     }
 
     protected function getDefaultCommands(): array
     {
-        return array_merge(
+        $commands = array_merge(
             parent::getDefaultCommands(),
             [
                 new ConfigureCommand(),
                 new RunCommand(),
             ]
         );
+
+        return $commands;
     }
 
     protected function configureIO(InputInterface $input, OutputInterface $output): void
@@ -187,16 +140,5 @@ final class Application extends BaseApplication
         $output->getFormatter()->setStyle('low', new OutputFormatterStyle('red', null, ['bold']));
         $output->getFormatter()->setStyle('medium', new OutputFormatterStyle('yellow', null, ['bold']));
         $output->getFormatter()->setStyle('high', new OutputFormatterStyle('green', null, ['bold']));
-    }
-
-    private function logRunningWithDebugger(): void
-    {
-        if (PHP_SAPI === 'phpdbg') {
-            $this->consoleOutput->logRunningWithDebugger(PHP_SAPI);
-        } elseif (extension_loaded('xdebug')) {
-            $this->consoleOutput->logRunningWithDebugger('Xdebug');
-        } elseif (extension_loaded('pcov')) {
-            $this->consoleOutput->logRunningWithDebugger('PCOV');
-        }
     }
 }
