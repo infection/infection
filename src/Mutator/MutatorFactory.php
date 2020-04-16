@@ -72,7 +72,7 @@ final class MutatorFactory
             );
 
             /** @var mixed[] $settings */
-            $settings = $config['settings'] ?? [];
+            $settings = (array) ($config['settings'] ?? []);
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
 

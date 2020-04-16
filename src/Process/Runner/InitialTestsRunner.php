@@ -39,7 +39,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Symfony\Component\Process\Process;
 
 /**
@@ -50,27 +50,33 @@ final class InitialTestsRunner
     private $processBuilder;
     private $eventDispatcher;
 
-    public function __construct(InitialTestRunProcessBuilder $processBuilder, EventDispatcher $eventDispatcher)
-    {
-        $this->processBuilder = $processBuilder;
+    public function __construct(
+        InitialTestsRunProcessFactory $processFactory,
+        EventDispatcher $eventDispatcher
+    ) {
+        $this->processBuilder = $processFactory;
         $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * @param string[] $phpExtraOptions
      */
-    public function run(string $testFrameworkExtraOptions, bool $skipCoverage, array $phpExtraOptions = []): Process
-    {
+    public function run(
+        string $testFrameworkExtraOptions,
+        array $phpExtraOptions,
+        bool $skipCoverage
+    ): Process {
         $process = $this->processBuilder->createProcess(
             $testFrameworkExtraOptions,
-            $skipCoverage,
-            $phpExtraOptions
+            $phpExtraOptions,
+            $skipCoverage
         );
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
 
-        $process->run(function ($type) use ($process): void {
+        $process->run(function (string $type) use ($process): void {
             if ($process::ERR === $type) {
+                // Stop on the first error encountered
                 $process->stop();
             }
 

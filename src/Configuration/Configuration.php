@@ -63,6 +63,7 @@ class Configuration
     private $sourceDirectories;
     private $sourceFiles;
     private $sourceFilesFilter;
+    private $sourceFilesExcludes;
     private $logs;
     private $logVerbosity;
     private $tmpDir;
@@ -89,6 +90,7 @@ class Configuration
 
     /**
      * @param string[] $sourceDirectories
+     * @param string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator> $mutators
      */
@@ -97,6 +99,7 @@ class Configuration
         array $sourceDirectories,
         iterable $sourceFiles,
         string $sourceFilesFilter,
+        array $sourceFilesExcludes,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -134,6 +137,7 @@ class Configuration
         $this->sourceDirectories = $sourceDirectories;
         $this->sourceFiles = $sourceFiles;
         $this->sourceFilesFilter = $sourceFilesFilter;
+        $this->sourceFilesExcludes = $sourceFilesExcludes;
         $this->logs = $logs;
         $this->logVerbosity = $logVerbosity;
         $this->tmpDir = $tmpDir;
@@ -183,6 +187,14 @@ class Configuration
     public function getSourceFilesFilter(): string
     {
         return $this->sourceFilesFilter;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSourceFilesExcludes(): array
+    {
+        return $this->sourceFilesExcludes;
     }
 
     public function getLogs(): Logs

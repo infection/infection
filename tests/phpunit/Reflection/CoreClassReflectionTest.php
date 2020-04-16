@@ -42,8 +42,8 @@ final class CoreClassReflectionTest extends ClassReflectionTestCase
 {
     public function test_it_exposes_the_class_name(): void
     {
-        $reflection = CoreClassReflection::fromClassName(get_class($this));
-        $this->assertSame($reflection->getName(), get_class($this));
+        $reflection = CoreClassReflection::fromClassName(self::class);
+        $this->assertSame($reflection->getName(), self::class);
     }
 
     protected function createFromName(string $name): ClassReflection

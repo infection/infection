@@ -42,7 +42,7 @@ final class DocBlockParserTest extends TestCase
     /**
      * @dataProvider docBlocksProvider
      */
-    public function test_it_can_parse_PHP_doc_blocks(string $docBlock, string $expected): void
+    public function test_it_can_parse_php_doc_blocks(string $docBlock, string $expected): void
     {
         $actual = DocBlockParser::parse($docBlock);
 

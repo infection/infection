@@ -55,7 +55,7 @@ final class DotFormatterTest extends TestCase
             '',
             '<killed>.</killed>: killed, '
             . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>S</uncovered>: uncovered, '
+            . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
             . '<timeout>T</timeout>: timed out',
             '',
@@ -139,7 +139,7 @@ final class DotFormatterTest extends TestCase
         $outputNotCovered
             ->expects($this->once())
             ->method('write')
-            ->with('<uncovered>S</uncovered>')
+            ->with('<uncovered>U</uncovered>')
         ;
 
         $dot = new DotFormatter($outputNotCovered);
@@ -165,7 +165,7 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-.: killed, M: escaped, S: uncovered, E: fatal error, T: timed out
+.: killed, M: escaped, U: uncovered, E: fatal error, T: timed out
 
 ..................................................   ( 50 / 127)
 ..................................................   (100 / 127)
@@ -194,7 +194,7 @@ TXT
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-.: killed, M: escaped, S: uncovered, E: fatal error, T: timed out
+.: killed, M: escaped, U: uncovered, E: fatal error, T: timed out
 
 ..................................................   (   50)
 ..................................................   (  100)
@@ -231,7 +231,7 @@ TXT
             '',
             '<killed>.</killed>: killed, '
             . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>S</uncovered>: uncovered, '
+            . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
             . '<timeout>T</timeout>: timed out',
             '',

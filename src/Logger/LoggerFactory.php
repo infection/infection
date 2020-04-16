@@ -41,8 +41,8 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
-use Infection\Http\StrykerCurlClient;
-use Infection\Http\StrykerDashboardClient;
+use Infection\Logger\Http\StrykerCurlClient;
+use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use OndraM\CiDetector\CiDetector;
 use Psr\Log\LoggerInterface;
@@ -52,8 +52,9 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
+ * @final
  */
-final class LoggerFactory
+class LoggerFactory
 {
     private $metricsCalculator;
     private $filesystem;

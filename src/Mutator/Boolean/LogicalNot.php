@@ -69,7 +69,7 @@ final class LogicalNot implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        if (!($node instanceof Node\Expr\BooleanNot)) {
+        if (!$node instanceof Node\Expr\BooleanNot) {
             return false;
         }
 
