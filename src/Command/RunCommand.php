@@ -275,7 +275,7 @@ final class RunCommand extends BaseCommand
         $installationDecider = $container->getAdapterInstallationDecider();
         $configTestFramework = $container->getConfiguration()->getTestFramework();
 
-        $adapterName = trim((string) $input->getOption('test-framework')) ?: $configTestFramework;
+        $adapterName = trim((string) $io->getInput()->getOption('test-framework')) ?: $configTestFramework;
 
         if (!$installationDecider->shouldBeInstalled($adapterName, $io)) {
             return;
@@ -294,7 +294,7 @@ final class RunCommand extends BaseCommand
     {
         $locator = $container->getRootsFileOrDirectoryLocator();
 
-        if ($customConfigPath = (string) $input->getOption('configuration')) {
+        if ($customConfigPath = (string) $io->getInput()->getOption('configuration')) {
             $locator->locate($customConfigPath);
         } else {
             $this->runConfigurationCommand($locator, $io);
