@@ -33,48 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\ValueProvider;
+namespace Infection\Console;
 
-use Infection\Config\ConsoleHelper;
-use Infection\Console\IO;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @internal
  */
-final class TextLogFileProvider
+final class IO extends SymfonyStyle
 {
-    public const TEXT_LOG_FILE_NAME = 'infection.log';
+    private $input;
+    private $output;
 
-    private $consoleHelper;
-    private $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    public function __construct(InputInterface $input, OutputInterface $output)
     {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+        parent::__construct($input, $output);
+
+        $this->input = $input;
+        $this->output = $output;
     }
 
-    /**
-     * @param string[] $dirsInCurrentDir
-     */
-    public function get(IO $io, array $dirsInCurrentDir): string
+    public static function createNull(): self
     {
-        $io->writeln(['']);
-
-        $questionText = $this->consoleHelper->getQuestion(
-            'Where do you want to store the text log file?',
-            self::TEXT_LOG_FILE_NAME
+        return new self(
+            new StringInput(''),
+            new NullOutput()
         );
+    }
 
-        $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
-        $question->setAutocompleterValues($dirsInCurrentDir);
+    public function getInput(): InputInterface
+    {
+        return $this->input;
+    }
 
-        return $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question
-        );
+    public function isInteractive(): bool
+    {
+        return $this->input->isInteractive();
+    }
+
+    public function getOutput(): OutputInterface
+    {
+        return $this->output;
     }
 }
