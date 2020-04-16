@@ -10,17 +10,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class FakeOutput implements OutputInterface
 {
-    public function write($messages, bool $newline = false, int $options = 0)
+    public function write($messages, $newline = false, $options = 0)
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function writeln($messages, int $options = 0)
+    public function writeln($messages, $options = 0)
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function setVerbosity(int $level)
+    public function setVerbosity($level)
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
@@ -50,7 +50,7 @@ final class FakeOutput implements OutputInterface
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function setDecorated(bool $decorated)
+    public function setDecorated($decorated)
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
