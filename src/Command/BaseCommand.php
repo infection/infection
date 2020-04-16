@@ -48,16 +48,6 @@ use Webmozart\Assert\Assert;
 abstract class BaseCommand extends Command
 {
     /**
-     * @var InputInterface
-     */
-    protected $input;
-
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
-
-    /**
      * @var IO|null
      */
     private $io;
@@ -74,6 +64,13 @@ abstract class BaseCommand extends Command
         );
 
         return $application;
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        parent::initialize($input, $output);
+
+        $this->io = new IO($input, $output);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -235,8 +235,8 @@ final class RunCommand extends BaseCommand
         $configFile = trim((string) $input->getOption('configuration'));
 
         $coverage = trim((string) $input->getOption('coverage'));
-        $testFramework = trim((string) $this->input->getOption('test-framework'));
-        $testFrameworkExtraOptions = trim((string) $this->input->getOption('test-framework-options'));
+        $testFramework = trim((string) $input->getOption('test-framework'));
+        $testFrameworkExtraOptions = trim((string) $input->getOption('test-framework-options'));
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
 
         /** @var string|null $minMsi */
@@ -265,8 +265,8 @@ final class RunCommand extends BaseCommand
             $testFramework === '' ? null : $testFramework,
             $testFrameworkExtraOptions === '' ? null : $testFrameworkExtraOptions,
             trim((string) $input->getOption('filter')),
-            (int) $this->input->getOption('threads'),
-            (bool) $this->input->getOption('dry-run')
+            (int) $input->getOption('threads'),
+            (bool) $input->getOption('dry-run')
         );
     }
 
@@ -275,7 +275,7 @@ final class RunCommand extends BaseCommand
         $installationDecider = $container->getAdapterInstallationDecider();
         $configTestFramework = $container->getConfiguration()->getTestFramework();
 
-        $adapterName = trim((string) $this->input->getOption('test-framework')) ?: $configTestFramework;
+        $adapterName = trim((string) $input->getOption('test-framework')) ?: $configTestFramework;
 
         if (!$installationDecider->shouldBeInstalled($adapterName, $io)) {
             return;
@@ -294,7 +294,7 @@ final class RunCommand extends BaseCommand
     {
         $locator = $container->getRootsFileOrDirectoryLocator();
 
-        if ($customConfigPath = (string) $this->input->getOption('configuration')) {
+        if ($customConfigPath = (string) $input->getOption('configuration')) {
             $locator->locate($customConfigPath);
         } else {
             $this->runConfigurationCommand($locator, $io);
@@ -304,7 +304,7 @@ final class RunCommand extends BaseCommand
 
         // Check if the application needs a restart _after_ configuring the command or adding
         // a missing test framework
-        XdebugHandler::check(new ConsoleLogger($this->output));
+        XdebugHandler::check(new ConsoleLogger($io->getOutput()));
 
         $application = $this->getApplication();
 
@@ -347,7 +347,7 @@ final class RunCommand extends BaseCommand
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
-                '--test-framework' => $this->input->getOption('test-framework') ?: TestFrameworkTypes::PHPUNIT,
+                '--test-framework' => $io->getInput()->getOption('test-framework') ?: TestFrameworkTypes::PHPUNIT,
             ];
 
             $newInput = new ArrayInput($args);
