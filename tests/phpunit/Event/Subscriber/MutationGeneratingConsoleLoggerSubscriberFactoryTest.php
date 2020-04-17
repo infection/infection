@@ -33,48 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\ValueProvider;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Config\ConsoleHelper;
-use Infection\Console\IO;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
+use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
+use Infection\Tests\Fixtures\Console\FakeOutput;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
-final class TextLogFileProvider
+final class MutationGeneratingConsoleLoggerSubscriberFactoryTest extends TestCase
 {
-    public const TEXT_LOG_FILE_NAME = 'infection.log';
-
-    private $consoleHelper;
-    private $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    public function test_it_creates_a_ci_subscriber_if_skips_the_progress_bar(): void
     {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(true);
+
+        $subscriber = $factory->create(new FakeOutput());
+
+        $this->assertInstanceOf(CiMutationGeneratingConsoleLoggerSubscriber::class, $subscriber);
     }
 
-    /**
-     * @param string[] $dirsInCurrentDir
-     */
-    public function get(IO $io, array $dirsInCurrentDir): string
+    public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(): void
     {
-        $io->writeln(['']);
+        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(false);
 
-        $questionText = $this->consoleHelper->getQuestion(
-            'Where do you want to store the text log file?',
-            self::TEXT_LOG_FILE_NAME
-        );
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock
+            ->method('isDecorated')
+            ->willReturn(false)
+        ;
 
-        $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
-        $question->setAutocompleterValues($dirsInCurrentDir);
+        $subscriber = $factory->create($outputMock);
 
-        return $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question
-        );
+        $this->assertInstanceOf(MutationGeneratingConsoleLoggerSubscriber::class, $subscriber);
     }
 }

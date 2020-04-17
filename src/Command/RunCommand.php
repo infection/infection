@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use function extension_loaded;
+use function file_exists;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
-use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Input\MsiParser;
+use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
 use Infection\Console\XdebugHandler;
 use Infection\Container;
@@ -53,32 +53,18 @@ use Infection\FileSystem\Locator\Locator;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
-use const PHP_SAPI;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class RunCommand extends BaseCommand
 {
-    /**
-     * @var ConsoleOutput
-     */
-    private $consoleOutput;
-
-    /**
-     * @var Container
-     */
-    private $container;
-
     protected function configure(): void
     {
         $this
@@ -209,46 +195,26 @@ final class RunCommand extends BaseCommand
         ;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
+    protected function executeCommand(IO $io): void
     {
-        parent::initialize($input, $output);
+        $container = $this->createContainer($io->getInput());
+        $consoleOutput = new ConsoleOutput($io);
 
-        $this->initContainer($input);
-
-        $locator = $this->container->getRootsFileOrDirectoryLocator();
-
-        if ($customConfigPath = (string) $input->getOption('configuration')) {
-            $locator->locate($customConfigPath);
-        } else {
-            $this->runConfigurationCommand($locator);
-        }
-
-        $this->installTestFrameworkIfNeeded($input, $output);
-
-        $this->consoleOutput = new ConsoleOutput(new SymfonyStyle($input, $output));
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        XdebugHandler::check(new ConsoleLogger($output));
-
-        $io = new SymfonyStyle($input, $output);
-
-        $this->startUp($io);
+        $this->startUp($container, $consoleOutput, $io);
 
         $engine = new Engine(
-            $this->container->getConfiguration(),
-            $this->container->getTestFrameworkAdapter(),
-            $this->container->getCoverageChecker(),
-            $this->container->getEventDispatcher(),
-            $this->container->getInitialTestsRunner(),
-            $this->container->getMemoryLimiter(),
-            $this->container->getMutationGenerator(),
-            $this->container->getMutationTestingRunner(),
-            $this->container->getMinMsiChecker(),
-            $this->consoleOutput,
-            $this->container->getMetricsCalculator(),
-            $this->container->getTestFrameworkExtraOptionsFilter()
+            $container->getConfiguration(),
+            $container->getTestFrameworkAdapter(),
+            $container->getCoverageChecker(),
+            $container->getEventDispatcher(),
+            $container->getInitialTestsRunner(),
+            $container->getMemoryLimiter(),
+            $container->getMutationGenerator(),
+            $container->getMutationTestingRunner(),
+            $container->getMinMsiChecker(),
+            $consoleOutput,
+            $container->getMetricsCalculator(),
+            $container->getTestFrameworkExtraOptionsFilter()
         );
 
         try {
@@ -258,11 +224,9 @@ final class RunCommand extends BaseCommand
             // Engine instead
             $io->error($exception->getMessage());
         }
-
-        return 0;
     }
 
-    private function initContainer(InputInterface $input): void
+    private function createContainer(InputInterface $input): Container
     {
         // Currently the configuration is mandatory hence there is no way to
         // say "do not use a config". If this becomes possible in the future
@@ -271,8 +235,8 @@ final class RunCommand extends BaseCommand
         $configFile = trim((string) $input->getOption('configuration'));
 
         $coverage = trim((string) $input->getOption('coverage'));
-        $testFramework = trim((string) $this->input->getOption('test-framework'));
-        $testFrameworkExtraOptions = trim((string) $this->input->getOption('test-framework-options'));
+        $testFramework = trim((string) $input->getOption('test-framework'));
+        $testFrameworkExtraOptions = trim((string) $input->getOption('test-framework-options'));
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
 
         /** @var string|null $minMsi */
@@ -282,7 +246,7 @@ final class RunCommand extends BaseCommand
 
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
-        $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
+        return $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile === '' ? null : $configFile,
             trim((string) $input->getOption('mutators')),
             $input->getOption('show-mutations'),
@@ -301,66 +265,78 @@ final class RunCommand extends BaseCommand
             $testFramework === '' ? null : $testFramework,
             $testFrameworkExtraOptions === '' ? null : $testFrameworkExtraOptions,
             trim((string) $input->getOption('filter')),
-            (int) $this->input->getOption('threads'),
-            (bool) $this->input->getOption('dry-run')
+            (int) $input->getOption('threads'),
+            (bool) $input->getOption('dry-run')
         );
     }
 
-    private function installTestFrameworkIfNeeded(InputInterface $input, OutputInterface $output): void
+    private function installTestFrameworkIfNeeded(Container $container, IO $io): void
     {
-        $installationDecider = $this->container->getAdapterInstallationDecider();
-        $configTestFramework = $this->container->getConfiguration()->getTestFramework();
+        $installationDecider = $container->getAdapterInstallationDecider();
+        $configTestFramework = $container->getConfiguration()->getTestFramework();
 
-        $adapterName = trim((string) $this->input->getOption('test-framework')) ?: $configTestFramework;
+        $adapterName = trim((string) $io->getInput()->getOption('test-framework')) ?: $configTestFramework;
 
-        if (!$installationDecider->shouldBeInstalled($adapterName, $input, $output)) {
+        if (!$installationDecider->shouldBeInstalled($adapterName, $io)) {
             return;
         }
 
-        $output->writeln([
-            '',
-            sprintf('Installing <comment>infection/%s-adapter</comment>...', $adapterName),
-        ]);
+        $io->newLine();
+        $io->writeln(sprintf(
+            'Installing <comment>infection/%s-adapter</comment>...',
+            $adapterName
+        ));
 
-        $this->container->getAdapterInstaller()->install($adapterName);
+        $container->getAdapterInstaller()->install($adapterName);
     }
 
-    private function startUp(SymfonyStyle $io): void
+    private function startUp(Container $container, ConsoleOutput $consoleOutput, IO $io): void
     {
-        Assert::notNull($this->container);
+        $locator = $container->getRootsFileOrDirectoryLocator();
 
-        $io->writeln($this->getApplication()->getHelp());
+        if ($customConfigPath = (string) $io->getInput()->getOption('configuration')) {
+            $locator->locate($customConfigPath);
+        } else {
+            $this->runConfigurationCommand($locator, $io);
+        }
+
+        $this->installTestFrameworkIfNeeded($container, $io);
+
+        // Check if the application needs a restart _after_ configuring the command or adding
+        // a missing test framework
+        XdebugHandler::check(new ConsoleLogger($io->getOutput()));
+
+        $application = $this->getApplication();
+
+        $io->writeln($application->getHelp());
         $io->newLine();
 
-        $this->logRunningWithDebugger();
+        $this->logRunningWithDebugger($consoleOutput);
 
-        if (!$this->getApplication()->isAutoExitEnabled()) {
+        if (!$application->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
             // responsibility to disable xdebug if it isn't needed. As of writing
             // that's only the case during E2E testing. Show a warning nevertheless.
 
-            $this->consoleOutput->logNotInControlOfExitCodes();
+            $consoleOutput->logNotInControlOfExitCodes();
         }
 
-        $this->container->getCoverageChecker()->checkCoverageRequirements();
+        $container->getCoverageChecker()->checkCoverageRequirements();
 
-        $config = $this->container->getConfiguration();
+        $config = $container->getConfiguration();
 
         $this->includeUserBootstrap($config);
 
-        $this->container->getFileSystem()->mkdir($config->getTmpDir());
+        $container->getFileSystem()->mkdir($config->getTmpDir());
 
-        LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
+        LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
 
-        $this->container->getSubscriberBuilder()->registerSubscribers(
-            $this->container->getTestFrameworkAdapter(),
-            $this->output
-        );
+        $container->getSubscriberRegisterer()->registerSubscribers($io->getOutput());
 
-        $this->container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
+        $container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
     }
 
-    private function runConfigurationCommand(Locator $locator): void
+    private function runConfigurationCommand(Locator $locator, IO $io): void
     {
         try {
             $locator->locateOneOf([
@@ -371,16 +347,12 @@ final class RunCommand extends BaseCommand
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
-                '--test-framework' => $this->input->getOption('test-framework') ?: TestFrameworkTypes::PHPUNIT,
+                '--test-framework' => $io->getInput()->getOption('test-framework') ?: TestFrameworkTypes::PHPUNIT,
             ];
 
             $newInput = new ArrayInput($args);
-            $newInput->setInteractive($this->input->isInteractive());
-            $result = $configureCommand->run($newInput, $this->output);
-
-            if ($result !== 0) {
-                throw ConfigurationException::configurationAborted();
-            }
+            $newInput->setInteractive($io->isInteractive());
+            $configureCommand->run($newInput, $io->getOutput());
         }
     }
 
@@ -401,14 +373,14 @@ final class RunCommand extends BaseCommand
         })($bootstrap);
     }
 
-    private function logRunningWithDebugger(): void
+    private function logRunningWithDebugger(ConsoleOutput $consoleOutput): void
     {
         if (PHP_SAPI === 'phpdbg') {
-            $this->consoleOutput->logRunningWithDebugger(PHP_SAPI);
+            $consoleOutput->logRunningWithDebugger(PHP_SAPI);
         } elseif (extension_loaded('xdebug')) {
-            $this->consoleOutput->logRunningWithDebugger('Xdebug');
+            $consoleOutput->logRunningWithDebugger('Xdebug');
         } elseif (extension_loaded('pcov')) {
-            $this->consoleOutput->logRunningWithDebugger('PCOV');
+            $consoleOutput->logRunningWithDebugger('PCOV');
         }
     }
 }

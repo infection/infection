@@ -33,48 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\ValueProvider;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Config\ConsoleHelper;
-use Infection\Console\IO;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
+use Infection\Configuration\Entry\Logs;
+use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
+use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
+use Infection\Logger\LoggerFactory;
+use Infection\Tests\Fixtures\Console\FakeOutput;
+use Infection\Tests\Logger\FakeMutationTestingResultsLogger;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class TextLogFileProvider
+final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
 {
-    public const TEXT_LOG_FILE_NAME = 'infection.log';
-
-    private $consoleHelper;
-    private $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    public function test_it_can_create_a_subscriber(): void
     {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
-    }
+        $logsConfig = Logs::createEmpty();
 
-    /**
-     * @param string[] $dirsInCurrentDir
-     */
-    public function get(IO $io, array $dirsInCurrentDir): string
-    {
-        $io->writeln(['']);
+        $output = new FakeOutput();
 
-        $questionText = $this->consoleHelper->getQuestion(
-            'Where do you want to store the text log file?',
-            self::TEXT_LOG_FILE_NAME
+        $loggerFactoryMock = $this->createMock(LoggerFactory::class);
+        $loggerFactoryMock
+            ->method('createFromLogEntries')
+            ->with($logsConfig, $output)
+            ->willReturn(new FakeMutationTestingResultsLogger())
+        ;
+
+        $factory = new MutationTestingResultsLoggerSubscriberFactory(
+            $loggerFactoryMock,
+            $logsConfig
         );
 
-        $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
-        $question->setAutocompleterValues($dirsInCurrentDir);
+        $subscriber = $factory->create($output);
 
-        return $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question
-        );
+        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
     }
 }

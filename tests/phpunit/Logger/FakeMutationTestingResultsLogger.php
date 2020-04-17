@@ -33,48 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\ValueProvider;
+namespace Infection\Tests\Logger;
 
-use Infection\Config\ConsoleHelper;
-use Infection\Console\IO;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
+use Infection\Logger\MutationTestingResultsLogger;
+use Infection\Tests\UnsupportedMethod;
 
-/**
- * @internal
- */
-final class TextLogFileProvider
+final class FakeMutationTestingResultsLogger implements MutationTestingResultsLogger
 {
-    public const TEXT_LOG_FILE_NAME = 'infection.log';
-
-    private $consoleHelper;
-    private $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    public function log(): void
     {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
-    }
-
-    /**
-     * @param string[] $dirsInCurrentDir
-     */
-    public function get(IO $io, array $dirsInCurrentDir): string
-    {
-        $io->writeln(['']);
-
-        $questionText = $this->consoleHelper->getQuestion(
-            'Where do you want to store the text log file?',
-            self::TEXT_LOG_FILE_NAME
-        );
-
-        $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
-        $question->setAutocompleterValues($dirsInCurrentDir);
-
-        return $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question
-        );
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 }

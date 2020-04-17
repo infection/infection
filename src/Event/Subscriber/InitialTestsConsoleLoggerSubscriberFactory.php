@@ -33,48 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\ValueProvider;
+namespace Infection\Event\Subscriber;
 
-use Infection\Config\ConsoleHelper;
-use Infection\Console\IO;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class TextLogFileProvider
+final class InitialTestsConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
-    public const TEXT_LOG_FILE_NAME = 'infection.log';
+    private $skipProgressBar;
+    private $testFrameworkAdapter;
+    private $debug;
 
-    private $consoleHelper;
-    private $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
-    {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+    public function __construct(
+        bool $skipProgressBar,
+        TestFrameworkAdapter $testFrameworkAdapter,
+        bool $debug
+    ) {
+        $this->skipProgressBar = $skipProgressBar;
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
+        $this->debug = $debug;
     }
 
-    /**
-     * @param string[] $dirsInCurrentDir
-     */
-    public function get(IO $io, array $dirsInCurrentDir): string
+    public function create(OutputInterface $output): EventSubscriber
     {
-        $io->writeln(['']);
-
-        $questionText = $this->consoleHelper->getQuestion(
-            'Where do you want to store the text log file?',
-            self::TEXT_LOG_FILE_NAME
-        );
-
-        $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
-        $question->setAutocompleterValues($dirsInCurrentDir);
-
-        return $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question
-        );
+        return $this->skipProgressBar
+            ? new CiInitialTestsConsoleLoggerSubscriber($output, $this->testFrameworkAdapter)
+            : new InitialTestsConsoleLoggerSubscriber(
+                $output,
+                $this->testFrameworkAdapter,
+                $this->debug
+            )
+        ;
     }
 }

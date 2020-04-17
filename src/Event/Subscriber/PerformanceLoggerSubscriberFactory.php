@@ -33,48 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\ValueProvider;
+namespace Infection\Event\Subscriber;
 
-use Infection\Config\ConsoleHelper;
-use Infection\Console\IO;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
+use Infection\Resource\Listener\PerformanceLoggerSubscriber;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Time\Stopwatch;
+use Infection\Resource\Time\TimeFormatter;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class TextLogFileProvider
+final class PerformanceLoggerSubscriberFactory implements SubscriberFactory
 {
-    public const TEXT_LOG_FILE_NAME = 'infection.log';
+    private $stopwatch;
+    private $timeFormatter;
+    private $memoryFormatter;
 
-    private $consoleHelper;
-    private $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
-    {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+    public function __construct(
+        Stopwatch $stopwatch,
+        TimeFormatter $timeFormatter,
+        MemoryFormatter $memoryFormatter
+    ) {
+        $this->stopwatch = $stopwatch;
+        $this->timeFormatter = $timeFormatter;
+        $this->memoryFormatter = $memoryFormatter;
     }
 
-    /**
-     * @param string[] $dirsInCurrentDir
-     */
-    public function get(IO $io, array $dirsInCurrentDir): string
+    public function create(OutputInterface $output): EventSubscriber
     {
-        $io->writeln(['']);
-
-        $questionText = $this->consoleHelper->getQuestion(
-            'Where do you want to store the text log file?',
-            self::TEXT_LOG_FILE_NAME
-        );
-
-        $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
-        $question->setAutocompleterValues($dirsInCurrentDir);
-
-        return $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question
+        return new PerformanceLoggerSubscriber(
+            $this->stopwatch,
+            $this->timeFormatter,
+            $this->memoryFormatter,
+            $output
         );
     }
 }

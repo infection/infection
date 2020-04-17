@@ -37,7 +37,6 @@ namespace Infection\Command;
 
 use function count;
 use function file_exists;
-use const GLOB_ONLYDIR;
 use function implode;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
@@ -47,9 +46,11 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
+use Infection\Console\IO;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
+use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\file_put_contents;
 use function Safe\glob;
@@ -57,9 +58,7 @@ use function Safe\json_decode;
 use function Safe\json_encode;
 use function Safe\sprintf;
 use stdClass;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -85,22 +84,23 @@ final class ConfigureCommand extends BaseCommand
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function executeCommand(IO $io): void
     {
-        if (!$input->isInteractive()) {
-            $output->writeln(self::NONINTERACTIVE_MODE_ERROR);
+        if (!$io->isInteractive()) {
+            $io->writeln(self::NONINTERACTIVE_MODE_ERROR);
 
-            return 1;
+            $this->abort();
         }
 
         $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
-        $consoleHelper->writeSection($output, 'Welcome to the Infection config generator');
+        $consoleHelper->writeSection(
+            $io->getOutput(),
+            'Welcome to the Infection config generator'
+        );
 
-        $output->writeln([
-            '',
-            'We did not find a configuration file. The following questions will help us to generate it for you.',
-            '',
-        ]);
+        $io->newLine();
+        $io->writeln('We did not find a configuration file. The following questions will help us to generate it for you.');
+        $io->newLine();
 
         $dirsInCurrentDir = glob('*', GLOB_ONLYDIR);
         $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
@@ -116,12 +116,12 @@ final class ConfigureCommand extends BaseCommand
         }
 
         $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper, $sourceDirGuesser);
-        $sourceDirs = $sourceDirsProvider->get($input, $output, $dirsInCurrentDir);
+        $sourceDirs = $sourceDirsProvider->get($io, $dirsInCurrentDir);
 
         if (count($sourceDirs) === 0) {
-            $output->writeln('A source directory was not provided. Unable to generate "infection.json.dist".');
+            $io->writeln('A source directory was not provided. Unable to generate "infection.json.dist".');
 
-            return 1;
+            $this->abort();
         }
 
         $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
@@ -132,30 +132,30 @@ final class ConfigureCommand extends BaseCommand
             $fileSystem
         );
 
-        $excludedDirs = $excludeDirsProvider->get($input, $output, $dirsInCurrentDir, $sourceDirs);
+        $excludedDirs = $excludeDirsProvider->get($io, $dirsInCurrentDir, $sourceDirs);
 
         $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $consoleHelper, $questionHelper);
-        $phpUnitConfigPath = $phpUnitConfigPathProvider->get($input, $output, $dirsInCurrentDir, $input->getOption('test-framework'));
+        $phpUnitConfigPath = $phpUnitConfigPathProvider->get(
+            $io,
+            $dirsInCurrentDir,
+            $io->getInput()->getOption('test-framework')
+        );
 
         $phpUnitExecutableFinder = new TestFrameworkFinder();
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
-        $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($input, $output);
+        $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
 
         $textLogFileProvider = new TextLogFileProvider($consoleHelper, $questionHelper);
-        $textLogFilePath = $textLogFileProvider->get($input, $output, $dirsInCurrentDir);
+        $textLogFilePath = $textLogFileProvider->get($io, $dirsInCurrentDir);
 
         $this->saveConfig($sourceDirs, $excludedDirs, $phpUnitConfigPath, $phpUnitCustomExecutablePath, $textLogFilePath);
 
-        $output->writeln([
-            '',
-            sprintf(
-                'Configuration file "<comment>%s</comment>" was created.',
-                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE
-            ),
-            '',
-        ]);
-
-        return 0;
+        $io->newLine();
+        $io->writeln(sprintf(
+            'Configuration file "<comment>%s</comment>" was created.',
+            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE
+        ));
+        $io->newLine();
     }
 
     /**
@@ -212,5 +212,10 @@ final class ConfigureCommand extends BaseCommand
             SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
             json_encode($configObject, JSON_PRETTY_PRINT)
         );
+    }
+
+    private function abort(): void
+    {
+        throw new RuntimeException('Configuration generation aborted');
     }
 }

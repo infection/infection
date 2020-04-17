@@ -33,62 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Config\ValueProvider;
+namespace Infection\Tests\Console;
 
-use function exec;
+use Infection\Console\IO;
 use PHPUnit\Framework\TestCase;
-use function Safe\fopen;
-use function Safe\fwrite;
-use function Safe\rewind;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\StreamableInputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
 
-abstract class AbstractBaseProviderTest extends TestCase
+final class IOTest extends TestCase
 {
-    protected static $stty;
-
-    protected function getQuestionHelper(): QuestionHelper
+    public function test_it_exposes_its_input_and_output(): void
     {
-        return new QuestionHelper();
+        $input = new StringInput('');
+        $output = new NullOutput();
+
+        $io = new IO($input, $output);
+
+        $this->assertSame($input, $io->getInput());
+        $this->assertSame($output, $io->getOutput());
     }
 
-    protected function getInputStream(string $input)
+    public function test_it_exposes_if_its_input_is_interactive(): void
     {
-        $stream = fopen('php://memory', 'r+', false);
-        fwrite($stream, $input);
-        rewind($stream);
+        $input = new StringInput('');
+        $output = new NullOutput();
 
-        return $stream;
+        $io = new IO($input, $output);
+
+        $input->setInteractive(true);
+
+        $this->assertTrue($io->isInteractive());
+
+        $input->setInteractive(false);
+
+        $this->assertFalse($io->isInteractive());
     }
 
-    protected function createOutputInterface(): StreamOutput
+    public function test_it_can_create_a_null_io(): void
     {
-        return new StreamOutput(fopen('php://memory', 'r+', false));
-    }
+        $io = IO::createNull();
 
-    protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
-    {
-        $mock = $this->createMock(StreamableInputInterface::class);
-        $mock->method('isInteractive')
-            ->willReturn($interactive);
+        $this->assertCount(0, $io->getInput()->getArguments());
+        $this->assertCount(0, $io->getInput()->getOptions());
 
-        if ($stream) {
-            $mock->method('getStream')
-                ->willReturn($stream);
-        }
-
-        return $mock;
-    }
-
-    protected function hasSttyAvailable(): bool
-    {
-        if (self::$stty !== null) {
-            return self::$stty;
-        }
-
-        exec('stty 2>&1', $output, $exitcode);
-
-        return self::$stty = $exitcode === 0;
+        $this->assertInstanceOf(NullOutput::class, $io->getOutput());
     }
 }

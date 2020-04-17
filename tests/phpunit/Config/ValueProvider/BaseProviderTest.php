@@ -33,48 +33,72 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\ValueProvider;
+namespace Infection\Tests\Config\ValueProvider;
 
-use Infection\Config\ConsoleHelper;
-use Infection\Console\IO;
+use function exec;
+use PHPUnit\Framework\TestCase;
+use function Safe\fopen;
+use function Safe\fwrite;
+use function Safe\rewind;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\StreamOutput;
+use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
-final class TextLogFileProvider
+abstract class BaseProviderTest extends TestCase
 {
-    public const TEXT_LOG_FILE_NAME = 'infection.log';
+    protected static $stty;
 
-    private $consoleHelper;
-    private $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    final protected function getQuestionHelper(): QuestionHelper
     {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+        return new QuestionHelper();
     }
 
     /**
-     * @param string[] $dirsInCurrentDir
+     * @return resource
      */
-    public function get(IO $io, array $dirsInCurrentDir): string
+    final protected function getInputStream(string $input)
     {
-        $io->writeln(['']);
+        $stream = fopen('php://memory', 'rb+', false);
+        fwrite($stream, $input);
+        rewind($stream);
 
-        $questionText = $this->consoleHelper->getQuestion(
-            'Where do you want to store the text log file?',
-            self::TEXT_LOG_FILE_NAME
-        );
+        return $stream;
+    }
 
-        $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
-        $question->setAutocompleterValues($dirsInCurrentDir);
+    final protected function createStreamOutput(): StreamOutput
+    {
+        return new StreamOutput(fopen('php://memory', 'rb+', false));
+    }
 
-        return $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question
-        );
+    /**
+     * @param resource $stream
+     */
+    final protected function createStreamableInput(
+        $stream,
+        bool $interactive = true
+    ): InputInterface {
+        Assert::resource($stream);
+
+        $input = new StringInput('');
+        $input->setStream($stream);
+        $input->setInteractive($interactive);
+
+        return $input;
+    }
+
+    /**
+     * @see \Symfony\Component\Console\Terminal::hasSttyAvailable()
+     */
+    final protected function hasSttyAvailable(): bool
+    {
+        if (self::$stty !== null) {
+            return self::$stty;
+        }
+
+        exec('stty 2>&1', $output, $exitcode);
+
+        return self::$stty = $exitcode === 0;
     }
 }

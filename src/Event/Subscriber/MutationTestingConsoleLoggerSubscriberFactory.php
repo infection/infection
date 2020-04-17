@@ -33,48 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\ValueProvider;
+namespace Infection\Event\Subscriber;
 
-use Infection\Config\ConsoleHelper;
-use Infection\Console\IO;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
+use Infection\Console\OutputFormatter\DotFormatter;
+use Infection\Console\OutputFormatter\OutputFormatter;
+use Infection\Console\OutputFormatter\ProgressFormatter;
+use Infection\Differ\DiffColorizer;
+use Infection\Metrics\MetricsCalculator;
+use InvalidArgumentException;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class TextLogFileProvider
+final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
-    public const TEXT_LOG_FILE_NAME = 'infection.log';
+    private $metricsCalculator;
+    private $diffColorizer;
+    private $showMutations;
+    private $formatter;
 
-    private $consoleHelper;
-    private $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
-    {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+    public function __construct(
+        MetricsCalculator $metricsCalculator,
+        DiffColorizer $diffColorizer,
+        bool $showMutations,
+        string $formatter
+    ) {
+        $this->metricsCalculator = $metricsCalculator;
+        $this->diffColorizer = $diffColorizer;
+        $this->showMutations = $showMutations;
+        $this->formatter = $formatter;
     }
 
-    /**
-     * @param string[] $dirsInCurrentDir
-     */
-    public function get(IO $io, array $dirsInCurrentDir): string
+    public function create(OutputInterface $output): EventSubscriber
     {
-        $io->writeln(['']);
-
-        $questionText = $this->consoleHelper->getQuestion(
-            'Where do you want to store the text log file?',
-            self::TEXT_LOG_FILE_NAME
+        return new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->createOutputFormatter($output),
+            $this->metricsCalculator,
+            $this->diffColorizer,
+            $this->showMutations
         );
+    }
 
-        $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
-        $question->setAutocompleterValues($dirsInCurrentDir);
+    private function createOutputFormatter(OutputInterface $output): OutputFormatter
+    {
+        if ($this->formatter === 'progress') {
+            return new ProgressFormatter(new ProgressBar($output));
+        }
 
-        return $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question
-        );
+        if ($this->formatter === 'dot') {
+            return new DotFormatter($output);
+        }
+
+        throw new InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
     }
 }

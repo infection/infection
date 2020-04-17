@@ -33,13 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\Exception;
+namespace Infection\Event\Subscriber;
 
-use Exception;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-abstract class InfectionException extends Exception
+final class SubscriberRegisterer
 {
+    private $eventDispatcher;
+    private $subscriberRegistry;
+
+    public function __construct(
+        EventDispatcher $eventDispatcher,
+        ChainSubscriberFactory $subscriberRegistry
+    ) {
+        $this->eventDispatcher = $eventDispatcher;
+        $this->subscriberRegistry = $subscriberRegistry;
+    }
+
+    public function registerSubscribers(OutputInterface $output): void
+    {
+        foreach ($this->subscriberRegistry->create($output) as $subscriber) {
+            $this->eventDispatcher->addSubscriber($subscriber);
+        }
+    }
 }

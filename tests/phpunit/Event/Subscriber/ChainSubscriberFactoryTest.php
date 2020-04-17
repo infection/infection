@@ -33,48 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\ValueProvider;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Config\ConsoleHelper;
-use Infection\Console\IO;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
+use Infection\Event\Subscriber\ChainSubscriberFactory;
+use Infection\Tests\Fixtures\Console\FakeOutput;
+use Infection\Tests\Fixtures\Event\DummySubscriberFactory;
+use Infection\Tests\Fixtures\Event\IONullSubscriber;
+use function iterator_to_array;
+use PHPUnit\Framework\TestCase;
+use Traversable;
 
-/**
- * @internal
- */
-final class TextLogFileProvider
+final class ChainSubscriberFactoryTest extends TestCase
 {
-    public const TEXT_LOG_FILE_NAME = 'infection.log';
-
-    private $consoleHelper;
-    private $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    public function test_it_does_not_create_any_subscriber_if_no_factory_was_given(): void
     {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+        $factory = new ChainSubscriberFactory();
+
+        $subscribers = $factory->create(new FakeOutput());
+
+        $this->assertCount(
+            0,
+            $subscribers instanceof Traversable
+                ? iterator_to_array($subscribers, false)
+                : $subscribers
+        );
     }
 
-    /**
-     * @param string[] $dirsInCurrentDir
-     */
-    public function get(IO $io, array $dirsInCurrentDir): string
+    public function test_it_creates_subscribers_from_each_factory_given(): void
     {
-        $io->writeln(['']);
+        $output = new FakeOutput();
 
-        $questionText = $this->consoleHelper->getQuestion(
-            'Where do you want to store the text log file?',
-            self::TEXT_LOG_FILE_NAME
+        $subscriber1 = new IONullSubscriber($output);
+        $subscriber2 = new IONullSubscriber($output);
+        $subscriber3 = new IONullSubscriber($output);
+
+        $factory = new ChainSubscriberFactory(
+            new DummySubscriberFactory($subscriber1),
+            new DummySubscriberFactory($subscriber2),
+            new DummySubscriberFactory($subscriber3)
         );
 
-        $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
-        $question->setAutocompleterValues($dirsInCurrentDir);
+        $subscribers = $factory->create($output);
 
-        return $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question
+        if ($subscribers instanceof Traversable) {
+            $subscribers = iterator_to_array($subscribers, false);
+        }
+
+        $this->assertSame(
+            [
+                $subscriber1,
+                $subscriber2,
+                $subscriber3,
+            ],
+            $subscribers
         );
     }
 }
