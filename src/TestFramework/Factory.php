@@ -92,7 +92,19 @@ final class Factory
     {
         $adapter = $this->constructAdapter($adapterName, $skipCoverage);
 
-        $adapter->checkVersion();
+        try {
+            $adapter->checkVersion();
+        } catch (UnsupportedTestFrameworkVersion $exception) {
+            $this->logger->error(
+                sprintf(
+                    'The %s version "%s" is not supported. The version detected is either a non-stable version or older than "%s". Infection may not run as intended',
+                    $adapter->getName(),
+                    $exception->getVersionDetected(),
+                    $exception->getMinimumVersionSupported()
+                ),
+                ['exception' => $exception]
+            );
+        }
 
         return $adapter;
     }

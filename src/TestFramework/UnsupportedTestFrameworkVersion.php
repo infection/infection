@@ -42,4 +42,24 @@ use RuntimeException;
  */
 final class UnsupportedTestFrameworkVersion extends RuntimeException
 {
+    private $versionDetected;
+    private $oldestVersionSupported;
+
+    public function __construct(string  $versionDetected, string $oldestVersionSupported)
+    {
+        parent::__construct('', 0, null);
+
+        $this->versionDetected = $versionDetected;
+        $this->oldestVersionSupported = $oldestVersionSupported;
+    }
+
+    public function getVersionDetected(): string
+    {
+        return $this->versionDetected;
+    }
+
+    public function getMinimumVersionSupported(): string
+    {
+        return $this->oldestVersionSupported;
+    }
 }

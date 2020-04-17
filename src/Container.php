@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Psr\Log\LoggerInterface;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -227,7 +228,8 @@ final class Container
                     $container->getTestFrameworkFinder(),
                     $container->getDefaultJUnitFilePath(),
                     $config,
-                    GeneratedExtensionsConfig::EXTENSIONS
+                    GeneratedExtensionsConfig::EXTENSIONS,
+                    $container->getLogger()
                 );
             },
             MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
@@ -545,6 +547,7 @@ final class Container
     }
 
     public function withDynamicParameters(
+        LoggerInterface $logger,
         ?string $configFile,
         string $mutatorsInput,
         bool $showMutations,
@@ -567,6 +570,13 @@ final class Container
         bool $dryRun
     ): self {
         $clone = clone $this;
+
+        $clone->offsetAdd(
+            LoggerInterface::class,
+            static function () use ($logger): LoggerInterface {
+                return $logger;
+            }
+        );
 
         $clone->offsetAdd(
             SchemaConfiguration::class,
@@ -983,6 +993,11 @@ final class Container
     public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
     {
         return $this->get(MutantExecutionResultFactory::class);
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->get(LoggerInterface::class);
     }
 
     /**

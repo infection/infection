@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use function file_exists;
 use function implode;
 use Infection\Configuration\Configuration;
@@ -197,7 +198,7 @@ final class RunCommand extends BaseCommand
 
     protected function executeCommand(IO $io): void
     {
-        $container = $this->createContainer($io->getInput());
+        $container = $this->createContainer($io);
         $consoleOutput = new ConsoleOutput($io);
 
         $this->startUp($container, $consoleOutput, $io);
@@ -226,8 +227,10 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private function createContainer(InputInterface $input): Container
+    private function createContainer(IO $io): Container
     {
+        $input = $io->getInput();
+
         // Currently the configuration is mandatory hence there is no way to
         // say "do not use a config". If this becomes possible in the future
         // though, it will likely be a `--no-config` option rather than relying
@@ -247,6 +250,7 @@ final class RunCommand extends BaseCommand
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
         return $this->getApplication()->getContainer()->withDynamicParameters(
+            new ConsoleLogger($io->getOutput()),
             $configFile === '' ? null : $configFile,
             trim((string) $input->getOption('mutators')),
             $input->getOption('show-mutations'),

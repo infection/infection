@@ -53,7 +53,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
-    private const MINIMUM_SUPPORTED_VERSION = '6.0.0';
+    private const MINIMUM_SUPPORTED_VERSION = '9.0.0';
 
     public function hasJUnitReport(): bool
     {
@@ -102,11 +102,10 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
             return;
         }
 
-        throw new UnsupportedTestFrameworkVersion(sprintf(
-            'The PHPUnit version "%s" is not supported. The oldest version supported is "%s"',
+        throw new UnsupportedTestFrameworkVersion(
             $this->getVersion(),
             self::MINIMUM_SUPPORTED_VERSION
-        ));
+        );
     }
 
     public function getInitialTestsFailRecommendations(string $commandLine): string
