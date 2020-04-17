@@ -87,7 +87,7 @@ class LoggerFactory
                     $this->createSummaryLogger($logConfig->getSummaryLogFilePath()),
                     $this->createDebugLogger($logConfig->getDebugLogFilePath()),
                     $this->createPerMutatorLogger($logConfig->getPerMutatorFilePath()),
-                    $this->createBadgeLogger($this->logger, $logConfig->getBadge()),
+                    $this->createBadgeLogger($logConfig->getBadge()),
                 ],
                 function (?MutationTestingResultsLogger $logger): bool {
                     return $logger !== null && $this->isAllowedToLog($logger);
