@@ -60,8 +60,8 @@ jobs:
           - INFECTION_FLAGS="${INFECTION_FLAGS} $(get_infection_pr_flags)"
           - |
             if [[ "$MIN_MSI_CHECK" == "true" ]]; then
-              INFECTION_FLAGS="${INFECTION_FLAGS} ${MIN_MSI_FLAGS}"
-            |
+              INFECTION_FLAGS="${INFECTION_FLAGS} ${MIN_MSI_FLAGS}";
+            fi
 
       script:
         - if [[ "$DRIVER" == "xdebug" || "$DRIVER" == "none" ]]; then xdebug_enable; fi
