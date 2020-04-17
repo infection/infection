@@ -127,7 +127,7 @@ jobs:
       php: nightly
       env: DRIVER="phpdbg"
       script:
-        # We don't have Xdebug on the nightly build, so we always run with PHPDBG.
+        # We don't have Xdebug on the nightly build, so we always run with phpdbg.
         - make compile
         - ./tests/e2e_tests build/infection.phar
         - phpdbg -qrr $PHPUNIT_BIN
