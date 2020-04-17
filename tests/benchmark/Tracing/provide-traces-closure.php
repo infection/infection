@@ -38,10 +38,12 @@ namespace Infection\Benchmark\Tracing;
 use Generator;
 use Infection\Container;
 use function iterator_to_array;
+use Psr\Log\NullLogger;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $container = Container::create()->withValues(
+    new NullLogger(),
     Container::DEFAULT_CONFIG_FILE,
     Container::DEFAULT_MUTATORS_INPUT,
     Container::DEFAULT_SHOW_MUTATIONS,

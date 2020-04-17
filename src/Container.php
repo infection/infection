@@ -121,6 +121,8 @@ use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
@@ -493,7 +495,8 @@ final class Container
                     $container->getFileSystem(),
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
-                    $config->mutateOnlyCoveredCode()
+                    $config->mutateOnlyCoveredCode(),
+                    $container->getLogger()
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
@@ -567,6 +570,7 @@ final class Container
         ]);
 
         return $container->withValues(
+            new NullLogger(),
             self::DEFAULT_CONFIG_FILE,
             self::DEFAULT_MUTATORS_INPUT,
             self::DEFAULT_SHOW_MUTATIONS,
@@ -591,6 +595,7 @@ final class Container
     }
 
     public function withValues(
+        LoggerInterface $logger,
         ?string $configFile,
         string $mutatorsInput,
         bool $showMutations,
@@ -613,6 +618,13 @@ final class Container
         bool $dryRun
     ): self {
         $clone = clone $this;
+
+        $clone->offsetSet(
+            LoggerInterface::class,
+            static function () use ($logger): LoggerInterface {
+                return $logger;
+            }
+        );
 
         $clone->offsetSet(
             SchemaConfiguration::class,
@@ -1030,6 +1042,11 @@ final class Container
     public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
     {
         return $this->get(MutantExecutionResultFactory::class);
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->get(LoggerInterface::class);
     }
 
     /**
