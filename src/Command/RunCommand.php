@@ -243,7 +243,7 @@ final class RunCommand extends BaseCommand
 
         $coverage = trim((string) $input->getOption('coverage'));
         $testFramework = trim((string) $input->getOption('test-framework'));
-        $testFrameworkOptions = trim((string) $input->getOption('test-framework-options'));
+        $testFrameworkExtraOptions = trim((string) $input->getOption('test-framework-options'));
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
 
         /** @var string|null $minMsi */
@@ -267,8 +267,12 @@ final class RunCommand extends BaseCommand
             trim((string) $input->getOption('formatter')),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             (bool) $input->getOption('no-progress'),
-            $coverage === '' ? Container::DEFAULT_EXISTING_COVERAGE_PATH : $coverage,
-            $initialTestsPhpOptions === '' ? Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS : $initialTestsPhpOptions,
+            $coverage === ''
+                ? Container::DEFAULT_EXISTING_COVERAGE_PATH
+                : $coverage,
+            $initialTestsPhpOptions === ''
+                ? Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS
+                : $initialTestsPhpOptions,
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
             (bool) $input->getOption('skip-initial-tests'),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
@@ -276,8 +280,12 @@ final class RunCommand extends BaseCommand
             MsiParser::parse($minMsi, $msiPrecision, 'min-msi'),
             MsiParser::parse($minCoveredMsi, $msiPrecision, 'min-covered-msi'),
             $msiPrecision,
-            $testFramework === '' ? Container::DEFAULT_TEST_FRAMEWORK : $testFramework,
-            $testFrameworkOptions,
+            $testFramework === ''
+                ? Container::DEFAULT_TEST_FRAMEWORK
+                : $testFramework,
+            $testFrameworkExtraOptions === ''
+                ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
+                : $testFrameworkExtraOptions,
             trim((string) $input->getOption('filter')),
             // TODO: more validation here?
             (int) $input->getOption('threads'),

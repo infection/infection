@@ -150,7 +150,7 @@ final class Container
     public const DEFAULT_MIN_COVERED_MSI = null;
     public const DEFAULT_MSI_PRECISION = MsiParser::DEFAULT_PRECISION;
     public const DEFAULT_TEST_FRAMEWORK = null;
-    public const DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = '';
+    public const DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
     public const DEFAULT_FILTER = '';
     public const DEFAULT_THREAD_COUNT = 1;
     public const DEFAULT_DRY_RUN = false;
