@@ -44,6 +44,7 @@ use function Safe\sprintf;
 final class VersionParser
 {
     private const VERSION_REGEX = '/(?<version>\d+\.\d+\.?\d*)(?<prerelease>-[0-9a-zA-Z.]+)?(?<build>\+[0-9a-zA-Z.]+)?/';
+    private const STABLE_VERSION = '/^\d+\.\d+\.\d+$/';
 
     /**
      * @throws InvalidVersion
@@ -61,5 +62,10 @@ final class VersionParser
         }
 
         return $matches[0];
+    }
+
+    public function isStable(string $parsedVersion): bool
+    {
+        return preg_match(self::STABLE_VERSION, $parsedVersion) === 0;
     }
 }

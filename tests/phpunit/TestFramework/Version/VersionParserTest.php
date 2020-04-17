@@ -104,5 +104,7 @@ final class VersionParserTest extends TestCase
         yield 'phpspec RC' => ['phpspec version 5.0.0-rc1', '5.0.0-rc1'];
 
         yield 'PHPUnit' => ['PHPUnit 7.5.11 by Sebastian Bergmann and contributors.', '7.5.11'];
+
+        yield 'PHPUnit dev-master' => ['PHPUnit 9.2-g4e89e91ef by Sebastian Bergmann and contributors.', '9.2-g4e89e91ef'];
     }
 }
