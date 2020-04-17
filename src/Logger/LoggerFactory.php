@@ -46,7 +46,6 @@ use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use OndraM\CiDetector\CiDetector;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -78,7 +77,7 @@ class LoggerFactory
         $this->logger = $logger;
     }
 
-    public function createFromLogEntries(Logs $logConfig, OutputInterface $output): MutationTestingResultsLogger
+    public function createFromLogEntries(Logs $logConfig): MutationTestingResultsLogger
     {
         return new LoggerRegistry(
             ...array_filter(

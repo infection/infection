@@ -54,7 +54,6 @@ use Infection\Tests\Fixtures\Logger\FakeLogger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -72,16 +71,10 @@ final class LoggerFactoryTest extends TestCase
      */
     private $fileSystemMock;
 
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $outputMock;
-
     protected function setUp(): void
     {
         $this->metricsCalculator = new MetricsCalculator(2);
         $this->fileSystemMock = $this->createMock(Filesystem::class);
-        $this->outputMock = $this->createMock(OutputInterface::class);
     }
 
     public function test_it_does_not_create_any_logger_for_no_verbosity_level_and_no_badge(): void
@@ -99,8 +92,7 @@ final class LoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 null
-            ),
-            $this->outputMock
+            )
         );
 
         $this->assertRegisteredLoggersAre([], $logger);
@@ -121,8 +113,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 new Badge('master')
-            ),
-            $this->outputMock
+            )
         );
 
         $this->assertRegisteredLoggersAre([BadgeLogger::class], $logger);
@@ -141,10 +132,7 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $logger = $factory->createFromLogEntries(
-            $logs,
-            $this->outputMock
-        );
+        $logger = $factory->createFromLogEntries($logs);
 
         $this->assertRegisteredLoggersAre($expectedLoggerClasses, $logger);
     }
