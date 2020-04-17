@@ -43,7 +43,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class ConsoleOutput
 {
-    private const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
     private const MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percent points over the required %s. Consider increasing the required %s percentage the next time you run infection.';
 
     private $io;
@@ -93,11 +92,6 @@ final class ConsoleOutput
                 $typeString
             )
         );
-    }
-
-    public function logRunningWithDebugger(string $debugger): void
-    {
-        $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, $debugger));
     }
 
     public function logNotInControlOfExitCodes(): void

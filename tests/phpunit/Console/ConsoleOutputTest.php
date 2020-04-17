@@ -67,16 +67,6 @@ final class ConsoleOutputTest extends TestCase
         $consoleOutput->logUnknownVerbosityOption($option);
     }
 
-    public function test_log_running_with_debugger(): void
-    {
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('writeln')
-            ->with('You are running Infection with foo enabled.');
-
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logRunningWithDebugger('foo');
-    }
-
     public function test_log_not_in_control_of_exit_codes(): void
     {
         $io = $this->createMock(SymfonyStyle::class);
