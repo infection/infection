@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection;
 
 use Infection\Console\OutputFormatter\FormatterFactory;
+use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\NullFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Symfony\Component\Console\Output\NullOutput;
@@ -145,7 +146,7 @@ final class Container
     public const DEFAULT_LOG_VERBOSITY = LogVerbosity::NORMAL;
     public const DEFAULT_DEBUG = false;
     public const DEFAULT_ONLY_COVERED = false;
-    public const DEFAULT_FORMATTER = 'dot';
+    public const DEFAULT_FORMATTER = FormatterName::DOT;
     public const DEFAULT_NO_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
     public const DEFAULT_INITIAL_TESTS_PHP_OPTIONS = null;

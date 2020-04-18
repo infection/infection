@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Console\OutputFormatter\FormatterName;
+use phpDocumentor\Reflection\DocBlock\Tags\Formatter;
 use function file_exists;
 use function implode;
 use Infection\Configuration\Configuration;
@@ -144,7 +146,10 @@ final class RunCommand extends BaseCommand
                 'formatter',
                 null,
                 InputOption::VALUE_REQUIRED,
-                '"dot" or "progress"',
+                sprintf(
+                    'Name of the formatter to use ("%s")',
+                    implode('", "', FormatterName::ALL)
+                ),
                 Container::DEFAULT_FORMATTER
             )
             ->addOption(
