@@ -634,7 +634,7 @@ final class ConfigurationFactoryTest extends TestCase
                 new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
             ],
             'src/Foo.php, src/Bar.php',
-            [],
+            ['vendor/'],
             Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
@@ -709,7 +709,7 @@ final class ConfigurationFactoryTest extends TestCase
                 new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
             ],
             'src/Foo.php, src/Bar.php',
-            ['exclude-dir'],
+            ['vendor/'],
             new Logs(
                 'text.log',
                 'summary.log',
