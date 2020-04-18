@@ -60,7 +60,7 @@ final class FormatterFactory
             $formatterName,
             FormatterName::ALL,
             sprintf(
-                'Unknown formatter "%%s". The known formatters are: "%s"',
+                'Unknown formatter %%s. The known formatters are: "%s"',
                 implode('", "', FormatterName::ALL)
             )
         );

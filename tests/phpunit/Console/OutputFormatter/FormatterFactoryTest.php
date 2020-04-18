@@ -41,6 +41,8 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\FormatterFactory;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\ProgressFormatter;
+use Infection\Tests\Fixtures\Console\FakeOutput;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -64,6 +66,16 @@ final class FormatterFactoryTest extends TestCase
         $formatter = (new FormatterFactory($outputMock))->create($formatterName);
 
         $this->assertInstanceOf($expectedFormatterClassName, $formatter);
+    }
+
+    public function test_it_provides_a_friendly_error_message_when_an_unknown_formatter_is_given(): void
+    {
+        $factory = new FormatterFactory(new FakeOutput());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown formatter "unknown". The known formatters are: "dot", "progress"');
+
+        $factory->create('unknown');
     }
 
     public static function formatterProvider(): iterable
