@@ -233,8 +233,10 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private function createContainer(InputInterface $input): Container
+    private function createContainer(IO $io): Container
     {
+        $input = $io->getInput();
+
         // Currently the configuration is mandatory hence there is no way to
         // say "do not use a config". If this becomes possible in the future
         // though, it will likely be a `--no-config` option rather than relying
@@ -254,6 +256,7 @@ final class RunCommand extends BaseCommand
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
         return $this->getApplication()->getContainer()->withValues(
+            $io->getOutput(),
             $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
             trim((string) $input->getOption('mutators')),
             // To keep in sync with Container::DEFAULT_SHOW_MUTATIONS

@@ -37,11 +37,13 @@ namespace Infection\Benchmark\Tracing;
 
 use Generator;
 use Infection\Container;
+use Symfony\Component\Console\Output\NullOutput;
 use function iterator_to_array;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $container = Container::create()->withValues(
+    new NullOutput(),
     Container::DEFAULT_CONFIG_FILE,
     Container::DEFAULT_MUTATORS_INPUT,
     Container::DEFAULT_SHOW_MUTATIONS,

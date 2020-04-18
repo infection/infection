@@ -58,7 +58,7 @@ final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberF
         MetricsCalculator $metricsCalculator,
         DiffColorizer $diffColorizer,
         bool $showMutations,
-        string $formatter
+        OutputFormatter $formatter
     ) {
         $this->metricsCalculator = $metricsCalculator;
         $this->diffColorizer = $diffColorizer;
@@ -70,23 +70,10 @@ final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberF
     {
         return new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->createOutputFormatter($output),
+            $this->formatter,
             $this->metricsCalculator,
             $this->diffColorizer,
             $this->showMutations
         );
-    }
-
-    private function createOutputFormatter(OutputInterface $output): OutputFormatter
-    {
-        if ($this->formatter === 'progress') {
-            return new ProgressFormatter(new ProgressBar($output));
-        }
-
-        if ($this->formatter === 'dot') {
-            return new DotFormatter($output);
-        }
-
-        throw new InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
     }
 }

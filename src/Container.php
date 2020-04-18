@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\Console\OutputFormatter\FormatterFactory;
+use Infection\Console\OutputFormatter\NullFormatter;
+use Infection\Console\OutputFormatter\OutputFormatter;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -453,7 +458,7 @@ final class Container
                     $container->getMetricsCalculator(),
                     $container->getDiffColorizer(),
                     $config->showMutations(),
-                    $config->getFormatter()
+                    $container->getOutputFormatter()
                 );
             },
             MutationTestingResultsLoggerSubscriberFactory::class => static function (self $container): MutationTestingResultsLoggerSubscriberFactory {
@@ -564,9 +569,13 @@ final class Container
             MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
                 return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
             },
+            FormatterFactory::class => static function (self $container): FormatterFactory {
+                return new FormatterFactory($container->getOutput());
+            },
         ]);
 
         return $container->withValues(
+            new NullOutput(),
             self::DEFAULT_CONFIG_FILE,
             self::DEFAULT_MUTATORS_INPUT,
             self::DEFAULT_SHOW_MUTATIONS,
@@ -591,6 +600,7 @@ final class Container
     }
 
     public function withValues(
+        OutputInterface $output,
         ?string $configFile,
         string $mutatorsInput,
         bool $showMutations,
@@ -626,6 +636,20 @@ final class Container
                         ]
                     )
                 );
+            }
+        );
+
+        $clone->offsetSet(
+            OutputInterface::class,
+            static function () use ($output): OutputInterface {
+                return $output;
+            }
+        );
+
+        $clone->offsetSet(
+            OutputFormatter::class,
+            static function (self $container) use ($formatter): OutputFormatter {
+                return $container->getFormatterFactory()->create($formatter);
             }
         );
 
@@ -1030,6 +1054,21 @@ final class Container
     public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
     {
         return $this->get(MutantExecutionResultFactory::class);
+    }
+
+    public function getOutput(): OutputInterface
+    {
+        return $this->get(OutputInterface::class);
+    }
+
+    public function getFormatterFactory(): FormatterFactory
+    {
+        return $this->get(FormatterFactory::class);
+    }
+
+    public function getOutputFormatter(): OutputFormatter
+    {
+        return $this->get(OutputFormatter::class);
     }
 
     /**
