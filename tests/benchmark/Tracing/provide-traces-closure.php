@@ -37,8 +37,8 @@ namespace Infection\Benchmark\Tracing;
 
 use Generator;
 use Infection\Container;
-use Symfony\Component\Console\Output\NullOutput;
 use function iterator_to_array;
+use Symfony\Component\Console\Output\NullOutput;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 

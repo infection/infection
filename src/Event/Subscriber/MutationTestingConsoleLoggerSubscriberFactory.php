@@ -35,13 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Metrics\MetricsCalculator;
-use InvalidArgumentException;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**

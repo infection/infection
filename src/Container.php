@@ -35,12 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\Console\OutputFormatter\FormatterFactory;
-use Infection\Console\OutputFormatter\FormatterName;
-use Infection\Console\OutputFormatter\NullFormatter;
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -55,6 +49,9 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
+use Infection\Console\OutputFormatter\FormatterFactory;
+use Infection\Console\OutputFormatter\FormatterName;
+use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
@@ -131,6 +128,8 @@ use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
@@ -663,7 +662,6 @@ final class Container
                 $logVerbosity,
                 $debug,
                 $onlyCovered,
-                $formatterName,
                 $noProgress,
                 $ignoreMsiWithNoMutations,
                 $minMsi,
@@ -685,7 +683,6 @@ final class Container
                     $logVerbosity,
                     $debug,
                     $onlyCovered,
-                    $formatterName,
                     $noProgress,
                     $ignoreMsiWithNoMutations,
                     $minMsi,

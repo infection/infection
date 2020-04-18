@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Infection\Console\OutputFormatter\FormatterName;
-use phpDocumentor\Reflection\DocBlock\Tags\Formatter;
 use function file_exists;
 use function implode;
 use Infection\Configuration\Configuration;
@@ -45,6 +43,7 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
+use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\XdebugHandler;
 use Infection\Container;
 use Infection\Engine;
@@ -57,7 +56,6 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use function trim;
