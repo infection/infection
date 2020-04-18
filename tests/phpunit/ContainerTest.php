@@ -81,7 +81,7 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_LOG_VERBOSITY,
             Container::DEFAULT_DEBUG,
             Container::DEFAULT_ONLY_COVERED,
-            Container::DEFAULT_FORMATTER,
+            Container::DEFAULT_FORMATTER_NAME,
             Container::DEFAULT_NO_PROGRESS,
             '/path/to/coverage',
             Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,

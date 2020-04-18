@@ -146,7 +146,7 @@ final class Container
     public const DEFAULT_LOG_VERBOSITY = LogVerbosity::NORMAL;
     public const DEFAULT_DEBUG = false;
     public const DEFAULT_ONLY_COVERED = false;
-    public const DEFAULT_FORMATTER = FormatterName::DOT;
+    public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
     public const DEFAULT_NO_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
     public const DEFAULT_INITIAL_TESTS_PHP_OPTIONS = null;
@@ -583,7 +583,7 @@ final class Container
             self::DEFAULT_LOG_VERBOSITY,
             self::DEFAULT_DEBUG,
             self::DEFAULT_ONLY_COVERED,
-            self::DEFAULT_FORMATTER,
+            self::DEFAULT_FORMATTER_NAME,
             self::DEFAULT_NO_PROGRESS,
             self::DEFAULT_EXISTING_COVERAGE_PATH,
             self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
@@ -608,7 +608,7 @@ final class Container
         string $logVerbosity,
         bool $debug,
         bool $onlyCovered,
-        string $formatter,
+        string $formatterName,
         bool $noProgress,
         ?string $existingCoveragePath,
         ?string $initialTestsPhpOptions,
@@ -649,8 +649,8 @@ final class Container
 
         $clone->offsetSet(
             OutputFormatter::class,
-            static function (self $container) use ($formatter): OutputFormatter {
-                return $container->getFormatterFactory()->create($formatter);
+            static function (self $container) use ($formatterName): OutputFormatter {
+                return $container->getFormatterFactory()->create($formatterName);
             }
         );
 
@@ -663,7 +663,7 @@ final class Container
                 $logVerbosity,
                 $debug,
                 $onlyCovered,
-                $formatter,
+                $formatterName,
                 $noProgress,
                 $ignoreMsiWithNoMutations,
                 $minMsi,
@@ -685,7 +685,7 @@ final class Container
                     $logVerbosity,
                     $debug,
                     $onlyCovered,
-                    $formatter,
+                    $formatterName,
                     $noProgress,
                     $ignoreMsiWithNoMutations,
                     $minMsi,

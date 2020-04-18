@@ -150,7 +150,7 @@ final class RunCommand extends BaseCommand
                     'Name of the formatter to use ("%s")',
                     implode('", "', FormatterName::ALL)
                 ),
-                Container::DEFAULT_FORMATTER
+                Container::DEFAULT_FORMATTER_NAME
             )
             ->addOption(
                 'min-msi',
