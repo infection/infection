@@ -39,6 +39,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Tests\Fixtures\Console\FakeOutputFormatter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -71,15 +72,15 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider valuesProvider
+     * @dataProvider showMutationsProvider
      */
-    public function test_it_creates_a_subscriber(string $formatter, bool $showMutations): void
+    public function test_it_creates_a_subscriber(bool $showMutations): void
     {
         $factory = new MutationTestingConsoleLoggerSubscriberFactory(
             $this->metricsCalculatorMock,
             $this->diffColorizerMock,
             $showMutations,
-            $formatter
+            new FakeOutputFormatter()
         );
 
         $outputMock = $this->createMock(OutputInterface::class);
@@ -93,15 +94,10 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         $this->assertInstanceOf(MutationTestingConsoleLoggerSubscriber::class, $subscriber);
     }
 
-    public function valuesProvider(): iterable
+    public function showMutationsProvider(): iterable
     {
-        $formatters = ['dot', 'progress'];
-        $showMutationsValues = [true, false];
-
-        foreach ($formatters as $formatter) {
-            foreach ($showMutationsValues as $showMutations) {
-                yield [$formatter, $showMutations];
-            }
+        foreach ([true, false] as $showMutations) {
+            yield [$showMutations];
         }
     }
 }
