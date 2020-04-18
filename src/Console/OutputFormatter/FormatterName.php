@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
+/**
+ * @internal
+ */
 final class FormatterName
 {
     public const DOT = 'dot';

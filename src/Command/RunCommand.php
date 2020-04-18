@@ -207,7 +207,7 @@ final class RunCommand extends BaseCommand
 
     protected function executeCommand(IO $io): void
     {
-        $container = $this->createContainer($io->getInput());
+        $container = $this->createContainer($io);
         $consoleOutput = new ConsoleOutput($io);
 
         $this->startUp($container, $consoleOutput, $io);

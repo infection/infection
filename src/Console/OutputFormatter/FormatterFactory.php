@@ -42,6 +42,9 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class FormatterFactory
 {
     private $output;
