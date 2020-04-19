@@ -50,7 +50,7 @@ trait ConfigurationAssertions
 
     /**
      * @param string[] $expectedSourceDirectories
-     * @param string[] $sourceFilesExcludes
+     * @param string[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
      */
     private function assertConfigurationStateIs(
@@ -58,8 +58,8 @@ trait ConfigurationAssertions
         ?int $expectedTimeout,
         array $expectedSourceDirectories,
         array $expectedSourceFiles,
-        string $filter,
-        array $sourceFilesExcludes,
+        string $expectedFilter,
+        array $expectedSourceFilesExcludes,
         Logs $expectedLogs,
         string $expectedLogVerbosity,
         string $expectedTmpDir,
@@ -90,8 +90,8 @@ trait ConfigurationAssertions
             self::normalizePaths($expectedSourceFiles),
             self::normalizePaths($configuration->getSourceFiles())
         );
-        $this->assertSame($filter, $configuration->getSourceFilesFilter());
-        $this->assertSame($filter, $configuration->getSourceFilesFilter());
+        $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter());
+        $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes());
         $this->assertLogsStateIs(
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),
