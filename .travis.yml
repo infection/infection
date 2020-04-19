@@ -5,6 +5,7 @@ sudo: false
 env:
   global:
     - INFECTION_FLAGS="--threads=$(nproc) --coverage=coverage --log-verbosity=none --skip-initial-tests --no-progress"
+    # Warning: the min-msi flag is overridden in PRs (see .ci/travis-functions.sh)
     - MIN_MSI_FLAGS="--min-msi=68.00 --min-covered-msi=80.00"
     - PHPUNIT_BIN="vendor/bin/phpunit --stop-on-failure --prepend=tests/xdebug-filter.php --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml"
     - COMPOSER_FLAGS="--no-interaction --no-progress --no-suggest --prefer-dist"

@@ -66,16 +66,18 @@ function xdebug_enable() {
 function get_infection_pr_flags() {
     local flags="";
     local changed_files;
+    local min_msi;
 
     if ! [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
         git remote set-branches --add origin "$TRAVIS_BRANCH";
         git fetch;
 
         changed_files=$(git diff origin/"$TRAVIS_BRANCH" --diff-filter=A --name-only | grep src/ | paste -sd "," -);
+        min_msi=$(($(grep -o 'min-msi=[0-9]*' .travis.yml | head | cut -f2 -d=) + 1))
 
         if [ -n "$changed_files" ]; then
             # Set those flags only if there is any changed files detected
-            flags="--filter=${changed_files} --ignore-msi-with-no-mutations --only-covered --show-mutations ${flags}";
+            flags="--filter=${changed_files} --ignore-msi-with-no-mutations --only-covered --min-msi=${min_msi} --show-mutations ${flags}";
         fi
     fi
 
