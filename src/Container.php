@@ -47,6 +47,8 @@ use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
+use Infection\Console\Input\MsiParser;
+use Infection\Console\LogVerbosity;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
@@ -132,6 +134,27 @@ use Webmozart\PathUtil\Path;
  */
 final class Container
 {
+    public const DEFAULT_CONFIG_FILE = null;
+    public const DEFAULT_MUTATORS_INPUT = '';
+    public const DEFAULT_SHOW_MUTATIONS = false;
+    public const DEFAULT_LOG_VERBOSITY = LogVerbosity::NORMAL;
+    public const DEFAULT_DEBUG = false;
+    public const DEFAULT_ONLY_COVERED = false;
+    public const DEFAULT_FORMATTER = 'dot';
+    public const DEFAULT_NO_PROGRESS = false;
+    public const DEFAULT_EXISTING_COVERAGE_PATH = null;
+    public const DEFAULT_INITIAL_TESTS_PHP_OPTIONS = null;
+    public const DEFAULT_SKIP_INITIAL_TESTS = false;
+    public const DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS = false;
+    public const DEFAULT_MIN_MSI = null;
+    public const DEFAULT_MIN_COVERED_MSI = null;
+    public const DEFAULT_MSI_PRECISION = MsiParser::DEFAULT_PRECISION;
+    public const DEFAULT_TEST_FRAMEWORK = null;
+    public const DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
+    public const DEFAULT_FILTER = '';
+    public const DEFAULT_THREAD_COUNT = 1;
+    public const DEFAULT_DRY_RUN = false;
+
     /**
      * @var array<class-string<object>, true>
      */
@@ -158,13 +181,13 @@ final class Container
     public function __construct(array $values)
     {
         foreach ($values as $id => $value) {
-            $this->offsetAdd($id, $value);
+            $this->offsetSet($id, $value);
         }
     }
 
     public static function create(): self
     {
-        return new self([
+        $container = new self([
             Filesystem::class => static function (): Filesystem {
                 return new Filesystem();
             },
@@ -542,9 +565,32 @@ final class Container
                 return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
             },
         ]);
+
+        return $container->withValues(
+            self::DEFAULT_CONFIG_FILE,
+            self::DEFAULT_MUTATORS_INPUT,
+            self::DEFAULT_SHOW_MUTATIONS,
+            self::DEFAULT_LOG_VERBOSITY,
+            self::DEFAULT_DEBUG,
+            self::DEFAULT_ONLY_COVERED,
+            self::DEFAULT_FORMATTER,
+            self::DEFAULT_NO_PROGRESS,
+            self::DEFAULT_EXISTING_COVERAGE_PATH,
+            self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
+            self::DEFAULT_SKIP_INITIAL_TESTS,
+            self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
+            self::DEFAULT_MIN_MSI,
+            self::DEFAULT_MIN_COVERED_MSI,
+            self::DEFAULT_MSI_PRECISION,
+            self::DEFAULT_TEST_FRAMEWORK,
+            self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+            self::DEFAULT_FILTER,
+            self::DEFAULT_THREAD_COUNT,
+            self::DEFAULT_DRY_RUN
+        );
     }
 
-    public function withDynamicParameters(
+    public function withValues(
         ?string $configFile,
         string $mutatorsInput,
         bool $showMutations,
@@ -568,7 +614,7 @@ final class Container
     ): self {
         $clone = clone $this;
 
-        $clone->offsetAdd(
+        $clone->offsetSet(
             SchemaConfiguration::class,
             static function (self $container) use ($configFile): SchemaConfiguration {
                 return $container->getSchemaConfigurationLoader()->loadConfiguration(
@@ -583,7 +629,7 @@ final class Container
             }
         );
 
-        $clone->offsetAdd(
+        $clone->offsetSet(
             Configuration::class,
             static function (self $container) use (
                 $existingCoveragePath,
@@ -636,6 +682,7 @@ final class Container
 
     public function getProjectDir(): string
     {
+        // TODO: cache that result
         return getcwd();
     }
 
@@ -989,11 +1036,11 @@ final class Container
      * @param class-string<object> $id
      * @param Closure(self): object $value
      */
-    private function offsetAdd(string $id, Closure $value): void
+    private function offsetSet(string $id, Closure $value): void
     {
         $this->keys[$id] = true;
-
         $this->factories[$id] = $value;
+        unset($this->values[$id]);
     }
 
     /**
