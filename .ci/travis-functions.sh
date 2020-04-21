@@ -56,7 +56,6 @@ function xdebug_enable() {
 # Globals:
 #   TRAVIS_PULL_REQUEST
 #   TRAVIS_BRANCH
-#   MIN_MSI
 #
 # Arguments:
 #   None
@@ -65,7 +64,7 @@ function xdebug_enable() {
 #   String
 #######################################
 function get_infection_pr_flags() {
-    local flags="--no-progress";
+    local flags="";
     local changed_files;
     local min_msi;
 
@@ -76,10 +75,9 @@ function get_infection_pr_flags() {
         changed_files=$(git diff origin/"$TRAVIS_BRANCH" --diff-filter=A --name-only | grep src/ | paste -sd "," -);
         min_msi=$(($(grep -o 'min-msi=[0-9]*' .travis.yml | head | cut -f2 -d=) + 1))
 
-        >&2 echo "Assumed minimal MSI: $min_msi%"
-
         if [ -n "$changed_files" ]; then
-            flags="--filter=${changed_files} --ignore-msi-with-no-mutations --only-covered --min-msi=${min_msi} --show-mutations $flags";
+            # Set those flags only if there is any changed files detected
+            flags="--filter=${changed_files} --ignore-msi-with-no-mutations --only-covered --min-msi=${min_msi} --show-mutations ${flags}";
         fi
     fi
 
