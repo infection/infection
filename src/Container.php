@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Symfony\Component\Console\Output\NullOutput;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -129,6 +128,7 @@ use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
