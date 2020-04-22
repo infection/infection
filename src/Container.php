@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Symfony\Component\Console\Output\NullOutput;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -574,6 +575,7 @@ final class Container
         ]);
 
         return $container->withValues(
+            new NullOutput(),
             self::DEFAULT_CONFIG_FILE,
             self::DEFAULT_MUTATORS_INPUT,
             self::DEFAULT_SHOW_MUTATIONS,
