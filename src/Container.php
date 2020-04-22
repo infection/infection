@@ -128,7 +128,6 @@ use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
@@ -575,7 +574,6 @@ final class Container
         ]);
 
         return $container->withValues(
-            new NullOutput(),
             self::DEFAULT_CONFIG_FILE,
             self::DEFAULT_MUTATORS_INPUT,
             self::DEFAULT_SHOW_MUTATIONS,
