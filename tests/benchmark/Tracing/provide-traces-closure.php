@@ -41,27 +41,27 @@ use function iterator_to_array;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-$container = Container::create()->withDynamicParameters(
-    null,
-    '',
-    false,
-    'default',
-    false,
-    false,
-    'dot',
-    false,
+$container = Container::create()->withValues(
+    Container::DEFAULT_CONFIG_FILE,
+    Container::DEFAULT_MUTATORS_INPUT,
+    Container::DEFAULT_SHOW_MUTATIONS,
+    Container::DEFAULT_LOG_VERBOSITY,
+    Container::DEFAULT_DEBUG,
+    Container::DEFAULT_ONLY_COVERED,
+    Container::DEFAULT_FORMATTER,
+    Container::DEFAULT_NO_PROGRESS,
     __DIR__ . '/coverage',
-    '',
-    false,
-    false,
-    .0,
-    .0,
-    2,
-    'phpunit',
-    '',
-    '',
-    0,
-    true
+    Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
+    Container::DEFAULT_SKIP_INITIAL_TESTS,
+    Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
+    Container::DEFAULT_MIN_MSI,
+    Container::DEFAULT_MIN_COVERED_MSI,
+    Container::DEFAULT_MSI_PRECISION,
+    Container::DEFAULT_TEST_FRAMEWORK,
+    Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+    Container::DEFAULT_FILTER,
+    Container::DEFAULT_THREAD_COUNT,
+    Container::DEFAULT_DRY_RUN
 );
 
 $generateTraces = static function (?int $maxCount) use ($container): iterable {

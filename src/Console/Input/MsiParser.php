@@ -52,10 +52,11 @@ use Webmozart\Assert\Assert;
 final class MsiParser
 {
     use CannotBeInstantiated;
+    public const DEFAULT_PRECISION = 2;
 
     public static function detectPrecision(?string ...$values): int
     {
-        $precisions = [2];
+        $precisions = [self::DEFAULT_PRECISION];
 
         foreach ($values as $value) {
             $value = trim((string) $value);

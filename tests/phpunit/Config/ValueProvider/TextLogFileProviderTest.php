@@ -37,11 +37,12 @@ namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TextLogFileProvider;
+use Infection\Console\IO;
 
 /**
  * @group integration
  */
-final class TextLogFileProviderTest extends AbstractBaseProviderTest
+final class TextLogFileProviderTest extends BaseProviderTest
 {
     /**
      * @var TextLogFileProvider
@@ -59,8 +60,10 @@ final class TextLogFileProviderTest extends AbstractBaseProviderTest
     public function test_it_uses_default_value(): void
     {
         $textLogFilePath = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("\n")),
+                $this->createStreamOutput()
+            ),
             []
         );
 
@@ -72,8 +75,10 @@ final class TextLogFileProviderTest extends AbstractBaseProviderTest
         $inputValue = 'test-log.txt';
 
         $textLogFilePath = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("{$inputValue}\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("{$inputValue}\n")),
+                $this->createStreamOutput()
+            ),
             []
         );
 

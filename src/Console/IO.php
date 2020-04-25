@@ -33,64 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Console;
 
-use function array_map;
-use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
-use function iterator_to_array;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+/**
+ * @internal
+ */
+final class IO extends SymfonyStyle
+{
+    private $input;
+    private $output;
 
-$container = Container::create();
+    public function __construct(InputInterface $input, OutputInterface $output)
+    {
+        parent::__construct($input, $output);
 
-$files = Finder::create()
-    ->files()
-    ->in(__DIR__ . '/sources')
-    ->name('*.php')
-;
-
-// Since those files are not autoloaded, we need to manually autoload them
-require_once __DIR__ . '/sources/autoload.php';
-
-$traces = array_map(
-    static function (SplFileInfo $fileInfo): Trace {
-        require_once $fileInfo->getRealPath();
-
-        return new PartialTrace($fileInfo);
-    },
-    iterator_to_array($files, false)
-);
-
-$mutators = $container->getMutatorFactory()->create(
-    $container->getMutatorResolver()->resolve(['@default' => true])
-);
-
-$fileMutationGenerator = $container->getFileMutationGenerator();
-
-return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
+        $this->input = $input;
+        $this->output = $output;
     }
 
-    $count = 0;
-
-    foreach ($traces as $trace) {
-        $mutations = $fileMutationGenerator->generate(
-            $trace,
-            false,
-            $mutators,
-            []
+    public static function createNull(): self
+    {
+        return new self(
+            new StringInput(''),
+            new NullOutput()
         );
-
-        foreach ($mutations as $_) {
-            ++$count;
-
-            if ($maxCount !== null && $count === $maxCount) {
-                return;
-            }
-        }
     }
-};
+
+    public function getInput(): InputInterface
+    {
+        return $this->input;
+    }
+
+    public function isInteractive(): bool
+    {
+        return $this->input->isInteractive();
+    }
+
+    public function getOutput(): OutputInterface
+    {
+        return $this->output;
+    }
+}

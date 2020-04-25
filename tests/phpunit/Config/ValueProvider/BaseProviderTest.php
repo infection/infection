@@ -33,64 +33,72 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Tests\Config\ValueProvider;
 
-use function array_map;
-use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
-use function iterator_to_array;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use function exec;
+use PHPUnit\Framework\TestCase;
+use function Safe\fopen;
+use function Safe\fwrite;
+use function Safe\rewind;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\StreamOutput;
+use Webmozart\Assert\Assert;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+abstract class BaseProviderTest extends TestCase
+{
+    protected static $stty;
 
-$container = Container::create();
-
-$files = Finder::create()
-    ->files()
-    ->in(__DIR__ . '/sources')
-    ->name('*.php')
-;
-
-// Since those files are not autoloaded, we need to manually autoload them
-require_once __DIR__ . '/sources/autoload.php';
-
-$traces = array_map(
-    static function (SplFileInfo $fileInfo): Trace {
-        require_once $fileInfo->getRealPath();
-
-        return new PartialTrace($fileInfo);
-    },
-    iterator_to_array($files, false)
-);
-
-$mutators = $container->getMutatorFactory()->create(
-    $container->getMutatorResolver()->resolve(['@default' => true])
-);
-
-$fileMutationGenerator = $container->getFileMutationGenerator();
-
-return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
+    final protected function getQuestionHelper(): QuestionHelper
+    {
+        return new QuestionHelper();
     }
 
-    $count = 0;
+    /**
+     * @return resource
+     */
+    final protected function getInputStream(string $input)
+    {
+        $stream = fopen('php://memory', 'rb+', false);
+        fwrite($stream, $input);
+        rewind($stream);
 
-    foreach ($traces as $trace) {
-        $mutations = $fileMutationGenerator->generate(
-            $trace,
-            false,
-            $mutators,
-            []
-        );
+        return $stream;
+    }
 
-        foreach ($mutations as $_) {
-            ++$count;
+    final protected function createStreamOutput(): StreamOutput
+    {
+        return new StreamOutput(fopen('php://memory', 'rb+', false));
+    }
 
-            if ($maxCount !== null && $count === $maxCount) {
-                return;
-            }
+    /**
+     * @param resource $stream
+     */
+    final protected function createStreamableInput(
+        $stream,
+        bool $interactive = true
+    ): InputInterface {
+        Assert::resource($stream);
+
+        $input = new StringInput('');
+        $input->setStream($stream);
+        $input->setInteractive($interactive);
+
+        return $input;
+    }
+
+    /**
+     * @see \Symfony\Component\Console\Terminal::hasSttyAvailable()
+     */
+    final protected function hasSttyAvailable(): bool
+    {
+        if (self::$stty !== null) {
+            return self::$stty;
         }
+
+        exec('stty 2>&1', $output, $exitcode);
+
+        return self::$stty = $exitcode === 0;
     }
-};
+}
