@@ -33,51 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Environment;
+namespace Infection\Tests\CI;
 
-use OndraM\CiDetector\CiDetector;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
-use function trim;
+use function array_key_exists;
+use OndraM\CiDetector\Env;
 
-/**
- * @internal
- */
-final class BuildContextResolver
+final class ConfigurableEnv extends Env
 {
-    private $ciDetector;
+    private $variables = [];
 
-    public function __construct(CiDetector $ciDetector)
+    /**
+     * @param array<string, string|false> $variables
+     */
+    public function setVariables(array $variables): void
     {
-        $this->ciDetector = $ciDetector;
+        $this->variables = $variables;
     }
 
-    public function resolve(): BuildContext
+    public function get(string $name)
     {
-        try {
-            $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException $exception) {
-            throw new CouldNotResolveBuildContext('The current process is not executed in a CI build');
+        if (!array_key_exists($name, $this->variables)) {
+            return false;
         }
 
-        if ($ci->isPullRequest()->yes()) {
-            throw new CouldNotResolveBuildContext('The current process is a pull request build');
-        }
-
-        if ($ci->isPullRequest()->maybe()) {
-            throw new CouldNotResolveBuildContext('The current process may be a pull request build');
-        }
-
-        if (trim($ci->getRepositoryName()) === '') {
-            throw new CouldNotResolveBuildContext('The repository name could not be determined for the current process');
-        }
-
-        if (trim($ci->getGitBranch()) === '') {
-            throw new CouldNotResolveBuildContext('The branch name could not be determined for the current process');
-        }
-
-        return new BuildContext(
-            $ci->getRepositoryName(),
-            $ci->getGitBranch()
-        );
+        return $this->variables[$name];
     }
 }

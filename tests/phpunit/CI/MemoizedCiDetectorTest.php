@@ -33,51 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Environment;
+namespace Infection\Tests\CI;
 
-use OndraM\CiDetector\CiDetector;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
-use function trim;
+use Infection\CI\MemoizedCiDetector;
+use OndraM\CiDetector\Env;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class BuildContextResolver
+final class MemoizedCiDetectorTest extends TestCase
 {
-    private $ciDetector;
-
-    public function __construct(CiDetector $ciDetector)
+    public function test_it_can_be_instantiated_from_environment(): void
     {
-        $this->ciDetector = $ciDetector;
+        $detector = MemoizedCiDetector::fromEnvironment(new Env());
+
+        $this->assertInstanceOf(MemoizedCiDetector::class, $detector);
     }
 
-    public function resolve(): BuildContext
+    public function test_it_runs_the_detection_only_once(): void
     {
-        try {
-            $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException $exception) {
-            throw new CouldNotResolveBuildContext('The current process is not executed in a CI build');
-        }
+        $env = new ConfigurableEnv();
 
-        if ($ci->isPullRequest()->yes()) {
-            throw new CouldNotResolveBuildContext('The current process is a pull request build');
-        }
+        $detector0 = MemoizedCiDetector::fromEnvironment($env);
+        $detector1 = MemoizedCiDetector::fromEnvironment($env);
 
-        if ($ci->isPullRequest()->maybe()) {
-            throw new CouldNotResolveBuildContext('The current process may be a pull request build');
-        }
+        $this->assertFalse($detector0->isCiDetected());
 
-        if (trim($ci->getRepositoryName()) === '') {
-            throw new CouldNotResolveBuildContext('The repository name could not be determined for the current process');
-        }
+        $env->setVariables(['TRAVIS' => true]);
 
-        if (trim($ci->getGitBranch()) === '') {
-            throw new CouldNotResolveBuildContext('The branch name could not be determined for the current process');
-        }
+        $this->assertFalse($detector0->isCiDetected());
+        $this->assertTrue($detector1->isCiDetected());
 
-        return new BuildContext(
-            $ci->getRepositoryName(),
-            $ci->getGitBranch()
-        );
+        $env->setVariables([]);
+
+        $this->assertTrue($detector1->isCiDetected());
     }
 }

@@ -52,6 +52,7 @@ $container = Container::create()->withValues(
     Container::DEFAULT_ONLY_COVERED,
     Container::DEFAULT_FORMATTER,
     Container::DEFAULT_NO_PROGRESS,
+    Container::DEFAULT_FORCE_PROGRESS,
     __DIR__ . '/coverage',
     Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
     Container::DEFAULT_SKIP_INITIAL_TESTS,

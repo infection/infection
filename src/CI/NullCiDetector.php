@@ -33,28 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Double\OndraM\CiDetector;
+namespace Infection\CI;
 
+use OndraM\CiDetector\Ci\CiInterface;
+use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\Env;
+use OndraM\CiDetector\Exception\CiNotDetectedException;
 
-final class ConfigurableEnv extends Env
+/**
+ * @internal
+ */
+final class NullCiDetector extends CiDetector
 {
-    private $variables = [];
-
-    /**
-     * @param array<string, string|false> $variables
-     */
-    public function setVariables(array $variables): void
+    public static function fromEnvironment(Env $environment): CiDetector
     {
-        $this->variables = $variables;
+        return new self();
     }
 
-    public function get(string $name)
+    public function isCiDetected(): bool
     {
-        if (!array_key_exists($name, $this->variables)) {
-            return false;
-        }
+        return false;
+    }
 
-        return $this->variables[$name];
+    public function detect(): CiInterface
+    {
+        throw new CiNotDetectedException('No CI server detectable with this detector');
     }
 }
