@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\CI\MemoizedCiDetector;
 use function array_filter;
 use function array_key_exists;
 use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;

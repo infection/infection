@@ -58,6 +58,6 @@ final class NullCiDetectorTest extends TestCase
         $this->expectException(CiNotDetectedException::class);
         $this->expectExceptionMessage('No CI server detectable with this detector');
 
-        $this->assertNull($detector->detect());
+        $detector->detect();
     }
 }
