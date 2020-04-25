@@ -33,30 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\CI;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Logger\LoggerFactory;
-use Symfony\Component\Console\Output\OutputInterface;
+use function array_key_exists;
+use OndraM\CiDetector\Env;
 
-/**
- * @internal
- */
-final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
+final class ConfigurableEnv extends Env
 {
-    private $loggerFactory;
-    private $logsConfig;
+    private $variables = [];
 
-    public function __construct(LoggerFactory $loggerFactory, Logs $logsConfig)
+    /**
+     * @param array<string, string|false> $variables
+     */
+    public function setVariables(array $variables): void
     {
-        $this->loggerFactory = $loggerFactory;
-        $this->logsConfig = $logsConfig;
+        $this->variables = $variables;
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function get(string $name)
     {
-        return new MutationTestingResultsLoggerSubscriber(
-            $this->loggerFactory->createFromLogEntries($this->logsConfig)
-        );
+        if (!array_key_exists($name, $this->variables)) {
+            return false;
+        }
+
+        return $this->variables[$name];
     }
 }

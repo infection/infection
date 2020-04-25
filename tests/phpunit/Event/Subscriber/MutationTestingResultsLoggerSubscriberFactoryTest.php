@@ -49,12 +49,10 @@ final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
     {
         $logsConfig = Logs::createEmpty();
 
-        $output = new FakeOutput();
-
         $loggerFactoryMock = $this->createMock(LoggerFactory::class);
         $loggerFactoryMock
             ->method('createFromLogEntries')
-            ->with($logsConfig, $output)
+            ->with($logsConfig)
             ->willReturn(new FakeMutationTestingResultsLogger())
         ;
 
@@ -63,7 +61,7 @@ final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
             $logsConfig
         );
 
-        $subscriber = $factory->create($output);
+        $subscriber = $factory->create(new FakeOutput());
 
         $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
     }

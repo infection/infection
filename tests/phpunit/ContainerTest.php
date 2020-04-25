@@ -39,6 +39,7 @@ use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
 
 /**
@@ -74,6 +75,7 @@ final class ContainerTest extends TestCase
     public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
     {
         $newContainer = SingletonContainer::getContainer()->withValues(
+            new NullLogger(),
             new NullOutput(),
             Container::DEFAULT_CONFIG_FILE,
             Container::DEFAULT_MUTATORS_INPUT,
@@ -83,6 +85,7 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_ONLY_COVERED,
             Container::DEFAULT_FORMATTER_NAME,
             Container::DEFAULT_NO_PROGRESS,
+            Container::DEFAULT_FORCE_PROGRESS,
             '/path/to/coverage',
             Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
             Container::DEFAULT_SKIP_INITIAL_TESTS,
@@ -107,5 +110,38 @@ final class ContainerTest extends TestCase
         foreach ($traces as $trace) {
             $this->fail();
         }
+    }
+
+    public function test_it_provides_a_friendly_error_when_attempting_to_configure_it_with_both_no_progress_and_force_progress(): void
+    {
+        $container = SingletonContainer::getContainer();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot force progress and set no progress at the same time');
+
+        $container->withValues(
+            new NullLogger(),
+            Container::DEFAULT_CONFIG_FILE,
+            Container::DEFAULT_MUTATORS_INPUT,
+            Container::DEFAULT_SHOW_MUTATIONS,
+            Container::DEFAULT_LOG_VERBOSITY,
+            Container::DEFAULT_DEBUG,
+            Container::DEFAULT_ONLY_COVERED,
+            Container::DEFAULT_FORMATTER,
+            true,
+            true,
+            Container::DEFAULT_EXISTING_COVERAGE_PATH,
+            Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
+            Container::DEFAULT_SKIP_INITIAL_TESTS,
+            Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
+            Container::DEFAULT_MIN_MSI,
+            Container::DEFAULT_MIN_COVERED_MSI,
+            Container::DEFAULT_MSI_PRECISION,
+            Container::DEFAULT_TEST_FRAMEWORK,
+            Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+            Container::DEFAULT_FILTER,
+            Container::DEFAULT_THREAD_COUNT,
+            Container::DEFAULT_DRY_RUN
+        );
     }
 }

@@ -33,30 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\CI;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Logger\LoggerFactory;
-use Symfony\Component\Console\Output\OutputInterface;
+use OndraM\CiDetector\Ci\CiInterface;
+use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\Env;
+use ReflectionClass;
 
 /**
  * @internal
+ *
+ * TODO: for now we are forced to extend CiDetector which is not ideal since we need to mind all
+ *  the API of the parent. See https://github.com/OndraM/ci-detector/issues/64
  */
-final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
+final class MemoizedCiDetector extends CiDetector
 {
-    private $loggerFactory;
-    private $logsConfig;
+    /**
+     * @var CiInterface|false|null
+     */
+    private $ci = false;
 
-    public function __construct(LoggerFactory $loggerFactory, Logs $logsConfig)
+    public static function fromEnvironment(Env $environment): CiDetector
     {
-        $this->loggerFactory = $loggerFactory;
-        $this->logsConfig = $logsConfig;
+        $detector = new self();
+
+        // TODO: this is an ugly hack to due to a design flaw in ondram\ci-detector
+        //  See https://github.com/OndraM/ci-detector/pull/65
+        $environmentReflection = (new ReflectionClass(CiDetector::class))->getProperty('environment');
+        $environmentReflection->setAccessible(true);
+        $environmentReflection->setValue($detector, $environment);
+
+        return $detector;
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    protected function detectCurrentCiServer(): ?CiInterface
     {
-        return new MutationTestingResultsLoggerSubscriber(
-            $this->loggerFactory->createFromLogEntries($this->logsConfig)
-        );
+        if ($this->ci === false) {
+            $this->ci = parent::detectCurrentCiServer();
+        }
+
+        return $this->ci;
     }
 }

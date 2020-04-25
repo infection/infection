@@ -33,30 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\CI;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Logger\LoggerFactory;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\CI\NullCiDetector;
+use OndraM\CiDetector\Env;
+use OndraM\CiDetector\Exception\CiNotDetectedException;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
+final class NullCiDetectorTest extends TestCase
 {
-    private $loggerFactory;
-    private $logsConfig;
-
-    public function __construct(LoggerFactory $loggerFactory, Logs $logsConfig)
+    public function test_it_can_be_instantiated_from_environment(): void
     {
-        $this->loggerFactory = $loggerFactory;
-        $this->logsConfig = $logsConfig;
+        $detector = NullCiDetector::fromEnvironment(new Env());
+
+        $this->assertInstanceOf(NullCiDetector::class, $detector);
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function test_it_does_not_detect_any__ci(): void
     {
-        return new MutationTestingResultsLoggerSubscriber(
-            $this->loggerFactory->createFromLogEntries($this->logsConfig)
-        );
+        $detector = new NullCiDetector();
+
+        $this->assertFalse($detector->isCiDetected());
+
+        $this->expectException(CiNotDetectedException::class);
+        $this->expectExceptionMessage('No CI server detectable with this detector');
+
+        $detector->detect();
     }
 }

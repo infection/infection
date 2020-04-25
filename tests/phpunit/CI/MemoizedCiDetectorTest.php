@@ -33,30 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\CI;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Logger\LoggerFactory;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\CI\MemoizedCiDetector;
+use OndraM\CiDetector\Env;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
+final class MemoizedCiDetectorTest extends TestCase
 {
-    private $loggerFactory;
-    private $logsConfig;
-
-    public function __construct(LoggerFactory $loggerFactory, Logs $logsConfig)
+    public function test_it_can_be_instantiated_from_environment(): void
     {
-        $this->loggerFactory = $loggerFactory;
-        $this->logsConfig = $logsConfig;
+        $detector = MemoizedCiDetector::fromEnvironment(new Env());
+
+        $this->assertInstanceOf(MemoizedCiDetector::class, $detector);
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function test_it_runs_the_detection_only_once(): void
     {
-        return new MutationTestingResultsLoggerSubscriber(
-            $this->loggerFactory->createFromLogEntries($this->logsConfig)
-        );
+        $env = new ConfigurableEnv();
+
+        $detector0 = MemoizedCiDetector::fromEnvironment($env);
+        $detector1 = MemoizedCiDetector::fromEnvironment($env);
+
+        $this->assertFalse($detector0->isCiDetected());
+
+        $env->setVariables(['TRAVIS' => true]);
+
+        $this->assertFalse($detector0->isCiDetected());
+        $this->assertTrue($detector1->isCiDetected());
+
+        $env->setVariables([]);
+
+        $this->assertTrue($detector1->isCiDetected());
     }
 }

@@ -38,8 +38,9 @@ namespace Infection;
 use function array_filter;
 use function array_key_exists;
 use Closure;
-use function getenv;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\CI\MemoizedCiDetector;
+use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -118,12 +119,15 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
+use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
@@ -147,6 +151,7 @@ final class Container
     public const DEFAULT_ONLY_COVERED = false;
     public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
     public const DEFAULT_NO_PROGRESS = false;
+    public const DEFAULT_FORCE_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
     public const DEFAULT_INITIAL_TESTS_PHP_OPTIONS = null;
     public const DEFAULT_SKIP_INITIAL_TESTS = false;
@@ -360,7 +365,8 @@ final class Container
                     $container->getMutatorResolver(),
                     $container->getMutatorFactory(),
                     $container->getMutatorParser(),
-                    $container->getSourceFileCollector()
+                    $container->getSourceFileCollector(),
+                    $container->getCiDetector()
                 );
             },
             MutatorResolver::class => static function (): MutatorResolver {
@@ -430,26 +436,16 @@ final class Container
             InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
 
-                // TODO: this should be moved to the config & config factory instead
-                $skipProgressBar = $container->getConfiguration()->noProgress()
-                    || getenv('CI') === 'true'
-                    || getenv('CONTINUOUS_INTEGRATION') === 'true'
-                ;
-
                 return new InitialTestsConsoleLoggerSubscriberFactory(
-                    $skipProgressBar,
+                    $config->noProgress(),
                     $container->getTestFrameworkAdapter(),
                     $config->isDebugEnabled()
                 );
             },
             MutationGeneratingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationGeneratingConsoleLoggerSubscriberFactory {
-                // TODO: this should be moved to the config & config factory instead
-                $skipProgressBar = $container->getConfiguration()->noProgress()
-                    || getenv('CI') === 'true'
-                    || getenv('CONTINUOUS_INTEGRATION') === 'true'
-                ;
-
-                return new MutationGeneratingConsoleLoggerSubscriberFactory($skipProgressBar);
+                return new MutationGeneratingConsoleLoggerSubscriberFactory(
+                    $container->getConfiguration()->noProgress()
+                );
             },
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
@@ -498,7 +494,9 @@ final class Container
                     $container->getFileSystem(),
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
-                    $config->mutateOnlyCoveredCode()
+                    $config->mutateOnlyCoveredCode(),
+                    $container->getCiDetector(),
+                    $container->getLogger()
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
@@ -536,7 +534,7 @@ final class Container
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
-                    $container->getConfiguration()->noProgress()
+                    $config->noProgress()
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
@@ -575,6 +573,7 @@ final class Container
         ]);
 
         return $container->withValues(
+            new NullLogger(),
             new NullOutput(),
             self::DEFAULT_CONFIG_FILE,
             self::DEFAULT_MUTATORS_INPUT,
@@ -584,6 +583,7 @@ final class Container
             self::DEFAULT_ONLY_COVERED,
             self::DEFAULT_FORMATTER_NAME,
             self::DEFAULT_NO_PROGRESS,
+            self::DEFAULT_FORCE_PROGRESS,
             self::DEFAULT_EXISTING_COVERAGE_PATH,
             self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
             self::DEFAULT_SKIP_INITIAL_TESTS,
@@ -600,6 +600,7 @@ final class Container
     }
 
     public function withValues(
+        LoggerInterface $logger,
         OutputInterface $output,
         ?string $configFile,
         string $mutatorsInput,
@@ -609,6 +610,7 @@ final class Container
         bool $onlyCovered,
         string $formatterName,
         bool $noProgress,
+        bool $forceProgress,
         ?string $existingCoveragePath,
         ?string $initialTestsPhpOptions,
         bool $skipInitialTests,
@@ -623,6 +625,24 @@ final class Container
         bool $dryRun
     ): self {
         $clone = clone $this;
+
+        if ($forceProgress) {
+            Assert::false($noProgress, 'Cannot force progress and set no progress at the same time');
+        }
+
+        $clone->offsetSet(
+            CiDetector::class,
+            static function () use ($forceProgress): CiDetector {
+                return $forceProgress ? new NullCiDetector() : new MemoizedCiDetector();
+            }
+        );
+
+        $clone->offsetSet(
+            LoggerInterface::class,
+            static function () use ($logger): LoggerInterface {
+                return $logger;
+            }
+        );
 
         $clone->offsetSet(
             SchemaConfiguration::class,
@@ -1052,6 +1072,16 @@ final class Container
     public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
     {
         return $this->get(MutantExecutionResultFactory::class);
+    }
+
+    public function getCiDetector(): CiDetector
+    {
+        return $this->get(CiDetector::class);
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->get(LoggerInterface::class);
     }
 
     public function getOutput(): OutputInterface
