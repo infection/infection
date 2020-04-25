@@ -33,43 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
-
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffColorizer;
-use Infection\Metrics\MetricsCalculator;
-use Symfony\Component\Console\Output\OutputInterface;
+namespace Infection\Console\OutputFormatter;
 
 /**
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final class FormatterName
 {
-    private $metricsCalculator;
-    private $diffColorizer;
-    private $showMutations;
-    private $formatter;
+    public const DOT = 'dot';
+    public const PROGRESS = 'progress';
 
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        DiffColorizer $diffColorizer,
-        bool $showMutations,
-        OutputFormatter $formatter
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->diffColorizer = $diffColorizer;
-        $this->showMutations = $showMutations;
-        $this->formatter = $formatter;
-    }
+    public const ALL = [
+        self::DOT,
+        self::PROGRESS,
+    ];
 
-    public function create(OutputInterface $output): EventSubscriber
+    private function __construct()
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->diffColorizer,
-            $this->showMutations
-        );
     }
 }

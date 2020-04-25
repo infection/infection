@@ -43,6 +43,7 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
+use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\XdebugHandler;
 use Infection\Container;
 use Infection\Engine;
@@ -151,8 +152,11 @@ final class RunCommand extends BaseCommand
                 'formatter',
                 null,
                 InputOption::VALUE_REQUIRED,
-                '"dot" or "progress"',
-                Container::DEFAULT_FORMATTER
+                sprintf(
+                    'Name of the formatter to use ("%s")',
+                    implode('", "', FormatterName::ALL)
+                ),
+                Container::DEFAULT_FORMATTER_NAME
             )
             ->addOption(
                 'min-msi',
@@ -272,6 +276,7 @@ final class RunCommand extends BaseCommand
 
         return $this->getApplication()->getContainer()->withValues(
             $logger,
+            $io->getOutput(),
             $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
             trim((string) $input->getOption('mutators')),
             // To keep in sync with Container::DEFAULT_SHOW_MUTATIONS

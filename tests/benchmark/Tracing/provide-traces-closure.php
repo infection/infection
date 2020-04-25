@@ -39,18 +39,20 @@ use Generator;
 use Infection\Container;
 use function iterator_to_array;
 use Psr\Log\NullLogger;
+use Symfony\Component\Console\Output\NullOutput;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $container = Container::create()->withValues(
     new NullLogger(),
+    new NullOutput(),
     Container::DEFAULT_CONFIG_FILE,
     Container::DEFAULT_MUTATORS_INPUT,
     Container::DEFAULT_SHOW_MUTATIONS,
     Container::DEFAULT_LOG_VERBOSITY,
     Container::DEFAULT_DEBUG,
     Container::DEFAULT_ONLY_COVERED,
-    Container::DEFAULT_FORMATTER,
+    Container::DEFAULT_FORMATTER_NAME,
     Container::DEFAULT_NO_PROGRESS,
     Container::DEFAULT_FORCE_PROGRESS,
     __DIR__ . '/coverage',

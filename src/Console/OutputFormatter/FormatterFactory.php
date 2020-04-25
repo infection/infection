@@ -33,43 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Console\OutputFormatter;
 
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffColorizer;
-use Infection\Metrics\MetricsCalculator;
+use function implode;
+use LogicException;
+use function Safe\sprintf;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final class FormatterFactory
 {
-    private $metricsCalculator;
-    private $diffColorizer;
-    private $showMutations;
-    private $formatter;
+    private $output;
 
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        DiffColorizer $diffColorizer,
-        bool $showMutations,
-        OutputFormatter $formatter
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->diffColorizer = $diffColorizer;
-        $this->showMutations = $showMutations;
-        $this->formatter = $formatter;
+    public function __construct(OutputInterface $output)
+    {
+        $this->output = $output;
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(string $formatterName): OutputFormatter
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->diffColorizer,
-            $this->showMutations
+        Assert::oneOf(
+            $formatterName,
+            FormatterName::ALL,
+            sprintf(
+                'Unknown formatter %%s. The known formatters are: "%s"',
+                implode('", "', FormatterName::ALL)
+            )
         );
+
+        switch ($formatterName) {
+            case FormatterName::PROGRESS:
+                return new ProgressFormatter(new ProgressBar($this->output));
+
+            case FormatterName::DOT:
+                return new DotFormatter($this->output);
+        }
+
+        throw new LogicException('Unreachable statement');
     }
 }
