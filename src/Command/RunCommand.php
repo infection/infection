@@ -55,13 +55,13 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
+use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use function trim;
-use const PHP_SAPI;
 
 /**
  * @internal
@@ -365,8 +365,6 @@ final class RunCommand extends BaseCommand
 
         $io->writeln($application->getHelp());
         $io->newLine();
-
-        $this->logRunningWithDebugger($consoleOutput);
 
         if (!$application->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
