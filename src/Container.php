@@ -558,6 +558,9 @@ final class Container
             MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
                 return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
             },
+            CiDetector::class => static function (): CiDetector {
+                return new CiDetector();
+            },
         ]);
 
         return $container->withValues(
