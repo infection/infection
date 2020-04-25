@@ -33,51 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Environment;
+namespace Infection\Tests\CI;
 
-use OndraM\CiDetector\CiDetector;
+use Infection\CI\NullCiDetector;
+use OndraM\CiDetector\Env;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
-use function trim;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class BuildContextResolver
+final class NullCiDetectorTest extends TestCase
 {
-    private $ciDetector;
-
-    public function __construct(CiDetector $ciDetector)
+    public function test_it_can_be_instantiated_from_environment(): void
     {
-        $this->ciDetector = $ciDetector;
+        $detector = NullCiDetector::fromEnvironment(new Env());
+
+        $this->assertInstanceOf(NullCiDetector::class, $detector);
     }
 
-    public function resolve(): BuildContext
+    public function test_it_does_not_detect_any__ci(): void
     {
-        try {
-            $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException $exception) {
-            throw new CouldNotResolveBuildContext('The current process is not executed in a CI build');
-        }
+        $detector = new NullCiDetector();
 
-        if ($ci->isPullRequest()->yes()) {
-            throw new CouldNotResolveBuildContext('The current process is a pull request build');
-        }
+        $this->assertFalse($detector->isCiDetected());
 
-        if ($ci->isPullRequest()->maybe()) {
-            throw new CouldNotResolveBuildContext('The current process may be a pull request build');
-        }
+        $this->expectException(CiNotDetectedException::class);
+        $this->expectExceptionMessage('No CI server detectable with this detector');
 
-        if (trim($ci->getRepositoryName()) === '') {
-            throw new CouldNotResolveBuildContext('The repository name could not be determined for the current process');
-        }
-
-        if (trim($ci->getGitBranch()) === '') {
-            throw new CouldNotResolveBuildContext('The branch name could not be determined for the current process');
-        }
-
-        return new BuildContext(
-            $ci->getRepositoryName(),
-            $ci->getGitBranch()
-        );
+        $detector->detect();
     }
 }

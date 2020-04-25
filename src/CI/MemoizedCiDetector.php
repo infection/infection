@@ -33,51 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Environment;
+namespace Infection\CI;
 
+use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\CiDetector;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
-use function trim;
+use OndraM\CiDetector\Env;
+use ReflectionClass;
 
 /**
  * @internal
+ *
+ * TODO: for now we are forced to extend CiDetector which is not ideal since we need to mind all
+ *  the API of the parent. See https://github.com/OndraM/ci-detector/issues/64
  */
-final class BuildContextResolver
+final class MemoizedCiDetector extends CiDetector
 {
-    private $ciDetector;
+    /**
+     * @var CiInterface|false|null
+     */
+    private $ci = false;
 
-    public function __construct(CiDetector $ciDetector)
+    public static function fromEnvironment(Env $environment): CiDetector
     {
-        $this->ciDetector = $ciDetector;
+        $detector = new self();
+
+        // TODO: this is an ugly hack to due to a design flaw in ondram\ci-detector
+        //  See https://github.com/OndraM/ci-detector/pull/65
+        $environmentReflection = (new ReflectionClass(CiDetector::class))->getProperty('environment');
+        $environmentReflection->setAccessible(true);
+        $environmentReflection->setValue($detector, $environment);
+
+        return $detector;
     }
 
-    public function resolve(): BuildContext
+    protected function detectCurrentCiServer(): ?CiInterface
     {
-        try {
-            $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException $exception) {
-            throw new CouldNotResolveBuildContext('The current process is not executed in a CI build');
+        if ($this->ci === false) {
+            $this->ci = parent::detectCurrentCiServer();
         }
 
-        if ($ci->isPullRequest()->yes()) {
-            throw new CouldNotResolveBuildContext('The current process is a pull request build');
-        }
-
-        if ($ci->isPullRequest()->maybe()) {
-            throw new CouldNotResolveBuildContext('The current process may be a pull request build');
-        }
-
-        if (trim($ci->getRepositoryName()) === '') {
-            throw new CouldNotResolveBuildContext('The repository name could not be determined for the current process');
-        }
-
-        if (trim($ci->getGitBranch()) === '') {
-            throw new CouldNotResolveBuildContext('The branch name could not be determined for the current process');
-        }
-
-        return new BuildContext(
-            $ci->getRepositoryName(),
-            $ci->getGitBranch()
-        );
+        return $this->ci;
     }
 }

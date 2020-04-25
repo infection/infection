@@ -59,6 +59,7 @@ class LoggerFactory
     private $logVerbosity;
     private $debugMode;
     private $onlyCoveredCode;
+    private $ciDetector;
     private $logger;
 
     public function __construct(
@@ -67,6 +68,7 @@ class LoggerFactory
         string $logVerbosity,
         bool $debugMode,
         bool $onlyCoveredCode,
+        CiDetector $ciDetector,
         LoggerInterface $logger
     ) {
         $this->metricsCalculator = $metricsCalculator;
@@ -74,6 +76,7 @@ class LoggerFactory
         $this->logVerbosity = $logVerbosity;
         $this->debugMode = $debugMode;
         $this->onlyCoveredCode = $onlyCoveredCode;
+        $this->ciDetector = $ciDetector;
         $this->logger = $logger;
     }
 
@@ -157,7 +160,7 @@ class LoggerFactory
         return $badge === null
             ? null
             : new BadgeLogger(
-                new BuildContextResolver(new CiDetector()),
+                new BuildContextResolver($this->ciDetector),
                 new StrykerApiKeyResolver(),
                 new StrykerDashboardClient(
                     new StrykerCurlClient(),

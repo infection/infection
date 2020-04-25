@@ -54,12 +54,14 @@ use Infection\FileSystem\Locator\Locator;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use function trim;
+use const PHP_SAPI;
 
 /**
  * @internal
@@ -111,7 +113,13 @@ final class RunCommand extends BaseCommand
                 'no-progress',
                 null,
                 InputOption::VALUE_NONE,
-                'Do not output progress bars'
+                'Do not output progress bars and mutation count during progress. Automatically enabled if a CI is detected'
+            )
+            ->addOption(
+                'force-progress',
+                null,
+                InputOption::VALUE_NONE,
+                'Output progress bars and mutation count during progress even if a CI is detected'
             )
             ->addOption(
                 'configuration',
@@ -257,6 +265,13 @@ final class RunCommand extends BaseCommand
 
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
+        $noProgress = (bool) $input->getOption('no-progress');
+        $forceProgress = (bool) $input->getOption('force-progress');
+
+        if ($noProgress && $forceProgress) {
+            throw new InvalidArgumentException('Cannot pass both "--no-progress" and "--force-progress" option: use none or only one of them');
+        }
+
         return $this->getApplication()->getContainer()->withValues(
             $logger,
             $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
@@ -271,7 +286,8 @@ final class RunCommand extends BaseCommand
             // TODO: add more type check like we do for the test frameworks
             trim((string) $input->getOption('formatter')),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
-            (bool) $input->getOption('no-progress'),
+            $noProgress,
+            $forceProgress,
             $coverage === ''
                 ? Container::DEFAULT_EXISTING_COVERAGE_PATH
                 : $coverage,
@@ -349,6 +365,8 @@ final class RunCommand extends BaseCommand
 
         $io->writeln($application->getHelp());
         $io->newLine();
+
+        $this->logRunningWithDebugger($consoleOutput);
 
         if (!$application->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
