@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\CI\NullCiDetector;
+use Infection\CI\MemoizedCiDetector;
 use function array_filter;
 use function array_key_exists;
 use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -615,14 +616,12 @@ final class Container
 
         if ($forceProgress) {
             Assert::false($noProgress, 'Cannot force progress and set no progress at the same time');
-        } elseif ($noProgress) {
-            Assert::false($forceProgress, 'Cannot force progress and set no progress at the same time');
         }
 
         $clone->offsetSet(
             CiDetector::class,
             static function () use ($forceProgress): CiDetector {
-                return $forceProgress ? new NullCiDetector() : new CiDetector();
+                return $forceProgress ? new NullCiDetector() : new MemoizedCiDetector();
             }
         );
 

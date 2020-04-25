@@ -33,28 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Double\OndraM\CiDetector;
+namespace Infection\Tests\CI;
 
+use Infection\CI\MemoizedCiDetector;
 use OndraM\CiDetector\Env;
+use PHPUnit\Framework\TestCase;
 
-final class ConfigurableEnv extends Env
+final class MemoizedCiDetectorTest extends TestCase
 {
-    private $variables = [];
-
-    /**
-     * @param array<string, string|false> $variables
-     */
-    public function setVariables(array $variables): void
+    public function test_it_can_be_instantiated_from_environment(): void
     {
-        $this->variables = $variables;
+        $detector = MemoizedCiDetector::fromEnvironment(new Env());
+
+        $this->assertInstanceOf(MemoizedCiDetector::class, $detector);
     }
 
-    public function get(string $name)
+    public function test_it_runs_the_detection_only_once(): void
     {
-        if (!array_key_exists($name, $this->variables)) {
-            return false;
-        }
+        $env = new ConfigurableEnv();
 
-        return $this->variables[$name];
+        $detector0 = MemoizedCiDetector::fromEnvironment($env);
+        $detector1 = MemoizedCiDetector::fromEnvironment($env);
+
+        $this->assertFalse($detector0->isCiDetected());
+
+        $env->setVariables(['TRAVIS' => true]);
+
+        $this->assertFalse($detector0->isCiDetected());
+        $this->assertTrue($detector1->isCiDetected());
+
+        $env->setVariables([]);
+
+        $this->assertTrue($detector1->isCiDetected());
     }
 }

@@ -33,30 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\CI;
+namespace Infection\Tests\CI;
 
-use OndraM\CiDetector\Ci\CiInterface;
-use OndraM\CiDetector\CiDetector;
+use Infection\CI\NullCiDetector;
 use OndraM\CiDetector\Env;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class NullCiDetector extends CiDetector
+final class NullCiDetectorTest extends TestCase
 {
-    public static function fromEnvironment(Env $environment): CiDetector
+    public function test_it_can_be_instantiated_from_environment(): void
     {
-        return new self();
+        $detector = NullCiDetector::fromEnvironment(new Env());
+
+        $this->assertInstanceOf(NullCiDetector::class, $detector);
     }
 
-    public function isCiDetected(): bool
+    public function test_it_does_not_detect_any__ci(): void
     {
-        return false;
-    }
+        $detector = new NullCiDetector();
 
-    public function detect(): CiInterface
-    {
-        throw new CiNotDetectedException('No CI server detectable with this detector');
+        $this->assertFalse($detector->isCiDetected());
+
+        $this->expectException(CiNotDetectedException::class);
+        $this->expectExceptionMessage('No CI server detectable with this detector');
+
+        $this->assertNull($detector->detect());
     }
 }

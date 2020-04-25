@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use InvalidArgumentException;
 use function file_exists;
 use function implode;
 use Infection\Configuration\Configuration;
@@ -54,6 +53,7 @@ use Infection\FileSystem\Locator\Locator;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
+use InvalidArgumentException;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -114,7 +114,7 @@ final class RunCommand extends BaseCommand
                 'Do not output progress bars and mutation count during progress. Automatically enabled if a CI is detected'
             )
             ->addOption(
-                'progress',
+                'force-progress',
                 null,
                 InputOption::VALUE_NONE,
                 'Output progress bars and mutation count during progress even if a CI is detected'
@@ -261,10 +261,10 @@ final class RunCommand extends BaseCommand
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
         $noProgress = (bool) $input->getOption('no-progress');
-        $progress = (bool) $input->getOption('progress');
+        $forceProgress = (bool) $input->getOption('force-progress');
 
-        if ($noProgress && $progress) {
-            throw new InvalidArgumentException('Cannot pass both "--no-progress" and "--progress" option: use none or only one of them');
+        if ($noProgress && $forceProgress) {
+            throw new InvalidArgumentException('Cannot pass both "--no-progress" and "--force-progress" option: use none or only one of them');
         }
 
         return $this->getApplication()->getContainer()->withValues(
@@ -281,7 +281,7 @@ final class RunCommand extends BaseCommand
             trim((string) $input->getOption('formatter')),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             $noProgress,
-            $progress,
+            $forceProgress,
             $coverage === ''
                 ? Container::DEFAULT_EXISTING_COVERAGE_PATH
                 : $coverage,
