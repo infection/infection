@@ -1,0 +1,35 @@
+Progress =
+- display progress bar
+- show mutation count during the run (the count in the summary is unconditionally displayed)
+
+---
+
+bin/infection
+
+noProgress:    false
+forceProgress: false
+
+# no CI: P
+# CI   : ø
+
+---
+
+bin/infection --no-progress
+
+noProgress:    true
+forceProgress: false
+
+# no CI: ø
+# CI   : ø
+
+---
+
+bin/infection --force-progress
+
+noProgress:    false
+forceProgress: true
+
+# no CI: P
+# CI   : P
+
+bin/infection --no-progress --force-progress # forbidden

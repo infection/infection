@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use InvalidArgumentException;
 use function file_exists;
 use function implode;
 use Infection\Configuration\Configuration;
@@ -110,7 +111,13 @@ final class RunCommand extends BaseCommand
                 'no-progress',
                 null,
                 InputOption::VALUE_NONE,
-                'Do not output progress bars'
+                'Do not output progress bars and mutation count during progress. Automatically enabled if a CI is detected'
+            )
+            ->addOption(
+                'progress',
+                null,
+                InputOption::VALUE_NONE,
+                'Output progress bars and mutation count during progress even if a CI is detected'
             )
             ->addOption(
                 'configuration',
@@ -253,6 +260,13 @@ final class RunCommand extends BaseCommand
 
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
+        $noProgress = (bool) $input->getOption('no-progress');
+        $progress = (bool) $input->getOption('progress');
+
+        if ($noProgress && $progress) {
+            throw new InvalidArgumentException('Cannot pass both "--no-progress" and "--progress" option: use none or only one of them');
+        }
+
         return $this->getApplication()->getContainer()->withValues(
             $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
             trim((string) $input->getOption('mutators')),
@@ -266,7 +280,8 @@ final class RunCommand extends BaseCommand
             // TODO: add more type check like we do for the test frameworks
             trim((string) $input->getOption('formatter')),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
-            (bool) $input->getOption('no-progress'),
+            $noProgress,
+            $progress,
             $coverage === ''
                 ? Container::DEFAULT_EXISTING_COVERAGE_PATH
                 : $coverage,

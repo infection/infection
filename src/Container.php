@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\CI\NullCiDetector;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -142,6 +143,7 @@ final class Container
     public const DEFAULT_ONLY_COVERED = false;
     public const DEFAULT_FORMATTER = 'dot';
     public const DEFAULT_NO_PROGRESS = false;
+    public const DEFAULT_FORCE_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
     public const DEFAULT_INITIAL_TESTS_PHP_OPTIONS = null;
     public const DEFAULT_SKIP_INITIAL_TESTS = false;
@@ -556,9 +558,6 @@ final class Container
             MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
                 return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
             },
-            CiDetector::class => static function (): CiDetector {
-                return new CiDetector();
-            },
         ]);
 
         return $container->withValues(
@@ -570,6 +569,7 @@ final class Container
             self::DEFAULT_ONLY_COVERED,
             self::DEFAULT_FORMATTER,
             self::DEFAULT_NO_PROGRESS,
+            self::DEFAULT_FORCE_PROGRESS,
             self::DEFAULT_EXISTING_COVERAGE_PATH,
             self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
             self::DEFAULT_SKIP_INITIAL_TESTS,
@@ -594,6 +594,7 @@ final class Container
         bool $onlyCovered,
         string $formatter,
         bool $noProgress,
+        bool $forceProgress,
         ?string $existingCoveragePath,
         ?string $initialTestsPhpOptions,
         bool $skipInitialTests,
@@ -608,6 +609,19 @@ final class Container
         bool $dryRun
     ): self {
         $clone = clone $this;
+
+        if ($forceProgress) {
+            Assert::false($noProgress, 'Cannot force progress and set no progress at the same time');
+        } elseif ($noProgress) {
+            Assert::false($forceProgress, 'Cannot force progress and set no progress at the same time');
+        }
+
+        $clone->offsetSet(
+            CiDetector::class,
+            static function () use ($forceProgress): CiDetector {
+                return $forceProgress ? new NullCiDetector() : new CiDetector();
+            }
+        );
 
         $clone->offsetSet(
             SchemaConfiguration::class,
