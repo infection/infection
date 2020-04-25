@@ -38,7 +38,6 @@ namespace Infection;
 use function array_filter;
 use function array_key_exists;
 use Closure;
-use function getenv;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
@@ -115,6 +114,7 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
+use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Lexer;
 use PhpParser\Parser;
@@ -357,7 +357,8 @@ final class Container
                     $container->getMutatorResolver(),
                     $container->getMutatorFactory(),
                     $container->getMutatorParser(),
-                    $container->getSourceFileCollector()
+                    $container->getSourceFileCollector(),
+                    $container->getCiDetector()
                 );
             },
             MutatorResolver::class => static function (): MutatorResolver {
@@ -427,26 +428,16 @@ final class Container
             InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
 
-                // TODO: this should be moved to the config & config factory instead
-                $skipProgressBar = $container->getConfiguration()->noProgress()
-                    || getenv('CI') === 'true'
-                    || getenv('CONTINUOUS_INTEGRATION') === 'true'
-                ;
-
                 return new InitialTestsConsoleLoggerSubscriberFactory(
-                    $skipProgressBar,
+                    $config->noProgress(),
                     $container->getTestFrameworkAdapter(),
                     $config->isDebugEnabled()
                 );
             },
             MutationGeneratingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationGeneratingConsoleLoggerSubscriberFactory {
-                // TODO: this should be moved to the config & config factory instead
-                $skipProgressBar = $container->getConfiguration()->noProgress()
-                    || getenv('CI') === 'true'
-                    || getenv('CONTINUOUS_INTEGRATION') === 'true'
-                ;
-
-                return new MutationGeneratingConsoleLoggerSubscriberFactory($skipProgressBar);
+                return new MutationGeneratingConsoleLoggerSubscriberFactory(
+                    $container->getConfiguration()->noProgress()
+                );
             },
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
@@ -496,6 +487,7 @@ final class Container
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
                     $config->mutateOnlyCoveredCode(),
+                    $container->getCiDetector(),
                     $container->getLogger()
                 );
             },
@@ -534,7 +526,7 @@ final class Container
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
-                    $container->getConfiguration()->noProgress()
+                    $config->noProgress()
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
@@ -566,6 +558,9 @@ final class Container
             },
             MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
                 return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
+            },
+            CiDetector::class => static function (): CiDetector {
+                return new CiDetector();
             },
         ]);
 
@@ -1042,6 +1037,11 @@ final class Container
     public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
     {
         return $this->get(MutantExecutionResultFactory::class);
+    }
+
+    public function getCiDetector(): CiDetector
+    {
+        return $this->get(CiDetector::class);
     }
 
     public function getLogger(): LoggerInterface
