@@ -61,19 +61,22 @@ class LoggerFactory
     private $logVerbosity;
     private $debugMode;
     private $onlyCoveredCode;
+    private $ciDetector;
 
     public function __construct(
         MetricsCalculator $metricsCalculator,
         Filesystem $filesystem,
         string $logVerbosity,
         bool $debugMode,
-        bool $onlyCoveredCode
+        bool $onlyCoveredCode,
+        CiDetector $ciDetector
     ) {
         $this->metricsCalculator = $metricsCalculator;
         $this->filesystem = $filesystem;
         $this->logVerbosity = $logVerbosity;
         $this->debugMode = $debugMode;
         $this->onlyCoveredCode = $onlyCoveredCode;
+        $this->ciDetector = $ciDetector;
     }
 
     public function createFromLogEntries(Logs $logConfig, OutputInterface $output): MutationTestingResultsLogger
@@ -166,7 +169,7 @@ class LoggerFactory
         return $badge === null
             ? null
             : new BadgeLogger(
-                new BuildContextResolver(new CiDetector()),
+                new BuildContextResolver($this->ciDetector),
                 new StrykerApiKeyResolver(),
                 new StrykerDashboardClient(
                     new StrykerCurlClient(),
