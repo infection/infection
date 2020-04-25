@@ -118,6 +118,7 @@ final class ContainerTest extends TestCase
         $this->expectExceptionMessage('Cannot force progress and set no progress at the same time');
 
         $container->withValues(
+            new NullLogger(),
             Container::DEFAULT_CONFIG_FILE,
             Container::DEFAULT_MUTATORS_INPUT,
             Container::DEFAULT_SHOW_MUTATIONS,
