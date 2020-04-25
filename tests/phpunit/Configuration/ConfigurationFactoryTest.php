@@ -141,7 +141,6 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputLogVerbosity,
                 $inputDebug,
                 $inputOnlyCovered,
-                $inputFormatter,
                 $inputNoProgress,
                 $inputIgnoreMsiWithNoMutations,
                 $inputMinMsi,

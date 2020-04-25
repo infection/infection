@@ -121,13 +121,14 @@ final class ContainerTest extends TestCase
 
         $container->withValues(
             new NullLogger(),
+            new NullOutput(),
             Container::DEFAULT_CONFIG_FILE,
             Container::DEFAULT_MUTATORS_INPUT,
             Container::DEFAULT_SHOW_MUTATIONS,
             Container::DEFAULT_LOG_VERBOSITY,
             Container::DEFAULT_DEBUG,
             Container::DEFAULT_ONLY_COVERED,
-            Container::DEFAULT_FORMATTER,
+            Container::DEFAULT_FORMATTER_NAME,
             true,
             true,
             Container::DEFAULT_EXISTING_COVERAGE_PATH,
