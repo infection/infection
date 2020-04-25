@@ -39,6 +39,7 @@ use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 /**
  * @group integration
@@ -73,6 +74,7 @@ final class ContainerTest extends TestCase
     public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
     {
         $newContainer = SingletonContainer::getContainer()->withValues(
+            new NullLogger(),
             Container::DEFAULT_CONFIG_FILE,
             Container::DEFAULT_MUTATORS_INPUT,
             Container::DEFAULT_SHOW_MUTATIONS,
@@ -116,6 +118,7 @@ final class ContainerTest extends TestCase
         $this->expectExceptionMessage('Cannot force progress and set no progress at the same time');
 
         $container->withValues(
+            new NullLogger(),
             Container::DEFAULT_CONFIG_FILE,
             Container::DEFAULT_MUTATORS_INPUT,
             Container::DEFAULT_SHOW_MUTATIONS,

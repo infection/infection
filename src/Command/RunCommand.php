@@ -54,9 +54,9 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use function trim;
@@ -211,10 +211,11 @@ final class RunCommand extends BaseCommand
 
     protected function executeCommand(IO $io): void
     {
-        $container = $this->createContainer($io->getInput());
+        $logger = new ConsoleLogger($io->getOutput());
+        $container = $this->createContainer($io, $logger);
         $consoleOutput = new ConsoleOutput($io);
 
-        $this->startUp($container, $consoleOutput, $io);
+        $this->startUp($container, $consoleOutput, $logger, $io);
 
         $engine = new Engine(
             $container->getConfiguration(),
@@ -240,8 +241,10 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private function createContainer(InputInterface $input): Container
+    private function createContainer(IO $io, LoggerInterface $logger): Container
     {
+        $input = $io->getInput();
+
         // Currently the configuration is mandatory hence there is no way to
         // say "do not use a config". If this becomes possible in the future
         // though, it will likely be a `--no-config` option rather than relying
@@ -268,6 +271,7 @@ final class RunCommand extends BaseCommand
         }
 
         return $this->getApplication()->getContainer()->withValues(
+            $logger,
             $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
             trim((string) $input->getOption('mutators')),
             // To keep in sync with Container::DEFAULT_SHOW_MUTATIONS
@@ -329,8 +333,12 @@ final class RunCommand extends BaseCommand
         $container->getAdapterInstaller()->install($adapterName);
     }
 
-    private function startUp(Container $container, ConsoleOutput $consoleOutput, IO $io): void
-    {
+    private function startUp(
+        Container $container,
+        ConsoleOutput $consoleOutput,
+        LoggerInterface $logger,
+        IO $io
+    ): void {
         $locator = $container->getRootsFileOrDirectoryLocator();
 
         if ($customConfigPath = (string) $io->getInput()->getOption('configuration')) {
@@ -343,7 +351,7 @@ final class RunCommand extends BaseCommand
 
         // Check if the application needs a restart _after_ configuring the command or adding
         // a missing test framework
-        XdebugHandler::check(new ConsoleLogger($io->getOutput()));
+        XdebugHandler::check($logger);
 
         $application = $this->getApplication();
 
