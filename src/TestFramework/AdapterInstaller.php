@@ -66,6 +66,7 @@ final class AdapterInstaller
         $process = new Process([
             $this->composerExecutableFinder->find(),
             'require',
+            '--dev',
             self::OFFICIAL_ADAPTERS_MAP[$adapterName],
         ]);
 
