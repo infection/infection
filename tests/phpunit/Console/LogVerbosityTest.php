@@ -40,93 +40,115 @@ use Infection\Console\LogVerbosity;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class LogVerbosityTest extends TestCase
 {
+    /**
+     * @var InputInterface|MockObject
+     */
+    private $inputMock;
+
+    /**
+     * @var ConsoleOutput
+     */
+    private $consoleOutputMock;
+
+    protected function setUp(): void
+    {
+        $this->inputMock = $this->createMock(InputInterface::class);
+        $this->consoleOutputMock = $this->createMock(ConsoleOutput::class);
+    }
+
     public function test_it_works_if_verbosity_is_valid(): void
     {
-        $input = $this->setInputExpectationsWhenItDoesNotChange(LogVerbosity::NORMAL);
+        $this->setInputExpectationsWhenItDoesNotChange(LogVerbosity::NORMAL);
 
-        LogVerbosity::convertVerbosityLevel($input, new ConsoleOutput($this->createMock(SymfonyStyle::class)));
+        $this->consoleOutputMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
     }
 
     /**
-     * @dataProvider provideConvertedLogVerbosity
+     * @dataProvider convertedLogVerbosityProvider
      */
-    public function test_it_converts_int_version_to_string_version_of_verbosity($input, string $output): void
-    {
-        $input = $this->setInputExpectationsWhenItDoesChange($input, $output);
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())
-            ->method('note')
-            ->with('Numeric versions of log-verbosity have been deprecated, please use, ' . $output . ' to keep the same result');
+    public function test_it_converts_int_version_to_string_version_of_verbosity(
+        $inputVerbosity,
+        string $output
+    ): void {
+        $this->setInputExpectationsWhenItDoesChange($inputVerbosity, $output);
 
-        LogVerbosity::convertVerbosityLevel($input, new ConsoleOutput($io));
+        $this->consoleOutputMock
+            ->expects($this->once())
+            ->method('logVerbosityDeprecationNotice')
+            ->with($output)
+        ;
+
+        LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
     }
 
-    public function provideConvertedLogVerbosity()
+    public function test_it_converts_to_normal_and_writes_notice_when_invalid_verbosity(): void
     {
-        yield 'It converts none integer to none' => [
+        $this->setInputExpectationsWhenItDoesChange('asdf', LogVerbosity::NORMAL);
+
+        $this->consoleOutputMock
+            ->expects($this->once())
+            ->method('logUnknownVerbosityOption')
+            ->with('default')
+        ;
+
+        LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
+    }
+
+    public static function convertedLogVerbosityProvider(): iterable
+    {
+        yield 'none integer to none' => [
             LogVerbosity::NONE_INTEGER,
             LogVerbosity::NONE,
         ];
 
-        yield 'It converts normal integer to normal' => [
+        yield 'normal integer to normal' => [
             LogVerbosity::NORMAL_INTEGER,
             LogVerbosity::NORMAL,
         ];
 
-        yield 'It converts debug integer to debug' => [
+        yield 'debug integer to debug' => [
             LogVerbosity::DEBUG_INTEGER,
             LogVerbosity::DEBUG,
         ];
 
-        yield 'It converts string version of debug integer to debug' => [
+        yield 'string version of debug integer to debug' => [
             (string) LogVerbosity::DEBUG_INTEGER,
             LogVerbosity::DEBUG,
         ];
     }
 
-    public function test_it_converts_to_normal_and_writes_notice_when_invalid_verbosity(): void
+    /**
+     * @param string|int $inputVerbosity
+     */
+    private function setInputExpectationsWhenItDoesNotChange($inputVerbosity): void
     {
-        $input = $this->setInputExpectationsWhenItDoesChange('asdf', LogVerbosity::NORMAL);
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())
-            ->method('note')
-            ->with('Running infection with an unknown log-verbosity option, falling back to default option');
-
-        LogVerbosity::convertVerbosityLevel($input, new ConsoleOutput($io));
+        $this->inputMock
+            ->expects($this->once())
+            ->method('getOption')
+            ->with('log-verbosity')
+            ->willReturn($inputVerbosity)
+        ;
     }
 
     /**
      * @param string|int $inputVerbosity
-     *
-     * @return InputInterface|MockObject
      */
-    private function setInputExpectationsWhenItDoesNotChange($inputVerbosity)
+    private function setInputExpectationsWhenItDoesChange($inputVerbosity, string $output): void
     {
-        $input = $this->createMock(InputInterface::class);
-        $input->expects($this->once())
-            ->method('getOption')
-            ->with('log-verbosity')
-            ->willReturn($inputVerbosity);
+        $this->setInputExpectationsWhenItDoesNotChange($inputVerbosity);
 
-        return $input;
-    }
-
-    /**
-     * @param string|int $input
-     *
-     * @return InputInterface|MockObject
-     */
-    private function setInputExpectationsWhenItDoesChange($input, string $output)
-    {
-        $input = $this->setInputExpectationsWhenItDoesNotChange($input);
-        $input->expects($this->once())
+        $this->inputMock
+            ->expects($this->once())
             ->method('setOption')
-            ->with('log-verbosity', $output);
-
-        return $input;
+            ->with('log-verbosity', $output)
+        ;
     }
 }

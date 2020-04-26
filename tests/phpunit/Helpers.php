@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function array_map;
 use const DIRECTORY_SEPARATOR;
+use function explode;
+use function implode;
 use function random_int;
 use function Safe\realpath;
 use function Safe\substr;
@@ -56,6 +59,17 @@ function normalizePath(string $value): string
 function normalizeLineReturn(string $value): string
 {
     return str_replace(["\r\n", "\r"], "\n", $value);
+}
+
+function normalize_trailing_spaces(string $value): string
+{
+    return implode(
+        "\n",
+        array_map(
+            'rtrim',
+            explode("\n", normalizeLineReturn($value))
+        )
+    );
 }
 
 function generator_to_phpunit_data_provider(iterable $source): iterable
