@@ -49,7 +49,7 @@ final class LogVerbosityTest extends TestCase
     private $inputMock;
 
     /**
-     * @var ConsoleOutput
+     * @var ConsoleOutput|MockObject
      */
     private $consoleOutputMock;
 
