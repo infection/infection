@@ -113,8 +113,8 @@ final class MinMsiCheckerTest extends TestCase
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The MSI is 70% percent points over the required MSI. Consider increasing the required MSI percentage the next
- !        time you run infection.
+ ! [NOTE] The MSI is 70% percent points over the required MSI. Consider increasing the required MSI
+ !        percentage the next time you run infection.
 
 
 TXT
@@ -132,8 +132,8 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The Covered Code MSI is 70% percent points over the required Covered Code MSI. Consider increasing the
- !        required Covered Code MSI percentage the next time you run infection.
+ ! [NOTE] The Covered Code MSI is 70% percent points over the required Covered Code MSI. Consider
+ !        increasing the required Covered Code MSI percentage the next time you run infection.
 
 
 TXT
@@ -151,11 +151,11 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The MSI is 70% percent points over the required MSI. Consider increasing the required MSI percentage the next
- !        time you run infection.
+ ! [NOTE] The MSI is 70% percent points over the required MSI. Consider increasing the required MSI
+ !        percentage the next time you run infection.
 
- ! [NOTE] The Covered Code MSI is 70% percent points over the required Covered Code MSI. Consider increasing the
- !        required Covered Code MSI percentage the next time you run infection.
+ ! [NOTE] The Covered Code MSI is 70% percent points over the required Covered Code MSI. Consider
+ !        increasing the required Covered Code MSI percentage the next time you run infection.
 
 
 TXT

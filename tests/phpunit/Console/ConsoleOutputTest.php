@@ -73,7 +73,8 @@ final class ConsoleOutputTest extends TestCase
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] Numeric versions of log-verbosity have been deprecated, please use, all to keep the same result
+ ! [NOTE] Numeric versions of log-verbosity have been deprecated, please use, all to keep the same
+ !        result
 
 
 TXT
@@ -139,8 +140,8 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The MSI is 5% percent points over the required MSI. Consider increasing the required MSI percentage the next
- !        time you run infection.
+ ! [NOTE] The MSI is 5% percent points over the required MSI. Consider increasing the required MSI
+ !        percentage the next time you run infection.
 
 
 TXT
@@ -159,8 +160,8 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The Covered Code MSI is 5% percent points over the required Covered Code MSI. Consider increasing the required
- !        Covered Code MSI percentage the next time you run infection.
+ ! [NOTE] The Covered Code MSI is 5% percent points over the required Covered Code MSI. Consider
+ !        increasing the required Covered Code MSI percentage the next time you run infection.
 
 
 TXT
