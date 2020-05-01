@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\NotInstantiable;
+use Infection\CannotBeInstantiated;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use function is_array;
@@ -46,7 +46,7 @@ use Traversable;
 
 final class TestLocationsNormalizer
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     /**
      * @param TestLocations[]|TestLocation[] $value

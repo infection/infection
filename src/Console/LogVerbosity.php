@@ -37,7 +37,7 @@ namespace Infection\Console;
 
 use function array_key_exists;
 use function in_array;
-use Infection\NotInstantiable;
+use Infection\CannotBeInstantiated;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
@@ -45,7 +45,7 @@ use Symfony\Component\Console\Input\InputInterface;
  */
 final class LogVerbosity
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     public const DEBUG = 'all';
     public const NORMAL = 'default';

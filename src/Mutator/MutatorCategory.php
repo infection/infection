@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use Infection\NotInstantiable;
+use Infection\CannotBeInstantiated;
 
 /**
  * @internal
  */
 final class MutatorCategory
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     /**
      * Semantic reductions exposes unused semantics. For example:

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
-use Infection\NotInstantiable;
+use Infection\CannotBeInstantiated;
 use function Safe\preg_match;
 use function Safe\preg_replace;
 use function str_replace;
@@ -43,7 +43,7 @@ use function strpos;
 
 final class SourceTestClassNameScheme
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     public static function getSourceClassName(string $testCaseClassName): string
     {

@@ -45,7 +45,7 @@ use function iterator_to_array;
  */
 final class IterableCounter
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     /**
      * @param iterable<mixed> $subjects

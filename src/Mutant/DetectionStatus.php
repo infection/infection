@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\NotInstantiable;
+use Infection\CannotBeInstantiated;
 
 /**
  * @internal
  */
 final class DetectionStatus
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     public const KILLED = 'killed';
     public const ESCAPED = 'escaped';

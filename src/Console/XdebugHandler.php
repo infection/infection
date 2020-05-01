@@ -37,7 +37,7 @@ namespace Infection\Console;
 
 use function array_key_exists;
 use Composer\XdebugHandler\XdebugHandler as ComposerXdebugHandler;
-use Infection\NotInstantiable;
+use Infection\CannotBeInstantiated;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -45,7 +45,7 @@ use Psr\Log\LoggerInterface;
  */
 final class XdebugHandler
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     private const PREFIX = 'INFECTION';
 

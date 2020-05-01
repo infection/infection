@@ -43,7 +43,7 @@ use function str_replace;
  */
 final class Str
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     public static function trimLineReturns(string $string): string
     {

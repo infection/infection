@@ -39,7 +39,7 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function class_exists;
-use Infection\NotInstantiable;
+use Infection\CannotBeInstantiated;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use function iterator_to_array;
@@ -50,7 +50,7 @@ use Webmozart\Assert\Assert;
 
 final class EnvTestCasesProvider
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     /**
      * @var string[][]|null

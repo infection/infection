@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutator;
 use function array_filter;
 use const ARRAY_FILTER_USE_KEY;
 use function array_values;
-use Infection\NotInstantiable;
+use Infection\CannotBeInstantiated;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
@@ -55,7 +55,7 @@ use Webmozart\PathUtil\Path;
 
 final class ProfileListProvider
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     /**
      * @var array<int, array<int, string>>|null

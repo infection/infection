@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\NotInstantiable;
+use Infection\CannotBeInstantiated;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class OutputFormatterStyleConfigurator
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     public static function configure(OutputInterface $output): void
     {

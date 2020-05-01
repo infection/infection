@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
 use function array_keys;
-use Infection\NotInstantiable;
+use Infection\CannotBeInstantiated;
 use function Safe\file_get_contents;
 use function Safe\preg_match_all;
 use function Safe\sprintf;
@@ -44,7 +44,7 @@ use function strpos;
 
 final class IoCodeDetector
 {
-    use NotInstantiable;
+    use CannotBeInstantiated;
 
     // See https://www.php.net/manual/en/ref.filesystem.php
     private const NATIVE_FUNCTIONS = [
