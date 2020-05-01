@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
-use Infection\CannotBeInstantiated;
+use Infection\NotInstantiable;
 use function Safe\sprintf;
 use function strpos;
 
 final class EnvManipulatorCodeDetector
 {
-    use CannotBeInstantiated;
+    use NotInstantiable;
 
     private const FUNCTIONS = [
         'putenv',

@@ -41,7 +41,7 @@ namespace Infection;
  *
  * @internal
  */
-trait CannotBeInstantiated
+trait NotInstantiable
 {
     private function __construct()
     {

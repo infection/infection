@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\CannotBeInstantiated;
+use Infection\NotInstantiable;
 
 /**
  * @internal
  */
 final class MutationAttributeKeys
 {
-    use CannotBeInstantiated;
+    use NotInstantiable;
 
     public const START_LINE = 'startLine';
     public const END_LINE = 'endLine';

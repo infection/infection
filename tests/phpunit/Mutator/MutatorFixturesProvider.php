@@ -39,7 +39,7 @@ use function array_key_exists;
 use function end;
 use function explode;
 use function get_class;
-use Infection\CannotBeInstantiated;
+use Infection\NotInstantiable;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\sprintf;
@@ -49,7 +49,7 @@ use Webmozart\PathUtil\Path;
 
 final class MutatorFixturesProvider
 {
-    use CannotBeInstantiated;
+    use NotInstantiable;
 
     private const MUTATOR_FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-fixtures';
 

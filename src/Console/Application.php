@@ -127,18 +127,6 @@ final class Application extends BaseApplication
     {
         parent::configureIO($input, $output);
 
-        $output->getFormatter()->setStyle('with-error', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('uncovered', new OutputFormatterStyle('blue', null, ['bold']));
-        $output->getFormatter()->setStyle('timeout', new OutputFormatterStyle('yellow'));
-        $output->getFormatter()->setStyle('escaped', new OutputFormatterStyle('red', null, ['bold']));
-        $output->getFormatter()->setStyle('killed', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('code', new OutputFormatterStyle('white'));
-
-        $output->getFormatter()->setStyle('diff-add', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('diff-del', new OutputFormatterStyle('red'));
-
-        $output->getFormatter()->setStyle('low', new OutputFormatterStyle('red', null, ['bold']));
-        $output->getFormatter()->setStyle('medium', new OutputFormatterStyle('yellow', null, ['bold']));
-        $output->getFormatter()->setStyle('high', new OutputFormatterStyle('green', null, ['bold']));
+        OutputFormatterStyleConfigurator::configure($output);
     }
 }

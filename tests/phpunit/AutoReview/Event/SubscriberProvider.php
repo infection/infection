@@ -37,7 +37,7 @@ namespace Infection\Tests\AutoReview\Event;
 
 use function array_filter;
 use function array_values;
-use Infection\CannotBeInstantiated;
+use Infection\NotInstantiable;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use function Infection\Tests\generator_to_phpunit_data_provider;
@@ -46,7 +46,7 @@ use ReflectionClass;
 
 final class SubscriberProvider
 {
-    use CannotBeInstantiated;
+    use NotInstantiable;
 
     /**
      * @var string[]|null

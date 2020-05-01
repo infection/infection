@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use Infection\CannotBeInstantiated;
+use Infection\NotInstantiable;
 use PhpParser\Node;
 use PhpParser\Node\Name\FullyQualified;
 use Webmozart\Assert\Assert;
@@ -45,7 +45,7 @@ use Webmozart\Assert\Assert;
  */
 final class FullyQualifiedClassNameManipulator
 {
-    use CannotBeInstantiated;
+    use NotInstantiable;
 
     private const FQN_ATTRIBUTE = 'fullyQualifiedClassName';
 

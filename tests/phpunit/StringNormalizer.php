@@ -38,11 +38,11 @@ namespace Infection\Tests;
 use function array_map;
 use function explode;
 use function implode;
-use Infection\CannotBeInstantiated;
+use Infection\NotInstantiable;
 
 final class StringNormalizer
 {
-    use CannotBeInstantiated;
+    use NotInstantiable;
 
     public static function normalizeString(string $string): string
     {

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use Infection\CannotBeInstantiated;
+use Infection\NotInstantiable;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
@@ -44,7 +44,7 @@ use Webmozart\Assert\Assert;
  */
 final class ParentConnector
 {
-    use CannotBeInstantiated;
+    use NotInstantiable;
 
     private const PARENT_ATTRIBUTE = 'parent';
 

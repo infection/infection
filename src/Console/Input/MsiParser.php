@@ -37,7 +37,7 @@ namespace Infection\Console\Input;
 
 use function count;
 use function explode;
-use Infection\CannotBeInstantiated;
+use Infection\NotInstantiable;
 use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
@@ -51,7 +51,7 @@ use Webmozart\Assert\Assert;
  */
 final class MsiParser
 {
-    use CannotBeInstantiated;
+    use NotInstantiable;
     public const DEFAULT_PRECISION = 2;
 
     public static function detectPrecision(?string ...$values): int

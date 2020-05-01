@@ -39,7 +39,7 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function class_exists;
-use Infection\CannotBeInstantiated;
+use Infection\NotInstantiable;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\Console\E2ETest;
@@ -52,7 +52,7 @@ use Webmozart\Assert\Assert;
 
 final class IntegrationGroupProvider
 {
-    use CannotBeInstantiated;
+    use NotInstantiable;
 
     /**
      * List of known integrational tests that must be treated as such.
