@@ -51,6 +51,7 @@ use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
+use Infection\Logger\ConsoleLogger;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -59,7 +60,6 @@ use Psr\Log\LoggerInterface;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Logger\ConsoleLogger;
 use function trim;
 
 /**
@@ -215,9 +215,9 @@ final class RunCommand extends BaseCommand
 
     protected function executeCommand(IO $io): void
     {
-        $logger = new ConsoleLogger($io->getOutput());
+        $logger = new ConsoleLogger($io);
         $container = $this->createContainer($io, $logger);
-        $consoleOutput = new ConsoleOutput($io);
+        $consoleOutput = new ConsoleOutput($logger);
 
         $this->startUp($container, $consoleOutput, $logger, $io);
 
