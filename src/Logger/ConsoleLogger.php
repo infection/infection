@@ -107,26 +107,33 @@ final class ConsoleLogger extends AbstractLogger
         );
 
         $output = $this->io->getOutput();
+        $verbosityLevel = self::VERBOSITY_LEVEL_MAP[$level];
 
         // The if condition check isn't necessary per se – it's the same one that $output will do
         // internally anyway. We only do it for efficiency here as the message formatting is
         // relatively expensive
-        if ($output->getVerbosity() < self::VERBOSITY_LEVEL_MAP[$level]) {
+        if ($output->getVerbosity() < $verbosityLevel) {
             return;
         }
 
         $interpolatedMessage = $this->interpolate($message, $context);
 
         if (!isset($context['block'])) {
-            $output->writeln(
-                sprintf(
+            $message = $interpolatedMessage;
+            $formatLevel = self::FORMAT_LEVEL_MAP[$level];
+
+            if ($level !== LogLevel::NOTICE) {
+                // If message is hidden with normal verbosity or is for an error level, we wrap
+                // the message in tags for a better color output
+                $message = sprintf(
                     '<%1$s>[%2$s] %3$s</%1$s>',
-                    self::FORMAT_LEVEL_MAP[$level],
+                    $formatLevel,
                     $level,
-                    $interpolatedMessage
-                ),
-                self::VERBOSITY_LEVEL_MAP[$level]
-            );
+                    $message
+                );
+            }
+
+            $output->writeln($message, $verbosityLevel);
 
             return;
         }

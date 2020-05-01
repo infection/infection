@@ -361,7 +361,7 @@ final class RunCommand extends BaseCommand
         if (!XdebugHandler::hasBeenRestarted()) {
             $this->logRunningWithDebugger($logger);
         } else {
-            $logger->notice('Disabled Xdebug for the main process');
+            $logger->notice('Xdebug has been disabled for the main process');
         }
 
         // Check if the application needs a restart _after_ configuring the command or adding
