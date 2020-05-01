@@ -68,7 +68,7 @@ final class ConsoleLoggerTest extends TestCase
     /**
      * @dataProvider outputMappingProvider
      */
-    public function test_the_log_level_is_added_to_the_message(
+    public function test_the_logs_the_message_if_is_the_right_log_verbosity(
         string $logLevel,
         int $outputVerbosity,
         bool $outputsMessage
@@ -80,7 +80,29 @@ final class ConsoleLoggerTest extends TestCase
 
         $logs = $output->fetch();
 
-        $this->assertSame($outputsMessage ? "[$logLevel] foo bar" . PHP_EOL : '', $logs);
+        if ($outputsMessage) {
+            $this->assertNotSame('', $logs);
+        } else {
+            $this->assertSame('', $logs);
+        }
+    }
+
+    /**
+     * @dataProvider logLevelProvider
+     */
+    public function test_the_log_level_is_added_to_the_message(
+        string $logLevel,
+        string $message,
+        string $expectedMessage
+    ): void {
+        $output = new BufferedOutput(OutputInterface::VERBOSITY_DEBUG);
+
+        $logger = new ConsoleLogger(new IO(new StringInput(''), $output));
+        $logger->log($logLevel, $message);
+
+        $logs = $output->fetch();
+
+        $this->assertSame($expectedMessage . PHP_EOL, $logs);
     }
 
     public function test_it_interpolates_the_message_with_the_context(): void
@@ -210,22 +232,95 @@ TXT
 
     public static function outputMappingProvider(): iterable
     {
+        yield [LogLevel::EMERGENCY, OutputInterface::VERBOSITY_QUIET, false];
+
         yield [LogLevel::EMERGENCY, OutputInterface::VERBOSITY_NORMAL, true];
+
+        yield [LogLevel::ALERT, OutputInterface::VERBOSITY_QUIET, false];
+
+        yield [LogLevel::ALERT, OutputInterface::VERBOSITY_NORMAL, true];
+
+        yield [LogLevel::CRITICAL, OutputInterface::VERBOSITY_QUIET, false];
+
+        yield [LogLevel::CRITICAL, OutputInterface::VERBOSITY_NORMAL, true];
+
+        yield [LogLevel::ERROR, OutputInterface::VERBOSITY_QUIET, false];
+
+        yield [LogLevel::ERROR, OutputInterface::VERBOSITY_NORMAL, true];
+
+        yield [LogLevel::WARNING, OutputInterface::VERBOSITY_QUIET, false];
 
         yield [LogLevel::WARNING, OutputInterface::VERBOSITY_NORMAL, true];
 
+        yield [LogLevel::NOTICE, OutputInterface::VERBOSITY_QUIET, false];
+
+        yield [LogLevel::NOTICE, OutputInterface::VERBOSITY_NORMAL, true];
+
+        yield [LogLevel::INFO, OutputInterface::VERBOSITY_QUIET, false];
+
         yield [LogLevel::INFO, OutputInterface::VERBOSITY_NORMAL, false];
+
+        yield [LogLevel::INFO, OutputInterface::VERBOSITY_VERBOSE, true];
+
+        yield [LogLevel::DEBUG, OutputInterface::VERBOSITY_QUIET, false];
 
         yield [LogLevel::DEBUG, OutputInterface::VERBOSITY_NORMAL, false];
 
-        yield [LogLevel::INFO, OutputInterface::VERBOSITY_VERBOSE, true];
+        yield [LogLevel::DEBUG, OutputInterface::VERBOSITY_VERBOSE, false];
 
         yield [LogLevel::DEBUG, OutputInterface::VERBOSITY_VERY_VERBOSE, false];
 
         yield [LogLevel::DEBUG, OutputInterface::VERBOSITY_DEBUG, true];
+    }
 
-        yield [LogLevel::ALERT, OutputInterface::VERBOSITY_QUIET, false];
+    public static function logLevelProvider(): iterable
+    {
+        yield [
+            LogLevel::EMERGENCY,
+            'message',
+            '[emergency] message',
+        ];
 
-        yield [LogLevel::EMERGENCY, OutputInterface::VERBOSITY_QUIET, false];
+        yield [
+            LogLevel::ALERT,
+            'message',
+            '[alert] message',
+        ];
+
+        yield [
+            LogLevel::CRITICAL,
+            'message',
+            '[critical] message',
+        ];
+
+        yield [
+            LogLevel::ERROR,
+            'message',
+            '[error] message',
+        ];
+
+        yield [
+            LogLevel::WARNING,
+            'message',
+            '[warning] message',
+        ];
+
+        yield [
+            LogLevel::NOTICE,
+            'message',
+            'message',
+        ];
+
+        yield [
+            LogLevel::INFO,
+            'message',
+            '[info] message',
+        ];
+
+        yield [
+            LogLevel::DEBUG,
+            'message',
+            '[debug] message',
+        ];
     }
 }

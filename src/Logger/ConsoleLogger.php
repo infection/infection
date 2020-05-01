@@ -119,18 +119,17 @@ final class ConsoleLogger extends AbstractLogger
         $interpolatedMessage = $this->interpolate($message, $context);
 
         if (!isset($context['block'])) {
-            $message = $interpolatedMessage;
-            $formatLevel = self::FORMAT_LEVEL_MAP[$level];
-
             if ($level !== LogLevel::NOTICE) {
                 // If message is hidden with normal verbosity or is for an error level, we wrap
                 // the message in tags for a better color output
                 $message = sprintf(
                     '<%1$s>[%2$s] %3$s</%1$s>',
-                    $formatLevel,
+                    self::FORMAT_LEVEL_MAP[$level],
                     $level,
-                    $message
+                    $interpolatedMessage
                 );
+            } else {
+                $message = $interpolatedMessage;
             }
 
             $output->writeln($message, $verbosityLevel);
