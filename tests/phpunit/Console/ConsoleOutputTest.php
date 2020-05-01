@@ -99,20 +99,6 @@ TXT
         );
     }
 
-    public function test_log_running_with_debugger(): void
-    {
-        $this->consoleOutput->logRunningWithDebugger('foo');
-
-        $this->assertSame(
-            <<<'TXT'
-[notice] You are running Infection with foo enabled.
-
-TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch())
-        );
-    }
-
     public function test_log_not_in_control_of_exit_codes(): void
     {
         $this->consoleOutput->logNotInControlOfExitCodes();
