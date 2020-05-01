@@ -106,6 +106,11 @@ class ConsoleOutput
         );
     }
 
+    public function logRunningWithDebugger(string $debugger): void
+    {
+        $this->logger->notice(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, $debugger));
+    }
+
     public function logNotInControlOfExitCodes(): void
     {
         $this->logger->warning(

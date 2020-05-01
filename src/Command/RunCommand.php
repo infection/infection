@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use function extension_loaded;
 use function file_exists;
 use function implode;
 use Infection\Configuration\Configuration;
@@ -57,7 +56,6 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
-use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -356,14 +354,6 @@ final class RunCommand extends BaseCommand
 
         $this->installTestFrameworkIfNeeded($container, $io);
 
-        // Log the detected debuggers _before_ a restart to ensure xdebug is not left out; log it
-        // only once though
-        if (!XdebugHandler::hasBeenRestarted()) {
-            $this->logRunningWithDebugger($logger);
-        } else {
-            $logger->notice('Disabled Xdebug for the main process');
-        }
-
         // Check if the application needs a restart _after_ configuring the command or adding
         // a missing test framework
         XdebugHandler::check($logger);
@@ -372,6 +362,8 @@ final class RunCommand extends BaseCommand
 
         $io->writeln($application->getHelp());
         $io->newLine();
+
+        $this->logRunningWithDebugger($consoleOutput);
 
         if (!$application->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
@@ -433,18 +425,14 @@ final class RunCommand extends BaseCommand
         })($bootstrap);
     }
 
-    private function logRunningWithDebugger(LoggerInterface $logger): void
+    private function logRunningWithDebugger(ConsoleOutput $consoleOutput): void
     {
         if (PHP_SAPI === 'phpdbg') {
-            $logger->notice('phpdbg detected');
-        }
-
-        if (extension_loaded('pcov')) {
-            $logger->notice('pcov detected');
-        }
-
-        if (extension_loaded('xdebug')) {
-            $logger->notice('Xdebug detected');
+            $consoleOutput->logRunningWithDebugger(PHP_SAPI);
+        } elseif (extension_loaded('xdebug')) {
+            $consoleOutput->logRunningWithDebugger('Xdebug');
+        } elseif (extension_loaded('pcov')) {
+            $consoleOutput->logRunningWithDebugger('PCOV');
         }
     }
 }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use function array_key_exists;
 use Composer\XdebugHandler\XdebugHandler as ComposerXdebugHandler;
 use Infection\CannotBeInstantiated;
 use Psr\Log\LoggerInterface;
@@ -58,10 +57,5 @@ final class XdebugHandler
             ->setPersistent()
             ->check()
         ;
-    }
-
-    public static function hasBeenRestarted(): bool
-    {
-        return array_key_exists(self::PREFIX . ComposerXdebugHandler::SUFFIX_ALLOW, $_SERVER);
     }
 }
