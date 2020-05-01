@@ -33,56 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Console\OutputFormatter;
 
-use Composer\Autoload\ClassLoader;
-use Infection\FileSystem\Finder\ComposerExecutableFinder;
-use Symfony\Component\Process\Process;
+use function implode;
+use LogicException;
+use function Safe\sprintf;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class AdapterInstaller
+final class FormatterFactory
 {
-    public const OFFICIAL_ADAPTERS_MAP = [
-        TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
-        TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
-    ];
+    private $output;
 
-    private const TIMEOUT = 120.0; // 2 minutes
-
-    private $composerExecutableFinder;
-
-    public function __construct(ComposerExecutableFinder $composerExecutableFinder)
+    public function __construct(OutputInterface $output)
     {
-        $this->composerExecutableFinder = $composerExecutableFinder;
+        $this->output = $output;
     }
 
-    public function install(string $adapterName): void
+    public function create(string $formatterName): OutputFormatter
     {
-        Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
+        Assert::oneOf(
+            $formatterName,
+            FormatterName::ALL,
+            sprintf(
+                'Unknown formatter %%s. The known formatters are: "%s"',
+                implode('", "', FormatterName::ALL)
+            )
+        );
 
-        $process = new Process([
-            $this->composerExecutableFinder->find(),
-            'require',
-            '--dev',
-            self::OFFICIAL_ADAPTERS_MAP[$adapterName],
-        ]);
+        switch ($formatterName) {
+            case FormatterName::PROGRESS:
+                return new ProgressFormatter(new ProgressBar($this->output));
 
-        $process->setTimeout(self::TIMEOUT);
-
-        $process->run();
-
-        $loader = new ClassLoader();
-
-        /** @var array<string, string[]> $map */
-        $map = require 'vendor/composer/autoload_psr4.php';
-
-        foreach ($map as $namespace => $paths) {
-            $loader->setPsr4($namespace, $paths);
+            case FormatterName::DOT:
+                return new DotFormatter($this->output);
         }
 
-        $loader->register(false);
+        throw new LogicException('Unreachable statement');
     }
 }

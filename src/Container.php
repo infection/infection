@@ -50,6 +50,9 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
+use Infection\Console\OutputFormatter\FormatterFactory;
+use Infection\Console\OutputFormatter\FormatterName;
+use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
@@ -129,6 +132,8 @@ use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
@@ -144,7 +149,7 @@ final class Container
     public const DEFAULT_LOG_VERBOSITY = LogVerbosity::NORMAL;
     public const DEFAULT_DEBUG = false;
     public const DEFAULT_ONLY_COVERED = false;
-    public const DEFAULT_FORMATTER = 'dot';
+    public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
     public const DEFAULT_NO_PROGRESS = false;
     public const DEFAULT_FORCE_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
@@ -449,7 +454,7 @@ final class Container
                     $container->getMetricsCalculator(),
                     $container->getDiffColorizer(),
                     $config->showMutations(),
-                    $config->getFormatter()
+                    $container->getOutputFormatter()
                 );
             },
             MutationTestingResultsLoggerSubscriberFactory::class => static function (self $container): MutationTestingResultsLoggerSubscriberFactory {
@@ -562,20 +567,21 @@ final class Container
             MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
                 return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
             },
-            CiDetector::class => static function (): CiDetector {
-                return new CiDetector();
+            FormatterFactory::class => static function (self $container): FormatterFactory {
+                return new FormatterFactory($container->getOutput());
             },
         ]);
 
         return $container->withValues(
             new NullLogger(),
+            new NullOutput(),
             self::DEFAULT_CONFIG_FILE,
             self::DEFAULT_MUTATORS_INPUT,
             self::DEFAULT_SHOW_MUTATIONS,
             self::DEFAULT_LOG_VERBOSITY,
             self::DEFAULT_DEBUG,
             self::DEFAULT_ONLY_COVERED,
-            self::DEFAULT_FORMATTER,
+            self::DEFAULT_FORMATTER_NAME,
             self::DEFAULT_NO_PROGRESS,
             self::DEFAULT_FORCE_PROGRESS,
             self::DEFAULT_EXISTING_COVERAGE_PATH,
@@ -595,13 +601,14 @@ final class Container
 
     public function withValues(
         LoggerInterface $logger,
+        OutputInterface $output,
         ?string $configFile,
         string $mutatorsInput,
         bool $showMutations,
         string $logVerbosity,
         bool $debug,
         bool $onlyCovered,
-        string $formatter,
+        string $formatterName,
         bool $noProgress,
         bool $forceProgress,
         ?string $existingCoveragePath,
@@ -653,6 +660,20 @@ final class Container
         );
 
         $clone->offsetSet(
+            OutputInterface::class,
+            static function () use ($output): OutputInterface {
+                return $output;
+            }
+        );
+
+        $clone->offsetSet(
+            OutputFormatter::class,
+            static function (self $container) use ($formatterName): OutputFormatter {
+                return $container->getFormatterFactory()->create($formatterName);
+            }
+        );
+
+        $clone->offsetSet(
             Configuration::class,
             static function (self $container) use (
                 $existingCoveragePath,
@@ -661,7 +682,6 @@ final class Container
                 $logVerbosity,
                 $debug,
                 $onlyCovered,
-                $formatter,
                 $noProgress,
                 $ignoreMsiWithNoMutations,
                 $minMsi,
@@ -683,7 +703,6 @@ final class Container
                     $logVerbosity,
                     $debug,
                     $onlyCovered,
-                    $formatter,
                     $noProgress,
                     $ignoreMsiWithNoMutations,
                     $minMsi,
@@ -1063,6 +1082,21 @@ final class Container
     public function getLogger(): LoggerInterface
     {
         return $this->get(LoggerInterface::class);
+    }
+
+    public function getOutput(): OutputInterface
+    {
+        return $this->get(OutputInterface::class);
+    }
+
+    public function getFormatterFactory(): FormatterFactory
+    {
+        return $this->get(FormatterFactory::class);
+    }
+
+    public function getOutputFormatter(): OutputFormatter
+    {
+        return $this->get(OutputFormatter::class);
     }
 
     /**

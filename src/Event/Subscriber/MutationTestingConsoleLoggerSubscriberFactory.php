@@ -35,13 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Metrics\MetricsCalculator;
-use InvalidArgumentException;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -58,7 +54,7 @@ final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberF
         MetricsCalculator $metricsCalculator,
         DiffColorizer $diffColorizer,
         bool $showMutations,
-        string $formatter
+        OutputFormatter $formatter
     ) {
         $this->metricsCalculator = $metricsCalculator;
         $this->diffColorizer = $diffColorizer;
@@ -70,23 +66,10 @@ final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberF
     {
         return new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->createOutputFormatter($output),
+            $this->formatter,
             $this->metricsCalculator,
             $this->diffColorizer,
             $this->showMutations
         );
-    }
-
-    private function createOutputFormatter(OutputInterface $output): OutputFormatter
-    {
-        if ($this->formatter === 'progress') {
-            return new ProgressFormatter(new ProgressBar($output));
-        }
-
-        if ($this->formatter === 'dot') {
-            return new DotFormatter($output);
-        }
-
-        throw new InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
     }
 }

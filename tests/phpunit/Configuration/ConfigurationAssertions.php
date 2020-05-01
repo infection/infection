@@ -74,7 +74,6 @@ trait ConfigurationAssertions
         bool $expectedSkipInitialTests,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
-        string $expectedFormatter,
         bool $expectedNoProgress,
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
@@ -120,7 +119,6 @@ trait ConfigurationAssertions
         $this->assertSame($expectedSkipInitialTests, $configuration->shouldSkipInitialTests());
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled());
         $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode());
-        $this->assertSame($expectedFormatter, $configuration->getFormatter());
         $this->assertSame($expectedNoProgress, $configuration->noProgress());
         $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations());
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi());

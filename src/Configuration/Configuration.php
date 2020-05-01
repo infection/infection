@@ -54,11 +54,6 @@ class Configuration
         'default',
     ];
 
-    private const FORMATTER = [
-        'dot',
-        'progress',
-    ];
-
     private $timeout;
     private $sourceDirectories;
     private $sourceFiles;
@@ -78,7 +73,6 @@ class Configuration
     private $skipInitialTests;
     private $debug;
     private $onlyCovered;
-    private $formatter;
     private $noProgress;
     private $ignoreMsiWithNoMutations;
     private $minMsi;
@@ -114,7 +108,6 @@ class Configuration
         bool $skipInitialTests,
         bool $debug,
         bool $onlyCovered,
-        string $formatter,
         bool $noProgress,
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
@@ -129,7 +122,6 @@ class Configuration
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
-        Assert::oneOf($formatter, self::FORMATTER);
         Assert::nullOrGreaterThanEq($minMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
 
@@ -152,7 +144,6 @@ class Configuration
         $this->skipInitialTests = $skipInitialTests;
         $this->debug = $debug;
         $this->onlyCovered = $onlyCovered;
-        $this->formatter = $formatter;
         $this->noProgress = $noProgress;
         $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
         $this->minMsi = $minMsi;
@@ -268,11 +259,6 @@ class Configuration
     public function mutateOnlyCoveredCode(): bool
     {
         return $this->onlyCovered;
-    }
-
-    public function getFormatter(): string
-    {
-        return $this->formatter;
     }
 
     public function noProgress(): bool

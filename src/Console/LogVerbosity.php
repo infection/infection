@@ -76,7 +76,7 @@ final class LogVerbosity
     {
         $verbosityLevel = $input->getOption('log-verbosity');
 
-        if (in_array($verbosityLevel, self::ALLOWED_OPTIONS)) {
+        if (in_array($verbosityLevel, self::ALLOWED_OPTIONS, true)) {
             return;
         }
 
