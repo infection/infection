@@ -58,10 +58,6 @@ final class Factory
     private $testFrameworkFinder;
     private $jUnitFilePath;
     private $infectionConfig;
-
-    /**
-     * @var array<string, array<string, mixed>>
-     */
     private $installedExtensions;
     private $logger;
 
@@ -90,7 +86,7 @@ final class Factory
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
-        $adapter = $this->constructAdapter($adapterName, $skipCoverage);
+        $adapter = $this->createAdapter($adapterName, $skipCoverage);
 
         try {
             $adapter->checkVersion();
@@ -99,8 +95,8 @@ final class Factory
                 sprintf(
                     'The %s version "%s" is not supported. The version detected is either a non-stable version or older than "%s". Infection may not run as intended',
                     $adapter->getName(),
-                    $exception->getVersionDetected(),
-                    $exception->getMinimumVersionSupported()
+                    $exception->getDetectedVersion(),
+                    $exception->getMinimumSupportedVersion()
                 ),
                 ['exception' => $exception]
             );
@@ -109,7 +105,7 @@ final class Factory
         return $adapter;
     }
 
-    private function constructAdapter(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
+    private function createAdapter(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);

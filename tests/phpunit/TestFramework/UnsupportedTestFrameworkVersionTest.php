@@ -43,11 +43,13 @@ final class UnsupportedTestFrameworkVersionTest extends TestCase
 {
     public function test_it_can_be_instantiated(): void
     {
-        $error = new Error();
-        $exception = new UnsupportedTestFrameworkVersion('Foo', 0, $error);
+        $exception = new UnsupportedTestFrameworkVersion('3.2.0', '6.0.0');
 
-        $this->assertSame('Foo', $exception->getMessage());
+        $this->assertSame('3.2.0', $exception->getDetectedVersion());
+        $this->assertSame('6.0.0', $exception->getMinimumSupportedVersion());
+
+        $this->assertSame('', $exception->getMessage());
         $this->assertSame(0, $exception->getCode());
-        $this->assertSame($error, $exception->getPrevious());
+        $this->assertNull($exception->getPrevious());
     }
 }
