@@ -39,7 +39,6 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use InvalidArgumentException;
 use function Safe\sprintf;
 use Symfony\Component\Process\Process;
 
@@ -125,30 +124,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
     public function getVersion(): string
     {
-        if ($this->version !== null) {
-            return $this->version;
-        }
-
-        $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
-            $this->testFrameworkExecutable,
-            [],
-            ['--version']
-        );
-
-        $process = new Process($testFrameworkVersionExecutable);
-        $process->mustRun();
-
-        $version = 'unknown';
-
-        try {
-            $version = $this->versionParser->parse($process->getOutput());
-        } catch (InvalidArgumentException $e) {
-            $version = 'unknown';
-        } finally {
-            $this->version = $version;
-        }
-
-        return $this->version;
+        return $this->version ?? $this->version = $this->retrieveVersion();
     }
 
     public function getInitialTestsFailRecommendations(string $commandLine): string
@@ -190,6 +166,24 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     ): array {
         $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
 
-        return $this->commandLineBuilder->build($this->testFrameworkExecutable, $phpExtraArgs, $frameworkArgs);
+        return $this->commandLineBuilder->build(
+            $this->testFrameworkExecutable,
+            $phpExtraArgs,
+            $frameworkArgs
+        );
+    }
+
+    private function retrieveVersion(): string
+    {
+        $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
+            $this->testFrameworkExecutable,
+            [],
+            ['--version']
+        );
+
+        $process = new Process($testFrameworkVersionExecutable);
+        $process->mustRun();
+
+        return $this->versionParser->parse($process->getOutput());
     }
 }
