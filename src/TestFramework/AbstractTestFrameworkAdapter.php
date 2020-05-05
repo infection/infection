@@ -43,6 +43,7 @@ use Infection\TestFramework\Version\InvalidVersion;
 use Infection\TestFramework\Version\VersionParser;
 use function Safe\sprintf;
 use Symfony\Component\Process\Process;
+use function version_compare;
 
 /**
  * @internal
@@ -125,7 +126,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     }
 
     /**
-     * @throws UnsupportedTestFrameworkVersion
+     * @throws InvalidVersion
+     * TODO: move this doc to the interface upstream
      */
     public function getVersion(): string
     {
@@ -134,8 +136,24 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
     /**
      * @throws UnsupportedTestFrameworkVersion
+     *                                        TODO: add this to the interface upstream
      */
-    abstract public function checkVersion(): void;
+    public function checkVersion(): void
+    {
+        if (version_compare($this->getVersion(), $this->getMinimumSupportedVersion(), '>=')) {
+            return;
+        }
+
+        throw new UnsupportedTestFrameworkVersion(
+            $this->getVersion(),
+            $this->getMinimumSupportedVersion()
+        );
+    }
+
+    /**
+     * @throws UnsupportedTestFrameworkVersion
+     */
+    abstract protected function getMinimumSupportedVersion(): string;
 
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
@@ -184,7 +202,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     }
 
     /**
-     * @throws UnsupportedTestFrameworkVersion
+     * @throws InvalidVersion
      */
     private function retrieveVersion(): string
     {
@@ -197,17 +215,6 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         $process = new Process($testFrameworkVersionExecutable);
         $process->mustRun();
 
-        try {
-            return $this->versionParser->parse($process->getOutput());
-        } catch (InvalidVersion $exception) {
-            throw new UnsupportedTestFrameworkVersion(
-                sprintf(
-                    'Could not identify the test framework version: "%s"',
-                    $exception->getMessage()
-                ),
-                0,
-                $exception
-            );
-        }
+        return $this->versionParser->parse($process->getOutput());
     }
 }

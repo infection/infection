@@ -64,6 +64,7 @@ final class VersionParser
         return $matches[0];
     }
 
+    // TODO: check that again
     public function isStable(string $parsedVersion): bool
     {
         return preg_match(self::STABLE_VERSION, $parsedVersion) === 0;
