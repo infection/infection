@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Psr\Log\LoggerInterface;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -120,6 +119,7 @@ use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
+use Psr\Log\LoggerInterface;
 use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;

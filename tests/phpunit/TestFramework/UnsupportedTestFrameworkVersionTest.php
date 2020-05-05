@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
-use Error;
 use Infection\TestFramework\UnsupportedTestFrameworkVersion;
 use PHPUnit\Framework\TestCase;
 
