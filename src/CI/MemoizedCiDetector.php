@@ -33,64 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\CI;
 
-use function array_map;
-use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
-use function iterator_to_array;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use OndraM\CiDetector\Ci\CiInterface;
+use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\Env;
+use ReflectionClass;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+/**
+ * @internal
+ *
+ * TODO: for now we are forced to extend CiDetector which is not ideal since we need to mind all
+ *  the API of the parent. See https://github.com/OndraM/ci-detector/issues/64
+ */
+final class MemoizedCiDetector extends CiDetector
+{
+    /**
+     * @var CiInterface|false|null
+     */
+    private $ci = false;
 
-$container = Container::create();
+    public static function fromEnvironment(Env $environment): CiDetector
+    {
+        $detector = new self();
 
-$files = Finder::create()
-    ->files()
-    ->in(__DIR__ . '/sources')
-    ->name('*.php')
-;
+        // TODO: this is an ugly hack to due to a design flaw in ondram\ci-detector
+        //  See https://github.com/OndraM/ci-detector/pull/65
+        $environmentReflection = (new ReflectionClass(CiDetector::class))->getProperty('environment');
+        $environmentReflection->setAccessible(true);
+        $environmentReflection->setValue($detector, $environment);
 
-// Since those files are not autoloaded, we need to manually autoload them
-require_once __DIR__ . '/sources/autoload.php';
-
-$traces = array_map(
-    static function (SplFileInfo $fileInfo): Trace {
-        require_once $fileInfo->getRealPath();
-
-        return new PartialTrace($fileInfo);
-    },
-    iterator_to_array($files, false)
-);
-
-$mutators = $container->getMutatorFactory()->create(
-    $container->getMutatorResolver()->resolve(['@default' => true])
-);
-
-$fileMutationGenerator = $container->getFileMutationGenerator();
-
-return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
+        return $detector;
     }
 
-    $count = 0;
-
-    foreach ($traces as $trace) {
-        $mutations = $fileMutationGenerator->generate(
-            $trace,
-            false,
-            $mutators,
-            []
-        );
-
-        foreach ($mutations as $_) {
-            ++$count;
-
-            if ($maxCount !== null && $count === $maxCount) {
-                return;
-            }
+    protected function detectCurrentCiServer(): ?CiInterface
+    {
+        if ($this->ci === false) {
+            $this->ci = parent::detectCurrentCiServer();
         }
+
+        return $this->ci;
     }
-};
+}

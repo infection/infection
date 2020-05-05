@@ -38,8 +38,9 @@ namespace Infection;
 use function array_filter;
 use function array_key_exists;
 use Closure;
-use function getenv;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\CI\MemoizedCiDetector;
+use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -47,6 +48,11 @@ use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
+use Infection\Console\Input\MsiParser;
+use Infection\Console\LogVerbosity;
+use Infection\Console\OutputFormatter\FormatterFactory;
+use Infection\Console\OutputFormatter\FormatterName;
+use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
@@ -113,6 +119,7 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
+use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Lexer;
 use PhpParser\Parser;
@@ -120,10 +127,13 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
@@ -133,6 +143,28 @@ use Webmozart\PathUtil\Path;
  */
 final class Container
 {
+    public const DEFAULT_CONFIG_FILE = null;
+    public const DEFAULT_MUTATORS_INPUT = '';
+    public const DEFAULT_SHOW_MUTATIONS = false;
+    public const DEFAULT_LOG_VERBOSITY = LogVerbosity::NORMAL;
+    public const DEFAULT_DEBUG = false;
+    public const DEFAULT_ONLY_COVERED = false;
+    public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
+    public const DEFAULT_NO_PROGRESS = false;
+    public const DEFAULT_FORCE_PROGRESS = false;
+    public const DEFAULT_EXISTING_COVERAGE_PATH = null;
+    public const DEFAULT_INITIAL_TESTS_PHP_OPTIONS = null;
+    public const DEFAULT_SKIP_INITIAL_TESTS = false;
+    public const DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS = false;
+    public const DEFAULT_MIN_MSI = null;
+    public const DEFAULT_MIN_COVERED_MSI = null;
+    public const DEFAULT_MSI_PRECISION = MsiParser::DEFAULT_PRECISION;
+    public const DEFAULT_TEST_FRAMEWORK = null;
+    public const DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
+    public const DEFAULT_FILTER = '';
+    public const DEFAULT_THREAD_COUNT = 1;
+    public const DEFAULT_DRY_RUN = false;
+
     /**
      * @var array<class-string<object>, true>
      */
@@ -159,13 +191,13 @@ final class Container
     public function __construct(array $values)
     {
         foreach ($values as $id => $value) {
-            $this->offsetAdd($id, $value);
+            $this->offsetSet($id, $value);
         }
     }
 
     public static function create(): self
     {
-        return new self([
+        $container = new self([
             Filesystem::class => static function (): Filesystem {
                 return new Filesystem();
             },
@@ -334,7 +366,8 @@ final class Container
                     $container->getMutatorResolver(),
                     $container->getMutatorFactory(),
                     $container->getMutatorParser(),
-                    $container->getSourceFileCollector()
+                    $container->getSourceFileCollector(),
+                    $container->getCiDetector()
                 );
             },
             MutatorResolver::class => static function (): MutatorResolver {
@@ -404,26 +437,16 @@ final class Container
             InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
 
-                // TODO: this should be moved to the config & config factory instead
-                $skipProgressBar = $container->getConfiguration()->noProgress()
-                    || getenv('CI') === 'true'
-                    || getenv('CONTINUOUS_INTEGRATION') === 'true'
-                ;
-
                 return new InitialTestsConsoleLoggerSubscriberFactory(
-                    $skipProgressBar,
+                    $config->noProgress(),
                     $container->getTestFrameworkAdapter(),
                     $config->isDebugEnabled()
                 );
             },
             MutationGeneratingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationGeneratingConsoleLoggerSubscriberFactory {
-                // TODO: this should be moved to the config & config factory instead
-                $skipProgressBar = $container->getConfiguration()->noProgress()
-                    || getenv('CI') === 'true'
-                    || getenv('CONTINUOUS_INTEGRATION') === 'true'
-                ;
-
-                return new MutationGeneratingConsoleLoggerSubscriberFactory($skipProgressBar);
+                return new MutationGeneratingConsoleLoggerSubscriberFactory(
+                    $container->getConfiguration()->noProgress()
+                );
             },
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
@@ -432,7 +455,7 @@ final class Container
                     $container->getMetricsCalculator(),
                     $container->getDiffColorizer(),
                     $config->showMutations(),
-                    $config->getFormatter()
+                    $container->getOutputFormatter()
                 );
             },
             MutationTestingResultsLoggerSubscriberFactory::class => static function (self $container): MutationTestingResultsLoggerSubscriberFactory {
@@ -472,7 +495,9 @@ final class Container
                     $container->getFileSystem(),
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
-                    $config->mutateOnlyCoveredCode()
+                    $config->mutateOnlyCoveredCode(),
+                    $container->getCiDetector(),
+                    $container->getLogger()
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
@@ -510,7 +535,7 @@ final class Container
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
-                    $container->getConfiguration()->noProgress()
+                    $config->noProgress()
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
@@ -543,19 +568,50 @@ final class Container
             MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
                 return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
             },
+            FormatterFactory::class => static function (self $container): FormatterFactory {
+                return new FormatterFactory($container->getOutput());
+            },
         ]);
+
+        return $container->withValues(
+            new NullLogger(),
+            new NullOutput(),
+            self::DEFAULT_CONFIG_FILE,
+            self::DEFAULT_MUTATORS_INPUT,
+            self::DEFAULT_SHOW_MUTATIONS,
+            self::DEFAULT_LOG_VERBOSITY,
+            self::DEFAULT_DEBUG,
+            self::DEFAULT_ONLY_COVERED,
+            self::DEFAULT_FORMATTER_NAME,
+            self::DEFAULT_NO_PROGRESS,
+            self::DEFAULT_FORCE_PROGRESS,
+            self::DEFAULT_EXISTING_COVERAGE_PATH,
+            self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
+            self::DEFAULT_SKIP_INITIAL_TESTS,
+            self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
+            self::DEFAULT_MIN_MSI,
+            self::DEFAULT_MIN_COVERED_MSI,
+            self::DEFAULT_MSI_PRECISION,
+            self::DEFAULT_TEST_FRAMEWORK,
+            self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+            self::DEFAULT_FILTER,
+            self::DEFAULT_THREAD_COUNT,
+            self::DEFAULT_DRY_RUN
+        );
     }
 
-    public function withDynamicParameters(
+    public function withValues(
         LoggerInterface $logger,
+        OutputInterface $output,
         ?string $configFile,
         string $mutatorsInput,
         bool $showMutations,
         string $logVerbosity,
         bool $debug,
         bool $onlyCovered,
-        string $formatter,
+        string $formatterName,
         bool $noProgress,
+        bool $forceProgress,
         ?string $existingCoveragePath,
         ?string $initialTestsPhpOptions,
         bool $skipInitialTests,
@@ -571,14 +627,25 @@ final class Container
     ): self {
         $clone = clone $this;
 
-        $clone->offsetAdd(
+        if ($forceProgress) {
+            Assert::false($noProgress, 'Cannot force progress and set no progress at the same time');
+        }
+
+        $clone->offsetSet(
+            CiDetector::class,
+            static function () use ($forceProgress): CiDetector {
+                return $forceProgress ? new NullCiDetector() : new MemoizedCiDetector();
+            }
+        );
+
+        $clone->offsetSet(
             LoggerInterface::class,
             static function () use ($logger): LoggerInterface {
                 return $logger;
             }
         );
 
-        $clone->offsetAdd(
+        $clone->offsetSet(
             SchemaConfiguration::class,
             static function (self $container) use ($configFile): SchemaConfiguration {
                 return $container->getSchemaConfigurationLoader()->loadConfiguration(
@@ -593,7 +660,21 @@ final class Container
             }
         );
 
-        $clone->offsetAdd(
+        $clone->offsetSet(
+            OutputInterface::class,
+            static function () use ($output): OutputInterface {
+                return $output;
+            }
+        );
+
+        $clone->offsetSet(
+            OutputFormatter::class,
+            static function (self $container) use ($formatterName): OutputFormatter {
+                return $container->getFormatterFactory()->create($formatterName);
+            }
+        );
+
+        $clone->offsetSet(
             Configuration::class,
             static function (self $container) use (
                 $existingCoveragePath,
@@ -602,7 +683,6 @@ final class Container
                 $logVerbosity,
                 $debug,
                 $onlyCovered,
-                $formatter,
                 $noProgress,
                 $ignoreMsiWithNoMutations,
                 $minMsi,
@@ -624,7 +704,6 @@ final class Container
                     $logVerbosity,
                     $debug,
                     $onlyCovered,
-                    $formatter,
                     $noProgress,
                     $ignoreMsiWithNoMutations,
                     $minMsi,
@@ -646,6 +725,7 @@ final class Container
 
     public function getProjectDir(): string
     {
+        // TODO: cache that result
         return getcwd();
     }
 
@@ -995,20 +1075,40 @@ final class Container
         return $this->get(MutantExecutionResultFactory::class);
     }
 
+    public function getCiDetector(): CiDetector
+    {
+        return $this->get(CiDetector::class);
+    }
+
     public function getLogger(): LoggerInterface
     {
         return $this->get(LoggerInterface::class);
+    }
+
+    public function getOutput(): OutputInterface
+    {
+        return $this->get(OutputInterface::class);
+    }
+
+    public function getFormatterFactory(): FormatterFactory
+    {
+        return $this->get(FormatterFactory::class);
+    }
+
+    public function getOutputFormatter(): OutputFormatter
+    {
+        return $this->get(OutputFormatter::class);
     }
 
     /**
      * @param class-string<object> $id
      * @param Closure(self): object $value
      */
-    private function offsetAdd(string $id, Closure $value): void
+    private function offsetSet(string $id, Closure $value): void
     {
         $this->keys[$id] = true;
-
         $this->factories[$id] = $value;
+        unset($this->values[$id]);
     }
 
     /**

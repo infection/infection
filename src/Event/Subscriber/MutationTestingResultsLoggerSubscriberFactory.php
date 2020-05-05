@@ -56,10 +56,7 @@ final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberF
     public function create(OutputInterface $output): EventSubscriber
     {
         return new MutationTestingResultsLoggerSubscriber(
-            $this->loggerFactory->createFromLogEntries(
-                $this->logsConfig,
-                $output
-            )
+            $this->loggerFactory->createFromLogEntries($this->logsConfig)
         );
     }
 }

@@ -33,64 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Console\OutputFormatter;
 
-use function array_map;
-use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
-use function iterator_to_array;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use function implode;
+use LogicException;
+use function Safe\sprintf;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+/**
+ * @internal
+ */
+final class FormatterFactory
+{
+    private $output;
 
-$container = Container::create();
-
-$files = Finder::create()
-    ->files()
-    ->in(__DIR__ . '/sources')
-    ->name('*.php')
-;
-
-// Since those files are not autoloaded, we need to manually autoload them
-require_once __DIR__ . '/sources/autoload.php';
-
-$traces = array_map(
-    static function (SplFileInfo $fileInfo): Trace {
-        require_once $fileInfo->getRealPath();
-
-        return new PartialTrace($fileInfo);
-    },
-    iterator_to_array($files, false)
-);
-
-$mutators = $container->getMutatorFactory()->create(
-    $container->getMutatorResolver()->resolve(['@default' => true])
-);
-
-$fileMutationGenerator = $container->getFileMutationGenerator();
-
-return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
+    public function __construct(OutputInterface $output)
+    {
+        $this->output = $output;
     }
 
-    $count = 0;
-
-    foreach ($traces as $trace) {
-        $mutations = $fileMutationGenerator->generate(
-            $trace,
-            false,
-            $mutators,
-            []
+    public function create(string $formatterName): OutputFormatter
+    {
+        Assert::oneOf(
+            $formatterName,
+            FormatterName::ALL,
+            sprintf(
+                'Unknown formatter %%s. The known formatters are: "%s"',
+                implode('", "', FormatterName::ALL)
+            )
         );
 
-        foreach ($mutations as $_) {
-            ++$count;
+        switch ($formatterName) {
+            case FormatterName::PROGRESS:
+                return new ProgressFormatter(new ProgressBar($this->output));
 
-            if ($maxCount !== null && $count === $maxCount) {
-                return;
-            }
+            case FormatterName::DOT:
+                return new DotFormatter($this->output);
         }
+
+        throw new LogicException('Unreachable statement');
     }
-};
+}

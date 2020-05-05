@@ -33,64 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Console\OutputFormatter;
 
-use function array_map;
-use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
-use function iterator_to_array;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+/**
+ * @internal
+ */
+final class FormatterName
+{
+    public const DOT = 'dot';
+    public const PROGRESS = 'progress';
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+    public const ALL = [
+        self::DOT,
+        self::PROGRESS,
+    ];
 
-$container = Container::create();
-
-$files = Finder::create()
-    ->files()
-    ->in(__DIR__ . '/sources')
-    ->name('*.php')
-;
-
-// Since those files are not autoloaded, we need to manually autoload them
-require_once __DIR__ . '/sources/autoload.php';
-
-$traces = array_map(
-    static function (SplFileInfo $fileInfo): Trace {
-        require_once $fileInfo->getRealPath();
-
-        return new PartialTrace($fileInfo);
-    },
-    iterator_to_array($files, false)
-);
-
-$mutators = $container->getMutatorFactory()->create(
-    $container->getMutatorResolver()->resolve(['@default' => true])
-);
-
-$fileMutationGenerator = $container->getFileMutationGenerator();
-
-return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
+    private function __construct()
+    {
     }
-
-    $count = 0;
-
-    foreach ($traces as $trace) {
-        $mutations = $fileMutationGenerator->generate(
-            $trace,
-            false,
-            $mutators,
-            []
-        );
-
-        foreach ($mutations as $_) {
-            ++$count;
-
-            if ($maxCount !== null && $count === $maxCount) {
-                return;
-            }
-        }
-    }
-};
+}

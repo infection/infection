@@ -33,64 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Tests\CI;
 
-use function array_map;
-use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
-use function iterator_to_array;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\CI\MemoizedCiDetector;
+use OndraM\CiDetector\Env;
+use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+final class MemoizedCiDetectorTest extends TestCase
+{
+    public function test_it_can_be_instantiated_from_environment(): void
+    {
+        $detector = MemoizedCiDetector::fromEnvironment(new Env());
 
-$container = Container::create();
-
-$files = Finder::create()
-    ->files()
-    ->in(__DIR__ . '/sources')
-    ->name('*.php')
-;
-
-// Since those files are not autoloaded, we need to manually autoload them
-require_once __DIR__ . '/sources/autoload.php';
-
-$traces = array_map(
-    static function (SplFileInfo $fileInfo): Trace {
-        require_once $fileInfo->getRealPath();
-
-        return new PartialTrace($fileInfo);
-    },
-    iterator_to_array($files, false)
-);
-
-$mutators = $container->getMutatorFactory()->create(
-    $container->getMutatorResolver()->resolve(['@default' => true])
-);
-
-$fileMutationGenerator = $container->getFileMutationGenerator();
-
-return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
+        $this->assertInstanceOf(MemoizedCiDetector::class, $detector);
     }
 
-    $count = 0;
+    public function test_it_runs_the_detection_only_once(): void
+    {
+        $env = new ConfigurableEnv();
 
-    foreach ($traces as $trace) {
-        $mutations = $fileMutationGenerator->generate(
-            $trace,
-            false,
-            $mutators,
-            []
-        );
+        $detector0 = MemoizedCiDetector::fromEnvironment($env);
+        $detector1 = MemoizedCiDetector::fromEnvironment($env);
 
-        foreach ($mutations as $_) {
-            ++$count;
+        $this->assertFalse($detector0->isCiDetected());
 
-            if ($maxCount !== null && $count === $maxCount) {
-                return;
-            }
-        }
+        $env->setVariables(['TRAVIS' => true]);
+
+        $this->assertFalse($detector0->isCiDetected());
+        $this->assertTrue($detector1->isCiDetected());
+
+        $env->setVariables([]);
+
+        $this->assertTrue($detector1->isCiDetected());
     }
-};
+}

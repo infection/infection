@@ -50,7 +50,7 @@ trait ConfigurationAssertions
 
     /**
      * @param string[] $expectedSourceDirectories
-     * @param string[] $sourceFilesExcludes
+     * @param string[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
      */
     private function assertConfigurationStateIs(
@@ -58,8 +58,8 @@ trait ConfigurationAssertions
         ?int $expectedTimeout,
         array $expectedSourceDirectories,
         array $expectedSourceFiles,
-        string $filter,
-        array $sourceFilesExcludes,
+        string $expectedFilter,
+        array $expectedSourceFilesExcludes,
         Logs $expectedLogs,
         string $expectedLogVerbosity,
         string $expectedTmpDir,
@@ -74,7 +74,6 @@ trait ConfigurationAssertions
         bool $expectedSkipInitialTests,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
-        string $expectedFormatter,
         bool $expectedNoProgress,
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
@@ -90,8 +89,8 @@ trait ConfigurationAssertions
             self::normalizePaths($expectedSourceFiles),
             self::normalizePaths($configuration->getSourceFiles())
         );
-        $this->assertSame($filter, $configuration->getSourceFilesFilter());
-        $this->assertSame($filter, $configuration->getSourceFilesFilter());
+        $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter());
+        $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes());
         $this->assertLogsStateIs(
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),
@@ -120,7 +119,6 @@ trait ConfigurationAssertions
         $this->assertSame($expectedSkipInitialTests, $configuration->shouldSkipInitialTests());
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled());
         $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode());
-        $this->assertSame($expectedFormatter, $configuration->getFormatter());
         $this->assertSame($expectedNoProgress, $configuration->noProgress());
         $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations());
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi());

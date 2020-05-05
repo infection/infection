@@ -46,6 +46,7 @@ use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Application;
+use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\XdebugHandler;
@@ -108,6 +109,7 @@ final class ProjectCodeProvider
         MutationAttributeKeys::class,
         XdebugHandler::class,
         NullSubscriber::class,
+        FormatterName::class,
     ];
 
     /**

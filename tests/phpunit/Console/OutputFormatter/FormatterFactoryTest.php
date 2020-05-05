@@ -33,71 +33,70 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Console\OutputFormatter;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Tests\Fixtures\Console\FakeOutputFormatter;
-use PHPUnit\Framework\MockObject\MockObject;
+use function array_keys;
+use function implode;
+use Infection\Console\OutputFormatter\DotFormatter;
+use Infection\Console\OutputFormatter\FormatterFactory;
+use Infection\Console\OutputFormatter\FormatterName;
+use Infection\Console\OutputFormatter\ProgressFormatter;
+use Infection\Tests\Fixtures\Console\FakeOutput;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
 
-final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
+final class FormatterFactoryTest extends TestCase
 {
     /**
-     * @var MetricsCalculator|MockObject
+     * @dataProvider formatterProvider
      */
-    private $metricsCalculatorMock;
-
-    /**
-     * @var DiffColorizer|MockObject
-     */
-    private $diffColorizerMock;
-
-    protected function setUp(): void
-    {
-        $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
-        $this->metricsCalculatorMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
-
-        $this->diffColorizerMock = $this->createMock(DiffColorizer::class);
-        $this->diffColorizerMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
-    }
-
-    /**
-     * @dataProvider showMutationsProvider
-     */
-    public function test_it_creates_a_subscriber(bool $showMutations): void
-    {
-        $factory = new MutationTestingConsoleLoggerSubscriberFactory(
-            $this->metricsCalculatorMock,
-            $this->diffColorizerMock,
-            $showMutations,
-            new FakeOutputFormatter()
-        );
-
+    public function test_it_can_create_all_known_factories(
+        string $formatterName,
+        string $expectedFormatterClassName
+    ): void {
         $outputMock = $this->createMock(OutputInterface::class);
         $outputMock
             ->method('isDecorated')
             ->willReturn(false)
         ;
 
-        $subscriber = $factory->create($outputMock);
+        $formatter = (new FormatterFactory($outputMock))->create($formatterName);
 
-        $this->assertInstanceOf(MutationTestingConsoleLoggerSubscriber::class, $subscriber);
+        $this->assertInstanceOf($expectedFormatterClassName, $formatter);
     }
 
-    public function showMutationsProvider(): iterable
+    public function test_it_provides_a_friendly_error_message_when_an_unknown_formatter_is_given(): void
     {
-        foreach ([true, false] as $showMutations) {
-            yield [$showMutations];
+        $factory = new FormatterFactory(new FakeOutput());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown formatter "unknown". The known formatters are: "dot", "progress"');
+
+        $factory->create('unknown');
+    }
+
+    public static function formatterProvider(): iterable
+    {
+        $map = [
+            FormatterName::DOT => DotFormatter::class,
+            FormatterName::PROGRESS => ProgressFormatter::class,
+        ];
+
+        Assert::same(
+            FormatterName::ALL,
+            array_keys($map),
+            sprintf(
+                'Expected the given map to contain all the known formatters "%s". Got "%s"',
+                implode('", "', FormatterName::ALL),
+                implode('", "', array_keys($map))
+            )
+        );
+
+        foreach ($map as $formatterName => $formatterClassName) {
+            yield [$formatterName, $formatterClassName];
         }
     }
 }

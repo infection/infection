@@ -100,7 +100,7 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver = new BuildContextResolver($ciDetector);
 
         $this->expectException(CouldNotResolveBuildContext::class);
-        $this->expectExceptionMessage('The current process is maybe a pull request build');
+        $this->expectExceptionMessage('The current process may be a pull request build');
 
         $buildContextResolver->resolve();
     }

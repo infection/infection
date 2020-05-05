@@ -37,6 +37,7 @@ namespace Infection\Environment;
 
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
+use function trim;
 
 /**
  * @internal
@@ -63,7 +64,7 @@ final class BuildContextResolver
         }
 
         if ($ci->isPullRequest()->maybe()) {
-            throw new CouldNotResolveBuildContext('The current process is maybe a pull request build');
+            throw new CouldNotResolveBuildContext('The current process may be a pull request build');
         }
 
         if (trim($ci->getRepositoryName()) === '') {
