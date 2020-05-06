@@ -35,21 +35,28 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use function array_keys;
+use Infection\AbstractTestFramework\UnsupportedTestFrameworkVersion;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
+use Infection\Tests\Fixtures\Logger\FakeLogger;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
+use Infection\Tests\Fixtures\TestFramework\FailedVersionCheckTestFrameworkAdapter;
+use Infection\Tests\Fixtures\TestFramework\FailedVersionCheckTestFrameworkFactory;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
+use Psr\Log\Test\TestLogger;
 
 /**
  * @group integration
  */
 final class FactoryTest extends TestCase
 {
-    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
+    public function test_it_throws_an_exception_if_it_cant_find_the_test_framework(): void
     {
         $factory = new Factory(
             '',
@@ -58,10 +65,12 @@ final class FactoryTest extends TestCase
             $this->createMock(TestFrameworkFinder::class),
             '',
             $this->createMock(Configuration::class),
-            []
+            [],
+            new FakeLogger()
         );
 
         $this->expectException(InvalidArgumentException::class);
+
         $factory->create('Fake Test Framework', false);
     }
 
@@ -76,15 +85,61 @@ final class FactoryTest extends TestCase
             $this->createMock(Configuration::class),
             [
                 'infection/codeception-adapter' => [
-                        'install_path' => '/path/to/dummy/adapter/factory.php',
-                        'extra' => ['class' => DummyTestFrameworkFactory::class],
-                        'version' => '1.0.0',
-                    ],
-            ]
+                    'install_path' => '/path/to/dummy/adapter/factory.php',
+                    'extra' => ['class' => DummyTestFrameworkFactory::class],
+                    'version' => '1.0.0',
+                ],
+            ],
+            new FakeLogger()
         );
 
         $adapter = $factory->create('dummy', false);
 
         $this->assertInstanceOf(DummyTestFrameworkAdapter::class, $adapter);
+    }
+
+    public function test_it_logs_an_error_if_the_test_framework_adapter_detects_an_unsupported_version(): void
+    {
+        $logger = new TestLogger();
+
+        $factory = new Factory(
+            '',
+            '',
+            $this->createMock(TestFrameworkConfigLocatorInterface::class),
+            $this->createMock(TestFrameworkFinder::class),
+            '',
+            $this->createMock(Configuration::class),
+            [
+                'infection/codeception-adapter' => [
+                    'install_path' => '/path/to/dummy/adapter/factory.php',
+                    'extra' => ['class' => FailedVersionCheckTestFrameworkFactory::class],
+                    'version' => '1.0.0',
+                ],
+            ],
+            $logger
+        );
+
+        $adapter = $factory->create('dummy', false);
+
+        $this->assertInstanceOf(FailedVersionCheckTestFrameworkAdapter::class, $adapter);
+
+        $this->assertCount(1, $logger->records);
+
+        $record = $logger->records[0];
+
+        $this->assertSame(['level', 'message', 'context'], array_keys($record));
+
+        $recordLevel = $record['level'];
+        $recordMessage = $record['message'];
+        $recordContext = $record['context'];
+
+        $this->assertSame(LogLevel::ERROR, $recordLevel);
+        $this->assertSame(
+            'The FailedVersionCheckAdapter version "X" is not supported. The version detected is either a non-stable version or older than "Y". Infection may not run as intended',
+            $recordMessage
+        );
+
+        $this->assertSame(['exception'], array_keys($recordContext));
+        $this->assertInstanceOf(UnsupportedTestFrameworkVersion::class, $recordContext['exception']);
     }
 }
