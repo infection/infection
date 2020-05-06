@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Version;
 
-use Infection\TestFramework\Version\InvalidVersion;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\TestFramework\Version\VersionParser;
 use PHPUnit\Framework\TestCase;
 

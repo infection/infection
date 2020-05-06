@@ -40,7 +40,6 @@ use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
-use Infection\TestFramework\UnsupportedTestFrameworkVersion;
 use function Safe\preg_match;
 use function Safe\sprintf;
 use function version_compare;
@@ -96,11 +95,6 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
         return 'PHPUnit';
     }
 
-    protected function getMinimumSupportedVersion(): string
-    {
-        return self::MINIMUM_SUPPORTED_VERSION;
-    }
-
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
         $recommendations = parent::getInitialTestsFailRecommendations($commandLine);
@@ -129,5 +123,10 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
     public function getInitialRunOnlyOptions(): array
     {
         return ['--configuration', '--filter', '--testsuite'];
+    }
+
+    protected function getMinimumSupportedVersion(): string
+    {
+        return self::MINIMUM_SUPPORTED_VERSION;
     }
 }
