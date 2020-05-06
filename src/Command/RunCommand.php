@@ -356,9 +356,14 @@ final class RunCommand extends BaseCommand
 
         $this->installTestFrameworkIfNeeded($container, $io);
 
+        $application = $this->getApplication();
+
         // Log the detected debuggers _before_ a restart to ensure xdebug is not left out; log it
         // only once though
         if (!XdebugHandler::hasBeenRestarted()) {
+            $io->writeln($application->getHelp());
+            $io->newLine();
+
             $this->logRunningWithDebugger($logger);
         } else {
             $logger->notice('Xdebug has been disabled for the main process');
@@ -367,11 +372,6 @@ final class RunCommand extends BaseCommand
         // Check if the application needs a restart _after_ configuring the command or adding
         // a missing test framework
         XdebugHandler::check($logger);
-
-        $application = $this->getApplication();
-
-        $io->writeln($application->getHelp());
-        $io->newLine();
 
         if (!$application->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
