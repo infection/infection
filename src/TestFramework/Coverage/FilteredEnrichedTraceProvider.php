@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Coverage;
 use function array_key_exists;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -118,32 +119,39 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
      */
     private function appendUncoveredFiles(iterable $traces): iterable
     {
-        $filesSeen = [];
+        $filteredSourceFiles = $this->makeSourceFileMap();
 
         /** @var Trace $trace */
         foreach ($traces as $trace) {
-            $filesSeen[$trace->getSourceFileInfo()->getRealPath()] = self::SEEN;
+            if (!array_key_exists($trace->getSourceFileInfo()->getRealPath(), $filteredSourceFiles)) {
+                continue;
+            }
+
+            unset($filteredSourceFiles[$trace->getSourceFileInfo()->getRealPath()]);
 
             yield $trace;
         }
-
-        /** @var iterable<SplFileInfo> $filteredSourceFiles */
-        $filteredSourceFiles = $this->filter->filter(
-            $this->sourceFiles
-        );
-
-        // Since these are sorted sets, there should be a way to optimize.
 
         foreach ($filteredSourceFiles as $splFileInfo) {
             $sourceFilePath = $splFileInfo->getRealPath();
 
             Assert::string($sourceFilePath);
 
-            if (array_key_exists($sourceFilePath, $filesSeen)) {
-                continue;
-            }
-
             yield new ProxyTrace($splFileInfo, [new TestLocations()]);
         }
+    }
+
+    /**
+     * Make source files whitelist.
+     *
+     * @return array<string, SplFileInfo>
+     */
+    private function makeSourceFileMap(): array
+    {
+        return iterator_to_array(take($this->filter->filter(
+            $this->sourceFiles
+        ))->map(static function (SplFileInfo $filteredSourceFile) {
+            yield $filteredSourceFile->getRealPath() => $filteredSourceFile;
+        }));
     }
 }
