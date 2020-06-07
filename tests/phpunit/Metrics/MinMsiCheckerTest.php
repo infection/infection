@@ -36,135 +36,158 @@ declare(strict_types=1);
 namespace Infection\Tests\Metrics;
 
 use Infection\Console\ConsoleOutput;
+use Infection\Console\IO;
+use Infection\Logger\ConsoleLogger;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
-use PHPUnit\Framework\MockObject\MockObject;
+use function Infection\Tests\normalize_trailing_spaces;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 final class MinMsiCheckerTest extends TestCase
 {
     /**
-     * @var SymfonyStyle|MockObject
+     * @var BufferedOutput
      */
-    private $ioMock;
+    private $output;
 
     /**
      * @var ConsoleOutput
      */
-    private $output;
+    private $consoleOutput;
 
     protected function setUp(): void
     {
-        $this->ioMock = $this->createMock(SymfonyStyle::class);
-        $this->output = new ConsoleOutput($this->ioMock);
+        $this->output = new BufferedOutput();
+
+        $this->consoleOutput = new ConsoleOutput(
+            new ConsoleLogger(
+                new IO(new StringInput(''), $this->output)
+            )
+        );
     }
 
     public function test_it_fails_the_check_if_the_msi_is_lower_than_the_min_msi(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 5.);
 
-        $this->ioMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        try {
+            $msiChecker->checkMetrics(2, 8., 10., $this->consoleOutput);
 
-        $this->expectException(MinMsiCheckFailed::class);
-        $this->expectExceptionMessage('The minimum required MSI percentage should be 10%, but actual is 8%. Improve your tests!');
+            $this->fail();
+        } catch (MinMsiCheckFailed $exception) {
+            $this->assertSame(
+                'The minimum required MSI percentage should be 10%, but actual is 8%. Improve your tests!',
+                $exception->getMessage()
+            );
 
-        $msiChecker->checkMetrics(2, 8., 10., $this->output);
+            $this->assertSame('', $this->output->fetch());
+        }
     }
 
     public function test_it_fails_the_check_if_the_covered_code_msi_is_lower_than_the_min_covered_code_msi(): void
     {
         $msiChecker = new MinMsiChecker(false, 5., 10.);
 
-        $this->ioMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        try {
+            $msiChecker->checkMetrics(2, 12., 8., $this->consoleOutput);
 
-        $this->expectException(MinMsiCheckFailed::class);
-        $this->expectExceptionMessage('The minimum required Covered Code MSI percentage should be 10%, but actual is 8%. Improve your tests!');
+            $this->fail();
+        } catch (MinMsiCheckFailed $exception) {
+            $this->assertSame(
+                'The minimum required Covered Code MSI percentage should be 10%, but actual is 8%. Improve your tests!',
+                $exception->getMessage()
+            );
 
-        $msiChecker->checkMetrics(2, 12., 8., $this->output);
+            $this->assertSame('', $this->output->fetch());
+        }
     }
 
     public function test_it_suggests_to_increase_the_min_msi_if_above_the_limit(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 10.);
 
-        $this->ioMock
-            ->expects($this->once())
-            ->method('note')
-            ->with('The MSI is 70% percent points over the required MSI. Consider increasing the required MSI percentage the next time you run infection.')
-        ;
+        $msiChecker->checkMetrics(2, 80., 10., $this->consoleOutput);
 
-        $msiChecker->checkMetrics(2, 80., 10., $this->output);
+        $this->assertSame(
+            <<<'TXT'
+
+ ! [NOTE] The MSI is 70% percent points over the required MSI. Consider increasing the required MSI
+ !        percentage the next time you run infection.
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_it_suggests_to_increase_the_min_covered_code_msi_if_above_the_limit(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 10.);
 
-        $this->ioMock
-            ->expects($this->once())
-            ->method('note')
-            ->with('The Covered Code MSI is 70% percent points over the required Covered Code MSI. Consider increasing the required Covered Code MSI percentage the next time you run infection.')
-        ;
+        $msiChecker->checkMetrics(2, 10., 80., $this->consoleOutput);
 
-        $msiChecker->checkMetrics(2, 10., 80., $this->output);
+        $this->assertSame(
+            <<<'TXT'
+
+ ! [NOTE] The Covered Code MSI is 70% percent points over the required Covered Code MSI. Consider
+ !        increasing the required Covered Code MSI percentage the next time you run infection.
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_it_suggests_to_increase_the_min_msi_and_min_covered_code_msi_if_above_the_limit(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 10.);
 
-        $this->ioMock
-            ->expects($this->exactly(2))
-            ->method('note')
-            ->withConsecutive(
-                ['The MSI is 70% percent points over the required MSI. Consider increasing the required MSI percentage the next time you run infection.'],
-                ['The Covered Code MSI is 70% percent points over the required Covered Code MSI. Consider increasing the required Covered Code MSI percentage the next time you run infection.']
-            )
-        ;
+        $msiChecker->checkMetrics(2, 80., 80., $this->consoleOutput);
 
-        $msiChecker->checkMetrics(2, 80., 80., $this->output);
+        $this->assertSame(
+            <<<'TXT'
+
+ ! [NOTE] The MSI is 70% percent points over the required MSI. Consider increasing the required MSI
+ !        percentage the next time you run infection.
+
+ ! [NOTE] The Covered Code MSI is 70% percent points over the required Covered Code MSI. Consider
+ !        increasing the required Covered Code MSI percentage the next time you run infection.
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_it_does_nothing_if_the_scores_barely_passes(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 10.);
 
-        $this->ioMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        $msiChecker->checkMetrics(2, 10.2, 10.2, $this->consoleOutput);
 
-        $msiChecker->checkMetrics(2, 10.2, 10.2, $this->output);
+        $this->assertSame('', $this->output->fetch());
     }
 
     public function test_it_does_nothing_if_the_scores_barely_passes_with_no_mutation(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 10.);
 
-        $this->ioMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        $msiChecker->checkMetrics(0, 10.2, 10.2, $this->consoleOutput);
 
-        $msiChecker->checkMetrics(0, 10.2, 10.2, $this->output);
+        $this->assertSame('', $this->output->fetch());
     }
 
     public function test_it_does_nothing_if_the_msis_are_too_low_but_we_ignore_it_with_no_mutations_and_there_is_no_mutations(): void
     {
         $msiChecker = new MinMsiChecker(true, 10., 10.);
 
-        $this->ioMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        $msiChecker->checkMetrics(0, 2, 2, $this->consoleOutput);
 
-        $msiChecker->checkMetrics(0, 2, 2, $this->output);
+        $this->assertSame('', $this->output->fetch());
     }
 }
