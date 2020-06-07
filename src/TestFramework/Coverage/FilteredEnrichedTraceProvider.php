@@ -40,6 +40,7 @@ use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
+use Webmozart\Assert\Assert;
 
 /**
  * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
@@ -84,7 +85,12 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
         foreach ($this->filter->filter(
             $sourceFiles
         ) as $filteredSourceFile) {
-            $this->sourceFiles[$filteredSourceFile->getRealPath()] = $filteredSourceFile;
+            /** @var SplFileInfo $filteredSourceFile */
+            $sourceFilePath = $filteredSourceFile->getRealPath();
+
+            Assert::string($sourceFilePath);
+
+            $this->sourceFiles[$sourceFilePath] = $filteredSourceFile;
         }
 
         $this->onlyCovered = $onlyCovered;
@@ -95,7 +101,7 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
      */
     public function provideTraces(): iterable
     {
-        /** @var iterable<Trace> $traces */
+        /** @var iterable<Trace> $filteredTraces */
         $filteredTraces = $this->filter->filter(
             $this->primaryTraceProvider->provideTraces()
         );
@@ -108,6 +114,8 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
          */
         $intersectedTraces = take($filteredTraces)->filter(function (Trace $trace) {
             $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
+
+            Assert::string($traceRealPath);
 
             if (array_key_exists($traceRealPath, $this->sourceFiles)) {
                 unset($this->sourceFiles[$traceRealPath]);
