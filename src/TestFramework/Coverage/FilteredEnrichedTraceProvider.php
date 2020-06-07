@@ -40,7 +40,6 @@ use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
 
 /**
  * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
@@ -62,9 +61,9 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
     private $filter;
 
     /**
-     * @var iterable<SplFileInfo>
+     * @var array<string, SplFileInfo>
      */
-    private $sourceFiles;
+    private $sourceFiles = [];
 
     private $onlyCovered;
 
@@ -81,7 +80,13 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
         $this->primaryTraceProvider = $primaryTraceProvider;
         $this->testFileDataAdder = $testFileDataAdder;
         $this->filter = $filter;
-        $this->sourceFiles = $sourceFiles;
+
+        foreach ($this->filter->filter(
+            $sourceFiles
+        ) as $filteredSourceFile) {
+            $this->sourceFiles[$filteredSourceFile->getRealPath()] = $filteredSourceFile;
+        }
+
         $this->onlyCovered = $onlyCovered;
     }
 
@@ -91,16 +96,34 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
     public function provideTraces(): iterable
     {
         /** @var iterable<Trace> $traces */
-        $traces = $this->filter->filter(
+        $filteredTraces = $this->filter->filter(
             $this->primaryTraceProvider->provideTraces()
         );
+
+        /*
+         * We need to remove traces that are not in the list of source files,
+         * which could have files that were been directly specified. All the
+         * while later we may need a list of files that in the list but were
+         * not covered.
+         */
+        $intersectedTraces = take($filteredTraces)->filter(function (Trace $trace) {
+            $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
+
+            if (array_key_exists($traceRealPath, $this->sourceFiles)) {
+                unset($this->sourceFiles[$traceRealPath]);
+
+                return true;
+            }
+
+            return false;
+        });
 
         /*
          * Looking up test executing timings is not a free operation. We even had to memoize it to help speed things up.
          * Therefore we add test execution info only after applying filter to the files feed. Adding this step above the
          * filter will negatively affect performance. The greater the junit.xml report size, the more.
          */
-        $enrichedTraces = $this->testFileDataAdder->addTestExecutionInfo($traces);
+        $enrichedTraces = $this->testFileDataAdder->addTestExecutionInfo($intersectedTraces);
 
         if ($this->onlyCovered === true) {
             // The case where only covered files are considered
@@ -119,39 +142,10 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
      */
     private function appendUncoveredFiles(iterable $traces): iterable
     {
-        $filteredSourceFiles = $this->makeSourceFileMap();
+        yield from $traces;
 
-        /** @var Trace $trace */
-        foreach ($traces as $trace) {
-            if (!array_key_exists($trace->getSourceFileInfo()->getRealPath(), $filteredSourceFiles)) {
-                continue;
-            }
-
-            unset($filteredSourceFiles[$trace->getSourceFileInfo()->getRealPath()]);
-
-            yield $trace;
-        }
-
-        foreach ($filteredSourceFiles as $splFileInfo) {
-            $sourceFilePath = $splFileInfo->getRealPath();
-
-            Assert::string($sourceFilePath);
-
+        foreach ($this->sourceFiles as $splFileInfo) {
             yield new ProxyTrace($splFileInfo, [new TestLocations()]);
         }
-    }
-
-    /**
-     * Make source files whitelist.
-     *
-     * @return array<string, SplFileInfo>
-     */
-    private function makeSourceFileMap(): array
-    {
-        return iterator_to_array(take($this->filter->filter(
-            $this->sourceFiles
-        ))->map(static function (SplFileInfo $filteredSourceFile) {
-            yield $filteredSourceFile->getRealPath() => $filteredSourceFile;
-        }));
     }
 }
