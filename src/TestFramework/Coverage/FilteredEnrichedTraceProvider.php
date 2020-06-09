@@ -62,6 +62,8 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
     private $filter;
 
     /**
+     * An associative array mapping real paths to SplFileInfo objects.
+     *
      * @var array<string, SplFileInfo>
      */
     private $sourceFiles = [];
@@ -101,30 +103,31 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
      */
     public function provideTraces(): iterable
     {
-        /** @var iterable<Trace> $filteredTraces */
-        $filteredTraces = $this->filter->filter(
-            $this->primaryTraceProvider->provideTraces()
-        );
-
         /*
          * We need to remove traces that are not in the list of source files,
          * which could have files that were been directly specified. All the
          * while later we may need a list of files that in the list but were
          * not covered.
+         *
+         * On the other hand we don't need to filter traces all over again as
+         * we're checking them against pre-filtered list of files.
          */
-        $intersectedTraces = take($filteredTraces)->filter(function (Trace $trace) {
-            $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
 
-            Assert::string($traceRealPath);
+        /** @var iterable<Trace> $intersectedTraces */
+        $intersectedTraces = take($this->primaryTraceProvider->provideTraces())
+            ->filter(function (Trace $trace) {
+                $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
 
-            if (array_key_exists($traceRealPath, $this->sourceFiles)) {
-                unset($this->sourceFiles[$traceRealPath]);
+                Assert::string($traceRealPath);
 
-                return true;
-            }
+                if (array_key_exists($traceRealPath, $this->sourceFiles)) {
+                    unset($this->sourceFiles[$traceRealPath]);
 
-            return false;
-        });
+                    return true;
+                }
+
+                return false;
+            });
 
         /*
          * Looking up test executing timings is not a free operation. We even had to memoize it to help speed things up.
