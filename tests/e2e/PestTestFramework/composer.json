@@ -1,0 +1,21 @@
+{
+    "require-dev": {
+        "pestphp/pest": "dev-feat-junit"
+    },
+    "autoload": {
+        "psr-4": {
+            "PestTestFramework\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PestTestFramework\\Test\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/olivernybroe/pest-1"
+        }
+    ]
+}

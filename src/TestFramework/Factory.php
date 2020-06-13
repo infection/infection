@@ -41,6 +41,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\PhpUnit\Adapter\PestAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
@@ -105,7 +106,25 @@ final class Factory
             );
         }
 
-        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT];
+        if ($adapterName === TestFrameworkTypes::PEST) {
+            $pestConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
+
+            return PestAdapterFactory::create(
+                $this->testFrameworkFinder->find(
+                    TestFrameworkTypes::PEST,
+                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
+                ),
+                $this->tmpDir,
+                $pestConfigPath,
+                (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
+                $this->jUnitFilePath,
+                $this->projectDir,
+                $this->infectionConfig->getSourceDirectories(),
+                $skipCoverage
+            );
+        }
+
+        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PEST];
 
         foreach ($this->installedExtensions as $installedExtension) {
             $factory = $installedExtension['extra']['class'];
