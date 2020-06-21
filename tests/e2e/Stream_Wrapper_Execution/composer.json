@@ -1,0 +1,16 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^8",
+        "dg/bypass-finals": "^1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Stream_Wrapper_Execution\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Stream_Wrapper_Execution\\Test\\": "tests/"
+        }
+    }
+}
