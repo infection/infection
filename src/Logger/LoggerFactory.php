@@ -87,6 +87,7 @@ class LoggerFactory
                 [
                     $this->createTextLogger($logConfig->getTextLogFilePath()),
                     $this->createSummaryLogger($logConfig->getSummaryLogFilePath()),
+                    $this->createJsonLogger($logConfig->getJsonLogFilePath()),
                     $this->createDebugLogger($logConfig->getDebugLogFilePath()),
                     $this->createPerMutatorLogger($logConfig->getPerMutatorFilePath()),
                     $this->createBadgeLogger($logConfig->getBadge()),
@@ -124,6 +125,19 @@ class LoggerFactory
                 $filePath,
                 $this->filesystem,
                 new SummaryFileLogger($this->metricsCalculator),
+                $this->logger
+            )
+        ;
+    }
+
+    private function createJsonLogger(?string $filePath): ?FileLogger
+    {
+        return $filePath === null
+            ? null
+            : new FileLogger(
+                $filePath,
+                $this->filesystem,
+                new JsonLogger($this->metricsCalculator, $this->onlyCoveredCode),
                 $this->logger
             )
         ;
