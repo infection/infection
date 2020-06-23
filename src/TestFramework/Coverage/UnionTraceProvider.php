@@ -35,12 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use function array_key_exists;
-use Infection\FileSystem\SourceFileFilter;
+use Infection\FileSystem\FileFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use function Pipeline\take;
-use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
 
 /**
  * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
@@ -48,10 +44,8 @@ use Webmozart\Assert\Assert;
  *
  * @internal
  */
-final class FilteredEnrichedTraceProvider implements TraceProvider
+final class UnionTraceProvider implements TraceProvider
 {
-    private const SEEN = true;
-
     /**
      * @var TraceProvider
      */
@@ -59,42 +53,23 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
 
     private $testFileDataAdder;
 
-    private $filter;
+    private $bufferedFilter;
 
-    /**
-     * An associative array mapping real paths to SplFileInfo objects.
-     *
-     * @var array<string, SplFileInfo>
-     */
-    private $sourceFiles = [];
+    private $uncoveredTraceProvider;
 
     private $onlyCovered;
 
-    /**
-     * @param iterable<SplFileInfo> $sourceFiles
-     */
     public function __construct(
         TraceProvider $primaryTraceProvider,
         JUnitTestExecutionInfoAdder $testFileDataAdder,
-        SourceFileFilter $filter,
-        iterable $sourceFiles,
+        FileFilter $bufferedFilter,
+        TraceProvider $uncoveredTraceProvider,
         bool $onlyCovered
     ) {
         $this->primaryTraceProvider = $primaryTraceProvider;
         $this->testFileDataAdder = $testFileDataAdder;
-        $this->filter = $filter;
-
-        foreach ($this->filter->filter(
-            $sourceFiles
-        ) as $filteredSourceFile) {
-            /** @var SplFileInfo $filteredSourceFile */
-            $sourceFilePath = $filteredSourceFile->getRealPath();
-
-            Assert::string($sourceFilePath);
-
-            $this->sourceFiles[$sourceFilePath] = $filteredSourceFile;
-        }
-
+        $this->bufferedFilter = $bufferedFilter;
+        $this->uncoveredTraceProvider = $uncoveredTraceProvider;
         $this->onlyCovered = $onlyCovered;
     }
 
@@ -104,59 +79,18 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
     public function provideTraces(): iterable
     {
         /*
-         * We need to remove traces that are not in the list of source files,
-         * which could have files that were been directly specified. All the
-         * while later we may need a list of files that in the list but were
-         * not covered.
-         *
-         * On the other hand we don't need to filter traces all over again as
-         * we're checking them against pre-filtered list of files.
-         */
-
-        /** @var iterable<Trace> $intersectedTraces */
-        $intersectedTraces = take($this->primaryTraceProvider->provideTraces())
-            ->filter(function (Trace $trace) {
-                $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
-
-                Assert::string($traceRealPath);
-
-                if (array_key_exists($traceRealPath, $this->sourceFiles)) {
-                    unset($this->sourceFiles[$traceRealPath]);
-
-                    return true;
-                }
-
-                return false;
-            });
-
-        /*
          * Looking up test executing timings is not a free operation. We even had to memoize it to help speed things up.
          * Therefore we add test execution info only after applying filter to the files feed. Adding this step above the
          * filter will negatively affect performance. The greater the junit.xml report size, the more.
          */
-        $enrichedTraces = $this->testFileDataAdder->addTestExecutionInfo($intersectedTraces);
+        yield from $this->testFileDataAdder->addTestExecutionInfo(
+            $this->bufferedFilter->filter(
+                $this->primaryTraceProvider->provideTraces()
+            )
+        );
 
-        if ($this->onlyCovered === true) {
-            // The case where only covered files are considered
-            return $enrichedTraces;
-        }
-
-        return $this->appendUncoveredFiles($enrichedTraces);
-    }
-
-    /**
-     * Adds to the queue uncovered files found on disk.
-     *
-     * @param iterable<Trace> $traces
-     *
-     * @return iterable<Trace>
-     */
-    private function appendUncoveredFiles(iterable $traces): iterable
-    {
-        yield from $traces;
-
-        foreach ($this->sourceFiles as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, [new TestLocations()]);
+        if ($this->onlyCovered === false) {
+            yield from $this->uncoveredTraceProvider->provideTraces();
         }
     }
 }

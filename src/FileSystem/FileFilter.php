@@ -33,29 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\FileSystem;
+
+use Infection\TestFramework\Coverage\Trace;
+use SplFileInfo;
 
 /**
- * Adds empty coverage report to uncovered files found on disk.
- *
  * @internal
  */
-final class UncoveredTraceProvider implements TraceProvider
+interface FileFilter
 {
-    private $bufferedFilter;
-
-    public function __construct(BufferedSourceFileFilter $bufferedFilter)
-    {
-        $this->bufferedFilter = $bufferedFilter;
-    }
-
     /**
-     * @return iterable<Trace>
+     * @param iterable<SplFileInfo|Trace> $input
+     *
+     * @return iterable<SplFileInfo|Trace>
      */
-    public function provideTraces(): iterable
-    {
-        foreach ($this->bufferedFilter->getUnseenFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, [new TestLocations()]);
-        }
-    }
+    public function filter(iterable $input): iterable;
 }
