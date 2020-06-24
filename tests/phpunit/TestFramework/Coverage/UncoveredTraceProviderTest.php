@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
@@ -45,18 +46,23 @@ final class UncoveredTraceProviderTest extends TestCase
 {
     public function test_it_provides_traces(): void
     {
-        $provider = new UncoveredTraceProvider([
-            $trace = $this->createMock(Trace::class),
-        ], [
-            $fileInfo = $this->createMock(SplFileInfo::class),
-        ]);
+        $filter = $this->createMock(BufferedSourceFileFilter::class);
+        $fileInfo = $this->createMock(SplFileInfo::class);
 
+        $filter
+            ->expects($this->once())
+            ->method('getUnseenInCoverageReportFiles')
+            ->willReturn([$fileInfo])
+        ;
+
+        $provider = new UncoveredTraceProvider($filter);
+
+        /** @var Trace[] $traces */
         $traces = iterator_to_array($provider->provideTraces(), false);
 
-        $this->assertCount(2, $traces);
-        $this->assertSame($trace, $traces[0]);
-        $this->assertInstanceOf(ProxyTrace::class, $traces[1]);
-        $this->assertSame($fileInfo, $traces[1]->getSourceFileInfo());
-        $this->assertFalse($traces[1]->hasTests());
+        $this->assertCount(1, $traces);
+        $this->assertInstanceOf(ProxyTrace::class, $traces[0]);
+        $this->assertSame($fileInfo, $traces[0]->getSourceFileInfo());
+        $this->assertFalse($traces[0]->hasTests());
     }
 }
