@@ -52,8 +52,9 @@ use Webmozart\Assert\Assert;
  * we're checking them against pre-filtered list of files.
  *
  * @internal
+ * @final
  */
-final class BufferedSourceFileFilter implements FileFilter
+class BufferedSourceFileFilter implements FileFilter
 {
     private $filter;
 
