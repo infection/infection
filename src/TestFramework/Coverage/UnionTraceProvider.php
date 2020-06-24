@@ -78,15 +78,18 @@ final class UnionTraceProvider implements TraceProvider
      */
     public function provideTraces(): iterable
     {
+        /** @var iterable<Trace> $filteredTraces */
+        $filteredTraces = $this->bufferedFilter->filter(
+            $this->primaryTraceProvider->provideTraces()
+        );
+
         /*
          * Looking up test executing timings is not a free operation. We even had to memoize it to help speed things up.
          * Therefore we add test execution info only after applying filter to the files feed. Adding this step above the
          * filter will negatively affect performance. The greater the junit.xml report size, the more.
          */
         yield from $this->testFileDataAdder->addTestExecutionInfo(
-            $this->bufferedFilter->filter(
-                $this->primaryTraceProvider->provideTraces()
-            )
+            $filteredTraces
         );
 
         if ($this->onlyCovered === false) {

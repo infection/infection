@@ -74,16 +74,10 @@ final class BufferedSourceFileFilter implements FileFilter
     ) {
         $this->filter = $filter;
 
-        // Make a list of source files so we can check against it.
-        foreach ($this->filter->filter(
-            $sourceFiles
-        ) as $filteredSourceFile) {
-            /** @var SplFileInfo $filteredSourceFile */
-            $sourceFilePath = $filteredSourceFile->getRealPath();
-
-            Assert::string($sourceFilePath);
-
-            $this->sourceFiles[$sourceFilePath] = $filteredSourceFile;
+        // Make a map of source files so we can check covered files against it.
+        // We don't filter here on the assumption that hash table lookups are faster.
+        foreach ($sourceFiles as $sourceFile) {
+            $this->sourceFiles[(string) $sourceFile->getRealPath()] = $sourceFile;
         }
     }
 
@@ -106,10 +100,15 @@ final class BufferedSourceFileFilter implements FileFilter
     }
 
     /**
-     * @return SplFileInfo[]
+     * Returns files that are in source.directories from infection.json.dist but not in coverage report (phpunit's filter.whitelist.directory)
+     *
+     * @return iterable<SplFileInfo>
      */
-    public function getUnseenFiles(): array
+    public function getUnseenInCoverageReportFiles(): iterable
     {
-        return $this->sourceFiles;
+        /** @var iterable<SplFileInfo> $result */
+        $result = $this->filter->filter($this->sourceFiles);
+
+        return $result;
     }
 }
