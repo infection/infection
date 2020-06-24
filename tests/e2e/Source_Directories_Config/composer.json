@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Source_Directories_Config\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Source_Directories_Config\\Test\\": "tests/"
+        }
+    }
+}

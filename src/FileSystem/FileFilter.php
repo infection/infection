@@ -33,65 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\Tracing;
+namespace Infection\FileSystem;
 
-use Generator;
-use Infection\Container;
-use function iterator_to_array;
+use Infection\TestFramework\Coverage\Trace;
+use SplFileInfo;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
-
-$container = Container::create()->withDynamicParameters(
-    null,
-    '',
-    false,
-    'default',
-    false,
-    false,
-    'dot',
-    false,
-    __DIR__ . '/coverage',
-    '',
-    false,
-    false,
-    .0,
-    .0,
-    'phpunit',
-    '',
-    '',
-    0,
-    true
-);
-
-$generateTraces = static function (?int $maxCount) use ($container): iterable {
-    $traces = $container->getUnionTraceProvider()->provideTraces();
-
-    if ($maxCount === null) {
-        // Avoid extra limiting generator for a simpler case
-        return $traces;
-    }
-
-    $i = 0;
-
-    foreach ($traces as $trace) {
-        ++$i;
-
-        if ($i === $maxCount) {
-            return;
-        }
-
-        yield $trace;
-    }
-};
-
-return static function (int $maxCount) use ($generateTraces): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
-    }
-
-    $traces = $generateTraces($maxCount);
-
-    foreach ($traces as $_) {
-        // Iterate over the generator: do not use iterator_to_array which is less GC friendly
-    }
-};
+/**
+ * @internal
+ */
+interface FileFilter
+{
+    /**
+     * @param iterable<SplFileInfo|Trace> $input
+     *
+     * @return iterable<SplFileInfo|Trace>
+     */
+    public function filter(iterable $input): iterable;
+}

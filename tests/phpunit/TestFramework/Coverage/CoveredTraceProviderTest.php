@@ -33,65 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\Tracing;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use Generator;
-use Infection\Container;
-use function iterator_to_array;
+use Infection\FileSystem\FileFilter;
+use Infection\TestFramework\Coverage\CoveredTraceProvider;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\Coverage\TraceProvider;
+use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+final class CoveredTraceProviderTest extends TestCase
+{
+    public function test_it_provides_traces(): void
+    {
+        $canary = [1, 2, 3];
 
-$container = Container::create()->withDynamicParameters(
-    null,
-    '',
-    false,
-    'default',
-    false,
-    false,
-    'dot',
-    false,
-    __DIR__ . '/coverage',
-    '',
-    false,
-    false,
-    .0,
-    .0,
-    'phpunit',
-    '',
-    '',
-    0,
-    true
-);
+        $traceProviderMock = $this->createMock(TraceProvider::class);
+        $traceProviderMock
+            ->expects($this->once())
+            ->method('provideTraces')
+            ->willReturn($canary)
+        ;
 
-$generateTraces = static function (?int $maxCount) use ($container): iterable {
-    $traces = $container->getUnionTraceProvider()->provideTraces();
+        $filter = $this->createMock(FileFilter::class);
+        $filter
+            ->expects($this->once())
+            ->method('filter')
+            ->with($canary)
+            ->willReturn($canary)
+        ;
 
-    if ($maxCount === null) {
-        // Avoid extra limiting generator for a simpler case
-        return $traces;
+        $testFileDataAdder = $this->createMock(JUnitTestExecutionInfoAdder::class);
+        $testFileDataAdder
+            ->expects($this->once())
+            ->method('addTestExecutionInfo')
+            ->with($canary)
+            ->willReturn($canary)
+        ;
+
+        $provider = new CoveredTraceProvider($traceProviderMock, $testFileDataAdder, $filter);
+
+        /** @var array<int> $traces */
+        $traces = $provider->provideTraces();
+
+        $this->assertSame($canary, $traces);
+        $this->assertCount(3, $canary);
     }
-
-    $i = 0;
-
-    foreach ($traces as $trace) {
-        ++$i;
-
-        if ($i === $maxCount) {
-            return;
-        }
-
-        yield $trace;
-    }
-};
-
-return static function (int $maxCount) use ($generateTraces): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
-    }
-
-    $traces = $generateTraces($maxCount);
-
-    foreach ($traces as $_) {
-        // Iterate over the generator: do not use iterator_to_array which is less GC friendly
-    }
-};
+}

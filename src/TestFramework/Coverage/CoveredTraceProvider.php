@@ -35,22 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use function array_key_exists;
-use Infection\FileSystem\SourceFileFilter;
+use Infection\FileSystem\FileFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 
 /**
- * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
- * original source files in order to ensure all the files are included.
+ * Filters traces and augments them with timing data from JUnit report.
  *
  * @internal
  */
-final class FilteredEnrichedTraceProvider implements TraceProvider
+final class CoveredTraceProvider implements TraceProvider
 {
-    private const SEEN = true;
-
     /**
      * @var TraceProvider
      */
@@ -58,30 +53,20 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
 
     private $testFileDataAdder;
 
-    private $filter;
+    private $bufferedFilter;
 
     /**
-     * @var iterable<SplFileInfo>
-     */
-    private $sourceFiles;
-
-    private $onlyCovered;
-
-    /**
-     * @param iterable<SplFileInfo> $sourceFiles
+     * @param PhpUnitXmlCoverageTraceProvider|TraceProvider $primaryTraceProvider
+     * @param BufferedSourceFileFilter|FileFilter $bufferedFilter
      */
     public function __construct(
         TraceProvider $primaryTraceProvider,
         JUnitTestExecutionInfoAdder $testFileDataAdder,
-        SourceFileFilter $filter,
-        iterable $sourceFiles,
-        bool $onlyCovered
+        FileFilter $bufferedFilter
     ) {
         $this->primaryTraceProvider = $primaryTraceProvider;
         $this->testFileDataAdder = $testFileDataAdder;
-        $this->filter = $filter;
-        $this->sourceFiles = $sourceFiles;
-        $this->onlyCovered = $onlyCovered;
+        $this->bufferedFilter = $bufferedFilter;
     }
 
     /**
@@ -89,8 +74,8 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
      */
     public function provideTraces(): iterable
     {
-        /** @var iterable<Trace> $traces */
-        $traces = $this->filter->filter(
+        /** @var iterable<Trace> $filteredTraces */
+        $filteredTraces = $this->bufferedFilter->filter(
             $this->primaryTraceProvider->provideTraces()
         );
 
@@ -99,51 +84,8 @@ final class FilteredEnrichedTraceProvider implements TraceProvider
          * Therefore we add test execution info only after applying filter to the files feed. Adding this step above the
          * filter will negatively affect performance. The greater the junit.xml report size, the more.
          */
-        $enrichedTraces = $this->testFileDataAdder->addTestExecutionInfo($traces);
-
-        if ($this->onlyCovered === true) {
-            // The case where only covered files are considered
-            return $enrichedTraces;
-        }
-
-        return $this->appendUncoveredFiles($enrichedTraces);
-    }
-
-    /**
-     * Adds to the queue uncovered files found on disk.
-     *
-     * @param iterable<Trace> $traces
-     *
-     * @return iterable<Trace>
-     */
-    private function appendUncoveredFiles(iterable $traces): iterable
-    {
-        $filesSeen = [];
-
-        /** @var Trace $trace */
-        foreach ($traces as $trace) {
-            $filesSeen[$trace->getSourceFileInfo()->getRealPath()] = self::SEEN;
-
-            yield $trace;
-        }
-
-        /** @var iterable<SplFileInfo> $filteredSourceFiles */
-        $filteredSourceFiles = $this->filter->filter(
-            $this->sourceFiles
+        return $this->testFileDataAdder->addTestExecutionInfo(
+            $filteredTraces
         );
-
-        // Since these are sorted sets, there should be a way to optimize.
-
-        foreach ($filteredSourceFiles as $splFileInfo) {
-            $sourceFilePath = $splFileInfo->getRealPath();
-
-            Assert::string($sourceFilePath);
-
-            if (array_key_exists($sourceFilePath, $filesSeen)) {
-                continue;
-            }
-
-            yield new ProxyTrace($splFileInfo, [new TestLocations()]);
-        }
     }
 }

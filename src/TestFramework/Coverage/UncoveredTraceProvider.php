@@ -33,65 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\Tracing;
+namespace Infection\TestFramework\Coverage;
 
-use Generator;
-use Infection\Container;
-use function iterator_to_array;
+/**
+ * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
+ *
+ * @internal
+ */
+final class UncoveredTraceProvider implements TraceProvider
+{
+    private $bufferedFilter;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
-
-$container = Container::create()->withDynamicParameters(
-    null,
-    '',
-    false,
-    'default',
-    false,
-    false,
-    'dot',
-    false,
-    __DIR__ . '/coverage',
-    '',
-    false,
-    false,
-    .0,
-    .0,
-    'phpunit',
-    '',
-    '',
-    0,
-    true
-);
-
-$generateTraces = static function (?int $maxCount) use ($container): iterable {
-    $traces = $container->getUnionTraceProvider()->provideTraces();
-
-    if ($maxCount === null) {
-        // Avoid extra limiting generator for a simpler case
-        return $traces;
+    public function __construct(BufferedSourceFileFilter $bufferedFilter)
+    {
+        $this->bufferedFilter = $bufferedFilter;
     }
 
-    $i = 0;
-
-    foreach ($traces as $trace) {
-        ++$i;
-
-        if ($i === $maxCount) {
-            return;
+    /**
+     * @return iterable<Trace>
+     */
+    public function provideTraces(): iterable
+    {
+        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
+            yield new ProxyTrace($splFileInfo, [new TestLocations()]);
         }
-
-        yield $trace;
     }
-};
-
-return static function (int $maxCount) use ($generateTraces): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
-    }
-
-    $traces = $generateTraces($maxCount);
-
-    foreach ($traces as $_) {
-        // Iterate over the generator: do not use iterator_to_array which is less GC friendly
-    }
-};
+}
