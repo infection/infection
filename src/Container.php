@@ -106,6 +106,7 @@ use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
@@ -213,11 +214,16 @@ final class Container
                 // TODO XmlCoverageParser might want to notify ProcessRunner if it can't parse another file due to lack of RAM
                 return new XmlCoverageParser();
             },
-            UnionTraceProvider::class => static function (self $container): UnionTraceProvider {
-                return new UnionTraceProvider(
+            CoveredTraceProvider::class => static function (self $container): CoveredTraceProvider {
+                return new CoveredTraceProvider(
                     $container->getPhpUnitXmlCoverageTraceProvider(),
                     $container->getJUnitTestExecutionInfoAdder(),
                     $container->getBufferedSourceFileFilter(),
+                );
+            },
+            UnionTraceProvider::class => static function (self $container): UnionTraceProvider {
+                return new UnionTraceProvider(
+                    $container->getCoveredTraceProvider(),
                     $container->getUncoveredTraceProvider(),
                     $container->getConfiguration()->mutateOnlyCoveredCode()
                 );
@@ -775,6 +781,11 @@ final class Container
     public function getXmlCoverageParser(): XmlCoverageParser
     {
         return $this->get(XmlCoverageParser::class);
+    }
+
+    public function getCoveredTraceProvider(): CoveredTraceProvider
+    {
+        return $this->get(CoveredTraceProvider::class);
     }
 
     public function getUnionTraceProvider(): UnionTraceProvider

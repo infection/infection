@@ -35,35 +35,38 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\FileSystem\FileFilter;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
+
 /**
- * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
- * original source files in order to ensure all the files are included.
+ * Filters traces and augments them with timing data from JUnit report.
  *
  * @internal
  */
-final class UnionTraceProvider implements TraceProvider
+final class CoveredTraceProvider implements TraceProvider
 {
     /**
      * @var TraceProvider
      */
-    private $coveredTraceProvider;
+    private $primaryTraceProvider;
 
-    private $uncoveredTraceProvider;
+    private $testFileDataAdder;
 
-    private $onlyCovered;
+    private $bufferedFilter;
 
     /**
-     * @param CoveredTraceProvider|TraceProvider $coveredTraceProvider
-     * @param UncoveredTraceProvider|TraceProvider $uncoveredTraceProvider
+     * @param PhpUnitXmlCoverageTraceProvider|TraceProvider $primaryTraceProvider
+     * @param BufferedSourceFileFilter|FileFilter $bufferedFilter
      */
     public function __construct(
-        TraceProvider $coveredTraceProvider,
-        TraceProvider $uncoveredTraceProvider,
-        bool $onlyCovered
+        TraceProvider $primaryTraceProvider,
+        JUnitTestExecutionInfoAdder $testFileDataAdder,
+        FileFilter $bufferedFilter
     ) {
-        $this->coveredTraceProvider = $coveredTraceProvider;
-        $this->uncoveredTraceProvider = $uncoveredTraceProvider;
-        $this->onlyCovered = $onlyCovered;
+        $this->primaryTraceProvider = $primaryTraceProvider;
+        $this->testFileDataAdder = $testFileDataAdder;
+        $this->bufferedFilter = $bufferedFilter;
     }
 
     /**
@@ -71,10 +74,18 @@ final class UnionTraceProvider implements TraceProvider
      */
     public function provideTraces(): iterable
     {
-        yield from $this->coveredTraceProvider->provideTraces();
+        /** @var iterable<Trace> $filteredTraces */
+        $filteredTraces = $this->bufferedFilter->filter(
+            $this->primaryTraceProvider->provideTraces()
+        );
 
-        if ($this->onlyCovered === false) {
-            yield from $this->uncoveredTraceProvider->provideTraces();
-        }
+        /*
+         * Looking up test executing timings is not a free operation. We even had to memoize it to help speed things up.
+         * Therefore we add test execution info only after applying filter to the files feed. Adding this step above the
+         * filter will negatively affect performance. The greater the junit.xml report size, the more.
+         */
+        return $this->testFileDataAdder->addTestExecutionInfo(
+            $filteredTraces
+        );
     }
 }
