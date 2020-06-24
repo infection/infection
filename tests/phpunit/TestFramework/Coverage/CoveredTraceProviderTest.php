@@ -72,6 +72,7 @@ final class CoveredTraceProviderTest extends TestCase
 
         $provider = new CoveredTraceProvider($traceProviderMock, $testFileDataAdder, $filter);
 
+        /** @var array<int> $traces */
         $traces = $provider->provideTraces();
 
         $this->assertSame($canary, $traces);

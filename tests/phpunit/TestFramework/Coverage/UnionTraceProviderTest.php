@@ -60,7 +60,9 @@ final class UnionTraceProviderTest extends TestCase
 
         $provider = new UnionTraceProvider($coveredTraceProvider, $uncoveredTraceProvider, true);
 
-        $this->assertSame($canary, iterator_to_array($provider->provideTraces(), false));
+        /** @var array<int> $traces */
+        $traces = iterator_to_array($provider->provideTraces(), false);
+        $this->assertSame($canary, $traces);
     }
 
     public function test_it_adds_uncovered_traces(): void
@@ -83,6 +85,8 @@ final class UnionTraceProviderTest extends TestCase
 
         $provider = new UnionTraceProvider($coveredTraceProvider, $uncoveredTraceProvider, false);
 
-        $this->assertSame(array_merge($canary, $canary), iterator_to_array($provider->provideTraces(), false));
+        /** @var array<int> $traces */
+        $traces = iterator_to_array($provider->provideTraces(), false);
+        $this->assertSame(array_merge($canary, $canary), $traces);
     }
 }
