@@ -33,71 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\FileSystem;
+namespace Infection\Tests\TestFramework\Coverage;
 
-/*
- * This file is part of the box project.
- *
- * (c) Kevin Herrera <kevin@herrera.io>
- *     Théo Fidry <theo.fidry@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
-use function Infection\Tests\make_tmp_dir;
-use function Infection\Tests\normalizePath;
+use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\Trace;
+use Infection\TestFramework\Coverage\UncoveredTraceProvider;
 use PHPUnit\Framework\TestCase;
-use function Safe\getcwd;
-use function Safe\realpath;
-use Symfony\Component\Filesystem\Filesystem;
-use function sys_get_temp_dir;
+use Symfony\Component\Finder\SplFileInfo;
 
-/**
- * @private
- */
-abstract class FileSystemTestCase extends TestCase
+final class UncoveredTraceProviderTest extends TestCase
 {
-    private const TMP_DIR_NAME = 'infection-test';
-
-    /**
-     * @var string
-     */
-    protected $cwd;
-
-    /**
-     * @var string
-     */
-    protected $tmp;
-
-    public static function tearDownAfterClass(): void
+    public function test_it_provides_traces(): void
     {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
-    }
+        $filter = $this->createMock(BufferedSourceFileFilter::class);
+        $fileInfo = $this->createMock(SplFileInfo::class);
 
-    protected function setUp(): void
-    {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
+        $filter
+            ->expects($this->once())
+            ->method('getUnseenInCoverageReportFiles')
+            ->willReturn([$fileInfo])
+        ;
 
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir(self::TMP_DIR_NAME, self::class);
-    }
+        $provider = new UncoveredTraceProvider($filter);
 
-    protected function tearDown(): void
-    {
-        (new Filesystem())->remove($this->tmp);
-    }
+        /** @var Trace[] $traces */
+        $traces = iterator_to_array($provider->provideTraces(), false);
 
-    final protected static function removeTmpDir(): void
-    {
-        (new Filesystem())->remove(
-            normalizePath(
-                realpath(sys_get_temp_dir()) . '/' . self::TMP_DIR_NAME
-            )
-        );
+        $this->assertCount(1, $traces);
+        $this->assertInstanceOf(ProxyTrace::class, $traces[0]);
+        $this->assertSame($fileInfo, $traces[0]->getSourceFileInfo());
+        $this->assertFalse($traces[0]->hasTests());
     }
 }

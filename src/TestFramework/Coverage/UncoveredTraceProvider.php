@@ -33,21 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Reflection;
+namespace Infection\TestFramework\Coverage;
 
-use Infection\Reflection\AnonymousClassReflection;
-use Infection\Reflection\ClassReflection;
-
-final class AnonymousClassReflectionTest extends ClassReflectionTestCase
+/**
+ * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
+ *
+ * @internal
+ */
+final class UncoveredTraceProvider implements TraceProvider
 {
-    public function test_it_has_no_name(): void
+    private $bufferedFilter;
+
+    public function __construct(BufferedSourceFileFilter $bufferedFilter)
     {
-        $reflection = AnonymousClassReflection::fromClassName(self::class);
-        $this->assertSame('', $reflection->getName());
+        $this->bufferedFilter = $bufferedFilter;
     }
 
-    protected function createFromName(string $name): ClassReflection
+    /**
+     * @return iterable<Trace>
+     */
+    public function provideTraces(): iterable
     {
-        return AnonymousClassReflection::fromClassName($name);
+        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
+            yield new ProxyTrace($splFileInfo, [new TestLocations()]);
+        }
     }
 }

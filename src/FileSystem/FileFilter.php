@@ -33,21 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Reflection;
+namespace Infection\FileSystem;
 
-use Infection\Reflection\AnonymousClassReflection;
-use Infection\Reflection\ClassReflection;
+use Infection\TestFramework\Coverage\Trace;
+use SplFileInfo;
 
-final class AnonymousClassReflectionTest extends ClassReflectionTestCase
+/**
+ * @internal
+ */
+interface FileFilter
 {
-    public function test_it_has_no_name(): void
-    {
-        $reflection = AnonymousClassReflection::fromClassName(self::class);
-        $this->assertSame('', $reflection->getName());
-    }
-
-    protected function createFromName(string $name): ClassReflection
-    {
-        return AnonymousClassReflection::fromClassName($name);
-    }
+    /**
+     * @param iterable<SplFileInfo|Trace> $input
+     *
+     * @return iterable<SplFileInfo|Trace>
+     */
+    public function filter(iterable $input): iterable;
 }

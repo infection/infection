@@ -132,9 +132,9 @@ return Config::create()
             'align' => 'left',
         ],
         'php_unit_dedicate_assert' => true,
-        'php_unit_method_casing' => [
+        /*'php_unit_method_casing' => [
             'case' => 'snake_case',
-        ],
+        ],*/
         'php_unit_set_up_tear_down_visibility' => true,
         'php_unit_strict' => true,
         'php_unit_ordered_covers' => true,

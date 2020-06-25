@@ -33,71 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\FileSystem;
+namespace Infection\Tests\TestFramework\Coverage;
 
-/*
- * This file is part of the box project.
- *
- * (c) Kevin Herrera <kevin@herrera.io>
- *     Théo Fidry <theo.fidry@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
-use function Infection\Tests\make_tmp_dir;
-use function Infection\Tests\normalizePath;
+use Infection\FileSystem\FileFilter;
+use Infection\TestFramework\Coverage\CoveredTraceProvider;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\Coverage\TraceProvider;
 use PHPUnit\Framework\TestCase;
-use function Safe\getcwd;
-use function Safe\realpath;
-use Symfony\Component\Filesystem\Filesystem;
-use function sys_get_temp_dir;
 
-/**
- * @private
- */
-abstract class FileSystemTestCase extends TestCase
+final class CoveredTraceProviderTest extends TestCase
 {
-    private const TMP_DIR_NAME = 'infection-test';
-
-    /**
-     * @var string
-     */
-    protected $cwd;
-
-    /**
-     * @var string
-     */
-    protected $tmp;
-
-    public static function tearDownAfterClass(): void
+    public function test_it_provides_traces(): void
     {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
-    }
+        $canary = [1, 2, 3];
 
-    protected function setUp(): void
-    {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
+        $traceProviderMock = $this->createMock(TraceProvider::class);
+        $traceProviderMock
+            ->expects($this->once())
+            ->method('provideTraces')
+            ->willReturn($canary)
+        ;
 
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir(self::TMP_DIR_NAME, self::class);
-    }
+        $filter = $this->createMock(FileFilter::class);
+        $filter
+            ->expects($this->once())
+            ->method('filter')
+            ->with($canary)
+            ->willReturn($canary)
+        ;
 
-    protected function tearDown(): void
-    {
-        (new Filesystem())->remove($this->tmp);
-    }
+        $testFileDataAdder = $this->createMock(JUnitTestExecutionInfoAdder::class);
+        $testFileDataAdder
+            ->expects($this->once())
+            ->method('addTestExecutionInfo')
+            ->with($canary)
+            ->willReturn($canary)
+        ;
 
-    final protected static function removeTmpDir(): void
-    {
-        (new Filesystem())->remove(
-            normalizePath(
-                realpath(sys_get_temp_dir()) . '/' . self::TMP_DIR_NAME
-            )
-        );
+        $provider = new CoveredTraceProvider($traceProviderMock, $testFileDataAdder, $filter);
+
+        /** @var array<int> $traces */
+        $traces = $provider->provideTraces();
+
+        $this->assertSame($canary, $traces);
+        $this->assertCount(3, $canary);
     }
 }

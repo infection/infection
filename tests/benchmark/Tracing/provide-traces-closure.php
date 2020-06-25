@@ -64,7 +64,7 @@ $container = Container::create()->withDynamicParameters(
 );
 
 $generateTraces = static function (?int $maxCount) use ($container): iterable {
-    $traces = $container->getFilteredEnrichedTraceProvider()->provideTraces();
+    $traces = $container->getUnionTraceProvider()->provideTraces();
 
     if ($maxCount === null) {
         // Avoid extra limiting generator for a simpler case

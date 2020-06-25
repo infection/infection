@@ -33,71 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\FileSystem;
-
-/*
- * This file is part of the box project.
- *
- * (c) Kevin Herrera <kevin@herrera.io>
- *     Théo Fidry <theo.fidry@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
-use function Infection\Tests\make_tmp_dir;
-use function Infection\Tests\normalizePath;
-use PHPUnit\Framework\TestCase;
-use function Safe\getcwd;
-use function Safe\realpath;
-use Symfony\Component\Filesystem\Filesystem;
-use function sys_get_temp_dir;
+namespace Infection\TestFramework\Coverage;
 
 /**
- * @private
+ * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
+ * original source files in order to ensure all the files are included.
+ *
+ * @internal
  */
-abstract class FileSystemTestCase extends TestCase
+final class UnionTraceProvider implements TraceProvider
 {
-    private const TMP_DIR_NAME = 'infection-test';
+    /**
+     * @var TraceProvider
+     */
+    private $coveredTraceProvider;
+
+    private $uncoveredTraceProvider;
+
+    private $onlyCovered;
 
     /**
-     * @var string
+     * @param CoveredTraceProvider|TraceProvider $coveredTraceProvider
+     * @param UncoveredTraceProvider|TraceProvider $uncoveredTraceProvider
      */
-    protected $cwd;
+    public function __construct(
+        TraceProvider $coveredTraceProvider,
+        TraceProvider $uncoveredTraceProvider,
+        bool $onlyCovered
+    ) {
+        $this->coveredTraceProvider = $coveredTraceProvider;
+        $this->uncoveredTraceProvider = $uncoveredTraceProvider;
+        $this->onlyCovered = $onlyCovered;
+    }
 
     /**
-     * @var string
+     * @return iterable<Trace>
      */
-    protected $tmp;
-
-    public static function tearDownAfterClass(): void
+    public function provideTraces(): iterable
     {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
-    }
+        yield from $this->coveredTraceProvider->provideTraces();
 
-    protected function setUp(): void
-    {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
-
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir(self::TMP_DIR_NAME, self::class);
-    }
-
-    protected function tearDown(): void
-    {
-        (new Filesystem())->remove($this->tmp);
-    }
-
-    final protected static function removeTmpDir(): void
-    {
-        (new Filesystem())->remove(
-            normalizePath(
-                realpath(sys_get_temp_dir()) . '/' . self::TMP_DIR_NAME
-            )
-        );
+        if ($this->onlyCovered === false) {
+            yield from $this->uncoveredTraceProvider->provideTraces();
+        }
     }
 }

@@ -139,7 +139,7 @@ final class ContainerTest extends TestCase
             true
         );
 
-        $traces = $newContainer->getFilteredEnrichedTraceProvider()->provideTraces();
+        $traces = $newContainer->getUnionTraceProvider()->provideTraces();
 
         $this->assertIsIterable($traces);
 
