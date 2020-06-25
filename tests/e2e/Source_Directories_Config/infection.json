@@ -1,0 +1,12 @@
+{
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "src/ToMutate"
+        ]
+    },
+    "logs": {
+        "summary": "infection.log"
+    },
+    "tmpDir": "."
+}

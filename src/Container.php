@@ -104,14 +104,17 @@ use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\Coverage\FilteredEnrichedTraceProvider;
+use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\UncoveredTraceProvider;
+use Infection\TestFramework\Coverage\UnionTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
@@ -211,13 +214,29 @@ final class Container
                 // TODO XmlCoverageParser might want to notify ProcessRunner if it can't parse another file due to lack of RAM
                 return new XmlCoverageParser();
             },
-            FilteredEnrichedTraceProvider::class => static function (self $container): FilteredEnrichedTraceProvider {
-                return new FilteredEnrichedTraceProvider(
+            CoveredTraceProvider::class => static function (self $container): CoveredTraceProvider {
+                return new CoveredTraceProvider(
                     $container->getPhpUnitXmlCoverageTraceProvider(),
                     $container->getJUnitTestExecutionInfoAdder(),
+                    $container->getBufferedSourceFileFilter(),
+                );
+            },
+            UnionTraceProvider::class => static function (self $container): UnionTraceProvider {
+                return new UnionTraceProvider(
+                    $container->getCoveredTraceProvider(),
+                    $container->getUncoveredTraceProvider(),
+                    $container->getConfiguration()->mutateOnlyCoveredCode()
+                );
+            },
+            BufferedSourceFileFilter::class => static function (self $container): BufferedSourceFileFilter {
+                return new BufferedSourceFileFilter(
                     $container->getSourceFileFilter(),
                     $container->getConfiguration()->getSourceFiles(),
-                    $container->getConfiguration()->mutateOnlyCoveredCode()
+                );
+            },
+            UncoveredTraceProvider::class => static function (self $container): UncoveredTraceProvider {
+                return new UncoveredTraceProvider(
+                    $container->getBufferedSourceFileFilter()
                 );
             },
             SourceFileFilter::class => static function (self $container): SourceFileFilter {
@@ -530,7 +549,7 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new MutationGenerator(
-                    $container->getFilteredEnrichedTraceProvider(),
+                    $container->getUnionTraceProvider(),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
@@ -764,14 +783,29 @@ final class Container
         return $this->get(XmlCoverageParser::class);
     }
 
-    public function getFilteredEnrichedTraceProvider(): FilteredEnrichedTraceProvider
+    public function getCoveredTraceProvider(): CoveredTraceProvider
     {
-        return $this->get(FilteredEnrichedTraceProvider::class);
+        return $this->get(CoveredTraceProvider::class);
+    }
+
+    public function getUnionTraceProvider(): UnionTraceProvider
+    {
+        return $this->get(UnionTraceProvider::class);
     }
 
     public function getSourceFileFilter(): SourceFileFilter
     {
         return $this->get(SourceFileFilter::class);
+    }
+
+    public function getBufferedSourceFileFilter(): BufferedSourceFileFilter
+    {
+        return $this->get(BufferedSourceFileFilter::class);
+    }
+
+    public function getUncoveredTraceProvider(): UncoveredTraceProvider
+    {
+        return $this->get(UncoveredTraceProvider::class);
     }
 
     public function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder

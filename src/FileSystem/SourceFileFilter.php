@@ -48,7 +48,7 @@ use Symfony\Component\Finder\Iterator\PathFilterIterator;
  * @internal
  * @final
  */
-class SourceFileFilter
+class SourceFileFilter implements FileFilter
 {
     /**
      * @var string[]
@@ -85,11 +85,6 @@ class SourceFileFilter
         return $this->filters;
     }
 
-    /**
-     * @param iterable<SplFileInfo|Trace> $input
-     *
-     * @return iterable<SplFileInfo|Trace>
-     */
     public function filter(iterable $input): iterable
     {
         $iterator = $this->iterableToIterator($input);
