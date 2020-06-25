@@ -35,17 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
+use function array_intersect_key;
+use function implode;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationAttributeKeys;
+use Infection\PhpParser\MutatedNode;
+use function md5;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
+use function Safe\array_flip;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  * @final
  */
-class MutantFactory
+class MutationFactory
 {
     private $tmpDir;
     private $differ;
@@ -55,7 +63,7 @@ class MutantFactory
      * @var string[]
      */
     private $printedFileCache = [];
-    private $mutantCodeFactory;
+    private $codeFactory;
 
     public function __construct(
         string $tmpDir,
@@ -66,35 +74,103 @@ class MutantFactory
         $this->tmpDir = $tmpDir;
         $this->differ = $differ;
         $this->printer = $printer;
-        $this->mutantCodeFactory = $mutantCodeFactory;
+        $this->codeFactory = $mutantCodeFactory;
     }
 
-    public function create(Mutation $mutation): Mutant
-    {
-        $mutantFilePath = sprintf(
-            '%s/mutant.%s.infection.php',
+    /**
+     * @param Node[] $originalFileAst
+     * @param array<string|int|float> $attributes
+     * @param class-string $mutatedNodeClass
+     * @param TestLocation[] $tests
+     */
+    public function create(
+        string $originalFilePath,
+        array $originalFileAst,
+        string $mutatorName,
+        array $attributes,
+        string $mutatedNodeClass,
+        MutatedNode $mutatedNode,
+        int $mutationByMutatorIndex,
+        array $tests
+    ): Mutation {
+        foreach (MutationAttributeKeys::ALL as $key) {
+            Assert::keyExists($attributes, $key);
+        }
+
+        $attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
+
+        $hash = self::createHash(
+            $originalFilePath,
+            $mutatorName,
+            $attributes,
+            $mutationByMutatorIndex
+        );
+
+        $mutationFilePath = sprintf(
+            '%s/mutation.%s.infection.php',
             $this->tmpDir,
-            $mutation->getHash()
+            $hash
         );
 
-        $mutatedCode = $this->mutantCodeFactory->createCode($mutation);
+        $mutatedCode = $this->codeFactory->createCode(
+            $attributes,
+            $originalFileAst,
+            $mutatedNodeClass,
+            $mutatedNode
+        );
 
-        return new Mutant(
-            $mutantFilePath,
-            $mutation,
+        return new Mutation(
+            $originalFilePath,
+            $mutatorName,
+            (int) $attributes[MutationAttributeKeys::START_LINE],
+            $tests,
+            $hash,
+            $mutationFilePath,
             $mutatedCode,
-            $this->createMutantDiff($mutation, $mutatedCode)
+            $this->createMutationDiff(
+                $originalFilePath,
+                $originalFileAst,
+                $mutatedCode
+            )
         );
     }
 
-    private function createMutantDiff(Mutation $mutation, string $mutantCode): string
-    {
+    /**
+     * @param array<string|int|float> $attributes
+     */
+    private static function createHash(
+        string $originalFilePath,
+        string $mutatorName,
+        array $attributes,
+        int $mutationByMutatorIndex
+    ): string {
+        $hashKeys = [
+            $originalFilePath,
+            $mutatorName,
+            $mutationByMutatorIndex,
+        ];
+
+        foreach ($attributes as $attribute) {
+            $hashKeys[] = $attribute;
+        }
+
+        return md5(implode('_', $hashKeys));
+    }
+
+    /**
+     * @param Node[] $originalFileAst
+     */
+    private function createMutationDiff(
+        string $originalFilePath,
+        array $originalFileAst,
+        string $mutationCode
+    ): string {
         $originalPrettyPrintedFile = $this->getOriginalPrettyPrintedFile(
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalFileAst()
+            $originalFilePath,
+            $originalFileAst
         );
 
-        return $this->differ->diff($originalPrettyPrintedFile, $mutantCode);
+        return $this->differ->diff($originalPrettyPrintedFile, $mutationCode);
     }
 
     /**

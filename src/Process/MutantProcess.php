@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use Closure;
-use Infection\Mutant\Mutant;
+use Infection\Mutation\Mutation;
 use Infection\Process\Runner\ProcessBearer;
 use Symfony\Component\Process\Process;
 
@@ -47,7 +47,7 @@ use Symfony\Component\Process\Process;
 class MutantProcess implements ProcessBearer
 {
     private $process;
-    private $mutant;
+    private $mutation;
     private $callback;
 
     /**
@@ -55,10 +55,10 @@ class MutantProcess implements ProcessBearer
      */
     private $timedOut = false;
 
-    public function __construct(Process $process, Mutant $mutant)
+    public function __construct(Process $process, Mutation $mutation)
     {
         $this->process = $process;
-        $this->mutant = $mutant;
+        $this->mutation = $mutation;
         $this->callback = static function (): void {};
     }
 
@@ -67,9 +67,9 @@ class MutantProcess implements ProcessBearer
         return $this->process;
     }
 
-    public function getMutant(): Mutant
+    public function getMutation(): Mutation
     {
-        return $this->mutant;
+        return $this->mutation;
     }
 
     public function markAsTimedOut(): void

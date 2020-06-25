@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\Mutation\Mutation;
+use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
+use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinterAbstract;
 
@@ -54,14 +55,23 @@ class MutantCodeFactory
         $this->printer = $prettyPrinter;
     }
 
-    public function createCode(Mutation $mutation): string
-    {
+    /**
+     * @param array<string|int|float> $attributes
+     * @param Node[] $originalFileAst
+     * @param class-string $mutatedNodeClass
+     */
+    public function createCode(
+        array $attributes,
+        array $originalFileAst,
+        string $mutatedNodeClass,
+        MutatedNode $mutatedNode
+    ): string {
         $traverser = new NodeTraverser();
 
         $traverser->addVisitor(new CloneVisitor());
-        $traverser->addVisitor(new MutatorVisitor($mutation));
+        $traverser->addVisitor(new MutatorVisitor($attributes, $mutatedNodeClass, $mutatedNode));
 
-        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
+        $mutatedStatements = $traverser->traverse($originalFileAst);
 
         return $this->printer->prettyPrintFile($mutatedStatements);
     }

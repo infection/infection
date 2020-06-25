@@ -33,64 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\Mutation;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutation\Mutation;
+use Infection\Mutant\MutantExecutionResult;
 
-/**
- * @internal
- * @final
- */
-class Mutant
+trait MutantExecutionResultAssertions
 {
-    private $mutantFilePath;
-    private $mutation;
-    private $mutatedCode;
-    private $diff;
-
-    public function __construct(
-        string $mutantFilePath,
-        Mutation $mutation,
-        string $mutatedCode,
-        string $diff
-    ) {
-        $this->mutantFilePath = $mutantFilePath;
-        $this->mutation = $mutation;
-        $this->mutatedCode = $mutatedCode;
-        $this->diff = $diff;
-    }
-
-    public function getFilePath(): string
-    {
-        return $this->mutantFilePath;
-    }
-
-    public function getMutation(): Mutation
-    {
-        return $this->mutation;
-    }
-
-    public function getMutatedCode(): string
-    {
-        return $this->mutatedCode;
-    }
-
-    public function getDiff(): string
-    {
-        return $this->diff;
-    }
-
-    public function isCoveredByTest(): bool
-    {
-        return $this->mutation->isCoveredByTest();
-    }
-
-    /**
-     * @return TestLocation[]
-     */
-    public function getTests(): array
-    {
-        return $this->mutation->getAllTests();
+    private function assertResultStateIs(
+        MutantExecutionResult $result,
+        string $expectedProcessCommandLine,
+        string $expectedProcessOutput,
+        string $expectedDetectionStatus,
+        string $expectedMutationDiff,
+        string $expectedMutatorName,
+        string $expectedOriginalFilePath,
+        int $expectedOriginalStartingLine
+    ): void {
+        $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
+        $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
+        $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
+        $this->assertSame($expectedMutationDiff, $result->getMutationDiff());
+        $this->assertSame($expectedMutatorName, $result->getMutatorName());
+        $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
+        $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());
     }
 }

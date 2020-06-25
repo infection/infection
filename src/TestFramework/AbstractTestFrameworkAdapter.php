@@ -97,7 +97,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     }
 
     /**
-     * Returns array of arguments to pass them into the Mutant Symfony Process
+     * Returns array of arguments to pass them into the Mutant Symfony's process
      *
      * @param TestLocation[] $tests
      *

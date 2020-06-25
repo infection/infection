@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use function array_keys;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\ProfileList;
 use Webmozart\Assert\Assert;
 
@@ -48,7 +49,7 @@ class MutantExecutionResult
     private $processCommandLine;
     private $processOutput;
     private $detectionStatus;
-    private $mutantDiff;
+    private $mutationDiff;
     private $mutatorName;
     private $originalFilePath;
     private $originalStartingLine;
@@ -57,7 +58,7 @@ class MutantExecutionResult
         string $processCommandLine,
         string $processOutput,
         string $detectionStatus,
-        string $mutantDiff,
+        string $mutationDiff,
         string $mutatorName,
         string $originalFilePath,
         int $originalStartingLine
@@ -68,22 +69,20 @@ class MutantExecutionResult
         $this->processCommandLine = $processCommandLine;
         $this->processOutput = $processOutput;
         $this->detectionStatus = $detectionStatus;
-        $this->mutantDiff = $mutantDiff;
+        $this->mutationDiff = $mutationDiff;
         $this->mutatorName = $mutatorName;
         $this->originalFilePath = $originalFilePath;
         $this->originalStartingLine = $originalStartingLine;
     }
 
-    public static function createFromNonCoveredMutant(Mutant $mutant): self
+    public static function createFromNonCoveredByTestsMutation(Mutation $mutation): self
     {
-        $mutation = $mutant->getMutation();
-
         return new self(
             '',
             '',
             DetectionStatus::NOT_COVERED,
-            $mutant->getDiff(),
-            $mutant->getMutation()->getMutatorName(),
+            $mutation->getDiff(),
+            $mutation->getMutatorName(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalStartingLine()
         );
@@ -104,9 +103,9 @@ class MutantExecutionResult
         return $this->detectionStatus;
     }
 
-    public function getMutantDiff(): string
+    public function getMutationDiff(): string
     {
-        return $this->mutantDiff;
+        return $this->mutationDiff;
     }
 
     public function getMutatorName(): string

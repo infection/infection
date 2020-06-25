@@ -40,9 +40,7 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Factory\MutantProcessFactory;
 use function Pipeline\take;
@@ -54,7 +52,6 @@ use Symfony\Component\Filesystem\Filesystem;
 final class MutationTestingRunner
 {
     private $processFactory;
-    private $mutantFactory;
     private $processRunner;
     private $eventDispatcher;
     private $fileSystem;
@@ -62,14 +59,12 @@ final class MutationTestingRunner
 
     public function __construct(
         MutantProcessFactory $processFactory,
-        MutantFactory $mutantFactory,
         ProcessRunner $processRunner,
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
         bool $runConcurrently
     ) {
         $this->processFactory = $processFactory;
-        $this->mutantFactory = $mutantFactory;
         $this->processRunner = $processRunner;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileSystem = $fileSystem;
@@ -81,29 +76,28 @@ final class MutationTestingRunner
      */
     public function run(iterable $mutations, string $testFrameworkExtraOptions): void
     {
-        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
-        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
+        $numberOfMutations = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
+        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutations));
 
         $processes = take($mutations)
-            ->map(function (Mutation $mutation): Mutant {
-                return $this->mutantFactory->create($mutation);
-            })
-            ->filter(function (Mutant $mutant) {
-                // It's a proxy call to Mutation, can be done one stage up
-                if ($mutant->isCoveredByTest()) {
+            ->filter(function (Mutation $mutation) {
+                if ($mutation->isCoveredByTest()) {
                     return true;
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromNonCoveredMutant($mutant)
+                    MutantExecutionResult::createFromNonCoveredByTestsMutation($mutation)
                 ));
 
                 return false;
             })
-            ->map(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
-                $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode());
+            ->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): ProcessBearer {
+                $this->fileSystem->dumpFile($mutation->getFilePath(), $mutation->getMutatedCode());
 
-                $process = $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+                $process = $this->processFactory->createProcessForMutation(
+                    $mutation,
+                    $testFrameworkExtraOptions
+                );
 
                 return $process;
             })

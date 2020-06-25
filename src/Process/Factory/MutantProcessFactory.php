@@ -38,8 +38,8 @@ namespace Infection\Process\Factory;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutation\Mutation;
 use Infection\Process\MutantProcess;
 use function method_exists;
 use Symfony\Component\Process\Process;
@@ -68,14 +68,14 @@ class MutantProcessFactory
         $this->resultFactory = $resultFactory;
     }
 
-    public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    public function createProcessForMutation(Mutation $mutation, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
+                $mutation->getAllTests(),
+                $mutation->getFilePath(),
+                $mutation->getHash(),
+                $mutation->getOriginalFilePath(),
                 $testFrameworkExtraOptions
             )
         );
@@ -87,7 +87,7 @@ class MutantProcessFactory
             $process->inheritEnvironmentVariables();
         }
 
-        $mutantProcess = new MutantProcess($process, $mutant);
+        $mutantProcess = new MutantProcess($process, $mutation);
 
         $eventDispatcher = $this->eventDispatcher;
         $resultFactory = $this->resultFactory;

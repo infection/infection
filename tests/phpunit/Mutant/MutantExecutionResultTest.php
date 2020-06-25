@@ -37,25 +37,20 @@ namespace Infection\Tests\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
-use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\TestCase;
 
 final class MutantExecutionResultTest extends TestCase
 {
-    use MutantExecutionResultAssertions;
-
     public function test_it_can_be_instantiated(): void
     {
         $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"';
         $processOutput = 'Passed!';
         $processResultCode = DetectionStatus::ESCAPED;
-        $mutantDiff = <<<'DIFF'
+        $mutationDiff = <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -73,7 +68,7 @@ DIFF;
             $processCommandLine,
             $processOutput,
             $processResultCode,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine
@@ -84,42 +79,16 @@ DIFF;
             $processCommandLine,
             $processOutput,
             $processResultCode,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine
         );
     }
 
-    public function test_it_can_be_instantiated_from_a_non_covered_mutant(): void
+    public function test_it_can_be_instantiated_from_a_mutation_non_covered_by_tests(): void
     {
-        $mutant = new Mutant(
-            '/path/to/mutant',
-            new Mutation(
-                $originalFilePath = 'path/to/Foo.php',
-                [],
-                $mutatorName = MutatorName::getName(For_::class),
-                [
-                    'startLine' => $originalStartingLine = 10,
-                    'endLine' => 15,
-                    'startTokenPos' => 0,
-                    'endTokenPos' => 8,
-                    'startFilePos' => 2,
-                    'endFilePos' => 4,
-                ],
-                'Unknown',
-                MutatedNode::wrap(new Nop()),
-                0,
-                [
-                    new TestLocation(
-                        'FooTest::test_it_can_instantiate',
-                        '/path/to/acme/FooTest.php',
-                        0.01
-                    ),
-                ]
-            ),
-            'notCovered#0',
-            $mutantDiff = <<<'DIFF'
+        $mutationDiff = <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -127,15 +96,31 @@ DIFF;
 - echo 'original';
 + echo 'notCovered#0';
 
-DIFF
+DIFF;
+
+        $mutation = new Mutation(
+            $originalFilePath = 'path/to/Foo.php',
+            $mutatorName = MutatorName::getName(For_::class),
+            $originalStartingLine = 10,
+            [
+                new TestLocation(
+                    'FooTest::test_it_can_instantiate',
+                    '/path/to/acme/FooTest.php',
+                    0.01
+                ),
+            ],
+            '0800f',
+            '/path/to/mutation',
+            'notCovered#0',
+            $mutationDiff
         );
 
         $this->assertResultStateIs(
-            MutantExecutionResult::createFromNonCoveredMutant($mutant),
+            MutantExecutionResult::createFromNonCoveredByTestsMutation($mutation),
             '',
             '',
             DetectionStatus::NOT_COVERED,
-            $mutantDiff,
+            $mutationDiff,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine
@@ -147,7 +132,7 @@ DIFF
         string $expectedProcessCommandLine,
         string $expectedProcessOutput,
         string $expectedDetectionStatus,
-        string $expectedMutantDiff,
+        string $expectedMutationDiff,
         string $expectedMutatorName,
         string $expectedOriginalFilePath,
         int $expectedOriginalStartingLine
@@ -155,7 +140,7 @@ DIFF
         $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
         $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
-        $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
+        $this->assertSame($expectedMutationDiff, $result->getMutationDiff());
         $this->assertSame($expectedMutatorName, $result->getMutatorName());
         $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
         $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());

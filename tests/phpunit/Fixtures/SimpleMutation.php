@@ -5,54 +5,50 @@ declare(strict_types=1);
 namespace Infection\Tests\Fixtures;
 
 use Infection\Mutation\Mutation;
-use Infection\Mutator\Mutator;
+use Infection\Mutation\MutationAttributeKeys;
 use Infection\PhpParser\MutatedNode;
 use PhpParser\Node;
 
 class SimpleMutation extends Mutation
 {
-    /**
-     * @var Mutator
-     */
-    private $mutator;
-
-    /**
-     * @var Node[]
-     */
     private $originalFileAst;
-
-    /**
-     * @var MutatedNode
-     */
     private $mutatedNode;
-    /**
-     * @var array
-     */
     private $attributes;
-    /**
-     * @var string
-     */
     private $mutatedNodeClass;
 
+    /**
+     * @param Node[]       $originalFileAst
+     * @param class-string $mutatorName
+     * @param array<string|int|float> $attributes
+     * @param class-string      $mutatedNodeClass
+     */
     public function __construct(
         array $originalFileAst,
-        Mutator $mutator,
-        $mutatedNode,
+        string $mutatorName,
+        MutatedNode $mutatedNode,
         array $attributes,
         string $mutatedNodeClass
     ) {
+        parent::__construct(
+            '/path/to/Foo.php',
+            $mutatorName,
+            (int) $attributes[MutationAttributeKeys::START_LINE],
+            [],
+            'hash',
+            '/path/to/MutatedFoo.php',
+            'mutatedCode',
+            'diff'
+        );
+
         $this->originalFileAst = $originalFileAst;
-        $this->mutator = $mutator;
         $this->mutatedNode = $mutatedNode;
         $this->attributes = $attributes;
         $this->mutatedNodeClass = $mutatedNodeClass;
     }
 
-    public function getMutator(): Mutator
-    {
-        return $this->mutator;
-    }
-
+    /**
+     * @return Node[]
+     */
     public function getOriginalFileAst(): array
     {
         return $this->originalFileAst;
@@ -63,6 +59,9 @@ class SimpleMutation extends Mutation
         return $this->mutatedNode;
     }
 
+    /**
+     * @return array<string|int|float>
+     */
     public function getAttributes(): array
     {
         return $this->attributes;

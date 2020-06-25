@@ -23,12 +23,22 @@ final class DummyTestFrameworkAdapter implements TestFrameworkAdapter
         return false;
     }
 
-    public function getInitialTestRunCommandLine(string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array
+    public function getInitialTestRunCommandLine(
+        string $extraOptions,
+        array $phpExtraArgs,
+        bool $skipCoverage
+    ): array
     {
         return ['/bin/dummy'];
     }
 
-    public function getMutantCommandLine(array $coverageTests, string $mutatedFilePath, string $mutationHash, string $mutationOriginalFilePath, string $extraOptions): array
+    public function getMutantCommandLine(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions
+    ): array
     {
         return ['/bin/dummy'];
     }

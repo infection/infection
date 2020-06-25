@@ -45,9 +45,10 @@ final class TestFrameworkExtraOptionsFilterTest extends TestCase
      */
     public function test_it_skips_filter_for_mutant_process(string $actualExtraOptions, string $expectedExtraOptions): void
     {
-        $filter = new TestFrameworkExtraOptionsFilter();
-
-        $filteredOptions = $filter->filterForMutantProcess($actualExtraOptions, ['--configuration', '--filter', '--testsuite']);
+        $filteredOptions = (new TestFrameworkExtraOptionsFilter())->filterForMutantProcess(
+            $actualExtraOptions,
+            ['--configuration', '--filter', '--testsuite']
+        );
 
         $this->assertSame($expectedExtraOptions, $filteredOptions);
     }

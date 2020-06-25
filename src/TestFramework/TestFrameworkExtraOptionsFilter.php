@@ -47,14 +47,17 @@ final class TestFrameworkExtraOptionsFilter
 {
     /**
      * @param string[] $initialRunOnlyOptions
-     *
-     * @throws \Safe\Exceptions\PcreException
-     * @throws \Safe\Exceptions\StringsException
      */
-    public function filterForMutantProcess(string $actualExtraOptions, array $initialRunOnlyOptions): string
-    {
+    public function filterForMutantProcess(
+        string $actualExtraOptions,
+        array $initialRunOnlyOptions
+    ): string {
         foreach ($initialRunOnlyOptions as $initialRunOnlyOption) {
-            $actualExtraOptions = preg_replace(sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption), '', $actualExtraOptions);
+            $actualExtraOptions = preg_replace(
+                sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption),
+                '',
+                $actualExtraOptions
+            );
             Assert::notNull($actualExtraOptions);
         }
 

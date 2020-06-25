@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\Mutant\MutationFactory;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -55,15 +56,18 @@ class FileMutationGenerator
     private $parser;
     private $traverserFactory;
     private $lineRangeCalculator;
+    private $mutationFactory;
 
     public function __construct(
         FileParser $parser,
         NodeTraverserFactory $traverserFactory,
-        LineRangeCalculator $lineRangeCalculator
+        LineRangeCalculator $lineRangeCalculator,
+        MutationFactory $mutationFactory
     ) {
         $this->parser = $parser;
         $this->traverserFactory = $traverserFactory;
         $this->lineRangeCalculator = $lineRangeCalculator;
+        $this->mutationFactory = $mutationFactory;
     }
 
     /**
@@ -98,7 +102,8 @@ class FileMutationGenerator
                 $initialStatements,
                 $trace,
                 $onlyCovered,
-                $this->lineRangeCalculator
+                $this->lineRangeCalculator,
+                $this->mutationFactory
             )
         );
 

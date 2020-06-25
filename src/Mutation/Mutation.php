@@ -35,16 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function array_intersect_key;
 use function array_keys;
 use function count;
-use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
-use Infection\PhpParser\MutatedNode;
-use function md5;
-use PhpParser\Node;
-use function Safe\array_flip;
 use Webmozart\Assert\Assert;
 
 /**
@@ -55,49 +49,38 @@ class Mutation
 {
     private $originalFilePath;
     private $mutatorName;
-    private $mutatedNodeClass;
-    private $mutatedNode;
-    private $mutationByMutatorIndex;
-    private $attributes;
-    private $originalFileAst;
+    private $originalStartingLine;
     private $tests;
     private $coveredByTests;
+    private $mutationHash;
+    private $mutationFilePath;
+    private $mutatedCode;
+    private $diff;
 
     /**
-     * @var string|null
-     */
-    private $hash;
-
-    /**
-     * @param Node[] $originalFileAst
-     * @param array<string|int|float> $attributes
      * @param TestLocation[] $tests
      */
     public function __construct(
         string $originalFilePath,
-        array $originalFileAst,
         string $mutatorName,
-        array $attributes,
-        string $mutatedNodeClass,
-        MutatedNode $mutatedNode,
-        int $mutationByMutatorIndex,
-        array $tests
+        int $originalStartingLine,
+        array $tests,
+        string $mutationHash,
+        string $mutationFilePath,
+        string $mutatedCode,
+        string $diff
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
-        foreach (MutationAttributeKeys::ALL as $key) {
-            Assert::keyExists($attributes, $key);
-        }
-
         $this->originalFilePath = $originalFilePath;
-        $this->originalFileAst = $originalFileAst;
         $this->mutatorName = $mutatorName;
-        $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
-        $this->mutatedNodeClass = $mutatedNodeClass;
-        $this->mutatedNode = $mutatedNode;
-        $this->mutationByMutatorIndex = $mutationByMutatorIndex;
+        $this->originalStartingLine = $originalStartingLine;
         $this->tests = $tests;
         $this->coveredByTests = count($tests) > 0;
+        $this->mutationHash = $mutationHash;
+        $this->mutationFilePath = $mutationFilePath;
+        $this->mutatedCode = $mutatedCode;
+        $this->diff = $diff;
     }
 
     public function getOriginalFilePath(): string
@@ -105,43 +88,16 @@ class Mutation
         return $this->originalFilePath;
     }
 
-    /**
-     * @return Node[]
-     */
-    public function getOriginalFileAst(): array
-    {
-        return $this->originalFileAst;
-    }
-
     public function getMutatorName(): string
     {
         return $this->mutatorName;
     }
 
-    /**
-     * @return (string|int|float)[]
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
     public function getOriginalStartingLine(): int
     {
-        return (int) $this->attributes['startLine'];
+        return $this->originalStartingLine;
     }
 
-    public function getMutatedNodeClass(): string
-    {
-        return $this->mutatedNodeClass;
-    }
-
-    public function getMutatedNode(): MutatedNode
-    {
-        return $this->mutatedNode;
-    }
-
-    // TODO: hasTest()?
     public function isCoveredByTest(): bool
     {
         return $this->coveredByTests;
@@ -157,21 +113,21 @@ class Mutation
 
     public function getHash(): string
     {
-        return $this->hash ?? $this->hash = $this->createHash();
+        return $this->mutationHash;
     }
 
-    private function createHash(): string
+    public function getFilePath(): string
     {
-        $hashKeys = [
-            $this->originalFilePath,
-            $this->mutatorName,
-            $this->mutationByMutatorIndex,
-        ];
+        return $this->mutationFilePath;
+    }
 
-        foreach ($this->attributes as $attribute) {
-            $hashKeys[] = $attribute;
-        }
+    public function getMutatedCode(): string
+    {
+        return $this->mutatedCode;
+    }
 
-        return md5(implode('_', $hashKeys));
+    public function getDiff(): string
+    {
+        return $this->diff;
     }
 }

@@ -138,7 +138,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
                 ),
             ]);
 
-            $this->output->writeln($this->diffColorizer->colorize($executionResult->getMutantDiff()));
+            $this->output->writeln($this->diffColorizer->colorize($executionResult->getMutationDiff()));
         }
     }
 

@@ -157,12 +157,15 @@ final class Engine
                 : []
         );
 
-        $actualExtraOptions = $this->config->getTestFrameworkExtraOptions();
+        $extraOptions = $this->config->getTestFrameworkExtraOptions();
 
-        $filteredExtraOptionsForMutant = $this->adapter instanceof ProvidesInitialRunOnlyOptions
-            ? $this->testFrameworkExtraOptionsFilter->filterForMutantProcess($actualExtraOptions, $this->adapter->getInitialRunOnlyOptions())
-            : $actualExtraOptions;
+        $mutationExtraOptions = $this->adapter instanceof ProvidesInitialRunOnlyOptions
+            ? $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
+                $extraOptions,
+                $this->adapter->getInitialRunOnlyOptions()
+            )
+            : $extraOptions;
 
-        $this->mutationTestingRunner->run($mutations, $filteredExtraOptionsForMutant);
+        $this->mutationTestingRunner->run($mutations, $mutationExtraOptions);
     }
 }

@@ -79,7 +79,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Mutant\MutantFactory;
+use Infection\Mutant\MutationFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutation\MutationGenerator;
@@ -285,8 +285,8 @@ final class Container
             MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
                 return new MutantCodeFactory($container->getPrinter());
             },
-            MutantFactory::class => static function (self $container): MutantFactory {
-                return new MutantFactory(
+            MutationFactory::class => static function (self $container): MutationFactory {
+                return new MutationFactory(
                     $container->getConfiguration()->getTmpDir(),
                     $container->getDiffer(),
                     $container->getPrinter(),
@@ -502,7 +502,8 @@ final class Container
                 return new FileMutationGenerator(
                     $container->getFileParser(),
                     $container->getNodeTraverserFactory(),
-                    $container->getLineRangeCalculator()
+                    $container->getLineRangeCalculator(),
+                    $container->getMutationFactory()
                 );
             },
             LoggerFactory::class => static function (self $container): LoggerFactory {
@@ -559,7 +560,6 @@ final class Container
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 return new MutationTestingRunner(
                     $container->getMutantProcessFactory(),
-                    $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
                     $container->getConfiguration()->isDryRun()
@@ -838,9 +838,9 @@ final class Container
         return $this->get(MutantCodeFactory::class);
     }
 
-    public function getMutantFactory(): MutantFactory
+    public function getMutationFactory(): MutationFactory
     {
-        return $this->get(MutantFactory::class);
+        return $this->get(MutationFactory::class);
     }
 
     public function getDiffer(): Differ

@@ -78,7 +78,6 @@ class MutationConfigBuilder extends ConfigBuilder
     ) {
         $this->tmpDir = $tmpDir;
         $this->projectDir = $projectDir;
-
         $this->originalXmlConfigContent = $originalXmlConfigContent;
         $this->configManipulator = $configManipulator;
         $this->jUnitTestCaseSorter = $jUnitTestCaseSorter;

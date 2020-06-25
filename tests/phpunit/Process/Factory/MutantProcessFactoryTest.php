@@ -39,50 +39,38 @@ use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\MutantProcessWasFinished;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
-use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutator\MutatorName;
 use const PHP_OS_FAMILY;
-use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\TestCase;
 
 final class MutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
-        $mutant = new Mutant(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
-                $originalFilePath = 'path/to/Foo.php',
-                [],
-                MutatorName::getName(For_::class),
-                [
-                    'startLine' => $originalStartingLine = 10,
-                    'endLine' => 15,
-                    'startTokenPos' => 0,
-                    'endTokenPos' => 8,
-                    'startFilePos' => 2,
-                    'endFilePos' => 4,
-                ],
-                'Unknown',
-                MutatedNode::wrap(new Nop()),
-                0,
-                $tests = [
-                    new TestLocation(
-                        'FooTest::test_it_can_instantiate',
-                        '/path/to/acme/FooTest.php',
-                        0.01
-                    ),
-                ]
-            ),
-            'killed#0',
-            $mutantDiff = <<<'DIFF'
+        $hash = '0800f';
+        $mutationFilePath = '/path/to/mutation';
+
+        $mutation = new Mutation(
+            $originalFilePath = 'path/to/Foo.php',
+            MutatorName::getName(For_::class),
+            10,
+            $tests = [
+                new TestLocation(
+                    'FooTest::test_it_can_instantiate',
+                    '/path/to/acme/FooTest.php',
+                    0.01
+                ),
+            ],
+            $hash,
+            $mutationFilePath,
+            'notCovered#0',
+            <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -100,8 +88,8 @@ DIFF
             ->method('getMutantCommandLine')
             ->with(
                 $tests,
-                $mutantFilePath,
-                $this->isType('string'),
+                $mutationFilePath,
+                $hash,
                 $originalFilePath,
                 $testFrameworkExtraOptions
             )
@@ -129,7 +117,7 @@ DIFF
             $resultFactoryMock
         );
 
-        $mutantProcess = $factory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+        $mutantProcess = $factory->createProcessForMutation($mutation, $testFrameworkExtraOptions);
 
         $process = $mutantProcess->getProcess();
 
@@ -142,7 +130,7 @@ DIFF
         $this->assertSame(100., $process->getTimeout());
         $this->assertFalse($process->isStarted());
 
-        $this->assertSame($mutant, $mutantProcess->getMutant());
+        $this->assertSame($mutation, $mutantProcess->getMutation());
         $this->assertFalse($mutantProcess->isTimedOut());
 
         $this->assertSame([], $eventDispatcher->getEvents());
