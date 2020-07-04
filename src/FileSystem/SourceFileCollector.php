@@ -55,7 +55,7 @@ class SourceFileCollector
         array $sourceDirectories,
         array $excludeDirectories
     ): iterable {
-        if ([] === $sourceDirectories) {
+        if ($sourceDirectories === []) {
             return;
         }
 
