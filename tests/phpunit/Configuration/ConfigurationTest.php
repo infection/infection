@@ -193,6 +193,7 @@ final class ConfigurationTest extends TestCase
             new Logs(
                 'text.log',
                 'summary.log',
+                'json.log',
                 'debug.log',
                 'mutator.log',
                 new Badge('master')

@@ -95,6 +95,7 @@ trait ConfigurationAssertions
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),
             $expectedLogs->getSummaryLogFilePath(),
+            $expectedLogs->getJsonLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
             $expectedLogs->getBadge()

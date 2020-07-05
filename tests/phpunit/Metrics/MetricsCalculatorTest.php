@@ -196,7 +196,9 @@ DIFF
             ),
             MutatorName::getName(For_::class),
             'foo/bar',
-            $id
+            $id,
+            '<?php $a = 1;',
+            '<?php $a = 1;'
         );
     }
 }

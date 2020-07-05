@@ -156,13 +156,15 @@ final class MutationTestingRunnerTest extends TestCase
                     '/path/to/mutant0',
                     $mutation0,
                     'mutated code 0',
-                    'diff0'
+                    'diff0',
+                    '<?php $a = 1;'
                 ),
                 $mutant1 = new Mutant(
                     '/path/to/mutant1',
                     $mutation1,
                     'mutated code 1',
-                    'diff1'
+                    'diff1',
+                    '<?php $a = 1;'
                 )
             )
         ;
@@ -225,13 +227,15 @@ final class MutationTestingRunnerTest extends TestCase
                     '/path/to/mutant0',
                     $mutation0,
                     'mutated code 0',
-                    'diff0'
+                    'diff0',
+                    '<?php $a = 1;'
                 ),
                 $mutant1 = new Mutant(
                     '/path/to/mutant1',
                     $mutation1,
                     'mutated code 1',
-                    'diff1'
+                    'diff1',
+                    '<?php $a = 1;'
                 )
             )
         ;
