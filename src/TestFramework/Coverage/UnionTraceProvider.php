@@ -33,35 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
-
-use function array_filter;
-use function array_map;
-use function implode;
-use function Safe\sprintf;
-use UnexpectedValueException;
-use Webmozart\Assert\Assert;
+namespace Infection\TestFramework\Coverage;
 
 /**
+ * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
+ * original source files in order to ensure all the files are included.
+ *
  * @internal
  */
-final class InvalidSchema extends UnexpectedValueException
+final class UnionTraceProvider implements TraceProvider
 {
     /**
-     * @param string[] $errors
+     * @var TraceProvider
      */
-    public static function create(SchemaConfigurationFile $config, array $errors): self
+    private $coveredTraceProvider;
+
+    private $uncoveredTraceProvider;
+
+    private $onlyCovered;
+
+    /**
+     * @param CoveredTraceProvider|TraceProvider $coveredTraceProvider
+     * @param UncoveredTraceProvider|TraceProvider $uncoveredTraceProvider
+     */
+    public function __construct(
+        TraceProvider $coveredTraceProvider,
+        TraceProvider $uncoveredTraceProvider,
+        bool $onlyCovered
+    ) {
+        $this->coveredTraceProvider = $coveredTraceProvider;
+        $this->uncoveredTraceProvider = $uncoveredTraceProvider;
+        $this->onlyCovered = $onlyCovered;
+    }
+
+    /**
+     * @return iterable<Trace>
+     */
+    public function provideTraces(): iterable
     {
-        Assert::allString($errors);
+        yield from $this->coveredTraceProvider->provideTraces();
 
-        $errors = array_filter(array_map('trim', $errors));
-
-        return new self(sprintf(
-            '"%s" does not match the expected JSON schema%s',
-            $config->getPath(),
-            $errors === []
-                ? '.'
-                : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
-        ));
+        if ($this->onlyCovered === false) {
+            yield from $this->uncoveredTraceProvider->provideTraces();
+        }
     }
 }

@@ -49,6 +49,7 @@ use Infection\Console\Application;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
+use Infection\Console\OutputFormatterStyleConfigurator;
 use Infection\Console\XdebugHandler;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
@@ -110,6 +111,7 @@ final class ProjectCodeProvider
         XdebugHandler::class,
         NullSubscriber::class,
         FormatterName::class,
+        OutputFormatterStyleConfigurator::class,
     ];
 
     /**

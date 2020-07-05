@@ -33,35 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use function array_filter;
-use function array_map;
-use function implode;
-use function Safe\sprintf;
-use UnexpectedValueException;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\Trace;
+use Infection\TestFramework\Coverage\UncoveredTraceProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 
-/**
- * @internal
- */
-final class InvalidSchema extends UnexpectedValueException
+final class UncoveredTraceProviderTest extends TestCase
 {
-    /**
-     * @param string[] $errors
-     */
-    public static function create(SchemaConfigurationFile $config, array $errors): self
+    public function test_it_provides_traces(): void
     {
-        Assert::allString($errors);
+        $filter = $this->createMock(BufferedSourceFileFilter::class);
+        $fileInfo = $this->createMock(SplFileInfo::class);
 
-        $errors = array_filter(array_map('trim', $errors));
+        $filter
+            ->expects($this->once())
+            ->method('getUnseenInCoverageReportFiles')
+            ->willReturn([$fileInfo])
+        ;
 
-        return new self(sprintf(
-            '"%s" does not match the expected JSON schema%s',
-            $config->getPath(),
-            $errors === []
-                ? '.'
-                : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
-        ));
+        $provider = new UncoveredTraceProvider($filter);
+
+        /** @var Trace[] $traces */
+        $traces = iterator_to_array($provider->provideTraces(), false);
+
+        $this->assertCount(1, $traces);
+        $this->assertInstanceOf(ProxyTrace::class, $traces[0]);
+        $this->assertSame($fileInfo, $traces[0]->getSourceFileInfo());
+        $this->assertFalse($traces[0]->hasTests());
     }
 }

@@ -33,35 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
-
-use function array_filter;
-use function array_map;
-use function implode;
-use function Safe\sprintf;
-use UnexpectedValueException;
-use Webmozart\Assert\Assert;
+namespace Infection\TestFramework\Coverage;
 
 /**
+ * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
+ *
  * @internal
  */
-final class InvalidSchema extends UnexpectedValueException
+final class UncoveredTraceProvider implements TraceProvider
 {
-    /**
-     * @param string[] $errors
-     */
-    public static function create(SchemaConfigurationFile $config, array $errors): self
+    private $bufferedFilter;
+
+    public function __construct(BufferedSourceFileFilter $bufferedFilter)
     {
-        Assert::allString($errors);
+        $this->bufferedFilter = $bufferedFilter;
+    }
 
-        $errors = array_filter(array_map('trim', $errors));
-
-        return new self(sprintf(
-            '"%s" does not match the expected JSON schema%s',
-            $config->getPath(),
-            $errors === []
-                ? '.'
-                : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
-        ));
+    /**
+     * @return iterable<Trace>
+     */
+    public function provideTraces(): iterable
+    {
+        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
+            yield new ProxyTrace($splFileInfo, [new TestLocations()]);
+        }
     }
 }

@@ -33,35 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\FileSystem;
 
-use function array_filter;
-use function array_map;
-use function implode;
-use function Safe\sprintf;
-use UnexpectedValueException;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Coverage\Trace;
+use SplFileInfo;
 
 /**
  * @internal
  */
-final class InvalidSchema extends UnexpectedValueException
+interface FileFilter
 {
     /**
-     * @param string[] $errors
+     * @param iterable<SplFileInfo|Trace> $input
+     *
+     * @return iterable<SplFileInfo|Trace>
      */
-    public static function create(SchemaConfigurationFile $config, array $errors): self
-    {
-        Assert::allString($errors);
-
-        $errors = array_filter(array_map('trim', $errors));
-
-        return new self(sprintf(
-            '"%s" does not match the expected JSON schema%s',
-            $config->getPath(),
-            $errors === []
-                ? '.'
-                : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
-        ));
-    }
+    public function filter(iterable $input): iterable;
 }

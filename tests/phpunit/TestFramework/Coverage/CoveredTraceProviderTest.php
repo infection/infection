@@ -33,35 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use function array_filter;
-use function array_map;
-use function implode;
-use function Safe\sprintf;
-use UnexpectedValueException;
-use Webmozart\Assert\Assert;
+use Infection\FileSystem\FileFilter;
+use Infection\TestFramework\Coverage\CoveredTraceProvider;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\Coverage\TraceProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class InvalidSchema extends UnexpectedValueException
+final class CoveredTraceProviderTest extends TestCase
 {
-    /**
-     * @param string[] $errors
-     */
-    public static function create(SchemaConfigurationFile $config, array $errors): self
+    public function test_it_provides_traces(): void
     {
-        Assert::allString($errors);
+        $canary = [1, 2, 3];
 
-        $errors = array_filter(array_map('trim', $errors));
+        $traceProviderMock = $this->createMock(TraceProvider::class);
+        $traceProviderMock
+            ->expects($this->once())
+            ->method('provideTraces')
+            ->willReturn($canary)
+        ;
 
-        return new self(sprintf(
-            '"%s" does not match the expected JSON schema%s',
-            $config->getPath(),
-            $errors === []
-                ? '.'
-                : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
-        ));
+        $filter = $this->createMock(FileFilter::class);
+        $filter
+            ->expects($this->once())
+            ->method('filter')
+            ->with($canary)
+            ->willReturn($canary)
+        ;
+
+        $testFileDataAdder = $this->createMock(JUnitTestExecutionInfoAdder::class);
+        $testFileDataAdder
+            ->expects($this->once())
+            ->method('addTestExecutionInfo')
+            ->with($canary)
+            ->willReturn($canary)
+        ;
+
+        $provider = new CoveredTraceProvider($traceProviderMock, $testFileDataAdder, $filter);
+
+        /** @var array<int> $traces */
+        $traces = $provider->provideTraces();
+
+        $this->assertSame($canary, $traces);
+        $this->assertCount(3, $canary);
     }
 }
