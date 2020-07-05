@@ -194,7 +194,9 @@ final class SortableMutantExecutionResultsTest extends TestCase
             '#' . $id,
             MutatorName::getName(For_::class),
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
+            '<?php $a = 1;',
+            '<?php $a = 1;'
         );
     }
 }

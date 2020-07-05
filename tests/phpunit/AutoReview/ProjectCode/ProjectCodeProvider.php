@@ -46,22 +46,24 @@ use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Application;
+use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
+use Infection\Console\OutputFormatterStyleConfigurator;
 use Infection\Console\XdebugHandler;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\NullSubscriber;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Http\StrykerCurlClient;
-use Infection\Http\StrykerDashboardClient;
+use Infection\Logger\Http\StrykerCurlClient;
+use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\OriginalPhpProcess;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
@@ -107,6 +109,9 @@ final class ProjectCodeProvider
         DummyFileSystem::class,
         MutationAttributeKeys::class,
         XdebugHandler::class,
+        NullSubscriber::class,
+        FormatterName::class,
+        OutputFormatterStyleConfigurator::class,
     ];
 
     /**
@@ -119,7 +124,6 @@ final class ProjectCodeProvider
         TestFrameworkFinder::class,
         StrykerDashboardClient::class,
         MetricsCalculator::class,
-        InitialTestRunProcessBuilder::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
     ];
@@ -255,6 +259,7 @@ final class ProjectCodeProvider
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
+            ->notPath('xdebug-filter.php')
             ->exclude([
                 'autoloaded',
                 'benchmark',

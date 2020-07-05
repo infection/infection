@@ -83,7 +83,8 @@ class MutantFactory
             $mutantFilePath,
             $mutation,
             $mutatedCode,
-            $this->createMutantDiff($mutation, $mutatedCode)
+            $this->createMutantDiff($mutation, $mutatedCode),
+            $this->getOriginalPrettyPrintedFile($mutation->getOriginalFilePath(), $mutation->getOriginalFileAst())
         );
     }
 

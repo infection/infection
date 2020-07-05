@@ -51,7 +51,8 @@ trait MutantAssertions
         string $expectedMutatedCode,
         string $expectedDiff,
         bool $expectedCoveredByTests,
-        array $expectedTests
+        array $expectedTests,
+        string $originalCode
     ): void {
         $this->assertSame($expectedFilePath, $mutant->getFilePath());
         $this->assertSame($expectedMutation, $mutant->getMutation());
@@ -59,5 +60,6 @@ trait MutantAssertions
         $this->assertSame($expectedDiff, $mutant->getDiff());
         $this->assertSame($expectedCoveredByTests, $mutant->isCoveredByTest());
         $this->assertSame($expectedTests, $mutant->getTests());
+        $this->assertSame($originalCode, $mutant->getPrettyPrintedOriginalCode());
     }
 }

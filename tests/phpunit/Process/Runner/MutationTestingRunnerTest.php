@@ -49,7 +49,7 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Process\Builder\MutantProcessFactory;
+use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
@@ -236,13 +236,15 @@ final class MutationTestingRunnerTest extends TestCase
                     '/path/to/mutant0',
                     $mutation0,
                     'mutated code 0',
-                    'diff0'
+                    'diff0',
+                    '<?php $a = 1;'
                 ),
                 $mutant1 = new Mutant(
                     '/path/to/mutant1',
                     $mutation1,
                     'mutated code 1',
-                    'diff1'
+                    'diff1',
+                    '<?php $a = 1;'
                 )
             )
         ;

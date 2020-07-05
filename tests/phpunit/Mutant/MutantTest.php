@@ -59,9 +59,10 @@ final class MutantTest extends TestCase
         string $mutatedCode,
         string $diff,
         bool $expectedCoveredByTests,
-        array $expectedTests
+        array $expectedTests,
+        string $originalCode
     ): void {
-        $mutant = new Mutant($filePath, $mutation, $mutatedCode, $diff);
+        $mutant = new Mutant($filePath, $mutation, $mutatedCode, $diff, $originalCode);
 
         $this->assertMutantStateIs(
             $mutant,
@@ -70,7 +71,8 @@ final class MutantTest extends TestCase
             $mutatedCode,
             $diff,
             $expectedCoveredByTests,
-            $expectedTests
+            $expectedTests,
+            $originalCode
         );
     }
 
@@ -93,6 +95,8 @@ final class MutantTest extends TestCase
             ),
         ];
 
+        $originalCode = '<?php $a = 1';
+
         yield 'nominal with tests' => [
             '/path/to/tmp/mutant.Foo.infection.php',
             new Mutation(
@@ -112,6 +116,7 @@ final class MutantTest extends TestCase
             'diff value',
             true,
             $tests,
+            $originalCode,
         ];
 
         yield 'nominal without tests' => [
@@ -133,6 +138,7 @@ final class MutantTest extends TestCase
             'diff value',
             false,
             [],
+            $originalCode,
         ];
     }
 }

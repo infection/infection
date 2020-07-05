@@ -35,15 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
 
+use Closure;
 use function count;
+use const GLOB_ONLYDIR;
 use function in_array;
 use Infection\Config\ConsoleHelper;
+use Infection\Console\IO;
 use Infection\FileSystem\Locator\Locator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use function Safe\glob;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -71,9 +72,9 @@ final class ExcludeDirsProvider
      *
      * @return string[]
      */
-    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, array $sourceDirs): array
+    public function get(IO $io, array $dirsInCurrentDir, array $sourceDirs): array
     {
-        $output->writeln([
+        $io->writeln([
             '',
             'There can be situations when you want to exclude some folders from generating mutants.',
             'You can use glob pattern (<comment>*Bundle/**/*/Tests</comment>) for them or just regular dir path.',
@@ -99,7 +100,7 @@ final class ExcludeDirsProvider
 
             $autocompleteValues = $dirsInCurrentDir;
         } elseif (count($sourceDirs) === 1) {
-            $globDirs = array_filter(glob($sourceDirs[0] . '/*'), 'is_dir');
+            $globDirs = glob($sourceDirs[0] . '/*', GLOB_ONLYDIR);
 
             $autocompleteValues = array_map(
                 static function (string $dir) use ($sourceDirs) {
@@ -113,7 +114,7 @@ final class ExcludeDirsProvider
         $question->setAutocompleterValues($autocompleteValues);
         $question->setValidator($this->getValidator(new RootsFileOrDirectoryLocator($sourceDirs, $this->filesystem)));
 
-        while ($dir = $this->questionHelper->ask($input, $output, $question)) {
+        while ($dir = $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question)) {
             if ($dir) {
                 $excludedDirs[] = $dir;
             }
@@ -123,9 +124,9 @@ final class ExcludeDirsProvider
     }
 
     /**
-     * @return callable(string): string
+     * @return Closure(string): string
      */
-    private function getValidator(Locator $locator)
+    private function getValidator(Locator $locator): Closure
     {
         return static function ($answer) use ($locator) {
             if (!$answer || strpos($answer, '*') !== false) {

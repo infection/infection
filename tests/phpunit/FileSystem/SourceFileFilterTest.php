@@ -55,7 +55,7 @@ final class SourceFileFilterTest extends TestCase
         string $filter,
         array $expectedFilters
     ): void {
-        $fileFilter = new SourceFileFilter($filter);
+        $fileFilter = new SourceFileFilter($filter, []);
 
         $this->assertSame($expectedFilters, array_values($fileFilter->getFilters()));
     }
@@ -206,7 +206,7 @@ final class SourceFileFilterTest extends TestCase
         iterable $input,
         array $expectedFilePaths
     ): void {
-        $actual = (new SourceFileFilter($filter))->filter($input);
+        $actual = (new SourceFileFilter($filter, []))->filter($input);
 
         $actual = take($actual)
             ->map(static function ($traceOrFileInfo) {

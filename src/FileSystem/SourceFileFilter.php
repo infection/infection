@@ -42,24 +42,35 @@ use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Infection\TestFramework\Coverage\Trace;
 use Iterator;
 use SplFileInfo;
+use Symfony\Component\Finder\Iterator\PathFilterIterator;
 
 /**
  * @internal
  * @final
  */
-class SourceFileFilter
+class SourceFileFilter implements FileFilter
 {
     /**
      * @var string[]
      */
     private $filters;
 
-    public function __construct(string $filter)
+    /**
+     * @var string[]
+     */
+    private $excludeDirectories;
+
+    /**
+     * @param string[] $excludeDirectories
+     */
+    public function __construct(string $filter, array $excludeDirectories)
     {
         $this->filters = array_filter(array_map(
             'trim',
             explode(',', $filter)
         ));
+
+        $this->excludeDirectories = $excludeDirectories;
     }
 
     /**
@@ -74,22 +85,23 @@ class SourceFileFilter
         return $this->filters;
     }
 
-    /**
-     * @param iterable<SplFileInfo|Trace> $input
-     *
-     * @return iterable<SplFileInfo|Trace>
-     */
     public function filter(iterable $input): iterable
     {
-        if ($this->filters === []) {
-            return $input;
+        $iterator = $this->iterableToIterator($input);
+
+        if ($this->filters !== []) {
+            $iterator = new RealPathFilterIterator(
+                $iterator,
+                $this->filters,
+                []
+            );
         }
 
-        return new RealPathFilterIterator(
-            $this->iterableToIterator($input),
-            $this->filters,
-            []
-        );
+        if ($this->excludeDirectories !== []) {
+            $iterator = new PathFilterIterator($iterator, [], $this->excludeDirectories);
+        }
+
+        return $iterator;
     }
 
     /**

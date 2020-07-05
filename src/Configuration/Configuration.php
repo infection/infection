@@ -54,15 +54,11 @@ class Configuration
         'default',
     ];
 
-    private const FORMATTER = [
-        'dot',
-        'progress',
-    ];
-
     private $timeout;
     private $sourceDirectories;
     private $sourceFiles;
     private $sourceFilesFilter;
+    private $sourceFilesExcludes;
     private $logs;
     private $logVerbosity;
     private $tmpDir;
@@ -77,7 +73,6 @@ class Configuration
     private $skipInitialTests;
     private $debug;
     private $onlyCovered;
-    private $formatter;
     private $noProgress;
     private $ignoreMsiWithNoMutations;
     private $minMsi;
@@ -89,6 +84,7 @@ class Configuration
 
     /**
      * @param string[] $sourceDirectories
+     * @param string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator> $mutators
      */
@@ -97,6 +93,7 @@ class Configuration
         array $sourceDirectories,
         iterable $sourceFiles,
         string $sourceFilesFilter,
+        array $sourceFilesExcludes,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -111,7 +108,6 @@ class Configuration
         bool $skipInitialTests,
         bool $debug,
         bool $onlyCovered,
-        string $formatter,
         bool $noProgress,
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
@@ -126,7 +122,6 @@ class Configuration
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
-        Assert::oneOf($formatter, self::FORMATTER);
         Assert::nullOrGreaterThanEq($minMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
 
@@ -134,6 +129,7 @@ class Configuration
         $this->sourceDirectories = $sourceDirectories;
         $this->sourceFiles = $sourceFiles;
         $this->sourceFilesFilter = $sourceFilesFilter;
+        $this->sourceFilesExcludes = $sourceFilesExcludes;
         $this->logs = $logs;
         $this->logVerbosity = $logVerbosity;
         $this->tmpDir = $tmpDir;
@@ -148,7 +144,6 @@ class Configuration
         $this->skipInitialTests = $skipInitialTests;
         $this->debug = $debug;
         $this->onlyCovered = $onlyCovered;
-        $this->formatter = $formatter;
         $this->noProgress = $noProgress;
         $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
         $this->minMsi = $minMsi;
@@ -183,6 +178,14 @@ class Configuration
     public function getSourceFilesFilter(): string
     {
         return $this->sourceFilesFilter;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSourceFilesExcludes(): array
+    {
+        return $this->sourceFilesExcludes;
     }
 
     public function getLogs(): Logs
@@ -256,11 +259,6 @@ class Configuration
     public function mutateOnlyCoveredCode(): bool
     {
         return $this->onlyCovered;
-    }
-
-    public function getFormatter(): string
-    {
-        return $this->formatter;
     }
 
     public function noProgress(): bool

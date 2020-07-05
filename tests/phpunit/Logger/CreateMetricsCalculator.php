@@ -141,7 +141,9 @@ DIFF
             ),
             MutatorName::getName($mutatorClassName),
             'foo/bar',
-            10 - $i
+            10 - $i,
+            '<?php $a = 1;',
+            '<?php $a = 2;'
         );
     }
 }

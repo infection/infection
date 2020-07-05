@@ -39,6 +39,7 @@ use Closure;
 use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use Infection\Config\ConsoleHelper;
+use Infection\Console\IO;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -46,8 +47,6 @@ use RuntimeException;
 use function Safe\sprintf;
 use function str_replace;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use function trim;
 
@@ -67,12 +66,12 @@ final class PhpUnitCustomExecutablePathProvider
         $this->questionHelper = $questionHelper;
     }
 
-    public function get(InputInterface $input, OutputInterface $output): ?string
+    public function get(IO $io): ?string
     {
         try {
             $this->phpUnitExecutableFinder->find(TestFrameworkTypes::PHPUNIT);
         } catch (FinderException $e) {
-            $output->writeln(['']);
+            $io->writeln(['']);
 
             $questionText = $this->consoleHelper->getQuestion(
                 'We did not find phpunit executable. Please provide custom absolute path'
@@ -84,7 +83,7 @@ final class PhpUnitCustomExecutablePathProvider
             return str_replace(
                 DIRECTORY_SEPARATOR,
                 '/',
-                $this->questionHelper->ask($input, $output, $question)
+                $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question)
             );
         }
 

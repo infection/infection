@@ -68,6 +68,8 @@ DIFF;
         $mutatorName = MutatorName::getName(For_::class);
         $originalFilePath = 'path/to/Foo.php';
         $originalStartingLine = 10;
+        $originalCode = '<php $a = 1;';
+        $mutatedCode = '<php $a = 2;';
 
         $result = new MutantExecutionResult(
             $processCommandLine,
@@ -76,7 +78,9 @@ DIFF;
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
+            $originalCode,
+            $mutatedCode
         );
 
         $this->assertResultStateIs(
@@ -87,12 +91,17 @@ DIFF;
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
+            $originalCode,
+            $mutatedCode
         );
     }
 
     public function test_it_can_be_instantiated_from_a_non_covered_mutant(): void
     {
+        $originalCode = '<?php $a = 1;';
+        $mutatedCode = '<?php $a = 1;';
+
         $mutant = new Mutant(
             '/path/to/mutant',
             new Mutation(
@@ -118,7 +127,7 @@ DIFF;
                     ),
                 ]
             ),
-            'notCovered#0',
+            $mutatedCode,
             $mutantDiff = <<<'DIFF'
 --- Original
 +++ New
@@ -127,7 +136,8 @@ DIFF;
 - echo 'original';
 + echo 'notCovered#0';
 
-DIFF
+DIFF,
+            $originalCode
         );
 
         $this->assertResultStateIs(
@@ -138,7 +148,9 @@ DIFF
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
+            $originalCode,
+            $mutatedCode
         );
     }
 
@@ -150,7 +162,9 @@ DIFF
         string $expectedMutantDiff,
         string $expectedMutatorName,
         string $expectedOriginalFilePath,
-        int $expectedOriginalStartingLine
+        int $expectedOriginalStartingLine,
+        string $originalCode,
+        string $mutatedCode
     ): void {
         $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
@@ -159,5 +173,7 @@ DIFF
         $this->assertSame($expectedMutatorName, $result->getMutatorName());
         $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
         $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());
+        $this->assertSame($originalCode, $result->getOriginalCode());
+        $this->assertSame($mutatedCode, $result->getMutatedCode());
     }
 }

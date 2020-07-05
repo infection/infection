@@ -37,10 +37,10 @@ namespace Infection\Tests\Logger;
 
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
-use Infection\Http\StrykerDashboardClient;
 use Infection\Logger\BadgeLogger;
+use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Tests\Double\OndraM\CiDetector\ConfigurableEnv;
+use Infection\Tests\CI\ConfigurableEnv;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use OndraM\CiDetector\CiDetector;
 use PHPUnit\Framework\MockObject\MockObject;

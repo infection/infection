@@ -54,6 +54,7 @@ final class ConfigurationTest extends TestCase
      * @dataProvider valueProvider
      *
      * @param string[] $sourceDirectories
+     * @param string[] $sourceFilesExcludes
      * @param SplFileInfo[] $sourceFiles
      * @param Mutator[] $mutators
      */
@@ -62,6 +63,7 @@ final class ConfigurationTest extends TestCase
         array $sourceDirectories,
         array $sourceFiles,
         string $sourceFileFilter,
+        array $sourceFilesExcludes,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -76,7 +78,6 @@ final class ConfigurationTest extends TestCase
         bool $skipInitialTests,
         bool $debug,
         bool $onlyCovered,
-        string $formatter,
         bool $noProgress,
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
@@ -91,6 +92,7 @@ final class ConfigurationTest extends TestCase
             $sourceDirectories,
             $sourceFiles,
             $sourceFileFilter,
+            $sourceFilesExcludes,
             $logs,
             $logVerbosity,
             $tmpDir,
@@ -105,7 +107,6 @@ final class ConfigurationTest extends TestCase
             $skipInitialTests,
             $debug,
             $onlyCovered,
-            $formatter,
             $noProgress,
             $ignoreMsiWithNoMutations,
             $minMsi,
@@ -122,6 +123,7 @@ final class ConfigurationTest extends TestCase
             $sourceDirectories,
             $sourceFiles,
             $sourceFileFilter,
+            $sourceFilesExcludes,
             $logs,
             $logVerbosity,
             $tmpDir,
@@ -136,7 +138,6 @@ final class ConfigurationTest extends TestCase
             $skipInitialTests,
             $debug,
             $onlyCovered,
-            $formatter,
             $noProgress,
             $ignoreMsiWithNoMutations,
             $minMsi,
@@ -155,6 +156,7 @@ final class ConfigurationTest extends TestCase
             [],
             [],
             '',
+            [],
             Logs::createEmpty(),
             'none',
             '',
@@ -169,7 +171,6 @@ final class ConfigurationTest extends TestCase
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -188,9 +189,11 @@ final class ConfigurationTest extends TestCase
                 new SplFileInfo('Bar.php', 'Bar.php', 'Bar.php'),
             ],
             'src/Foo.php,src/Bar.php',
+            ['exclude-dir'],
             new Logs(
                 'text.log',
                 'summary.log',
+                'json.log',
                 'debug.log',
                 'mutator.log',
                 new Badge('master')
@@ -210,7 +213,6 @@ final class ConfigurationTest extends TestCase
             false,
             true,
             true,
-            'progress',
             true,
             true,
             43.,

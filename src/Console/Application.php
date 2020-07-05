@@ -45,7 +45,6 @@ use function preg_quote;
 use function Safe\preg_match;
 use function Safe\sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use function trim;
@@ -127,20 +126,6 @@ final class Application extends BaseApplication
     {
         parent::configureIO($input, $output);
 
-        $output->getFormatter()->setStyle('with-error', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('uncovered', new OutputFormatterStyle('blue', null, ['bold']));
-        $output->getFormatter()->setStyle('timeout', new OutputFormatterStyle('yellow'));
-        $output->getFormatter()->setStyle('escaped', new OutputFormatterStyle('red', null, ['bold']));
-        $output->getFormatter()->setStyle('killed', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('skipped', new OutputFormatterStyle('magenta'));
-
-        $output->getFormatter()->setStyle('code', new OutputFormatterStyle('white'));
-
-        $output->getFormatter()->setStyle('diff-add', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('diff-del', new OutputFormatterStyle('red'));
-
-        $output->getFormatter()->setStyle('low', new OutputFormatterStyle('red', null, ['bold']));
-        $output->getFormatter()->setStyle('medium', new OutputFormatterStyle('yellow', null, ['bold']));
-        $output->getFormatter()->setStyle('high', new OutputFormatterStyle('green', null, ['bold']));
+        OutputFormatterStyleConfigurator::configure($output);
     }
 }
