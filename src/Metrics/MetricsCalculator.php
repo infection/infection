@@ -51,6 +51,7 @@ class MetricsCalculator
     private $errorExecutionResults;
     private $escapedExecutionResults;
     private $timedOutExecutionResults;
+    private $skippedExecutionResults;
     private $notCoveredExecutionResults;
     private $allExecutionResults;
 
@@ -101,6 +102,7 @@ class MetricsCalculator
         $this->errorExecutionResults = new SortableMutantExecutionResults();
         $this->escapedExecutionResults = new SortableMutantExecutionResults();
         $this->timedOutExecutionResults = new SortableMutantExecutionResults();
+        $this->skippedExecutionResults = new SortableMutantExecutionResults();
         $this->notCoveredExecutionResults = new SortableMutantExecutionResults();
         $this->allExecutionResults = new SortableMutantExecutionResults();
     }
@@ -143,7 +145,7 @@ class MetricsCalculator
 
                 case DetectionStatus::SKIPPED:
                     $this->skippedCount++;
-                    $this->timedOutExecutionResults->add($executionResult);
+                    $this->skippedExecutionResults->add($executionResult);
 
                     break;
 
@@ -181,6 +183,14 @@ class MetricsCalculator
     public function getErrorExecutionResults(): array
     {
         return $this->errorExecutionResults->getSortedExecutionResults();
+    }
+
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getSkippedExecutionResults(): array
+    {
+        return $this->skippedExecutionResults->getSortedExecutionResults();
     }
 
     /**

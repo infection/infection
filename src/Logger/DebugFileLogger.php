@@ -88,6 +88,11 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
             'Timed Out',
             $separateSections
         );
+        $logs[] = $this->getResultsLine(
+            $this->metricsCalculator->getSkippedExecutionResults(),
+            'Skipped',
+            $separateSections
+        );
 
         if (!$this->onlyCoveredMode) {
             $logs[] = $this->getResultsLine(

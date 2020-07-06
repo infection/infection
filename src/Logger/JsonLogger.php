@@ -69,6 +69,7 @@ final class JsonLogger implements LineMutationTestingResultsLogger
                 'notCoveredCount' => $this->metricsCalculator->getNotTestedCount(),
                 'escapedCount' => $this->metricsCalculator->getEscapedCount(),
                 'errorCount' => $this->metricsCalculator->getErrorCount(),
+                'skippedCount' => $this->metricsCalculator->getSkippedCount(),
                 'timeOutCount' => $this->metricsCalculator->getTimedOutCount(),
                 'msi' => $this->metricsCalculator->getMutationScoreIndicator(),
                 'mutationCodeCoverage' => $this->metricsCalculator->getCoverageRate(),
