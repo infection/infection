@@ -100,6 +100,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $this->addCoverageFilterWhitelistIfDoesNotExist($xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
+        $this->addFailOnAttributesIfNotSet($version, $xPath);
         $this->configManipulator->replaceWithAbsolutePaths($xPath);
         $this->configManipulator->setStopOnFailure($xPath);
         $this->configManipulator->deactivateColours($xPath);
@@ -202,13 +203,23 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addRandomTestsOrderAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
     {
-        if (!version_compare($version, '7.2', '>=')) {
+        if (version_compare($version, '7.2', '<')) {
             return;
         }
 
         if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
             $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
         }
+    }
+
+    private function addFailOnAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
+    {
+        if (version_compare($version, '5.2', '<')) {
+            return;
+        }
+
+        $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
+        $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
     }
 
     private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
