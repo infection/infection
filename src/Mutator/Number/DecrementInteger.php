@@ -98,6 +98,10 @@ final class DecrementInteger extends AbstractNumberMutator
 
         $parentNode = ParentConnector::getParent($node);
 
+        if ($parentNode instanceof Node\Expr\ArrayDimFetch && $node->value === 0) {
+            return false;
+        }
+
         if (!$this->isComparison($parentNode)) {
             return true;
         }
