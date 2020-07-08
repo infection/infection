@@ -77,9 +77,16 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
             'Escaped',
             $separateSections
         );
+
         $logs[] = $this->getResultsLine(
             $this->metricsCalculator->getTimedOutExecutionResults(),
             'Timed Out',
+            $separateSections
+        );
+
+        $logs[] = $this->getResultsLine(
+            $this->metricsCalculator->getSkippedExecutionResults(),
+            'Skipped',
             $separateSections
         );
 
@@ -89,6 +96,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
                 'Killed',
                 $separateSections
             );
+
             $logs[] = $this->getResultsLine(
                 $this->metricsCalculator->getErrorExecutionResults(),
                 'Errors',

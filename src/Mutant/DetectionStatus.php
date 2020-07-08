@@ -48,6 +48,7 @@ final class DetectionStatus
     public const ESCAPED = 'escaped';
     public const ERROR = 'error';
     public const TIMED_OUT = 'timed out';
+    public const SKIPPED = 'skipped';
     public const NOT_COVERED = 'not covered';
 
     public const ALL = [
@@ -55,6 +56,7 @@ final class DetectionStatus
         self::ESCAPED,
         self::ERROR,
         self::TIMED_OUT,
+        self::SKIPPED,
         self::NOT_COVERED,
     ];
 }

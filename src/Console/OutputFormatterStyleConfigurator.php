@@ -69,6 +69,7 @@ final class OutputFormatterStyleConfigurator
             new OutputFormatterStyle('red', null, ['bold'])
         );
         $formatter->setStyle('killed', new OutputFormatterStyle('green'));
+        $formatter->setStyle('skipped', new OutputFormatterStyle('magenta'));
         $formatter->setStyle('code', new OutputFormatterStyle('white'));
     }
 

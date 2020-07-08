@@ -57,7 +57,8 @@ final class DotFormatterTest extends TestCase
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
-            . '<timeout>T</timeout>: timed out',
+            . '<timeout>T</timeout>: timed out, '
+            . '<skipped>S</skipped>: skipped',
             '',
         ]);
 
@@ -133,7 +134,7 @@ final class DotFormatterTest extends TestCase
         );
     }
 
-    public function test_not_covered_correctly_in_console(): void
+    public function test_not_covered_logs_correctly_in_console(): void
     {
         $outputNotCovered = $this->getStartOutputFormatter();
         $outputNotCovered
@@ -146,6 +147,23 @@ final class DotFormatterTest extends TestCase
         $dot->start(10);
         $dot->advance(
             $this->createMutantExecutionResultsOfType(DetectionStatus::NOT_COVERED)[0],
+            10
+        );
+    }
+
+    public function test_skipped_logs_correctly_in_console(): void
+    {
+        $outputSkipped = $this->getStartOutputFormatter();
+        $outputSkipped
+            ->expects($this->once())
+            ->method('write')
+            ->with('<skipped>S</skipped>')
+        ;
+
+        $dot = new DotFormatter($outputSkipped);
+        $dot->start(10);
+        $dot->advance(
+            $this->createMutantExecutionResultsOfType(DetectionStatus::SKIPPED)[0],
             10
         );
     }
@@ -165,7 +183,7 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-.: killed, M: escaped, U: uncovered, E: fatal error, T: timed out
+.: killed, M: escaped, U: uncovered, E: fatal error, T: timed out, S: skipped
 
 ..................................................   ( 50 / 127)
 ..................................................   (100 / 127)
@@ -194,7 +212,7 @@ TXT
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-.: killed, M: escaped, U: uncovered, E: fatal error, T: timed out
+.: killed, M: escaped, U: uncovered, E: fatal error, T: timed out, S: skipped
 
 ..................................................   (   50)
 ..................................................   (  100)
@@ -233,7 +251,8 @@ TXT
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
-            . '<timeout>T</timeout>: timed out',
+            . '<timeout>T</timeout>: timed out, '
+            . '<skipped>S</skipped>: skipped',
             '',
         ]);
 

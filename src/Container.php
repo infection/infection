@@ -565,7 +565,8 @@ final class Container
                     $container->getConfiguration()->isDryRun()
                         ? new DummyFileSystem()
                         : $container->getFileSystem(),
-                    $container->getConfiguration()->noProgress()
+                    $container->getConfiguration()->noProgress(),
+                    $container->getConfiguration()->getProcessTimeout()
                 );
             },
             LineRangeCalculator::class => static function (): LineRangeCalculator {

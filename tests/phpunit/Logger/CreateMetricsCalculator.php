@@ -102,6 +102,18 @@ trait CreateMetricsCalculator
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
+                DetectionStatus::SKIPPED,
+                'skipped#0'
+            ),
+            $this->createMutantExecutionResult(
+                0,
+                PregQuote::class,
+                DetectionStatus::SKIPPED,
+                'skipped#1'
+            ),
+            $this->createMutantExecutionResult(
+                0,
+                For_::class,
                 DetectionStatus::NOT_COVERED,
                 'notCovered#0'
             ),
