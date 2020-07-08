@@ -46,7 +46,7 @@ final class OutputFormatterStyleConfiguratorTest extends TestCase
     {
         $formatter = $this->createMock(OutputFormatterInterface::class);
         $formatter
-        ->expects($this->exactly(12))
+            ->expects($this->exactly(12))
             ->method('setStyle')
         ;
 
