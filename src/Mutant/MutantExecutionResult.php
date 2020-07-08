@@ -82,19 +82,12 @@ class MutantExecutionResult
 
     public static function createFromNonCoveredMutant(Mutant $mutant): self
     {
-        $mutation = $mutant->getMutation();
+        return self::createFromMutant($mutant, DetectionStatus::NOT_COVERED);
+    }
 
-        return new self(
-            '',
-            '',
-            DetectionStatus::NOT_COVERED,
-            $mutant->getDiff(),
-            $mutant->getMutation()->getMutatorName(),
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalStartingLine(),
-            $mutant->getPrettyPrintedOriginalCode(),
-            $mutant->getMutatedCode()
-        );
+    public static function createFromTimeSkippedMutant(Mutant $mutant): self
+    {
+        return self::createFromMutant($mutant, DetectionStatus::SKIPPED);
     }
 
     public function getProcessCommandLine(): string
@@ -140,5 +133,22 @@ class MutantExecutionResult
     public function getMutatedCode(): string
     {
         return $this->mutatedCode;
+    }
+
+    private static function createFromMutant(Mutant $mutant, string $detectionStatus): self
+    {
+        $mutation = $mutant->getMutation();
+
+        return new self(
+            '',
+            '',
+            $detectionStatus,
+            $mutant->getDiff(),
+            $mutant->getMutation()->getMutatorName(),
+            $mutation->getOriginalFilePath(),
+            $mutation->getOriginalStartingLine(),
+            $mutant->getPrettyPrintedOriginalCode(),
+            $mutant->getMutatedCode()
+        );
     }
 }

@@ -37,7 +37,8 @@ namespace Infection\Mutation;
 
 use function array_intersect_key;
 use function array_keys;
-use function count;
+use function array_map;
+use function array_sum;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
@@ -62,6 +63,10 @@ class Mutation
     private $originalFileAst;
     private $tests;
     private $coveredByTests;
+    /**
+     * @var float|null
+     */
+    private $nominalTimeToTest;
 
     /**
      * @var string|null
@@ -97,7 +102,7 @@ class Mutation
         $this->mutatedNode = $mutatedNode;
         $this->mutationByMutatorIndex = $mutationByMutatorIndex;
         $this->tests = $tests;
-        $this->coveredByTests = count($tests) > 0;
+        $this->coveredByTests = $tests !== [];
     }
 
     public function getOriginalFilePath(): string
@@ -153,6 +158,19 @@ class Mutation
     public function getAllTests(): array
     {
         return $this->tests;
+    }
+
+    /**
+     * Overall time needed to run known tests for a mutation, excluding dependencies.
+     */
+    public function getNominalTestExecutionTime(): float
+    {
+        return $this->nominalTimeToTest ?? $this->nominalTimeToTest = array_sum(array_map(
+            static function (TestLocation $testLocation) {
+                return $testLocation->getExecutionTime();
+            },
+            $this->tests
+        ));
     }
 
     public function getHash(): string

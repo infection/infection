@@ -4,4 +4,5 @@ Killed: 6
 Errored: 0
 Escaped: 0
 Timed Out: 0
+Skipped: 0
 Not Covered: 1

@@ -33,25 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Tests\Console;
 
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Console\OutputFormatterStyleConfigurator;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- * @final
- */
-class MutantProcessWasFinished
+final class OutputFormatterStyleConfiguratorTest extends TestCase
 {
-    private $executionResult;
-
-    public function __construct(MutantExecutionResult $executionResult)
+    public function test_it_adds_styles(): void
     {
-        $this->executionResult = $executionResult;
-    }
+        $formatter = $this->createMock(OutputFormatterInterface::class);
+        $formatter
+            ->expects($this->exactly(12))
+            ->method('setStyle')
+        ;
 
-    public function getExecutionResult(): MutantExecutionResult
-    {
-        return $this->executionResult;
+        $output = $this->createMock(OutputInterface::class);
+        $output
+            ->expects($this->once())
+            ->method('getFormatter')
+            ->willReturn($formatter)
+        ;
+
+        OutputFormatterStyleConfigurator::configure($output);
     }
 }

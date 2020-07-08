@@ -144,11 +144,12 @@ final class DecrementInteger extends AbstractNumberMutator
 
     private function isArrayZeroIndexAccess(Node $node): bool
     {
-        if ($node instanceof Node\Scalar\LNumber) {
+        if (!$node instanceof Node\Scalar\LNumber) {
             return false;
         }
+
         /** @var Node\Scalar\LNumber $node */
-        if ($node->value === 0) {
+        if ($node->value !== 0) {
             return false;
         }
 

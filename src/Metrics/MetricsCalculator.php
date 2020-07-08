@@ -51,6 +51,7 @@ class MetricsCalculator
     private $errorExecutionResults;
     private $escapedExecutionResults;
     private $timedOutExecutionResults;
+    private $skippedExecutionResults;
     private $notCoveredExecutionResults;
     private $allExecutionResults;
 
@@ -63,6 +64,11 @@ class MetricsCalculator
      * @var int
      */
     private $errorCount = 0;
+
+    /**
+     * @var int
+     */
+    private $skippedCount = 0;
 
     /**
      * @var int
@@ -96,6 +102,7 @@ class MetricsCalculator
         $this->errorExecutionResults = new SortableMutantExecutionResults();
         $this->escapedExecutionResults = new SortableMutantExecutionResults();
         $this->timedOutExecutionResults = new SortableMutantExecutionResults();
+        $this->skippedExecutionResults = new SortableMutantExecutionResults();
         $this->notCoveredExecutionResults = new SortableMutantExecutionResults();
         $this->allExecutionResults = new SortableMutantExecutionResults();
     }
@@ -136,6 +143,12 @@ class MetricsCalculator
 
                     break;
 
+                case DetectionStatus::SKIPPED:
+                    $this->skippedCount++;
+                    $this->skippedExecutionResults->add($executionResult);
+
+                    break;
+
                 case DetectionStatus::ERROR:
                     $this->errorCount++;
                     $this->errorExecutionResults->add($executionResult);
@@ -170,6 +183,14 @@ class MetricsCalculator
     public function getErrorExecutionResults(): array
     {
         return $this->errorExecutionResults->getSortedExecutionResults();
+    }
+
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getSkippedExecutionResults(): array
+    {
+        return $this->skippedExecutionResults->getSortedExecutionResults();
     }
 
     /**
@@ -214,6 +235,11 @@ class MetricsCalculator
         return $this->errorCount;
     }
 
+    public function getSkippedCount(): int
+    {
+        return $this->skippedCount;
+    }
+
     public function getEscapedCount(): int
     {
         return $this->escapedCount;
@@ -232,6 +258,11 @@ class MetricsCalculator
     public function getTotalMutantsCount(): int
     {
         return $this->totalMutantsCount;
+    }
+
+    public function getTestedMutantsCount(): int
+    {
+        return $this->totalMutantsCount - $this->skippedCount;
     }
 
     /**
