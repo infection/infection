@@ -83,6 +83,10 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
+        if ($this->isArrayZeroIndexAccess($node)) {
+            return false;
+        }
+
         if ($this->isPartOfSizeComparison($node)) {
             return false;
         }
@@ -136,5 +140,23 @@ final class DecrementInteger extends AbstractNumberMutator
             || $parentNode instanceof Node\Expr\BinaryOp\Smaller
             || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual
         ;
+    }
+
+    private function isArrayZeroIndexAccess(Node $node): bool
+    {
+        if (!$node instanceof Node\Scalar\LNumber) {
+            return false;
+        }
+
+        /** @var Node\Scalar\LNumber $node */
+        if ($node->value !== 0) {
+            return false;
+        }
+
+        if (ParentConnector::getParent($node) instanceof Node\Expr\ArrayDimFetch) {
+            return true;
+        }
+
+        return false;
     }
 }
