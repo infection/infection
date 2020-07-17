@@ -279,7 +279,8 @@ final class Container
                     $container->getTestFrameworkFinder(),
                     $container->getDefaultJUnitFilePath(),
                     $config,
-                    GeneratedExtensionsConfig::EXTENSIONS
+                    GeneratedExtensionsConfig::EXTENSIONS,
+                    $container->getLogger()
                 );
             },
             MutantCodeFactory::class => static function (self $container): MutantCodeFactory {

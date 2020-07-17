@@ -38,11 +38,13 @@ namespace Infection\TestFramework;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\AbstractTestFramework\UnsupportedTestFrameworkVersion;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
@@ -57,11 +59,8 @@ final class Factory
     private $testFrameworkFinder;
     private $jUnitFilePath;
     private $infectionConfig;
-
-    /**
-     * @var array<string, array<string, mixed>>
-     */
     private $installedExtensions;
+    private $logger;
 
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
@@ -73,7 +72,8 @@ final class Factory
         TestFrameworkFinder $testFrameworkFinder,
         string $jUnitFilePath,
         Configuration $infectionConfig,
-        array $installedExtensions
+        array $installedExtensions,
+        LoggerInterface $logger
     ) {
         $this->tmpDir = $tmpDir;
         $this->configLocator = $configLocator;
@@ -82,9 +82,31 @@ final class Factory
         $this->infectionConfig = $infectionConfig;
         $this->testFrameworkFinder = $testFrameworkFinder;
         $this->installedExtensions = $installedExtensions;
+        $this->logger = $logger;
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
+    {
+        $adapter = $this->createAdapter($adapterName, $skipCoverage);
+
+        try {
+            $adapter->checkVersion();
+        } catch (UnsupportedTestFrameworkVersion $exception) {
+            $this->logger->error(
+                sprintf(
+                    'The %s version "%s" is not supported. The version detected is either a non-stable version or older than "%s". Infection may not run as intended',
+                    $adapter->getName(),
+                    $exception->getDetectedVersion(),
+                    $exception->getMinimumSupportedVersion()
+                ),
+                ['exception' => $exception]
+            );
+        }
+
+        return $adapter;
+    }
+
+    private function createAdapter(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);

@@ -36,11 +36,15 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\UnsupportedTestFrameworkVersion;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\TestFramework\Version\VersionParser;
 use function Safe\sprintf;
 use Symfony\Component\Process\Process;
+use function version_compare;
 
 /**
  * @internal
@@ -127,10 +131,31 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         return $this->version ?? $this->version = $this->retrieveVersion();
     }
 
+    /**
+     * @throws UnsupportedTestFrameworkVersion
+     *                                         TODO: add this to the interface upstream
+     */
+    public function checkVersion(): void
+    {
+        if (version_compare($this->getVersion(), $this->getMinimumSupportedVersion(), '>=')) {
+            return;
+        }
+
+        throw new UnsupportedTestFrameworkVersion(
+            $this->getVersion(),
+            $this->getMinimumSupportedVersion()
+        );
+    }
+
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
         return sprintf('Check the executed command to identify the problem: %s', $commandLine);
     }
+
+    /**
+     * @throws UnsupportedTestFrameworkVersion
+     */
+    abstract protected function getMinimumSupportedVersion(): string;
 
     protected function buildInitialConfigFile(): string
     {
@@ -173,6 +198,9 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         );
     }
 
+    /**
+     * @throws InvalidVersion
+     */
     private function retrieveVersion(): string
     {
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(

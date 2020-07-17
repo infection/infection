@@ -52,6 +52,8 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
+    private const MINIMUM_SUPPORTED_VERSION = '5.0.0';
+
     public function hasJUnitReport(): bool
     {
         return true;
@@ -121,5 +123,10 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
     public function getInitialRunOnlyOptions(): array
     {
         return ['--configuration', '--filter', '--testsuite'];
+    }
+
+    protected function getMinimumSupportedVersion(): string
+    {
+        return self::MINIMUM_SUPPORTED_VERSION;
     }
 }

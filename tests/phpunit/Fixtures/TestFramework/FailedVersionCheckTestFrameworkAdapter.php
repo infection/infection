@@ -7,11 +7,11 @@ namespace Infection\Tests\Fixtures\TestFramework;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\UnsupportedTestFrameworkVersion;
 
-final class DummyTestFrameworkAdapter implements TestFrameworkAdapter
+final class FailedVersionCheckTestFrameworkAdapter implements TestFrameworkAdapter
 {
     public function getName(): string
     {
-        return 'dummy';
+        return 'FailedVersionCheckAdapter';
     }
 
     public function testsPass(string $output): bool
@@ -46,6 +46,6 @@ final class DummyTestFrameworkAdapter implements TestFrameworkAdapter
 
     public function checkVersion(): void
     {
-        // Do nothing
+        throw new UnsupportedTestFrameworkVersion('X', 'Y');
     }
 }

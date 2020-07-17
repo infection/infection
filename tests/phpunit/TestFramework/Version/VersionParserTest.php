@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\TestFramework\Version;
 
-use Infection\TestFramework\VersionParser;
-use InvalidArgumentException;
+use Infection\AbstractTestFramework\InvalidVersion;
+use Infection\TestFramework\Version\VersionParser;
 use PHPUnit\Framework\TestCase;
 
 final class VersionParserTest extends TestCase
@@ -63,16 +63,10 @@ final class VersionParserTest extends TestCase
 
     public function test_it_throws_exception_when_content_has_no_version_substring(): void
     {
-        try {
-            $this->versionParser->parse('abc');
+        $this->expectException(InvalidVersion::class);
+        $this->expectExceptionMessage('Expected "abc" to be contain a valid SemVer (sub)string value.');
 
-            $this->fail();
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Expected "abc" to be contain a valid SemVer (sub)string value.',
-                $exception->getMessage()
-            );
-        }
+        $this->versionParser->parse('abc');
     }
 
     public function versionProvider(): iterable
@@ -110,5 +104,7 @@ final class VersionParserTest extends TestCase
         yield 'phpspec RC' => ['phpspec version 5.0.0-rc1', '5.0.0-rc1'];
 
         yield 'PHPUnit' => ['PHPUnit 7.5.11 by Sebastian Bergmann and contributors.', '7.5.11'];
+
+        yield 'PHPUnit dev-master' => ['PHPUnit 9.2-g4e89e91ef by Sebastian Bergmann and contributors.', '9.2-g4e89e91ef'];
     }
 }

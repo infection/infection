@@ -44,7 +44,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
-use Infection\TestFramework\VersionParser;
+use Infection\TestFramework\Version\VersionParser;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;

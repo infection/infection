@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6a6277ac6f4270174033923b9b68e6d5",
+    "content-hash": "d05db84eebf802576cc8fd93f9208e4a",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -52,16 +52,16 @@
         },
         {
             "name": "infection/abstract-testframework-adapter",
-            "version": "0.3.0",
+            "version": "0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/abstract-testframework-adapter.git",
-                "reference": "f3ec6fc4beb6377b72d8106f5ff329dffd51ca8a"
+                "reference": "aede0b85dd1dccc69341fec8cb324c0bd60e4234"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/abstract-testframework-adapter/zipball/f3ec6fc4beb6377b72d8106f5ff329dffd51ca8a",
-                "reference": "f3ec6fc4beb6377b72d8106f5ff329dffd51ca8a",
+                "url": "https://api.github.com/repos/infection/abstract-testframework-adapter/zipball/aede0b85dd1dccc69341fec8cb324c0bd60e4234",
+                "reference": "aede0b85dd1dccc69341fec8cb324c0bd60e4234",
                 "shasum": ""
             },
             "require": {
@@ -87,7 +87,7 @@
                 }
             ],
             "description": "Abstract Test Framework Adapter for Infection",
-            "time": "2020-03-14T07:20:06+00:00"
+            "time": "2020-05-06T20:55:19+00:00"
         },
         {
             "name": "infection/extension-installer",
@@ -731,6 +731,20 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-02-24T15:05:31+00:00"
         },
         {
@@ -830,6 +844,20 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-02-14T07:43:07+00:00"
         },
         {
@@ -3055,6 +3083,20 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-02-03T13:51:17+00:00"
         },
         {
