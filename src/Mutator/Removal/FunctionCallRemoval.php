@@ -48,6 +48,18 @@ final class FunctionCallRemoval implements Mutator
 {
     use GetMutatorName;
 
+    /** @var string[] */
+    private $doNotRemoveFunctions = [
+        'assert',
+        'closedir',
+        'curl_close',
+        'curl_multi_close',
+        'fclose',
+        'mysqli_free_result',
+        'mysqli_close',
+        'socket_close',
+    ];
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -85,6 +97,6 @@ final class FunctionCallRemoval implements Mutator
             return true;
         }
 
-        return $name->toLowerString() !== 'assert';
+        return !in_array($name->toLowerString(), $this->doNotRemoveFunctions);
     }
 }
