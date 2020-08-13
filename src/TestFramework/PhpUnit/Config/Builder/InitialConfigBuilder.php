@@ -149,8 +149,9 @@ class InitialConfigBuilder implements ConfigBuilder
     private function addCoverageFilterWhitelistIfDoesNotExist(SafeDOMXPath $xPath): void
     {
         $filterNode = $this->getNode($xPath, 'filter');
+        $coverageNode = $this->getNode($xPath, 'coverage');
 
-        if (!$filterNode) {
+        if (!$filterNode && !$coverageNode) {
             $filterNode = $this->createNode($xPath->document, 'filter');
 
             $whiteListNode = $xPath->document->createElement('whitelist');
