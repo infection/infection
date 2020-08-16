@@ -66,6 +66,7 @@
         "webmozart/path-util": "^2.3"
     },
     "conflict": {
+        "phpunit/php-code-coverage": ">9 <9.1.4",
         "symfony/console": "=4.1.5"
     },
     "require-dev": {
@@ -96,8 +97,12 @@
             "Infection\\Benchmark\\": "tests/benchmark",
             "Infection\\Tests\\": "tests/phpunit"
         },
-        "classmap": ["tests/autoloaded"],
-        "files": ["tests/phpunit/Helpers.php"]
+        "classmap": [
+            "tests/autoloaded"
+        ],
+        "files": [
+            "tests/phpunit/Helpers.php"
+        ]
     },
     "bin": [
         "bin/infection"
