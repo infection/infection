@@ -66,6 +66,7 @@
         "webmozart/path-util": "^2.3"
     },
     "conflict": {
+        "phpunit/php-code-coverage": ">9 <9.1.4",
         "symfony/console": "=4.1.5"
     },
     "require-dev": {
