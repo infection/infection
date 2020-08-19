@@ -55,8 +55,8 @@ final class FunctionCallRemoval implements Mutator
         'curl_close',
         'curl_multi_close',
         'fclose',
-        'mysqli_free_result',
         'mysqli_close',
+        'mysqli_free_result',
         'socket_close',
     ];
 
