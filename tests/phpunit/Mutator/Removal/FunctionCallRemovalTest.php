@@ -179,6 +179,7 @@ fclose();
 mysqli_free_result();
 mysqli_close();
 socket_close();
+openssl_free_key();
 
 $a = 3;
 PHP

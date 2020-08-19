@@ -57,6 +57,7 @@ final class FunctionCallRemoval implements Mutator
         'fclose',
         'mysqli_close',
         'mysqli_free_result',
+        'openssl_free_key',
         'socket_close',
     ];
 
