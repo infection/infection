@@ -74,7 +74,7 @@ final class MsiParser
             $precisions[] = strlen($valueParts[1]);
         }
 
-        return max($precisions);
+        return (int) max($precisions);
     }
 
     public static function parse(?string $value, int $precision, string $optionName): ?float
