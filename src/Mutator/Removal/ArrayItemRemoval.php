@@ -45,6 +45,7 @@ use function min;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ArrayItem;
 use function range;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -106,6 +107,8 @@ TXT
      */
     public function mutate(Node $arrayNode): iterable
     {
+        Assert::allNotNull($arrayNode->items);
+
         foreach ($this->getItemsIndexes($arrayNode->items) as $indexToRemove) {
             $newArrayNode = clone $arrayNode;
             unset($newArrayNode->items[$indexToRemove]);
