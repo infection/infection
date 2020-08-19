@@ -127,23 +127,54 @@ class InitialConfigBuilder implements ConfigBuilder
     private function addJUnitLogger(SafeDOMXPath $xPath): void
     {
         $logging = $this->getOrCreateNode($xPath, 'logging');
+        $logging->appendChild($this->createJUnitLogger($xPath));
+    }
 
-        $junitLog = $xPath->document->createElement('log');
-        $junitLog->setAttribute('type', 'junit');
-        $junitLog->setAttribute('target', $this->jUnitFilePath);
+    private function createJUnitLogger(SafeDOMXPath $xPath): DOMElement
+    {
+        $coverageNode = $this->getNode($xPath, 'coverage');
 
-        $logging->appendChild($junitLog);
+        if ($coverageNode !== null) {
+            $logger = $xPath->document->createElement('junit');
+            $logger->setAttribute('outputFile', $this->jUnitFilePath);
+
+            return $logger;
+        }
+
+        $logger = $xPath->document->createElement('log');
+        $logger->setAttribute('type', 'junit');
+        $logger->setAttribute('target', $this->jUnitFilePath);
+
+        return $logger;
     }
 
     private function addCodeCoverageLogger(SafeDOMXPath $xPath): void
     {
-        $logging = $this->getOrCreateNode($xPath, 'logging');
+        $coverageNode = $this->getNode($xPath, 'coverage');
 
-        $coverageXmlLog = $xPath->document->createElement('log');
-        $coverageXmlLog->setAttribute('type', 'coverage-xml');
-        $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . PhpUnitAdapter::COVERAGE_DIR);
+        if ($coverageNode === null) {
+            $logging = $this->getOrCreateNode($xPath, 'logging');
 
-        $logging->appendChild($coverageXmlLog);
+            $coverageXmlLog = $xPath->document->createElement('log');
+            $coverageXmlLog->setAttribute('type', 'coverage-xml');
+            $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . PhpUnitAdapter::COVERAGE_DIR);
+
+            $logging->appendChild($coverageXmlLog);
+
+            return;
+        }
+
+        $report = $this->getNode($xPath, 'coverage/report');
+
+        if ($report === null) {
+            $report = $xPath->document->createElement('report');
+            $coverageNode->appendChild($report);
+        }
+
+        $coverageXmlLog = $xPath->document->createElement('xml');
+        $coverageXmlLog->setAttribute('outputDirectory', $this->tmpDir . '/' . PhpUnitAdapter::COVERAGE_DIR);
+
+        $report->appendChild($coverageXmlLog);
     }
 
     private function addCoverageFilterWhitelistIfDoesNotExist(SafeDOMXPath $xPath): void
