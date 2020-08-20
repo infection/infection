@@ -84,7 +84,7 @@ final class ConfigureCommand extends BaseCommand
             );
     }
 
-    protected function executeCommand(IO $io): void
+    protected function executeCommand(IO $io): bool
     {
         if (!$io->isInteractive()) {
             $io->writeln(self::NONINTERACTIVE_MODE_ERROR);
@@ -156,6 +156,8 @@ final class ConfigureCommand extends BaseCommand
             SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE
         ));
         $io->newLine();
+
+        return true;
     }
 
     /**

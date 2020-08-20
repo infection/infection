@@ -1,5 +1,29 @@
 # Change Log
 
+## [0.17.0](https://github.com/infection/infection/tree/0.17.0) (2020-08-17)
+[Full Changelog](https://github.com/infection/infection/compare/0.16.4...0.17.0)
+
+**Added:**
+
+- Set `failOnRisky`, `failOnWarning` to `true` if parameters are not already set [\#1280](https://github.com/infection/infection/pull/1280)
+- Add JSON logger, useful for CI and analyzing results of Infection programmatically [\#1278](https://github.com/infection/infection/pull/1278)
+- Do not mutate clean up functions [\#1285](https://github.com/infection/infection/pull/1285)
+- Restrict installing with faulty versions of PHPUnit's coverage package [\#1295](https://github.com/infection/infection/pull/1295)
+- Add `--no-progress` option to opt-out the CI detection [\#1261](https://github.com/infection/infection/pull/1261)
+- InstanceOf\_ mutator [\#1232](https://github.com/infection/infection/pull/1232)
+
+**Changed:**
+
+- Exclude mutations that are over specified time limit [\#1171](https://github.com/infection/infection/pull/1171)
+- Decrement mutator makes array indexes negative [\#1270](https://github.com/infection/infection/issues/1270)
+- Upgrade infection/include-interceptor to ^0.2.4 [\#1288](https://github.com/infection/infection/pull/1288)
+- U for uncovered [\#1233](https://github.com/infection/infection/pull/1233)
+- Round MSI scores [\#1190](https://github.com/infection/infection/pull/1190)
+
+**Fixed:**
+
+- symbolic link trouble + PHPUnit unknown [\#778](https://github.com/infection/infection/issues/778)
+
 ## [0.16.0](https://github.com/infection/infection/tree/0.16.0) (2020-03-22)
 [Full Changelog](https://github.com/infection/infection/compare/0.15.3...0.16.0)
 
