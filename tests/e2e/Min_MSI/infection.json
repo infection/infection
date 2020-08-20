@@ -1,0 +1,9 @@
+{
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "tmpDir": "."
+}
