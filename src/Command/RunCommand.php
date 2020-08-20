@@ -213,7 +213,7 @@ final class RunCommand extends BaseCommand
         ;
     }
 
-    protected function executeCommand(IO $io): void
+    protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);
         $container = $this->createContainer($io, $logger);
@@ -238,10 +238,14 @@ final class RunCommand extends BaseCommand
 
         try {
             $engine->execute();
+
+            return true;
         } catch (InitialTestsFailed | MinMsiCheckFailed $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
             $io->error($exception->getMessage());
+
+            return false;
         }
     }
 
