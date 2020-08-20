@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Min_MSI\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Min_MSI\\Test\\": "tests/"
+        }
+    }
+}
