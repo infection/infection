@@ -57,6 +57,10 @@ final class ConsoleOutputTest extends TestCase
 
     protected function setUp(): void
     {
+        if (getenv('COLUMNS') !== '100') {
+            $this->markTestSkipped('This test assumes 100 columns wide display');
+        }
+
         $this->output = new BufferedOutput();
 
         $this->consoleOutput = new ConsoleOutput(
