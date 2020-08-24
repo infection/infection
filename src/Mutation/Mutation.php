@@ -46,6 +46,7 @@ use function md5;
 use PhpParser\Node;
 use function Pipeline\take;
 use function Safe\array_flip;
+use function Safe\substr;
 use Webmozart\Assert\Assert;
 
 /**
@@ -171,7 +172,7 @@ class Mutation
                 ->map(static function (TestLocation $testLocation) {
                     // Timings are per test suite, not per test, therefore we have to unique by test suite name
                     $methodName = $testLocation->getMethod();
-                    $className = substr($methodName, 0, strpos($methodName, '::'));
+                    $className = substr($methodName, 0, (int) strpos($methodName, '::'));
 
                     yield $className => $testLocation->getExecutionTime();
                 }),
