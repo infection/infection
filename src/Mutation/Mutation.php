@@ -169,7 +169,11 @@ class Mutation
         return $this->nominalTimeToTest ?? $this->nominalTimeToTest = array_sum(iterator_to_array(
             take($this->tests)
                 ->map(static function (TestLocation $testLocation) {
-                    yield $testLocation->getMethod() => $testLocation->getExecutionTime();
+                    // Timings are per test suite, not per test, therefore we have to unique by test suite name
+                    $methodName = $testLocation->getMethod();
+                    $className = substr($methodName, 0, strpos($methodName, '::'));
+
+                    yield $className => $testLocation->getExecutionTime();
                 }),
             true
         ));
