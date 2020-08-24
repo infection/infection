@@ -37,16 +37,14 @@ namespace Infection\Mutation;
 
 use function array_intersect_key;
 use function array_keys;
-use function array_sum;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\MutatedNode;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
 use PhpParser\Node;
-use function Pipeline\take;
 use function Safe\array_flip;
-use function Safe\substr;
 use Webmozart\Assert\Assert;
 
 /**
@@ -167,17 +165,7 @@ class Mutation
     public function getNominalTestExecutionTime(): float
     {
         // TestLocator returns non-unique tests, and JUnitTestCaseSorter works around that; we have to do that too.
-        return $this->nominalTimeToTest ?? $this->nominalTimeToTest = array_sum(iterator_to_array(
-            take($this->tests)
-                ->map(static function (TestLocation $testLocation) {
-                    // Timings are per test suite, not per test, therefore we have to unique by test suite name
-                    $methodName = $testLocation->getMethod();
-                    $className = substr($methodName, 0, (int) strpos($methodName, '::'));
-
-                    yield $className => $testLocation->getExecutionTime();
-                }),
-            true
-        ));
+        return $this->nominalTimeToTest ?? $this->nominalTimeToTest = (new JUnitTestCaseTimeAdder($this->tests))->getTotalTestTime();
     }
 
     public function getHash(): string
