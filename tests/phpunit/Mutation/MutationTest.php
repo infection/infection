@@ -64,6 +64,7 @@ final class MutationTest extends TestCase
         MutatedNode $mutatedNode,
         int $mutationByMutatorIndex,
         array $tests,
+        float $timeToTest,
         array $expectedAttributes,
         int $expectedOriginalStartingLine,
         bool $expectedCoveredByTests,
@@ -88,6 +89,7 @@ final class MutationTest extends TestCase
         $this->assertSame($mutatedNodeClass, $mutation->getMutatedNodeClass());
         $this->assertSame($mutatedNode, $mutation->getMutatedNode());
         $this->assertSame($tests, $mutation->getAllTests());
+        $this->assertSame($timeToTest, $mutation->getNominalTestExecutionTime());
         $this->assertSame($expectedCoveredByTests, $mutation->isCoveredByTest());
         $this->assertSame($expectedHash, $mutation->getHash());
     }
@@ -112,6 +114,7 @@ final class MutationTest extends TestCase
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             -1,
             [],
+            0.0,
             $nominalAttributes,
             $originalStartingLine,
             false,
@@ -136,6 +139,7 @@ final class MutationTest extends TestCase
                     0.01
                 ),
             ],
+            0.01,
             $nominalAttributes,
             $originalStartingLine,
             true,
@@ -160,6 +164,7 @@ final class MutationTest extends TestCase
                     0.01
                 ),
             ],
+            0.01,
             $nominalAttributes,
             $originalStartingLine,
             true,
@@ -181,9 +186,15 @@ final class MutationTest extends TestCase
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
-                    0.01
+                    1.1
+                ),
+                new TestLocation(
+                    'FooTest::test_it_can_instantiate',
+                    '/path/to/acme/FooTest.php',
+                    1.1
                 ),
             ],
+            1.1,
             $nominalAttributes,
             $originalStartingLine,
             true,
@@ -202,6 +213,7 @@ final class MutationTest extends TestCase
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
             [],
+            0.0,
             $nominalAttributes,
             $originalStartingLine,
             false,
@@ -229,6 +241,7 @@ final class MutationTest extends TestCase
                     0.01
                 ),
             ],
+            0.01,
             $nominalAttributes,
             $originalStartingLine,
             true,
