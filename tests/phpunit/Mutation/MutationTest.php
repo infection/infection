@@ -240,8 +240,13 @@ final class MutationTest extends TestCase
                     '/path/to/acme/FooTest.php',
                     0.01
                 ),
+                new TestLocation(
+                    'FooTest::test_it_just_works',
+                    '/path/to/acme/FooTest.php',
+                    0.02
+                ),
             ],
-            0.01,
+            0.03,
             $nominalAttributes,
             $originalStartingLine,
             true,
