@@ -36,37 +36,39 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use const DIRECTORY_SEPARATOR;
-use Generator;
 use function in_array;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
-use Infection\Command\InfectionCommand;
+use Infection\Command\RunCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Application;
+use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
-use Infection\Console\Util\PhpProcess;
+use Infection\Console\XdebugHandler;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\NullSubscriber;
+use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
-use Infection\FileSystem\Finder\FilterableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Http\StrykerCurlClient;
-use Infection\Http\StrykerDashboardClient;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Logger\Http\StrykerCurlClient;
+use Infection\Logger\Http\StrykerDashboardClient;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Resource\Memory\MemoryLimiterEnvironment;
+use Infection\Process\OriginalPhpProcess;
 use Infection\TestFramework\AdapterInstaller;
-use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
-use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
+use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -82,25 +84,32 @@ use Symfony\Component\Finder\SplFileInfo;
 
 final class ProjectCodeProvider
 {
+    use CannotBeInstantiated;
+
     /**
      * This array contains all classes that don't have tests yet, due to legacy
      * reasons. This list should never be added to, only removed from.
      */
     public const NON_TESTED_CONCRETE_CLASSES = [
         ConfigureCommand::class,
-        InfectionCommand::class,
+        RunCommand::class,
         Application::class,
         ProgressFormatter::class,
-        PhpProcess::class,
+        OriginalPhpProcess::class,
         ComposerExecutableFinder::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
-        FilterableFinder::class,
         Engine::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
+        DetectionStatus::class,
+        DummyFileSystem::class,
+        MutationAttributeKeys::class,
+        XdebugHandler::class,
+        NullSubscriber::class,
+        FormatterName::class,
     ];
 
     /**
@@ -113,10 +122,8 @@ final class ProjectCodeProvider
         TestFrameworkFinder::class,
         StrykerDashboardClient::class,
         MetricsCalculator::class,
-        InitialTestRunProcessBuilder::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
-        MemoryLimiterEnvironment::class,
     ];
 
     /**
@@ -144,11 +151,7 @@ final class ProjectCodeProvider
      */
     private static $testClasses;
 
-    private function __construct()
-    {
-    }
-
-    public static function provideSourceClasses(): Generator
+    public static function provideSourceClasses(): iterable
     {
         if (self::$sourceClasses !== null) {
             yield from self::$sourceClasses;
@@ -181,14 +184,14 @@ final class ProjectCodeProvider
         yield from self::$sourceClasses;
     }
 
-    public static function sourceClassesProvider(): Generator
+    public static function sourceClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::provideSourceClasses()
         );
     }
 
-    public static function provideConcreteSourceClasses(): Generator
+    public static function provideConcreteSourceClasses(): iterable
     {
         yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(
             self::provideSourceClasses(),
@@ -196,14 +199,14 @@ final class ProjectCodeProvider
         ));
     }
 
-    public static function concreteSourceClassesProvider(): Generator
+    public static function concreteSourceClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::provideConcreteSourceClasses()
         );
     }
 
-    public static function provideSourceClassesToCheckForPublicProperties(): Generator
+    public static function provideSourceClassesToCheckForPublicProperties(): iterable
     {
         if (self::$sourceClassesToCheckForPublicProperties !== null) {
             yield from self::$sourceClassesToCheckForPublicProperties;
@@ -220,9 +223,8 @@ final class ProjectCodeProvider
                     && !in_array(
                         $className,
                         [
-                            CoverageReport::class,
-                            CoverageLineData::class,
-                            MethodLocationData::class,
+                            TestLocations::class,
+                            SourceMethodLineRange::class,
                             NodeLineRangeData::class,
                             TestFileTimeData::class,
                         ],
@@ -235,14 +237,14 @@ final class ProjectCodeProvider
         yield from self::$sourceClassesToCheckForPublicProperties;
     }
 
-    public static function sourceClassesToCheckForPublicPropertiesProvider(): Generator
+    public static function sourceClassesToCheckForPublicPropertiesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::provideSourceClassesToCheckForPublicProperties()
         );
     }
 
-    public static function provideTestClasses(): Generator
+    public static function provideTestClasses(): iterable
     {
         if (self::$testClasses !== null) {
             yield from self::$testClasses;
@@ -255,7 +257,10 @@ final class ProjectCodeProvider
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
+            ->notPath('xdebug-filter.php')
             ->exclude([
+                'autoloaded',
+                'benchmark',
                 'e2e',
                 'Fixtures',
             ])
@@ -285,21 +290,21 @@ final class ProjectCodeProvider
 
     // "testClassesProvider" would be more correct but PHPUnit will then detect this method as a
     // test instead of a test provider.
-    public static function classesTestProvider(): Generator
+    public static function classesTestProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::provideTestClasses()
         );
     }
 
-    public static function nonTestedConcreteClassesProvider(): Generator
+    public static function nonTestedConcreteClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::NON_TESTED_CONCRETE_CLASSES
         );
     }
 
-    public static function nonFinalExtensionClasses(): Generator
+    public static function nonFinalExtensionClasses(): iterable
     {
         yield from generator_to_phpunit_data_provider(
             self::NON_FINAL_EXTENSION_CLASSES

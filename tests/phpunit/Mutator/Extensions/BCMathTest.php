@@ -36,12 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Extensions;
 
 use function array_map;
-use Generator;
 use function implode;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 use function range;
 
-final class BCMathTest extends AbstractMutatorTestCase
+final class BCMathTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -53,7 +52,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield from $this->mutationsProviderForBinaryOperator('bcadd', '+', 'summation');
 
@@ -74,7 +73,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield from $this->mutationsProviderForComparision();
     }
 
-    private function mutationsProviderForBinaryOperator(string $bcFunc, string $op, string $expression): Generator
+    private function mutationsProviderForBinaryOperator(string $bcFunc, string $op, string $expression): iterable
     {
         yield "It converts $bcFunc to $expression expression" => [
             "<?php \\$bcFunc('3', \$b);",
@@ -94,7 +93,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield from $this->provideCasesWhereMutatorShouldNotApply($bcFunc);
     }
 
-    private function mutationsProviderForPowerOperator(): Generator
+    private function mutationsProviderForPowerOperator(): iterable
     {
         yield 'It converts bcpow to power expression' => [
             '<?php \\bcpow(5, $b);',
@@ -114,7 +113,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield from $this->provideCasesWhereMutatorShouldNotApply('bcpow');
     }
 
-    private function mutationsProviderForSquareRoot(): Generator
+    private function mutationsProviderForSquareRoot(): iterable
     {
         yield 'It converts bcsqrt to sqrt call' => [
             '<?php \\bcsqrt(2);',
@@ -134,7 +133,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield from $this->provideCasesWhereMutatorShouldNotApply('bcsqrt', 1);
     }
 
-    private function mutationsProviderForPowerModulo(): Generator
+    private function mutationsProviderForPowerModulo(): iterable
     {
         yield 'It converts bcpowmod to power modulo expression' => [
             '<?php \\bcpowmod($a, $b, $mod);',
@@ -154,7 +153,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield from $this->provideCasesWhereMutatorShouldNotApply('bcpowmod', 3);
     }
 
-    private function mutationsProviderForComparision(): Generator
+    private function mutationsProviderForComparision(): iterable
     {
         yield 'It converts bccomp to spaceship expression' => [
             '<?php \\bccomp(\'3\', $b);',
@@ -174,7 +173,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield from $this->provideCasesWhereMutatorShouldNotApply('bccomp', 2);
     }
 
-    private function provideCasesWhereMutatorShouldNotApply(string $bcFunc, int $requiredArgumentsCount = 2): Generator
+    private function provideCasesWhereMutatorShouldNotApply(string $bcFunc, int $requiredArgumentsCount = 2): iterable
     {
         $invalidArgumentsExpression = $this->generateArgumentsExpression($requiredArgumentsCount - 1);
         $validArgumentsExpression = $this->generateArgumentsExpression($requiredArgumentsCount);

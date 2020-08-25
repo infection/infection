@@ -40,8 +40,9 @@ use DOMDocument;
 use DOMNode;
 use DOMNodeList;
 use DOMXPath;
-use Generator;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use function escapeshellarg;
+use function exec;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -85,7 +86,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         $this->builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit.xml');
     }
 
-    public function test_it_builds_and_dump_the_XML_configuration(): void
+    public function test_it_builds_and_dump_the_xml_configuration(): void
     {
         $configurationPath = $this->builder->build(
             [],
@@ -190,7 +191,7 @@ XML
             file_get_contents(
                 $this->builder->build(
                     [
-                        CoverageLineData::with(
+                        new TestLocation(
                             'FooTest::test_foo',
                             '/path/to/FooTest.php',
                             1.
@@ -202,10 +203,16 @@ XML
                 )
             )
         );
+
+        $phpCode = file_get_contents($this->tmp . '/interceptor.autoload.hash1.infection.php');
+
         $this->assertSame(
             <<<PHP
 <?php
 
+if (function_exists('proc_nice')) {
+    proc_nice(1);
+}
 
 require_once '$interceptorPath';
 
@@ -217,8 +224,10 @@ require_once '$projectPath/app/autoload2.php';
 
 PHP
             ,
-            file_get_contents($this->tmp . '/interceptor.autoload.hash1.infection.php')
+            $phpCode
         );
+
+        $this->assertPHPSyntaxIsValid($phpCode);
 
         $this->assertSame(
             <<<XML
@@ -251,7 +260,7 @@ XML
             file_get_contents(
                 $this->builder->build(
                     [
-                        CoverageLineData::with(
+                        new TestLocation(
                             'BarTest::test_bar_1',
                             '/path/to/BarTest.php',
                             1.
@@ -263,10 +272,16 @@ XML
                 )
             )
         );
+
+        $phpCode = file_get_contents($this->tmp . '/interceptor.autoload.hash2.infection.php');
+
         $this->assertSame(
             <<<PHP
 <?php
 
+if (function_exists('proc_nice')) {
+    proc_nice(1);
+}
 
 require_once '$interceptorPath';
 
@@ -278,8 +293,10 @@ require_once '$projectPath/app/autoload2.php';
 
 PHP
             ,
-            file_get_contents($this->tmp . '/interceptor.autoload.hash2.infection.php')
+            $phpCode
         );
+
+        $this->assertPHPSyntaxIsValid($phpCode);
     }
 
     public function test_it_builds_path_to_mutation_config_file(): void
@@ -436,18 +453,18 @@ PHP
     }
 
     /**
-     * @dataProvider coverageTestsProvider
+     * @dataProvider locationsProvider
      *
-     * @param CoverageLineData[] $coverageTests
+     * @param TestLocation[] $tests
      * @param string[] $expectedFiles
      */
     public function test_it_sets_sorted_list_of_test_files(
-        array $coverageTests,
+        array $tests,
         array $expectedFiles
     ): void {
         $xml = file_get_contents(
             $this->builder->build(
-                $coverageTests,
+                $tests,
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH
@@ -508,26 +525,26 @@ PHP
         );
     }
 
-    public function coverageTestsProvider(): Generator
+    public function locationsProvider(): iterable
     {
         yield [
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #5',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                    0.086178
+                    0.861780
                 ),
-                CoverageLineData::with(
+                new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #6',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                    0.086178
+                    0.861780
                 ),
-                CoverageLineData::with(
+                new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_id',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
                     0.035935
                 ),
-                CoverageLineData::with(
+                new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_recorded_at_date',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
                     0.035935
@@ -541,17 +558,17 @@ PHP
 
         yield [
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'Path\\To\\A::test_a',
                     '/path/to/A.php',
-                    0.186178
+                    0.586178
                 ),
-                CoverageLineData::with(
+                new TestLocation(
                     'Path\\To\\B::test_b',
                     '/path/to/B.php',
-                    0.086178
+                    0.186178
                 ),
-                CoverageLineData::with(
+                new TestLocation(
                     'Path\\To\\C::test_c',
                     '/path/to/C.php',
                     0.016178
@@ -586,6 +603,21 @@ PHP
             new XmlConfigurationManipulator($replacer, ''),
             'project/dir',
             new JUnitTestCaseSorter()
+        );
+    }
+
+    private function assertPHPSyntaxIsValid(string $phpCode): void
+    {
+        exec(
+            sprintf('echo %s | php -l', escapeshellarg($phpCode)),
+            $output,
+            $returnCode
+        );
+
+        $this->assertSame(
+            0,
+            $returnCode,
+            'Builder produced invalid code'
         );
     }
 }

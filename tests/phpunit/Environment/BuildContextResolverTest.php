@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Environment;
 
-use Generator;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use OndraM\CiDetector\Ci\CiInterface;
@@ -101,7 +100,7 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver = new BuildContextResolver($ciDetector);
 
         $this->expectException(CouldNotResolveBuildContext::class);
-        $this->expectExceptionMessage('The current process is maybe a pull request build');
+        $this->expectExceptionMessage('The current process may be a pull request build');
 
         $buildContextResolver->resolve();
     }
@@ -176,7 +175,7 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver->resolve();
     }
 
-    public function provideBlankOrEmptyString(): Generator
+    public function provideBlankOrEmptyString(): iterable
     {
         yield 'string-blank' => [' '];
 

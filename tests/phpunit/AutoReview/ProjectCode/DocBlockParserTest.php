@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 
 final class DocBlockParserTest extends TestCase
@@ -43,14 +42,14 @@ final class DocBlockParserTest extends TestCase
     /**
      * @dataProvider docBlocksProvider
      */
-    public function test_it_can_parse_PHP_doc_blocks(string $docBlock, string $expected): void
+    public function test_it_can_parse_php_doc_blocks(string $docBlock, string $expected): void
     {
         $actual = DocBlockParser::parse($docBlock);
 
         $this->assertSame($expected, $actual);
     }
 
-    public function docBlocksProvider(): Generator
+    public function docBlocksProvider(): iterable
     {
         yield ['', ''];
 

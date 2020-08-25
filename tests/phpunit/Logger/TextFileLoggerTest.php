@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Generator;
 use Infection\Logger\TextFileLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
 
 final class TextFileLoggerTest extends TestCase
@@ -55,7 +54,7 @@ final class TextFileLoggerTest extends TestCase
         string $expectedContents
     ): void {
         $logger = new TextFileLogger(
-            new MetricsCalculator(),
+            new MetricsCalculator(2),
             $debugVerbosity,
             $onlyCoveredMode,
             $debugMode
@@ -83,7 +82,7 @@ final class TextFileLoggerTest extends TestCase
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function emptyMetricsProvider(): Generator
+    public function emptyMetricsProvider(): iterable
     {
         yield 'no debug verbosity; no debug mode' => [
             false,
@@ -95,6 +94,9 @@ Escaped mutants:
 
 Timed Out mutants:
 ==================
+
+Skipped mutants:
+================
 
 Not Covered mutants:
 ====================
@@ -112,6 +114,9 @@ Escaped mutants:
 
 Timed Out mutants:
 ==================
+
+Skipped mutants:
+================
 
 Killed mutants:
 ===============
@@ -136,6 +141,9 @@ Escaped mutants:
 Timed Out mutants:
 ==================
 
+Skipped mutants:
+================
+
 Not Covered mutants:
 ====================
 
@@ -152,6 +160,9 @@ Escaped mutants:
 
 Timed Out mutants:
 ==================
+
+Skipped mutants:
+================
 
 Killed mutants:
 ===============
@@ -176,6 +187,9 @@ Escaped mutants:
 Timed Out mutants:
 ==================
 
+Skipped mutants:
+================
+
 TXT
         ];
 
@@ -189,6 +203,9 @@ Escaped mutants:
 
 Timed Out mutants:
 ==================
+
+Skipped mutants:
+================
 
 Killed mutants:
 ===============
@@ -210,6 +227,9 @@ Escaped mutants:
 Timed Out mutants:
 ==================
 
+Skipped mutants:
+================
+
 TXT
         ];
 
@@ -223,6 +243,9 @@ Escaped mutants:
 
 Timed Out mutants:
 ==================
+
+Skipped mutants:
+================
 
 Killed mutants:
 ===============
@@ -234,7 +257,7 @@ TXT
         ];
     }
 
-    public function completeMetricsProvider(): Generator
+    public function completeMetricsProvider(): iterable
     {
         yield 'no debug verbosity; no debug mode' => [
             false,
@@ -285,6 +308,29 @@ Timed Out mutants:
 
 - echo 'original';
 + echo 'timedOut#0';
+
+
+Skipped mutants:
+================
+
+1) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#0';
+
+
+2) foo/bar:10    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#1';
 
 
 Not Covered mutants:
@@ -367,6 +413,33 @@ Timed Out mutants:
 
 - echo 'original';
 + echo 'timedOut#0';
+
+  process output
+
+
+Skipped mutants:
+================
+
+1) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#0';
+
+  process output
+
+
+2) foo/bar:10    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#1';
 
   process output
 
@@ -513,6 +586,33 @@ $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/Foo
 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
 
+Skipped mutants:
+================
+
+1) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#0';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+
+
+2) foo/bar:10    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#1';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+
+
 Not Covered mutants:
 ====================
 
@@ -600,6 +700,35 @@ $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/Foo
 
 - echo 'original';
 + echo 'timedOut#0';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+  process output
+
+
+Skipped mutants:
+================
+
+1) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#0';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+  process output
+
+
+2) foo/bar:10    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#1';
 
 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
   process output
@@ -744,6 +873,29 @@ Timed Out mutants:
 - echo 'original';
 + echo 'timedOut#0';
 
+
+Skipped mutants:
+================
+
+1) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#0';
+
+
+2) foo/bar:10    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#1';
+
 TXT
         ];
 
@@ -802,6 +954,33 @@ Timed Out mutants:
 
 - echo 'original';
 + echo 'timedOut#0';
+
+  process output
+
+
+Skipped mutants:
+================
+
+1) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#0';
+
+  process output
+
+
+2) foo/bar:10    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#1';
 
   process output
 
@@ -920,6 +1099,33 @@ $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/Foo
 
 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
+
+Skipped mutants:
+================
+
+1) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#0';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+
+
+2) foo/bar:10    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#1';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+
 TXT
         ];
 
@@ -981,6 +1187,35 @@ $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/Foo
 
 - echo 'original';
 + echo 'timedOut#0';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+  process output
+
+
+Skipped mutants:
+================
+
+1) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#0';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+  process output
+
+
+2) foo/bar:10    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'skipped#1';
 
 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
   process output

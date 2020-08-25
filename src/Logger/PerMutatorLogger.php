@@ -39,7 +39,7 @@ use function array_fill;
 use function array_unshift;
 use function count;
 use function implode;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
@@ -68,7 +68,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
         $calculatorPerMutator = $this->createMetricsPerMutators();
 
         $table = [
-            ['Mutator', 'Mutations', 'Killed', 'Escaped', 'Errors', 'Timed Out', 'MSI (%s)', 'Covered MSI (%s)'],
+            ['Mutator', 'Mutations', 'Killed', 'Escaped', 'Errors', 'Timed Out', 'Skipped', 'MSI (%s)', 'Covered MSI (%s)'],
         ];
 
         foreach ($calculatorPerMutator as $mutatorName => $calculator) {
@@ -81,6 +81,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
                 (string) $calculator->getEscapedCount(),
                 (string) $calculator->getErrorCount(),
                 (string) $calculator->getTimedOutCount(),
+                (string) $calculator->getSkippedCount(),
                 self::formatScore($calculator->getMutationScoreIndicator()),
                 self::formatScore($calculator->getCoveredCodeMutationScoreIndicator()),
             ];
@@ -184,7 +185,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
         $calculatorPerMutator = [];
 
         foreach ($processPerMutator as $mutator => $executionResults) {
-            $calculator = new MetricsCalculator();
+            $calculator = new MetricsCalculator($this->metricsCalculator->getRoundingPrecision());
             $calculator->collect(...$executionResults);
 
             $calculatorPerMutator[$mutator] = $calculator;

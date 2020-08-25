@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use function array_values;
+use Infection\CannotBeInstantiated;
 use Infection\Mutator;
 
 /**
@@ -43,6 +44,8 @@ use Infection\Mutator;
  */
 final class ProfileList
 {
+    use CannotBeInstantiated;
+
     public const ALL_PROFILES = [
         '@arithmetic' => self::ARITHMETIC_PROFILE,
         '@boolean' => self::BOOLEAN_PROFILE,
@@ -95,6 +98,7 @@ final class ProfileList
         // EqualIdentical disabled from the default boolean profile
         Mutator\Boolean\FalseValue::class,
         // IdenticalEqual disabled from the default boolean profile
+        Mutator\Boolean\InstanceOf_::class,
         Mutator\Boolean\LogicalAnd::class,
         Mutator\Boolean\LogicalLowerAnd::class,
         Mutator\Boolean\LogicalLowerOr::class,
@@ -295,6 +299,7 @@ final class ProfileList
         'EqualIdentical' => Mutator\Boolean\EqualIdentical::class,
         'FalseValue' => Mutator\Boolean\FalseValue::class,
         'IdenticalEqual' => Mutator\Boolean\IdenticalEqual::class,
+        'InstanceOf_' => Mutator\Boolean\InstanceOf_::class,
         'LogicalAnd' => Mutator\Boolean\LogicalAnd::class,
         'LogicalLowerAnd' => Mutator\Boolean\LogicalLowerAnd::class,
         'LogicalLowerOr' => Mutator\Boolean\LogicalLowerOr::class,
@@ -427,10 +432,6 @@ final class ProfileList
      * @var array<string, string>|null
      */
     private static $defaultProfileMutators;
-
-    private function __construct()
-    {
-    }
 
     /**
      * @return array<int, string>

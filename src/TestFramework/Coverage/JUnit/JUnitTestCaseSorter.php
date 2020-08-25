@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use function array_key_exists;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use function count;
+use function current;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use function Safe\usort;
 
 /**
@@ -45,54 +47,106 @@ use function Safe\usort;
 final class JUnitTestCaseSorter
 {
     /**
-     * @param CoverageLineData[] $coverageTestCases
+     * Expected average number of buckets. Exposed for testing purposes.
      *
-     * @return string[]
+     * @var int[]
      */
-    public function getUniqueSortedFileNames(array $coverageTestCases): iterable
+    public const BUCKETS_COUNT = 25;
+
+    /**
+     * For 25 buckets QS becomes theoretically less efficient on average at and after 15 elements.
+     * Exposed for testing purposes.
+     */
+    public const USE_BUCKET_SORT_AFTER = 15;
+
+    /**
+     * @param TestLocation[] $tests
+     *
+     * @return iterable<string>
+     */
+    public function getUniqueSortedFileNames(array $tests): iterable
     {
-        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
+        $uniqueTestLocations = $this->uniqueByTestFile($tests);
 
-        if (count($uniqueCoverageTests) === 1) {
+        $numberOfTestLocation = count($uniqueTestLocations);
+
+        if ($numberOfTestLocation === 1) {
             // Around 5% speed up compared to when without this optimization.
-            yield current($uniqueCoverageTests)->testFilePath;
+            /** @var TestLocation $testLocation */
+            $testLocation = current($uniqueTestLocations);
 
-            return;
+            /*
+             * TestLocation gets its file path and timings from TestFileTimeData.
+             * Path for TestFileTimeData is not optional. It is never a null.
+             * Therefore we don't need to make any type checks here.
+             */
+
+            /** @var string $filePath */
+            $filePath = $testLocation->getFilePath();
+
+            return [$filePath];
         }
 
         /*
+         * We need to sort tests to run the fastest first.
+         *
          * Two tests per file are also very frequent. Yet it doesn't make sense
-         * to sort them by hand: apparently usort does that just as good.
+         * to sort them by hand: usort does that just as good.
          */
 
-        // sort tests to run the fastest first
-        usort(
-            $uniqueCoverageTests,
-            static function (CoverageLineData $a, CoverageLineData $b) {
-                return $a->time <=> $b->time;
-            }
-        );
+        if ($numberOfTestLocation < self::USE_BUCKET_SORT_AFTER) {
+            usort(
+                $uniqueTestLocations,
+                static function (TestLocation $a, TestLocation $b) {
+                    return $a->getExecutionTime() <=> $b->getExecutionTime();
+                }
+            );
 
-        foreach ($uniqueCoverageTests as $coverageLineData) {
-            yield $coverageLineData->testFilePath;
+            return self::sortedLocationsGenerator($uniqueTestLocations);
+        }
+
+        /*
+         * For large number of tests use a more efficient algorithm.
+         */
+        return self::sortedLocationsGenerator(
+            TestLocationBucketSorter::bucketSort($uniqueTestLocations)
+        );
+    }
+
+    /**
+     * @param iterable<TestLocation> $sortedTestLocations
+     *
+     * @return iterable<string>
+     */
+    private static function sortedLocationsGenerator(iterable $sortedTestLocations): iterable
+    {
+        foreach ($sortedTestLocations as $testLocation) {
+            /** @var string $filePath */
+            $filePath = $testLocation->getFilePath();
+
+            yield $filePath;
         }
     }
 
     /**
-     * @param CoverageLineData[] $coverageTestCases
+     * @param TestLocation[] $testLocations
      *
-     * @return CoverageLineData[]
+     * @return TestLocation[]
      */
-    private function uniqueByTestFile(array $coverageTestCases): array
+    private function uniqueByTestFile(array $testLocations): array
     {
         // It is faster to have two arrays, and discard one later.
         $usedFileNames = [];
         $uniqueTests = [];
 
-        foreach ($coverageTestCases as $coverageLineData) {
-            if (!array_key_exists($coverageLineData->testFilePath, $usedFileNames)) {
-                $uniqueTests[] = $coverageLineData;
-                $usedFileNames[$coverageLineData->testFilePath] = true;
+        foreach ($testLocations as $testLocation) {
+            /** @var string $filePath */
+            $filePath = $testLocation->getFilePath();
+
+            // isset() is 20% faster than array_key_exists() as of PHP 7.3
+            if (!isset($usedFileNames[$filePath])) {
+                $uniqueTests[] = $testLocation;
+                $usedFileNames[$filePath] = true;
             }
         }
 

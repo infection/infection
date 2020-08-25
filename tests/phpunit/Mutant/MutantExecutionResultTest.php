@@ -35,26 +35,26 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 final class MutantExecutionResultTest extends TestCase
 {
+    use MutantExecutionResultAssertions;
+
     public function test_it_can_be_instantiated(): void
     {
         $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"';
         $processOutput = 'Passed!';
-        $processResultCode = MutantProcess::CODE_ESCAPED;
+        $processResultCode = DetectionStatus::ESCAPED;
         $mutantDiff = <<<'DIFF'
 --- Original
 +++ New
@@ -68,6 +68,8 @@ DIFF;
         $mutatorName = MutatorName::getName(For_::class);
         $originalFilePath = 'path/to/Foo.php';
         $originalStartingLine = 10;
+        $originalCode = '<php $a = 1;';
+        $mutatedCode = '<php $a = 2;';
 
         $result = new MutantExecutionResult(
             $processCommandLine,
@@ -76,7 +78,9 @@ DIFF;
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
+            $originalCode,
+            $mutatedCode
         );
 
         $this->assertResultStateIs(
@@ -87,12 +91,17 @@ DIFF;
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
+            $originalCode,
+            $mutatedCode
         );
     }
 
     public function test_it_can_be_instantiated_from_a_non_covered_mutant(): void
     {
+        $originalCode = '<?php $a = 1;';
+        $mutatedCode = '<?php $a = 1;';
+
         $mutant = new Mutant(
             '/path/to/mutant',
             new Mutation(
@@ -111,14 +120,14 @@ DIFF;
                 MutatedNode::wrap(new Nop()),
                 0,
                 [
-                    CoverageLineData::with(
+                    new TestLocation(
                         'FooTest::test_it_can_instantiate',
                         '/path/to/acme/FooTest.php',
                         0.01
                     ),
                 ]
             ),
-            'notCovered#0',
+            $mutatedCode,
             $mutantDiff = <<<'DIFF'
 --- Original
 +++ New
@@ -127,178 +136,21 @@ DIFF;
 - echo 'original';
 + echo 'notCovered#0';
 
-DIFF
+DIFF,
+            $originalCode
         );
 
         $this->assertResultStateIs(
             MutantExecutionResult::createFromNonCoveredMutant($mutant),
             '',
             '',
-            MutantProcess::CODE_NOT_COVERED,
+            DetectionStatus::NOT_COVERED,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
-        );
-    }
-
-    public function test_it_can_be_instantiated_from_a_mutant_process(): void
-    {
-        $processMock = $this->createMock(Process::class);
-        $processMock
-            ->method('getCommandLine')
-            ->willReturn($processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
-        ;
-        $processMock
-            ->method('isStarted')
-            ->willReturn(true)
-        ;
-        $processMock
-            ->method('getOutput')
-            ->willReturn($processOutput = 'Passed!')
-        ;
-        $processMock
-            ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(152)
-        ;
-
-        $testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
-        $testFrameworkAdapterMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
-
-        $mutantProcess = new MutantProcess(
-            $processMock,
-            new Mutant(
-                '/path/to/mutant',
-                new Mutation(
-                    $originalFilePath = 'path/to/Foo.php',
-                    [],
-                    $mutatorName = MutatorName::getName(For_::class),
-                    [
-                        'startLine' => $originalStartingLine = 10,
-                        'endLine' => 15,
-                        'startTokenPos' => 0,
-                        'endTokenPos' => 8,
-                        'startFilePos' => 2,
-                        'endFilePos' => 4,
-                    ],
-                    'Unknown',
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    [
-                        CoverageLineData::with(
-                            'FooTest::test_it_can_instantiate',
-                            '/path/to/acme/FooTest.php',
-                            0.01
-                        ),
-                    ]
-                ),
-                'notCovered#0',
-                $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#0';
-
-DIFF
-            ),
-            $testFrameworkAdapterMock
-        );
-
-        $this->assertResultStateIs(
-            MutantExecutionResult::createFromProcess($mutantProcess),
-            $processCommandLine,
-            $processOutput,
-            MutantProcess::CODE_ERROR,
-            $mutantDiff,
-            $mutatorName,
-            $originalFilePath,
-            $originalStartingLine
-        );
-    }
-
-    public function test_it_can_be_instantiated_from_an_escaped_mutant_process(): void
-    {
-        $processMock = $this->createMock(Process::class);
-        $processMock
-            ->method('getCommandLine')
-            ->willReturn($processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
-        ;
-        $processMock
-            ->method('isStarted')
-            ->willReturn(false)
-        ;
-        $processMock
-            ->expects($this->never())
-            ->method('getOutput')
-        ;
-        $processMock
-            ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(152)
-        ;
-
-        $testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
-        $testFrameworkAdapterMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
-
-        $mutantProcess = new MutantProcess(
-            $processMock,
-            new Mutant(
-                '/path/to/mutant',
-                new Mutation(
-                    $originalFilePath = 'path/to/Foo.php',
-                    [],
-                    $mutatorName = MutatorName::getName(For_::class),
-                    [
-                        'startLine' => $originalStartingLine = 10,
-                        'endLine' => 15,
-                        'startTokenPos' => 0,
-                        'endTokenPos' => 8,
-                        'startFilePos' => 2,
-                        'endFilePos' => 4,
-                    ],
-                    'Unknown',
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    [
-                        CoverageLineData::with(
-                            'FooTest::test_it_can_instantiate',
-                            '/path/to/acme/FooTest.php',
-                            0.01
-                        ),
-                    ]
-                ),
-                'notCovered#0',
-                $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#0';
-
-DIFF
-            ),
-            $testFrameworkAdapterMock
-        );
-
-        $this->assertResultStateIs(
-            MutantExecutionResult::createFromProcess($mutantProcess),
-            $processCommandLine,
-            '',
-            MutantProcess::CODE_ERROR,
-            $mutantDiff,
-            $mutatorName,
-            $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
+            $originalCode,
+            $mutatedCode
         );
     }
 
@@ -306,18 +158,22 @@ DIFF
         MutantExecutionResult $result,
         string $expectedProcessCommandLine,
         string $expectedProcessOutput,
-        int $expectedProcessResultCode,
+        string $expectedDetectionStatus,
         string $expectedMutantDiff,
         string $expectedMutatorName,
         string $expectedOriginalFilePath,
-        int $expectedOriginalStartingLine
+        int $expectedOriginalStartingLine,
+        string $originalCode,
+        string $mutatedCode
     ): void {
         $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
-        $this->assertSame($expectedProcessResultCode, $result->getProcessResultCode());
+        $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
         $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
         $this->assertSame($expectedMutatorName, $result->getMutatorName());
         $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
         $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());
+        $this->assertSame($originalCode, $result->getOriginalCode());
+        $this->assertSame($mutatedCode, $result->getMutatedCode());
     }
 }

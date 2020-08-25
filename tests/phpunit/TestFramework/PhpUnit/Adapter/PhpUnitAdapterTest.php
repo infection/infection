@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
-use Generator;
 use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
@@ -74,7 +73,7 @@ final class PhpUnitAdapterTest extends TestCase
         $this->assertSame('PHPUnit', $this->adapter->getName());
     }
 
-    public function test_it_supports_JUnit_reports(): void
+    public function test_it_supports_junit_reports(): void
     {
         $this->assertTrue($this->adapter->hasJUnitReport());
     }
@@ -121,7 +120,7 @@ final class PhpUnitAdapterTest extends TestCase
         );
     }
 
-    public function outputProvider(): Generator
+    public function outputProvider(): iterable
     {
         yield ['OK, but incomplete, skipped, or risky tests!', true];
 
@@ -132,7 +131,7 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['ERRORS!', false];
     }
 
-    public function memoryReportProvider(): Generator
+    public function memoryReportProvider(): iterable
     {
         yield ['Memory: 8.00MB', 8.0];
 

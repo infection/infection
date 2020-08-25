@@ -39,27 +39,38 @@ use function array_filter;
 use function array_map;
 use function explode;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
-use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\Trace;
 use Iterator;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
+use Symfony\Component\Finder\Iterator\PathFilterIterator;
 
 /**
  * @internal
  * @final
  */
-class SourceFileFilter
+class SourceFileFilter implements FileFilter
 {
     /**
      * @var string[]
      */
     private $filters;
 
-    public function __construct(string $filter)
+    /**
+     * @var string[]
+     */
+    private $excludeDirectories;
+
+    /**
+     * @param string[] $excludeDirectories
+     */
+    public function __construct(string $filter, array $excludeDirectories)
     {
         $this->filters = array_filter(array_map(
             'trim',
             explode(',', $filter)
         ));
+
+        $this->excludeDirectories = $excludeDirectories;
     }
 
     /**
@@ -74,28 +85,29 @@ class SourceFileFilter
         return $this->filters;
     }
 
-    /**
-     * @param iterable<SplFileInfo&SourceFileData> $input
-     *
-     * @return iterable<SplFileInfo&SourceFileData>
-     */
     public function filter(iterable $input): iterable
     {
-        if ($this->filters === []) {
-            return $input;
+        $iterator = $this->iterableToIterator($input);
+
+        if ($this->filters !== []) {
+            $iterator = new RealPathFilterIterator(
+                $iterator,
+                $this->filters,
+                []
+            );
         }
 
-        return new RealPathFilterIterator(
-            $this->iterableToIterator($input),
-            $this->filters,
-            []
-        );
+        if ($this->excludeDirectories !== []) {
+            $iterator = new PathFilterIterator($iterator, [], $this->excludeDirectories);
+        }
+
+        return $iterator;
     }
 
     /**
-     * @param iterable<SplFileInfo&SourceFileData> $input
+     * @param iterable<SplFileInfo|Trace> $input
      *
-     * @return Iterator<SplFileInfo&SourceFileData>
+     * @return Iterator<SplFileInfo|Trace>
      */
     private function iterableToIterator(iterable $input): Iterator
     {

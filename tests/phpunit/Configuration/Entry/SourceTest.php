@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Entry;
 
-use Generator;
 use Infection\Configuration\Entry\Source;
 use PHPUnit\Framework\TestCase;
 
@@ -57,7 +56,7 @@ final class SourceTest extends TestCase
         );
     }
 
-    public function valuesProvider(): Generator
+    public function valuesProvider(): iterable
     {
         yield 'minimal' => [
             [],

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Time;
 
-use Generator;
 use Infection\Resource\Time\TimeFormatter;
 use PHPUnit\Framework\TestCase;
 
@@ -61,7 +60,7 @@ final class TimeFormatterTest extends TestCase
         $this->assertSame($expectedString, $timeString);
     }
 
-    public function timeProvider(): Generator
+    public function timeProvider(): iterable
     {
         foreach (self::secondsProvider() as $i => $set) {
             yield 'seconds#' . $i => $set;
@@ -76,7 +75,7 @@ final class TimeFormatterTest extends TestCase
         }
     }
 
-    private static function secondsProvider(): Generator
+    private static function secondsProvider(): iterable
     {
         yield [0, '0s'];
 
@@ -93,7 +92,7 @@ final class TimeFormatterTest extends TestCase
         yield [31.01, '31s'];
     }
 
-    private static function minutesProvider(): Generator
+    private static function minutesProvider(): iterable
     {
         yield [60, '1m'];
 
@@ -106,7 +105,7 @@ final class TimeFormatterTest extends TestCase
         yield [122.9, '2m 2s'];
     }
 
-    private static function hoursProvider(): Generator
+    private static function hoursProvider(): iterable
     {
         yield [3600, '1h'];
 

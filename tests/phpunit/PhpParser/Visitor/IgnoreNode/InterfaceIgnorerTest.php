@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
-use Generator;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 
@@ -53,7 +52,7 @@ final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
         $this->assertSame($count, $spy->nodeCounter);
     }
 
-    public function provideIgnoreCases(): Generator
+    public function provideIgnoreCases(): iterable
     {
         yield 'interfaces are ignored' => [
             <<<'PHP'

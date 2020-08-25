@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Generator;
 use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -71,9 +70,9 @@ final class DecrementInteger extends AbstractNumberMutator
     /**
      * @param Node\Scalar\LNumber $node
      *
-     * @return Generator<Node\Scalar\LNumber>
+     * @return iterable<Node\Scalar\LNumber>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Scalar\LNumber($node->value - 1);
     }
@@ -81,6 +80,10 @@ final class DecrementInteger extends AbstractNumberMutator
     public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Scalar\LNumber || $node->value === 1) {
+            return false;
+        }
+
+        if ($this->isArrayZeroIndexAccess($node)) {
             return false;
         }
 
@@ -97,17 +100,18 @@ final class DecrementInteger extends AbstractNumberMutator
             return true;
         }
 
-        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+        $parentNode = ParentConnector::getParent($node);
 
         if (!$this->isComparison($parentNode)) {
             return true;
         }
-
+        /** @var Node\Expr\BinaryOp $parentNode */
         if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
             && in_array(
                 $parentNode->left->name->toLowerString(),
                 self::COUNT_NAMES,
-                true)
+                true
+            )
         ) {
             return false;
         }
@@ -116,7 +120,8 @@ final class DecrementInteger extends AbstractNumberMutator
             && in_array(
                 $parentNode->right->name->toLowerString(),
                 self::COUNT_NAMES,
-                true)
+                true
+            )
         ) {
             return false;
         }
@@ -133,6 +138,25 @@ final class DecrementInteger extends AbstractNumberMutator
             || $parentNode instanceof Node\Expr\BinaryOp\Greater
             || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
             || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual
+        ;
+    }
+
+    private function isArrayZeroIndexAccess(Node $node): bool
+    {
+        if (!$node instanceof Node\Scalar\LNumber) {
+            return false;
+        }
+
+        /** @var Node\Scalar\LNumber $node */
+        if ($node->value !== 0) {
+            return false;
+        }
+
+        if (ParentConnector::getParent($node) instanceof Node\Expr\ArrayDimFetch) {
+            return true;
+        }
+
+        return false;
     }
 }

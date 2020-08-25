@@ -36,8 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use function array_merge;
-use Generator;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
@@ -54,7 +53,7 @@ final class MutationTest extends TestCase
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
      * @param array<string|int|float> $expectedAttributes
-     * @param CoverageLineData[] $tests
+     * @param TestLocation[] $tests
      */
     public function test_it_can_be_instantiated(
         string $originalFilePath,
@@ -65,7 +64,9 @@ final class MutationTest extends TestCase
         MutatedNode $mutatedNode,
         int $mutationByMutatorIndex,
         array $tests,
+        float $timeToTest,
         array $expectedAttributes,
+        int $expectedOriginalStartingLine,
         bool $expectedCoveredByTests,
         string $expectedHash
     ): void {
@@ -84,18 +85,19 @@ final class MutationTest extends TestCase
         $this->assertSame($originalFileAst, $mutation->getOriginalFileAst());
         $this->assertSame($mutatorName, $mutation->getMutatorName());
         $this->assertSame($expectedAttributes, $mutation->getAttributes());
+        $this->assertSame($expectedOriginalStartingLine, $mutation->getOriginalStartingLine());
         $this->assertSame($mutatedNodeClass, $mutation->getMutatedNodeClass());
         $this->assertSame($mutatedNode, $mutation->getMutatedNode());
         $this->assertSame($tests, $mutation->getAllTests());
+        $this->assertSame($timeToTest, $mutation->getNominalTestExecutionTime());
         $this->assertSame($expectedCoveredByTests, $mutation->isCoveredByTest());
-
         $this->assertSame($expectedHash, $mutation->getHash());
     }
 
-    public function valuesProvider(): Generator
+    public function valuesProvider(): iterable
     {
         $nominalAttributes = [
-            'startLine' => 3,
+            'startLine' => $originalStartingLine = 3,
             'endLine' => 5,
             'startTokenPos' => 21,
             'endTokenPos' => 31,
@@ -112,7 +114,9 @@ final class MutationTest extends TestCase
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             -1,
             [],
+            0.0,
             $nominalAttributes,
+            $originalStartingLine,
             false,
             md5('_Plus_-1_3_5_21_31_43_53'),
         ];
@@ -129,13 +133,15 @@ final class MutationTest extends TestCase
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
                     0.01
                 ),
             ],
+            0.01,
             $nominalAttributes,
+            $originalStartingLine,
             true,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
@@ -152,13 +158,15 @@ final class MutationTest extends TestCase
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             99,
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
                     0.01
                 ),
             ],
+            0.01,
             $nominalAttributes,
+            $originalStartingLine,
             true,
             md5('/path/to/acme/Foo.php_Plus_99_3_5_21_31_43_53'),
         ];
@@ -175,13 +183,20 @@ final class MutationTest extends TestCase
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
-                    0.01
+                    1.1
+                ),
+                new TestLocation(
+                    'FooTest::test_it_can_do_something',
+                    '/path/to/acme/FooTest.php',
+                    1.1
                 ),
             ],
+            1.1,
             $nominalAttributes,
+            $originalStartingLine,
             true,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
@@ -198,7 +213,9 @@ final class MutationTest extends TestCase
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
             [],
+            0.0,
             $nominalAttributes,
+            $originalStartingLine,
             false,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
@@ -218,13 +235,20 @@ final class MutationTest extends TestCase
             ]),
             0,
             [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
                     0.01
                 ),
+                new TestLocation(
+                    'BarTest::test_it_just_works',
+                    '/path/to/acme/FooTest.php',
+                    0.02
+                ),
             ],
+            0.03,
             $nominalAttributes,
+            $originalStartingLine,
             true,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];

@@ -37,17 +37,16 @@ namespace Infection\TestFramework\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
 use function count;
-use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
-use function file_exists;
 use function implode;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoveredFileDataProvider;
+use Infection\FileSystem\Locator\FileNotFound;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\preg_match;
 use function Safe\sprintf;
 use function strtolower;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -61,23 +60,29 @@ final class CoverageChecker
     private $skipInitialTests;
     private $initialTestPhpOptions;
     private $coveragePath;
-    private $jUnitPath;
+    private $jUnitReport;
+    private $jUnitReportLocator;
     private $frameworkAdapterName;
+    private $indexXmlCoverageLocator;
 
     public function __construct(
         bool $skipCoverage,
         bool $skipInitialTests,
         string $initialTestPhpOptions,
         string $coveragePath,
-        ?string $jUnitPath,
-        string $testFrameworkAdapterName
+        bool $junitReport,
+        JUnitReportLocator $jUnitReportLocator,
+        string $testFrameworkAdapterName,
+        IndexXmlCoverageLocator $indexXmlCoverageLocator
     ) {
         $this->skipCoverage = $skipCoverage;
         $this->skipInitialTests = $skipInitialTests;
         $this->initialTestPhpOptions = $initialTestPhpOptions;
         $this->coveragePath = $coveragePath;
-        $this->jUnitPath = $jUnitPath;
+        $this->jUnitReport = $junitReport;
+        $this->jUnitReportLocator = $jUnitReportLocator;
         $this->frameworkAdapterName = strtolower($testFrameworkAdapterName);
+        $this->indexXmlCoverageLocator = $indexXmlCoverageLocator;
     }
 
     public function checkCoverageRequirements(): void
@@ -86,8 +91,8 @@ final class CoverageChecker
             throw new CoverageNotFound(sprintf(
                 'The initial test suite run is being skipped. The XML %sreports need to be '
                 . 'provided with the "--coverage" option',
-                $this->jUnitPath !== null ?
-                    'and JUnit coverage '
+                $this->jUnitReport
+                    ? 'and JUnit coverage '
                     : ''
             ));
         }
@@ -107,50 +112,8 @@ TXT
 
     public function checkCoverageExists(): void
     {
-        $coverageIndexFilePath = Path::canonicalize(
-            $this->coveragePath . DIRECTORY_SEPARATOR . PhpUnitXmlCoveredFileDataProvider::COVERAGE_INDEX_FILE_NAME
-        );
-
-        if (!file_exists($coverageIndexFilePath)) {
-            $message = sprintf(
-                'Could not find the file "%s". Please ensure that the XML coverage report '
-                . 'has been properly generated at the right place.',
-                $coverageIndexFilePath
-            );
-
-            if ($this->frameworkAdapterName === self::PHPUNIT) {
-                $message .= sprintf(
-                    ' The PHPUnit option for the path given is "--coverage-xml=%s"',
-                    $this->coveragePath . '/coverage-xml'
-                );
-            } elseif ($this->frameworkAdapterName === self::CODECEPTION) {
-                $message .= sprintf(
-                    ' The Codeception option for the path given is "--coverage-phpunit=%s"',
-                    $this->coveragePath . '/coverage-xml'
-                );
-            }
-
-            throw new CoverageNotFound($message);
-        }
-
-        if ($this->jUnitPath !== null && !file_exists($this->jUnitPath)) {
-            $message = sprintf(
-                'Could not find the file "%s". Please ensure that the JUnit coverage report '
-                . 'has been properly generated at the right place.',
-                $this->jUnitPath
-            );
-
-            if ($this->frameworkAdapterName === self::PHPUNIT) {
-                $message .= sprintf(
-                    ' The PHPUnit option for the path given is "--log-junit=%s/junit.xml"',
-                    $this->coveragePath
-                );
-            } elseif ($this->frameworkAdapterName === self::CODECEPTION) {
-                $message .= ' The Codeception option for the path given is "--xml"';
-            }
-
-            throw new CoverageNotFound($message);
-        }
+        $this->checkIndexCoverageReport();
+        $this->checkJUnitReport();
     }
 
     public function checkCoverageHasBeenGenerated(
@@ -159,16 +122,24 @@ TXT
     ): void {
         $errors = [];
 
-        $coverageIndexFilePath = Path::canonicalize(
-            $this->coveragePath . DIRECTORY_SEPARATOR . PhpUnitXmlCoveredFileDataProvider::COVERAGE_INDEX_FILE_NAME
-        );
-
-        if (!file_exists($coverageIndexFilePath)) {
-            $errors[] = sprintf('- The file "%s" could not be found', $coverageIndexFilePath);
+        try {
+            $this->indexXmlCoverageLocator->locate();
+        } catch (FileNotFound $exception) {
+            $errors[] = sprintf(
+                '- The file "index.xml" could not be found: %s',
+                $exception->getMessage()
+            );
         }
 
-        if ($this->jUnitPath !== null && !file_exists($this->jUnitPath)) {
-            $errors[] = sprintf('- The file "%s" could not be found', $this->jUnitPath);
+        if ($this->jUnitReport) {
+            try {
+                $this->jUnitReportLocator->locate();
+            } catch (FileNotFound $exception) {
+                $errors[] = sprintf(
+                    '- The JUnit file could not be found: %s',
+                    $exception->getMessage()
+                );
+            }
         }
 
         if (count($errors) === 0) {
@@ -221,5 +192,63 @@ TXT
             '/(extension\s*=.*pcov.*)/mi',
             $this->initialTestPhpOptions
         );
+    }
+
+    private function checkIndexCoverageReport(): void
+    {
+        try {
+            $this->indexXmlCoverageLocator->locate();
+
+            return;
+        } catch (FileNotFound $exception) {
+            // Continue
+        }
+
+        $message = 'Could not find the "index.xml" file. Please ensure that the XML coverage '
+            . 'report has been properly generated at the right place.'
+        ;
+
+        if ($this->frameworkAdapterName === self::PHPUNIT) {
+            $message .= sprintf(
+                ' The PHPUnit option for the path given is "--coverage-xml=%s"',
+                $this->coveragePath . '/coverage-xml'
+            );
+        } elseif ($this->frameworkAdapterName === self::CODECEPTION) {
+            $message .= sprintf(
+                ' The Codeception option for the path given is "--coverage-phpunit=%s"',
+                $this->coveragePath . '/coverage-xml'
+            );
+        }
+
+        throw new CoverageNotFound($message, 0, $exception);
+    }
+
+    private function checkJUnitReport(): void
+    {
+        if (!$this->jUnitReport) {
+            return;
+        }
+
+        try {
+            $this->jUnitReportLocator->locate();
+
+            return;
+        } catch (FileNotFound $exception) {
+            // Continue
+        }
+
+        $message = 'Could not find the JUnit file report. Please ensure that the JUnit coverage'
+            . ' report has been properly generated at the right place.';
+
+        if ($this->frameworkAdapterName === self::PHPUNIT) {
+            $message .= sprintf(
+                ' The PHPUnit option for the path given is "--log-junit=%s/junit.xml"',
+                $this->coveragePath
+            );
+        } elseif ($this->frameworkAdapterName === self::CODECEPTION) {
+            $message .= ' The Codeception option for the path given is "--xml"';
+        }
+
+        throw new CoverageNotFound($message, 0, $exception);
     }
 }

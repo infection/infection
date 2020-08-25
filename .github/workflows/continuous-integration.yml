@@ -28,7 +28,7 @@ jobs:
         run: "mkdir -p ${{ env.PHP_CS_FIXER_CACHE_DIRECTORY }}"
 
       - name: "Cache cache directory for friendsofphp/php-cs-fixer"
-        uses: "actions/cache@v1"
+        uses: "actions/cache@v2"
         with:
           path: "${{ env.PHP_CS_FIXER_CACHE_DIRECTORY }}"
           key: "php-7.3-php-cs-fixer"

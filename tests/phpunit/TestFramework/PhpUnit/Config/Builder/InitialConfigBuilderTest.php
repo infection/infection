@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
-use Generator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -78,7 +77,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->builder = $this->createConfigBuilder();
     }
 
-    public function test_it_builds_and_dump_the_XML_configuration(): void
+    public function test_it_builds_and_dump_the_xml_configuration(): void
     {
         $configurationPath = $this->builder->build('6.5');
 
@@ -112,7 +111,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         );
     }
 
-    public function test_the_original_XML_config_must_be_a_valid_XML_file(): void
+    public function test_the_original_xml_config_must_be_a_valid_xml_file(): void
     {
         try {
             $this->createConfigBuilder(
@@ -129,7 +128,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         }
     }
 
-    public function test_the_original_XML_config_must_be_a_valid_PHPUnit_config_file(): void
+    public function test_the_original_xml_config_must_be_a_valid_phpunit_config_file(): void
     {
         $builder = $this->createConfigBuilder(
             self::FIXTURES . '/invalid/invalid-phpunit.xml',
@@ -316,8 +315,53 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $resolveDependencies = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'resolveDependencies'));
 
-        $this->assertInstanceOf(DOMNodeList::class, $executionOrder);
+        $this->assertInstanceOf(DOMNodeList::class, $resolveDependencies);
         $this->assertSame(0, $resolveDependencies->length);
+    }
+
+    /**
+     * @dataProvider failOnProvider
+     */
+    public function test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions(
+        string $version,
+        string $attributeName,
+        int $expectedNodeCount
+    ): void {
+        $xml = file_get_contents($this->builder->build($version));
+
+        $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
+
+        $this->assertInstanceOf(DOMNodeList::class, $nodes);
+
+        $this->assertSame($expectedNodeCount, $nodes->length);
+    }
+
+    public function test_it_does_not_update_fail_on_risky_attributes_if_it_is_already_set(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_fail_on_risky_set.xml';
+
+        $builder = $this->createConfigBuilder($phpunitXmlPath);
+
+        $xml = file_get_contents($builder->build('5.2'));
+
+        $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
+
+        $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
+        $this->assertSame('true', $failOnRisky[0]->value);
+    }
+
+    public function test_it_does_not_update_fail_on_warning_attributes_if_it_is_already_set(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_fail_on_warning_set.xml';
+
+        $builder = $this->createConfigBuilder($phpunitXmlPath);
+
+        $xml = file_get_contents($builder->build('5.2'));
+
+        $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnWarning'));
+
+        $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
+        $this->assertSame('true', $failOnRisky[0]->value);
     }
 
     public function test_it_creates_a_configuration(): void
@@ -339,7 +383,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
   ~
   ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
   -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" stopOnFailure="true" cacheResult="false" stderr="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
   <testsuites>
     <testsuite name="Application Test Suite">
       <directory>$projectPath/*Bundle</directory>
@@ -363,7 +407,7 @@ XML
         );
     }
 
-    public function executionOrderProvider(): Generator
+    public function executionOrderProvider(): iterable
     {
         yield 'PHPUnit 7.1.99 runs without random test order' => [
             '7.1.99',
@@ -398,6 +442,45 @@ XML
         yield 'PHPUnit 7.3.1 runs dependency resolver' => [
             '7.3.1',
             'resolveDependencies',
+            1,
+        ];
+    }
+
+    public function failOnProvider(): iterable
+    {
+        yield 'PHPUnit 5.1.99 runs without failOnRisky' => [
+            '5.1.99',
+            'failOnRisky',
+            0,
+        ];
+
+        yield 'PHPUnit 5.2 runs with failOnRisky' => [
+            '5.2',
+            'failOnRisky',
+            1,
+        ];
+
+        yield 'PHPUnit 5.3.1 runs with failOnRisky' => [
+            '5.3.1',
+            'failOnRisky',
+            1,
+        ];
+
+        yield 'PHPUnit 5.1.99 runs without resolveDependencies' => [
+            '5.1.99',
+            'failOnWarning',
+            0,
+        ];
+
+        yield 'PHPUnit 5.2 runs with resolveDependencies' => [
+            '5.2',
+            'failOnWarning',
+            1,
+        ];
+
+        yield 'PHPUnit 5.3.1 runs resolveDependencies' => [
+            '5.3.1',
+            'failOnWarning',
             1,
         ];
     }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Reflection;
 
-use Generator;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\Reflection\ClassReflection;
 use Infection\Reflection\Visibility;
@@ -55,7 +54,7 @@ abstract class ClassReflectionTestCase extends TestCase
         $this->assertSame($hasParent, $reflection->hasParentMethodWithVisibility($method, $visibility));
     }
 
-    public function provideParentMethodCases(): Generator
+    public function provideParentMethodCases(): iterable
     {
         yield [
             $this->createFromName(CloneVisitor::class),
@@ -72,14 +71,14 @@ abstract class ClassReflectionTestCase extends TestCase
         ];
 
         yield [
-            $this->createFromName(get_class($this)),
+            $this->createFromName(static::class),
             'foo',
             Visibility::asProtected(),
             false,
         ];
 
         yield [
-            $this->createFromName(get_class($this)),
+            $this->createFromName(static::class),
             'foo',
             Visibility::asPublic(),
             false,

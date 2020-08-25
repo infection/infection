@@ -35,18 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\CoverageReport;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
-use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\ProxyTrace;
+use Infection\TestFramework\Coverage\TestLocations;
+use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 
-/**
- * @covers \Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder
- */
 final class JUnitTestExecutionInfoAdderTest extends TestCase
 {
     public function test_it_does_not_add_if_junit_is_not_provided(): void
@@ -66,12 +65,13 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
         $adder = new JUnitTestExecutionInfoAdder($adapter, $testFileDataProvider);
 
-        $expected = [1, 2, 3];
+        $proxyTraceMock = $this->createMock(ProxyTrace::class);
+        $proxyTraceMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
 
-        /** @var array $actual */
-        $actual = $adder->addTestExecutionInfo($expected);
-
-        $this->assertSame($expected, $actual);
+        $adder->addTestExecutionInfo([$proxyTraceMock]);
     }
 
     public function test_it_adds_if_junit_is_provided(): void
@@ -96,35 +96,43 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
         $adder = new JUnitTestExecutionInfoAdder($adapter, $testFileDataProvider);
 
-        $lineData = CoverageLineData::withTestMethod('Acme\FooTest::test_it_can_be_instantiated');
-
-        $fileData = new CoverageReport();
-        $fileData->byLine = [
-            11 => [
-                $lineData,
+        $tests = new TestLocations(
+            [
+                11 => [
+                    TestLocation::forTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
+                ],
             ],
-        ];
+            []
+        );
 
-        $sourceFileDataMock = $this->createMock(SourceFileData::class);
-        $sourceFileDataMock
-            ->expects($this->once())
-            ->method('retrieveCoverageReport')
-            ->willReturn($fileData)
-        ;
+        $proxyTrace = new ProxyTrace(
+            new SplFileInfo('/path/to/Foo.php', 'Foo.php', 'Foo.php'),
+            [$tests]
+        );
 
-        $expected = [
-            $sourceFileDataMock,
-        ];
+        $expected = [$proxyTrace];
 
         $actual = $adder->addTestExecutionInfo($expected);
         $actual = iterator_to_array($actual, false);
 
         $this->assertSame($expected, $actual);
 
-        $this->assertSame('Acme\FooTest::test_it_can_be_instantiated', $lineData->testMethod);
-        $this->assertSame('/path/to/acme/FooTest.php', $lineData->testFilePath);
-        $this->assertSame(0.000234, $lineData->time);
-
-        $this->assertSame($lineData, $fileData->byLine[11][0]);
+        $this->assertSame(
+            [
+                [
+                    'byLine' => [
+                        11 => [
+                            [
+                                'testMethod' => 'Acme\FooTest::test_it_can_be_instantiated',
+                                'testFilePath' => '/path/to/acme/FooTest.php',
+                                'testExecutionTime' => 0.000234,
+                            ],
+                        ],
+                    ],
+                    'byMethod' => [],
+                ],
+            ],
+            TestLocationsNormalizer::normalize([$proxyTrace->getTests()])
+        );
     }
 }

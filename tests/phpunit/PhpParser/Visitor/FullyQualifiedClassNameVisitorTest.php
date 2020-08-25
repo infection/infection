@@ -36,88 +36,188 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use function array_map;
-use Generator;
+use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
+use Infection\Tests\Fixtures\PhpParser\FullyQualifiedClassNameSpyVisitor;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
 
 /**
  * @group integration
  */
 final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
 {
-    private $spyVisitor;
-
-    protected function setUp(): void
-    {
-        $this->spyVisitor = $this->getSpyVisitor();
-    }
-
     /**
      * @dataProvider codeProvider
      *
-     * @param string[] $expectedProcessedNodesFqcn
+     * @param array<array{string, string}> $expected
      */
-    public function test_it_adds_FQCN_to_the_appropriate_node(
-        string $path,
-        array $expectedProcessedNodesFqcn
-    ): void {
-        $code = $this->getFileContent($path);
-
-        $this->parseAndTraverse($code);
-
-        $actualProcessedNodesFqcn = array_map(
-            static function (Node $node): string {
-                return $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString();
-            },
-            $this->spyVisitor->processedNodes
-        );
-
-        $this->assertSame($expectedProcessedNodesFqcn, $actualProcessedNodesFqcn);
-    }
-
-    public function codeProvider(): Generator
+    public function test_it_adds_fqcn_to_the_appropriate_node(string $code, array $expected): void
     {
-        yield [
-            'Fqcn/fqcn-empty-class.php',
-            ['FqcnEmptyClass\EmptyClass'],
-        ];
-
-        yield [
-            'Fqcn/fqcn-class-interface.php',
-            ['FqcnClassInterface\Ci'],
-        ];
-
-        yield [
-            'Fqcn/fqcn-anonymous-class.php',
-            ['FqcnClassAnonymous\Ci'],
-        ];
-    }
-
-    private function getSpyVisitor()
-    {
-        return new class() extends NodeVisitorAbstract {
-            public $processedNodes = [];
-
-            public function enterNode(Node $node): void
-            {
-                if ($node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)) {
-                    $this->processedNodes[] = $node;
-                }
-            }
-        };
-    }
-
-    private function parseAndTraverse($code): void
-    {
-        $nodes = $this->parseCode($code);
+        $spyVisitor = new FullyQualifiedClassNameSpyVisitor();
 
         $this->traverse(
-            $nodes,
+            $this->parseCode($code),
             [
                 new FullyQualifiedClassNameVisitor(),
-                $this->spyVisitor,
+                $spyVisitor,
             ]
         );
+
+        $actual = array_map(
+            static function (Node $node): array {
+                return [
+                    $node->getType(),
+                    (string) FullyQualifiedClassNameManipulator::getFqcn($node),
+                ];
+            },
+            $spyVisitor->getCollectedNodes()
+        );
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function codeProvider(): iterable
+    {
+        yield 'global class' => [
+            <<<'PHP'
+<?php
+
+class Foo {}
+PHP
+            ,
+            [
+                ['Stmt_Class', 'Foo'],
+            ],
+        ];
+
+        yield 'global abstract class' => [
+            <<<'PHP'
+<?php
+
+abstract class Foo {}
+PHP
+            ,
+            [
+                ['Stmt_Class', 'Foo'],
+            ],
+        ];
+
+        yield 'global final class' => [
+            <<<'PHP'
+<?php
+
+abstract class Foo {}
+PHP
+            ,
+            [
+                ['Stmt_Class', 'Foo'],
+            ],
+        ];
+
+        yield 'namespaced class' => [
+            <<<'PHP'
+<?php
+
+namespace Acme;
+
+class Foo {}
+PHP
+            ,
+            [
+                ['Stmt_Class', 'Acme\Foo'],
+            ],
+        ];
+
+        yield 'global interface' => [
+            <<<'PHP'
+<?php
+
+interface Foo {}
+PHP
+            ,
+            [
+                ['Stmt_Interface', 'Foo'],
+            ],
+        ];
+
+        yield 'namespaced interface' => [
+            <<<'PHP'
+<?php
+
+namespace Acme;
+
+interface Foo {}
+PHP
+            ,
+            [
+                ['Stmt_Interface', 'Acme\Foo'],
+            ],
+        ];
+
+        yield 'global anonymous class' => [
+            <<<'PHP'
+<?php
+
+new class() extends SplFileInfo {};
+PHP
+            ,
+            [
+                ['Stmt_Class', ''],
+            ],
+        ];
+
+        yield 'namespaced anonymous class' => [
+            <<<'PHP'
+<?php
+
+namespace Acme;
+
+new class() extends SplFileInfo {};
+PHP
+            ,
+            [
+                ['Stmt_Class', ''],
+            ],
+        ];
+
+        // We ignore regular instances but not in the case of anonymous classes. The reason being
+        // we are only interested in mutating a class-like _body_. So an instance is not
+        // interesting. However, in the case of an anonymous class, a new instance is _also_ the
+        // class body declaration.
+        yield 'ignore regular instances' => [
+            <<<'PHP'
+<?php
+
+new Foo();
+PHP
+            ,
+            [],
+        ];
+
+        yield 'multiple namespace classes with multiple classes' => [
+            <<<'PHP'
+<?php
+
+namespace X {
+    class Foo {}
+}
+
+namespace Y {
+    class Bar {}
+    class Baz {}
+}
+
+namespace {
+    class Faz {}
+}
+PHP
+            ,
+            [
+                ['Stmt_Class', 'X\Foo'],
+                ['Stmt_Class', 'Y\Bar'],
+                ['Stmt_Class', 'Y\Baz'],
+                ['Stmt_Class', 'Faz'],
+            ],
+        ];
     }
 }

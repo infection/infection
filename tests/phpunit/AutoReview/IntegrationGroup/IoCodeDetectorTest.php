@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -46,14 +45,14 @@ final class IoCodeDetectorTest extends TestCase
     /**
      * @dataProvider codeProvider
      */
-    public function test_it_can_detect_IO_operations(string $code, bool $expected): void
+    public function test_it_can_detect_io_operations(string $code, bool $expected): void
     {
         $actual = IoCodeDetector::codeContainsIoOperations($code);
 
         $this->assertSame($expected, $actual);
     }
 
-    public function codeProvider(): Generator
+    public function codeProvider(): iterable
     {
         yield 'empty' => [
             '',

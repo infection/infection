@@ -41,12 +41,13 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\MinMsiChecker;
+use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\IgnoresAdditionalNodes;
@@ -63,10 +64,10 @@ final class Engine
     private $coverageChecker;
     private $eventDispatcher;
     private $initialTestsRunner;
-    private $memoryLimitApplier;
+    private $memoryLimiter;
     private $mutationGenerator;
     private $mutationTestingRunner;
-    private $constraintChecker;
+    private $minMsiChecker;
     private $consoleOutput;
     private $metricsCalculator;
     private $testFrameworkExtraOptionsFilter;
@@ -77,10 +78,10 @@ final class Engine
         CoverageChecker $coverageChecker,
         EventDispatcher $eventDispatcher,
         InitialTestsRunner $initialTestsRunner,
-        MemoryLimiter $memoryLimitApplier,
+        MemoryLimiter $memoryLimiter,
         MutationGenerator $mutationGenerator,
         MutationTestingRunner $mutationTestingRunner,
-        TestRunConstraintChecker $constraintChecker,
+        MinMsiChecker $minMsiChecker,
         ConsoleOutput $consoleOutput,
         MetricsCalculator $metricsCalculator,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter
@@ -90,21 +91,32 @@ final class Engine
         $this->coverageChecker = $coverageChecker;
         $this->eventDispatcher = $eventDispatcher;
         $this->initialTestsRunner = $initialTestsRunner;
-        $this->memoryLimitApplier = $memoryLimitApplier;
+        $this->memoryLimiter = $memoryLimiter;
         $this->mutationGenerator = $mutationGenerator;
         $this->mutationTestingRunner = $mutationTestingRunner;
-        $this->constraintChecker = $constraintChecker;
+        $this->minMsiChecker = $minMsiChecker;
         $this->consoleOutput = $consoleOutput;
         $this->metricsCalculator = $metricsCalculator;
         $this->testFrameworkExtraOptionsFilter = $testFrameworkExtraOptionsFilter;
     }
 
-    public function execute(int $threads): bool
+    /**
+     * @throws InitialTestsFailed
+     * @throws MinMsiCheckFailed
+     */
+    public function execute(): void
     {
         $this->runInitialTestSuite();
-        $this->runMutationAnalysis($threads);
+        $this->runMutationAnalysis();
 
-        return $this->checkMetrics();
+        $this->minMsiChecker->checkMetrics(
+            $this->metricsCalculator->getTotalMutantsCount(),
+            $this->metricsCalculator->getMutationScoreIndicator(),
+            $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
+            $this->consoleOutput
+        );
+
+        $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
     }
 
     private function runInitialTestSuite(): void
@@ -118,8 +130,8 @@ final class Engine
 
         $initialTestSuitProcess = $this->initialTestsRunner->run(
             $this->config->getTestFrameworkExtraOptions(),
-            $this->config->shouldSkipCoverage(),
-            explode(' ', (string) $this->config->getInitialTestsPhpOptions())
+            explode(' ', (string) $this->config->getInitialTestsPhpOptions()),
+            $this->config->shouldSkipCoverage()
         );
 
         if (!$initialTestSuitProcess->isSuccessful()) {
@@ -131,10 +143,12 @@ final class Engine
             $initialTestSuitProcess->getOutput()
         );
 
-        $this->memoryLimitApplier->applyMemoryLimitFromProcess($initialTestSuitProcess, $this->adapter);
+        // Limit the memory used for the mutation processes based on the memory used for the initial
+        // test run
+        $this->memoryLimiter->limitMemory($initialTestSuitProcess->getOutput(), $this->adapter);
     }
 
-    private function runMutationAnalysis(int $threads): void
+    private function runMutationAnalysis(): void
     {
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
@@ -149,31 +163,6 @@ final class Engine
             ? $this->testFrameworkExtraOptionsFilter->filterForMutantProcess($actualExtraOptions, $this->adapter->getInitialRunOnlyOptions())
             : $actualExtraOptions;
 
-        $this->mutationTestingRunner->run($mutations, $threads, $filteredExtraOptionsForMutant);
-    }
-
-    private function checkMetrics(): bool
-    {
-        if (!$this->constraintChecker->hasTestRunPassedConstraints()) {
-            $this->consoleOutput->logBadMsiErrorMessage(
-                $this->metricsCalculator,
-                $this->constraintChecker->getMinRequiredValue(),
-                $this->constraintChecker->getErrorType()
-            );
-
-            return false;
-        }
-
-        if ($this->constraintChecker->isActualOverRequired()) {
-            $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
-                $this->metricsCalculator,
-                $this->constraintChecker->getMinRequiredValue(),
-                $this->constraintChecker->getActualOverRequiredType()
-            );
-        }
-
-        $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
-
-        return true;
+        $this->mutationTestingRunner->run($mutations, $filteredExtraOptionsForMutant);
     }
 }

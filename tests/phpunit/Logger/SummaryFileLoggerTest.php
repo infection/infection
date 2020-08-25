@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Generator;
 use Infection\Logger\SummaryFileLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
 
 final class SummaryFileLoggerTest extends TestCase
@@ -57,10 +56,10 @@ final class SummaryFileLoggerTest extends TestCase
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): Generator
+    public function metricsProvider(): iterable
     {
         yield 'no mutations' => [
-            new MetricsCalculator(),
+            new MetricsCalculator(2),
             <<<'TXT'
 Total: 0
 
@@ -68,6 +67,7 @@ Killed: 0
 Errored: 0
 Escaped: 0
 Timed Out: 0
+Skipped: 0
 Not Covered: 0
 
 TXT
@@ -76,12 +76,13 @@ TXT
         yield 'all mutations' => [
             $this->createCompleteMetricsCalculator(),
             <<<'TXT'
-Total: 10
+Total: 12
 
 Killed: 2
 Errored: 2
 Escaped: 2
 Timed Out: 2
+Skipped: 2
 Not Covered: 2
 
 TXT

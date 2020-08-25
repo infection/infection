@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Generator;
 use Infection\Logger\PerMutatorLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
 
 final class PerMutatorLoggerTest extends TestCase
@@ -57,15 +56,15 @@ final class PerMutatorLoggerTest extends TestCase
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): Generator
+    public function metricsProvider(): iterable
     {
         yield 'no mutations' => [
-            new MetricsCalculator(),
+            new MetricsCalculator(2),
             <<<'TXT'
 # Effects per Mutator
 
-| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI (%s) | Covered MSI (%s) |
-| ------- | --------- | ------ | ------- | ------ | --------- | -------- | ---------------- |
+| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | Skipped | MSI (%s) | Covered MSI (%s) |
+| ------- | --------- | ------ | ------- | ------ | --------- | ------- | -------- | ---------------- |
 
 TXT
         ];
@@ -75,10 +74,10 @@ TXT
             <<<'TXT'
 # Effects per Mutator
 
-| Mutator   | Mutations | Killed | Escaped | Errors | Timed Out | MSI (%s) | Covered MSI (%s) |
-| --------- | --------- | ------ | ------- | ------ | --------- | -------- | ---------------- |
-| For_      |         5 |      1 |       1 |      1 |         1 |    60.00 |            75.00 |
-| PregQuote |         5 |      1 |       1 |      1 |         1 |    60.00 |            75.00 |
+| Mutator   | Mutations | Killed | Escaped | Errors | Timed Out | Skipped | MSI (%s) | Covered MSI (%s) |
+| --------- | --------- | ------ | ------- | ------ | --------- | ------- | -------- | ---------------- |
+| For_      |         6 |      1 |       1 |      1 |         1 |       1 |    60.00 |            75.00 |
+| PregQuote |         6 |      1 |       1 |      1 |         1 |       1 |    60.00 |            75.00 |
 
 TXT
         ];

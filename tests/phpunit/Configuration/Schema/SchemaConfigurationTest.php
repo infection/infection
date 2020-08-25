@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
-use Generator;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
@@ -97,7 +96,7 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions());
     }
 
-    public function valueProvider(): Generator
+    public function valueProvider(): iterable
     {
         yield 'minimal' => [
             '',
@@ -123,6 +122,7 @@ final class SchemaConfigurationTest extends TestCase
             new Logs(
                 'text.log',
                 'summary.log',
+                'json.log',
                 'debug.log',
                 'mutator.log',
                 new Badge('master')

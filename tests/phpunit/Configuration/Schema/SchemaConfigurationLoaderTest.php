@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
-use Generator;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -101,7 +100,7 @@ final class SchemaConfigurationLoaderTest extends TestCase
         $this->assertSame($expectedConfig, $actualConfig);
     }
 
-    public function configurationPathsProvider(): Generator
+    public function configurationPathsProvider(): iterable
     {
         $config = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
-use Generator;
 use Infection\TestFramework\VersionParser;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -76,7 +75,7 @@ final class VersionParserTest extends TestCase
         }
     }
 
-    public function versionProvider(): Generator
+    public function versionProvider(): iterable
     {
         yield 'nominal stable' => ['7.0.2', '7.0.2'];
 

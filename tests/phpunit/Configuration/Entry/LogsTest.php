@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Entry;
 
-use Generator;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use PHPUnit\Framework\TestCase;
@@ -50,6 +49,7 @@ final class LogsTest extends TestCase
     public function test_it_can_be_instantiated(
         ?string $textLogFilePath,
         ?string $summaryLogFilePath,
+        ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
         ?Badge $badge
@@ -57,6 +57,7 @@ final class LogsTest extends TestCase
         $logs = new Logs(
             $textLogFilePath,
             $summaryLogFilePath,
+            $jsonLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
             $badge
@@ -66,6 +67,7 @@ final class LogsTest extends TestCase
             $logs,
             $textLogFilePath,
             $summaryLogFilePath,
+            $jsonLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
             $badge
@@ -82,13 +84,15 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
             null
         );
     }
 
-    public function valuesProvider(): Generator
+    public function valuesProvider(): iterable
     {
         yield 'minimal' => [
+            null,
             null,
             null,
             null,
@@ -99,6 +103,7 @@ final class LogsTest extends TestCase
         yield 'complete' => [
             'text.log',
             'summary.log',
+            'json.log',
             'debug.log',
             'perMutator.log',
             new Badge('master'),

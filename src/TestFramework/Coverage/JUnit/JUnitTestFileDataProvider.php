@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use DOMDocument;
+use DOMElement;
+use DOMNodeList;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;
 use function Safe\sprintf;
@@ -46,16 +48,16 @@ use Webmozart\Assert\Assert;
  */
 final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
-    private $jUnitFilePath;
+    private $jUnitLocator;
 
     /**
      * @var SafeDOMXPath|null
      */
     private $xPath;
 
-    public function __construct(string $jUnitFilePath)
+    public function __construct(JUnitReportLocator $jUnitLocator)
     {
-        $this->jUnitFilePath = $jUnitFilePath;
+        $this->jUnitLocator = $jUnitLocator;
     }
 
     /**
@@ -65,31 +67,27 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     {
         $xPath = $this->getXPath();
 
-        $nodes = $xPath->query(
-            sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName)
-        );
+        /** @var DOMNodeList<DOMElement> $nodes */
+        $nodes = null;
 
-        if ($nodes->length === 0) {
-            // Try another format where the class name is inside `class` attribute of `testcase` tag
-            $nodes = $xPath->query(
-                sprintf('//testcase[@class="%s"]', $fullyQualifiedClassName)
-            );
+        foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {
+            $nodes = $xPath->query(sprintf($queryString, $placeholder));
+
+            if ($nodes->length !== 0) {
+                break;
+            }
         }
 
-        if ($nodes->length === 0) {
-            $feature = preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
-            // try another format where the class name is inside `file` attribute of `testcase` tag
-            $nodes = $xPath->query(
-                sprintf('//testcase[contains(@file, "%s")]', $feature)
-            );
-        }
+        Assert::notNull($nodes);
 
         if ($nodes->length === 0) {
             throw TestFileNameNotFoundException::notFoundFromFQN(
                 $fullyQualifiedClassName,
-                $this->jUnitFilePath
+                $this->jUnitLocator->locate()
             );
         }
+
+        Assert::same($nodes->length, 1);
 
         return new TestFileTimeData(
             $nodes[0]->getAttribute('file'),
@@ -97,13 +95,24 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         );
     }
 
+    /**
+     * @return iterable<string, string>
+     */
+    private static function testCaseMapGenerator(string $fullyQualifiedClassName): iterable
+    {
+        // A default format for <testsuite>
+        yield '//testsuite[@name="%s"][1]' => $fullyQualifiedClassName;
+
+        // A format where the class name is inside `class` attribute of `testcase` tag
+        yield '//testcase[@class="%s"][1]' => $fullyQualifiedClassName;
+
+        // A format where the class name is inside `file` attribute of `testcase` tag
+        yield '//testcase[contains(@file, "%s")][1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
+    }
+
     private function getXPath(): SafeDOMXPath
     {
-        if (!$this->xPath) {
-            $this->xPath = self::createXPath($this->jUnitFilePath);
-        }
-
-        return $this->xPath;
+        return $this->xPath ?? $this->xPath = self::createXPath($this->jUnitLocator->locate());
     }
 
     private static function createXPath(string $jUnitPath): SafeDOMXPath

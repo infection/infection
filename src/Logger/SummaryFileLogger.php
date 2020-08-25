@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 
 /**
  * Simple loggers recording the mutation result counts. This is mostly intended for internal
@@ -61,6 +61,7 @@ final class SummaryFileLogger implements LineMutationTestingResultsLogger
             'Errored: ' . $this->metricsCalculator->getErrorCount(),
             'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
             'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
+            'Skipped: ' . $this->metricsCalculator->getSkippedCount(),
             'Not Covered: ' . $this->metricsCalculator->getNotTestedCount(),
             '',
         ];

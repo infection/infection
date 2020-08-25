@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class FunctionCallRemovalTest extends AbstractMutatorTestCase
+final class FunctionCallRemovalTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -50,7 +49,7 @@ final class FunctionCallRemovalTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It removes a function call without parameters' => [
             <<<'PHP'
@@ -166,13 +165,22 @@ $a = 3;
 PHP
         ];
 
-        yield 'It does not remove an assert() call' => [
+        yield 'It does not remove disallowed calls' => [
             <<<'PHP'
 <?php
 
 assert(true === true);
 aSsert(true === true);
 \assert(true === true);
+fclose($fileHandle);
+closedir($close);
+curl_close($curlHandle);
+fclose();
+mysqli_free_result();
+mysqli_close();
+socket_close();
+openssl_free_key();
+
 $a = 3;
 PHP
         ];

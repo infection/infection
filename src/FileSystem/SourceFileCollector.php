@@ -35,10 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
-use function array_filter;
-use function array_map;
-use function explode;
-use Infection\FileSystem\Finder\FilterableFinder;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -56,32 +53,24 @@ class SourceFileCollector
      */
     public function collectFiles(
         array $sourceDirectories,
-        array $excludeDirectories,
-        string $filter
+        array $excludeDirectories
     ): iterable {
-        if ([] === $sourceDirectories) {
-            return [];
+        if ($sourceDirectories === []) {
+            return;
         }
 
-        $finder = FilterableFinder::create()
+        $finder = Finder::create()
             ->exclude($excludeDirectories)
             ->in($sourceDirectories)
             ->files()
+            ->name('*.php')
         ;
 
-        if ($filter === '') {
-            $finder->name('*.php');
-        } else {
-            $finder->filterFiles(
-                array_filter(
-                    array_map(
-                        'trim',
-                        explode(',', $filter)
-                    )
-                )
-            );
+        foreach ($excludeDirectories as $excludeDirectory) {
+            $finder->notPath($excludeDirectory);
         }
 
-        return $finder;
+        // Generator here to make sure these files used only once
+        yield from $finder;
     }
 }

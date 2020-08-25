@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
@@ -99,7 +99,7 @@ final class MutantFactoryTest extends TestCase
                 [new Node\Scalar\LNumber(0)]
             )],
             $tests = [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
                     0.01
@@ -119,11 +119,12 @@ final class MutantFactoryTest extends TestCase
             ->willReturn('mutated code')
         ;
 
+        $originalCode = 'original code';
         $this->printerMock
             ->expects($this->once())
             ->method('prettyPrintFile')
             ->with($originalNodes)
-            ->willReturn('original code')
+            ->willReturn($originalCode)
         ;
 
         $this->differMock
@@ -142,7 +143,8 @@ final class MutantFactoryTest extends TestCase
             'mutated code',
             'code diff',
             true,
-            $tests
+            $tests,
+            $originalCode
         );
     }
 
@@ -172,7 +174,7 @@ final class MutantFactoryTest extends TestCase
 
     /**
      * @param Node[] $originalNodes
-     * @param CoverageLineData[] $tests
+     * @param TestLocation[] $tests
      */
     private static function createMutation(array $originalNodes, array $tests): Mutation
     {

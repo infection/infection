@@ -38,7 +38,7 @@ namespace Infection\Logger;
 use function array_map;
 use function explode;
 use function implode;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Str;
 use const PHP_EOL;
@@ -77,9 +77,16 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
             'Escaped',
             $separateSections
         );
+
         $logs[] = $this->getResultsLine(
             $this->metricsCalculator->getTimedOutExecutionResults(),
             'Timed Out',
+            $separateSections
+        );
+
+        $logs[] = $this->getResultsLine(
+            $this->metricsCalculator->getSkippedExecutionResults(),
+            'Skipped',
             $separateSections
         );
 
@@ -89,6 +96,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
                 'Killed',
                 $separateSections
             );
+
             $logs[] = $this->getResultsLine(
                 $this->metricsCalculator->getErrorExecutionResults(),
                 'Errors',

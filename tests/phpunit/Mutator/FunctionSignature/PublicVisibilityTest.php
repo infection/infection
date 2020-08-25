@@ -35,22 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\FunctionSignature;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
-use function Safe\file_get_contents;
-use function Safe\sprintf;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 
 /**
  * @group integration
  */
-final class PublicVisibilityTest extends AbstractMutatorTestCase
+final class PublicVisibilityTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider blacklistedProvider
      */
     public function test_it_does_not_modify_blacklisted_functions(string $functionName): void
     {
-        $code = $this->getFileContent("pv-{$functionName}.php");
+        $code = MutatorFixturesProvider::getFixtureFileContent($this, "pv-{$functionName}.php");
 
         $this->doTest($code);
     }
@@ -81,10 +79,10 @@ final class PublicVisibilityTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates public to protected' => [
-            $this->getFileContent('pv-one-class.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-one-class.php'),
                 <<<'PHP'
 <?php
 
@@ -103,7 +101,7 @@ PHP
             ];
 
         yield 'It does not mutate final flag' => [
-            $this->getFileContent('pv-final.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-final.php'),
             <<<'PHP'
 <?php
 
@@ -122,7 +120,7 @@ PHP
         ];
 
         yield 'It mutates non abstract public to protected in an abstract class' => [
-            $this->getFileContent('pv-non-abstract-in-abstract-class.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-non-abstract-in-abstract-class.php'),
             <<<'PHP'
 <?php
 
@@ -141,7 +139,7 @@ PHP
         ];
 
         yield 'It does not mutate static flag' => [
-            $this->getFileContent('pv-static.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-static.php'),
         <<<'PHP'
 <?php
 
@@ -160,7 +158,7 @@ PHP
         ];
 
         yield 'It replaces visibility if not set' => [
-            $this->getFileContent('pv-not-set.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-not-set.php'),
             <<<'PHP'
 <?php
 
@@ -177,27 +175,27 @@ PHP
         ];
 
         yield 'It does not mutate an interface' => [
-            $this->getFileContent('pv-interface.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-interface.php'),
         ];
 
         yield 'It does not mutate an abstract function' => [
-            $this->getFileContent('pv-abstract.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-abstract.php'),
         ];
 
         yield 'It does not mutate if interface has same public method' => [
-            $this->getFileContent('pv-same-method-interface.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-interface.php'),
         ];
 
         yield 'It does not mutate if any of interfaces has same public method' => [
-            $this->getFileContent('pv-same-method-any-interface.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-any-interface.php'),
         ];
 
         yield 'It does not mutate if parent abstract has same public method' => [
-            $this->getFileContent('pv-same-method-abstract.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-abstract.php'),
         ];
 
         yield 'It does not mutate if parent class has same public method' => [
-            $this->getFileContent('pv-same-method-parent.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-parent.php'),
             <<<'PHP'
 <?php
 
@@ -220,7 +218,7 @@ PHP
         ];
 
         yield 'it does not mutate if grandparent class has same public method' => [
-            $this->getFileContent('pv-same-method-grandparent.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-grandparent.php'),
             <<<'PHP'
 <?php
 
@@ -246,7 +244,7 @@ PHP
         ];
 
         yield 'it does mutate non-inherited methods' => [
-            $this->getFileContent('pv-non-same-method-parent.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-non-same-method-parent.php'),
             <<<'PHP'
 <?php
 
@@ -301,7 +299,7 @@ PHP
         ];
 
         yield 'It does mutate when the parents method is protected' => [
-            $this->getFileContent('pv-protected-parent.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-protected-parent.php'),
             <<<'PHP'
 <?php
 
@@ -319,10 +317,5 @@ class Child extends SameAbstract
 }
 PHP
         ];
-    }
-
-    private function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/%s', $file));
     }
 }

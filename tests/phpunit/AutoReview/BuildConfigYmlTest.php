@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\realpath;
@@ -70,7 +69,7 @@ final class BuildConfigYmlTest extends TestCase
         }
     }
 
-    public function providesYamlFilesForTesting(): Generator
+    public function providesYamlFilesForTesting(): iterable
     {
         $rootPath = __DIR__ . '/../../../';
 

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser;
 
-use Generator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\UnparsableFile;
 use Infection\Tests\SingletonContainer;
@@ -129,7 +128,7 @@ final class FileParserTest extends TestCase
         }
     }
 
-    public function fileToParserProvider(): Generator
+    public function fileToParserProvider(): iterable
     {
         yield 'empty file' => [
             self::createFileInfo('/unknown', ''),
@@ -258,6 +257,7 @@ array(
                 )
                 args: array(
                     0: Arg(
+                        name: null
                         value: Expr_StaticCall(
                             class: Name(
                                 parts: array(

@@ -36,10 +36,9 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use function explode;
-use Generator;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\SourceFileData;
+use Infection\TestFramework\Coverage\Trace;
 
 /**
  * Adds test execution info to selected covered file data object.
@@ -49,6 +48,9 @@ use Infection\TestFramework\Coverage\SourceFileData;
  */
 class JUnitTestExecutionInfoAdder
 {
+    /**
+     * @var TestFileDataProvider
+     */
     private $testFileDataProvider;
 
     private $adapter;
@@ -63,46 +65,49 @@ class JUnitTestExecutionInfoAdder
     }
 
     /**
-     * @param iterable<SourceFileData> $coverage
+     * @param iterable<Trace> $traces
      *
-     * @return iterable<SourceFileData>
+     * @return iterable<Trace>
      */
-    public function addTestExecutionInfo(iterable $coverage): iterable
+    public function addTestExecutionInfo(iterable $traces): iterable
     {
         if (!$this->adapter->hasJUnitReport()) {
-            return $coverage;
+            return $traces;
         }
 
-        return $this->testExecutionInfoAdder($coverage);
+        return $this->testExecutionInfoAdder($traces);
     }
 
     /**
-     * @param iterable<SourceFileData> $coverage
+     * @param iterable<Trace> $traces
      *
-     * @return Generator<SourceFileData>
+     * @return iterable<Trace>
      */
-    private function testExecutionInfoAdder(iterable $coverage): Generator
+    private function testExecutionInfoAdder(iterable $traces): iterable
     {
-        foreach ($coverage as $data) {
-            foreach ($data->retrieveCoverageReport()->byLine as $linesCoverageData) {
-                foreach ($linesCoverageData as $test) {
-                    self::updateTestExecutionInfo($test, $this->testFileDataProvider);
+        /** @var Trace $trace */
+        foreach ($traces as $trace) {
+            foreach ($trace->getTests()->getTestsLocationsBySourceLine() as &$testsLocations) {
+                foreach ($testsLocations as $line => $test) {
+                    $testsLocations[$line] = $this->createCompleteTestLocation($test);
                 }
             }
+            unset($testsLocations);
 
-            yield $data;
+            yield $trace;
         }
     }
 
-    private static function updateTestExecutionInfo(
-        CoverageLineData $test,
-        TestFileDataProvider $testFileDataProvider
-    ): void {
-        $class = explode(':', $test->testMethod, 2)[0];
+    private function createCompleteTestLocation(TestLocation $test): TestLocation
+    {
+        $class = explode(':', $test->getMethod(), 2)[0];
 
-        $testFileData = $testFileDataProvider->getTestFileInfo($class);
+        $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
 
-        $test->testFilePath = $testFileData->path;
-        $test->time = $testFileData->time;
+        return new TestLocation(
+            $test->getMethod(),
+            $testFileData->path,
+            $testFileData->time
+        );
     }
 }

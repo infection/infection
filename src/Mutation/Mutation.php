@@ -37,11 +37,11 @@ namespace Infection\Mutation;
 
 use function array_intersect_key;
 use function array_keys;
-use function count;
 use function implode;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\MutatedNode;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
 use PhpParser\Node;
 use function Safe\array_flip;
@@ -53,15 +53,6 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
-    public const ATTRIBUTE_KEYS = [
-        'startLine',
-        'endLine',
-        'startTokenPos',
-        'endTokenPos',
-        'startFilePos',
-        'endFilePos',
-    ];
-
     private $originalFilePath;
     private $mutatorName;
     private $mutatedNodeClass;
@@ -71,6 +62,10 @@ class Mutation
     private $originalFileAst;
     private $tests;
     private $coveredByTests;
+    /**
+     * @var float|null
+     */
+    private $nominalTimeToTest;
 
     /**
      * @var string|null
@@ -80,7 +75,7 @@ class Mutation
     /**
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
-     * @param CoverageLineData[] $tests
+     * @param TestLocation[] $tests
      */
     public function __construct(
         string $originalFilePath,
@@ -94,19 +89,19 @@ class Mutation
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
-        foreach (self::ATTRIBUTE_KEYS as $key) {
+        foreach (MutationAttributeKeys::ALL as $key) {
             Assert::keyExists($attributes, $key);
         }
 
         $this->originalFilePath = $originalFilePath;
         $this->originalFileAst = $originalFileAst;
         $this->mutatorName = $mutatorName;
-        $this->attributes = array_intersect_key($attributes, array_flip(self::ATTRIBUTE_KEYS));
+        $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
         $this->mutatedNodeClass = $mutatedNodeClass;
         $this->mutatedNode = $mutatedNode;
         $this->mutationByMutatorIndex = $mutationByMutatorIndex;
         $this->tests = $tests;
-        $this->coveredByTests = count($tests) > 0;
+        $this->coveredByTests = $tests !== [];
     }
 
     public function getOriginalFilePath(): string
@@ -135,6 +130,11 @@ class Mutation
         return $this->attributes;
     }
 
+    public function getOriginalStartingLine(): int
+    {
+        return (int) $this->attributes['startLine'];
+    }
+
     public function getMutatedNodeClass(): string
     {
         return $this->mutatedNodeClass;
@@ -145,17 +145,27 @@ class Mutation
         return $this->mutatedNode;
     }
 
+    // TODO: hasTest()?
     public function isCoveredByTest(): bool
     {
         return $this->coveredByTests;
     }
 
     /**
-     * @return CoverageLineData[]
+     * @return TestLocation[]
      */
     public function getAllTests(): array
     {
         return $this->tests;
+    }
+
+    /**
+     * Overall time needed to run known tests for a mutation, excluding dependencies.
+     */
+    public function getNominalTestExecutionTime(): float
+    {
+        // TestLocator returns non-unique tests, and JUnitTestCaseSorter works around that; we have to do that too.
+        return $this->nominalTimeToTest ?? $this->nominalTimeToTest = (new JUnitTestCaseTimeAdder($this->tests))->getTotalTestTime();
     }
 
     public function getHash(): string
