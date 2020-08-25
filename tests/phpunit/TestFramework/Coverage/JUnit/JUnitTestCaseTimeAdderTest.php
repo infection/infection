@@ -66,13 +66,18 @@ final class JUnitTestCaseTimeAdderTest extends TestCase
                 '/path/to/test-file-1',
                 0.000234
             ),
+            new TestLocation(
+                'Test::testMethod1',
+                '/path/to/test-file-1',
+                10.0
+            ),
         ];
 
         $adder = new JUnitTestCaseTimeAdder($coverageTestCases);
 
         $total = $adder->getTotalTestTime();
 
-        $this->assertSame(0.0, $total);
+        $this->assertSame(10.0, $total);
     }
 
     public function test_it_returns_sum_for_uniqued_test_cases(): void
