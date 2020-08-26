@@ -59,7 +59,7 @@ final class ConfigurationTest extends TestCase
      * @param Mutator[] $mutators
      */
     public function test_it_can_be_instantiated(
-        int $timeout,
+        float $timeout,
         array $sourceDirectories,
         array $sourceFiles,
         string $sourceFileFilter,
@@ -152,7 +152,7 @@ final class ConfigurationTest extends TestCase
     public function valueProvider(): iterable
     {
         yield 'empty' => [
-            10,
+            10.,
             [],
             [],
             '',
@@ -182,7 +182,7 @@ final class ConfigurationTest extends TestCase
         ];
 
         yield 'nominal' => [
-            1,
+            1.,
             ['src', 'lib'],
             [
                 new SplFileInfo('Foo.php', 'Foo.php', 'Foo.php'),

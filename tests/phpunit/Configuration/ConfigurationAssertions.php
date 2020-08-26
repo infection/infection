@@ -55,7 +55,7 @@ trait ConfigurationAssertions
      */
     private function assertConfigurationStateIs(
         Configuration $configuration,
-        ?int $expectedTimeout,
+        ?float $expectedTimeout,
         array $expectedSourceDirectories,
         array $expectedSourceFiles,
         string $expectedFilter,
