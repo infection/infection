@@ -89,7 +89,7 @@ class Configuration
      * @param array<string, Mutator> $mutators
      */
     public function __construct(
-        int $timeout,
+        float $timeout,
         array $sourceDirectories,
         iterable $sourceFiles,
         string $sourceFilesFilter,
@@ -117,7 +117,7 @@ class Configuration
         int $threadCount,
         bool $dryRun
     ) {
-        Assert::nullOrGreaterThanEq($timeout, 1);
+        Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
@@ -154,7 +154,7 @@ class Configuration
         $this->dryRun = $dryRun;
     }
 
-    public function getProcessTimeout(): int
+    public function getProcessTimeout(): float
     {
         return $this->timeout;
     }
