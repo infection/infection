@@ -79,11 +79,11 @@ final class SharedCaseRemoval implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        $lastWasEmpty = false;
+        $previousWasEmpty = false;
 
         foreach ($node->cases as $i => $case) {
             if ($case->stmts === []) {
-                $lastWasEmpty = true;
+                $previousWasEmpty = true;
                 $cases = $node->cases;
                 unset($cases[$i]);
 
@@ -92,8 +92,12 @@ final class SharedCaseRemoval implements Mutator
                     $cases,
                     $node->getAttributes()
                 );
-            } elseif ($lastWasEmpty) {
-                $lastWasEmpty = false;
+
+                continue;
+            }
+
+            if ($previousWasEmpty) {
+                $previousWasEmpty = false;
                 $cases = $node->cases;
                 unset($cases[$i]);
                 $lastCase = $cases[$i - 1];

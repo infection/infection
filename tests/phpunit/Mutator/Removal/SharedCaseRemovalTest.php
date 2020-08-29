@@ -53,11 +53,30 @@ final class SharedCaseRemovalTest extends BaseMutatorTestCase
     public function mutationsProvider(): iterable
     {
         yield 'It does not mutate single cases with a body' => [
-            '<?php switch(true) {case true: $a = [];break; case false: $a = [];break;};',
+            '<?php
+
+ switch(true) {
+    case true:
+        $a = [];
+        break;
+    case false:
+        $a = [];
+        break;
+}',
         ];
 
         yield 'It removes cases that share a body' => [
-            '<?php switch(true) {case true: case false: $a = [];break; case null: $a = []; break;};',
+            '<?php
+
+switch(true) {
+    case true:
+    case false:
+        $a = [];
+        break;
+    case null:
+        $a = [];
+        break;
+}',
             [
                 '<?php
 
@@ -83,7 +102,17 @@ switch (true) {
         ];
 
         yield 'It removes default if it shares a body with a case' => [
-            '<?php switch(true) {case true: $a = [];break; case false: default: $b = []; break;};',
+            '<?php
+
+switch(true) {
+    case true:
+        $a = [];
+        break;
+    case false:
+    default:
+        $b = [];
+        break;
+}',
             [
                 '<?php
 
