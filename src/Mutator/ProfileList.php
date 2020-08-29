@@ -170,6 +170,7 @@ final class ProfileList
         Mutator\Removal\CloneRemoval::class,
         Mutator\Removal\FunctionCallRemoval::class,
         Mutator\Removal\MethodCallRemoval::class,
+        Mutator\Removal\SharedCaseRemoval::class,
     ];
 
     public const RETURN_VALUE_PROFILE = [
@@ -354,6 +355,7 @@ final class ProfileList
         'CloneRemoval' => Mutator\Removal\CloneRemoval::class,
         'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
         'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
+        'SharedCaseRemoval' => Mutator\Removal\SharedCaseRemoval::class,
 
         // Return Value
         'ArrayOneItem' => Mutator\ReturnValue\ArrayOneItem::class,
