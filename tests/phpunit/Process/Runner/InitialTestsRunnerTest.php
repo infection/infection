@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use function array_map;
+use function extension_loaded;
 use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
@@ -45,6 +46,7 @@ use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use const PHP_SAPI;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -147,7 +149,16 @@ STR
             ->willReturn($process)
         ;
 
-        $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+        try {
+            $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+        } catch (RuntimeException $e) {
+            // Signal 11, AKA "segmentation fault", is not something we can do anything about
+            if (extension_loaded('xdebug') && strpos($e->getMessage(), 'The process has been signaled with signal "11"') !== false) {
+                $this->markTestIncomplete($e->getMessage());
+            }
+
+            throw $e;
+        }
 
         $this->assertSame(
             [

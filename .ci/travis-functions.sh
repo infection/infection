@@ -25,7 +25,7 @@ readonly XDEBUG_DISABLED_INI_FILE="/tmp/xdebug.ini"
 #######################################
 function xdebug_disable() {
     if ! [[ -f $XDEBUG_ENABLED_INI_FILE ]]; then
-        exit
+        return 0
     fi
 
     cp "$XDEBUG_ENABLED_INI_FILE" "$XDEBUG_DISABLED_INI_FILE"
