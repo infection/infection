@@ -47,9 +47,9 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\TestFramework\TestFrameworkTypes;
+use OndraM\CiDetector\CiDetector;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
-use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -68,19 +68,22 @@ class ConfigurationFactory
     private $mutatorFactory;
     private $mutatorParser;
     private $sourceFileCollector;
+    private $ciDetector;
 
     public function __construct(
         TmpDirProvider $tmpDirProvider,
         MutatorResolver $mutatorResolver,
         MutatorFactory $mutatorFactory,
         MutatorParser $mutatorParser,
-        SourceFileCollector $sourceFileCollector
+        SourceFileCollector $sourceFileCollector,
+        CiDetector $ciDetector
     ) {
         $this->tmpDirProvider = $tmpDirProvider;
         $this->mutatorResolver = $mutatorResolver;
         $this->mutatorFactory = $mutatorFactory;
         $this->mutatorParser = $mutatorParser;
         $this->sourceFileCollector = $sourceFileCollector;
+        $this->ciDetector = $ciDetector;
     }
 
     public function create(
@@ -91,7 +94,6 @@ class ConfigurationFactory
         string $logVerbosity,
         bool $debug,
         bool $onlyCovered,
-        string $formatter,
         bool $noProgress,
         ?bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
@@ -127,6 +129,7 @@ class ConfigurationFactory
                 $schema->getSource()->getExcludes()
             ),
             $filter,
+            $schema->getSource()->getExcludes(),
             $schema->getLogs(),
             $logVerbosity,
             $namespacedTmpDir,
@@ -141,8 +144,7 @@ class ConfigurationFactory
             $skipInitialTests,
             $debug,
             $onlyCovered,
-            $formatter,
-            $noProgress,
+            $this->retrieveNoProgress($noProgress),
             self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
             self::retrieveMinMsi($minMsi, $schema),
             $showMutations,
@@ -214,8 +216,6 @@ class ConfigurationFactory
         string $configDir,
         string $tmpDir
     ): string {
-        Assert::nullOrStringNotEmpty($existingCoveragePath);
-
         if ($existingCoveragePath === null) {
             return $tmpDir;
         }
@@ -232,6 +232,11 @@ class ConfigurationFactory
         SchemaConfiguration $schema
     ): string {
         return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
+    }
+
+    private function retrieveNoProgress(bool $noProgress): bool
+    {
+        return $noProgress || $this->ciDetector->isCiDetected();
     }
 
     private static function retrieveIgnoreMsiWithNoMutations(

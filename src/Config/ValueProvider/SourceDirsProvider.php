@@ -35,15 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
 
+use function array_merge;
+use function array_unique;
+use function array_values;
 use function count;
 use function implode;
 use function in_array;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
+use Infection\Console\IO;
 use LogicException;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
@@ -55,8 +57,11 @@ final class SourceDirsProvider
     private $questionHelper;
     private $sourceDirGuesser;
 
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper, SourceDirGuesser $sourceDirGuesser)
-    {
+    public function __construct(
+        ConsoleHelper $consoleHelper,
+        QuestionHelper $questionHelper,
+        SourceDirGuesser $sourceDirGuesser
+    ) {
         $this->consoleHelper = $consoleHelper;
         $this->questionHelper = $questionHelper;
         $this->sourceDirGuesser = $sourceDirGuesser;
@@ -67,9 +72,9 @@ final class SourceDirsProvider
      *
      * @return string[]
      */
-    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir): array
+    public function get(IO $io, array $dirsInCurrentDir): array
     {
-        $output->writeln(['']);
+        $io->newLine();
 
         $guessedSourceDirs = (array) $this->sourceDirGuesser->guess();
 
@@ -85,7 +90,7 @@ final class SourceDirsProvider
         $question = new ChoiceQuestion($questionText, $choices, $defaultValues);
         $question->setMultiselect(true);
 
-        $sourceFolders = $this->questionHelper->ask($input, $output, $question);
+        $sourceFolders = $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question);
 
         if (in_array('.', $sourceFolders, true) && count($sourceFolders) > 1) {
             throw new LogicException('You cannot use current folder "." with other subfolders');

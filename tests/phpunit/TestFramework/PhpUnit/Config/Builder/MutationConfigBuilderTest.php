@@ -86,7 +86,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         $this->builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit.xml');
     }
 
-    public function test_it_builds_and_dump_the_XML_configuration(): void
+    public function test_it_builds_and_dump_the_xml_configuration(): void
     {
         $configurationPath = $this->builder->build(
             [],

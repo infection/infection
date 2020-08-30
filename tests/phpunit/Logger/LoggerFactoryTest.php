@@ -43,6 +43,7 @@ use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\FileLogger;
+use Infection\Logger\JsonLogger;
 use Infection\Logger\LoggerFactory;
 use Infection\Logger\LoggerRegistry;
 use Infection\Logger\MutationTestingResultsLogger;
@@ -50,10 +51,11 @@ use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Tests\Fixtures\FakeCiDetector;
+use Infection\Tests\Fixtures\Logger\FakeLogger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -71,16 +73,10 @@ final class LoggerFactoryTest extends TestCase
      */
     private $fileSystemMock;
 
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $outputMock;
-
     protected function setUp(): void
     {
         $this->metricsCalculator = new MetricsCalculator(2);
         $this->fileSystemMock = $this->createMock(Filesystem::class);
-        $this->outputMock = $this->createMock(OutputInterface::class);
     }
 
     public function test_it_does_not_create_any_logger_for_no_verbosity_level_and_no_badge(): void
@@ -97,9 +93,9 @@ final class LoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 '/a/file',
+                '/a/file',
                 null
-            ),
-            $this->outputMock
+            )
         );
 
         $this->assertRegisteredLoggersAre([], $logger);
@@ -119,9 +115,9 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 new Badge('master')
-            ),
-            $this->outputMock
+            )
         );
 
         $this->assertRegisteredLoggersAre([BadgeLogger::class], $logger);
@@ -140,10 +136,7 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $logger = $factory->createFromLogEntries(
-            $logs,
-            $this->outputMock
-        );
+        $logger = $factory->createFromLogEntries($logs);
 
         $this->assertRegisteredLoggersAre($expectedLoggerClasses, $logger);
     }
@@ -161,6 +154,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 null
             ),
             [TextFileLogger::class],
@@ -172,6 +166,7 @@ final class LoggerFactoryTest extends TestCase
                 'summary_file',
                 null,
                 null,
+                null,
                 null
             ),
             [SummaryFileLogger::class],
@@ -181,6 +176,7 @@ final class LoggerFactoryTest extends TestCase
             new Logs(
                 null,
                 null,
+                null,
                 'debug_file',
                 null,
                 null
@@ -188,8 +184,21 @@ final class LoggerFactoryTest extends TestCase
             [DebugFileLogger::class],
         ];
 
+        yield 'json logger' => [
+            new Logs(
+                null,
+                null,
+                'json_file',
+                null,
+                null,
+                null
+            ),
+            [JsonLogger::class],
+        ];
+
         yield 'per mutator logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -205,6 +214,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 new Badge('foo')
             ),
             [BadgeLogger::class],
@@ -214,6 +224,7 @@ final class LoggerFactoryTest extends TestCase
             new Logs(
                 'text',
                 'summary',
+                'json',
                 'debug',
                 'per_mutator',
                 new Badge('branch')
@@ -221,6 +232,7 @@ final class LoggerFactoryTest extends TestCase
             [
                 TextFileLogger::class,
                 SummaryFileLogger::class,
+                JsonLogger::class,
                 DebugFileLogger::class,
                 PerMutatorLogger::class,
                 BadgeLogger::class,
@@ -238,7 +250,9 @@ final class LoggerFactoryTest extends TestCase
             $this->fileSystemMock,
             $logVerbosity,
             $debugMode,
-            $onlyCoveredCode
+            $onlyCoveredCode,
+            new FakeCiDetector(),
+            new FakeLogger(),
         );
     }
 

@@ -257,6 +257,7 @@ array(
                 )
                 args: array(
                     0: Arg(
+                        name: null
                         value: Expr_StaticCall(
                             class: Name(
                                 parts: array(

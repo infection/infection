@@ -46,7 +46,7 @@ use PhpParser\NodeVisitorAbstract;
 final class MutationCollectorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var iterable<Mutation>[]
+     * @var array<iterable<Mutation>>
      */
     private $mutationChunks = [];
 

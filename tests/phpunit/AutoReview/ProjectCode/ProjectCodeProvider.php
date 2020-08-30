@@ -46,11 +46,13 @@ use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Application;
+use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\XdebugHandler;
 use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\NullSubscriber;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
@@ -106,6 +108,8 @@ final class ProjectCodeProvider
         DummyFileSystem::class,
         MutationAttributeKeys::class,
         XdebugHandler::class,
+        NullSubscriber::class,
+        FormatterName::class,
     ];
 
     /**
@@ -253,6 +257,7 @@ final class ProjectCodeProvider
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
+            ->notPath('xdebug-filter.php')
             ->exclude([
                 'autoloaded',
                 'benchmark',

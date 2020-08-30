@@ -98,7 +98,7 @@ ERROR
             <<<'ERROR'
 "/path/to/config" does not match the expected JSON schema:
  - [source] The property source is required
- - [timeout] String value found, but an integer is required
+ - [timeout] String value found, but a number is required
 ERROR
             ,
         ];

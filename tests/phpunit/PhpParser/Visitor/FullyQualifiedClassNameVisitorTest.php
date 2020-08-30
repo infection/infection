@@ -51,7 +51,7 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
      *
      * @param array<array{string, string}> $expected
      */
-    public function test_it_adds_FQCN_to_the_appropriate_node(string $code, array $expected): void
+    public function test_it_adds_fqcn_to_the_appropriate_node(string $code, array $expected): void
     {
         $spyVisitor = new FullyQualifiedClassNameSpyVisitor();
 

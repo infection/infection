@@ -49,6 +49,7 @@ final class LogsTest extends TestCase
     public function test_it_can_be_instantiated(
         ?string $textLogFilePath,
         ?string $summaryLogFilePath,
+        ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
         ?Badge $badge
@@ -56,6 +57,7 @@ final class LogsTest extends TestCase
         $logs = new Logs(
             $textLogFilePath,
             $summaryLogFilePath,
+            $jsonLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
             $badge
@@ -65,6 +67,7 @@ final class LogsTest extends TestCase
             $logs,
             $textLogFilePath,
             $summaryLogFilePath,
+            $jsonLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
             $badge
@@ -81,6 +84,7 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
             null
         );
     }
@@ -93,11 +97,13 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
         ];
 
         yield 'complete' => [
             'text.log',
             'summary.log',
+            'json.log',
             'debug.log',
             'perMutator.log',
             new Badge('master'),

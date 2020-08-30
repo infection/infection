@@ -37,11 +37,11 @@ namespace Infection\Mutation;
 
 use function array_intersect_key;
 use function array_keys;
-use function count;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\MutatedNode;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
 use PhpParser\Node;
 use function Safe\array_flip;
@@ -62,6 +62,10 @@ class Mutation
     private $originalFileAst;
     private $tests;
     private $coveredByTests;
+    /**
+     * @var float|null
+     */
+    private $nominalTimeToTest;
 
     /**
      * @var string|null
@@ -97,7 +101,7 @@ class Mutation
         $this->mutatedNode = $mutatedNode;
         $this->mutationByMutatorIndex = $mutationByMutatorIndex;
         $this->tests = $tests;
-        $this->coveredByTests = count($tests) > 0;
+        $this->coveredByTests = $tests !== [];
     }
 
     public function getOriginalFilePath(): string
@@ -153,6 +157,15 @@ class Mutation
     public function getAllTests(): array
     {
         return $this->tests;
+    }
+
+    /**
+     * Overall time needed to run known tests for a mutation, excluding dependencies.
+     */
+    public function getNominalTestExecutionTime(): float
+    {
+        // TestLocator returns non-unique tests, and JUnitTestCaseSorter works around that; we have to do that too.
+        return $this->nominalTimeToTest ?? $this->nominalTimeToTest = (new JUnitTestCaseTimeAdder($this->tests))->getTotalTestTime();
     }
 
     public function getHash(): string

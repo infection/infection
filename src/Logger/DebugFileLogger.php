@@ -88,6 +88,11 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
             'Timed Out',
             $separateSections
         );
+        $logs[] = $this->getResultsLine(
+            $this->metricsCalculator->getSkippedExecutionResults(),
+            'Skipped',
+            $separateSections
+        );
 
         if (!$this->onlyCoveredMode) {
             $logs[] = $this->getResultsLine(
@@ -123,7 +128,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
 
         $separateSections = false;
 
-        foreach ($executionResults as $index => $executionResult) {
+        foreach ($executionResults as $executionResult) {
             if ($separateSections) {
                 $lines[] = '';
             }

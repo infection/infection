@@ -58,7 +58,7 @@ class MutantProcessFactory
     // TODO: is it necessary for the timeout to be an int?
     public function __construct(
         TestFrameworkAdapter $testFrameworkAdapter,
-        int $timeout,
+        float $timeout,
         EventDispatcher $eventDispatcher,
         MutantExecutionResultFactory $resultFactory
     ) {
@@ -80,7 +80,7 @@ class MutantProcessFactory
             )
         );
 
-        $process->setTimeout((float) $this->timeout);
+        $process->setTimeout($this->timeout);
 
         if (method_exists($process, 'inheritEnvironmentVariables')) {
             // in version 4.4.0 this method is deprecated and removed in 5.0.0

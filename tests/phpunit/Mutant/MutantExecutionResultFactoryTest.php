@@ -124,7 +124,8 @@ final class MutantExecutionResultFactoryTest extends TestCase
 - echo 'original';
 + echo 'notCovered#0';
 
-DIFF
+DIFF,
+                '<?php $a = 1;'
             )
         );
 
@@ -199,7 +200,8 @@ DIFF
 - echo 'original';
 + echo 'timedOut#0';
 
-DIFF
+DIFF,
+                '<?php $a = 1;'
             )
         );
         $mutantProcess->markAsTimedOut();
@@ -280,7 +282,8 @@ DIFF
 - echo 'original';
 + echo 'errored#0';
 
-DIFF
+DIFF,
+                '<?php $a = 1;'
             )
         );
 
@@ -362,7 +365,8 @@ DIFF
 - echo 'original';
 + echo 'escaped#0';
 
-DIFF
+DIFF,
+                '<?php $a = 1;'
             )
         );
 
@@ -444,7 +448,8 @@ DIFF
 - echo 'original';
 + echo 'killed#0';
 
-DIFF
+DIFF,
+                '<?php $a = 1;'
             )
         );
 

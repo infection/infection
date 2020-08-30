@@ -13,4 +13,8 @@ else
     php $INFECTION 2> infection.log
 fi
 
-diff expected-output.txt infection.log
+if [[ -v GOLDEN ]]; then
+   cp -v infection.log expected-output.txt
+fi
+
+diff -u expected-output.txt infection.log

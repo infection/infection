@@ -71,14 +71,14 @@ abstract class ClassReflectionTestCase extends TestCase
         ];
 
         yield [
-            $this->createFromName(get_class($this)),
+            $this->createFromName(static::class),
             'foo',
             Visibility::asProtected(),
             false,
         ];
 
         yield [
-            $this->createFromName(get_class($this)),
+            $this->createFromName(static::class),
             'foo',
             Visibility::asPublic(),
             false,

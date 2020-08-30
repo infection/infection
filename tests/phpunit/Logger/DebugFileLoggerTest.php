@@ -77,6 +77,9 @@ Escaped mutants:
 Timed Out mutants:
 ==================
 
+Skipped mutants:
+================
+
 Not Covered mutants:
 ====================
 
@@ -87,7 +90,7 @@ TXT
             $this->createCompleteMetricsCalculator(),
             false,
             <<<'TXT'
-Total: 10
+Total: 12
 
 Killed mutants:
 ===============
@@ -126,6 +129,16 @@ Mutator: PregQuote
 Line 9
 
 Mutator: For_
+Line 10
+
+
+Skipped mutants:
+================
+
+Mutator: For_
+Line 10
+
+Mutator: PregQuote
 Line 10
 
 
@@ -145,7 +158,7 @@ TXT
             $this->createCompleteMetricsCalculator(),
             true,
             <<<'TXT'
-Total: 10
+Total: 12
 
 Killed mutants:
 ===============
@@ -184,6 +197,16 @@ Mutator: PregQuote
 Line 9
 
 Mutator: For_
+Line 10
+
+
+Skipped mutants:
+================
+
+Mutator: For_
+Line 10
+
+Mutator: PregQuote
 Line 10
 
 TXT

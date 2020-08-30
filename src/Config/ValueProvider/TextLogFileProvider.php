@@ -36,9 +36,8 @@ declare(strict_types=1);
 namespace Infection\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
+use Infection\Console\IO;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
 /**
@@ -60,9 +59,9 @@ final class TextLogFileProvider
     /**
      * @param string[] $dirsInCurrentDir
      */
-    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir): string
+    public function get(IO $io, array $dirsInCurrentDir): string
     {
-        $output->writeln(['']);
+        $io->writeln(['']);
 
         $questionText = $this->consoleHelper->getQuestion(
             'Where do you want to store the text log file?',
@@ -72,6 +71,10 @@ final class TextLogFileProvider
         $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
         $question->setAutocompleterValues($dirsInCurrentDir);
 
-        return $this->questionHelper->ask($input, $output, $question);
+        return $this->questionHelper->ask(
+            $io->getInput(),
+            $io->getOutput(),
+            $question
+        );
     }
 }

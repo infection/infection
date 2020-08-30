@@ -59,7 +59,7 @@ final class InvalidSchema extends UnexpectedValueException
         return new self(sprintf(
             '"%s" does not match the expected JSON schema%s',
             $config->getPath(),
-            [] === $errors
+            $errors === []
                 ? '.'
                 : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
         ));

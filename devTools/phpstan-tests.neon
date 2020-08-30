@@ -1,4 +1,6 @@
 parameters:
+    parallel:
+        processTimeout: 120.0
     checkGenericClassInNonGenericObjectType: false
     checkMissingIterableValueType: false
     excludes_analyse:

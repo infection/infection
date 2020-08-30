@@ -138,7 +138,7 @@ EOF;
                 continue;
             }
 
-            if ([] !== $dependencies && strpos($dependencies[0], '#') === 0) {
+            if ($dependencies !== [] && strpos($dependencies[0], '#') === 0) {
                 $this->assertStringStartsWith(
                     '## ',
                     $dependencies[0],
@@ -202,7 +202,7 @@ EOF;
                 continue;
             }
 
-            if ([] !== $dependencies && strpos($dependencies[0], '## ') === 0) {
+            if ($dependencies !== [] && strpos($dependencies[0], '## ') === 0) {
                 continue;
             }
 
@@ -231,7 +231,7 @@ EOF;
 
                 return strpos($target, 'test-') === 0
                     && substr($target, -7) === '-docker'
-                    && ([] === $dependencies
+                    && ($dependencies === []
                         || strpos($dependencies[0], '## ') !== 0
                     )
                 ;
@@ -257,7 +257,7 @@ EOF;
                 0
             );
 
-            if ([] === $subTestTargets) {
+            if ($subTestTargets === []) {
                 continue;
             }
 
@@ -288,7 +288,7 @@ EOF;
                 return strpos($target, 'test') === 0
                     && strpos($target, 'tests/') !== 0
                     && substr($target, -7) !== '-docker'
-                    && ([] === $dependencies
+                    && ($dependencies === []
                         || strpos($dependencies[0], '## ') !== 0
                     )
                 ;
@@ -323,7 +323,7 @@ EOF;
 
                 return strpos($target, 'test') === 0
                     && substr($target, -7) === '-docker'
-                    && ([] === $dependencies
+                    && ($dependencies === []
                         || strpos($dependencies[0], '## ') !== 0
                     )
                 ;

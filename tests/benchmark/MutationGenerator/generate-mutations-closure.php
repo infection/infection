@@ -44,28 +44,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-$container = Container::create()->withDynamicParameters(
-    null,
-    '',
-    false,
-    'default',
-    false,
-    false,
-    'dot',
-    false,
-    '',
-    '',
-    false,
-    false,
-    .0,
-    .0,
-    2,
-    'phpunit',
-    '',
-    '',
-    0,
-    true
-);
+$container = Container::create();
 
 $files = Finder::create()
     ->files()

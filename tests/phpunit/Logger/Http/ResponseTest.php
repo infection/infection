@@ -52,7 +52,7 @@ final class ResponseTest extends TestCase
         $this->assertSame($body, $response->getBody());
     }
 
-    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_HTTP_status_code(): void
+    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_http_status_code(): void
     {
         try {
             new Response(102, '');

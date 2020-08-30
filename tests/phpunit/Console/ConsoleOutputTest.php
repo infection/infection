@@ -36,101 +36,141 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
+use Infection\Console\IO;
+use Infection\Logger\ConsoleLogger;
+use function Infection\Tests\normalize_trailing_spaces;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 final class ConsoleOutputTest extends TestCase
 {
+    /**
+     * @var BufferedOutput
+     */
+    private $output;
+
+    /**
+     * @var ConsoleOutput
+     */
+    private $consoleOutput;
+
+    protected function setUp(): void
+    {
+        if (getenv('COLUMNS') !== '100') {
+            $this->markTestSkipped('This test assumes 100 columns wide display');
+        }
+
+        $this->output = new BufferedOutput();
+
+        $this->consoleOutput = new ConsoleOutput(
+            new ConsoleLogger(
+                new IO(new StringInput(''), $this->output)
+            )
+        );
+    }
+
     public function test_log_verbosity_deprecation_notice(): void
     {
-        $option = 'all';
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('note')
-            ->with(
-                'Numeric versions of log-verbosity have been deprecated, please use, ' . $option . ' to keep the same result'
-            );
+        $this->consoleOutput->logVerbosityDeprecationNotice('all');
 
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logVerbosityDeprecationNotice($option);
+        $this->assertSame(
+            <<<'TXT'
+
+ ! [NOTE] Numeric versions of log-verbosity have been deprecated, please use, all to keep the same
+ !        result
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_log_unknown_verbosity_option(): void
     {
-        $option = 'default';
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('note')
-            ->with(
-                'Running infection with an unknown log-verbosity option, falling back to ' . $option . ' option'
-            );
+        $this->consoleOutput->logUnknownVerbosityOption('default');
 
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logUnknownVerbosityOption($option);
+        $this->assertSame(
+            <<<'TXT'
+
+ ! [NOTE] Running infection with an unknown log-verbosity option, falling back to default option
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_log_running_with_debugger(): void
     {
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('writeln')
-            ->with('You are running Infection with foo enabled.');
+        $this->consoleOutput->logRunningWithDebugger('foo');
 
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logRunningWithDebugger('foo');
+        $this->assertSame(
+            <<<'TXT'
+[notice] You are running Infection with foo enabled.
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_log_not_in_control_of_exit_codes(): void
     {
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('warning')
-            ->with([
-                'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
-                'It is your responsibility to disable xdebug/phpdbg unless needed.',
-            ]);
+        $this->consoleOutput->logNotInControlOfExitCodes();
 
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logNotInControlOfExitCodes();
+        $this->assertSame(
+            <<<'TXT'
+
+ [WARNING] Infection cannot control exit codes and unable to relaunch itself.
+           It is your responsibility to disable xdebug/phpdbg unless needed.
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_log_min_msi_can_get_increased_notice_for_msi(): void
     {
-        $actualMsi = 10.0;
-        $minMsi = 5.0;
-        $msiDifference = $actualMsi - $minMsi;
+        $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
+            5.0,
+            10.0
+        );
 
-        $ioMock = $this->createMock(SymfonyStyle::class);
-        $ioMock
-            ->expects($this->once())
-            ->method('note')
-            ->with(
-                'The MSI is ' . $msiDifference . '% percent points over the required MSI. ' .
-                'Consider increasing the required MSI percentage the next time you run infection.'
-            )
-        ;
+        $this->assertSame(
+            <<<'TXT'
 
-        (new ConsoleOutput($ioMock))->logMinMsiCanGetIncreasedNotice(
-            $minMsi,
-            $actualMsi
+ ! [NOTE] The MSI is 5% percent points over the required MSI. Consider increasing the required MSI
+ !        percentage the next time you run infection.
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
         );
     }
 
     public function test_log_min_msi_can_get_increased_notice_for_covered_msi(): void
     {
-        $actualCoveredCodeMsi = 10.0;
-        $minCoveredCodeMsi = 5.0;
-        $msiDifference = $actualCoveredCodeMsi - $minCoveredCodeMsi;
+        $this->consoleOutput->logMinCoveredCodeMsiCanGetIncreasedNotice(
+            5.0,
+            10.0
+        );
 
-        $ioMock = $this->createMock(SymfonyStyle::class);
-        $ioMock
-            ->expects($this->once())
-            ->method('note')
-            ->with(
-                'The Covered Code MSI is ' . $msiDifference . '% percent points over the required Covered Code MSI. ' .
-                'Consider increasing the required Covered Code MSI percentage the next time you run infection.'
-            )
-        ;
+        $this->assertSame(
+            <<<'TXT'
 
-        (new ConsoleOutput($ioMock))->logMinCoveredCodeMsiCanGetIncreasedNotice(
-            $minCoveredCodeMsi,
-            $actualCoveredCodeMsi
+ ! [NOTE] The Covered Code MSI is 5% percent points over the required Covered Code MSI. Consider
+ !        increasing the required Covered Code MSI percentage the next time you run infection.
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
         );
     }
 }

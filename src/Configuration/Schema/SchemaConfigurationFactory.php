@@ -83,6 +83,7 @@ class SchemaConfigurationFactory
         return new Logs(
             self::normalizeString($logs->text ?? null),
             self::normalizeString($logs->summary ?? null),
+            self::normalizeString($logs->json ?? null),
             self::normalizeString($logs->debug ?? null),
             self::normalizeString($logs->perMutator ?? null),
             self::createBadge($logs->badge ?? null)
