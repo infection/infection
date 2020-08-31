@@ -67,6 +67,7 @@
     },
     "conflict": {
         "phpunit/php-code-coverage": ">9 <9.1.4",
+        "phpunit/phpunit": ">=9.3",
         "symfony/console": "=4.1.5"
     },
     "require-dev": {
