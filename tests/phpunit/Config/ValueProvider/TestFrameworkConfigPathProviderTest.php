@@ -38,16 +38,16 @@ namespace Infection\Tests\Config\ValueProvider;
 use Exception;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
+use Infection\Console\IO;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use function Safe\realpath;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\StringInput;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
-final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
+final class TestFrameworkConfigPathProviderTest extends BaseProviderTest
 {
     /**
      * @var TestFrameworkConfigPathProvider
@@ -82,8 +82,10 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             ->method('locate');
 
         $result = $this->provider->get(
-            $this->createStreamableInputInterfaceMock(),
-            $this->createOutputInterface(),
+            new IO(
+                new StringInput(''),
+                $this->createStreamOutput()
+            ),
             [],
             'phpunit'
         );
@@ -112,8 +114,10 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
         $inputPhpUnitPath = realpath(__DIR__ . '/../../Fixtures/Files/phpunit');
 
         $path = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("{$inputPhpUnitPath}\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("{$inputPhpUnitPath}\n")),
+                $this->createStreamOutput()
+            ),
             [],
             'phpunit'
         );
@@ -139,8 +143,7 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             ->method('getQuestion');
 
         $path = $this->provider->get(
-            $this->createMock(InputInterface::class),
-            $this->createMock(OutputInterface::class),
+            IO::createNull(),
             [],
             'phpunit'
         );
@@ -166,8 +169,10 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             );
 
         $path = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("abc\n")),
+                $this->createStreamOutput()
+            ),
             [],
             'phpunit'
         );

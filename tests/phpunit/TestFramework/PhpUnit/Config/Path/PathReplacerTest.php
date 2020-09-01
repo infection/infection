@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 
 use DOMDocument;
-use Generator;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +43,7 @@ use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class PathReplacerTest extends TestCase
 {
@@ -76,7 +75,7 @@ final class PathReplacerTest extends TestCase
         $this->assertSame($expectedPath, p($node->nodeValue));
     }
 
-    public function pathProvider(): Generator
+    public function pathProvider(): iterable
     {
         yield ['autoload.php', $this->projectPath . '/autoload.php'];
 

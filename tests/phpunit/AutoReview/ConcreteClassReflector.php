@@ -36,13 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview;
 
 use function array_filter;
+use Infection\CannotBeInstantiated;
 use ReflectionClass;
 
 final class ConcreteClassReflector
 {
-    private function __construct()
-    {
-    }
+    use CannotBeInstantiated;
 
     /**
      * @param string[] $classNames

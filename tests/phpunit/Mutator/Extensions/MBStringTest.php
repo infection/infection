@@ -36,11 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Extensions;
 
 use function defined;
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 use function Safe\define;
 
-final class MBStringTest extends AbstractMutatorTestCase
+final class MBStringTest extends BaseMutatorTestCase
 {
     public static function setUpBeforeClass(): void
     {
@@ -57,7 +56,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It converts mb_strlen with leading slash' => [
             "<?php \mb_strlen('test');",
@@ -122,7 +121,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield from $this->mutationsProviderForStrSplit();
     }
 
-    private function mutationsProviderForChr(): Generator
+    private function mutationsProviderForChr(): iterable
     {
         yield 'It converts mb_chr to chr' => [
             '<?php mb_chr(74);',
@@ -144,7 +143,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForOrd(): Generator
+    private function mutationsProviderForOrd(): iterable
     {
         yield 'It converts mb_ord to ord' => [
             "<?php mb_ord('T');",
@@ -166,7 +165,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForParseStr(): Generator
+    private function mutationsProviderForParseStr(): iterable
     {
         yield 'It converts mb_parse_str to parse_str' => [
             "<?php mb_parse_str('T');",
@@ -188,7 +187,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForSendMail(): Generator
+    private function mutationsProviderForSendMail(): iterable
     {
         yield 'It converts mb_send_mail to mail' => [
             "<?php mb_send_mail('to', 'subject', 'msg');",
@@ -210,7 +209,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForStrCut(): Generator
+    private function mutationsProviderForStrCut(): iterable
     {
         yield 'It converts mb_strcut to substr' => [
             "<?php mb_strcut('subject', 1);",
@@ -237,7 +236,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForStrPos(): Generator
+    private function mutationsProviderForStrPos(): iterable
     {
         yield 'It converts mb_strpos to strpos' => [
             "<?php mb_strpos('subject', 'b');",
@@ -264,7 +263,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForStrIPos(): Generator
+    private function mutationsProviderForStrIPos(): iterable
     {
         yield 'It converts mb_stripos to stripos' => [
             "<?php mb_stripos('subject', 'b');",
@@ -291,7 +290,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForStrIStr(): Generator
+    private function mutationsProviderForStrIStr(): iterable
     {
         yield 'It converts mb_stristr to stristr' => [
             "<?php mb_stristr('subject', 'b');",
@@ -318,7 +317,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForStrRiPos(): Generator
+    private function mutationsProviderForStrRiPos(): iterable
     {
         yield 'It converts mb_strripos to strripos' => [
             "<?php mb_strripos('subject', 'b');",
@@ -345,7 +344,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForStrRPos(): Generator
+    private function mutationsProviderForStrRPos(): iterable
     {
         yield 'It converts mb_strrpos to strrpos' => [
             "<?php mb_strrpos('subject', 'b');",
@@ -372,7 +371,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForStrStr(): Generator
+    private function mutationsProviderForStrStr(): iterable
     {
         yield 'It converts mb_strstr to strstr' => [
             "<?php mb_strstr('subject', 'b');",
@@ -399,7 +398,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForStrToLower(): Generator
+    private function mutationsProviderForStrToLower(): iterable
     {
         yield 'It converts mb_strtolower to strtolower' => [
             "<?php mb_strtolower('test');",
@@ -421,7 +420,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForStrToUpper(): Generator
+    private function mutationsProviderForStrToUpper(): iterable
     {
         yield 'It converts mb_strtoupper to strtoupper' => [
             "<?php mb_strtoupper('test');",
@@ -443,7 +442,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForSubStrCount(): Generator
+    private function mutationsProviderForSubStrCount(): iterable
     {
         yield 'It converts mb_substr_count to substr_count' => [
             "<?php mb_substr_count('test', 't');",
@@ -465,7 +464,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForSubStr(): Generator
+    private function mutationsProviderForSubStr(): iterable
     {
         yield 'It converts mb_substr to substr' => [
             "<?php mb_substr('test', 2);",
@@ -492,7 +491,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForStrRChr(): Generator
+    private function mutationsProviderForStrRChr(): iterable
     {
         yield 'It converts mb_strrchr to strrchr' => [
             "<?php mb_strrchr('subject', 'b');",
@@ -519,7 +518,7 @@ final class MBStringTest extends AbstractMutatorTestCase
         ];
     }
 
-    private function mutationsProviderForConvertCase(): Generator
+    private function mutationsProviderForConvertCase(): iterable
     {
         yield 'It converts mb_convert_case with MB_CASE_UPPER mode to strtoupper' => [
             "<?php mb_convert_case('test', MB_CASE_UPPER);",

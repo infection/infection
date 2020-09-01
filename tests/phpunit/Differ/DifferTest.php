@@ -37,7 +37,6 @@ namespace Infection\Tests\Differ;
 
 use function array_map;
 use function explode;
-use Generator;
 use function implode;
 use Infection\Differ\Differ;
 use PHPUnit\Framework\TestCase;
@@ -58,7 +57,7 @@ final class DifferTest extends TestCase
         $this->assertSame($expectedDiff, self::normalizeString($actualDiff));
     }
 
-    public function diffProvider(): Generator
+    public function diffProvider(): iterable
     {
         yield 'empty' => [
             '',

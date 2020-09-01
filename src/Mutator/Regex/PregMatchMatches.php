@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Mutator\Regex;
 
 use function count;
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -80,9 +79,9 @@ TXT
     /**
      * @param Node\Expr\FuncCall $node
      *
-     * @return Generator<Node\Expr\Cast\Int_>
+     * @return iterable<Node\Expr\Cast\Int_>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
     }

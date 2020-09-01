@@ -40,68 +40,90 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\Process\Builder\MutantProcessBuilder;
-use Infection\Process\MutantProcess;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
+use Infection\Process\Factory\MutantProcessFactory;
 use function Pipeline\take;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
 final class MutationTestingRunner
 {
+    private $processFactory;
     private $mutantFactory;
-    private $parallelProcessManager;
+    private $processRunner;
     private $eventDispatcher;
-    private $processBuilder;
+    private $fileSystem;
     private $runConcurrently;
+    private $timeout;
 
     public function __construct(
-        MutantProcessBuilder $mutantProcessBuilder,
+        MutantProcessFactory $processFactory,
         MutantFactory $mutantFactory,
-        ParallelProcessRunner $parallelProcessManager,
+        ProcessRunner $processRunner,
         EventDispatcher $eventDispatcher,
-        bool $runConcurrently
+        Filesystem $fileSystem,
+        bool $runConcurrently,
+        float $timeout
     ) {
-        $this->processBuilder = $mutantProcessBuilder;
+        $this->processFactory = $processFactory;
         $this->mutantFactory = $mutantFactory;
-        $this->parallelProcessManager = $parallelProcessManager;
+        $this->processRunner = $processRunner;
         $this->eventDispatcher = $eventDispatcher;
+        $this->fileSystem = $fileSystem;
         $this->runConcurrently = $runConcurrently;
+        $this->timeout = $timeout;
     }
 
     /**
      * @param iterable<Mutation> $mutations
      */
-    public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
+    public function run(iterable $mutations, string $testFrameworkExtraOptions): void
     {
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
         $processes = take($mutations)
-            ->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
-                $mutant = $this->mutantFactory->create($mutation);
-
-                $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
-
-                return $process;
+            ->map(function (Mutation $mutation): Mutant {
+                return $this->mutantFactory->create($mutation);
             })
-            ->filter(function (MutantProcess $mutantProcess) {
-                if ($mutantProcess->getMutant()->isCoveredByTest()) {
+            ->filter(function (Mutant $mutant) {
+                // It's a proxy call to Mutation, can be done one stage up
+                if ($mutant->isCoveredByTest()) {
                     return true;
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromProcess($mutantProcess)
+                    MutantExecutionResult::createFromNonCoveredMutant($mutant)
                 ));
 
                 return false;
-            });
+            })
+            ->filter(function (Mutant $mutant) {
+                if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
+                    return true;
+                }
 
-        $this->parallelProcessManager->run($processes, $threadCount);
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromTimeSkippedMutant($mutant)
+                ));
+
+                return false;
+            })
+            ->map(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
+                $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode());
+
+                $process = $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+
+                return $process;
+            })
+        ;
+
+        $this->processRunner->run($processes);
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }

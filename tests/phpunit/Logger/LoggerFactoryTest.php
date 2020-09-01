@@ -35,28 +35,39 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use function current;
-use Generator;
+use function array_map;
+use function get_class;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
+use Infection\Logger\FileLogger;
+use Infection\Logger\JsonLogger;
 use Infection\Logger\LoggerFactory;
+use Infection\Logger\LoggerRegistry;
+use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Tests\Fixtures\FakeCiDetector;
+use Infection\Tests\Fixtures\Logger\FakeLogger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
+use ReflectionClass;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class LoggerFactoryTest extends TestCase
 {
+    /**
+     * @var MetricsCalculator
+     */
+    private $metricsCalculator;
+
     /**
      * @var Filesystem|MockObject
      */
@@ -64,106 +75,89 @@ final class LoggerFactoryTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->metricsCalculator = new MetricsCalculator(2);
         $this->fileSystemMock = $this->createMock(Filesystem::class);
     }
 
-    public function test_it_does_not_create_any_logger_for_no_verbosity_level(): void
+    public function test_it_does_not_create_any_logger_for_no_verbosity_level_and_no_badge(): void
     {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            $this->fileSystemMock,
+        $factory = $this->createLoggerFactory(
             LogVerbosity::NONE,
             true,
             true
         );
 
-        $loggers = $factory->createFromLogEntries(
+        $logger = $factory->createFromLogEntries(
             new Logs(
                 '/a/file',
                 '/a/file',
                 '/a/file',
                 '/a/file',
+                '/a/file',
                 null
-            ),
-            $this->createMock(OutputInterface::class)
+            )
         );
 
-        $this->assertCount(0, $loggers);
+        $this->assertRegisteredLoggersAre([], $logger);
     }
 
-    public function test_it_creates_a_bade_logger_on_low_verbosity(): void
+    public function test_it_creates_a_bade_logger_on_no_verbosity(): void
     {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            $this->fileSystemMock,
+        $factory = $this->createLoggerFactory(
             LogVerbosity::NONE,
             true,
             true
         );
 
-        $loggers = $factory->createFromLogEntries(
-            new Logs(null, null, null, null, new Badge('branch_name')),
-            $this->createMock(OutputInterface::class)
+        $logger = $factory->createFromLogEntries(
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                new Badge('master')
+            )
         );
 
-        $this->assertCount(1, $loggers);
-        $this->assertInstanceOf(BadgeLogger::class, current($loggers));
+        $this->assertRegisteredLoggersAre([BadgeLogger::class], $logger);
     }
 
     /**
-     * @dataProvider logTypesAndClassesProvider
+     * @dataProvider logsProvider
      */
-    public function test_it_creates_a_logger_for_log_type(Logs $logs, string $expectedLoggerClass): void
-    {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            $this->fileSystemMock,
+    public function test_it_creates_a_logger_for_log_type_on_normal_verbosity(
+        Logs $logs,
+        array $expectedLoggerClasses
+    ): void {
+        $factory = $this->createLoggerFactory(
             LogVerbosity::NORMAL,
             true,
             true
         );
 
-        $loggers = $factory->createFromLogEntries(
-            $logs,
-            $this->createMock(OutputInterface::class)
-        );
+        $logger = $factory->createFromLogEntries($logs);
 
-        $this->assertCount(1, $loggers);
-        $this->assertInstanceOf($expectedLoggerClass, current($loggers));
+        $this->assertRegisteredLoggersAre($expectedLoggerClasses, $logger);
     }
 
-    /**
-     * @dataProvider logsAndCountProvider
-     */
-    public function test_it_creates_multiple_loggers(Logs $logs, int $expectedLoggerCount): void
+    public function logsProvider(): iterable
     {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            $this->fileSystemMock,
-            LogVerbosity::NORMAL,
-            true,
-            true
-        );
+        yield 'no logger' => [
+            Logs::createEmpty(),
+            [],
+        ];
 
-        $loggers = $factory->createFromLogEntries(
-            $logs,
-            $this->createMock(OutputInterface::class)
-        );
-
-        $this->assertCount($expectedLoggerCount, $loggers);
-    }
-
-    public function logTypesAndClassesProvider(): Generator
-    {
         yield 'text logger' => [
             new Logs(
                 'text',
                 null,
                 null,
                 null,
+                null,
                 null
             ),
-            TextFileLogger::class,
+            [TextFileLogger::class],
         ];
 
         yield 'summary logger' => [
@@ -172,20 +166,34 @@ final class LoggerFactoryTest extends TestCase
                 'summary_file',
                 null,
                 null,
+                null,
                 null
             ),
-            SummaryFileLogger::class,
+            [SummaryFileLogger::class],
         ];
 
         yield 'debug logger' => [
             new Logs(
                 null,
                 null,
+                null,
                 'debug_file',
                 null,
                 null
             ),
-            DebugFileLogger::class,
+            [DebugFileLogger::class],
+        ];
+
+        yield 'json logger' => [
+            new Logs(
+                null,
+                null,
+                'json_file',
+                null,
+                null,
+                null
+            ),
+            [JsonLogger::class],
         ];
 
         yield 'per mutator logger' => [
@@ -193,10 +201,11 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 'per_muator',
                 null
             ),
-            PerMutatorLogger::class,
+            [PerMutatorLogger::class],
         ];
 
         yield 'badge logger' => [
@@ -205,34 +214,73 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 new Badge('foo')
             ),
-            BadgeLogger::class,
-        ];
-    }
-
-    public function logsAndCountProvider(): Generator
-    {
-        yield 'no logger' => [
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
-            0,
+            [BadgeLogger::class],
         ];
 
-        yield 'nominal' => [
+        yield 'all loggers' => [
             new Logs(
                 'text',
                 'summary',
+                'json',
                 'debug',
                 'per_mutator',
                 new Badge('branch')
             ),
-            5,
+            [
+                TextFileLogger::class,
+                SummaryFileLogger::class,
+                JsonLogger::class,
+                DebugFileLogger::class,
+                PerMutatorLogger::class,
+                BadgeLogger::class,
+            ],
         ];
+    }
+
+    private function createLoggerFactory(
+        string $logVerbosity,
+        bool $debugMode,
+        bool $onlyCoveredCode
+    ): LoggerFactory {
+        return new LoggerFactory(
+            $this->metricsCalculator,
+            $this->fileSystemMock,
+            $logVerbosity,
+            $debugMode,
+            $onlyCoveredCode,
+            new FakeCiDetector(),
+            new FakeLogger(),
+        );
+    }
+
+    private function assertRegisteredLoggersAre(
+        array $expectedLoggerClasses,
+        MutationTestingResultsLogger $logger
+    ): void {
+        $this->assertInstanceOf(LoggerRegistry::class, $logger);
+
+        $loggersReflection = (new ReflectionClass(LoggerRegistry::class))->getProperty('loggers');
+        $loggersReflection->setAccessible(true);
+
+        $loggers = $loggersReflection->getValue($logger);
+
+        $fileLoggerDecoratedLogger = (new ReflectionClass(FileLogger::class))->getProperty('lineLogger');
+        $fileLoggerDecoratedLogger->setAccessible(true);
+
+        $actualLoggerClasses = array_map(
+            static function ($logger) use ($fileLoggerDecoratedLogger): string {
+                if ($logger instanceof FileLogger) {
+                    $logger = $fileLoggerDecoratedLogger->getValue($logger);
+                }
+
+                return get_class($logger);
+            },
+            $loggers
+        );
+
+        $this->assertSame($expectedLoggerClasses, $actualLoggerClasses);
     }
 }

@@ -47,7 +47,7 @@ final class IntegrationGroupTest extends TestCase
     /**
      * @dataProvider \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::ioTestCaseTupleProvider
      */
-    public function test_the_test_cases_requiring_IO_operations_belongs_to_the_integration_group(
+    public function test_the_test_cases_requiring_io_operations_belongs_to_the_integration_group(
         string $testCaseClassName,
         string $fileWithIoOperations
     ): void {

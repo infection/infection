@@ -41,7 +41,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use function Safe\sprintf;
 use function str_pad;
@@ -102,10 +102,10 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->outputFormatter->finish();
 
         if ($this->showMutations) {
-            $this->showMutations($this->metricsCalculator->getEscapedMutantExecutionResults(), 'Escaped');
+            $this->showMutations($this->metricsCalculator->getEscapedExecutionResults(), 'Escaped');
 
             if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-                $this->showMutations($this->metricsCalculator->getNotCoveredMutantExecutionResults(), 'Not covered');
+                $this->showMutations($this->metricsCalculator->getNotCoveredExecutionResults(), 'Not covered');
             }
         }
 
@@ -147,10 +147,11 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->output->writeln(['', '']);
         $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotCoveredByTestsCount()) . '</options=bold> mutants were not covered by tests');
+        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotTestedCount()) . '</options=bold> mutants were not covered by tests');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getErrorCount()) . '</options=bold> errors were encountered');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');
+        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getSkippedCount()) . '</options=bold> mutants required more time than configured');
 
         $mutationScoreIndicator = floor($this->metricsCalculator->getMutationScoreIndicator());
         $msiTag = $this->getPercentageTag($mutationScoreIndicator);

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
@@ -63,9 +62,9 @@ TXT
     /**
      * @param Node\Scalar\LNumber $node
      *
-     * @return Generator<Node\Scalar\LNumber>
+     * @return iterable<Node\Scalar\LNumber>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         if ($node->value === 0) {
             yield new Node\Scalar\LNumber(1);

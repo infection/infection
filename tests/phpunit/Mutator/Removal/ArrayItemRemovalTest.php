@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class ArrayItemRemovalTest extends AbstractMutatorTestCase
+final class ArrayItemRemovalTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -51,7 +50,7 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It does not mutate empty arrays' => [
             '<?php $a = [];',

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser;
 
-use Generator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\UnparsableFile;
 use Infection\Tests\SingletonContainer;
@@ -49,7 +48,7 @@ use function Safe\sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class FileParserTest extends TestCase
 {
@@ -129,7 +128,7 @@ final class FileParserTest extends TestCase
         }
     }
 
-    public function fileToParserProvider(): Generator
+    public function fileToParserProvider(): iterable
     {
         yield 'empty file' => [
             self::createFileInfo('/unknown', ''),
@@ -258,6 +257,7 @@ array(
                 )
                 args: array(
                     0: Arg(
+                        name: null
                         value: Expr_StaticCall(
                             class: Name(
                                 parts: array(

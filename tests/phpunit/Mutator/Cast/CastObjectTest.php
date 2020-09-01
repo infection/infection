@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class CastObjectTest extends AbstractMutatorTestCase
+final class CastObjectTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -50,7 +49,7 @@ final class CastObjectTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It removes casting to object' => [
             <<<'PHP'

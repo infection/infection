@@ -39,6 +39,7 @@ use Closure;
 use Exception;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
+use Infection\Console\IO;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_dir;
@@ -47,8 +48,6 @@ use function Safe\file_get_contents;
 use function Safe\json_decode;
 use function Safe\sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
 /**
@@ -70,7 +69,7 @@ final class TestFrameworkConfigPathProvider
     /**
      * @param string[] $dirsInCurrentDir
      */
-    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework): ?string
+    public function get(IO $io, array $dirsInCurrentDir, string $testFramework): ?string
     {
         try {
             $this->testFrameworkConfigLocator->locate($testFramework);
@@ -78,11 +77,11 @@ final class TestFrameworkConfigPathProvider
             return null;
         } catch (Exception $e) {
             if ($testFramework !== TestFrameworkTypes::PHPUNIT) {
-                return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, '');
+                return $this->askTestFrameworkConfigLocation($io, $dirsInCurrentDir, $testFramework, '');
             }
 
             if (!file_exists('composer.json')) {
-                return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, '');
+                return $this->askTestFrameworkConfigLocation($io, $dirsInCurrentDir, $testFramework, '');
             }
 
             $composerJsonText = file_get_contents('composer.json');
@@ -100,7 +99,7 @@ final class TestFrameworkConfigPathProvider
                 }
             }
 
-            return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, $defaultValue);
+            return $this->askTestFrameworkConfigLocation($io, $dirsInCurrentDir, $testFramework, $defaultValue);
         }
     }
 
@@ -126,8 +125,12 @@ final class TestFrameworkConfigPathProvider
     /**
      * @param string[] $dirsInCurrentDir
      */
-    private function askTestFrameworkConfigLocation(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework, string $defaultValue): string
-    {
+    private function askTestFrameworkConfigLocation(
+        IO $io,
+        array $dirsInCurrentDir,
+        string $testFramework,
+        string $defaultValue
+    ): string {
         $question = sprintf(
             'Where is your <comment>%s.(xml|yml)(.dist)</comment> configuration located?',
             $testFramework
@@ -138,7 +141,11 @@ final class TestFrameworkConfigPathProvider
         $question->setAutocompleterValues($dirsInCurrentDir);
         $question->setValidator($this->getValidator($testFramework));
 
-        $testFrameworkConfigLocation = $this->questionHelper->ask($input, $output, $question);
+        $testFrameworkConfigLocation = $this->questionHelper->ask(
+            $io->getInput(),
+            $io->getOutput(),
+            $question
+        );
 
         return $testFrameworkConfigLocation;
     }

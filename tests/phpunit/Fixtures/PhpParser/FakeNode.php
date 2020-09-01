@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\PhpParser;
 
-use LogicException;
+use Infection\Tests\UnsupportedMethod;
 use PhpParser\Comment;
 use PhpParser\Node;
 
@@ -12,86 +12,86 @@ final class FakeNode implements Node
 {
     public function getType(): string
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getSubNodeNames(): array
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getLine(): int
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getStartLine(): int
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getEndLine(): int
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getStartTokenPos(): int
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getEndTokenPos(): int
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getStartFilePos(): int
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getEndFilePos(): int
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getComments(): array
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getDocComment()
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function setDocComment(Comment\Doc $docComment)
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function setAttribute(string $key, $value)
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function hasAttribute(string $key): bool
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getAttribute(string $key, $default = null)
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getAttributes(): array
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function setAttributes(array $attributes)
     {
-        throw new LogicException();
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 }

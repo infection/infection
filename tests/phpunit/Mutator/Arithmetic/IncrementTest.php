@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class IncrementTest extends AbstractMutatorTestCase
+final class IncrementTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -50,7 +49,7 @@ final class IncrementTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It replaces post increment' => [
             <<<'PHP'

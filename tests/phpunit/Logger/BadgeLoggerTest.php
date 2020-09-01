@@ -35,23 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use function getenv;
+use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
-use Infection\Environment\TravisCiResolver;
-use Infection\Http\StrykerDashboardClient;
 use Infection\Logger\BadgeLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Logger\Http\StrykerDashboardClient;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Tests\CI\ConfigurableEnv;
+use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
+use OndraM\CiDetector\CiDetector;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use function Safe\putenv;
-use Symfony\Component\Console\Output\OutputInterface;
 
 final class BadgeLoggerTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $outputMock;
+    use BacksUpEnvironmentVariables;
 
     /**
      * @var StrykerDashboardClient|MockObject
@@ -64,68 +63,49 @@ final class BadgeLoggerTest extends TestCase
     private $metricsCalculatorMock;
 
     /**
+     * @var ConfigurableEnv
+     */
+    private $ciDetectorEnv;
+
+    /**
+     * @var DummyLogger
+     */
+    private $logger;
+
+    /**
      * @var BadgeLogger
      */
     private $badgeLogger;
 
-    /**
-     * @var array<string|bool>
-     */
-    private static $env = [];
-
-    public static function setUpBeforeClass(): void
-    {
-        // Save current env state
-        $names = [
-            'TRAVIS',
-            'TRAVIS_BRANCH',
-            'TRAVIS_REPO_SLUG',
-            'TRAVIS_PULL_REQUEST',
-            'INFECTION_BADGE_API_KEY',
-            'STRYKER_DASHBOARD_API_KEY',
-        ];
-
-        foreach ($names as $name) {
-            self::$env[$name] = getenv($name);
-        }
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        // Restore original env state
-        foreach (self::$env as $name => $value) {
-            if ($value !== false) {
-                putenv($name . '=' . $value);
-            } else {
-                putenv($name);
-            }
-        }
-    }
-
     protected function setUp(): void
     {
-        $this->outputMock = $this->createMock(OutputInterface::class);
+        $this->backupEnvironmentVariables();
+
         $this->badgeApiClientMock = $this->createMock(StrykerDashboardClient::class);
         $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
+        $this->ciDetectorEnv = new ConfigurableEnv();
+        $this->logger = new DummyLogger();
 
         $this->badgeLogger = new BadgeLogger(
-            $this->outputMock,
-            new TravisCiResolver(),
+            new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
             new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,
-            'master'
+            'master',
+            $this->logger
         );
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreEnvironmentVariables();
     }
 
     public function test_it_skips_logging_when_it_is_not_travis(): void
     {
-        putenv('TRAVIS');
-
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: The current process is not executed in a Travis CI build')
-        ;
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => false,
+        ]);
 
         $this->badgeApiClientMock
             ->expects($this->never())
@@ -133,17 +113,25 @@ final class BadgeLoggerTest extends TestCase
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: The current process is not executed in a CI build',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_skips_logging_when_it_is_pull_request(): void
     {
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=123');
-
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: The current process is a pull request build (TRAVIS_PULL_REQUEST=123)')
-        ;
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => '123',
+        ]);
 
         $this->badgeApiClientMock
             ->expects($this->never())
@@ -151,38 +139,54 @@ final class BadgeLoggerTest extends TestCase
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: The current process is a pull request build',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_skips_logging_when_branch_not_found(): void
     {
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG=a/b');
-        putenv('TRAVIS_BRANCH');
-
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: Could not find the repository slug (TRAVIS_REPO_SLUG) or branch (TRAVIS_BRANCH)')
-        ;
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => false,
+        ]);
 
         $this->badgeApiClientMock
             ->expects($this->never())
             ->method('sendReport');
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: The branch name could not be determined for the current process',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_skips_logging_when_repo_slug_not_found(): void
     {
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG');
-        putenv('TRAVIS_BRANCH=foo');
-
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: Could not find the repository slug (TRAVIS_REPO_SLUG) or branch (TRAVIS_BRANCH)')
-        ;
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => false,
+            'TRAVIS_BRANCH' => 'foo',
+        ]);
 
         $this->badgeApiClientMock
             ->expects($this->never())
@@ -190,19 +194,27 @@ final class BadgeLoggerTest extends TestCase
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: The repository name could not be determined for the current process',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_skips_logging_when_it_is_branch_not_from_config(): void
     {
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG=a/b');
-        putenv('TRAVIS_BRANCH=foo');
-
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: Expected branch "master", found "foo"')
-        ;
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => 'foo',
+        ]);
 
         $this->badgeApiClientMock
             ->expects($this->never())
@@ -210,21 +222,30 @@ final class BadgeLoggerTest extends TestCase
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: Expected branch "master", found "foo"',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_sends_report_missing_our_api_key(): void
     {
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG=a/b');
-        putenv('TRAVIS_BRANCH=master');
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => 'master',
+        ]);
+
         putenv('INFECTION_BADGE_API_KEY');
         putenv('STRYKER_DASHBOARD_API_KEY');
-
-        $this->outputMock
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: The Stryker API key needs to be configured using one of the environment variables "INFECTION_BADGE_API_KEY" or "STRYKER_DASHBOARD_API_KEY", but could not find any of these.')
-        ;
 
         $this->badgeApiClientMock
             ->expects($this->never())
@@ -232,25 +253,34 @@ final class BadgeLoggerTest extends TestCase
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: The Stryker API key needs to be configured using one of the environment variables "INFECTION_BADGE_API_KEY" or "STRYKER_DASHBOARD_API_KEY", but could not find any of these.',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_sends_report_when_everything_is_ok_with_stryker_key(): void
     {
-        putenv('STRYKER_DASHBOARD_API_KEY=abc');
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG=a/b');
-        putenv('TRAVIS_BRANCH=master');
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => 'master',
+        ]);
 
-        $this->outputMock
-            ->method('writeln')
-            ->with('Sending dashboard report...')
-        ;
+        putenv('STRYKER_DASHBOARD_API_KEY=abc');
 
         $this->badgeApiClientMock
             ->expects($this->once())
             ->method('sendReport')
-            ->with('abc', 'github.com/a/b', 'master', 33.3)
+            ->with('github.com/a/b', 'master', 'abc', 33.3)
         ;
 
         $this->metricsCalculatorMock
@@ -259,25 +289,34 @@ final class BadgeLoggerTest extends TestCase
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Sending dashboard report...',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 
     public function test_it_sends_report_when_everything_is_ok_with_our_key(): void
     {
-        putenv('INFECTION_BADGE_API_KEY=abc');
-        putenv('TRAVIS=true');
-        putenv('TRAVIS_PULL_REQUEST=false');
-        putenv('TRAVIS_REPO_SLUG=a/b');
-        putenv('TRAVIS_BRANCH=master');
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => 'master',
+        ]);
 
-        $this->outputMock
-            ->method('writeln')
-            ->with('Sending dashboard report...')
-        ;
+        putenv('INFECTION_BADGE_API_KEY=abc');
 
         $this->badgeApiClientMock
             ->expects($this->once())
             ->method('sendReport')
-            ->with('abc', 'github.com/a/b', 'master', 33.3)
+            ->with('github.com/a/b', 'master', 'abc', 33.3)
         ;
 
         $this->metricsCalculatorMock
@@ -286,5 +325,16 @@ final class BadgeLoggerTest extends TestCase
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Sending dashboard report...',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
     }
 }

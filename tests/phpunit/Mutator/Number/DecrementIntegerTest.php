@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Number;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class DecrementIntegerTest extends AbstractMutatorTestCase
+final class DecrementIntegerTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -50,7 +49,7 @@ final class DecrementIntegerTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It does not decrement an integer in a comparison' => [
             <<<'PHP'
@@ -391,6 +390,13 @@ PHP
 if (strlen($a) === 0) {
     echo 'bar';
 }
+PHP
+        ];
+
+        yield 'It does not decrement when it is accessed zero index of an array' => [
+            <<<'PHP'
+<?php
+$b = $a[0];
 PHP
         ];
     }

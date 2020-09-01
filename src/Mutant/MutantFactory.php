@@ -37,11 +37,8 @@ namespace Infection\Mutant;
 
 use Infection\Differ\Differ;
 use Infection\Mutation\Mutation;
-use function is_readable;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
-use function Safe\file_get_contents;
-use function Safe\file_put_contents;
 use function Safe\sprintf;
 
 /**
@@ -80,26 +77,15 @@ class MutantFactory
             $mutation->getHash()
         );
 
-        $mutantCode = $this->createMutantCode($mutation, $mutantFilePath);
+        $mutatedCode = $this->mutantCodeFactory->createCode($mutation);
 
         return new Mutant(
             $mutantFilePath,
             $mutation,
-            $this->createMutantDiff($mutation, $mutantCode)
+            $mutatedCode,
+            $this->createMutantDiff($mutation, $mutatedCode),
+            $this->getOriginalPrettyPrintedFile($mutation->getOriginalFilePath(), $mutation->getOriginalFileAst())
         );
-    }
-
-    private function createMutantCode(Mutation $mutation, string $mutantFilePath): string
-    {
-        if (is_readable($mutantFilePath)) {
-            return file_get_contents($mutantFilePath);
-        }
-
-        $mutantCode = $this->mutantCodeFactory->createCode($mutation);
-
-        file_put_contents($mutantFilePath, $mutantCode);
-
-        return $mutantCode;
     }
 
     private function createMutantDiff(Mutation $mutation, string $mutantCode): string
@@ -117,6 +103,7 @@ class MutantFactory
      */
     private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): string
     {
+        // The same file may be mutated multiple times hence we can memoize that call
         return $this->printedFileCache[$originalFilePath]
             ?? $this->printedFileCache[$originalFilePath] = $this->printer->prettyPrintFile($originalStatements);
     }

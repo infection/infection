@@ -4,11 +4,11 @@ sudo: false
 
 env:
   global:
-    - INFECTION_FLAGS='--threads=$(nproc) --min-msi=63.949716139497 --min-covered-msi=74 --coverage=coverage --log-verbosity=none'
-    - PHPUNIT_BIN='vendor/bin/phpunit --stop-on-failure --prepend=devTools/xdebug-filter.php --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml'
-    - COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
-    - secure: KPHUzOeWLeCWzcyPrnrDaR6grVUEXj48KlSQhJiubdkyKtGcvEs+TzZNYa2v+mSZsvrBHez9MRu4itcx05fNrb7/6M23uppv+fENH7tgZi8PXktlEXvD+Iqc9DIaDS1hQKpsnOhOZLlDNQ/kyE6TJAvoBMcbG6RfLqwLP1Abdz11t9Z65SIL7l2YpTjLjgmZUctpEVkivnQ3VQojd3soFTKZ8s9jNhdyUL2F+Rab4wu26Dy+q9xEd5y1tj2242nmVU7U/OD/spTkxRivuUPNM7jEnUvUcdEHd5DIBki702OrSkgsjrxlOlqOWcIRzVZA+A54GiE8qpnLSPN1qbc68ifXhd4lw4zKrE9KfvI8gnnFHtwQP0lhQuwG+j/VtbQRYrb0ufX1sAOUpOIDGMxYrh+Hn6j/nZnBiBh3NRF0u6PLfnAuph5TybylY0cuiGfGOWFf8UG7yz/EH+Br/D5M/IkObU8b9e3YJlUQPcjTi0BSa/+lkLpQMOOVOlQZk+LTVVRjXwSO10JcWhpqwWX74dsa5b2N/XbXOEQldVsYuQZz7re8e5Nwm5dx+B/KF/ohv2GDkQdqAA35ogOAABI3rvGlfOESDeZyGYOiJqBWX+KLKNRQ6l/KRkHNflX5J+0xeRlK4L84n0YwesyEAEFnYrYtQ+/VNd9ZP2+xXyTrePI=
-    - secure: gto1Cg/FEurmKP+JNi7G7MBxJx9KX+WzM9VlLnu0x1Hq+2n8dEgNCBc9gvNrdpPPWHdke23uYXxM3XaKh6f/KXNRmYskJwAUP/jWTwkAc9dIz6qo3ObcS3M6WPnohkjhTJjJJH/dbUknR9gbstTvGsan7JysUnast6uyAhuP81ago0BoiCshTGPa7gZkD4dPPvDrUr70kRzgOd2ZJQZcuoCfL00q4Yu0OkjM9VMBxaBKkL8EE7594aYDjFtGbJuvWmZ36qqtUxzc3ly+G3IHfQVMQqN8+H0VB4ULwE1JOzWMsj5gpJtVeyPY5BTcAOE3je5/+1eq14VVnf3iSgMu3DbF1o/KuMxdes5vDadoZaVQmtLtNHvgu/UDCicBKk3BnLtlQe1bFfEsoSDRr+zCVkO5ypcbERxQzVCGdZdHsXLFZSxdLsEqSqD5ItZe1ZXv4K8bsDDY5rJgjyaiQs/FT/G4dlf61MHqzKtErgsNQ99ilV4iWqHGHnbMISyYdiLWTG8z/nhE34M+08J0gpSDfVrs1pvoUIzhD8KvjlU2QC2IXuE38aXTZm4IeTA7P6vZbUoCCcgOxIRqzS0UX9M1ddOUmy6prc3CGgiEgn6ey/eWmfyRQSbuL07aRH7MEzW4ESAJbdjHsuZoIUXGC9okLvk2pKfQxCjV86akPub7BZ8=
+    - INFECTION_FLAGS="--threads=$(nproc) --coverage=coverage --log-verbosity=none --skip-initial-tests --no-progress"
+    # Warning: the min-msi flag is overridden in PRs (see .ci/travis-functions.sh)
+    - MIN_MSI_FLAGS="--min-msi=68.00 --min-covered-msi=80.00"
+    - PHPUNIT_BIN="vendor/bin/phpunit --stop-on-failure --prepend=tests/xdebug-filter.php --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml"
+    - COMPOSER_FLAGS="--no-interaction --no-progress --no-suggest --prefer-dist"
 
 cache:
   directories:
@@ -31,7 +31,7 @@ before_install:
 jobs:
   include:
     - stage: Static Code Analysis
-      php: 7.2
+      php: 7.3
       install:
         - composer install $COMPOSER_FLAGS
       script:
@@ -40,8 +40,8 @@ jobs:
 
     - &STANDARD_TEST_JOB
       stage: Test
-      php: 7.2
-      env: DRIVER="xdebug"
+      php: 7.3
+      env: DRIVER="none"
       install:
         - |
           if [ "$DEPS" == "LOW" ]; then
@@ -56,8 +56,15 @@ jobs:
             if [[ "$DRIVER" == "pcov" ]]; then
               pecl install pcov;
             fi
+          - INFECTION_FLAGS="${INFECTION_FLAGS} $(get_infection_pr_flags)"
+          - |
+            if [[ "$MIN_MSI_CHECK" == "true" ]]; then
+              INFECTION_FLAGS="${INFECTION_FLAGS} ${MIN_MSI_FLAGS}";
+            fi
+
       script:
         - if [[ "$DRIVER" == "xdebug" || "$DRIVER" == "none" ]]; then xdebug_enable; fi
+        - make tests/benchmark/MutationGenerator/sources tests/benchmark/Tracing/coverage tests/benchmark/Tracing/sources
         - if [[ "$DRIVER" != "phpdbg" ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
         - |
           if [[ "$DEPS" == "LOW" ]]; then
@@ -68,16 +75,14 @@ jobs:
           fi
         - if [[ "$DRIVER" == "none" ]]; then xdebug_disable; fi
         - |
-          INFECTION_PR_FLAGS=$(get_infection_pr_flags);
-
-          echo "Flags used: ${INFECTION_FLAGS} ${INFECTION_PR_FLAGS};";
+          echo "Infection falgs: ${INFECTION_FLAGS}";
 
           if [[ "$DRIVER" == "none" ]]; then
             exit 0
           elif [[ "$DRIVER" != "phpdbg" ]]; then
-            bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
+            bin/infection $INFECTION_FLAGS;
           else
-            phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
+            phpdbg -qrr bin/infection $INFECTION_FLAGS;
           fi
 
     - <<: *STANDARD_TEST_JOB
@@ -88,16 +93,11 @@ jobs:
 
     - <<: *STANDARD_TEST_JOB
       php: 7.3
-      env: DRIVER="none"
+      env: DRIVER="xdebug"
 
     - <<: *STANDARD_TEST_JOB
       php: 7.3
       env: DRIVER="phpdbg"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.3
-      env: DRIVER="xdebug"
 
     -
       <<: *STANDARD_TEST_JOB
@@ -112,7 +112,9 @@ jobs:
     -
       <<: *STANDARD_TEST_JOB
       php: 7.4
-      env: DRIVER="pcov"
+      env:
+        - DRIVER="pcov"
+        - MIN_MSI_CHECK="true"
 
     -
       <<: *STANDARD_TEST_JOB
@@ -123,22 +125,21 @@ jobs:
       <<: *STANDARD_TEST_JOB
       php: nightly
       env: DRIVER="phpdbg"
-
       script:
-        # We don't have xdebug on the nightly build, so we always run with phpdbg.
-        - make compile;
-        - ./tests/e2e_tests build/infection.phar;
+        # We don't have Xdebug on the nightly build, so we always run with phpdbg
+        - make compile
+        - ./tests/e2e_tests build/infection.phar
         - phpdbg -qrr $PHPUNIT_BIN
-        - |
-          INFECTION_PR_FLAGS=$(get_infection_pr_flags);
-          phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
+        - phpdbg -qrr bin/infection $INFECTION_FLAGS
 
     - stage: Deploy
-      php: 7.2
+      php: 7.3
+      env:
+        - secure: KPHUzOeWLeCWzcyPrnrDaR6grVUEXj48KlSQhJiubdkyKtGcvEs+TzZNYa2v+mSZsvrBHez9MRu4itcx05fNrb7/6M23uppv+fENH7tgZi8PXktlEXvD+Iqc9DIaDS1hQKpsnOhOZLlDNQ/kyE6TJAvoBMcbG6RfLqwLP1Abdz11t9Z65SIL7l2YpTjLjgmZUctpEVkivnQ3VQojd3soFTKZ8s9jNhdyUL2F+Rab4wu26Dy+q9xEd5y1tj2242nmVU7U/OD/spTkxRivuUPNM7jEnUvUcdEHd5DIBki702OrSkgsjrxlOlqOWcIRzVZA+A54GiE8qpnLSPN1qbc68ifXhd4lw4zKrE9KfvI8gnnFHtwQP0lhQuwG+j/VtbQRYrb0ufX1sAOUpOIDGMxYrh+Hn6j/nZnBiBh3NRF0u6PLfnAuph5TybylY0cuiGfGOWFf8UG7yz/EH+Br/D5M/IkObU8b9e3YJlUQPcjTi0BSa/+lkLpQMOOVOlQZk+LTVVRjXwSO10JcWhpqwWX74dsa5b2N/XbXOEQldVsYuQZz7re8e5Nwm5dx+B/KF/ohv2GDkQdqAA35ogOAABI3rvGlfOESDeZyGYOiJqBWX+KLKNRQ6l/KRkHNflX5J+0xeRlK4L84n0YwesyEAEFnYrYtQ+/VNd9ZP2+xXyTrePI=
+        - secure: gto1Cg/FEurmKP+JNi7G7MBxJx9KX+WzM9VlLnu0x1Hq+2n8dEgNCBc9gvNrdpPPWHdke23uYXxM3XaKh6f/KXNRmYskJwAUP/jWTwkAc9dIz6qo3ObcS3M6WPnohkjhTJjJJH/dbUknR9gbstTvGsan7JysUnast6uyAhuP81ago0BoiCshTGPa7gZkD4dPPvDrUr70kRzgOd2ZJQZcuoCfL00q4Yu0OkjM9VMBxaBKkL8EE7594aYDjFtGbJuvWmZ36qqtUxzc3ly+G3IHfQVMQqN8+H0VB4ULwE1JOzWMsj5gpJtVeyPY5BTcAOE3je5/+1eq14VVnf3iSgMu3DbF1o/KuMxdes5vDadoZaVQmtLtNHvgu/UDCicBKk3BnLtlQe1bFfEsoSDRr+zCVkO5ypcbERxQzVCGdZdHsXLFZSxdLsEqSqD5ItZe1ZXv4K8bsDDY5rJgjyaiQs/FT/G4dlf61MHqzKtErgsNQ99ilV4iWqHGHnbMISyYdiLWTG8z/nhE34M+08J0gpSDfVrs1pvoUIzhD8KvjlU2QC2IXuE38aXTZm4IeTA7P6vZbUoCCcgOxIRqzS0UX9M1ddOUmy6prc3CGgiEgn6ey/eWmfyRQSbuL07aRH7MEzW4ESAJbdjHsuZoIUXGC9okLvk2pKfQxCjV86akPub7BZ8=
       install:
         - composer install --no-dev $COMPOSER_FLAGS
-      script:
-        make compile;
+      script: make compile
       before_deploy:
         - echo $DECRYPT_KEY | gpg --passphrase-fd 0 .ci/keys.asc.gpg
         - gpg --batch --yes --import .ci/keys.asc
@@ -159,9 +160,5 @@ jobs:
   allow_failures:
     - php: nightly
       env: DRIVER="phpdbg"
-    - php: 7.4
-      env: DRIVER="xdebug"
-    - php: 7.4
-      env: DRIVER="pcov"
     - php: 7.4
       env: DRIVER="phpdbg"

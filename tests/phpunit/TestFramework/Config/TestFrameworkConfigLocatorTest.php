@@ -42,7 +42,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class TestFrameworkConfigLocatorTest extends TestCase
 {

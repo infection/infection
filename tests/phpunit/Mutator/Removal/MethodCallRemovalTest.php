@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class MethodCallRemovalTest extends AbstractMutatorTestCase
+final class MethodCallRemovalTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -50,7 +49,7 @@ final class MethodCallRemovalTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It removes a method call without parameters' => [
             <<<'PHP'

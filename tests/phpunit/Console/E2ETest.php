@@ -42,7 +42,6 @@ use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
 use function file_exists;
 use function function_exists;
-use Generator;
 use function getenv;
 use function implode;
 use Infection\Command\ConfigureCommand;
@@ -70,7 +69,7 @@ use Symfony\Component\Process\Process;
 
 /**
  * @group e2e
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class E2ETest extends TestCase
 {
@@ -170,7 +169,7 @@ final class E2ETest extends TestCase
         $this->runOnE2EFixture($fullPath);
     }
 
-    public function e2eTestSuiteDataProvider(): Generator
+    public function e2eTestSuiteDataProvider(): iterable
     {
         $directories = Finder::create()
             ->depth('== 0')

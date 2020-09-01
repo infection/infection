@@ -164,7 +164,7 @@ final class XmlConfigurationManipulator
         $errorsString = '';
         $errors = libxml_get_errors();
 
-        foreach ($errors as $key => $error) {
+        foreach ($errors as $error) {
             $level = $this->getErrorLevelName($error);
             $errorsString .= sprintf('[%s] %s', $level, $error->message);
 

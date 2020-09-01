@@ -38,10 +38,10 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 use DOMDocument;
 use DOMNode;
 use DOMNodeList;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
@@ -85,10 +85,10 @@ class MutationConfigBuilder extends ConfigBuilder
     }
 
     /**
-     * @param CoverageLineData[] $coverageTests
+     * @param TestLocation[] $tests
      */
     public function build(
-        array $coverageTests,
+        array $tests,
         string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath
@@ -119,7 +119,7 @@ class MutationConfigBuilder extends ConfigBuilder
         );
 
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
-        $this->setFilteredTestsToRun($coverageTests, $dom, $xPath);
+        $this->setFilteredTestsToRun($tests, $dom, $xPath);
 
         file_put_contents(
             $customAutoloadFilePath,
@@ -164,6 +164,9 @@ class MutationConfigBuilder extends ConfigBuilder
             <<<'PHP'
 <?php
 
+if (function_exists('proc_nice')) {
+    proc_nice(1);
+}
 %s
 require_once '%s';
 
@@ -196,13 +199,13 @@ PHP
     }
 
     /**
-     * @param CoverageLineData[] $coverageTests
+     * @param TestLocation[] $tests
      */
-    private function setFilteredTestsToRun(array $coverageTests, DOMDocument $dom, SafeDOMXPath $xPath): void
+    private function setFilteredTestsToRun(array $tests, DOMDocument $dom, SafeDOMXPath $xPath): void
     {
         $this->removeExistingTestSuite($xPath);
 
-        $this->addTestSuiteWithFilteredTestFiles($coverageTests, $dom, $xPath);
+        $this->addTestSuiteWithFilteredTestFiles($tests, $dom, $xPath);
     }
 
     private function removeExistingTestSuite(SafeDOMXPath $xPath): void
@@ -232,10 +235,10 @@ PHP
     }
 
     /**
-     * @param CoverageLineData[] $coverageTestCases
+     * @param TestLocation[] $tests
      */
     private function addTestSuiteWithFilteredTestFiles(
-        array $coverageTestCases,
+        array $tests,
         DOMDocument $dom,
         SafeDOMXPath $xPath
     ): void {
@@ -245,13 +248,13 @@ PHP
 
         // If there is no `testsuites` node, append to root
         if (!$nodeToAppendTestSuite) {
-            $nodeToAppendTestSuite = $testSuites = $xPath->query('/phpunit')->item(0);
+            $nodeToAppendTestSuite = $xPath->query('/phpunit')->item(0);
         }
 
         $testSuite = $dom->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
-        $uniqueTestFilePaths = $this->jUnitTestCaseSorter->getUniqueSortedFileNames($coverageTestCases);
+        $uniqueTestFilePaths = $this->jUnitTestCaseSorter->getUniqueSortedFileNames($tests);
 
         foreach ($uniqueTestFilePaths as $testFilePath) {
             $file = $dom->createElement('file', $testFilePath);

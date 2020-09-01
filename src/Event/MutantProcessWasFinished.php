@@ -39,8 +39,9 @@ use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
+ * @final
  */
-final class MutantProcessWasFinished
+class MutantProcessWasFinished
 {
     private $executionResult;
 

@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Process\MutantProcess;
 use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
@@ -64,9 +64,10 @@ final class DotFormatter extends AbstractOutputFormatter
             '',
             '<killed>.</killed>: killed, '
             . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>S</uncovered>: uncovered, '
+            . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
-            . '<timeout>T</timeout>: timed out',
+            . '<timeout>T</timeout>: timed out, '
+            . '<skipped>S</skipped>: skipped',
             '',
         ]);
     }
@@ -75,24 +76,28 @@ final class DotFormatter extends AbstractOutputFormatter
     {
         parent::advance($executionResult, $mutationCount);
 
-        switch ($executionResult->getProcessResultCode()) {
-            case MutantProcess::CODE_KILLED:
+        switch ($executionResult->getDetectionStatus()) {
+            case DetectionStatus::KILLED:
                 $this->output->write('<killed>.</killed>');
 
                 break;
-            case MutantProcess::CODE_NOT_COVERED:
-                $this->output->write('<uncovered>S</uncovered>');
+            case DetectionStatus::NOT_COVERED:
+                $this->output->write('<uncovered>U</uncovered>');
 
                 break;
-            case MutantProcess::CODE_ESCAPED:
+            case DetectionStatus::ESCAPED:
                 $this->output->write('<escaped>M</escaped>');
 
                 break;
-            case MutantProcess::CODE_TIMED_OUT:
+            case DetectionStatus::TIMED_OUT:
                 $this->output->write('<timeout>T</timeout>');
 
                 break;
-            case MutantProcess::CODE_ERROR:
+            case DetectionStatus::SKIPPED:
+                $this->output->write('<skipped>S</skipped>');
+
+                break;
+            case DetectionStatus::ERROR:
                 $this->output->write('<with-error>E</with-error>');
 
                 break;

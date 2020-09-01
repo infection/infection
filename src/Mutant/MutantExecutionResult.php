@@ -37,7 +37,6 @@ namespace Infection\Mutant;
 
 use function array_keys;
 use Infection\Mutator\ProfileList;
-use Infection\Process\MutantProcess;
 use Webmozart\Assert\Assert;
 
 /**
@@ -48,47 +47,47 @@ class MutantExecutionResult
 {
     private $processCommandLine;
     private $processOutput;
-    private $processResultCode;
+    private $detectionStatus;
     private $mutantDiff;
     private $mutatorName;
     private $originalFilePath;
     private $originalStartingLine;
+    private $originalCode;
+    private $mutatedCode;
 
     public function __construct(
         string $processCommandLine,
         string $processOutput,
-        int $processResultCode,
+        string $detectionStatus,
         string $mutantDiff,
         string $mutatorName,
         string $originalFilePath,
-        int $originalStartingLine
+        int $originalStartingLine,
+        string $originalCode,
+        string $mutatedCode
     ) {
-        Assert::oneOf($processResultCode, MutantProcess::RESULT_CODES);
+        Assert::oneOf($detectionStatus, DetectionStatus::ALL);
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
         $this->processCommandLine = $processCommandLine;
         $this->processOutput = $processOutput;
-        $this->processResultCode = $processResultCode;
+        $this->detectionStatus = $detectionStatus;
         $this->mutantDiff = $mutantDiff;
         $this->mutatorName = $mutatorName;
         $this->originalFilePath = $originalFilePath;
         $this->originalStartingLine = $originalStartingLine;
+        $this->originalCode = $originalCode;
+        $this->mutatedCode = $mutatedCode;
     }
 
-    public static function createFromProcess(MutantProcess $mutantProcess): self
+    public static function createFromNonCoveredMutant(Mutant $mutant): self
     {
-        $process = $mutantProcess->getProcess();
-        $mutant = $mutantProcess->getMutant();
+        return self::createFromMutant($mutant, DetectionStatus::NOT_COVERED);
+    }
 
-        return new self(
-            $process->getCommandLine(),
-            $process->isStarted() ? $process->getOutput() : '',
-            $mutantProcess->getResultCode(),
-            $mutant->getDiff(),
-            $mutant->getMutation()->getMutatorName(),
-            $mutantProcess->getOriginalFilePath(),
-            $mutantProcess->getOriginalStartingLine()
-        );
+    public static function createFromTimeSkippedMutant(Mutant $mutant): self
+    {
+        return self::createFromMutant($mutant, DetectionStatus::SKIPPED);
     }
 
     public function getProcessCommandLine(): string
@@ -101,9 +100,9 @@ class MutantExecutionResult
         return $this->processOutput;
     }
 
-    public function getProcessResultCode(): int
+    public function getDetectionStatus(): string
     {
-        return $this->processResultCode;
+        return $this->detectionStatus;
     }
 
     public function getMutantDiff(): string
@@ -124,5 +123,32 @@ class MutantExecutionResult
     public function getOriginalStartingLine(): int
     {
         return $this->originalStartingLine;
+    }
+
+    public function getOriginalCode(): string
+    {
+        return $this->originalCode;
+    }
+
+    public function getMutatedCode(): string
+    {
+        return $this->mutatedCode;
+    }
+
+    private static function createFromMutant(Mutant $mutant, string $detectionStatus): self
+    {
+        $mutation = $mutant->getMutation();
+
+        return new self(
+            '',
+            '',
+            $detectionStatus,
+            $mutant->getDiff(),
+            $mutant->getMutation()->getMutatorName(),
+            $mutation->getOriginalFilePath(),
+            $mutation->getOriginalStartingLine(),
+            $mutant->getPrettyPrintedOriginalCode(),
+            $mutant->getMutatedCode()
+        );
     }
 }

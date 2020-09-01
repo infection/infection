@@ -50,13 +50,16 @@ trait ConfigurationAssertions
 
     /**
      * @param string[] $expectedSourceDirectories
+     * @param string[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
      */
     private function assertConfigurationStateIs(
         Configuration $configuration,
-        ?int $expectedTimeout,
+        ?float $expectedTimeout,
         array $expectedSourceDirectories,
         array $expectedSourceFiles,
+        string $expectedFilter,
+        array $expectedSourceFilesExcludes,
         Logs $expectedLogs,
         string $expectedLogVerbosity,
         string $expectedTmpDir,
@@ -71,12 +74,14 @@ trait ConfigurationAssertions
         bool $expectedSkipInitialTests,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
-        string $expectedFormatter,
         bool $expectedNoProgress,
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
-        ?float $expectedMinCoveredMsi
+        ?float $expectedMinCoveredMsi,
+        int $expectedMsiPrecision,
+        int $expectedThreadCount,
+        bool $expectedDryRyn
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
@@ -84,10 +89,13 @@ trait ConfigurationAssertions
             self::normalizePaths($expectedSourceFiles),
             self::normalizePaths($configuration->getSourceFiles())
         );
+        $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter());
+        $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes());
         $this->assertLogsStateIs(
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),
             $expectedLogs->getSummaryLogFilePath(),
+            $expectedLogs->getJsonLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
             $expectedLogs->getBadge()
@@ -112,12 +120,14 @@ trait ConfigurationAssertions
         $this->assertSame($expectedSkipInitialTests, $configuration->shouldSkipInitialTests());
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled());
         $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode());
-        $this->assertSame($expectedFormatter, $configuration->getFormatter());
         $this->assertSame($expectedNoProgress, $configuration->noProgress());
         $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations());
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi());
         $this->assertSame($expectedShowMutations, $configuration->showMutations());
         $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi());
+        $this->assertSame($expectedMsiPrecision, $configuration->getMsiPrecision());
+        $this->assertSame($expectedThreadCount, $configuration->getThreadCount());
+        $this->assertSame($expectedDryRyn, $configuration->isDryRun());
     }
 
     /**

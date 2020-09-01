@@ -35,31 +35,30 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\Mutator;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
-use LogicException;
+use Infection\Tests\UnsupportedMethod;
 use PhpParser\Node;
 
 final class FakeMutator implements Mutator
 {
     public static function getDefinition(): ?Definition
     {
-        throw new LogicException('Not expected to be called');
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function getName(): string
     {
-        throw new LogicException('Not expected to be called');
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
     public function canMutate(Node $node): bool
     {
-        throw new LogicException('Not expected to be called');
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
-        throw new LogicException('Not expected to be called');
+        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 }

@@ -35,26 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\MockObject\MockObject;
-use function Safe\file_get_contents;
-use function Safe\file_put_contents;
+use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 
-/**
- * @group integration Requires some I/O operations
- */
-final class MutantFactoryTest extends FileSystemTestCase
+final class MutantFactoryTest extends TestCase
 {
     use MutantAssertions;
 
@@ -89,7 +84,7 @@ final class MutantFactoryTest extends FileSystemTestCase
         $this->differMock = $this->createMock(Differ::class);
 
         $this->mutantFactory = new MutantFactory(
-            $this->tmp,
+            '/path/to/tmp',
             $this->differMock,
             $this->printerMock,
             $this->codeFactoryMock
@@ -104,7 +99,7 @@ final class MutantFactoryTest extends FileSystemTestCase
                 [new Node\Scalar\LNumber(0)]
             )],
             $tests = [
-                CoverageLineData::with(
+                new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
                     0.01
@@ -113,8 +108,7 @@ final class MutantFactoryTest extends FileSystemTestCase
         );
 
         $expectedMutantFilePath = sprintf(
-            '%s/mutant.%s.infection.php',
-            $this->tmp,
+            '/path/to/tmp/mutant.%s.infection.php',
             $mutation->getHash()
         );
 
@@ -122,20 +116,21 @@ final class MutantFactoryTest extends FileSystemTestCase
             ->expects($this->once())
             ->method('createCode')
             ->with($mutation)
-            ->willReturn('mutant code')
+            ->willReturn('mutated code')
         ;
 
+        $originalCode = 'original code';
         $this->printerMock
             ->expects($this->once())
             ->method('prettyPrintFile')
             ->with($originalNodes)
-            ->willReturn('original code')
+            ->willReturn($originalCode)
         ;
 
         $this->differMock
             ->expects($this->once())
             ->method('diff')
-            ->with('original code', 'mutant code')
+            ->with('original code', 'mutated code')
             ->willReturn('code diff')
         ;
 
@@ -145,52 +140,11 @@ final class MutantFactoryTest extends FileSystemTestCase
             $mutant,
             $expectedMutantFilePath,
             $mutation,
+            'mutated code',
             'code diff',
             true,
-            $tests
-        );
-
-        $this->assertFileExists($expectedMutantFilePath);
-        $this->assertSame('mutant code', file_get_contents($expectedMutantFilePath));
-    }
-
-    public function test_it_uses_the_mutant_code_found_if_available(): void
-    {
-        $mutation = self::createMutation(
-            $originalNodes = [],
-            []
-        );
-
-        $expectedMutantFilePath = sprintf(
-            '%s/mutant.%s.infection.php',
-            $this->tmp,
-            $mutation->getHash()
-        );
-
-        file_put_contents($expectedMutantFilePath, 'mutant code');
-
-        $this->printerMock
-            ->expects($this->once())
-            ->method('prettyPrintFile')
-            ->willReturn('original code')
-        ;
-
-        $this->differMock
-            ->expects($this->once())
-            ->method('diff')
-            ->with('original code', 'mutant code')
-            ->willReturn('code diff')
-        ;
-
-        $mutant = $this->mutantFactory->create($mutation);
-
-        $this->assertMutantStateIs(
-            $mutant,
-            $expectedMutantFilePath,
-            $mutation,
-            'code diff',
-            false,
-            []
+            $tests,
+            $originalCode
         );
     }
 
@@ -200,14 +154,6 @@ final class MutantFactoryTest extends FileSystemTestCase
             $originalNodes = [new Node\Stmt\Nop()],
             []
         );
-
-        $expectedMutantFilePath = sprintf(
-            '%s/mutant.%s.infection.php',
-            $this->tmp,
-            $mutation->getHash()
-        );
-
-        file_put_contents($expectedMutantFilePath, 'mutant code');
 
         $this->printerMock
             ->expects($this->once())
@@ -228,7 +174,7 @@ final class MutantFactoryTest extends FileSystemTestCase
 
     /**
      * @param Node[] $originalNodes
-     * @param CoverageLineData[] $tests
+     * @param TestLocation[] $tests
      */
     private static function createMutation(array $originalNodes, array $tests): Mutation
     {

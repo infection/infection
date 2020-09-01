@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Mutator\Removal;
 
 use function count;
-use Generator;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
@@ -46,6 +45,7 @@ use function min;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ArrayItem;
 use function range;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -103,10 +103,12 @@ TXT
     /**
      * @param Node\Expr\Array_ $arrayNode
      *
-     * @return Generator<Node\Expr\Array_>
+     * @return iterable<Node\Expr\Array_>
      */
-    public function mutate(Node $arrayNode): Generator
+    public function mutate(Node $arrayNode): iterable
     {
+        Assert::allNotNull($arrayNode->items);
+
         foreach ($this->getItemsIndexes($arrayNode->items) as $indexToRemove) {
             $newArrayNode = clone $arrayNode;
             unset($newArrayNode->items[$indexToRemove]);

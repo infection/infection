@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -65,9 +64,9 @@ TXT
     /**
      * @param Node\Stmt\Break_ $node
      *
-     * @return Generator<Node\Stmt\Continue_>
+     * @return iterable<Node\Stmt\Continue_>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Continue_();
     }
@@ -78,7 +77,7 @@ TXT
             return false;
         }
 
-        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+        $parentNode = ParentConnector::findParent($node);
 
         return !$parentNode instanceof Node\Stmt\Case_;
     }

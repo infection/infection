@@ -37,6 +37,7 @@ namespace Infection\Console;
 
 use function array_key_exists;
 use function in_array;
+use Infection\CannotBeInstantiated;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
@@ -44,6 +45,8 @@ use Symfony\Component\Console\Input\InputInterface;
  */
 final class LogVerbosity
 {
+    use CannotBeInstantiated;
+
     public const DEBUG = 'all';
     public const NORMAL = 'default';
     public const NONE = 'none';
@@ -63,6 +66,9 @@ final class LogVerbosity
      */
     public const NONE_INTEGER = 3;
 
+    /**
+     * @var array<int, string>
+     */
     public const ALLOWED_OPTIONS = [
         self::DEBUG_INTEGER => self::DEBUG,
         self::NORMAL_INTEGER => self::NORMAL,
@@ -73,11 +79,14 @@ final class LogVerbosity
     {
         $verbosityLevel = $input->getOption('log-verbosity');
 
-        if (in_array($verbosityLevel, self::ALLOWED_OPTIONS)) {
+        if (in_array($verbosityLevel, self::ALLOWED_OPTIONS, true)) {
             return;
         }
 
-        if (array_key_exists((int) $verbosityLevel, self::ALLOWED_OPTIONS)) {
+        // If that's non-standard, think it's a legacy numeric option.
+        $verbosityLevel = (int) $verbosityLevel;
+
+        if (array_key_exists($verbosityLevel, self::ALLOWED_OPTIONS)) {
             $input->setOption('log-verbosity', self::ALLOWED_OPTIONS[$verbosityLevel]);
             $io->logVerbosityDeprecationNotice(self::ALLOWED_OPTIONS[$verbosityLevel]);
 

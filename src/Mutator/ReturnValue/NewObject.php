@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
@@ -84,9 +83,9 @@ TXT
     /**
      * @param Node\Stmt\Return_ $node
      *
-     * @return Generator<array<Node\Stmt\Expression|Node\Stmt\Return_>>
+     * @return iterable<array<Node\Stmt\Expression|Node\Stmt\Return_>>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         /** @var Node\Expr\New_ $expr */
         $expr = $node->expr;

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use Generator;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
@@ -55,13 +54,16 @@ final class ConfigurationTest extends TestCase
      * @dataProvider valueProvider
      *
      * @param string[] $sourceDirectories
+     * @param string[] $sourceFilesExcludes
      * @param SplFileInfo[] $sourceFiles
      * @param Mutator[] $mutators
      */
     public function test_it_can_be_instantiated(
-        int $timeout,
+        float $timeout,
         array $sourceDirectories,
         array $sourceFiles,
+        string $sourceFileFilter,
+        array $sourceFilesExcludes,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -76,17 +78,21 @@ final class ConfigurationTest extends TestCase
         bool $skipInitialTests,
         bool $debug,
         bool $onlyCovered,
-        string $formatter,
         bool $noProgress,
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         bool $showMutations,
-        ?float $minCoveredMsi
+        ?float $minCoveredMsi,
+        int $msiPrecision,
+        int $threadsCount,
+        bool $dryRun
     ): void {
         $config = new Configuration(
             $timeout,
             $sourceDirectories,
             $sourceFiles,
+            $sourceFileFilter,
+            $sourceFilesExcludes,
             $logs,
             $logVerbosity,
             $tmpDir,
@@ -101,12 +107,14 @@ final class ConfigurationTest extends TestCase
             $skipInitialTests,
             $debug,
             $onlyCovered,
-            $formatter,
             $noProgress,
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi
+            $minCoveredMsi,
+            $msiPrecision,
+            $threadsCount,
+            $dryRun
         );
 
         $this->assertConfigurationStateIs(
@@ -114,6 +122,8 @@ final class ConfigurationTest extends TestCase
             $timeout,
             $sourceDirectories,
             $sourceFiles,
+            $sourceFileFilter,
+            $sourceFilesExcludes,
             $logs,
             $logVerbosity,
             $tmpDir,
@@ -128,28 +138,26 @@ final class ConfigurationTest extends TestCase
             $skipInitialTests,
             $debug,
             $onlyCovered,
-            $formatter,
             $noProgress,
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi
+            $minCoveredMsi,
+            $msiPrecision,
+            $threadsCount,
+            $dryRun
         );
     }
 
-    public function valueProvider(): Generator
+    public function valueProvider(): iterable
     {
         yield 'empty' => [
-            10,
+            10.,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             '',
             new PhpUnit(null, null),
@@ -163,24 +171,29 @@ final class ConfigurationTest extends TestCase
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
             false,
             null,
+            2,
+            0,
+            false,
         ];
 
         yield 'nominal' => [
-            1,
+            1.,
             ['src', 'lib'],
             [
                 new SplFileInfo('Foo.php', 'Foo.php', 'Foo.php'),
                 new SplFileInfo('Bar.php', 'Bar.php', 'Bar.php'),
             ],
+            'src/Foo.php,src/Bar.php',
+            ['exclude-dir'],
             new Logs(
                 'text.log',
                 'summary.log',
+                'json.log',
                 'debug.log',
                 'mutator.log',
                 new Badge('master')
@@ -200,12 +213,14 @@ final class ConfigurationTest extends TestCase
             false,
             true,
             true,
-            'progress',
             true,
             true,
             43.,
             true,
-            43.,
+            45.,
+            2,
+            4,
+            true,
         ];
     }
 }

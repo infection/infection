@@ -36,208 +36,180 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\DebugFileLogger;
-use Infection\Mutant\MetricsCalculator;
-use const PHP_EOL;
-use PHPUnit\Framework\MockObject\MockObject;
+use Infection\Metrics\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
-use function str_replace;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration Requires some I/O operations
- *
- * @covers \Infection\Logger\DebugFileLogger
- * @covers \Infection\Logger\FileLogger
- */
 final class DebugFileLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
-
-    private const LOG_FILE_PATH = '/path/to/text.log';
-
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    use LineLoggerAssertions;
 
     /**
-     * @var OutputInterface|MockObject
+     * @dataProvider metricsProvider
      */
-    private $outputMock;
+    public function test_it_logs_correctly_with_mutations(
+        MetricsCalculator $metricsCalculator,
+        bool $onlyCoveredMode,
+        string $expectedContents
+    ): void {
+        $logger = new DebugFileLogger($metricsCalculator, $onlyCoveredMode);
 
-    protected function setUp(): void
-    {
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
-        $this->outputMock = $this->createMock(OutputInterface::class);
+        $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function test_it_logs_correctly_with_no_mutations(): void
+    public function metricsProvider(): iterable
     {
-        $expectedContent = <<<'TXT'
+        yield 'no mutations' => [
+            new MetricsCalculator(2),
+            false,
+            <<<'TXT'
 Total: 0
+
 Killed mutants:
 ===============
-
 
 Errors mutants:
 ===============
 
-
 Escaped mutants:
 ================
-
 
 Timed Out mutants:
 ==================
 
-
-Not Covered mutants:
-====================
-
-
-TXT;
-
-        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
-
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $expectedContent)
-        ;
-
-        $debugFileLogger = new DebugFileLogger(
-            $this->outputMock,
-            self::LOG_FILE_PATH,
-            new MetricsCalculator(),
-            $this->fileSystemMock,
-            false,
-            false
-        );
-
-        $debugFileLogger->log();
-    }
-
-    public function test_it_log_correctly_with_mutations(): void
-    {
-        $expectedContent = <<<'TXT'
-Total: 10
-Killed mutants:
-===============
-
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
-
-Errors mutants:
-===============
-
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
-
-Escaped mutants:
+Skipped mutants:
 ================
 
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
-
-Timed Out mutants:
-==================
-
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
-
 Not Covered mutants:
 ====================
 
+TXT
+        ];
 
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
-
-TXT;
-
-        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
-
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $expectedContent)
-        ;
-
-        $debugFileLogger = new DebugFileLogger(
-            $this->outputMock,
-            self::LOG_FILE_PATH,
+        yield 'all mutations' => [
             $this->createCompleteMetricsCalculator(),
-            $this->fileSystemMock,
             false,
-            false
-        );
+            <<<'TXT'
+Total: 12
 
-        $debugFileLogger->log();
-    }
+Killed mutants:
+===============
 
-    public function test_it_cannot_log_on_invalid_streams(): void
-    {
-        $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with('<error>The only streams supported are php://stdout and php://stderr</error>')
-        ;
+Mutator: PregQuote
+Line 9
 
-        $debugFileLogger = new DebugFileLogger(
-            $this->outputMock,
-            'php://memory',
-            new MetricsCalculator(),
-            $this->fileSystemMock,
-            false,
-            false
-        );
+Mutator: For_
+Line 10
 
-        $debugFileLogger->log();
-    }
 
-    public function test_it_fails_if_cannot_write_file(): void
-    {
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $this->anything())
-            ->willThrowException(new IOException('Cannot write in directory X'));
+Errors mutants:
+===============
 
-        $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with('<error>Cannot write in directory X</error>')
-        ;
+Mutator: PregQuote
+Line 9
 
-        $debugFileLogger = new DebugFileLogger(
-            $this->outputMock,
-            self::LOG_FILE_PATH,
-            new MetricsCalculator(),
-            $this->fileSystemMock,
-            false,
-            false
-        );
+Mutator: For_
+Line 10
 
-        $debugFileLogger->log();
+
+Escaped mutants:
+================
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+
+Timed Out mutants:
+==================
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+
+Skipped mutants:
+================
+
+Mutator: For_
+Line 10
+
+Mutator: PregQuote
+Line 10
+
+
+Not Covered mutants:
+====================
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+TXT
+        ];
+
+        yield 'all mutations only covered' => [
+            $this->createCompleteMetricsCalculator(),
+            true,
+            <<<'TXT'
+Total: 12
+
+Killed mutants:
+===============
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+
+Errors mutants:
+===============
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+
+Escaped mutants:
+================
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+
+Timed Out mutants:
+==================
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+
+Skipped mutants:
+================
+
+Mutator: For_
+Line 10
+
+Mutator: PregQuote
+Line 10
+
+TXT
+        ];
     }
 }

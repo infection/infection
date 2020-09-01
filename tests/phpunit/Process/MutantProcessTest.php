@@ -36,11 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
-use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -48,180 +44,75 @@ use Symfony\Component\Process\Process;
 final class MutantProcessTest extends TestCase
 {
     /**
-     * @var MutantProcess
-     */
-    private $mutantProcess;
-
-    /**
      * @var MockObject|Process
      */
-    private $process;
+    private $processMock;
 
     /**
      * @var MockObject|Mutant
      */
-    private $mutant;
+    private $mutantMock;
 
     /**
-     * @var MockObject|AbstractTestFrameworkAdapter
+     * @var MutantProcess
      */
-    private $adapter;
+    private $mutantProcess;
 
     protected function setUp(): void
     {
-        $this->process = $this->createMock(Process::class);
-        $this->mutant = $this->createMock(Mutant::class);
-        $this->adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $this->processMock = $this->createMock(Process::class);
+        $this->mutantMock = $this->createMock(Mutant::class);
 
-        $this->mutantProcess = new MutantProcess($this->process, $this->mutant, $this->adapter);
+        $this->mutantProcess = new MutantProcess($this->processMock, $this->mutantMock);
     }
 
-    public function test_it_handles_not_covered_mutant(): void
+    public function test_it_exposes_its_state(): void
     {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(false);
-
-        $this->assertSame(MutantProcess::CODE_NOT_COVERED, $this->mutantProcess->getResultCode());
+        $this->assertMutantProcessStateIs(
+            $this->mutantProcess,
+            $this->processMock,
+            $this->mutantMock,
+            false
+        );
     }
 
-    public function test_it_handles_timeout(): void
+    public function test_it_can_be_marked_as_timed_out(): void
     {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
         $this->mutantProcess->markAsTimedOut();
 
-        $this->assertSame(MutantProcess::CODE_TIMED_OUT, $this->mutantProcess->getResultCode());
+        $this->assertMutantProcessStateIs(
+            $this->mutantProcess,
+            $this->processMock,
+            $this->mutantMock,
+            true
+        );
     }
 
-    public function test_it_handles_error(): void
+    public function test_it_can_have_a_callback_registered_and_executed(): void
     {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
+        $called = false;
 
-        $this->process
-            ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(126);
+        $this->mutantProcess->registerTerminateProcessClosure(
+            static function () use (&$called): void {
+                $called = true;
+            }
+        );
 
-        $this->assertSame(MutantProcess::CODE_ERROR, $this->mutantProcess->getResultCode());
+        $this->assertFalse($called);
+
+        $this->mutantProcess->terminateProcess();
+
+        $this->assertTrue($called);
     }
 
-    public function test_it_handles_escaped_mutant(): void
-    {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
-        $this->process
-            ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(0);
-
-        $this->process
-            ->expects($this->once())
-            ->method('getOutput')
-            ->willReturn('...');
-
-        $this->adapter
-            ->expects($this->once())
-            ->method('testsPass')
-            ->willReturn(true);
-
-        $this->assertSame(MutantProcess::CODE_ESCAPED, $this->mutantProcess->getResultCode());
-    }
-
-    public function test_it_handles_killed_mutant(): void
-    {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
-        $this->process
-            ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(0);
-
-        $this->process
-            ->expects($this->once())
-            ->method('getOutput')
-            ->willReturn('...');
-
-        $this->adapter
-            ->expects($this->once())
-            ->method('testsPass')
-            ->willReturn(false);
-
-        $this->assertSame(MutantProcess::CODE_KILLED, $this->mutantProcess->getResultCode());
-        $this->assertSame($this->mutant, $this->mutantProcess->getMutant());
-    }
-
-    public function test_it_knows_its_mutator(): void
-    {
-        $mutation = $this->createMock(Mutation::class);
-        $mutation->expects($this->once())
-            ->method('getMutatorName')
-            ->willReturn(MutatorName::getName(For_::class));
-
-        $this->mutant
-            ->expects($this->once())
-            ->method('getMutation')
-            ->willReturn($mutation);
-
-        $this->assertSame('For_', $this->mutantProcess->getMutatorName());
-    }
-
-    public function test_it_knows_its_original_path(): void
-    {
-        $this->process
-            ->expects($this->never())
-            ->method($this->anything());
-
-        $this->adapter
-            ->expects($this->never())
-            ->method($this->anything());
-
-        $mutation = $this->createMock(Mutation::class);
-        $mutation->expects($this->once())
-            ->method('getOriginalFilePath')
-            ->willReturn('foo/bar');
-
-        $this->mutant
-            ->expects($this->once())
-            ->method('getMutation')
-            ->willReturn($mutation);
-
-        $this->assertSame('foo/bar', $this->mutantProcess->getOriginalFilePath());
-    }
-
-    public function test_it_knows_its_original_starting_line(): void
-    {
-        $this->process
-            ->expects($this->never())
-            ->method($this->anything());
-
-        $this->adapter
-            ->expects($this->never())
-            ->method($this->anything());
-
-        $mutation = $this->createMock(Mutation::class);
-        $mutation->expects($this->once())
-            ->method('getAttributes')
-            ->willReturn(['startLine' => '3']);
-
-        $this->mutant
-            ->expects($this->once())
-            ->method('getMutation')
-            ->willReturn($mutation);
-
-        $this->assertSame(3, $this->mutantProcess->getOriginalStartingLine());
+    private function assertMutantProcessStateIs(
+        MutantProcess $mutantProcess,
+        Process $expectedProcess,
+        Mutant $expectedMutant,
+        bool $expectedTimedOut
+    ): void {
+        $this->assertSame($expectedProcess, $mutantProcess->getProcess());
+        $this->assertSame($expectedMutant, $mutantProcess->getMutant());
+        $this->assertSame($expectedTimedOut, $mutantProcess->isTimedOut());
     }
 }

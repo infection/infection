@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Generator;
 use Infection\Mutator\IgnoreConfig;
 use PHPUnit\Framework\TestCase;
 
@@ -79,7 +78,7 @@ final class IgnoreConfigTest extends TestCase
         $this->assertFalse($config->isIgnored($class, $method, $lineNumber));
     }
 
-    public function ignoredValuesProvider(): Generator
+    public function ignoredValuesProvider(): iterable
     {
         foreach ([null, 50] as $lineNumber) {
             $titleSuffix = $lineNumber === null ? '' : ' with line number #' . $lineNumber;
@@ -135,7 +134,7 @@ final class IgnoreConfigTest extends TestCase
         ];
     }
 
-    public function nonIgnoredValuesProvider(): Generator
+    public function nonIgnoredValuesProvider(): iterable
     {
         foreach ([null, 50] as $lineNumber) {
             $titleSuffix = $lineNumber === null ? '' : ' with line number #' . $lineNumber;

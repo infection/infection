@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit cacheResult="false" colors="false" stderr="false" stopOnFailure="true">
+<phpunit cacheResult="false" colors="false" stderr="false" stopOnFailure="true" failOnRisky="true" failOnWarning="true">
   <testsuites>
     <testsuite name="Application Test Suite">
       <directory>/path/to/src</directory>

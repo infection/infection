@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Generator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\PhpParser\MutatedNode;
@@ -50,7 +49,7 @@ use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class MutatorVisitorTest extends BaseVisitorTest
 {
@@ -74,7 +73,7 @@ final class MutatorVisitorTest extends BaseVisitorTest
         $this->assertSame($expectedCodeOutput, StringNormalizer::normalizeString($output));
     }
 
-    public function providesMutationCases(): Generator
+    public function providesMutationCases(): iterable
     {
         yield 'it mutates the correct node' => (function () {
             return [

@@ -42,6 +42,7 @@ final class Logs
 {
     private $textLogFilePath;
     private $summaryLogFilePath;
+    private $jsonLogFilePath;
     private $debugLogFilePath;
     private $perMutatorFilePath;
     private $badge;
@@ -49,15 +50,29 @@ final class Logs
     public function __construct(
         ?string $textLogFilePath,
         ?string $summaryLogFilePath,
+        ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
         ?Badge $badge
     ) {
         $this->textLogFilePath = $textLogFilePath;
         $this->summaryLogFilePath = $summaryLogFilePath;
+        $this->jsonLogFilePath = $jsonLogFilePath;
         $this->debugLogFilePath = $debugLogFilePath;
         $this->perMutatorFilePath = $perMutatorFilePath;
         $this->badge = $badge;
+    }
+
+    public static function createEmpty(): self
+    {
+        return new self(
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
     }
 
     public function getTextLogFilePath(): ?string
@@ -68,6 +83,11 @@ final class Logs
     public function getSummaryLogFilePath(): ?string
     {
         return $this->summaryLogFilePath;
+    }
+
+    public function getJsonLogFilePath(): ?string
+    {
+        return $this->jsonLogFilePath;
     }
 
     public function getDebugLogFilePath(): ?string

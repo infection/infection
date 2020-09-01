@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Schema;
 
 use Error;
-use Generator;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\TestCase;
@@ -89,7 +88,7 @@ final class InvalidFileTest extends TestCase
     /**
      * @dataProvider jsonErrorProvider
      */
-    public function test_it_can_be_created_for_file_with_invalid_JSON_content(
+    public function test_it_can_be_created_for_file_with_invalid_json_content(
         SchemaConfigurationFile $config,
         string $error,
         Throwable $previous,
@@ -102,7 +101,7 @@ final class InvalidFileTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    public function jsonErrorProvider(): Generator
+    public function jsonErrorProvider(): iterable
     {
         yield [
             new SchemaConfigurationFile('/path/to/config'),

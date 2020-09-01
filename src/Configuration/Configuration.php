@@ -54,14 +54,11 @@ class Configuration
         'default',
     ];
 
-    private const FORMATTER = [
-        'dot',
-        'progress',
-    ];
-
     private $timeout;
     private $sourceDirectories;
     private $sourceFiles;
+    private $sourceFilesFilter;
+    private $sourceFilesExcludes;
     private $logs;
     private $logVerbosity;
     private $tmpDir;
@@ -76,22 +73,27 @@ class Configuration
     private $skipInitialTests;
     private $debug;
     private $onlyCovered;
-    private $formatter;
     private $noProgress;
     private $ignoreMsiWithNoMutations;
     private $minMsi;
     private $showMutations;
     private $minCoveredMsi;
+    private $msiPrecision;
+    private $threadCount;
+    private $dryRun;
 
     /**
      * @param string[] $sourceDirectories
+     * @param string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator> $mutators
      */
     public function __construct(
-        int $timeout,
+        float $timeout,
         array $sourceDirectories,
         iterable $sourceFiles,
+        string $sourceFilesFilter,
+        array $sourceFilesExcludes,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -106,25 +108,28 @@ class Configuration
         bool $skipInitialTests,
         bool $debug,
         bool $onlyCovered,
-        string $formatter,
         bool $noProgress,
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         bool $showMutations,
-        ?float $minCoveredMsi
+        ?float $minCoveredMsi,
+        int $msiPrecision,
+        int $threadCount,
+        bool $dryRun
     ) {
-        Assert::nullOrGreaterThanEq($timeout, 1);
+        Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
-        Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
-        Assert::oneOf($formatter, self::FORMATTER);
         Assert::nullOrGreaterThanEq($minMsi, 0.);
+        Assert::greaterThanEq($threadCount, 0);
 
         $this->timeout = $timeout;
         $this->sourceDirectories = $sourceDirectories;
         $this->sourceFiles = $sourceFiles;
+        $this->sourceFilesFilter = $sourceFilesFilter;
+        $this->sourceFilesExcludes = $sourceFilesExcludes;
         $this->logs = $logs;
         $this->logVerbosity = $logVerbosity;
         $this->tmpDir = $tmpDir;
@@ -139,15 +144,17 @@ class Configuration
         $this->skipInitialTests = $skipInitialTests;
         $this->debug = $debug;
         $this->onlyCovered = $onlyCovered;
-        $this->formatter = $formatter;
         $this->noProgress = $noProgress;
         $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
         $this->minMsi = $minMsi;
         $this->showMutations = $showMutations;
         $this->minCoveredMsi = $minCoveredMsi;
+        $this->msiPrecision = $msiPrecision;
+        $this->threadCount = $threadCount;
+        $this->dryRun = $dryRun;
     }
 
-    public function getProcessTimeout(): int
+    public function getProcessTimeout(): float
     {
         return $this->timeout;
     }
@@ -166,6 +173,19 @@ class Configuration
     public function getSourceFiles(): iterable
     {
         return $this->sourceFiles;
+    }
+
+    public function getSourceFilesFilter(): string
+    {
+        return $this->sourceFilesFilter;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSourceFilesExcludes(): array
+    {
+        return $this->sourceFilesExcludes;
     }
 
     public function getLogs(): Logs
@@ -241,11 +261,6 @@ class Configuration
         return $this->onlyCovered;
     }
 
-    public function getFormatter(): string
-    {
-        return $this->formatter;
-    }
-
     public function noProgress(): bool
     {
         return $this->noProgress;
@@ -269,5 +284,20 @@ class Configuration
     public function getMinCoveredMsi(): ?float
     {
         return $this->minCoveredMsi;
+    }
+
+    public function getMsiPrecision(): int
+    {
+        return $this->msiPrecision;
+    }
+
+    public function getThreadCount(): int
+    {
+        return $this->threadCount;
+    }
+
+    public function isDryRun(): bool
+    {
+        return $this->dryRun;
     }
 }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use Generator;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
@@ -53,6 +52,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\Tests\Fixtures\DummyCiDetector;
 use function Infection\Tests\normalizePath;
 use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
@@ -61,7 +61,7 @@ use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class ConfigurationFactoryTest extends TestCase
 {
@@ -72,50 +72,21 @@ final class ConfigurationFactoryTest extends TestCase
      */
     private static $mutators;
 
-    /**
-     * @var ConfigurationFactory
-     */
-    private $configFactory;
-
     public static function tearDownAfterClass(): void
     {
         self::$mutators = null;
-    }
-
-    protected function setUp(): void
-    {
-        /** @var SourceFileCollector&ObjectProphecy $sourceFilesCollectorProphecy */
-        $sourceFilesCollectorProphecy = $this->prophesize(SourceFileCollector::class);
-
-        $sourceFilesCollectorProphecy
-            ->collectFiles([], [], '')
-            ->willReturn([])
-        ;
-        $sourceFilesCollectorProphecy
-            ->collectFiles(['src/'], ['vendor/'], 'src/Foo.php, src/Bar.php')
-            ->willReturn([
-                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-            ])
-        ;
-
-        $this->configFactory = new ConfigurationFactory(
-            new TmpDirProvider(),
-            SingletonContainer::getContainer()->getMutatorResolver(),
-            SingletonContainer::getContainer()->getMutatorFactory(),
-            new MutatorParser(),
-            $sourceFilesCollectorProphecy->reveal()
-        );
     }
 
     /**
      * @dataProvider valueProvider
      *
      * @param SplFileInfo[] $expectedSourceDirectories
+     * @param SplFileInfo[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
      * @param Mutator[] $expectedMutators
      */
     public function test_it_can_create_a_configuration(
+        bool $ciDetected,
         SchemaConfiguration $schema,
         ?string $inputExistingCoveragePath,
         ?string $inputInitialTestsPhpOptions,
@@ -123,7 +94,6 @@ final class ConfigurationFactoryTest extends TestCase
         string $inputLogVerbosity,
         bool $inputDebug,
         bool $inputOnlyCovered,
-        string $inputFormatter,
         bool $inputNoProgress,
         ?bool $inputIgnoreMsiWithNoMutations,
         ?float $inputMinMsi,
@@ -133,9 +103,14 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $inputTestFramework,
         ?string $inputTestFrameworkExtraOptions,
         string $inputFilter,
+        int $inputThreadsCount,
+        bool $inputDryRun,
+        int $inputMsiPrecision,
         int $expectedTimeout,
         array $expectedSourceDirectories,
         array $expectedSourceFiles,
+        string $expectedFilter,
+        array $expectedSourceFilesExcludes,
         Logs $expectedLogs,
         ?string $expectedLogVerbosity,
         string $expectedTmpDir,
@@ -150,38 +125,44 @@ final class ConfigurationFactoryTest extends TestCase
         bool $expectedSkipCoverage,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
-        string $expectedFormatter,
         bool $expectedNoProgress,
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
         ?float $expectedMinCoveredMsi
     ): void {
-        $config = $this->configFactory->create(
-            $schema,
-            $inputExistingCoveragePath,
-            $inputInitialTestsPhpOptions,
-            $skipInitialTests,
-            $inputLogVerbosity,
-            $inputDebug,
-            $inputOnlyCovered,
-            $inputFormatter,
-            $inputNoProgress,
-            $inputIgnoreMsiWithNoMutations,
-            $inputMinMsi,
-            $inputShowMutations,
-            $inputMinCoveredMsi,
-            $inputMutators,
-            $inputTestFramework,
-            $inputTestFrameworkExtraOptions,
-            $inputFilter
-        );
+        $config = $this
+            ->createConfigurationFactory($ciDetected)
+            ->create(
+                $schema,
+                $inputExistingCoveragePath,
+                $inputInitialTestsPhpOptions,
+                $skipInitialTests,
+                $inputLogVerbosity,
+                $inputDebug,
+                $inputOnlyCovered,
+                $inputNoProgress,
+                $inputIgnoreMsiWithNoMutations,
+                $inputMinMsi,
+                $inputShowMutations,
+                $inputMinCoveredMsi,
+                $inputMsiPrecision,
+                $inputMutators,
+                $inputTestFramework,
+                $inputTestFrameworkExtraOptions,
+                $inputFilter,
+                $inputThreadsCount,
+                $inputDryRun
+            )
+        ;
 
         $this->assertConfigurationStateIs(
             $config,
             $expectedTimeout,
             $expectedSourceDirectories,
             $expectedSourceFiles,
+            $expectedFilter,
+            $expectedSourceFilesExcludes,
             $expectedLogs,
             $expectedLogVerbosity,
             normalizePath($expectedTmpDir),
@@ -196,29 +177,26 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedSkipInitialTests,
             $expectedDebug,
             $expectedOnlyCovered,
-            $expectedFormatter,
             $expectedNoProgress,
             $expectedIgnoreMsiWithNoMutations,
             $expectedMinMsi,
             $expectedShowMutations,
-            $expectedMinCoveredMsi
+            $expectedMinCoveredMsi,
+            $inputMsiPrecision,
+            $inputThreadsCount,
+            $inputDryRun
         );
     }
 
-    public function valueProvider(): Generator
+    public function valueProvider(): iterable
     {
         yield 'minimal' => [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -236,7 +214,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -246,16 +223,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -265,11 +241,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             '',
-            sys_get_temp_dir() . '/infection/coverage-xml',
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -310,19 +285,19 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'no existing base path for code coverage' => self::createValueForCoveragePath(
             null,
             false,
-            sys_get_temp_dir() . '/infection/coverage-xml'
+            sys_get_temp_dir() . '/infection'
         );
 
         yield 'absolute base path for code coverage' => self::createValueForCoveragePath(
             '/path/to/coverage',
             true,
-            '/path/to/coverage/coverage-xml'
+            '/path/to/coverage'
         );
 
         yield 'relative base path for code coverage' => self::createValueForCoveragePath(
             'relative/path/to/coverage',
             true,
-            '/path/to/relative/path/to/coverage/coverage-xml'
+            '/path/to/relative/path/to/coverage'
         );
 
         yield 'no PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
@@ -338,6 +313,30 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'absolute PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
             '/path/to/phpunit/config',
             '/path/to/phpunit/config'
+        );
+
+        yield 'progress in non-CI environment' => self::createValueForNoProgress(
+            false,
+            false,
+            false
+        );
+
+        yield 'progress in CI environment' => self::createValueForNoProgress(
+            true,
+            false,
+            true
+        );
+
+        yield 'no progress in non-CI environment' => self::createValueForNoProgress(
+            false,
+            true,
+            true
+        );
+
+        yield 'no progress in CI environment' => self::createValueForNoProgress(
+            true,
+            true,
+            true
         );
 
         yield 'ignoreMsiWithNoMutations not specified in schema and not specified in input' => self::createValueForIgnoreMsiWithNoMutations(
@@ -434,32 +433,28 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             'phpunit',
-            '',
-            sys_get_temp_dir() . '/infection/coverage-xml'
+            ''
         );
 
         yield 'test framework from config' => self::createValueForTestFramework(
             'phpspec',
             null,
             'phpspec',
-            '',
-            sys_get_temp_dir() . '/infection/phpspec-coverage-xml'
+            ''
         );
 
         yield 'test framework from input' => self::createValueForTestFramework(
             null,
             'phpspec',
             'phpspec',
-            '',
-            sys_get_temp_dir() . '/infection/phpspec-coverage-xml'
+            ''
         );
 
         yield 'test framework from config & input' => self::createValueForTestFramework(
             'phpunit',
             'phpspec',
             'phpspec',
-            '',
-            sys_get_temp_dir() . '/infection/phpspec-coverage-xml'
+            ''
         );
 
         yield 'test no test PHP options' => self::createValueForInitialTestsPhpOptions(
@@ -490,61 +485,53 @@ final class ConfigurationFactoryTest extends TestCase
             'phpunit',
             null,
             null,
-            '',
-            sys_get_temp_dir() . '/infection/coverage-xml'
+            ''
         );
 
         yield 'test framework PHP options from config' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             '--debug',
             null,
-            '--debug',
-            sys_get_temp_dir() . '/infection/coverage-xml'
+            '--debug'
         );
 
         yield 'test framework PHP options from input' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             null,
             '--debug',
-            '--debug',
-            sys_get_temp_dir() . '/infection/coverage-xml'
+            '--debug'
         );
 
         yield 'test framework PHP options from config & input' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             '--stop-on-failure',
             '--debug',
-            '--debug',
-            sys_get_temp_dir() . '/infection/coverage-xml'
+            '--debug'
         );
 
         yield 'test framework PHP options from config with phpspec framework' => self::createValueForTestFrameworkExtraOptions(
             'phpspec',
             '--debug',
             null,
-            '--debug',
-            sys_get_temp_dir() . '/infection/phpspec-coverage-xml'
+            '--debug'
         );
 
         yield 'PHPUnit test framework' => self::createValueForTestFrameworkKey(
             'phpunit',
             '--debug',
-            '--debug',
-            sys_get_temp_dir() . '/infection/coverage-xml'
+            '--debug'
         );
 
         yield 'phpSpec test framework' => self::createValueForTestFrameworkKey(
             'phpspec',
             '--debug',
-            '--debug',
-            sys_get_temp_dir() . '/infection/phpspec-coverage-xml'
+            '--debug'
         );
 
         yield 'codeception test framework' => self::createValueForTestFrameworkKey(
             'codeception',
             '--debug',
-            '--debug',
-            sys_get_temp_dir() . '/infection/codeception-coverage-xml'
+            '--debug'
         );
 
         yield 'no mutator' => self::createValueForMutators(
@@ -598,17 +585,12 @@ final class ConfigurationFactoryTest extends TestCase
         );
 
         yield 'with source files' => [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source(['src/'], ['vendor/']),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -626,7 +608,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -636,19 +617,18 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             'src/Foo.php, src/Bar.php',
+            0,
+            false,
+            2,
             10,
             ['src/'],
             [
                 new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                 new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
             ],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            'src/Foo.php, src/Bar.php',
+            ['vendor/'],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -658,11 +638,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             '',
-            sys_get_temp_dir() . '/infection/coverage-xml',
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -671,6 +650,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'complete' => [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 10,
@@ -678,6 +658,7 @@ final class ConfigurationFactoryTest extends TestCase
                 new Logs(
                     'text.log',
                     'summary.log',
+                    'json.log',
                     'debug.log',
                     'mutator.log',
                     new Badge('master')
@@ -702,7 +683,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             true,
             true,
-            'dot',
             true,
             true,
             72.3,
@@ -712,15 +692,21 @@ final class ConfigurationFactoryTest extends TestCase
             'phpspec',
             '--stop-on-failure',
             'src/Foo.php, src/Bar.php',
+            4,
+            true,
+            2,
             10,
             ['src/'],
             [
                 new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                 new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
             ],
+            'src/Foo.php, src/Bar.php',
+            ['vendor/'],
             new Logs(
                 'text.log',
                 'summary.log',
+                'json.log',
                 'debug.log',
                 'mutator.log',
                 new Badge('master')
@@ -744,11 +730,10 @@ final class ConfigurationFactoryTest extends TestCase
             '-d zend_extension=xdebug.so',
             false,
             '--stop-on-failure',
-            '/path/to/dist/coverage/phpspec-coverage-xml',
+            '/path/to/dist/coverage',
             true,
             true,
             true,
-            'dot',
             true,
             true,
             72.3,
@@ -762,17 +747,12 @@ final class ConfigurationFactoryTest extends TestCase
         int $expectedTimeOut
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 $schemaTimeout,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -790,7 +770,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -800,16 +779,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             '',
+            0,
+            false,
+            2,
             $expectedTimeOut,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -819,11 +797,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             '',
-            sys_get_temp_dir() . '/infection/coverage-xml',
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -837,17 +814,12 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedTmpDir
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 $configTmpDir,
                 new PhpUnit(null, null),
                 null,
@@ -865,7 +837,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -875,16 +846,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             $expectedTmpDir,
             new PhpUnit('/path/to', null),
@@ -894,11 +864,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             '',
-            $expectedTmpDir . '/coverage-xml',
+            $expectedTmpDir,
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -913,17 +882,12 @@ final class ConfigurationFactoryTest extends TestCase
         string $expectedCoveragePath
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -941,7 +905,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -951,16 +914,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -974,7 +936,6 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedSkipCoverage,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -988,17 +949,12 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedPhpUnitConfigDir
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit($phpUnitConfigDir, null),
                 null,
@@ -1016,7 +972,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1026,16 +981,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit($expectedPhpUnitConfigDir, null),
@@ -1045,12 +999,79 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             '',
-            sys_get_temp_dir() . '/infection/coverage-xml',
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
+            false,
+            null,
+            false,
+            null,
+        ];
+    }
+
+    private static function createValueForNoProgress(
+        bool $ciDetected,
+        bool $noProgress,
+        bool $expectedNoProgress
+    ): array {
+        return [
+            $ciDetected,
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                Logs::createEmpty(),
+                '',
+                new PhpUnit(null, null),
+                null,
+                null,
+                null,
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            false,
+            'none',
+            false,
+            false,
+            $noProgress,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            0,
+            false,
+            2,
+            10,
+            [],
+            [],
+            '',
+            [],
+            Logs::createEmpty(),
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            'phpunit',
+            null,
+            null,
+            false,
+            '',
+            sys_get_temp_dir() . '/infection',
+            false,
+            false,
+            false,
+            $expectedNoProgress,
             false,
             null,
             false,
@@ -1064,17 +1085,12 @@ final class ConfigurationFactoryTest extends TestCase
         ?bool $expectedIgnoreMsiWithNoMutations
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit('/path/to', null),
                 $ignoreMsiWithNoMutationsFromSchemaConfiguration,
@@ -1092,7 +1108,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             $ignoreMsiWithNoMutationsFromInput,
             null,
@@ -1102,16 +1117,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1121,11 +1135,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             '',
-            sys_get_temp_dir() . '/infection/coverage-xml',
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             $expectedIgnoreMsiWithNoMutations,
             null,
@@ -1140,17 +1153,12 @@ final class ConfigurationFactoryTest extends TestCase
         ?float $expectedMinMsi
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit('/path/to', null),
                 null,
@@ -1168,7 +1176,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             null,
             $minMsiFromInput,
@@ -1178,16 +1185,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1197,11 +1203,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             '',
-            sys_get_temp_dir() . '/infection/coverage-xml',
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             false,
             $expectedMinMsi,
@@ -1216,17 +1221,12 @@ final class ConfigurationFactoryTest extends TestCase
         ?float $expectedMinCoveredMsi
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit('/path/to', null),
                 null,
@@ -1244,7 +1244,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             null,
             null,
@@ -1254,16 +1253,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1273,11 +1271,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             '',
-            sys_get_temp_dir() . '/infection/coverage-xml',
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1290,21 +1287,15 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $configTestFramework,
         ?string $inputTestFramework,
         string $expectedTestFramework,
-        string $expectedTestFrameworkExtraOptions,
-        string $expectedCoveragePath
+        string $expectedTestFrameworkExtraOptions
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -1322,7 +1313,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1332,16 +1322,15 @@ final class ConfigurationFactoryTest extends TestCase
             $inputTestFramework,
             null,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1351,11 +1340,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             $expectedTestFrameworkExtraOptions,
-            $expectedCoveragePath,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1370,17 +1358,12 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedInitialTestPhpOptions
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -1398,7 +1381,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1408,16 +1390,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1427,11 +1408,10 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedInitialTestPhpOptions,
             false,
             '',
-            sys_get_temp_dir() . '/infection/coverage-xml',
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1444,21 +1424,15 @@ final class ConfigurationFactoryTest extends TestCase
         string $configTestFramework,
         ?string $configTestFrameworkExtraOptions,
         ?string $inputTestFrameworkExtraOptions,
-        string $expectedTestFrameworkExtraOptions,
-        string $expectedCoveragePath
+        string $expectedTestFrameworkExtraOptions
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -1476,7 +1450,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1486,16 +1459,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             $inputTestFrameworkExtraOptions,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1505,11 +1477,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             $expectedTestFrameworkExtraOptions,
-            $expectedCoveragePath,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1521,21 +1492,15 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForTestFrameworkKey(
         string $configTestFramework,
         string $inputTestFrameworkExtraOptions,
-        string $expectedTestFrameworkExtraOptions,
-        string $expectedCoveragePath
+        string $expectedTestFrameworkExtraOptions
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 '',
                 new PhpUnit(null, null),
                 null,
@@ -1553,7 +1518,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1563,16 +1527,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             $inputTestFrameworkExtraOptions,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1582,11 +1545,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             $expectedTestFrameworkExtraOptions,
-            $expectedCoveragePath,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1604,17 +1566,12 @@ final class ConfigurationFactoryTest extends TestCase
         array $expectedMutators
     ): array {
         return [
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
                 new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                Logs::createEmpty(),
                 null,
                 new PhpUnit(null, null),
                 null,
@@ -1632,7 +1589,6 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1642,16 +1598,15 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             '',
+            0,
+            false,
+            2,
             10,
             [],
             [],
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            '',
+            [],
+            Logs::createEmpty(),
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -1661,11 +1616,10 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             '',
-            sys_get_temp_dir() . '/infection/coverage-xml',
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             false,
-            'progress',
             false,
             false,
             null,
@@ -1691,5 +1645,32 @@ final class ConfigurationFactoryTest extends TestCase
         }
 
         return self::$mutators;
+    }
+
+    private function createConfigurationFactory(bool $ciDetected): ConfigurationFactory
+    {
+        /** @var SourceFileCollector&ObjectProphecy $sourceFilesCollectorProphecy */
+        $sourceFilesCollectorProphecy = $this->prophesize(SourceFileCollector::class);
+
+        $sourceFilesCollectorProphecy
+            ->collectFiles([], [])
+            ->willReturn([])
+        ;
+        $sourceFilesCollectorProphecy
+            ->collectFiles(['src/'], ['vendor/'])
+            ->willReturn([
+                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
+                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
+            ])
+        ;
+
+        return new ConfigurationFactory(
+            new TmpDirProvider(),
+            SingletonContainer::getContainer()->getMutatorResolver(),
+            SingletonContainer::getContainer()->getMutatorFactory(),
+            new MutatorParser(),
+            $sourceFilesCollectorProphecy->reveal(),
+            new DummyCiDetector($ciDetected)
+        );
     }
 }

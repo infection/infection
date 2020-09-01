@@ -37,6 +37,7 @@ namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
+use Infection\Console\IO;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -44,11 +45,12 @@ use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\MockObject\MockObject;
 use function Safe\realpath;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
+use Symfony\Component\Console\Input\StringInput;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
-final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
+final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
 {
     /**
      * @var MockObject|TestFrameworkFinder
@@ -79,7 +81,10 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
             ->with(TestFrameworkTypes::PHPUNIT);
 
         $this->assertNull(
-            $this->provider->get($this->createStreamableInputInterfaceMock(), $this->createOutputInterface())
+            $this->provider->get(new IO(
+                new StringInput(''),
+                $this->createStreamOutput())
+            )
         );
     }
 
@@ -93,10 +98,10 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
 
         $customExecutable = p(realpath(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar'));
 
-        $path = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("{$customExecutable}\n")),
-            $this->createOutputInterface()
-        );
+        $path = $this->provider->get(new IO(
+            $this->createStreamableInput($this->getInputStream("{$customExecutable}\n")),
+            $this->createStreamOutput()
+        ));
 
         $this->assertSame($customExecutable, $path);
     }
@@ -115,9 +120,9 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
 
         $this->expectException(SymfonyRuntimeException::class);
 
-        $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
-            $this->createOutputInterface()
-        );
+        $this->provider->get(new IO(
+            $this->createStreamableInput($this->getInputStream("abc\n")),
+            $this->createStreamOutput()
+        ));
     }
 }

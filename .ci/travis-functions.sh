@@ -25,7 +25,7 @@ readonly XDEBUG_DISABLED_INI_FILE="/tmp/xdebug.ini"
 #######################################
 function xdebug_disable() {
     if ! [[ -f $XDEBUG_ENABLED_INI_FILE ]]; then
-        exit
+        return 0
     fi
 
     cp "$XDEBUG_ENABLED_INI_FILE" "$XDEBUG_DISABLED_INI_FILE"
@@ -56,7 +56,6 @@ function xdebug_enable() {
 # Globals:
 #   TRAVIS_PULL_REQUEST
 #   TRAVIS_BRANCH
-#   MIN_MSI
 #
 # Arguments:
 #   None
@@ -76,10 +75,9 @@ function get_infection_pr_flags() {
         changed_files=$(git diff origin/"$TRAVIS_BRANCH" --diff-filter=A --name-only | grep src/ | paste -sd "," -);
         min_msi=$(($(grep -o 'min-msi=[0-9]*' .travis.yml | head | cut -f2 -d=) + 1))
 
-        >&2 echo "Assumed minimal MSI: $min_msi%"
-
         if [ -n "$changed_files" ]; then
-            flags="--filter=${changed_files} --ignore-msi-with-no-mutations --only-covered --min-msi=${min_msi} --show-mutations";
+            # Set those flags only if there is any changed files detected
+            flags="--filter=${changed_files} --ignore-msi-with-no-mutations --only-covered --min-msi=${min_msi} --show-mutations ${flags}";
         fi
     fi
 

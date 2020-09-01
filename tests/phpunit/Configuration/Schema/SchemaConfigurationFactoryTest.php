@@ -41,7 +41,6 @@ use function array_keys;
 use function array_map;
 use function array_merge;
 use function array_values;
-use Generator;
 use function implode;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
@@ -113,7 +112,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
         );
     }
 
-    public function provideRawConfig(): Generator
+    public function provideRawConfig(): iterable
     {
         // The schema is given as a JSON here to be closer to how the user configure the schema
         yield 'minimal' => [
@@ -230,6 +229,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
             ]),
@@ -254,6 +254,32 @@ JSON
                     'summary.log',
                     null,
                     null,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][json] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "json": "json.log"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    'json.log',
+                    null,
+                    null,
                     null
                 ),
             ]),
@@ -274,6 +300,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     null,
                     'debug.log',
@@ -298,6 +325,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     null,
                     null,
@@ -328,6 +356,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     new Badge('master')
                 ),
             ]),
@@ -342,6 +371,7 @@ JSON
     "logs": {
         "text": "text.log",
         "summary": "summary.log",
+        "json": "json.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
         "badge": {
@@ -356,6 +386,7 @@ JSON
                 'logs' => new Logs(
                     'text.log',
                     'summary.log',
+                    'json.log',
                     'debug.log',
                     'perMutator.log',
                     new Badge('master')
@@ -383,13 +414,7 @@ JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'logs' => new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
+                'logs' => Logs::createEmpty(),
             ]),
         ];
 
@@ -402,6 +427,7 @@ JSON
     "logs": {
         "text": " text.log ",
         "summary": " summary.log ",
+        "json": " json.log ",
         "debug": " debug.log ",
         "perMutator": " perMutator.log ",
         "badge": {
@@ -416,6 +442,7 @@ JSON
                 'logs' => new Logs(
                     'text.log',
                     'summary.log',
+                    'json.log',
                     'debug.log',
                     'perMutator.log',
                     new Badge('master')
@@ -848,6 +875,66 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'testFrameworkOptions' => '--debug',
+            ]),
+        ];
+
+        yield '[mutators][global ignore] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "global-ignore": ["A::B"]
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'global-ignore' => ['A::B'],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][global ignore] empty & untrimmed ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "global-ignore": [" file ", " "]
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'global-ignore' => [' file ', ' '],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][global ignore] empty' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "global-ignore": []
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'global-ignore' => [],
+                ],
             ]),
         ];
 
@@ -1882,6 +1969,7 @@ JSON
     "logs": {
         "text": "text.log",
         "summary": "summary.log",
+        "json": "json.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
         "badge": {
@@ -2119,6 +2207,7 @@ JSON
                 'logs' => new Logs(
                     'text.log',
                     'summary.log',
+                    'json.log',
                     'debug.log',
                     'perMutator.log',
                     new Badge('master')
@@ -2329,13 +2418,7 @@ JSON
             'path' => '/path/to/config',
             'timeout' => null,
             'source' => new Source([], []),
-            'logs' => new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            'logs' => Logs::createEmpty(),
             'tmpDir' => null,
             'phpunit' => new PhpUnit(null, null),
             'ignoreMsiWithNoMutations' => null,

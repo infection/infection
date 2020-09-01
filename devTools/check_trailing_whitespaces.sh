@@ -32,10 +32,13 @@ files_with_trailing_whitespaces=$(
         -not -path "./build/*" \
         -not -path "./.git/*" \
         -not -path "./vendor/*" \
+        -not -path "./tests/autoloaded/*" \
+        -not -path "./tests/benchmark/*/coverage/*" \
+        -not -path "./tests/benchmark/*/sources/*" \
         -not -path "./tests/e2e/*" \
         -not -path "./tests/phpunit/Fixtures/Files/phpunit/format-whitespace/original-phpunit.xml" \
         -not -path "./tests/phpunit/StringNormalizerTest.php" \
-        -not -exec git ls-files --error-unmatch {} 2>/dev/null \; \
+        -not -path "./tests/phpunit/StrTest.php" \
         -exec grep -EIHn "\\s$" {} \;
 )
 

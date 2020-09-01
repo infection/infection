@@ -35,20 +35,35 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Infection\Metrics\MetricsCalculator;
+
 /**
+ * Simple loggers recording the mutation result counts. This is mostly intended for internal
+ * purposes e.g. some end-to-end tests.
+ *
  * @internal
  */
-final class SummaryFileLogger extends FileLogger
+final class SummaryFileLogger implements LineMutationTestingResultsLogger
 {
-    protected function getLogLines(): array
+    private $metricsCalculator;
+
+    public function __construct(MetricsCalculator $metricsCalculator)
+    {
+        $this->metricsCalculator = $metricsCalculator;
+    }
+
+    public function getLogLines(): array
     {
         return [
             'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
+            '',
             'Killed: ' . $this->metricsCalculator->getKilledCount(),
             'Errored: ' . $this->metricsCalculator->getErrorCount(),
             'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
             'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
-            'Not Covered: ' . $this->metricsCalculator->getNotCoveredByTestsCount(),
+            'Skipped: ' . $this->metricsCalculator->getSkippedCount(),
+            'Not Covered: ' . $this->metricsCalculator->getNotTestedCount(),
+            '',
         ];
     }
 }

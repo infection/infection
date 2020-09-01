@@ -36,44 +36,74 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function implode;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
+use const PHP_EOL;
 use function Safe\sprintf;
+use function str_repeat;
 use function strlen;
 
 /**
- * This file is used for tests only.
+ * Simple loggers recording the mutation names and original first line. This is mostly intended for
+ * internal purposes e.g. some end-to-end tests.
  *
  * @internal
  */
-final class DebugFileLogger extends FileLogger
+final class DebugFileLogger implements LineMutationTestingResultsLogger
 {
-    protected function getLogLines(): array
+    private $metricsCalculator;
+    private $onlyCoveredMode;
+
+    public function __construct(MetricsCalculator $metricsCalculator, bool $onlyCoveredMode)
     {
+        $this->metricsCalculator = $metricsCalculator;
+        $this->onlyCoveredMode = $onlyCoveredMode;
+    }
+
+    public function getLogLines(): array
+    {
+        $separateSections = false;
+
         $logs = [];
 
         $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
-        $logs[] = $this->converExecutionResult(
-            $this->metricsCalculator->getKilledMutantExecutionResults(),
-            'Killed'
+        $logs[] = '';
+        $logs[] = $this->getResultsLine(
+            $this->metricsCalculator->getKilledExecutionResults(),
+            'Killed',
+            $separateSections
         );
-        $logs[] = $this->converExecutionResult(
-            $this->metricsCalculator->getErrorMutantExecutionResults(),
-            'Errors'
+        $logs[] = $this->getResultsLine(
+            $this->metricsCalculator->getErrorExecutionResults(),
+            'Errors',
+            $separateSections
         );
-        $logs[] = $this->converExecutionResult(
-            $this->metricsCalculator->getEscapedMutantExecutionResults(),
-            'Escaped'
+        $logs[] = $this->getResultsLine(
+            $this->metricsCalculator->getEscapedExecutionResults(),
+            'Escaped',
+            $separateSections
         );
-        $logs[] = $this->converExecutionResult(
-            $this->metricsCalculator->getTimedOutMutantExecutionResults(),
-            'Timed Out'
+        $logs[] = $this->getResultsLine(
+            $this->metricsCalculator->getTimedOutExecutionResults(),
+            'Timed Out',
+            $separateSections
+        );
+        $logs[] = $this->getResultsLine(
+            $this->metricsCalculator->getSkippedExecutionResults(),
+            'Skipped',
+            $separateSections
         );
 
-        if (!$this->isOnlyCoveredMode) {
-            $logs[] = $this->converExecutionResult(
-                $this->metricsCalculator->getNotCoveredMutantExecutionResults(),
-                'Not Covered'
+        if (!$this->onlyCoveredMode) {
+            $logs[] = $this->getResultsLine(
+                $this->metricsCalculator->getNotCoveredExecutionResults(),
+                'Not Covered',
+                $separateSections
             );
+        }
+
+        if ($separateSections) {
+            $logs[] = '';
         }
 
         return $logs;
@@ -82,31 +112,47 @@ final class DebugFileLogger extends FileLogger
     /**
      * @param MutantExecutionResult[] $executionResults
      */
-    private function converExecutionResult(array $executionResults, string $headlinePrefix): string
-    {
-        $logParts = $this->getHeadlineParts($headlinePrefix);
-        $this->sortProcesses($executionResults);
+    private function getResultsLine(
+        array $executionResults,
+        string $headlinePrefix,
+        bool &$separateSections
+    ): string {
+        $lines = [];
 
-        foreach ($executionResults as $executionResult) {
-            $logParts[] = '';
-            $logParts[] = 'Mutator: ' . $executionResult->getMutatorName();
-            $logParts[] = 'Line ' . $executionResult->getOriginalStartingLine();
+        if ($separateSections) {
+            $lines[] = '';
+            $lines[] = '';
         }
 
-        return implode(PHP_EOL, $logParts) . PHP_EOL;
+        $lines[] = self::getHeadlineLines($headlinePrefix);
+
+        $separateSections = false;
+
+        foreach ($executionResults as $executionResult) {
+            if ($separateSections) {
+                $lines[] = '';
+            }
+
+            $lines[] = 'Mutator: ' . $executionResult->getMutatorName();
+            $lines[] = 'Line ' . $executionResult->getOriginalStartingLine();
+
+            $separateSections = true;
+        }
+
+        return implode(PHP_EOL, $lines);
     }
 
-    /**
-     * @return string[]
-     */
-    private function getHeadlineParts(string $headlinePrefix): array
+    private static function getHeadlineLines(string $headlinePrefix): string
     {
         $headline = sprintf('%s mutants:', $headlinePrefix);
 
-        return [
-            $headline,
-            str_repeat('=', strlen($headline)),
-            '',
-        ];
+        return implode(
+            PHP_EOL,
+            [
+                $headline,
+                str_repeat('=', strlen($headline)),
+                '',
+            ]
+        );
     }
 }

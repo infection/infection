@@ -36,13 +36,12 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use function array_key_exists;
-use Generator;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 use function Safe\array_flip;
 
@@ -76,16 +75,16 @@ final class TrueValue implements ConfigurableMutator
     /**
      * @param Node\Expr\ConstFetch $node
      *
-     * @return Generator<Node\Expr\ConstFetch>
+     * @return iterable<Node\Expr\ConstFetch>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Expr\ConstFetch(new Node\Name('false'));
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!($node instanceof Node\Expr\ConstFetch)) {
+        if (!$node instanceof Node\Expr\ConstFetch) {
             return false;
         }
 
@@ -93,8 +92,8 @@ final class TrueValue implements ConfigurableMutator
             return false;
         }
 
-        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
-        $grandParentNode = $parentNode !== null ? $parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY) : null;
+        $parentNode = ParentConnector::findParent($node);
+        $grandParentNode = $parentNode !== null ? ParentConnector::findParent($parentNode) : null;
 
         if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
             return true;

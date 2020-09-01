@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -48,6 +47,19 @@ use PhpParser\Node;
 final class FunctionCallRemoval implements Mutator
 {
     use GetMutatorName;
+
+    /** @var string[] */
+    private $doNotRemoveFunctions = [
+        'assert',
+        'closedir',
+        'curl_close',
+        'curl_multi_close',
+        'fclose',
+        'mysqli_close',
+        'mysqli_free_result',
+        'openssl_free_key',
+        'socket_close',
+    ];
 
     public static function getDefinition(): ?Definition
     {
@@ -63,9 +75,9 @@ final class FunctionCallRemoval implements Mutator
      *
      * @param Node\Stmt\Expression $node
      *
-     * @return Generator<Node\Stmt\Nop>
+     * @return iterable<Node\Stmt\Nop>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Nop();
     }
@@ -86,6 +98,6 @@ final class FunctionCallRemoval implements Mutator
             return true;
         }
 
-        return $name->toLowerString() !== 'assert';
+        return !in_array($name->toLowerString(), $this->doNotRemoveFunctions);
     }
 }

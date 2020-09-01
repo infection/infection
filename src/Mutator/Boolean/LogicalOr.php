@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -63,9 +62,9 @@ final class LogicalOr implements Mutator
      *
      * @param Node\Expr\BinaryOp\BooleanOr $node
      *
-     * @return Generator<Node\Expr\BinaryOp\BooleanAnd>
+     * @return iterable<Node\Expr\BinaryOp\BooleanAnd>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, $node->getAttributes());
     }

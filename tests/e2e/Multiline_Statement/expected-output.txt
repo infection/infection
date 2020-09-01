@@ -1,8 +1,62 @@
+Total: 14
+
+Killed mutants:
+===============
+
+Mutator: PublicVisibility
+Line 7
+
+Mutator: DecrementInteger
+Line 9
+
+Mutator: IncrementInteger
+Line 9
+
+Mutator: DecrementInteger
+Line 10
+
+Mutator: IncrementInteger
+Line 10
+
+Mutator: Division
+Line 13
+
+Mutator: Multiplication
+Line 13
+
+Mutator: DecrementInteger
+Line 20
+
+Mutator: IncrementInteger
+Line 20
+
+Mutator: DecrementInteger
+Line 20
+
+Mutator: IncrementInteger
+Line 20
+
+Mutator: PublicVisibility
+Line 20
+
+Mutator: Division
+Line 22
+
+Mutator: Multiplication
+Line 22
+
+
+Errors mutants:
+===============
+
 Escaped mutants:
 ================
 
 Timed Out mutants:
 ==================
+
+Skipped mutants:
+================
 
 Not Covered mutants:
 ====================

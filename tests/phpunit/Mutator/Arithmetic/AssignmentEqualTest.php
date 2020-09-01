@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class AssignmentEqualTest extends AbstractMutatorTestCase
+final class AssignmentEqualTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -50,7 +49,7 @@ final class AssignmentEqualTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates a comparison to an assignment' => [
             <<<'PHP'

@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use function array_values;
-use Generator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -82,7 +81,7 @@ final class MutatorRobustnessTest extends TestCase
         }
     }
 
-    public function mutatorWithCodeCaseProvider(): Generator
+    public function mutatorWithCodeCaseProvider(): iterable
     {
         $mutatorFactory = SingletonContainer::getContainer()->getMutatorFactory();
 
@@ -99,7 +98,7 @@ final class MutatorRobustnessTest extends TestCase
         }
     }
 
-    private function provideCodeSamples(): Generator
+    private function provideCodeSamples(): iterable
     {
         if (self::$files !== null) {
             yield from self::$files;
@@ -108,7 +107,7 @@ final class MutatorRobustnessTest extends TestCase
         }
 
         $finder = Finder::create()
-            ->in(__DIR__ . '/../Fixtures/CodeSamples')
+            ->in(__DIR__ . '/../../autoloaded/mutator-code-samples')
             ->name('*.php')
             ->files()
         ;

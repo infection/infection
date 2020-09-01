@@ -35,8 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Generator;
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -52,28 +51,32 @@ final class MutantTest extends TestCase
     /**
      * @dataProvider valuesProvider
      *
-     * @param CoverageLineData[] $expectedTests
+     * @param TestLocation[] $expectedTests
      */
     public function test_it_can_be_instantiated(
         string $filePath,
         Mutation $mutation,
+        string $mutatedCode,
         string $diff,
         bool $expectedCoveredByTests,
-        array $expectedTests
+        array $expectedTests,
+        string $originalCode
     ): void {
-        $mutant = new Mutant($filePath, $mutation, $diff);
+        $mutant = new Mutant($filePath, $mutation, $mutatedCode, $diff, $originalCode);
 
         $this->assertMutantStateIs(
             $mutant,
             $filePath,
             $mutation,
+            $mutatedCode,
             $diff,
             $expectedCoveredByTests,
-            $expectedTests
+            $expectedTests,
+            $originalCode
         );
     }
 
-    public function valuesProvider(): Generator
+    public function valuesProvider(): iterable
     {
         $nominalAttributes = [
             'startLine' => 3,
@@ -85,12 +88,14 @@ final class MutantTest extends TestCase
         ];
 
         $tests = [
-            CoverageLineData::with(
+            new TestLocation(
                 'FooTest::test_it_can_instantiate',
                 '/path/to/acme/FooTest.php',
                 0.01
             ),
         ];
+
+        $originalCode = '<?php $a = 1';
 
         yield 'nominal with tests' => [
             '/path/to/tmp/mutant.Foo.infection.php',
@@ -107,9 +112,11 @@ final class MutantTest extends TestCase
                 0,
                 $tests
             ),
+            'mutated code',
             'diff value',
             true,
             $tests,
+            $originalCode,
         ];
 
         yield 'nominal without tests' => [
@@ -127,9 +134,11 @@ final class MutantTest extends TestCase
                 0,
                 []
             ),
+            'mutated code',
             'diff value',
             false,
             [],
+            $originalCode,
         ];
     }
 }

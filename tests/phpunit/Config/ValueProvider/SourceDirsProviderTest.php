@@ -38,13 +38,14 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\ValueProvider\SourceDirsProvider;
+use Infection\Console\IO;
 use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
-final class SourceDirsProviderTest extends AbstractBaseProviderTest
+final class SourceDirsProviderTest extends BaseProviderTest
 {
     /**
      * @var SourceDirsProvider
@@ -78,8 +79,10 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
             ->willReturn(['src']);
 
         $sourceDirs = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("\n")),
+                $this->createStreamOutput()
+            ),
             ['src']
         );
 
@@ -93,8 +96,10 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
             ->willReturn(['src/Namespace']);
 
         $sourceDirs = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("\n")),
+                $this->createStreamOutput()
+            ),
             ['src']
         );
 
@@ -108,8 +113,10 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
             ->willReturn(['foo', 'bar']);
 
         $sourceDirs = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("\n")),
+                $this->createStreamOutput()
+            ),
             ['src']
         );
 
@@ -123,8 +130,10 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
             ->willReturn(['src']);
 
         $sourceDirs = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("0\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("0\n")),
+                $this->createStreamOutput()
+            ),
             ['src']
         );
 
@@ -140,8 +149,10 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
         $this->expectException(LogicException::class);
 
         $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("0,1\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("0,1\n")),
+                $this->createStreamOutput()
+            ),
             ['src']
         );
     }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
-use Generator;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
@@ -50,7 +49,7 @@ final class SchemaConfigurationTest extends TestCase
      */
     public function test_it_can_be_instantiated(
         string $path,
-        ?int $timeout,
+        ?float $timeout,
         Source $source,
         Logs $logs,
         ?string $tmpDir,
@@ -97,19 +96,13 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions());
     }
 
-    public function valueProvider(): Generator
+    public function valueProvider(): iterable
     {
         yield 'minimal' => [
             '',
             null,
             new Source([], []),
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null
-            ),
+            Logs::createEmpty(),
             null,
             new PhpUnit(null, null),
             null,
@@ -124,11 +117,12 @@ final class SchemaConfigurationTest extends TestCase
 
         yield 'complete' => [
             '/path/to/config',
-            10,
+            10.,
             new Source(['src', 'lib'], ['fixtures', 'tests']),
             new Logs(
                 'text.log',
                 'summary.log',
+                'json.log',
                 'debug.log',
                 'mutator.log',
                 new Badge('master')

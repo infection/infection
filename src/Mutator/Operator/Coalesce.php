@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -74,9 +73,9 @@ TXT
     /**
      * @param Node\Expr\BinaryOp\Coalesce $node
      *
-     * @return Generator<Node\Expr>
+     * @return iterable<Node\Expr>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield $node->right;
     }

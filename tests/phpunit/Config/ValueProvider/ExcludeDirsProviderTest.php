@@ -38,6 +38,7 @@ namespace Infection\Tests\Config\ValueProvider;
 use const DIRECTORY_SEPARATOR;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
+use Infection\Console\IO;
 use function microtime;
 use function random_int;
 use function Safe\mkdir;
@@ -45,9 +46,9 @@ use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
-final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
+final class ExcludeDirsProviderTest extends BaseProviderTest
 {
     /**
      * @var string
@@ -89,8 +90,10 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
     public function test_it_contains_vendors_when_sources_contains_current_dir(string $excludedRootDir, array $dirsInCurrentFolder): void
     {
         $excludedDirs = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("\n")),
+                $this->createStreamOutput()
+            ),
             $dirsInCurrentFolder,
             ['.']
         );
@@ -105,8 +108,10 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         }
 
         $excludeDirs = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("abc\n")),
+                $this->createStreamOutput()
+            ),
             ['src'],
             ['src']
         );
@@ -127,8 +132,10 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         mkdir($dir2);
 
         $excludeDirs = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("foo\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("foo\n")),
+                $this->createStreamOutput()
+            ),
             ['src'],
             [$this->workspace]
         );
@@ -151,8 +158,10 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         mkdir($dirC);
 
         $excludeDirs = $this->provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("$dirA\n$dirA\n$dirC\n")),
-            $this->createOutputInterface(),
+            new IO(
+                $this->createStreamableInput($this->getInputStream("$dirA\n$dirA\n$dirC\n")),
+                $this->createStreamOutput()
+            ),
             [$dirA, $dirB, $dirC],
             ['.']
         );
@@ -160,13 +169,10 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         $this->assertSame([0 => $dirA, 1 => $dirC], $excludeDirs);
     }
 
-    public function excludeDirsProvider()
+    public static function excludeDirsProvider(): iterable
     {
-        return array_map(
-            static function (string $excludedRootDir) {
-                return [$excludedRootDir, [$excludedRootDir, 'src']];
-            },
-            ExcludeDirsProvider::EXCLUDED_ROOT_DIRS
-        );
+        foreach (ExcludeDirsProvider::EXCLUDED_ROOT_DIRS as $excludedRootDir) {
+            yield [$excludedRootDir, [$excludedRootDir, 'src']];
+        }
     }
 }

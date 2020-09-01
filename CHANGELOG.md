@@ -1,5 +1,77 @@
 # Change Log
 
+## [0.17.0](https://github.com/infection/infection/tree/0.17.0) (2020-08-17)
+[Full Changelog](https://github.com/infection/infection/compare/0.16.4...0.17.0)
+
+**Added:**
+
+- Set `failOnRisky`, `failOnWarning` to `true` if parameters are not already set [\#1280](https://github.com/infection/infection/pull/1280)
+- Add JSON logger, useful for CI and analyzing results of Infection programmatically [\#1278](https://github.com/infection/infection/pull/1278)
+- Do not mutate clean up functions [\#1285](https://github.com/infection/infection/pull/1285)
+- Restrict installing with faulty versions of PHPUnit's coverage package [\#1295](https://github.com/infection/infection/pull/1295)
+- Add `--no-progress` option to opt-out the CI detection [\#1261](https://github.com/infection/infection/pull/1261)
+- InstanceOf\_ mutator [\#1232](https://github.com/infection/infection/pull/1232)
+
+**Changed:**
+
+- Exclude mutations that are over specified time limit [\#1171](https://github.com/infection/infection/pull/1171)
+- Decrement mutator makes array indexes negative [\#1270](https://github.com/infection/infection/issues/1270)
+- Upgrade infection/include-interceptor to ^0.2.4 [\#1288](https://github.com/infection/infection/pull/1288)
+- U for uncovered [\#1233](https://github.com/infection/infection/pull/1233)
+- Round MSI scores [\#1190](https://github.com/infection/infection/pull/1190)
+
+**Fixed:**
+
+- symbolic link trouble + PHPUnit unknown [\#778](https://github.com/infection/infection/issues/778)
+
+## [0.16.0](https://github.com/infection/infection/tree/0.16.0) (2020-03-22)
+[Full Changelog](https://github.com/infection/infection/compare/0.15.3...0.16.0)
+
+**Added:**
+
+- Allow the initial test suite to be skipped [\#1042](https://github.com/infection/infection/pull/1042)
+- Implements dry-run mode [\#1183](https://github.com/infection/infection/pull/1183)
+- Add notice to console output if actual msi is higher than required msi [\#877](https://github.com/infection/infection/pull/877)
+- Allow to configure ignore globally [\#1104](https://github.com/infection/infection/pull/1104)
+- Parallel source file collector [\#1097](https://github.com/infection/infection/pull/1097)
+- Concurrent mutation generator [\#1082](https://github.com/infection/infection/pull/1082)
+- Add accepted ADR entries [\#1192](https://github.com/infection/infection/pull/1192)
+- Increase niceness for mutant processes [\#1152](https://github.com/infection/infection/pull/1152)
+- Enhancement: Use ondram/ci-detector to resolve build context [\#1135](https://github.com/infection/infection/pull/1135)
+- Automatically install Test Framework adapter if needed [\#1102](https://github.com/infection/infection/pull/1102)
+- Accounting For Codeception Cest Tests In JUnit File. [\#1074](https://github.com/infection/infection/pull/1074)
+- Introduce ConfigurableMutator [\#1012](https://github.com/infection/infection/pull/1012)
+- Enhancement: Allow specifying a few command line options via config [\#789](https://github.com/infection/infection/pull/789)
+- Use `infection/extension-installer` to automatically register Test Framework Adapters [\#1019](https://github.com/infection/infection/pull/1019)
+- Exclude --configuration from PhpUnit options [\#941](https://github.com/infection/infection/pull/941)
+
+**Changed:**
+
+- Drop support for PHP 7.2 [\#1132](https://github.com/infection/infection/pull/1132)
+- Use coverage report as a primary source of files to mutate [\#1106](https://github.com/infection/infection/pull/1106)
+- Extract PhpSpec Test Framework adapter to a separate package [\#1052](https://github.com/infection/infection/pull/1052)
+- Extract Abstract TestFrameworkAdapter & Codeception to separate packages [\#933](https://github.com/infection/infection/pull/933)
+- Optimize JUnit test lookups to stop on the first element [\#1172](https://github.com/infection/infection/pull/1172)
+- Rename InfectionCommand to RunCommand [\#1188](https://github.com/infection/infection/pull/1188)
+- Rename LineCodeCoverage to Trace [\#1164](https://github.com/infection/infection/pull/1164)
+- Remove dependency on `OutputInterface` for the loggers [\#1157](https://github.com/infection/infection/pull/1157)
+- Update continuous-integration.yml to use PHP 7.3 [\#1142](https://github.com/infection/infection/pull/1142)
+- Bundle test framework adapters into PHAR [\#1141](https://github.com/infection/infection/pull/1141)
+- Migrate to the new Stryker dashboard API [\#1136](https://github.com/infection/infection/pull/1136)
+- Make PHPUnit fail on warning or risky [\#1115](https://github.com/infection/infection/pull/1115)
+- Improve TextLogger [\#1110](https://github.com/infection/infection/pull/1110)
+- Remove MutantWasCreated [\#1096](https://github.com/infection/infection/pull/1096)
+- Introduce specific configuration objects for the mutators [\#1005](https://github.com/infection/infection/pull/1005)
+
+**Fixed:**
+
+- Fix the order in which the infection configuration files are loaded [\#1105](https://github.com/infection/infection/pull/1105)
+- Fix scoping [\#1072](https://github.com/infection/infection/pull/1072)
+- Fix false positives since update to 0.14.x [\#815](https://github.com/infection/infection/pull/815)
+- Ignore bogus "not installed" exception from PackageVersions [\#1151](https://github.com/infection/infection/pull/1151)
+- Don't let PHP 7.4 builds fail [\#1130](https://github.com/infection/infection/pull/1130)
+- Provide a more user-friendly error when the schema path is invalid [\#1080](https://github.com/infection/infection/pull/1080)
+
 ## [0.15.0](https://github.com/infection/infection/tree/0.15.0)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.14.0...0.15.0)

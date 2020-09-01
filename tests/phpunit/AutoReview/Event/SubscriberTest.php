@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Event;
 
+use function count;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -51,6 +52,12 @@ final class SubscriberTest extends TestCase
     public function test_subscription_methods_match_their_event_names(string $subscriberClass): void
     {
         $subscriberMethods = (new ReflectionClass($subscriberClass))->getMethods();
+
+        if (count($subscriberMethods) === 0) {
+            $this->addToAssertionCount(1);
+
+            return;
+        }
 
         foreach ($subscriberMethods as $method) {
             if (!$this->isSubscriptionMethod($method)) {

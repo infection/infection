@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutator;
 use function array_filter;
 use const ARRAY_FILTER_USE_KEY;
 use function array_values;
-use Generator;
+use Infection\CannotBeInstantiated;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
@@ -55,6 +55,8 @@ use Webmozart\PathUtil\Path;
 
 final class ProfileListProvider
 {
+    use CannotBeInstantiated;
+
     /**
      * @var array<int, array<int, string>>|null
      */
@@ -65,18 +67,14 @@ final class ProfileListProvider
      */
     private static $profileConstants;
 
-    private function __construct()
-    {
-    }
-
-    public static function mutatorNameAndClassProvider(): Generator
+    public static function mutatorNameAndClassProvider(): iterable
     {
         foreach (self::implementedMutatorProvider() as [$filePath, $className, $shortClassName]) {
             yield [$shortClassName, $className];
         }
     }
 
-    public static function implementedMutatorProvider(): Generator
+    public static function implementedMutatorProvider(): iterable
     {
         if (self::$mutators !== null) {
             yield from self::$mutators;
@@ -145,7 +143,7 @@ final class ProfileListProvider
         return self::$profileConstants;
     }
 
-    public static function profileProvider(): Generator
+    public static function profileProvider(): iterable
     {
         foreach (self::getProfiles() as $profile => $profileOrMutators) {
             yield $profile => [

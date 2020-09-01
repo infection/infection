@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 
 /**
@@ -46,16 +46,25 @@ class Mutant
 {
     private $mutantFilePath;
     private $mutation;
+    private $mutatedCode;
     private $diff;
+    private $prettyPrintedOriginalCode;
 
-    public function __construct(string $mutantFilePath, Mutation $mutation, string $diff)
-    {
+    public function __construct(
+        string $mutantFilePath,
+        Mutation $mutation,
+        string $mutatedCode,
+        string $diff,
+        string $prettyPrintedOriginalCode
+    ) {
         $this->mutantFilePath = $mutantFilePath;
         $this->mutation = $mutation;
+        $this->mutatedCode = $mutatedCode;
         $this->diff = $diff;
+        $this->prettyPrintedOriginalCode = $prettyPrintedOriginalCode;
     }
 
-    public function getMutantFilePath(): string
+    public function getFilePath(): string
     {
         return $this->mutantFilePath;
     }
@@ -63,6 +72,16 @@ class Mutant
     public function getMutation(): Mutation
     {
         return $this->mutation;
+    }
+
+    public function getMutatedCode(): string
+    {
+        return $this->mutatedCode;
+    }
+
+    public function getPrettyPrintedOriginalCode(): string
+    {
+        return $this->prettyPrintedOriginalCode;
     }
 
     public function getDiff(): string
@@ -76,7 +95,7 @@ class Mutant
     }
 
     /**
-     * @return CoverageLineData[]
+     * @return TestLocation[]
      */
     public function getTests(): array
     {

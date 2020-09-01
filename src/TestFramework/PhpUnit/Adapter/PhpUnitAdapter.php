@@ -46,8 +46,9 @@ use function version_compare;
 
 /**
  * @internal
+ * @final
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditionalNodes, MemoryUsageAware, ProvidesInitialRunOnlyOptions
+class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditionalNodes, MemoryUsageAware, ProvidesInitialRunOnlyOptions
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
@@ -84,7 +85,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Ignor
             return (float) $match[1];
         }
 
-        return -1;
+        return -1.;
     }
 
     public function getName(): string

@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Schema;
 
 use Exception;
-use Generator;
 use function get_class;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
@@ -46,7 +45,7 @@ use function Safe\sprintf;
 use Seld\JsonLint\ParsingException;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class SchemaConfigurationFileTest extends TestCase
 {
@@ -138,7 +137,7 @@ final class SchemaConfigurationFileTest extends TestCase
         }
     }
 
-    public function invalidConfigContentsProvider(): Generator
+    public function invalidConfigContentsProvider(): iterable
     {
         yield 'unknown path' => [
             '/nowhere',

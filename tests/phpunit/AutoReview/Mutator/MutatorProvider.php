@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Mutator;
 
 use function array_column;
-use Generator;
 use function in_array;
+use Infection\CannotBeInstantiated;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
@@ -56,6 +56,8 @@ use function Safe\class_implements;
  */
 final class MutatorProvider
 {
+    use CannotBeInstantiated;
+
     /**
      * @var string[]|null
      */
@@ -71,11 +73,7 @@ final class MutatorProvider
      */
     private static $configurableMutatorClasses;
 
-    private function __construct()
-    {
-    }
-
-    public static function provideMutatorClasses(): Generator
+    public static function provideMutatorClasses(): iterable
     {
         if (self::$mutatorClasses === null) {
             self::$mutatorClasses = array_column(
@@ -87,7 +85,7 @@ final class MutatorProvider
         yield from self::$mutatorClasses;
     }
 
-    public static function provideConcreteMutatorClasses(): Generator
+    public static function provideConcreteMutatorClasses(): iterable
     {
         if (self::$concreteMutatorClasses === null) {
             self::$concreteMutatorClasses = ConcreteClassReflector::filterByConcreteClasses(
@@ -98,7 +96,7 @@ final class MutatorProvider
         yield from self::$concreteMutatorClasses;
     }
 
-    public static function provideConfigurableMutatorClasses(): Generator
+    public static function provideConfigurableMutatorClasses(): iterable
     {
         if (self::$configurableMutatorClasses === null) {
             self::$configurableMutatorClasses = [];
@@ -113,17 +111,17 @@ final class MutatorProvider
         yield from self::$configurableMutatorClasses;
     }
 
-    public static function mutatorClassesProvider(): Generator
+    public static function mutatorClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(self::provideMutatorClasses());
     }
 
-    public static function concreteMutatorClassesProvider(): Generator
+    public static function concreteMutatorClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(self::provideConcreteMutatorClasses());
     }
 
-    public static function configurableMutatorClassesProvider(): Generator
+    public static function configurableMutatorClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(self::provideConfigurableMutatorClasses());
     }

@@ -28,11 +28,11 @@ jobs:
         run: "mkdir -p ${{ env.PHP_CS_FIXER_CACHE_DIRECTORY }}"
 
       - name: "Cache cache directory for friendsofphp/php-cs-fixer"
-        uses: "actions/cache@v1"
+        uses: "actions/cache@v2"
         with:
           path: "${{ env.PHP_CS_FIXER_CACHE_DIRECTORY }}"
-          key: "php-7.2-php-cs-fixer"
-          restore-keys: "php-7.2-php-cs-fixer"
+          key: "php-7.3-php-cs-fixer"
+          restore-keys: "php-7.3-php-cs-fixer"
 
       - name: "Run friendsofphp/php-cs-fixer"
-        run: "php7.2 ${{ env.PHP_CS_FIXER_BINARY }} fix --cache-file=${{ env.PHP_CS_FIXER_CACHE_DIRECTORY }}/.php_cs.cache --diff --diff-format=udiff --dry-run --verbose"
+        run: "php7.3 ${{ env.PHP_CS_FIXER_BINARY }} fix --cache-file=${{ env.PHP_CS_FIXER_CACHE_DIRECTORY }}/.php_cs.cache --diff --diff-format=udiff --dry-run --verbose"

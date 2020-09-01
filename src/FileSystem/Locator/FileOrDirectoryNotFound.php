@@ -55,7 +55,7 @@ final class FileOrDirectoryNotFound extends RuntimeException
         return new self(sprintf(
             'Could not locate the file/directory "%s"%s.',
             $file,
-            [] === $roots
+            $roots === []
                 ? ''
                 : sprintf(' in "%s"', implode('", "', $roots))
         ));
@@ -87,12 +87,12 @@ final class FileOrDirectoryNotFound extends RuntimeException
         Assert::allString($roots);
 
         return new self(
-            [] === $files
+            $files === []
                 ? 'Could not locate any files (no file provided).'
                 : sprintf(
                     'Could not locate the files "%s"%s',
                     implode('", "', $files),
-                    [] === $roots
+                    $roots === []
                         ? ''
                         : sprintf(' in "%s"', implode('", "', $roots))
                 )

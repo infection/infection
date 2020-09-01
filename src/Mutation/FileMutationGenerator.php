@@ -41,10 +41,9 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\TestFramework\Coverage\Trace;
 use Webmozart\Assert\Assert;
 
 /**
@@ -76,41 +75,37 @@ class FileMutationGenerator
      * @return iterable<Mutation>
      */
     public function generate(
-        SplFileInfo $fileInfo,
+        Trace $trace,
         bool $onlyCovered,
-        LineCodeCoverage $codeCoverage,
         array $mutators,
         array $nodeIgnorers
     ): iterable {
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
-        $filePath = $fileInfo->getRealPath() === false
-            ? $fileInfo->getPathname()
-            : $fileInfo->getRealPath()
-        ;
-
-        if ($onlyCovered && !$codeCoverage->hasTests($filePath)) {
+        if ($onlyCovered && !$trace->hasTests()) {
             return;
         }
 
+        $fileInfo = $trace->getSourceFileInfo();
+
         $initialStatements = $this->parser->parse($fileInfo);
 
-        $mutationsCollectorVisitor = new MutationsCollectorVisitor(
+        $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 $mutators,
-                $filePath,
+                $fileInfo->getPathname(),
                 $initialStatements,
-                $codeCoverage,
+                $trace,
                 $onlyCovered,
                 $this->lineRangeCalculator
             )
         );
 
-        $traverser = $this->traverserFactory->create($mutationsCollectorVisitor, $nodeIgnorers);
+        $traverser = $this->traverserFactory->create($mutationCollectorVisitor, $nodeIgnorers);
 
         $traverser->traverse($initialStatements);
 
-        yield from $mutationsCollectorVisitor->getMutations();
+        yield from $mutationCollectorVisitor->getMutations();
     }
 }

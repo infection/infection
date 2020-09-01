@@ -42,7 +42,7 @@ use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class CloneVisitorTest extends BaseVisitorTest
 {

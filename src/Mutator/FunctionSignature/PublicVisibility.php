@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -64,9 +63,9 @@ final class PublicVisibility implements Mutator
     /**
      * @param Node\Stmt\ClassMethod $node
      *
-     * @return Generator<Node\Stmt\ClassMethod>
+     * @return iterable<Node\Stmt\ClassMethod>
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\ClassMethod(
             $node->name,

@@ -36,132 +36,141 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
-use Infection\Mutant\Exception\MsiCalculationException;
-use Infection\Mutant\MetricsCalculator;
-use Infection\Process\Runner\TestRunConstraintChecker;
+use Infection\Console\IO;
+use Infection\Logger\ConsoleLogger;
+use function Infection\Tests\normalize_trailing_spaces;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 final class ConsoleOutputTest extends TestCase
 {
+    /**
+     * @var BufferedOutput
+     */
+    private $output;
+
+    /**
+     * @var ConsoleOutput
+     */
+    private $consoleOutput;
+
+    protected function setUp(): void
+    {
+        if (getenv('COLUMNS') !== '100') {
+            $this->markTestSkipped('This test assumes 100 columns wide display');
+        }
+
+        $this->output = new BufferedOutput();
+
+        $this->consoleOutput = new ConsoleOutput(
+            new ConsoleLogger(
+                new IO(new StringInput(''), $this->output)
+            )
+        );
+    }
+
     public function test_log_verbosity_deprecation_notice(): void
     {
-        $option = 'all';
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('note')
-            ->with(
-                'Numeric versions of log-verbosity have been deprecated, please use, ' . $option . ' to keep the same result'
-            );
+        $this->consoleOutput->logVerbosityDeprecationNotice('all');
 
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logVerbosityDeprecationNotice($option);
+        $this->assertSame(
+            <<<'TXT'
+
+ ! [NOTE] Numeric versions of log-verbosity have been deprecated, please use, all to keep the same
+ !        result
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_log_unknown_verbosity_option(): void
     {
-        $option = 'default';
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('note')
-            ->with(
-                'Running infection with an unknown log-verbosity option, falling back to ' . $option . ' option'
-            );
+        $this->consoleOutput->logUnknownVerbosityOption('default');
 
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logUnknownVerbosityOption($option);
-    }
+        $this->assertSame(
+            <<<'TXT'
 
-    public function test_log_bad_msi_error_message(): void
-    {
-        $metrics = $this->createMock(MetricsCalculator::class);
-        $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(75.0);
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('error')->with(
-            'The minimum required MSI percentage should be 25%, but actual is 75%. Improve your tests!'
+ ! [NOTE] Running infection with an unknown log-verbosity option, falling back to default option
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
         );
-        $console = new ConsoleOutput($io);
-        $console->logBadMsiErrorMessage($metrics, 25.0, 'min-msi');
-    }
-
-    public function test_log_bad_msi_error_message_throws_error_on_faulty_msi(): void
-    {
-        $io = $this->createMock(SymfonyStyle::class);
-        $consoleOutput = new ConsoleOutput($io);
-        $this->expectException(MsiCalculationException::class);
-        $consoleOutput->logBadMsiErrorMessage(new MetricsCalculator(), 0.0, 'min-msi');
-    }
-
-    public function test_log_bad_covered_msi_error_message(): void
-    {
-        $metrics = $this->createMock(MetricsCalculator::class);
-        $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn(75.0);
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('error')->with(
-            'The minimum required Covered Code MSI percentage should be 25%, but actual is 75%. Improve your tests!'
-        );
-        $console = new ConsoleOutput($io);
-        $console->logBadMsiErrorMessage($metrics, 25.0, 'min-covered-msi');
     }
 
     public function test_log_running_with_debugger(): void
     {
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('writeln')
-            ->with('You are running Infection with foo enabled.');
+        $this->consoleOutput->logRunningWithDebugger('foo');
 
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logRunningWithDebugger('foo');
+        $this->assertSame(
+            <<<'TXT'
+[notice] You are running Infection with foo enabled.
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_log_not_in_control_of_exit_codes(): void
     {
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('warning')
-            ->with([
-                'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
-                'It is your responsibility to disable xdebug/phpdbg unless needed.',
-            ]);
+        $this->consoleOutput->logNotInControlOfExitCodes();
 
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logNotInControlOfExitCodes();
+        $this->assertSame(
+            <<<'TXT'
+
+ [WARNING] Infection cannot control exit codes and unable to relaunch itself.
+           It is your responsibility to disable xdebug/phpdbg unless needed.
+
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_log_min_msi_can_get_increased_notice_for_msi(): void
     {
-        $actualMsi = 10.0;
-        $minMsi = 5.0;
-        $msiDifference = $actualMsi - $minMsi;
+        $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
+            5.0,
+            10.0
+        );
 
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('note')
-            ->with(
-                'The MSI is ' . $msiDifference . '% percent points over the required MSI. ' .
-                'Consider increasing the required MSI percentage the next time you run infection.');
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $this->assertSame(
+            <<<'TXT'
 
-        $metricsCalculator->expects($this->once())->method('getMutationScoreIndicator')
-            ->willReturn($actualMsi);
+ ! [NOTE] The MSI is 5% percent points over the required MSI. Consider increasing the required MSI
+ !        percentage the next time you run infection.
 
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::MSI_OVER_MIN_MSI);
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 
     public function test_log_min_msi_can_get_increased_notice_for_covered_msi(): void
     {
-        $actualMsi = 10.0;
-        $minMsi = 5.0;
-        $msiDifference = $actualMsi - $minMsi;
+        $this->consoleOutput->logMinCoveredCodeMsiCanGetIncreasedNotice(
+            5.0,
+            10.0
+        );
 
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('note')
-            ->with(
-                'The Covered Code MSI is ' . $msiDifference . '% percent points over the required Covered Code MSI. ' .
-                'Consider increasing the required Covered Code MSI percentage the next time you run infection.');
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $this->assertSame(
+            <<<'TXT'
 
-        $metricsCalculator->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn($actualMsi);
+ ! [NOTE] The Covered Code MSI is 5% percent points over the required Covered Code MSI. Consider
+ !        increasing the required Covered Code MSI percentage the next time you run infection.
 
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::COVERED_MSI_OVER_MIN_MSI);
+
+TXT
+            ,
+            normalize_trailing_spaces($this->output->fetch())
+        );
     }
 }

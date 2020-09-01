@@ -47,9 +47,9 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\TestFramework\TestFrameworkTypes;
+use OndraM\CiDetector\CiDetector;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
-use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -63,30 +63,27 @@ class ConfigurationFactory
      */
     private const DEFAULT_TIMEOUT = 10;
 
-    private const TEST_FRAMEWORK_COVERAGE_DIRECTORY = [
-        TestFrameworkTypes::PHPUNIT => 'coverage-xml',
-        TestFrameworkTypes::PHPSPEC => TestFrameworkTypes::PHPSPEC . '-coverage-xml',
-        TestFrameworkTypes::CODECEPTION => TestFrameworkTypes::CODECEPTION . '-coverage-xml',
-    ];
-
     private $tmpDirProvider;
     private $mutatorResolver;
     private $mutatorFactory;
     private $mutatorParser;
     private $sourceFileCollector;
+    private $ciDetector;
 
     public function __construct(
         TmpDirProvider $tmpDirProvider,
         MutatorResolver $mutatorResolver,
         MutatorFactory $mutatorFactory,
         MutatorParser $mutatorParser,
-        SourceFileCollector $sourceFileCollector
+        SourceFileCollector $sourceFileCollector,
+        CiDetector $ciDetector
     ) {
         $this->tmpDirProvider = $tmpDirProvider;
         $this->mutatorResolver = $mutatorResolver;
         $this->mutatorFactory = $mutatorFactory;
         $this->mutatorParser = $mutatorParser;
         $this->sourceFileCollector = $sourceFileCollector;
+        $this->ciDetector = $ciDetector;
     }
 
     public function create(
@@ -97,16 +94,18 @@ class ConfigurationFactory
         string $logVerbosity,
         bool $debug,
         bool $onlyCovered,
-        string $formatter,
         bool $noProgress,
         ?bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
+        int $msiPrecision,
         string $mutatorsInput,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
-        string $filter
+        string $filter,
+        int $threadCount,
+        bool $dryRun
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -127,9 +126,10 @@ class ConfigurationFactory
             $schema->getSource()->getDirectories(),
             $this->sourceFileCollector->collectFiles(
                 $schema->getSource()->getDirectories(),
-                $schema->getSource()->getExcludes(),
-                $filter
+                $schema->getSource()->getExcludes()
             ),
+            $filter,
+            $schema->getSource()->getExcludes(),
             $schema->getLogs(),
             $logVerbosity,
             $namespacedTmpDir,
@@ -139,17 +139,19 @@ class ConfigurationFactory
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
-            self::retrieveCoveragePath($coverageBasePath, $testFramework),
+            $coverageBasePath,
             $skipCoverage,
             $skipInitialTests,
             $debug,
             $onlyCovered,
-            $formatter,
-            $noProgress,
+            $this->retrieveNoProgress($noProgress),
             self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
             self::retrieveMinMsi($minMsi, $schema),
             $showMutations,
-            self::retrieveMinCoveredMsi($minCoveredMsi, $schema)
+            self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
+            $msiPrecision,
+            $threadCount,
+            $dryRun
         );
     }
 
@@ -209,26 +211,11 @@ class ConfigurationFactory
         );
     }
 
-    private static function retrieveCoveragePath(
-        string $coverageBasePath,
-        string $testFramework
-    ): string {
-        Assert::keyExists(self::TEST_FRAMEWORK_COVERAGE_DIRECTORY, $testFramework);
-
-        return sprintf(
-            '%s/%s',
-            $coverageBasePath,
-            self::TEST_FRAMEWORK_COVERAGE_DIRECTORY[$testFramework]
-        );
-    }
-
     private static function retrieveCoverageBasePath(
         ?string $existingCoveragePath,
         string $configDir,
         string $tmpDir
     ): string {
-        Assert::nullOrStringNotEmpty($existingCoveragePath);
-
         if ($existingCoveragePath === null) {
             return $tmpDir;
         }
@@ -245,6 +232,11 @@ class ConfigurationFactory
         SchemaConfiguration $schema
     ): string {
         return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
+    }
+
+    private function retrieveNoProgress(bool $noProgress): bool
+    {
+        return $noProgress || $this->ciDetector->isCiDetected();
     }
 
     private static function retrieveIgnoreMsiWithNoMutations(

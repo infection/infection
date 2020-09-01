@@ -36,175 +36,56 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\SummaryFileLogger;
-use Infection\Mutant\MetricsCalculator;
-use Infection\Tests\FileSystem\FileSystemTestCase;
-use const PHP_EOL;
-use PHPUnit\Framework\MockObject\MockObject;
-use function str_replace;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
+use Infection\Metrics\MetricsCalculator;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration Requires some I/O operations
- */
-final class SummaryFileLoggerTest extends FileSystemTestCase
+final class SummaryFileLoggerTest extends TestCase
 {
-    private const LOG_FILE_PATH = '/path/to/text.log';
+    use CreateMetricsCalculator;
+    use LineLoggerAssertions;
 
     /**
-     * @var Filesystem|MockObject
+     * @dataProvider metricsProvider
      */
-    private $fileSystemMock;
+    public function test_it_logs_correctly_with_mutations(
+        MetricsCalculator $metricsCalculator,
+        string $expectedContents
+    ): void {
+        $logger = new SummaryFileLogger($metricsCalculator);
 
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $outputMock;
-
-    protected function setUp(): void
-    {
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
-        $this->outputMock = $this->createMock(OutputInterface::class);
+        $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function test_it_logs_the_correct_lines_with_no_mutations(): void
+    public function metricsProvider(): iterable
     {
-        $expectedContent = <<<'TXT'
+        yield 'no mutations' => [
+            new MetricsCalculator(2),
+            <<<'TXT'
 Total: 0
+
 Killed: 0
 Errored: 0
 Escaped: 0
 Timed Out: 0
+Skipped: 0
 Not Covered: 0
-TXT;
 
-        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
+TXT
+        ];
 
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $expectedContent)
-        ;
+        yield 'all mutations' => [
+            $this->createCompleteMetricsCalculator(),
+            <<<'TXT'
+Total: 12
 
-        $debugFileLogger = new SummaryFileLogger(
-            $this->outputMock,
-            self::LOG_FILE_PATH,
-            new MetricsCalculator(),
-            $this->fileSystemMock,
-            false,
-            false
-        );
-
-        $debugFileLogger->log();
-    }
-
-    public function test_it_logs_the_correct_lines_with_mutations(): void
-    {
-        $calculatorMock = $this->createMock(MetricsCalculator::class);
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getTotalMutantsCount')
-            ->willReturn(6)
-        ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getKilledCount')
-            ->willReturn(8)
-        ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getErrorCount')
-            ->willReturn(7)
-        ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getEscapedCount')
-            ->willReturn(30216)
-        ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getTimedOutCount')
-            ->willReturn(2)
-        ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getNotCoveredByTestsCount')
-            ->willReturn(0)
-        ;
-
-        $expectedContent = <<<'TXT'
-Total: 6
-Killed: 8
-Errored: 7
-Escaped: 30216
+Killed: 2
+Errored: 2
+Escaped: 2
 Timed Out: 2
-Not Covered: 0
-TXT;
+Skipped: 2
+Not Covered: 2
 
-        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
-
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $expectedContent)
-        ;
-
-        $debugFileLogger = new SummaryFileLogger(
-            $this->outputMock,
-            self::LOG_FILE_PATH,
-            $calculatorMock,
-            $this->fileSystemMock,
-            false,
-            false
-        );
-
-        $debugFileLogger->log();
-    }
-
-    public function test_it_cannot_log_on_invalid_streams(): void
-    {
-        $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with('<error>The only streams supported are php://stdout and php://stderr</error>')
-        ;
-
-        $debugFileLogger = new SummaryFileLogger(
-            $this->outputMock,
-            'php://memory',
-            new MetricsCalculator(),
-            $this->fileSystemMock,
-            false,
-            false
-        );
-
-        $debugFileLogger->log();
-    }
-
-    public function test_it_fails_if_cannot_write_file(): void
-    {
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $this->anything())
-            ->willThrowException(new IOException('Cannot write in directory X'));
-
-        $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with('<error>Cannot write in directory X</error>')
-        ;
-
-        $debugFileLogger = new SummaryFileLogger(
-            $this->outputMock,
-            self::LOG_FILE_PATH,
-            new MetricsCalculator(),
-            $this->fileSystemMock,
-            false,
-            false
-        );
-
-        $debugFileLogger->log();
+TXT
+        ];
     }
 }

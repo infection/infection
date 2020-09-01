@@ -35,61 +35,265 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use function in_array;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use function is_array;
-use PhpParser\Node;
+use Infection\Tests\Fixtures\PhpParser\ParentConnectorSpyVisitor;
+use Infection\Tests\Fixtures\PhpParser\StackSpyVisitor;
+use Infection\Tests\SingletonContainer;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
 final class ParentConnectorVisitorTest extends BaseVisitorTest
 {
     private const CODE = <<<'PHP'
-<?php declare(strict_types=1);
+<?php
 
-namespace Acme;
+namespace Foo;
 
-function hello()
-{
-    return 'hello';
-}
+echo 'Hello';
+echo ' World!';
+
+namespace Bar;
+
 PHP;
 
-    public function test_mutating_nodes_during_traverse_mutates_the_original_nodes(): void
+    public function test_it_attaches_the_parent_nodes_to_each_node(): void
     {
+        $stackSpyVisitor = new StackSpyVisitor();
+        $parentSpyVisitor = new ParentConnectorSpyVisitor();
+
         $nodes = $this->traverse(
             $this->parseCode(self::CODE),
-            [new ParentConnectorVisitor()]
+            [
+                $stackSpyVisitor,
+                new ParentConnectorVisitor(),
+                $parentSpyVisitor,
+            ]
         );
 
-        foreach ($nodes as $node) {
-            $this->assertHasParentNode($node, $nodes);
-        }
-    }
+        $dumper = SingletonContainer::getNodeDumper();
 
-    /**
-     * @param Node[] $roots
-     */
-    private function assertHasParentNode(Node $node, array $roots): void
-    {
-        if (!in_array($node, $roots, true)) {
-            $this->assertTrue($node->hasAttribute(ParentConnectorVisitor::PARENT_KEY));
-            $this->assertInstanceOf(Node::class, $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-        }
+        // Sanity check: just make sure the structure is the one we expect it to be
+        // The choice of the structure is important here: we want to clearly display the resulting
+        // tree without too much noise - otherwise the tree is much harder to read.
+        // In this case what we want to show:
+        // - Multiple roots
+        // - Multiple children nodes
+        // - A case where two children nodes points to the same parent
+        $this->assertSame(
+            <<<'STR'
+array(
+    0: Stmt_Namespace(
+        name: Name(
+            parts: array(
+                0: Foo
+            )
+        )
+        stmts: array(
+            0: Stmt_Echo(
+                exprs: array(
+                    0: Scalar_String(
+                        value: Hello
+                    )
+                )
+            )
+            1: Stmt_Echo(
+                exprs: array(
+                    0: Scalar_String(
+                        value:  World!
+                    )
+                )
+            )
+        )
+    )
+    1: Stmt_Namespace(
+        name: Name(
+            parts: array(
+                0: Bar
+            )
+        )
+        stmts: array(
+        )
+    )
+)
+STR
+            ,
+            $dumper->dump($nodes)
+        );
 
-        foreach ($node->getSubNodeNames() as $subNodeName) {
-            $subNodes = $node->$subNodeName;
+        // Sanity check: display the whole stack flattened out.
+        $this->assertSame(
+            <<<'STR'
+array(
+    0: Stmt_Namespace(
+        name: Name(
+            parts: array(
+                0: Foo
+            )
+        )
+        stmts: array(
+            0: Stmt_Echo(
+                exprs: array(
+                    0: Scalar_String(
+                        value: Hello
+                    )
+                )
+            )
+            1: Stmt_Echo(
+                exprs: array(
+                    0: Scalar_String(
+                        value:  World!
+                    )
+                )
+            )
+        )
+    )
+    1: Name(
+        parts: array(
+            0: Foo
+        )
+    )
+    2: Stmt_Echo(
+        exprs: array(
+            0: Scalar_String(
+                value: Hello
+            )
+        )
+    )
+    3: Scalar_String(
+        value: Hello
+    )
+    4: Stmt_Echo(
+        exprs: array(
+            0: Scalar_String(
+                value:  World!
+            )
+        )
+    )
+    5: Scalar_String(
+        value:  World!
+    )
+    6: Stmt_Namespace(
+        name: Name(
+            parts: array(
+                0: Bar
+            )
+        )
+        stmts: array(
+        )
+    )
+    7: Name(
+        parts: array(
+            0: Bar
+        )
+    )
+)
+STR
+            ,
+            $dumper->dump($stackSpyVisitor->getCollectedNodes())
+        );
 
-            if (!is_array($subNodes)) {
-                $subNodes = [$subNodes];
-            }
-
-            foreach ($subNodes as $subNode) {
-                if ($subNode instanceof Node) {
-                    $this->assertHasParentNode($subNode, $roots);
-                }
-            }
-        }
+        $this->assertSame(
+            <<<'STR'
+array(
+    0: null
+    1: Stmt_Namespace(
+        name: Name(
+            parts: array(
+                0: Foo
+            )
+        )
+        stmts: array(
+            0: Stmt_Echo(
+                exprs: array(
+                    0: Scalar_String(
+                        value: Hello
+                    )
+                )
+            )
+            1: Stmt_Echo(
+                exprs: array(
+                    0: Scalar_String(
+                        value:  World!
+                    )
+                )
+            )
+        )
+    )
+    2: Stmt_Namespace(
+        name: Name(
+            parts: array(
+                0: Foo
+            )
+        )
+        stmts: array(
+            0: Stmt_Echo(
+                exprs: array(
+                    0: Scalar_String(
+                        value: Hello
+                    )
+                )
+            )
+            1: Stmt_Echo(
+                exprs: array(
+                    0: Scalar_String(
+                        value:  World!
+                    )
+                )
+            )
+        )
+    )
+    3: Stmt_Echo(
+        exprs: array(
+            0: Scalar_String(
+                value: Hello
+            )
+        )
+    )
+    4: Stmt_Namespace(
+        name: Name(
+            parts: array(
+                0: Foo
+            )
+        )
+        stmts: array(
+            0: Stmt_Echo(
+                exprs: array(
+                    0: Scalar_String(
+                        value: Hello
+                    )
+                )
+            )
+            1: Stmt_Echo(
+                exprs: array(
+                    0: Scalar_String(
+                        value:  World!
+                    )
+                )
+            )
+        )
+    )
+    5: Stmt_Echo(
+        exprs: array(
+            0: Scalar_String(
+                value:  World!
+            )
+        )
+    )
+    6: null
+    7: Stmt_Namespace(
+        name: Name(
+            parts: array(
+                0: Bar
+            )
+        )
+        stmts: array(
+        )
+    )
+)
+STR
+            ,
+            $dumper->dump($parentSpyVisitor->getCollectedNodes())
+        );
     }
 }

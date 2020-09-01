@@ -35,15 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\FunctionSignature;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
-use function Safe\file_get_contents;
-use function Safe\sprintf;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 
 /**
- * @group integration Requires some I/O operations
+ * @group integration
  */
-final class ProtectedVisibilityTest extends AbstractMutatorTestCase
+final class ProtectedVisibilityTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -55,10 +53,10 @@ final class ProtectedVisibilityTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public function mutationsProvider(): iterable
     {
         yield 'It mutates protected to private' => [
-            $this->getFileContent('pv-one-class.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-one-class.php'),
             <<<'PHP'
 <?php
 
@@ -77,7 +75,7 @@ PHP
         ];
 
         yield 'It does not mutate final flag' => [
-            $this->getFileContent('pv-final.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-final.php'),
             <<<'PHP'
 <?php
 
@@ -96,11 +94,11 @@ PHP
         ];
 
         yield 'It does not mutate abstract protected to private' => [
-            $this->getFileContent('pv-abstract.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-abstract.php'),
         ];
 
         yield 'It does mutate not abstract protected to private in an abstract class' => [
-            $this->getFileContent('pv-abstract-class-protected-method.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-abstract-class-protected-method.php'),
             <<<'PHP'
 <?php
 
@@ -119,7 +117,7 @@ PHP
         ];
 
         yield 'It does not mutate static flag' => [
-            $this->getFileContent('pv-static.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-static.php'),
             <<<'PHP'
 <?php
 
@@ -138,11 +136,11 @@ PHP
         ];
 
         yield 'It does not mutate if parent abstract has same protected method' => [
-            $this->getFileContent('pv-same-method-abstract.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-abstract.php'),
         ];
 
         yield 'It does not mutate if parent class has same protected method' => [
-            $this->getFileContent('pv-same-method-parent.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-parent.php'),
             <<<'PHP'
 <?php
 
@@ -165,7 +163,7 @@ PHP
         ];
 
         yield 'It does not mutate if grand parent class has same protected method' => [
-            $this->getFileContent('pv-same-method-grandparent.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-grandparent.php'),
             <<<'PHP'
 <?php
 
@@ -191,7 +189,7 @@ PHP
         ];
 
         yield 'it does mutate non-inherited methods' => [
-            $this->getFileContent('pv-non-same-method-parent.php'),
+            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-non-same-method-parent.php'),
             <<<'PHP'
 <?php
 
@@ -244,10 +242,5 @@ function something()
 }
 PHP
         ];
-    }
-
-    private function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/ProtectedVisibility/%s', $file));
     }
 }

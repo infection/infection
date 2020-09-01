@@ -4,11 +4,14 @@
          bootstrap="./vendor/autoload.php"
          colors="true"
          executionOrder="random"
+         failOnWarning="true"
+         failOnRisky="true"
          verbose="true"
 >
 
     <php>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
+        <env name="COLUMNS" value="100" force="true" />
     </php>
 
     <testsuites>

@@ -39,7 +39,7 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function class_exists;
-use Generator;
+use Infection\CannotBeInstantiated;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\Console\E2ETest;
@@ -52,6 +52,8 @@ use Webmozart\Assert\Assert;
 
 final class IntegrationGroupProvider
 {
+    use CannotBeInstantiated;
+
     /**
      * List of known integrational tests that must be treated as such.
      *
@@ -66,16 +68,12 @@ final class IntegrationGroupProvider
      */
     private static $ioTestCaseClassesTuple;
 
-    private function __construct()
-    {
-    }
-
     /**
      * Note that the current implementation is far from being bullet-proof. For example as of now
      * it checks the source classes, but it is not excluded that a fixture file used in a test case
      * contains I/O operations. In this scenario, the current implementation would miss out that one.
      */
-    public static function provideIoTestCaseTuple(): Generator
+    public static function provideIoTestCaseTuple(): iterable
     {
         if (self::$ioTestCaseClassesTuple !== null) {
             yield from self::$ioTestCaseClassesTuple;
@@ -103,7 +101,7 @@ final class IntegrationGroupProvider
         yield from self::$ioTestCaseClassesTuple;
     }
 
-    public static function ioTestCaseTupleProvider(): Generator
+    public static function ioTestCaseTupleProvider(): iterable
     {
         yield from self::provideIoTestCaseTuple();
     }

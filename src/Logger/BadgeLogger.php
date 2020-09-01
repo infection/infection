@@ -39,51 +39,51 @@ use Infection\Environment\BuildContextResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
 use Infection\Environment\StrykerApiKeyResolver;
-use Infection\Http\StrykerDashboardClient;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Logger\Http\StrykerDashboardClient;
+use Infection\Metrics\MetricsCalculator;
+use Psr\Log\LoggerInterface;
 use function Safe\sprintf;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
 final class BadgeLogger implements MutationTestingResultsLogger
 {
-    private $output;
     private $buildContextResolver;
     private $strykerApiKeyResolver;
     private $strykerDashboardClient;
     private $metricsCalculator;
     private $branch;
+    private $logger;
 
     public function __construct(
-        OutputInterface $output,
         BuildContextResolver $buildContextResolver,
         StrykerApiKeyResolver $strykerApiKeyResolver,
         StrykerDashboardClient $strykerDashboardClient,
         MetricsCalculator $metricsCalculator,
-        string $branch
+        string $branch,
+        LoggerInterface $logger
     ) {
-        $this->output = $output;
         $this->buildContextResolver = $buildContextResolver;
         $this->strykerApiKeyResolver = $strykerApiKeyResolver;
         $this->strykerDashboardClient = $strykerDashboardClient;
         $this->metricsCalculator = $metricsCalculator;
         $this->branch = $branch;
+        $this->logger = $logger;
     }
 
     public function log(): void
     {
         try {
-            $buildContext = $this->buildContextResolver->resolve(getenv());
+            $buildContext = $this->buildContextResolver->resolve();
         } catch (CouldNotResolveBuildContext $exception) {
-            $this->logMessage($exception->getMessage());
+            $this->logReportWasNotSent($exception->getMessage());
 
             return;
         }
 
         if ($buildContext->branch() !== $this->branch) {
-            $this->logMessage(sprintf(
+            $this->logReportWasNotSent(sprintf(
                 'Expected branch "%s", found "%s"',
                 $this->branch,
                 $buildContext->branch()
@@ -95,24 +95,24 @@ final class BadgeLogger implements MutationTestingResultsLogger
         try {
             $apiKey = $this->strykerApiKeyResolver->resolve(getenv());
         } catch (CouldNotResolveStrykerApiKey $exception) {
-            $this->logMessage($exception->getMessage());
+            $this->logReportWasNotSent($exception->getMessage());
 
             return;
         }
 
         // All clear!
-        $this->output->writeln('Sending dashboard report...');
+        $this->logger->warning('Sending dashboard report...');
 
         $this->strykerDashboardClient->sendReport(
-            $apiKey,
             'github.com/' . $buildContext->repositorySlug(),
             $buildContext->branch(),
+            $apiKey,
             $this->metricsCalculator->getMutationScoreIndicator()
         );
     }
 
-    private function logMessage(string $message): void
+    private function logReportWasNotSent(string $message): void
     {
-        $this->output->writeln(sprintf('Dashboard report has not been sent: %s', $message));
+        $this->logger->warning(sprintf('Dashboard report has not been sent: %s', $message));
     }
 }

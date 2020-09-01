@@ -40,11 +40,13 @@ use function get_class;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\Trace;
+use function iterator_to_array;
 use PhpParser\Node;
 use function Pipeline\take;
 use Throwable;
+use Traversable;
 use Webmozart\Assert\Assert;
 
 /**
@@ -56,7 +58,7 @@ class NodeMutationGenerator
     private $mutators;
     private $filePath;
     private $fileNodes;
-    private $codeCoverageData;
+    private $trace;
     private $onlyCovered;
     private $lineRangeCalculator;
 
@@ -68,7 +70,7 @@ class NodeMutationGenerator
         array $mutators,
         string $filePath,
         array $fileNodes,
-        LineCodeCoverage $codeCoverageData,
+        Trace $trace,
         bool $onlyCovered,
         LineRangeCalculator $lineRangeCalculator
     ) {
@@ -77,7 +79,7 @@ class NodeMutationGenerator
         $this->mutators = $mutators;
         $this->filePath = $filePath;
         $this->fileNodes = $fileNodes;
-        $this->codeCoverageData = $codeCoverageData;
+        $this->trace = $trace;
         $this->onlyCovered = $onlyCovered;
         $this->lineRangeCalculator = $lineRangeCalculator;
     }
@@ -117,11 +119,14 @@ class NodeMutationGenerator
             return;
         }
 
-        $tests = $this->codeCoverageData->getAllTestsForMutation(
-            $this->filePath,
+        $tests = $this->trace->getAllTestsForMutation(
             $this->lineRangeCalculator->calculateRange($node),
             $isOnFunctionSignature
         );
+
+        if ($tests instanceof Traversable) {
+            $tests = iterator_to_array($tests, false);
+        }
 
         if ($this->onlyCovered && count($tests) === 0) {
             return;
