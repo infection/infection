@@ -42,6 +42,7 @@ use Infection\Mutator\ZeroIteration\For_;
 use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
+use function Safe\base64_decode;
 use function Safe\json_decode;
 use function str_replace;
 
@@ -242,6 +243,42 @@ final class JsonLoggerTest extends TestCase
                 ],
             ],
         ];
+
+        yield 'Non UTF-8 characters' => [
+            false,
+            $this->createNonUtf8CharactersCalculator(),
+            [
+                'stats' => [
+                    'totalMutantsCount' => 1,
+                    'killedCount' => 0,
+                    'notCoveredCount' => 1,
+                    'escapedCount' => 0,
+                    'errorCount' => 0,
+                    'skippedCount' => 0,
+                    'timeOutCount' => 0,
+                    'msi' => 0,
+                    'mutationCodeCoverage' => 0,
+                    'coveredCodeMsi' => 0,
+                ],
+                'escaped' => [],
+                'timeouted' => [],
+                'killed' => [],
+                'errored' => [],
+                'uncovered' => [
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'For_',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 10,
+                        ],
+                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';"),
+                        'processOutput' => 'process output',
+                    ],
+                ],
+            ],
+        ];
     }
 
     private function assertLoggedContentIs(array $expectedJson, JsonLogger $logger): void
@@ -259,6 +296,22 @@ final class JsonLoggerTest extends TestCase
                 For_::class,
                 DetectionStatus::NOT_COVERED,
                 'uncovered#0'
+            ),
+        );
+
+        return $calculator;
+    }
+
+    private function createNonUtf8CharactersCalculator(): MetricsCalculator
+    {
+        $calculator = new MetricsCalculator(2);
+
+        $calculator->collect(
+            $this->createMutantExecutionResult(
+                0,
+                For_::class,
+                DetectionStatus::NOT_COVERED,
+                base64_decode('abc') // produces non UTF-8 character
             ),
         );
 
