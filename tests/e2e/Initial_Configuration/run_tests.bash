@@ -18,6 +18,10 @@ else
     INFECTION="php ../../../bin/infection"
 fi
 export INFECTION
+unset CI
+unset CONTINUOUS_INTEGRATION
+unset TRAVIS
+unset GITHUB_ACTIONS
 
 ./do_configure.expect
 
