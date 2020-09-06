@@ -30,7 +30,9 @@ jobs:
           tools: composer:v2
 
       - name: Install dependencies
-        run: composer update --no-interaction ${{ matrix.dependencies }}
+        run: |
+          composer update --no-interaction ${{ matrix.dependencies }}
+          composer require --dev symfony/phpunit-bridge:dev-master
 
       - name: Run Infection
         run: |
