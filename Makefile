@@ -213,7 +213,7 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	composer remove infection/codeception-adapter infection/phpspec-adapter
 	touch -c $@
 
-vendor: composer.lock
+vendor: composer.lock build/cache/phpunit.xsd
 	composer install
 	touch $@
 
@@ -223,6 +223,9 @@ composer.lock: composer.json
 
 $(PHPUNIT): vendor
 	touch -c $@
+
+build/cache/phpunit.xsd: vendor/phpunit/phpunit/schema/9.2.xsd vendor/phpunit/phpunit/phpunit.xsd
+	@for xsd in $^; do test -f $$xsd && cp -v $$xsd $@ && break; done
 
 $(DOCKER_RUN_73_IMAGE): devTools/Dockerfile-php73-xdebug
 	docker build --tag infection_php73 --file devTools/Dockerfile-php73-xdebug .
