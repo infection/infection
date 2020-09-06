@@ -225,7 +225,8 @@ $(PHPUNIT): vendor
 	touch -c $@
 
 build/cache/phpunit.xsd: vendor/phpunit/phpunit/schema/9.2.xsd vendor/phpunit/phpunit/phpunit.xsd
-	@for xsd in $^; do test -f $$xsd && cp -v $$xsd $@ && break; done
+	mkdir -p build/cache
+	for xsd in $^; do test -f $$xsd && cp -v $$xsd $@ && break; done
 
 $(DOCKER_RUN_73_IMAGE): devTools/Dockerfile-php73-xdebug
 	docker build --tag infection_php73 --file devTools/Dockerfile-php73-xdebug .
