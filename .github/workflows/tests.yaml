@@ -41,6 +41,6 @@ jobs:
       - name: Run Infection
         run: |
           make build/cache/phpunit.xsd
-          ./bin/infection -j$(nproc)
+          ./bin/infection -j$(nproc) --test-framework-options="--group=default"
           
 
