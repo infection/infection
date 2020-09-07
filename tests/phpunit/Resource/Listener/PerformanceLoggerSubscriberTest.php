@@ -59,6 +59,9 @@ final class PerformanceLoggerSubscriberTest extends TestCase
         $this->output = $this->createMock(OutputInterface::class);
     }
 
+    /**
+     * @requires PHP < 8.0
+     */
     public function test_it_reacts_on_application_execution_events(): void
     {
         $this->output->expects($this->once())
