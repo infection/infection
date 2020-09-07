@@ -60,6 +60,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
+use function trait_exists;
 
 /**
  * @group integration
@@ -1650,7 +1651,7 @@ final class ConfigurationFactoryTest extends TestCase
 
     private function createConfigurationFactory(bool $ciDetected): ConfigurationFactory
     {
-        if (class_exists(ProphecyTrait::class)) {
+        if (trait_exists(ProphecyTrait::class)) {
             $this->markTestIncomplete('ProphecyTrait requires PHPUnit 9.1+');
         }
 

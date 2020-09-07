@@ -52,12 +52,13 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
+use function trait_exists;
 
 final class MutationGeneratorTest extends TestCase
 {
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
-        if (class_exists(ProphecyTrait::class)) {
+        if (trait_exists(ProphecyTrait::class)) {
             $this->markTestIncomplete('ProphecyTrait requires PHPUnit 9.1+');
         }
 
