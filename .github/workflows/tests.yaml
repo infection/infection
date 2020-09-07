@@ -34,8 +34,8 @@ jobs:
         run: |
           composer update --no-interaction ${{ matrix.dependencies }}
           composer require --dev symfony/phpunit-bridge:dev-master
-          patch -p0 < CallCenter.patch
-          patch -p0 < Util_Test.patch
+          patch -p0 < CallCenter.patch || true
+          patch -p0 < Util_Test.patch || true
 
       - name: Run tests
         run: make test-unit
