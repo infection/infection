@@ -129,7 +129,8 @@ final class ConfigurationFactoryTest extends TestCase
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
-        ?float $expectedMinCoveredMsi
+        ?float $expectedMinCoveredMsi,
+        array $expectedIgnoreSourceCodeMutatorsMap
     ): void {
         $config = $this
             ->createConfigurationFactory($ciDetected)
@@ -184,7 +185,8 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedMinCoveredMsi,
             $inputMsiPrecision,
             $inputThreadsCount,
-            $inputDryRun
+            $inputDryRun,
+            $expectedIgnoreSourceCodeMutatorsMap
         );
     }
 
@@ -250,6 +252,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
 
         yield 'null timeout' => self::createValueForTimeout(
@@ -560,6 +563,16 @@ final class ConfigurationFactoryTest extends TestCase
             ]
         );
 
+        yield 'ignore source code by regex' => self::createValueForIgnoreSourceCodeByRegex(
+            [
+                '@default' => false,
+                'MethodCallRemoval' => (object) [
+                    'ignoreSourceCodeByRegex' => ['Assert::.*'],
+                ],
+            ],
+            ['MethodCallRemoval' => ['Assert::.*']]
+        );
+
         yield 'mutators from config & input' => self::createValueForMutators(
             [
                 '@default' => true,
@@ -641,6 +654,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
 
         yield 'complete' => [
@@ -730,6 +744,7 @@ final class ConfigurationFactoryTest extends TestCase
             72.3,
             true,
             81.5,
+            [],
         ];
     }
 
@@ -797,6 +812,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
     }
 
@@ -864,6 +880,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
     }
 
@@ -932,6 +949,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
     }
 
@@ -999,6 +1017,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
     }
 
@@ -1067,6 +1086,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
     }
 
@@ -1135,6 +1155,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
     }
 
@@ -1203,6 +1224,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedMinMsi,
             false,
             null,
+            [],
         ];
     }
 
@@ -1271,6 +1293,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             $expectedMinCoveredMsi,
+            [],
         ];
     }
 
@@ -1340,6 +1363,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
     }
 
@@ -1408,6 +1432,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
     }
 
@@ -1477,6 +1502,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
     }
 
@@ -1545,6 +1571,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
         ];
     }
 
@@ -1616,6 +1643,84 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $configMutators
+     * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
+     */
+    private static function createValueForIgnoreSourceCodeByRegex(
+        array $configMutators,
+        array $expectedIgnoreSourceCodeMutatorsMap
+    ): array {
+        return [
+            false,
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                Logs::createEmpty(),
+                null,
+                new PhpUnit(null, null),
+                null,
+                null,
+                null,
+                $configMutators,
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            false,
+            'none',
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            0,
+            false,
+            2,
+            10,
+            [],
+            [],
+            '',
+            [],
+            Logs::createEmpty(),
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            [
+                'MethodCallRemoval' => new IgnoreMutator(
+                    new IgnoreConfig([]),
+                    new MethodCallRemoval()
+                ),
+            ],
+            'phpunit',
+            null,
+            null,
+            false,
+            '',
+            sys_get_temp_dir() . '/infection',
+            false,
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            $expectedIgnoreSourceCodeMutatorsMap,
         ];
     }
 

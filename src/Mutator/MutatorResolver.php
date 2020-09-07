@@ -49,6 +49,7 @@ use stdClass;
 final class MutatorResolver
 {
     private const GLOBAL_IGNORE_SETTING = 'global-ignore';
+    private const GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'global-ignoreSourceCodeByRegex';
 
     /**
      * Resolves the given hashmap of enabled, disabled or configured mutators
@@ -72,6 +73,16 @@ final class MutatorResolver
 
                 $globalSettings = ['ignore' => $globalSetting];
                 unset($mutatorSettings[self::GLOBAL_IGNORE_SETTING]);
+
+                break;
+            }
+
+            if ($mutatorOrProfileOrGlobalSettingKey === self::GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING) {
+                /** @var string[] $globalSetting */
+                $globalSetting = $setting;
+
+                $globalSettings = ['ignoreSourceCodeByRegex' => $globalSetting];
+                unset($mutatorSettings[self::GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING]);
 
                 break;
             }
