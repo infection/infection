@@ -16,6 +16,7 @@ jobs:
           - { php-versions: '7.3', dependencies: '--prefer-lowest' }
           - { php-versions: '8.0', dependencies: '--ignore-platform-req=php' }
 
+    continue-on-error: ${{ matrix.php == '8.0' }}
     name: PHP ${{ matrix.php-versions }} ${{ matrix.dependencies }}
 
     steps:
