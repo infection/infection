@@ -213,7 +213,7 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	composer remove infection/codeception-adapter infection/phpspec-adapter
 	touch -c $@
 
-vendor: composer.lock build/cache/phpunit.xsd
+vendor: composer.lock
 	composer install
 	touch $@
 
@@ -221,8 +221,12 @@ composer.lock: composer.json
 	composer install
 	touch -c $@
 
-$(PHPUNIT): vendor
+$(PHPUNIT): vendor phpunit.xml.dist
 	touch -c $@
+
+phpunit.xml.dist: build/cache/phpunit.xsd
+	# Not updating phpunit.xml with:
+	# phpunit --migrate-configuration || true
 
 build/cache/phpunit.xsd: vendor/phpunit/phpunit/phpunit.xsd
 	mkdir -p build/cache
