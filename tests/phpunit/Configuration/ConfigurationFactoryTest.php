@@ -56,6 +56,7 @@ use Infection\Tests\Fixtures\DummyCiDetector;
 use function Infection\Tests\normalizePath;
 use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
@@ -1649,8 +1650,12 @@ final class ConfigurationFactoryTest extends TestCase
 
     private function createConfigurationFactory(bool $ciDetected): ConfigurationFactory
     {
+        if (class_exists(ProphecyTrait::class)) {
+            $this->markTestIncomplete('ProphecyTrait requires PHPUnit 9.1+');
+        }
+
         /** @var SourceFileCollector&ObjectProphecy $sourceFilesCollectorProphecy */
-        $sourceFilesCollectorProphecy = @$this->prophesize(SourceFileCollector::class);
+        $sourceFilesCollectorProphecy = $this->prophesize(SourceFileCollector::class);
 
         $sourceFilesCollectorProphecy
             ->collectFiles([], [])

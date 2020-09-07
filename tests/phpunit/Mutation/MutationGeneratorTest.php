@@ -49,16 +49,18 @@ use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 
 final class MutationGeneratorTest extends TestCase
 {
-    /**
-     * @requires PHP < 8.0
-     */
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
+        if (class_exists(ProphecyTrait::class)) {
+            $this->markTestIncomplete('ProphecyTrait requires PHPUnit 9.1+');
+        }
+
         $fileInfo = $this->createMock(SplFileInfo::class);
 
         // Prophecy compares arguments on equality, therefore these have to be somewhat unique
@@ -75,7 +77,7 @@ final class MutationGeneratorTest extends TestCase
         $mutation2 = $this->createMock(Mutation::class);
 
         /** @var FileMutationGenerator|ObjectProphecy $fileMutationGeneratorProphecy */
-        $fileMutationGeneratorProphecy = @$this->prophesize(FileMutationGenerator::class);
+        $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
         $fileMutationGeneratorProphecy
             ->generate($proxyTraceA, $onlyCovered, $mutators, $nodeIgnorers)
             ->shouldBeCalledTimes(1)
