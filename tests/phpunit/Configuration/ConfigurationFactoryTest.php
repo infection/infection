@@ -1650,7 +1650,7 @@ final class ConfigurationFactoryTest extends TestCase
     private function createConfigurationFactory(bool $ciDetected): ConfigurationFactory
     {
         /** @var SourceFileCollector&ObjectProphecy $sourceFilesCollectorProphecy */
-        $sourceFilesCollectorProphecy = $this->prophesize(SourceFileCollector::class);
+        $sourceFilesCollectorProphecy = @$this->prophesize(SourceFileCollector::class);
 
         $sourceFilesCollectorProphecy
             ->collectFiles([], [])

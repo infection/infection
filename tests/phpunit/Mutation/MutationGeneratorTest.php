@@ -75,7 +75,7 @@ final class MutationGeneratorTest extends TestCase
         $mutation2 = $this->createMock(Mutation::class);
 
         /** @var FileMutationGenerator|ObjectProphecy $fileMutationGeneratorProphecy */
-        $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
+        $fileMutationGeneratorProphecy = @$this->prophesize(FileMutationGenerator::class);
         $fileMutationGeneratorProphecy
             ->generate($proxyTraceA, $onlyCovered, $mutators, $nodeIgnorers)
             ->shouldBeCalledTimes(1)
