@@ -39,6 +39,7 @@ use function get_class;
 use Infection\Event\Subscriber\EventSubscriber;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
 use Webmozart\Assert\Assert;
 
 /**
@@ -83,7 +84,7 @@ final class SyncEventDispatcher implements EventDispatcher
 
             foreach ($method->getParameters() as $param) {
                 $paramClass = $param->getType();
-                Assert::notNull($paramClass);
+                Assert::isInstanceOf($paramClass, ReflectionNamedType::class);
 
                 $closure = $method->getClosure($eventSubscriber);
                 Assert::notNull($closure);
