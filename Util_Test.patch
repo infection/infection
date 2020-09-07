@@ -1,0 +1,11 @@
+--- vendor/phpunit/phpunit/src/Util/Test.php.old	2020-09-07 18:36:30.000000000 +0900
++++ vendor/phpunit/phpunit/src/Util/Test.php	2020-09-07 18:37:29.000000000 +0900
+@@ -398,7 +398,7 @@
+             }
+         }
+ 
+-        return \array_unique(\array_merge([], ...$groups));
++        return \array_unique(\array_merge([], ...array_values($groups)));
+     }
+ 
+     /** @psalm-param class-string $className */
