@@ -91,6 +91,7 @@ final class SyncEventDispatcher implements EventDispatcher
 
                 // Returning a closure instead of array [$eventSubscriber, $method->name], should work the same
                 yield $paramClass->getName() => $closure;
+
                 break;
             }
         }
