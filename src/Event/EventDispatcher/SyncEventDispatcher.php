@@ -82,14 +82,14 @@ final class SyncEventDispatcher implements EventDispatcher
             }
 
             foreach ($method->getParameters() as $param) {
-                $paramClassName = $param->getType()->getName();
-                Assert::notNull($paramClassName);
+                $paramClass = $param->getType();
+                Assert::notNull($paramClass);
 
                 $closure = $method->getClosure($eventSubscriber);
                 Assert::notNull($closure);
 
                 // Returning a closure instead of array [$eventSubscriber, $method->name], should work the same
-                yield $paramClassName => $closure;
+                yield $paramClass->getName() => $closure;
 
                 break;
             }
