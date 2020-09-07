@@ -82,7 +82,7 @@ final class SyncEventDispatcher implements EventDispatcher
             }
 
             foreach ($method->getParameters() as $param) {
-                $paramClass = $param->getClass();
+                $paramClass = $param->getType()->getName();
                 Assert::notNull($paramClass);
 
                 $closure = $method->getClosure($eventSubscriber);
