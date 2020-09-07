@@ -34,6 +34,9 @@ jobs:
           composer update --no-interaction ${{ matrix.dependencies }}
           composer require --dev symfony/phpunit-bridge:dev-master
 
+      - name: Run tests
+        run: make test-unit
+
       - name: Run Infection
         run: |
           make build/cache/phpunit.xsd
