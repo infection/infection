@@ -18,9 +18,9 @@ labels: Bug, Not Confirmed
 
 - Please complete the above table with a correct information.
 
-- Please include steps to reproduce your issue.
+- Please include steps to reproduce your issue, or use Infection Playground https://infection-php.dev/.
 
-- Please include any options you use when running infection
+- Please include any options you use when running Infection
 
 - For general support, please use the Twitter @infection_php or Gitter channel https://gitter.im/infection/Lobby.
 -->
