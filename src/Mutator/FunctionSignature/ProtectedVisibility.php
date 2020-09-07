@@ -87,6 +87,10 @@ final class ProtectedVisibility implements Mutator
             return false;
         }
 
+        if ($node->isFinal()) {
+            return false;
+        }
+
         if ($node->isAbstract()) {
             return false;
         }
