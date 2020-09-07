@@ -54,6 +54,9 @@ use Symfony\Component\Finder\SplFileInfo;
 
 final class MutationGeneratorTest extends TestCase
 {
+    /**
+     * @requires PHP < 8.0
+     */
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
         $fileInfo = $this->createMock(SplFileInfo::class);
