@@ -16,7 +16,6 @@ jobs:
           - { php-versions: '7.3', dependencies: '--prefer-lowest' }
           - { php-versions: '8.0', dependencies: '--ignore-platform-req=php' }
 
-    continue-on-error: ${{ matrix.php == '8.0' }}
     name: PHP ${{ matrix.php-versions }} ${{ matrix.dependencies }}
 
     steps:
@@ -34,9 +33,6 @@ jobs:
         run: |
           composer update --no-interaction ${{ matrix.dependencies }}
           composer require --dev symfony/phpunit-bridge:dev-master
-          patch -p0 < CallCenter.patch || true
-          patch -p0 < Util_Test.patch || true
-          patch -p0 < DocBlock.patch || true
 
       - name: Run tests
         run: make test-unit
