@@ -43,9 +43,6 @@ use PHPUnit\Framework\TestCase;
 
 final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @requires PHP < 8.0
-     */
     public function test_it_reacts_on_mutation_testing_finished(): void
     {
         $dispatcher = new SyncEventDispatcher();
