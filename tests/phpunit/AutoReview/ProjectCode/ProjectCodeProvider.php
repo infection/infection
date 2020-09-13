@@ -50,7 +50,6 @@ use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\XdebugHandler;
-use Infection\Engine;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\FileSystem\DummyFileSystem;
@@ -101,7 +100,6 @@ final class ProjectCodeProvider
         MutationGeneratingConsoleLoggerSubscriber::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
-        Engine::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
         DetectionStatus::class,

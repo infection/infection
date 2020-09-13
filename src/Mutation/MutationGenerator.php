@@ -49,8 +49,9 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class MutationGenerator
+class MutationGenerator
 {
     private $traceProvider;
     private $mutators;

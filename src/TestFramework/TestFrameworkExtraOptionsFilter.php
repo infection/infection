@@ -42,8 +42,9 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class TestFrameworkExtraOptionsFilter
+class TestFrameworkExtraOptionsFilter
 {
     /**
      * @param string[] $initialRunOnlyOptions
