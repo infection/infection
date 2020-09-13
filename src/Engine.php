@@ -110,7 +110,7 @@ final class Engine
         $this->runMutationAnalysis();
 
         $this->minMsiChecker->checkMetrics(
-            $this->metricsCalculator->getTotalMutantsCount(),
+            $this->metricsCalculator->getTestedMutantsCount(),
             $this->metricsCalculator->getMutationScoreIndicator(),
             $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
             $this->consoleOutput
