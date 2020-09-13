@@ -43,7 +43,6 @@ use function Safe\sprintf;
 
 /**
  * @internal
- * @final
  */
 class MetricsCalculator
 {
