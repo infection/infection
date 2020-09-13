@@ -39,6 +39,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Engine;
+use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
@@ -133,6 +134,129 @@ final class EngineTest extends TestCase
         );
 
         $this->expectException(InitialTestsFailed::class);
+
+        $engine->execute();
+    }
+
+    public function test_initial_test_run_succeeds(): void
+    {
+        $config = $this->createMock(Configuration::class);
+        $config
+            ->expects($this->once())
+            ->method('shouldSkipInitialTests')
+            ->willReturn(false)
+        ;
+
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter->expects($this->never())->method($this->anything());
+
+        $coverageChecker = $this->createMock(CoverageChecker::class);
+        $coverageChecker
+            ->expects($this->once())
+            ->method('checkCoverageHasBeenGenerated')
+        ;
+
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
+        $eventDispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with($this->callback(static function (ApplicationExecutionWasFinished $event) {
+                return true;
+            }));
+
+        $process = $this->createMock(Process::class);
+        $process
+            ->expects($this->once())
+            ->method('isSuccessful')
+            ->willReturn(true)
+        ;
+
+        $process
+            ->expects($this->once())
+            ->method('getCommandLine')
+            ->willReturn('/tmp/bar')
+        ;
+
+        $process
+            ->expects($this->exactly(2))
+            ->method('getOutput')
+            ->willReturn('testing')
+        ;
+
+        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->willReturn($process)
+        ;
+
+        $memoryLimiter = $this->createMock(MemoryLimiter::class);
+        $memoryLimiter
+            ->expects($this->once())
+            ->method('limitMemory')
+            ->with('testing', $adapter)
+        ;
+
+        $mutationGenerator = $this->createMock(MutationGenerator::class);
+        $mutationGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(false, [])
+        ;
+
+        $mutationTestingRunner = $this->createMock(MutationTestingRunner::class);
+        $mutationTestingRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->callback(static function (iterable $input) {
+                return true;
+            }))
+        ;
+
+        $consoleOutput = $this->createMock(ConsoleOutput::class);
+        $consoleOutput->expects($this->never())->method($this->anything());
+
+        $minMsiChecker = $this->createMock(MinMsiChecker::class);
+        $minMsiChecker
+            ->expects($this->once())
+            ->method('checkMetrics')
+            ->with(1000, 2.0, 3.0, $consoleOutput)
+        ;
+
+        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $metricsCalculator
+            ->expects($this->once())
+            ->method('getTestedMutantsCount')
+            ->willReturn(1000)
+        ;
+        $metricsCalculator
+            ->expects($this->once())
+            ->method('getMutationScoreIndicator')
+            ->willReturn(2.0)
+        ;
+        $metricsCalculator
+            ->expects($this->once())
+            ->method('getCoveredCodeMutationScoreIndicator')
+            ->willReturn(3.0)
+        ;
+
+        $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
+        $testFrameworkExtraOptionsFilter->expects($this->never())->method($this->anything());
+
+        $engine = new Engine(
+            $config,
+            $adapter,
+            $coverageChecker,
+            $eventDispatcher,
+            $initialTestsRunner,
+            $memoryLimiter,
+            $mutationGenerator,
+            $mutationTestingRunner,
+            $minMsiChecker,
+            $consoleOutput,
+            $metricsCalculator,
+            $testFrameworkExtraOptionsFilter
+        );
 
         $engine->execute();
     }
