@@ -43,34 +43,97 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Mutation\MutationGenerator;
+use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use PHPUnit\Framework\TestCase;
-use TypeError;
+use Symfony\Component\Process\Process;
 
 final class EngineTest extends TestCase
 {
-    public function test_it_runs(): void
+    public function test_initial_test_run_fails(): void
     {
         $config = $this->createMock(Configuration::class);
+        $config
+            ->expects($this->once())
+            ->method('shouldSkipInitialTests')
+            ->willReturn(false)
+        ;
+
         $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('getName')
+            ->willReturn('foo')
+        ;
+
         $coverageChecker = $this->createMock(CoverageChecker::class);
+        $coverageChecker->expects($this->never())->method($this->anything());
+
         $eventDispatcher = $this->createMock(EventDispatcher::class);
+        $eventDispatcher->expects($this->never())->method($this->anything());
+
+        $process = $this->createMock(Process::class);
+        $process
+            ->expects($this->once())
+            ->method('isSuccessful')
+            ->willReturn(false)
+        ;
+
+        $process
+            ->expects($this->once())
+            ->method('getCommandLine')
+            ->willReturn('/tmp/bar')
+        ;
+
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->willReturn($process)
+        ;
+
         $memoryLimiter = $this->createMock(MemoryLimiter::class);
+        $memoryLimiter->expects($this->never())->method($this->anything());
+
         $mutationGenerator = $this->createMock(MutationGenerator::class);
+        $mutationGenerator->expects($this->never())->method($this->anything());
+
         $mutationTestingRunner = $this->createMock(MutationTestingRunner::class);
+        $mutationTestingRunner->expects($this->never())->method($this->anything());
+
         $minMsiChecker = $this->createMock(MinMsiChecker::class);
+        $minMsiChecker->expects($this->never())->method($this->anything());
+
         $consoleOutput = $this->createMock(ConsoleOutput::class);
+        $consoleOutput->expects($this->never())->method($this->anything());
+
         $metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $metricsCalculator->expects($this->never())->method($this->anything());
+
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
+        $testFrameworkExtraOptionsFilter->expects($this->never())->method($this->anything());
 
-        $engine = new Engine($config, $adapter, $coverageChecker, $eventDispatcher, $initialTestsRunner, $memoryLimiter, $mutationGenerator, $mutationTestingRunner, $minMsiChecker, $consoleOutput, $metricsCalculator, $testFrameworkExtraOptionsFilter);
+        $engine = new Engine(
+            $config,
+            $adapter,
+            $coverageChecker,
+            $eventDispatcher,
+            $initialTestsRunner,
+            $memoryLimiter,
+            $mutationGenerator,
+            $mutationTestingRunner,
+            $minMsiChecker,
+            $consoleOutput,
+            $metricsCalculator,
+            $testFrameworkExtraOptionsFilter
+        );
 
-        $this->expectException(TypeError::class);
+        $this->expectException(InitialTestsFailed::class);
+
         $engine->execute();
     }
 }
