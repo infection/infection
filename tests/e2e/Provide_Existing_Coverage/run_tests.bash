@@ -11,7 +11,11 @@ else
     php $INFECTION
 fi
 
-diff expected-output_phpunit.txt infection.log
+if [[ -v GOLDEN ]]; then
+   cp -v infection.log expected-output_phpunit.txt
+fi
+
+diff -u expected-output_phpunit.txt infection.log
 
 if [ -f "infection-cache/infection/phpunit.junit.xml" ]
 then

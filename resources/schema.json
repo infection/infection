@@ -7,9 +7,9 @@
     ],
     "properties": {
         "timeout": {
-            "type": "integer",
+            "type": "number",
             "description": "The allowed timeout in seconds.",
-            "minimum": "1"
+            "minimum": "0"
         },
         "source": {
             "type": "object",
@@ -50,6 +50,10 @@
                 "summary": {
                     "type": "string",
                     "definition": "Summary log file, which display the amount of mutants per category, (Killed, Errored, Escaped, Timed Out & Not Covered). More intended for internal purposes."
+                },
+                "json": {
+                    "type": "string",
+                    "definition": "JSON log file, which contains information about all mutants, as well as the source and mutated code and test framework output. Useful for using on CI servers to be able to programmatically analyze it."
                 },
                 "debug": {
                     "type": "string",
@@ -272,6 +276,7 @@
                 "FunctionCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "MethodCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "CloneRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "SharedCaseRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayOneItem": { "$ref": "#/definitions/default-mutator-config" },
                 "FloatNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "FunctionCall": { "$ref": "#/definitions/default-mutator-config" },

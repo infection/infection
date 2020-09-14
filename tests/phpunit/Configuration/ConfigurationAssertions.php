@@ -55,7 +55,7 @@ trait ConfigurationAssertions
      */
     private function assertConfigurationStateIs(
         Configuration $configuration,
-        ?int $expectedTimeout,
+        ?float $expectedTimeout,
         array $expectedSourceDirectories,
         array $expectedSourceFiles,
         string $expectedFilter,
@@ -95,6 +95,7 @@ trait ConfigurationAssertions
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),
             $expectedLogs->getSummaryLogFilePath(),
+            $expectedLogs->getJsonLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
             $expectedLogs->getBadge()

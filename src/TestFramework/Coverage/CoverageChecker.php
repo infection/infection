@@ -50,8 +50,9 @@ use function strtolower;
 
 /**
  * @internal
+ * @final
  */
-final class CoverageChecker
+class CoverageChecker
 {
     private const PHPUNIT = 'phpunit';
     private const CODECEPTION = 'codeception';

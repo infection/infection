@@ -90,7 +90,8 @@ final class MutantProcessFactoryTest extends TestCase
 - echo 'original';
 + echo 'killed#0';
 
-DIFF
+DIFF,
+            '<?php $a = 1;'
         );
 
         $testFrameworkExtraOptions = '--verbose';

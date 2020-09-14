@@ -392,5 +392,12 @@ if (strlen($a) === 0) {
 }
 PHP
         ];
+
+        yield 'It does not decrement when it is accessed zero index of an array' => [
+            <<<'PHP'
+<?php
+$b = $a[0];
+PHP
+        ];
     }
 }

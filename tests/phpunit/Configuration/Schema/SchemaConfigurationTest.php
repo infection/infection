@@ -49,7 +49,7 @@ final class SchemaConfigurationTest extends TestCase
      */
     public function test_it_can_be_instantiated(
         string $path,
-        ?int $timeout,
+        ?float $timeout,
         Source $source,
         Logs $logs,
         ?string $tmpDir,
@@ -117,11 +117,12 @@ final class SchemaConfigurationTest extends TestCase
 
         yield 'complete' => [
             '/path/to/config',
-            10,
+            10.,
             new Source(['src', 'lib'], ['fixtures', 'tests']),
             new Logs(
                 'text.log',
                 'summary.log',
+                'json.log',
                 'debug.log',
                 'mutator.log',
                 new Badge('master')

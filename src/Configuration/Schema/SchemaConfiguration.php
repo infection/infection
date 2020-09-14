@@ -66,7 +66,7 @@ final class SchemaConfiguration
      */
     public function __construct(
         string $file,
-        ?int $timeout,
+        ?float $timeout,
         Source $source,
         Logs $logs,
         ?string $tmpDir,
@@ -80,7 +80,7 @@ final class SchemaConfiguration
         ?string $initialTestsPhpOptions,
         ?string $testFrameworkExtraOptions
     ) {
-        Assert::nullOrGreaterThanEq($timeout, 1);
+        Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
 
         $this->file = $file;
@@ -104,7 +104,7 @@ final class SchemaConfiguration
         return $this->file;
     }
 
-    public function getTimeout(): ?int
+    public function getTimeout(): ?float
     {
         return $this->timeout;
     }

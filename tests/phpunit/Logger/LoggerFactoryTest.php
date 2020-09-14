@@ -43,6 +43,7 @@ use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\FileLogger;
+use Infection\Logger\JsonLogger;
 use Infection\Logger\LoggerFactory;
 use Infection\Logger\LoggerRegistry;
 use Infection\Logger\MutationTestingResultsLogger;
@@ -92,6 +93,7 @@ final class LoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 '/a/file',
+                '/a/file',
                 null
             )
         );
@@ -109,6 +111,7 @@ final class LoggerFactoryTest extends TestCase
 
         $logger = $factory->createFromLogEntries(
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -151,6 +154,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 null
             ),
             [TextFileLogger::class],
@@ -162,6 +166,7 @@ final class LoggerFactoryTest extends TestCase
                 'summary_file',
                 null,
                 null,
+                null,
                 null
             ),
             [SummaryFileLogger::class],
@@ -171,6 +176,7 @@ final class LoggerFactoryTest extends TestCase
             new Logs(
                 null,
                 null,
+                null,
                 'debug_file',
                 null,
                 null
@@ -178,8 +184,21 @@ final class LoggerFactoryTest extends TestCase
             [DebugFileLogger::class],
         ];
 
+        yield 'json logger' => [
+            new Logs(
+                null,
+                null,
+                'json_file',
+                null,
+                null,
+                null
+            ),
+            [JsonLogger::class],
+        ];
+
         yield 'per mutator logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -195,6 +214,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 new Badge('foo')
             ),
             [BadgeLogger::class],
@@ -204,6 +224,7 @@ final class LoggerFactoryTest extends TestCase
             new Logs(
                 'text',
                 'summary',
+                'json',
                 'debug',
                 'per_mutator',
                 new Badge('branch')
@@ -211,6 +232,7 @@ final class LoggerFactoryTest extends TestCase
             [
                 TextFileLogger::class,
                 SummaryFileLogger::class,
+                JsonLogger::class,
                 DebugFileLogger::class,
                 PerMutatorLogger::class,
                 BadgeLogger::class,

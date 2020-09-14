@@ -115,7 +115,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $frameworkFinder = new TestFrameworkFinder();
 
         $this->expectException(FinderException::class);
-        $this->expectExceptionMessageRegExp('/custom path/');
+        $this->expectExceptionMessage('custom path');
 
         $frameworkFinder->find('not-used', $filename);
     }

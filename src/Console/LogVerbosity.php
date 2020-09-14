@@ -66,6 +66,9 @@ final class LogVerbosity
      */
     public const NONE_INTEGER = 3;
 
+    /**
+     * @var array<int, string>
+     */
     public const ALLOWED_OPTIONS = [
         self::DEBUG_INTEGER => self::DEBUG,
         self::NORMAL_INTEGER => self::NORMAL,
@@ -80,7 +83,10 @@ final class LogVerbosity
             return;
         }
 
-        if (array_key_exists((int) $verbosityLevel, self::ALLOWED_OPTIONS)) {
+        // If that's non-standard, think it's a legacy numeric option.
+        $verbosityLevel = (int) $verbosityLevel;
+
+        if (array_key_exists($verbosityLevel, self::ALLOWED_OPTIONS)) {
             $input->setOption('log-verbosity', self::ALLOWED_OPTIONS[$verbosityLevel]);
             $io->logVerbosityDeprecationNotice(self::ALLOWED_OPTIONS[$verbosityLevel]);
 

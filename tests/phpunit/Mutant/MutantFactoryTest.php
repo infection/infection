@@ -119,11 +119,12 @@ final class MutantFactoryTest extends TestCase
             ->willReturn('mutated code')
         ;
 
+        $originalCode = 'original code';
         $this->printerMock
             ->expects($this->once())
             ->method('prettyPrintFile')
             ->with($originalNodes)
-            ->willReturn('original code')
+            ->willReturn($originalCode)
         ;
 
         $this->differMock
@@ -142,7 +143,8 @@ final class MutantFactoryTest extends TestCase
             'mutated code',
             'code diff',
             true,
-            $tests
+            $tests,
+            $originalCode
         );
     }
 

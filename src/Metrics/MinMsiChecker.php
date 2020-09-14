@@ -39,8 +39,9 @@ use Infection\Console\ConsoleOutput;
 
 /**
  * @internal
+ * @final
  */
-final class MinMsiChecker
+class MinMsiChecker
 {
     private const VALUE_OVER_REQUIRED_TOLERANCE = 2;
 

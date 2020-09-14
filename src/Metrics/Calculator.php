@@ -89,7 +89,7 @@ final class Calculator
             $calculator->getErrorCount(),
             $calculator->getTimedOutCount(),
             $calculator->getNotTestedCount(),
-            $calculator->getTotalMutantsCount()
+            $calculator->getTestedMutantsCount()
         );
     }
 

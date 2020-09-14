@@ -102,6 +102,18 @@ trait CreateMetricsCalculator
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
+                DetectionStatus::SKIPPED,
+                'skipped#0'
+            ),
+            $this->createMutantExecutionResult(
+                0,
+                PregQuote::class,
+                DetectionStatus::SKIPPED,
+                'skipped#1'
+            ),
+            $this->createMutantExecutionResult(
+                0,
+                For_::class,
                 DetectionStatus::NOT_COVERED,
                 'notCovered#0'
             ),
@@ -141,7 +153,9 @@ DIFF
             ),
             MutatorName::getName($mutatorClassName),
             'foo/bar',
-            10 - $i
+            10 - $i,
+            '<?php $a = 1;',
+            '<?php $a = 2;'
         );
     }
 }

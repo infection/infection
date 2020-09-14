@@ -44,8 +44,9 @@ use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class InitialTestsRunner
+class InitialTestsRunner
 {
     private $processBuilder;
     private $eventDispatcher;
