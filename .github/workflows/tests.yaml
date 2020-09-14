@@ -16,7 +16,7 @@ jobs:
           - { php-versions: '7.3', dependencies: '--prefer-lowest' }
           - { php-versions: '8.0', dependencies: '--ignore-platform-req=php' }
 
-    continue-on-error: ${{ matrix.php == '8.0' }}
+    continue-on-error: ${{ matrix.php-versions == '8.0' }}
     name: PHP ${{ matrix.php-versions }} ${{ matrix.dependencies }}
 
     steps:
@@ -42,4 +42,3 @@ jobs:
         run: |
           ./bin/infection -j$(nproc) --test-framework-options="--group=default"
           
-
