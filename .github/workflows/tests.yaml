@@ -32,8 +32,9 @@ jobs:
 
       - name: Install dependencies
         run: |
+          composer config prefer-stable true
+          composer config minimum-stability dev
           composer update --no-interaction ${{ matrix.dependencies }}
-          composer require --dev symfony/phpunit-bridge:dev-master
 
       - name: Run tests
         run: make test-unit
