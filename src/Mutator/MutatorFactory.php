@@ -92,4 +92,11 @@ final class MutatorFactory
 
         return $mutators;
     }
+
+    public static function getMutatorNameForClassName(string $className): string
+    {
+        $parts = explode('\\', $className);
+
+        return (string) end($parts);
+    }
 }
