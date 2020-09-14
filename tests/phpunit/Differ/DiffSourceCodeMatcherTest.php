@@ -169,5 +169,18 @@ DIFF
             ,
             false,
         ];
+
+        yield 'Regex contains delimiters should not lead to syntax error' => [
+            '/getString/',
+            <<<'DIFF'
+--- Original
++++ New
+@@ @@
+
++ $a - 2 + $this->getString();
+DIFF
+            ,
+            false,
+        ];
     }
 }

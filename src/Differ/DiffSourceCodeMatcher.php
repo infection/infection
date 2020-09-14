@@ -44,6 +44,8 @@ final class DiffSourceCodeMatcher
 {
     public function matches(string $diff, string $sourceCodeRegex): bool
     {
-        return preg_match("/^-\s*{$sourceCodeRegex}$/mu", $diff) === 1;
+        $regexWithEscapedDelimiters = str_replace('/', '\/', $sourceCodeRegex);
+
+        return preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff) === 1;
     }
 }
