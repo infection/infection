@@ -97,6 +97,7 @@ final class MutatorFactoryTest extends TestCase
             ],
         ]);
 
+        $this->assertContainsOnlyInstancesOf(IgnoreMutator::class, $mutators);
         $this->assertSameMutatorsByClass([TrueValue::class], $mutators);
 
         /** @var MockObject|ClassReflection $reflectionMock */
@@ -156,12 +157,12 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_cannot_create_an_unknown_mutator(): void
     {
         try {
-            $this->mutatorFactory->create(['Unknwon\Mutator' => []]);
+            $this->mutatorFactory->create(['Unknown\Mutator' => []]);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'Unknown mutator "Unknwon\Mutator"',
+                'Unknown mutator "Unknown\Mutator"',
                 $exception->getMessage()
             );
         }
@@ -199,10 +200,14 @@ final class MutatorFactoryTest extends TestCase
         $decoratedMutatorReflection->setAccessible(true);
 
         foreach (array_values($actualMutators) as $index => $mutator) {
-            $this->assertInstanceOf(IgnoreMutator::class, $mutator);
+            $this->assertInstanceOf(Mutator::class, $mutator);
 
             $expectedMutatorClass = $expectedMutatorClassNames[$index];
-            $actualMutatorClass = get_class($decoratedMutatorReflection->getValue($mutator));
+            $actualMutatorClass = get_class(
+                $mutator instanceof IgnoreMutator ?
+                    $decoratedMutatorReflection->getValue($mutator) :
+                    $mutator
+            );
 
             $this->assertSame(
                 $expectedMutatorClass,
