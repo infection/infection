@@ -572,14 +572,8 @@ final class ConfigurationFactoryTest extends TestCase
             'AssignmentEqual,EqualIdentical',
             (static function (): array {
                 return [
-                    'AssignmentEqual' => new IgnoreMutator(
-                        new IgnoreConfig([]),
-                        new AssignmentEqual()
-                    ),
-                    'EqualIdentical' => new IgnoreMutator(
-                        new IgnoreConfig([]),
-                        new EqualIdentical()
-                    ),
+                    'AssignmentEqual' => new AssignmentEqual(),
+                    'EqualIdentical' => new EqualIdentical(),
                 ];
             })()
         );
@@ -719,10 +713,7 @@ final class ConfigurationFactoryTest extends TestCase
             ),
             (static function (): array {
                 return [
-                    'TrueValue' => new IgnoreMutator(
-                        new IgnoreConfig([]),
-                        new TrueValue(new TrueValueConfig([]))
-                    ),
+                    'TrueValue' => new TrueValue(new TrueValueConfig([])),
                 ];
             })(),
             'phpspec',
