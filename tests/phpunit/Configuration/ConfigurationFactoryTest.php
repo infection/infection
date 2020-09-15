@@ -1701,10 +1701,7 @@ final class ConfigurationFactoryTest extends TestCase
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             [
-                'MethodCallRemoval' => new IgnoreMutator(
-                    new IgnoreConfig([]),
-                    new MethodCallRemoval()
-                ),
+                'MethodCallRemoval' => new MethodCallRemoval(),
             ],
             'phpunit',
             null,

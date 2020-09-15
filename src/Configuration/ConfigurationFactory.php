@@ -39,11 +39,12 @@ use function array_fill_keys;
 use function array_key_exists;
 use function count;
 use function dirname;
-use function explode;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Mutator\ConfigurableMutator;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
@@ -166,7 +167,7 @@ class ConfigurationFactory
     /**
      * @param array<string, mixed> $schemaMutators
      *
-     * @return array<string, mixed[]>
+     * @return array<class-string<Mutator&ConfigurableMutator>, mixed[]>
      */
     public function resolveMutators(array $schemaMutators, string $mutatorsInput): array
     {
@@ -273,10 +274,8 @@ class ConfigurationFactory
 
         foreach ($resolvedMutatorsMap as $mutatorClassName => $config) {
             if (array_key_exists('ignoreSourceCodeByRegex', $config)) {
-                $classNameParts = explode('\\', $mutatorClassName);
-                $mutatorName = end($classNameParts);
+                $mutatorName = MutatorFactory::getMutatorNameForClassName($mutatorClassName);
 
-                Assert::string($mutatorName);
                 Assert::isArray($config['ignoreSourceCodeByRegex']);
 
                 $map[$mutatorName] = $config['ignoreSourceCodeByRegex'];
