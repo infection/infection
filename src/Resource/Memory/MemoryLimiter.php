@@ -44,8 +44,9 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
+ * @final
  */
-final class MemoryLimiter
+class MemoryLimiter
 {
     private $fileSystem;
     private $phpIniPath;

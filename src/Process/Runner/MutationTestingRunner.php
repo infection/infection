@@ -50,8 +50,9 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
+ * @final
  */
-final class MutationTestingRunner
+class MutationTestingRunner
 {
     private $processFactory;
     private $mutantFactory;
