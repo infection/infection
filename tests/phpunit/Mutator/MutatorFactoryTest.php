@@ -45,6 +45,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
+use Infection\Mutator\Sort\Spaceship;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use Infection\Tests\SingletonContainer;
@@ -165,6 +166,13 @@ final class MutatorFactoryTest extends TestCase
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_it_can_parse_name(): void
+    {
+        $name = $this->mutatorFactory::getMutatorNameForClassName(Spaceship::class);
+
+        $this->assertSame('Spaceship', $name);
     }
 
     private function createBoolNode(string $boolean, string $functionName, ClassReflection $reflectionMock): Node

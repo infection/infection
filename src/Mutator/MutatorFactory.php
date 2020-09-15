@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function end;
+use function explode;
 use function is_a;
 use function Safe\array_flip;
 use function Safe\sprintf;
@@ -93,6 +95,13 @@ final class MutatorFactory
         }
 
         return $mutators;
+    }
+
+    public static function getMutatorNameForClassName(string $className): string
+    {
+        $parts = explode('\\', $className);
+
+        return (string) end($parts);
     }
 
     /**
