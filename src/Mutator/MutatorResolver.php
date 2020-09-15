@@ -57,7 +57,7 @@ final class MutatorResolver
      *
      * @param array<string, bool|stdClass> $mutatorSettings
      *
-     * @return array<string, mixed[]>
+     * @return array<class-string<Mutator&ConfigurableMutator>, mixed[]>
      */
     public function resolve(array $mutatorSettings): array
     {
