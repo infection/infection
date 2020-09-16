@@ -37,7 +37,6 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
-use function count;
 use function dirname;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -169,9 +168,9 @@ class ConfigurationFactory
      *
      * @return array<class-string<Mutator&ConfigurableMutator>, mixed[]>
      */
-    public function resolveMutators(array $schemaMutators, string $mutatorsInput): array
+    private function resolveMutators(array $schemaMutators, string $mutatorsInput): array
     {
-        if (count($schemaMutators) === 0) {
+        if ($schemaMutators === []) {
             $schemaMutators = ['@default' => true];
         }
 
