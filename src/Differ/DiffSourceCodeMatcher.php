@@ -33,60 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator;
+namespace Infection\Differ;
 
-use function array_key_exists;
-use const FNM_NOESCAPE;
-use function fnmatch;
-use function Safe\array_flip;
+use function Safe\preg_match;
 
 /**
  * @internal
- * @final
  */
-class IgnoreConfig
+final class DiffSourceCodeMatcher
 {
-    private $patterns;
-    /** @var array<string, int> */
-    private $hashtable = [];
-
-    /**
-     * @param string[] $ignored
-     */
-    public function __construct(array $ignored)
+    public function matches(string $diff, string $sourceCodeRegex): bool
     {
-        $this->patterns = $ignored;
+        $regexWithEscapedDelimiters = str_replace('/', '\/', $sourceCodeRegex);
 
-        if ($ignored !== []) {
-            $this->hashtable = array_flip($ignored);
-        }
-    }
-
-    public function isIgnored(string $class, string $method, ?int $lineNumber): bool
-    {
-        if ($this->patterns === []) {
-            return false;
-        }
-
-        if (array_key_exists($class, $this->hashtable)) {
-            return true;
-        }
-
-        $classMethod = $class . '::' . $method;
-
-        if (array_key_exists($classMethod, $this->hashtable)) {
-            return true;
-        }
-
-        foreach ($this->patterns as $ignorePattern) {
-            if (fnmatch($ignorePattern, $class, FNM_NOESCAPE)
-                || fnmatch($ignorePattern, $classMethod, FNM_NOESCAPE)
-                || ($lineNumber !== null && fnmatch($ignorePattern, $classMethod . '::' . $lineNumber, FNM_NOESCAPE))
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+        return preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff) === 1;
     }
 }

@@ -1,0 +1,18 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Exclude_Mutations_By_Regex\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Exclude_Mutations_By_Regex\\Test\\": "tests/"
+        }
+    },
+    "require": {
+        "webmozart/assert": "^1.9"
+    }
+}
