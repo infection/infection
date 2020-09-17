@@ -33,16 +33,47 @@
 
 declare(strict_types=1);
 
-return [
-    'whitelist' => [
-        \Composer\Autoload\ClassLoader::class,
-        'Safe\*',
-        \Infection\Plugins\Plugin::class,
-        \Infection\Plugins\MutantFilterPlugin::class,
-        \Infection\Plugins\Mutant::class,
-        \Infection\Plugins\Configuration::class,
-    ],
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
-];
+namespace Infection;
+
+use function array_filter;
+use Infection\Plugins\Configuration as PluginConfiguration;
+use Infection\Plugins\MutantFilterPlugin;
+use Infection\Plugins\Plugin;
+use Webmozart\Assert\Assert;
+
+/**
+ * Recognizes and provides different types of plugin class instances.
+ *
+ * @internal
+ */
+final class PluginProvider
+{
+    /**
+     * @var Plugin[]
+     */
+    private $plugins;
+
+    /**
+     * @param array<class-string<Plugin>> $plugins
+     */
+    public function __construct(array $plugins, PluginConfiguration $configuration)
+    {
+        $this->plugins = [];
+
+        foreach ($plugins as $pluginClassName) {
+            Assert::classExists($pluginClassName);
+
+            $this->plugins[] = $pluginClassName::create($configuration);
+        }
+    }
+
+    /**
+     * @return MutantFilterPlugin[]
+     */
+    public function getMutantFilters(): array
+    {
+        return array_filter($this->plugins, static function (Plugin $plugin): bool {
+            return $plugin instanceof MutantFilterPlugin;
+        });
+    }
+}

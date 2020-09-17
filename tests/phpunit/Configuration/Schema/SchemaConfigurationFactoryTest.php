@@ -2429,6 +2429,7 @@ JSON
             'bootstrap' => null,
             'initialTestsPhpOptions' => null,
             'testFrameworkOptions' => null,
+            'plugins' => [],
         ];
 
         $args = array_values(array_merge($defaultArgs, $args));

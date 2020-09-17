@@ -33,16 +33,20 @@
 
 declare(strict_types=1);
 
-return [
-    'whitelist' => [
-        \Composer\Autoload\ClassLoader::class,
-        'Safe\*',
-        \Infection\Plugins\Plugin::class,
-        \Infection\Plugins\MutantFilterPlugin::class,
-        \Infection\Plugins\Mutant::class,
-        \Infection\Plugins\Configuration::class,
-    ],
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
-];
+namespace Infection\Plugins;
+
+/**
+ * Common input for mutant filters.
+ */
+interface Mutant
+{
+    public function getFilePath(): string;
+
+    public function getMutatedCode(): string;
+
+    public function getDiff(): string;
+
+    public function isCoveredByTest(): bool;
+
+    public function getMutatorName(): string;
+}

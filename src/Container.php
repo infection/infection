@@ -81,6 +81,7 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
+use Infection\Mutant\MutantFiltersHandler;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutation\MutationGenerator;
@@ -89,6 +90,7 @@ use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
+use Infection\Plugins\Wrapper\ContainerWrapper;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Process\Runner\DryProcessRunner;
@@ -563,6 +565,7 @@ final class Container
                 return new MutationTestingRunner(
                     $container->getMutantProcessFactory(),
                     $container->getMutantFactory(),
+                    $container->getMutantFiltersHandler(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
                     $configuration->isDryRun()
@@ -572,6 +575,17 @@ final class Container
                     $configuration->noProgress(),
                     $configuration->getProcessTimeout(),
                     $configuration->getIgnoreSourceCodeMutatorsMap()
+                );
+            },
+            MutantFiltersHandler::class => static function (self $container): MutantFiltersHandler {
+                return new MutantFiltersHandler(
+                    $container->getPluginProvider()->getMutantFilters()
+                );
+            },
+            PluginProvider::class => static function (self $container): PluginProvider {
+                return new PluginProvider(
+                    $container->getConfiguration()->getPlugins(),
+                    new ContainerWrapper($container)
                 );
             },
             LineRangeCalculator::class => static function (): LineRangeCalculator {
@@ -850,6 +864,16 @@ final class Container
     public function getMutantFactory(): MutantFactory
     {
         return $this->get(MutantFactory::class);
+    }
+
+    public function getMutantFiltersHandler(): MutantFiltersHandler
+    {
+        return $this->get(MutantFiltersHandler::class);
+    }
+
+    public function getPluginProvider(): PluginProvider
+    {
+        return $this->get(PluginProvider::class);
     }
 
     public function getDiffer(): Differ

@@ -61,7 +61,8 @@ final class SchemaConfigurationTest extends TestCase
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkExtraOptions
+        ?string $testFrameworkExtraOptions,
+        array $plugins
     ): void {
         $config = new SchemaConfiguration(
             $path,
@@ -77,7 +78,8 @@ final class SchemaConfigurationTest extends TestCase
             $testFramework,
             $bootstrap,
             $initialTestsPhpOptions,
-            $testFrameworkExtraOptions
+            $testFrameworkExtraOptions,
+            $plugins
         );
 
         $this->assertSame($path, $config->getFile());
@@ -94,6 +96,7 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($bootstrap, $config->getBootstrap());
         $this->assertSame($initialTestsPhpOptions, $config->getInitialTestsPhpOptions());
         $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions());
+        $this->assertSame($plugins, $config->getPlugins());
     }
 
     public function valueProvider(): iterable
@@ -113,6 +116,7 @@ final class SchemaConfigurationTest extends TestCase
             null,
             null,
             null,
+            [],
         ];
 
         yield 'complete' => [
@@ -140,6 +144,7 @@ final class SchemaConfigurationTest extends TestCase
             'bin/bootstrap.php',
             '-d zend_extension=xdebug.so',
             '--debug',
+            ['Foo'],
         ];
     }
 }

@@ -52,7 +52,6 @@ trait ConfigurationAssertions
      * @param string[] $expectedSourceDirectories
      * @param string[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
-     * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
      */
     private function assertConfigurationStateIs(
         Configuration $configuration,
@@ -83,7 +82,8 @@ trait ConfigurationAssertions
         int $expectedMsiPrecision,
         int $expectedThreadCount,
         bool $expectedDryRyn,
-        array $expectedIgnoreSourceCodeMutatorsMap
+        array $expectedIgnoreSourceCodeMutatorsMap,
+        array $expectedPlugins
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
@@ -131,6 +131,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedThreadCount, $configuration->getThreadCount());
         $this->assertSame($expectedDryRyn, $configuration->isDryRun());
         $this->assertSame($expectedIgnoreSourceCodeMutatorsMap, $configuration->getIgnoreSourceCodeMutatorsMap());
+        $this->assertSame($expectedPlugins, $configuration->getPlugins());
     }
 
     /**

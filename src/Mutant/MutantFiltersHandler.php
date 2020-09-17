@@ -33,16 +33,49 @@
 
 declare(strict_types=1);
 
-return [
-    'whitelist' => [
-        \Composer\Autoload\ClassLoader::class,
-        'Safe\*',
-        \Infection\Plugins\Plugin::class,
-        \Infection\Plugins\MutantFilterPlugin::class,
-        \Infection\Plugins\Mutant::class,
-        \Infection\Plugins\Configuration::class,
-    ],
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
-];
+namespace Infection\Mutant;
+
+use Infection\Plugins\Mutant as PublicMutant;
+use Infection\Plugins\MutantFilterPlugin;
+use Pipeline\Interfaces\StandardPipeline as MutantPipeline;
+
+/**
+ * @internal
+ * @final
+ */
+class MutantFiltersHandler
+{
+    /**
+     * @var array<callable>
+     * @psalm-var array<callable(PublicMutant): bool>
+     */
+    private $filters;
+
+    /**
+     * @param array<MutantFilterPlugin> $filters
+     */
+    public function __construct(array $filters)
+    {
+        $this->filters = [];
+
+        foreach ($filters as $filter) {
+            $filterCallable = $filter->getMutantFilter();
+
+            if ($filterCallable !== null) {
+                $this->filters[] = $filterCallable;
+            }
+        }
+    }
+
+    /**
+     * @param MutantPipeline<Mutant> $mutants
+     */
+    public function applyFilters(MutantPipeline $mutants): void
+    {
+        foreach ($this->filters as $filterCallback) {
+            $mutants->filter(static function (Mutant $mutant) use ($filterCallback): bool {
+                return $filterCallback($mutant->getMutantWrapper());
+            });
+        }
+    }
+}

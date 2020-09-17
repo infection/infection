@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\Mutator;
+use Infection\Plugins\Plugin;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -82,6 +83,7 @@ class Configuration
     private $threadCount;
     private $dryRun;
     private $ignoreSourceCodeMutatorsMap;
+    private $plugins;
 
     /**
      * @param string[] $sourceDirectories
@@ -89,6 +91,7 @@ class Configuration
      * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param array<class-string<Plugin>> $plugins
      */
     public function __construct(
         float $timeout,
@@ -118,7 +121,8 @@ class Configuration
         int $msiPrecision,
         int $threadCount,
         bool $dryRun,
-        array $ignoreSourceCodeMutatorsMap
+        array $ignoreSourceCodeMutatorsMap,
+        array $plugins
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
@@ -156,6 +160,7 @@ class Configuration
         $this->threadCount = $threadCount;
         $this->dryRun = $dryRun;
         $this->ignoreSourceCodeMutatorsMap = $ignoreSourceCodeMutatorsMap;
+        $this->plugins = $plugins;
     }
 
     public function getProcessTimeout(): float
@@ -253,6 +258,14 @@ class Configuration
     public function shouldSkipInitialTests(): bool
     {
         return $this->skipInitialTests;
+    }
+
+    /**
+     * @return array<class-string<Plugin>>
+     */
+    public function getPlugins(): array
+    {
+        return $this->plugins;
     }
 
     public function isDebugEnabled(): bool

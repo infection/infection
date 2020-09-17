@@ -159,7 +159,8 @@ class ConfigurationFactory
             $msiPrecision,
             $threadCount,
             $dryRun,
-            $ignoreSourceCodeMutatorsMap
+            $ignoreSourceCodeMutatorsMap,
+            $schema->getPlugins()
         );
     }
 

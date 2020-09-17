@@ -33,16 +33,58 @@
 
 declare(strict_types=1);
 
-return [
-    'whitelist' => [
-        \Composer\Autoload\ClassLoader::class,
-        'Safe\*',
-        \Infection\Plugins\Plugin::class,
-        \Infection\Plugins\MutantFilterPlugin::class,
-        \Infection\Plugins\Mutant::class,
-        \Infection\Plugins\Configuration::class,
-    ],
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
-];
+namespace Infection\Tests;
+
+use Infection\PluginProvider;
+use Infection\Plugins\Configuration;
+use Infection\Plugins\MutantFilterPlugin;
+use Infection\Plugins\Plugin;
+use PHPUnit\Framework\TestCase;
+
+final class PluginProviderTest extends TestCase
+{
+    private $examplePlugin;
+
+    public function test_it_exists(): void
+    {
+        $examplePlugin = new class() implements MutantFilterPlugin {
+            /** @var self&Plugin */
+            public static $instance;
+
+            public static function create(Configuration $container): self
+            {
+                return self::$instance;
+            }
+
+            public function getMutantFilter(): ?callable
+            {
+                return null;
+            }
+        };
+
+        $examplePlugin::$instance = $examplePlugin;
+
+        $examplePlugin2 = new class() implements Plugin {
+            /** @var self&Plugin */
+            public static $instance;
+
+            public static function create(Configuration $container): self
+            {
+                return self::$instance;
+            }
+        };
+
+        $examplePlugin2::$instance = $examplePlugin2;
+
+        $container = $this->createMock(Configuration::class);
+
+        $provider = new PluginProvider([
+                get_class($examplePlugin),
+                get_class($examplePlugin2),
+        ], $container);
+
+        $this->assertSame([
+                $examplePlugin,
+        ], $provider->getMutantFilters());
+    }
+}

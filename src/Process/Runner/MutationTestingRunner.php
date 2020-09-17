@@ -45,6 +45,7 @@ use Infection\IterableCounter;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
+use Infection\Mutant\MutantFiltersHandler;
 use Infection\Mutation\Mutation;
 use Infection\Process\Factory\MutantProcessFactory;
 use function Pipeline\take;
@@ -58,6 +59,7 @@ class MutationTestingRunner
 {
     private $processFactory;
     private $mutantFactory;
+    private $pluginsHandler;
     private $processRunner;
     private $eventDispatcher;
     private $fileSystem;
@@ -73,6 +75,7 @@ class MutationTestingRunner
     public function __construct(
         MutantProcessFactory $processFactory,
         MutantFactory $mutantFactory,
+        MutantFiltersHandler $pluginsHandler,
         ProcessRunner $processRunner,
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
@@ -83,6 +86,7 @@ class MutationTestingRunner
     ) {
         $this->processFactory = $processFactory;
         $this->mutantFactory = $mutantFactory;
+        $this->pluginsHandler = $pluginsHandler;
         $this->processRunner = $processRunner;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileSystem = $fileSystem;
@@ -100,10 +104,14 @@ class MutationTestingRunner
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
-        $processes = take($mutations)
+        $mutants = take($mutations)
             ->map(function (Mutation $mutation): Mutant {
                 return $this->mutantFactory->create($mutation);
-            })
+            });
+
+        $this->pluginsHandler->applyFilters($mutants);
+
+        $processes = $mutants
             ->filter(function (Mutant $mutant) {
                 // It's a proxy call to Mutation, can be done one stage up
                 if ($mutant->isCoveredByTest()) {

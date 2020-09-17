@@ -47,6 +47,7 @@ use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantFactory;
+use Infection\Mutant\MutantFiltersHandler;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\PhpParser\MutatedNode;
@@ -61,6 +62,7 @@ use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Pipeline\Standard;
 use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -78,6 +80,11 @@ final class MutationTestingRunnerTest extends TestCase
      * @var MutantFactory|MockObject
      */
     private $mutantFactoryMock;
+
+    /**
+     * @var MutantFiltersHandler|MockObject
+     */
+    private $pluginsHandler;
 
     /**
      * @var ProcessRunner|MockObject
@@ -103,6 +110,7 @@ final class MutationTestingRunnerTest extends TestCase
     {
         $this->processFactoryMock = $this->createMock(MutantProcessFactory::class);
         $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
+        $this->pluginsHandler = $this->createMock(MutantFiltersHandler::class);
         $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
         $this->fileSystemMock = $this->createMock(Filesystem::class);
@@ -110,6 +118,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
+            $this->pluginsHandler,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
@@ -279,12 +288,13 @@ final class MutationTestingRunnerTest extends TestCase
         $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->iterableContaining([$process0, $process1]), )
+            ->with($this->iterableContaining([$process0, $process1]))
         ;
 
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
+            $this->pluginsHandler,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
@@ -348,6 +358,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
+            $this->pluginsHandler,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
@@ -383,6 +394,14 @@ final class MutationTestingRunnerTest extends TestCase
             ->method($this->anything())
         ;
 
+        $this->pluginsHandler
+            ->expects($this->once())
+            ->method('applyFilters')
+            ->with($this->callback(static function (Standard $arg) {
+                return true;
+            }))
+        ;
+
         $this->processFactoryMock
             ->expects($this->never())
             ->method($this->anything())
@@ -397,6 +416,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
+            $this->pluginsHandler,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
