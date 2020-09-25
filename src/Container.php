@@ -55,6 +55,7 @@ use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
+use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -557,16 +558,20 @@ final class Container
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
+                $configuration = $container->getConfiguration();
+
                 return new MutationTestingRunner(
                     $container->getMutantProcessFactory(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
-                    $container->getConfiguration()->isDryRun()
+                    $configuration->isDryRun()
                         ? new DummyFileSystem()
                         : $container->getFileSystem(),
-                    $container->getConfiguration()->noProgress(),
-                    $container->getConfiguration()->getProcessTimeout()
+                    $container->getDiffSourceCodeMatcher(),
+                    $configuration->noProgress(),
+                    $configuration->getProcessTimeout(),
+                    $configuration->getIgnoreSourceCodeMutatorsMap()
                 );
             },
             LineRangeCalculator::class => static function (): LineRangeCalculator {
@@ -589,6 +594,9 @@ final class Container
             },
             FormatterFactory::class => static function (self $container): FormatterFactory {
                 return new FormatterFactory($container->getOutput());
+            },
+            DiffSourceCodeMatcher::class => static function (): DiffSourceCodeMatcher {
+                return new DiffSourceCodeMatcher();
             },
         ]);
 
@@ -1132,6 +1140,11 @@ final class Container
     public function getOutputFormatter(): OutputFormatter
     {
         return $this->get(OutputFormatter::class);
+    }
+
+    public function getDiffSourceCodeMatcher(): DiffSourceCodeMatcher
+    {
+        return $this->get(DiffSourceCodeMatcher::class);
     }
 
     /**

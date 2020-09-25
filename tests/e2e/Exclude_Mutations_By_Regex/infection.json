@@ -1,0 +1,31 @@
+{
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "summary": "infection.log"
+    },
+    "tmpDir": ".",
+    "mutators": {
+        "global-ignoreSourceCodeByRegex": [
+            ".*hello.*"
+        ],
+        "PublicVisibility": {
+            "ignore": [
+                "App\\*"
+            ],
+            "ignoreSourceCodeByRegex": [
+                ".*getString.*"
+            ]
+        },
+        "MethodCallRemoval": {
+            "ignoreSourceCodeByRegex": [
+                "Assert::.*",
+                "\\$this->getString\\(\\);"
+            ]
+        }
+    }
+}
