@@ -688,12 +688,12 @@ XML
         ];
 
         yield 'invalid URL' => [
-            'https://unknown.com',
+            'https://unknown.example.com',
             <<<'EOF'
 The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-[Warning] failed to load external entity "https://unknown.com"
+[Warning] failed to load external entity "https://unknown.example.com"
 
-[Error] Failed to locate the main schema resource at 'https://unknown.com'.
+[Error] Failed to locate the main schema resource at 'https://unknown.example.com'.
 
 
 EOF
