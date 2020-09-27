@@ -32,8 +32,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer config prefer-stable true
-          composer config minimum-stability dev
           composer update --no-interaction ${{ matrix.dependencies }}
 
       - name: Run tests
