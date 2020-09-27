@@ -49,6 +49,9 @@ install:
 test_script:
     - cd c:\projects\workspace
     - vendor\bin\phpunit --prepend=tests/xdebug-filter.php --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml
+    - New-Item -ItemType Directory -Path build\cache
+    - Copy-Item -Path vendor\phpunit\phpunit\phpunit.xsd -Destination build\cache -Force
+    - Copy-Item -Path vendor\phpunit\phpunit\schema\9.2.xsd -Destination build\cache -Force -ErrorAction SilentlyContinue
     - php bin\infection --threads=%NUMBER_OF_PROCESSORS% --log-verbosity=none --coverage=coverage --no-progress --only-covered --ignore-msi-with-no-mutations
 
 matrix:
