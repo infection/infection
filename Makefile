@@ -224,13 +224,9 @@ composer.lock: composer.json
 $(PHPUNIT): vendor phpunit.xml.dist
 	touch -c $@
 
-phpunit.xml.dist: build/cache/phpunit.xsd
+phpunit.xml.dist:
 	# Not updating phpunit.xml with:
 	# phpunit --migrate-configuration || true
-
-build/cache/phpunit.xsd: vendor/phpunit/phpunit/phpunit.xsd
-	mkdir -p build/cache
-	for xsd in vendor/phpunit/phpunit/schema/9.2.xsd vendor/phpunit/phpunit/phpunit.xsd; do test -f $$xsd && cp -v $$xsd $@ && break; done
 
 $(DOCKER_RUN_73_IMAGE): devTools/Dockerfile-php73-xdebug
 	docker build --tag infection_php73 --file devTools/Dockerfile-php73-xdebug .
