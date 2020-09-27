@@ -6,8 +6,8 @@
   </build>
   <project source="src">
     <tests>
-      <test name="Namespace_\Test\SourceClassTest::test_it_adds" size="unknown" result="0" status="PASSED"/>
-      <test name="Namespace_\Test\SourceClassTest::test_it_returns_true" size="unknown" result="0" status="PASSED"/>
+      <test name="ProvideExistingCoverage\Test\SourceClassTest::test_it_adds" size="unknown" result="0" status="PASSED"/>
+      <test name="ProvideExistingCoverage\Test\SourceClassTest::test_it_returns_true" size="unknown" result="0" status="PASSED"/>
     </tests>
     <directory name="/">
       <totals>
