@@ -147,8 +147,8 @@ final class E2ETest extends TestCase
             '--test-framework-options="--exclude-group=' . self::EXCLUDED_GROUP . '"',
         ]);
 
-        $this->assertRegExp('/\d+ mutations were generated/', $output);
-        $this->assertRegExp('/\d{2,} mutants were killed/', $output);
+        $this->assertMatchesRegularExpression('/\d+ mutations were generated/', $output);
+        $this->assertMatchesRegularExpression('/\d{2,} mutants were killed/', $output);
     }
 
     public function test_it_runs_configure_command_if_no_configuration(): void
@@ -195,9 +195,9 @@ final class E2ETest extends TestCase
         $this->installComposerDeps();
         $output = $this->runInfection(self::EXPECT_SUCCESS);
 
-        $this->assertRegExp('/You are running Infection with \w+ enabled./', $output);
-        $this->assertRegExp('/\d+ mutations were generated/', $output);
-        $this->assertRegExp('/\d+ mutants were killed/', $output);
+        $this->assertMatchesRegularExpression('/You are running Infection with \w+ enabled./', $output);
+        $this->assertMatchesRegularExpression('/\d+ mutations were generated/', $output);
+        $this->assertMatchesRegularExpression('/\d+ mutants were killed/', $output);
 
         if (isset($_SERVER['GOLDEN'])) {
             copy('infection.log', 'expected-output.txt');
