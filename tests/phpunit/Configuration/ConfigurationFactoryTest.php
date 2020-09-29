@@ -56,6 +56,7 @@ use Infection\Tests\Fixtures\DummyCiDetector;
 use function Infection\Tests\normalizePath;
 use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
@@ -66,6 +67,7 @@ use function sys_get_temp_dir;
 final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;
+    use ProphecyTrait;
 
     /**
      * @var array<string, Mutator>|null

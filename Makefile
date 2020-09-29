@@ -221,8 +221,12 @@ composer.lock: composer.json
 	composer install
 	touch -c $@
 
-$(PHPUNIT): vendor
+$(PHPUNIT): vendor phpunit.xml.dist
 	touch -c $@
+
+phpunit.xml.dist:
+	# Not updating phpunit.xml with:
+	# phpunit --migrate-configuration || true
 
 $(DOCKER_RUN_73_IMAGE): devTools/Dockerfile-php73-xdebug
 	docker build --tag infection_php73 --file devTools/Dockerfile-php73-xdebug .
