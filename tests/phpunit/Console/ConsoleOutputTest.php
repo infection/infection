@@ -144,8 +144,8 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The MSI is 5% percentage points over the required MSI. Consider increasing the required MSI
- !        percentage the next time you run Infection.
+ ! [NOTE] The MSI is 5% percentage points over the required MSI. Consider increasing the required
+ !        MSI percentage the next time you run Infection.
 
 
 TXT
