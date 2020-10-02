@@ -52,7 +52,7 @@
         "infection/include-interceptor": "^0.2.4",
         "justinrainbow/json-schema": "^5.2",
         "nikic/php-parser": "^4.2.2",
-        "ocramius/package-versions": "^1.2",
+        "composer/package-versions-deprecated": "^1.2",
         "ondram/ci-detector": "^3.3.0",
         "sanmai/pipeline": "^3.1 || ^5.0",
         "sebastian/diff": "^3.0.2 || ^4.0",
