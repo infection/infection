@@ -51,7 +51,7 @@
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.4",
         "justinrainbow/json-schema": "^5.2",
-        "nikic/php-parser": "^4.9",
+        "nikic/php-parser": "^4.9 <4.10",
         "composer/package-versions-deprecated": "^1.2",
         "ondram/ci-detector": "^3.3.0",
         "sanmai/pipeline": "^3.1 || ^5.0",
