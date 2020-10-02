@@ -144,8 +144,8 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The MSI is 5% percent points over the required MSI. Consider increasing the required MSI
- !        percentage the next time you run infection.
+ ! [NOTE] The MSI is 5% percentage points over the required MSI. Consider increasing the required MSI
+ !        percentage the next time you run Infection.
 
 
 TXT
@@ -164,8 +164,8 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The Covered Code MSI is 5% percent points over the required Covered Code MSI. Consider
- !        increasing the required Covered Code MSI percentage the next time you run infection.
+ ! [NOTE] The Covered Code MSI is 5% percentage points over the required Covered Code MSI. Consider
+ !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
 TXT
