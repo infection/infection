@@ -107,7 +107,7 @@ TXT
      */
     public function mutate(Node $arrayNode): iterable
     {
-        Assert::notNull($arrayNode->items);
+        Assert::allNotNull($arrayNode->items);
 
         foreach ($this->getItemsIndexes($arrayNode->items) as $indexToRemove) {
             $newArrayNode = clone $arrayNode;
