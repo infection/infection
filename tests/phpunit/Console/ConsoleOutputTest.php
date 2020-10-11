@@ -42,6 +42,7 @@ use function Infection\Tests\normalize_trailing_spaces;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Terminal;
 
 final class ConsoleOutputTest extends TestCase
 {
@@ -57,7 +58,7 @@ final class ConsoleOutputTest extends TestCase
 
     protected function setUp(): void
     {
-        if (getenv('COLUMNS') !== '100') {
+        if ((new Terminal())->getWidth() !== '100') {
             $this->markTestSkipped('This test assumes 100 columns wide display');
         }
 
