@@ -58,8 +58,10 @@ final class ConsoleOutputTest extends TestCase
 
     protected function setUp(): void
     {
-        if ((new Terminal())->getWidth() !== '100') {
-            $this->markTestSkipped('This test assumes 100 columns wide display');
+        $terminalWidth = (new Terminal())->getWidth();
+
+        if ($terminalWidth !== 100) {
+            $this->markTestSkipped("This test assumes 100 columns wide display (seeing $terminalWidth)");
         }
 
         $this->output = new BufferedOutput();
