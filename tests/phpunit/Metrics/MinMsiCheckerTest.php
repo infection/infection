@@ -44,6 +44,7 @@ use function Infection\Tests\normalize_trailing_spaces;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Terminal;
 
 final class MinMsiCheckerTest extends TestCase
 {
@@ -59,6 +60,12 @@ final class MinMsiCheckerTest extends TestCase
 
     protected function setUp(): void
     {
+        $terminalWidth = (new Terminal())->getWidth();
+
+        if ($terminalWidth !== 100) {
+            $this->markTestSkipped("This test assumes 100 columns wide display (seeing $terminalWidth)");
+        }
+
         $this->output = new BufferedOutput();
 
         $this->consoleOutput = new ConsoleOutput(
