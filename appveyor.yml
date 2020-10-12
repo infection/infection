@@ -21,7 +21,7 @@ cache: # cache is cleared when linked file is modified
 
 init:
     - SET PATH=C:\Program Files\OpenSSL;c:\tools\php;%PATH%
-    - SET ANSICON=121x100 (121x100)
+    - SET ANSICON=121x101 (121x101)
     - SET COMPOSER_NO_INTERACTION=1
     - SET COMPOSER_FLAGS=--no-interaction --no-progress --no-suggest --prefer-dist
 
