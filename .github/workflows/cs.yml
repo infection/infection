@@ -20,7 +20,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.3
-          tools: php-cs-fixer:v2.16
+          tools: php-cs-fixer:2.16
 
       - name: Restore PHP-CS-Fixer cache
         uses: actions/cache@v2
