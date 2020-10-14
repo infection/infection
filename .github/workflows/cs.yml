@@ -1,38 +1,34 @@
-# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
-
-name: "Continuous Integration"
+name: Coding Standards
 
 on:
-  - "pull_request"
-  - "push"
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
 
 jobs:
   coding-standards:
-    name: "Coding Standards"
-
-    runs-on: "ubuntu-latest"
-
-    env:
-      PHP_CS_FIXER_BINARY: ".tools/php-cs-fixer"
-      PHP_CS_FIXER_CACHE_DIRECTORY: "build/cache/php-cs-fixer"
-      PHP_CS_FIXER_URL: "https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
+    name: Coding Standards
+    runs-on: ubuntu-latest
 
     steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v2"
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - name: "Download friendsofphp/php-cs-fixer to ${{ env.PHP_CS_FIXER_BINARY }}"
-        run: "wget ${{ env.PHP_CS_FIXER_URL }} --output-document=${{ env.PHP_CS_FIXER_BINARY }}"
-
-      - name: "Create cache directory for friendsofphp/php-cs-fixer"
-        run: "mkdir -p ${{ env.PHP_CS_FIXER_CACHE_DIRECTORY }}"
-
-      - name: "Cache cache directory for friendsofphp/php-cs-fixer"
-        uses: "actions/cache@v2"
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          path: "${{ env.PHP_CS_FIXER_CACHE_DIRECTORY }}"
-          key: "php-7.3-php-cs-fixer"
-          restore-keys: "php-7.3-php-cs-fixer"
+          php-version: 7.3
+          tools: php-cs-fixer
 
-      - name: "Run friendsofphp/php-cs-fixer"
-        run: "php7.3 ${{ env.PHP_CS_FIXER_BINARY }} fix --cache-file=${{ env.PHP_CS_FIXER_CACHE_DIRECTORY }}/.php_cs.cache --diff --diff-format=udiff --dry-run --verbose"
+      - name: Restore PHP-CS-Fixer cache
+        uses: actions/cache@v2
+        with:
+          path: .php_cs.cache
+          key: "php-cs-fixer"
+          restore-keys: "php-cs-fixer"
+
+      - name: Run PHP-CS-Fixer
+        run: |
+          php-cs-fixer fix --diff --diff-format=udiff --dry-run --verbose
