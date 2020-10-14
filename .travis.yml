@@ -13,6 +13,7 @@ env:
 cache:
   directories:
     - $HOME/.composer/cache
+    - $HOME/.cache
     - build/cache
     - .tools
 
