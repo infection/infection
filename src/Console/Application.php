@@ -126,6 +126,10 @@ final class Application extends BaseApplication
     {
         parent::configureIO($input, $output);
 
+        if ($this->getContainer()->getCiDetector()->isCiDetected()) {
+            $input->setInteractive(false);
+        }
+
         OutputFormatterStyleConfigurator::configure($output);
     }
 }

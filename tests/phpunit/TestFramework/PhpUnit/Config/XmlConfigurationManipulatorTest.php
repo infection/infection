@@ -547,6 +547,19 @@ XML
         }
     }
 
+    public function test_it_works_if_schema_location_is_absent_but_xmlns_xsi_is_present(): void
+    {
+        $xPath = $this->createXPath(<<<XML
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        bootstrap="vendor/autoload.php"
+        colors="true">
+</phpunit>
+XML
+        );
+
+        $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
+    }
+
     /**
      * @dataProvider schemaProvider
      *
@@ -688,12 +701,12 @@ XML
         ];
 
         yield 'invalid URL' => [
-            'https://unknown.com',
+            'https://unknown.example.com',
             <<<'EOF'
 The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-[Warning] failed to load external entity "https://unknown.com"
+[Warning] failed to load external entity "https://unknown.example.com"
 
-[Error] Failed to locate the main schema resource at 'https://unknown.com'.
+[Error] Failed to locate the main schema resource at 'https://unknown.example.com'.
 
 
 EOF

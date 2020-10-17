@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use function in_array;
+use function end;
+use function explode;
+use function is_a;
 use function Safe\array_flip;
-use function Safe\class_implements;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
@@ -47,7 +48,7 @@ use Webmozart\Assert\Assert;
 final class MutatorFactory
 {
     /**
-     * @param array<string, mixed[]> $resolvedMutators
+     * @param array<class-string<Mutator&ConfigurableMutator>, mixed[]> $resolvedMutators
      *
      * @return array<string, Mutator>
      */
@@ -76,20 +77,41 @@ final class MutatorFactory
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
 
-            if (in_array(ConfigurableMutator::class, class_implements($mutatorClassName), true)) {
-                $configClassName = $mutatorClassName::getConfigClassName();
+            $mutator =
+                is_a($mutatorClassName, ConfigurableMutator::class, true) ?
+                    self::getConfigurableMutator($mutatorClassName, $settings) :
+                    new $mutatorClassName();
 
-                $mutator = new $mutatorClassName(new $configClassName($settings));
-            } else {
-                $mutator = new $mutatorClassName();
+            if ($ignored === []) {
+                $mutators[$mutator->getName()] = $mutator;
+
+                continue;
             }
 
-            $mutators[(string) $mutator->getName()] = new IgnoreMutator(
+            $mutators[$mutator->getName()] = new IgnoreMutator(
                 new IgnoreConfig($ignored),
                 $mutator
             );
         }
 
         return $mutators;
+    }
+
+    public static function getMutatorNameForClassName(string $className): string
+    {
+        $parts = explode('\\', $className);
+
+        return (string) end($parts);
+    }
+
+    /**
+     * @param class-string<ConfigurableMutator> $mutatorClassName
+     * @param mixed[] $settings
+     */
+    private static function getConfigurableMutator(string $mutatorClassName, array $settings): ConfigurableMutator
+    {
+        $configClassName = $mutatorClassName::getConfigClassName();
+
+        return new $mutatorClassName(new $configClassName($settings));
     }
 }

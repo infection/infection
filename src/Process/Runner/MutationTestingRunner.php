@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use function array_key_exists;
+use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
@@ -50,33 +52,44 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
+ * @final
  */
-final class MutationTestingRunner
+class MutationTestingRunner
 {
     private $processFactory;
     private $mutantFactory;
     private $processRunner;
     private $eventDispatcher;
     private $fileSystem;
+    private $diffSourceCodeMatcher;
     private $runConcurrently;
     private $timeout;
+    /** @var array<string, array<int, string>> */
+    private $ignoreSourceCodeMutatorsMap;
 
+    /**
+     * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     */
     public function __construct(
         MutantProcessFactory $processFactory,
         MutantFactory $mutantFactory,
         ProcessRunner $processRunner,
         EventDispatcher $eventDispatcher,
         Filesystem $fileSystem,
+        DiffSourceCodeMatcher $diffSourceCodeMatcher,
         bool $runConcurrently,
-        float $timeout
+        float $timeout,
+        array $ignoreSourceCodeMutatorsMap
     ) {
         $this->processFactory = $processFactory;
         $this->mutantFactory = $mutantFactory;
         $this->processRunner = $processRunner;
         $this->eventDispatcher = $eventDispatcher;
         $this->fileSystem = $fileSystem;
+        $this->diffSourceCodeMatcher = $diffSourceCodeMatcher;
         $this->runConcurrently = $runConcurrently;
         $this->timeout = $timeout;
+        $this->ignoreSourceCodeMutatorsMap = $ignoreSourceCodeMutatorsMap;
     }
 
     /**
@@ -102,6 +115,21 @@ final class MutationTestingRunner
                 ));
 
                 return false;
+            })
+            ->filter(function (Mutant $mutant) {
+                $mutatorName = $mutant->getMutation()->getMutatorName();
+
+                if (!array_key_exists($mutatorName, $this->ignoreSourceCodeMutatorsMap)) {
+                    return true;
+                }
+
+                foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] as $sourceCodeRegex) {
+                    if ($this->diffSourceCodeMatcher->matches($mutant->getDiff(), $sourceCodeRegex)) {
+                        return false;
+                    }
+                }
+
+                return true;
             })
             ->filter(function (Mutant $mutant) {
                 if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {

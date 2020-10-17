@@ -137,9 +137,8 @@ final class XmlConfigurationManipulator
         $schema = $xPath->query('/phpunit/@xsi:noNamespaceSchemaLocation');
 
         $original = libxml_use_internal_errors(true);
-        $schemaPath = $this->buildSchemaPath($schema[0]->nodeValue);
 
-        if ($schema->length && !$xPath->document->schemaValidate($schemaPath)) {
+        if ($schema->length && !$xPath->document->schemaValidate($this->buildSchemaPath($schema[0]->nodeValue))) {
             throw InvalidPhpUnitConfiguration::byXsdSchema(
                 $configPath,
                 $this->getXmlErrorsString()

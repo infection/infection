@@ -47,7 +47,7 @@ use function Safe\array_flip;
 class IgnoreConfig
 {
     private $patterns;
-    /** @var int[] */
+    /** @var array<string, int> */
     private $hashtable = [];
 
     /**
