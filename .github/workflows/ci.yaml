@@ -16,10 +16,10 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ['7.3', '7.4']
+        php-version: ['7.4']
         dependencies: ['']
         include:
-          - { php-version: '7.3', dependencies: '--prefer-lowest' }
+          - { php-version: '7.4', dependencies: '--prefer-lowest' }
           - { php-version: '8.0', dependencies: '--ignore-platform-req=php' }
 
     continue-on-error: ${{ matrix.php-version == '8.0' }}
