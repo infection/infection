@@ -23,7 +23,7 @@ jobs:
           - { php-version: '8.0', dependencies: '--ignore-platform-req=php' }
 
     continue-on-error: ${{ matrix.php-version == '8.0' }}
-    name: PHP ${{ matrix.php-version }} ${{ matrix.dependencies }}
+    name: CI with PHP ${{ matrix.php-version }} ${{ matrix.dependencies }}
 
     steps:
       - name: Checkout code
@@ -40,8 +40,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.cache/composer
-          key: composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}
+          key: composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-${{ matrix.dependencies }}
           restore-keys: |
+            composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}
             composer-${{ matrix.php-version }}-
             composer-
 
