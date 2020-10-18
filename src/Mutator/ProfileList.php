@@ -180,6 +180,7 @@ final class ProfileList
         Mutator\ReturnValue\IntegerNegation::class,
         Mutator\ReturnValue\NewObject::class,
         Mutator\ReturnValue\This::class,
+        Mutator\ReturnValue\YieldValue::class,
     ];
 
     public const SORT_PROFILE = [
@@ -364,6 +365,7 @@ final class ProfileList
         'IntegerNegation' => Mutator\ReturnValue\IntegerNegation::class,
         'NewObject' => Mutator\ReturnValue\NewObject::class,
         'This' => Mutator\ReturnValue\This::class,
+        'YieldValue' => Mutator\ReturnValue\YieldValue::class,
 
         // Sort
         'Spaceship' => Mutator\Sort\Spaceship::class,
