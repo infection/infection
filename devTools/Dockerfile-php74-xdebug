@@ -1,13 +1,31 @@
-FROM php:7.4-cli
+FROM php:7.4-cli-alpine
 
-RUN pecl install xdebug-beta && docker-php-ext-enable xdebug
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    expect git zip \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+        bash \
+        expect \
+        git \
+        zip
+
+RUN set -eux; \
+    apk add --no-cache --virtual .build-deps \
+        ${PHPIZE_DEPS} \
+        build-base \
+    ; \
+    pecl install xdebug; \
+    pecl clear-cache; \
+    docker-php-ext-enable xdebug ;\
+    runDeps="$( \
+        scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
+            | tr ',' '\n' \
+            | sort -u \
+            | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+    )"; \
+    apk add --no-cache --virtual .phpexts-rundeps ${runDeps}; \
+    apk del .build-deps
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-RUN useradd --home-dir /opt/infection --shell /bin/bash infection
+RUN adduser -h /opt/infection -s /bin/bash -D infection
 
 COPY devTools/memory-limit.ini /usr/local/etc/php/conf.d/memory-limit.ini
 
