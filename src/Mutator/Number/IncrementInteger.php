@@ -38,6 +38,7 @@ namespace Infection\Mutator\Number;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -63,7 +64,15 @@ final class IncrementInteger extends AbstractNumberMutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Scalar\LNumber($node->value + 1);
+        $parentNode = ParentConnector::getParent($node);
+
+        $value = $node->value + 1;
+
+        if ($parentNode instanceof Node\Expr\UnaryMinus) {
+            $value = $node->value - 1;
+        }
+
+        yield new Node\Scalar\LNumber($value);
     }
 
     public function canMutate(Node $node): bool
