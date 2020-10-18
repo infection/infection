@@ -86,8 +86,6 @@ TXT
 
     /**
      * @param Node\Scalar\LNumber $node
-     *
-     * @return bool
      */
     private function isPregSplitLimitMinusOneValue(Node $node): bool
     {

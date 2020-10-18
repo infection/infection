@@ -168,8 +168,6 @@ final class DecrementInteger extends AbstractNumberMutator
 
     /**
      * @param Node\Scalar\LNumber $node
-     *
-     * @return bool
      */
     private function isPregSplitLimitZeroValue(Node $node): bool
     {
