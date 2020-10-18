@@ -1,8 +1,14 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
 name: Tests
 
 on:
-  push:
   pull_request:
+  push:
+    branches:
+      - main
+      - master
 
 jobs:
   tests:
@@ -10,34 +16,43 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ['7.3', '7.4']
+        php-version: ['7.4']
         dependencies: ['']
         include:
-          - { php-version: '7.3', dependencies: '--prefer-lowest' }
+          - { php-version: '7.4', dependencies: '--prefer-lowest' }
           - { php-version: '8.0', dependencies: '--ignore-platform-req=php' }
 
     continue-on-error: ${{ matrix.php-version == '8.0' }}
     name: PHP ${{ matrix.php-version }} ${{ matrix.dependencies }}
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          extensions: 
           coverage: pcov
           tools: composer:v2
 
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}
+          restore-keys: |
+            composer-${{ matrix.php-version }}-
+            composer-
+
       - name: Install dependencies
         run: |
-          composer update --no-interaction ${{ matrix.dependencies }}
+          composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
 
       - name: Run tests
-        run: make test-unit
+        run: |
+          make test-unit
 
       - name: Run Infection
         run: |
           ./bin/infection -j$(nproc) --test-framework-options="--group=default"
-          

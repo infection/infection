@@ -13,6 +13,7 @@ env:
 cache:
   directories:
     - $HOME/.composer/cache
+    - $HOME/.cache
     - build/cache
     - .tools
 
@@ -31,7 +32,7 @@ before_install:
 jobs:
   include:
     - stage: Static Code Analysis
-      php: 7.3
+      php: 7.4
       install:
         - composer install $COMPOSER_FLAGS
       script:
@@ -40,7 +41,7 @@ jobs:
 
     - &STANDARD_TEST_JOB
       stage: Test
-      php: 7.3
+      php: 7.4
       env: DRIVER="none"
       install:
         - |
@@ -85,25 +86,6 @@ jobs:
             phpdbg -qrr bin/infection $INFECTION_FLAGS;
           fi
 
-    - <<: *STANDARD_TEST_JOB
-      php: 7.3
-      env: DRIVER="pcov"
-      after_success:
-        - bash <(curl -s https://codecov.io/bash)
-
-    - <<: *STANDARD_TEST_JOB
-      php: 7.3
-      env: DRIVER="xdebug"
-
-    - <<: *STANDARD_TEST_JOB
-      php: 7.3
-      env: DRIVER="phpdbg"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.3
-      env: DEPS="LOW" DRIVER="xdebug"
-
     -
       <<: *STANDARD_TEST_JOB
       php: 7.4
@@ -133,7 +115,7 @@ jobs:
         - phpdbg -qrr bin/infection $INFECTION_FLAGS
 
     - stage: Deploy
-      php: 7.3
+      php: 7.4
       env:
         - secure: KPHUzOeWLeCWzcyPrnrDaR6grVUEXj48KlSQhJiubdkyKtGcvEs+TzZNYa2v+mSZsvrBHez9MRu4itcx05fNrb7/6M23uppv+fENH7tgZi8PXktlEXvD+Iqc9DIaDS1hQKpsnOhOZLlDNQ/kyE6TJAvoBMcbG6RfLqwLP1Abdz11t9Z65SIL7l2YpTjLjgmZUctpEVkivnQ3VQojd3soFTKZ8s9jNhdyUL2F+Rab4wu26Dy+q9xEd5y1tj2242nmVU7U/OD/spTkxRivuUPNM7jEnUvUcdEHd5DIBki702OrSkgsjrxlOlqOWcIRzVZA+A54GiE8qpnLSPN1qbc68ifXhd4lw4zKrE9KfvI8gnnFHtwQP0lhQuwG+j/VtbQRYrb0ufX1sAOUpOIDGMxYrh+Hn6j/nZnBiBh3NRF0u6PLfnAuph5TybylY0cuiGfGOWFf8UG7yz/EH+Br/D5M/IkObU8b9e3YJlUQPcjTi0BSa/+lkLpQMOOVOlQZk+LTVVRjXwSO10JcWhpqwWX74dsa5b2N/XbXOEQldVsYuQZz7re8e5Nwm5dx+B/KF/ohv2GDkQdqAA35ogOAABI3rvGlfOESDeZyGYOiJqBWX+KLKNRQ6l/KRkHNflX5J+0xeRlK4L84n0YwesyEAEFnYrYtQ+/VNd9ZP2+xXyTrePI=
         - secure: gto1Cg/FEurmKP+JNi7G7MBxJx9KX+WzM9VlLnu0x1Hq+2n8dEgNCBc9gvNrdpPPWHdke23uYXxM3XaKh6f/KXNRmYskJwAUP/jWTwkAc9dIz6qo3ObcS3M6WPnohkjhTJjJJH/dbUknR9gbstTvGsan7JysUnast6uyAhuP81ago0BoiCshTGPa7gZkD4dPPvDrUr70kRzgOd2ZJQZcuoCfL00q4Yu0OkjM9VMBxaBKkL8EE7594aYDjFtGbJuvWmZ36qqtUxzc3ly+G3IHfQVMQqN8+H0VB4ULwE1JOzWMsj5gpJtVeyPY5BTcAOE3je5/+1eq14VVnf3iSgMu3DbF1o/KuMxdes5vDadoZaVQmtLtNHvgu/UDCicBKk3BnLtlQe1bFfEsoSDRr+zCVkO5ypcbERxQzVCGdZdHsXLFZSxdLsEqSqD5ItZe1ZXv4K8bsDDY5rJgjyaiQs/FT/G4dlf61MHqzKtErgsNQ99ilV4iWqHGHnbMISyYdiLWTG8z/nhE34M+08J0gpSDfVrs1pvoUIzhD8KvjlU2QC2IXuE38aXTZm4IeTA7P6vZbUoCCcgOxIRqzS0UX9M1ddOUmy6prc3CGgiEgn6ey/eWmfyRQSbuL07aRH7MEzW4ESAJbdjHsuZoIUXGC9okLvk2pKfQxCjV86akPub7BZ8=

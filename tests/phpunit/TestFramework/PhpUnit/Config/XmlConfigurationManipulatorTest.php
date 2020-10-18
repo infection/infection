@@ -547,6 +547,19 @@ XML
         }
     }
 
+    public function test_it_works_if_schema_location_is_absent_but_xmlns_xsi_is_present(): void
+    {
+        $xPath = $this->createXPath(<<<XML
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        bootstrap="vendor/autoload.php"
+        colors="true">
+</phpunit>
+XML
+        );
+
+        $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
+    }
+
     /**
      * @dataProvider schemaProvider
      *

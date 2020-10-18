@@ -6,11 +6,11 @@ clone_folder: c:\projects\workspace
 environment:
   matrix:
   - dependencies: highest
-    php_ver_target: 7.3.15
-    xdebug_ver: '2.9.2-7.3-vc15'
+    php_ver_target: 7.4.11
+    xdebug_ver: '2.9.2-7.4-vc15'
   - dependencies: current
-    php_ver_target: 7.3.15
-    xdebug_ver: '2.9.2-7.3-vc15'
+    php_ver_target: 7.4.11
+    xdebug_ver: '2.9.2-7.4-vc15'
 
 cache: # cache is cleared when linked file is modified
     - '%LOCALAPPDATA%\Composer\files -> composer.lock'

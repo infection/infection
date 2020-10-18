@@ -27,8 +27,6 @@ PHPUNIT=vendor/bin/phpunit
 INFECTION=./build/infection.phar
 
 DOCKER_RUN=docker run --tty --rm --volume "$$PWD":/opt/infection --workdir /opt/infection
-DOCKER_RUN_73=$(FLOCK) devTools/*php73*.json $(DOCKER_RUN) infection_php73
-DOCKER_RUN_73_IMAGE=devTools/Dockerfile-php73-xdebug.json
 DOCKER_RUN_74=$(FLOCK) devTools/*php74*.json $(DOCKER_RUN) infection_php74
 DOCKER_RUN_74_IMAGE=devTools/Dockerfile-php74-xdebug.json
 
@@ -108,11 +106,7 @@ test-unit: $(PHPUNIT)
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker: test-unit-73-docker test-unit-74-docker
-
-.PHONY: test-unit-73-docker
-test-unit-73-docker: $(DOCKER_RUN_73_IMAGE) $(PHPUNIT)
-	$(DOCKER_RUN_73) $(PHPUNIT) --group default
+test-unit-docker: test-unit-74-docker
 
 .PHONY: test-unit-74-docker
 test-unit-74-docker: $(DOCKER_RUN_74_IMAGE) $(PHPUNIT)
@@ -132,12 +126,7 @@ test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
 test-e2e-docker: test-e2e-phpdbg-docker test-e2e-xdebug-docker
 
 .PHONY: test-e2e-phpdbg-docker
-test-e2e-phpdbg-docker: test-e2e-phpdbg-73-docker test-e2e-phpdbg-74-docker
-
-.PHONY: test-e2e-phpdbg-73-docker
-test-e2e-phpdbg-73-docker: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_73) $(PHPUNIT) --group integration,e2e
-	$(DOCKER_RUN_73) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
+test-e2e-phpdbg-docker: test-e2e-phpdbg-74-docker
 
 .PHONY: test-e2e-phpdbg-74-docker
 test-e2e-phpdbg-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
@@ -145,12 +134,7 @@ test-e2e-phpdbg-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_74) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-xdebug-docker
-test-e2e-xdebug-docker: test-e2e-xdebug-73-docker test-e2e-xdebug-74-docker
-
-.PHONY: test-e2e-xdebug-73-docker
-test-e2e-xdebug-73-docker: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_73) $(PHPUNIT) --group integration,e2e
-	$(DOCKER_RUN_73) ./tests/e2e_tests $(INFECTION)
+test-e2e-xdebug-docker: test-e2e-xdebug-74-docker
 
 .PHONY: test-e2e-xdebug-74-docker
 test-e2e-xdebug-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
@@ -167,22 +151,14 @@ test-infection-docker:	## Runs Infection against itself on the different Docker 
 test-infection-docker: test-infection-phpdbg-docker test-infection-xdebug-docker
 
 .PHONY: test-infection-phpdbg-docker
-test-infection-phpdbg-docker: test-infection-phpdbg-73-docker test-infection-phpdbg-74-docker
-
-.PHONY: test-infection-phpdbg-73-docker
-test-infection-phpdbg-73-docker: $(DOCKER_RUN_73_IMAGE)
-	$(DOCKER_RUN_73) phpdbg -qrr bin/infection --threads=4
+test-infection-phpdbg-docker: test-infection-phpdbg-74-docker
 
 .PHONY: test-infection-phpdbg-74-docker
 test-infection-phpdbg-74-docker: $(DOCKER_RUN_74_IMAGE)
 	$(DOCKER_RUN_74) phpdbg -qrr bin/infection --threads=4
 
 .PHONY: test-infection-xdebug-docker
-test-infection-xdebug-docker: test-infection-xdebug-73-docker test-infection-xdebug-74-docker
-
-.PHONY: test-infection-xdebug-73-docker
-test-infection-xdebug-73-docker: $(DOCKER_RUN_73_IMAGE)
-	$(DOCKER_RUN_73) ./bin/infection --threads=4
+test-infection-xdebug-docker: test-infection-xdebug-74-docker
 
 .PHONY: test-infection-xdebug-74-docker
 test-infection-xdebug-74-docker: $(DOCKER_RUN_74_IMAGE)
@@ -227,11 +203,6 @@ $(PHPUNIT): vendor phpunit.xml.dist
 phpunit.xml.dist:
 	# Not updating phpunit.xml with:
 	# phpunit --migrate-configuration || true
-
-$(DOCKER_RUN_73_IMAGE): devTools/Dockerfile-php73-xdebug
-	docker build --tag infection_php73 --file devTools/Dockerfile-php73-xdebug .
-	docker image inspect infection_php73 > $(DOCKER_RUN_73_IMAGE)
-	touch $@
 
 $(DOCKER_RUN_74_IMAGE): devTools/Dockerfile-php74-xdebug
 	docker build --tag infection_php74 --file devTools/Dockerfile-php74-xdebug .
