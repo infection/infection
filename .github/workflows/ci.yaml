@@ -42,7 +42,7 @@ jobs:
           path: ~/.cache/composer
           key: composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-${{ matrix.dependencies }}
           restore-keys: |
-            composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}
+            composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-
             composer-${{ matrix.php-version }}-
             composer-
 
