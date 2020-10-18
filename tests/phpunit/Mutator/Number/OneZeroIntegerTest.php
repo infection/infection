@@ -116,5 +116,13 @@ if ($a < 0) {
 }
 PHP
         ];
+
+        yield 'It does not mutate if it is third argument of preg_split and value is -1' => [
+            <<<'PHP'
+<?php
+preg_split('//', 'string', -1);
+PHP
+            ,
+        ];
     }
 }

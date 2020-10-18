@@ -38,6 +38,7 @@ namespace Infection\Mutator\Number;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -79,6 +80,41 @@ TXT
     {
         return $node instanceof Node\Scalar\LNumber
             && ($node->value === 0 || $node->value === 1)
-            && !$this->isPartOfSizeComparison($node);
+            && !$this->isPartOfSizeComparison($node)
+            && !$this->isPregSplitLimitMinusOneValue($node);
+    }
+
+    /**
+     * @param Node\Scalar\LNumber $node
+     *
+     * @return bool
+     */
+    private function isPregSplitLimitMinusOneValue(Node $node): bool
+    {
+        $minusNode = ParentConnector::getParent($node);
+
+        if (!$minusNode instanceof Node\Expr\UnaryMinus) {
+            return false;
+        }
+
+        $argNode = ParentConnector::getParent($minusNode);
+
+        if (!$argNode instanceof Node\Arg) {
+            return false;
+        }
+
+        $funcNode = ParentConnector::getParent($argNode);
+
+        if (
+            $funcNode instanceof Node\Expr\FuncCall &&
+            $funcNode->name instanceof Node\Name &&
+            $funcNode->name->toLowerString() === 'preg_split' &&
+            count($funcNode->args) >= 3 &&
+            spl_object_id($funcNode->args[2]) === spl_object_id($argNode)
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }
