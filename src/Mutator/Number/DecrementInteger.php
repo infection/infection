@@ -74,7 +74,13 @@ final class DecrementInteger extends AbstractNumberMutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Scalar\LNumber($node->value - 1);
+        $decrement = 1;
+
+        if ($this->isPregSplitLimitZeroValue($node)) {
+            $decrement = 2;
+        }
+
+        yield new Node\Scalar\LNumber($node->value - $decrement);
     }
 
     public function canMutate(Node $node): bool
@@ -154,6 +160,38 @@ final class DecrementInteger extends AbstractNumberMutator
         }
 
         if (ParentConnector::getParent($node) instanceof Node\Expr\ArrayDimFetch) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Node\Scalar\LNumber $node
+     *
+     * @return bool
+     */
+    private function isPregSplitLimitZeroValue(Node $node): bool
+    {
+        if ($node->value !== 0) {
+            return false;
+        }
+
+        $argNode = ParentConnector::getParent($node);
+
+        if (!$argNode instanceof Node\Arg) {
+            return false;
+        }
+
+        $funcNode = ParentConnector::getParent($argNode);
+
+        if (
+            $funcNode instanceof Node\Expr\FuncCall &&
+            $funcNode->name instanceof Node\Name &&
+            $funcNode->name->toLowerString() === 'preg_split' &&
+            count($funcNode->args) >= 3 &&
+            spl_object_id($funcNode->args[2]) === spl_object_id($argNode)
+        ) {
             return true;
         }
 

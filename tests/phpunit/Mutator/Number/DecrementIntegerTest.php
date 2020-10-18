@@ -399,5 +399,19 @@ PHP
 $b = $a[0];
 PHP
         ];
+
+        yield 'It decrements on 2 if it is third argument of preg_split and value is 0' => [
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', 0);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', -2);
+PHP
+        ];
     }
 }
