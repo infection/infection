@@ -115,9 +115,7 @@ final class ExcludeDirsProvider
         $question->setValidator($this->getValidator(new RootsFileOrDirectoryLocator($sourceDirs, $this->filesystem)));
 
         while ($dir = $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question)) {
-            if ($dir) {
-                $excludedDirs[] = $dir;
-            }
+            $excludedDirs[] = $dir;
         }
 
         return array_values(array_unique($excludedDirs));
