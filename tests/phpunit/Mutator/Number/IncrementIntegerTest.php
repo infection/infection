@@ -70,7 +70,36 @@ PHP
             ,
         ];
 
-        yield 'It does not increment the number zero' => [
+        yield 'It does not increment assigment of 0' => [
+            <<<'PHP'
+<?php
+
+$foo = 0;
+PHP
+            ,
+        ];
+
+        yield 'It does not increment 0 in greater comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo > 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in greater or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo >= 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in smaller comparison' => [
             <<<'PHP'
 <?php
 
@@ -78,7 +107,56 @@ if ($foo < 0) {
     echo 'bar';
 }
 PHP
-            ,
+        ];
+
+        yield 'It does not increment 0 in smaller or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo <= 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo == 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in not equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo != 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo === 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in not identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo !== 0) {
+    echo 'bar';
+}
+PHP
         ];
 
         yield 'It increments one' => [
