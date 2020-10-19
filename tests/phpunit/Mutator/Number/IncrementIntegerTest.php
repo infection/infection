@@ -110,7 +110,7 @@ if ($foo === 1.0) {
 PHP
         ];
 
-        yield 'It decrements a negative integer' => [
+        yield 'It increments a negative integer' => [
             <<<'PHP'
 <?php
 
@@ -122,7 +122,7 @@ PHP
             <<<'PHP'
 <?php
 
-if ($foo === -11) {
+if ($foo === -9) {
     echo 'bar';
 }
 PHP

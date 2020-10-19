@@ -300,7 +300,7 @@ PHP
             <<<'PHP'
 <?php
 
-if ($foo === -9) {
+if ($foo === -11) {
     echo 'bar';
 }
 PHP
