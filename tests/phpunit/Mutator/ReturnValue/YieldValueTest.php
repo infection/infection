@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Number;
+namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class IncrementIntegerTest extends BaseMutatorTestCase
+final class YieldValueTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -51,80 +51,32 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield 'It increments an integer' => [
+        yield 'It mutates a yield with key and value to a yield with a value only' => [
             <<<'PHP'
 <?php
 
-if ($foo === 10) {
-    echo 'bar';
-}
+$a = function () {
+    (yield $a => $b);
+};
 PHP
             ,
             <<<'PHP'
 <?php
 
-if ($foo === 11) {
-    echo 'bar';
-}
-PHP
-            ,
-        ];
-
-        yield 'It does not increment the number zero' => [
-            <<<'PHP'
-<?php
-
-if ($foo < 0) {
-    echo 'bar';
-}
+$a = function () {
+    (yield $b);
+};
 PHP
             ,
         ];
 
-        yield 'It increments one' => [
+        yield 'It does not mutate yields without a double arrow operator' => [
             <<<'PHP'
 <?php
 
-if ($foo === 1) {
-    echo 'bar';
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-if ($foo === 2) {
-    echo 'bar';
-}
-PHP
-            ,
-        ];
-
-        yield 'It does not increment floats' => [
-            <<<'PHP'
-<?php
-
-if ($foo === 1.0) {
-    echo 'bar';
-}
-PHP
-        ];
-
-        yield 'It increments a negative integer' => [
-            <<<'PHP'
-<?php
-
-if ($foo === -10) {
-    echo 'bar';
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-if ($foo === -9) {
-    echo 'bar';
-}
+$a = function () {
+    (yield $b);
+};
 PHP
             ,
         ];

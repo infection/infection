@@ -33,100 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Number;
+namespace Infection\Mutator\ReturnValue;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
+use PhpParser\Node;
 
-final class IncrementIntegerTest extends BaseMutatorTestCase
+/**
+ * @internal
+ *
+ * @see Yield_
+ */
+final class YieldValue implements Mutator
 {
-    /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
-     */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        $this->doTest($input, $expected);
+        return new Definition(
+            <<<'TXT'
+Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only;
+For example `yield $b->bar;`.
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
-    public function mutationsProvider(): iterable
+    /**
+     * @param Node\Expr\Yield_ $node
+     *
+     * @return iterable<Node\Expr\Yield_>
+     */
+    public function mutate(Node $node): iterable
     {
-        yield 'It increments an integer' => [
-            <<<'PHP'
-<?php
+        $node->key = null;
 
-if ($foo === 10) {
-    echo 'bar';
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
+        yield $node;
+    }
 
-if ($foo === 11) {
-    echo 'bar';
-}
-PHP
-            ,
-        ];
-
-        yield 'It does not increment the number zero' => [
-            <<<'PHP'
-<?php
-
-if ($foo < 0) {
-    echo 'bar';
-}
-PHP
-            ,
-        ];
-
-        yield 'It increments one' => [
-            <<<'PHP'
-<?php
-
-if ($foo === 1) {
-    echo 'bar';
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-if ($foo === 2) {
-    echo 'bar';
-}
-PHP
-            ,
-        ];
-
-        yield 'It does not increment floats' => [
-            <<<'PHP'
-<?php
-
-if ($foo === 1.0) {
-    echo 'bar';
-}
-PHP
-        ];
-
-        yield 'It increments a negative integer' => [
-            <<<'PHP'
-<?php
-
-if ($foo === -10) {
-    echo 'bar';
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-if ($foo === -9) {
-    echo 'bar';
-}
-PHP
-            ,
-        ];
+    public function canMutate(Node $node): bool
+    {
+        return $node instanceof Node\Expr\Yield_ && $node->key;
     }
 }
