@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use function count;
 use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
@@ -183,16 +184,10 @@ final class DecrementInteger extends AbstractNumberMutator
 
         $funcNode = ParentConnector::getParent($argNode);
 
-        if (
-            $funcNode instanceof Node\Expr\FuncCall &&
+        return $funcNode instanceof Node\Expr\FuncCall &&
             $funcNode->name instanceof Node\Name &&
             $funcNode->name->toLowerString() === 'preg_split' &&
             count($funcNode->args) >= 3 &&
-            spl_object_id($funcNode->args[2]) === spl_object_id($argNode)
-        ) {
-            return true;
-        }
-
-        return false;
+            $funcNode->args[2] === $argNode;
     }
 }
