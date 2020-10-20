@@ -62,15 +62,6 @@ PHP
             ,
         ];
 
-        yield 'It does not decrement the number one' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
-PHP
-            ,
-        ];
-
         yield 'It does not decrement zero when it is being compared as identical with result of count()' => [
             <<<'PHP'
 <?php
@@ -340,6 +331,86 @@ PHP
 <?php
 
 $foo = 1;
+PHP
+        ];
+
+        yield 'It does not decrement 1 in greater comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo > 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in greater or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo >= 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in smaller comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo < 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in smaller or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo <= 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo == 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in not equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo != 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo === 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in not identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo !== 1) {
+    echo 'bar';
+}
 PHP
         ];
 

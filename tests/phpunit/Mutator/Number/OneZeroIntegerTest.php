@@ -107,12 +107,338 @@ PHP
 PHP
         ];
 
-        yield 'It does not mutate in a comparison' => [
+        yield 'It does not mutate 0 in smaller comparison' => [
             <<<'PHP'
 <?php
 
-if ($a < 0) {
-    echo "small";
+if ($foo < 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate 0 in smaller or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo <= 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate 0 in greater comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo > 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate 0 in greater or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo >= 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates 0 to 1 in equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo == 0) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo == 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates 0 to 1 in not equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo != 0) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo != 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates 0 to 1 in identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo === 0) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo === 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates 0 to 1 in not identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo !== 0) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo !== 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate 1 in smaller comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo < 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate 1 in smaller or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo <= 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate 1 in greater comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo > 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate 1 in greater or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo >= 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates 1 to 0 in equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo == 1) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo == 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates 1 to 0 in not equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo != 1) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo != 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates 1 to 0 in identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo === 1) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo === 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates 1 to 0 in not identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo !== 1) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo !== 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate -1 in smaller comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo < -1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate -1 in smaller or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo <= -1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate -1 in greater comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo > -1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not mutate -1 in greater or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo >= -1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates -1 to -0 in equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo == -1) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo == -0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates -1 to -0 in not equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo != -1) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo != -0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates -1 to -0 in identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo === -1) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo === -0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It mutates -1 to -0 in not identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo !== -1) {
+    echo 'bar';
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if ($foo !== -0) {
+    echo 'bar';
 }
 PHP
         ];
