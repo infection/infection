@@ -90,6 +90,7 @@ class LoggerFactory
                     $this->createJsonLogger($logConfig->getJsonLogFilePath()),
                     $this->createDebugLogger($logConfig->getDebugLogFilePath()),
                     $this->createPerMutatorLogger($logConfig->getPerMutatorFilePath()),
+                    $this->createCheckstyleLogger($logConfig->getCheckstyleFilePath()),
                     $this->createBadgeLogger($logConfig->getBadge()),
                 ],
                 function (?MutationTestingResultsLogger $logger): bool {
@@ -138,6 +139,19 @@ class LoggerFactory
                 $filePath,
                 $this->filesystem,
                 new JsonLogger($this->metricsCalculator, $this->onlyCoveredCode),
+                $this->logger
+            )
+        ;
+    }
+
+    private function createCheckstyleLogger(?string $filePath): ?FileLogger
+    {
+        return $filePath === null
+            ? null
+            : new FileLogger(
+                $filePath,
+                $this->filesystem,
+                new CheckstyleLogger($this->metricsCalculator),
                 $this->logger
             )
         ;

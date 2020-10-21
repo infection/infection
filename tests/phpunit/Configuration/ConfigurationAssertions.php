@@ -100,6 +100,7 @@ trait ConfigurationAssertions
             $expectedLogs->getJsonLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
+            $expectedLogs->getCheckstyleFilePath(),
             $expectedLogs->getBadge()
         );
         $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity());

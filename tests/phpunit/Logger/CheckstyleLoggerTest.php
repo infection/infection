@@ -33,39 +33,55 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Tests\Logger;
 
-use Infection\Configuration\Entry\Badge;
-use Infection\Configuration\Entry\Logs;
+use Infection\Logger\CheckstyleLogger;
+use Infection\Metrics\MetricsCalculator;
+use PHPUnit\Framework\TestCase;
 
-trait LogsAssertions
+final class CheckstyleLoggerTest extends TestCase
 {
-    use BadgeAssertions;
+    use CreateMetricsCalculator;
 
-    private function assertLogsStateIs(
-        Logs $logs,
-        ?string $expectedTextLogFilePath,
-        ?string $expectedSummaryLogFilePath,
-        ?string $expectedJsonLogFilePath,
-        ?string $expectedDebugLogFilePath,
-        ?string $expectedPerMutatorFilePath,
-        ?string $expectedCheckstyleFilePath,
-        ?Badge $expectedBadge
+    /**
+     * @dataProvider metricsProvider
+     */
+    public function test_it_logs_correctly_with_mutations(
+        MetricsCalculator $metricsCalculator,
+        string $expectedContents
     ): void {
-        $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
-        $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
-        $this->assertSame($expectedJsonLogFilePath, $logs->getJsonLogFilePath());
-        $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
-        $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
-        $this->assertSame($expectedCheckstyleFilePath, $logs->getCheckstyleFilePath());
+        $logger = new CheckstyleLogger($metricsCalculator);
 
-        $badge = $logs->getBadge();
+        $this->assertLoggedContentIs($expectedContents, $logger);
+    }
 
-        if ($expectedBadge === null) {
-            $this->assertNull($badge);
-        } else {
-            $this->assertNotNull($badge);
-            $this->assertBadgeStateIs($badge, $expectedBadge->getBranch());
-        }
+    public function metricsProvider(): iterable
+    {
+        yield 'no mutations' => [
+            new MetricsCalculator(2),
+            <<<XML
+<?xml version="1.0"?>
+<checkstyle version="6.5"/>
+XML
+        ];
+
+        yield 'all mutations' => [
+            $this->createCompleteMetricsCalculator(),
+            <<<XML
+<?xml version="1.0"?>
+<checkstyle version="6.5">
+  <file name="foo/bar">
+    <error line="9" message="Escaped Mutant:&#10;&#10;--- Original&#10;+++ New&#10;@@ @@&#10;&#10;- echo 'original';&#10;+ echo 'escaped#1';&#10;" severity="warning" source="PregQuote"/>
+    <error line="10" message="Escaped Mutant:&#10;&#10;--- Original&#10;+++ New&#10;@@ @@&#10;&#10;- echo 'original';&#10;+ echo 'escaped#0';&#10;" severity="warning" source="For_"/>
+  </file>
+</checkstyle>
+XML
+            ,
+        ];
+    }
+
+    private function assertLoggedContentIs(string $expectedXml, CheckstyleLogger $logger): void
+    {
+        $this->assertXmlStringEqualsXmlString($expectedXml, $logger->getLogLines()[0]);
     }
 }

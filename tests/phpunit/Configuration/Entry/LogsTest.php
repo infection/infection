@@ -52,6 +52,7 @@ final class LogsTest extends TestCase
         ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
+        ?string $checkstyleFilePath,
         ?Badge $badge
     ): void {
         $logs = new Logs(
@@ -60,6 +61,7 @@ final class LogsTest extends TestCase
             $jsonLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
+            $checkstyleFilePath,
             $badge
         );
 
@@ -70,6 +72,7 @@ final class LogsTest extends TestCase
             $jsonLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
+            $checkstyleFilePath,
             $badge
         );
     }
@@ -80,6 +83,7 @@ final class LogsTest extends TestCase
 
         $this->assertLogsStateIs(
             $logs,
+            null,
             null,
             null,
             null,
@@ -98,6 +102,7 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
         ];
 
         yield 'complete' => [
@@ -106,6 +111,7 @@ final class LogsTest extends TestCase
             'json.log',
             'debug.log',
             'perMutator.log',
+            'checkstyle.xml',
             new Badge('master'),
         ];
     }

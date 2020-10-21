@@ -230,6 +230,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
             ]),
@@ -252,6 +253,7 @@ JSON
                 'logs' => new Logs(
                     null,
                     'summary.log',
+                    null,
                     null,
                     null,
                     null,
@@ -280,6 +282,7 @@ JSON
                     'json.log',
                     null,
                     null,
+                    null,
                     null
                 ),
             ]),
@@ -304,6 +307,7 @@ JSON
                     null,
                     null,
                     'debug.log',
+                    null,
                     null,
                     null
                 ),
@@ -330,6 +334,7 @@ JSON
                     null,
                     null,
                     'perMutator.log',
+                    null,
                     null
                 ),
             ]),
@@ -357,6 +362,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     new Badge('master')
                 ),
             ]),
@@ -374,6 +380,7 @@ JSON
         "json": "json.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
+        "checkstyle": "checkstyle.xml",
         "badge": {
             "branch": "master"
         }
@@ -389,6 +396,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
+                    'checkstyle.xml',
                     new Badge('master')
                 ),
             ]),
@@ -430,6 +438,7 @@ JSON
         "json": " json.log ",
         "debug": " debug.log ",
         "perMutator": " perMutator.log ",
+        "checkstyle": " checkstyle.xml ",
         "badge": {
             "branch": " master "
         }
@@ -445,6 +454,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
+                    'checkstyle.xml',
                     new Badge('master')
                 ),
             ]),
@@ -2076,6 +2086,7 @@ JSON
         "json": "json.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
+        "checkstyle": "checkstyle.xml",
         "badge": {
             "branch": "master"
         }
@@ -2314,6 +2325,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
+                    'checkstyle.xml',
                     new Badge('master')
                 ),
                 'tmpDir' => 'custom-tmp',

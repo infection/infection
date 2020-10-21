@@ -41,8 +41,7 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
-use const PHP_EOL;
-use function str_replace;
+use function Infection\Tests\normalize_trailing_spaces;
 
 trait CreateMetricsCalculator
 {
@@ -138,9 +137,7 @@ trait CreateMetricsCalculator
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
             $detectionStatus,
-            str_replace(
-                "\n",
-                PHP_EOL,
+            normalize_trailing_spaces(
                 <<<DIFF
 --- Original
 +++ New

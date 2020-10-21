@@ -9,7 +9,8 @@
         "text": "infection.log",
         "badge": {
             "branch": "master"
-        }
+        },
+        "checkstyle": "build/checkstyle.xml"
     },
     "mutators": {
         "@default": true,

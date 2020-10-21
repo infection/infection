@@ -41,6 +41,7 @@ use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
+use Infection\Logger\CheckstyleLogger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\FileLogger;
 use Infection\Logger\JsonLogger;
@@ -94,6 +95,7 @@ final class LoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 '/a/file',
+                '/a/file',
                 null
             )
         );
@@ -111,6 +113,7 @@ final class LoggerFactoryTest extends TestCase
 
         $logger = $factory->createFromLogEntries(
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -155,6 +158,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 null
             ),
             [TextFileLogger::class],
@@ -164,6 +168,7 @@ final class LoggerFactoryTest extends TestCase
             new Logs(
                 null,
                 'summary_file',
+                null,
                 null,
                 null,
                 null,
@@ -179,6 +184,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 'debug_file',
                 null,
+                null,
                 null
             ),
             [DebugFileLogger::class],
@@ -189,6 +195,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 'json_file',
+                null,
                 null,
                 null,
                 null
@@ -203,13 +210,28 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 'per_muator',
+                null,
                 null
             ),
             [PerMutatorLogger::class],
         ];
 
+        yield 'checkstyle logger' => [
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                'checkstyle',
+                null
+            ),
+            [CheckstyleLogger::class],
+        ];
+
         yield 'badge logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -227,6 +249,7 @@ final class LoggerFactoryTest extends TestCase
                 'json',
                 'debug',
                 'per_mutator',
+                'checkstyle',
                 new Badge('branch')
             ),
             [
@@ -235,6 +258,7 @@ final class LoggerFactoryTest extends TestCase
                 JsonLogger::class,
                 DebugFileLogger::class,
                 PerMutatorLogger::class,
+                CheckstyleLogger::class,
                 BadgeLogger::class,
             ],
         ];

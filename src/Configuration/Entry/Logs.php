@@ -45,6 +45,7 @@ final class Logs
     private ?string $jsonLogFilePath;
     private ?string $debugLogFilePath;
     private ?string $perMutatorFilePath;
+    private ?string $checkstyleFilePath;
     private ?Badge $badge;
 
     public function __construct(
@@ -53,6 +54,7 @@ final class Logs
         ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
+        ?string $checkstyleFilePath,
         ?Badge $badge
     ) {
         $this->textLogFilePath = $textLogFilePath;
@@ -61,11 +63,13 @@ final class Logs
         $this->debugLogFilePath = $debugLogFilePath;
         $this->perMutatorFilePath = $perMutatorFilePath;
         $this->badge = $badge;
+        $this->checkstyleFilePath = $checkstyleFilePath;
     }
 
     public static function createEmpty(): self
     {
         return new self(
+            null,
             null,
             null,
             null,
@@ -98,6 +102,11 @@ final class Logs
     public function getPerMutatorFilePath(): ?string
     {
         return $this->perMutatorFilePath;
+    }
+
+    public function getCheckstyleFilePath(): ?string
+    {
+        return $this->checkstyleFilePath;
     }
 
     public function getBadge(): ?Badge
