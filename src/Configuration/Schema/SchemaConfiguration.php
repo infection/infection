@@ -38,6 +38,7 @@ namespace Infection\Configuration\Schema;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Plugins\Plugin;
 use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;
 
@@ -60,9 +61,11 @@ final class SchemaConfiguration
     private $bootstrap;
     private $initialTestsPhpOptions;
     private $testFrameworkExtraOptions;
+    private $plugins;
 
     /**
      * @param array<string, mixed> $mutators
+     * @param array<class-string<Plugin>> $plugins
      */
     public function __construct(
         string $file,
@@ -78,7 +81,8 @@ final class SchemaConfiguration
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkExtraOptions
+        ?string $testFrameworkExtraOptions,
+        array $plugins
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
@@ -97,6 +101,7 @@ final class SchemaConfiguration
         $this->bootstrap = $bootstrap;
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
         $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
+        $this->plugins = $plugins;
     }
 
     public function getFile(): string
@@ -170,5 +175,13 @@ final class SchemaConfiguration
     public function getTestFrameworkExtraOptions(): ?string
     {
         return $this->testFrameworkExtraOptions;
+    }
+
+    /**
+     * @return array<class-string<Plugin>>
+     */
+    public function getPlugins(): array
+    {
+        return $this->plugins;
     }
 }

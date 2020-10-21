@@ -33,16 +33,18 @@
 
 declare(strict_types=1);
 
-return [
-    'whitelist' => [
-        \Composer\Autoload\ClassLoader::class,
-        'Safe\*',
-        \Infection\Plugins\Plugin::class,
-        \Infection\Plugins\MutantFilterPlugin::class,
-        \Infection\Plugins\Mutant::class,
-        \Infection\Plugins\Configuration::class,
-    ],
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
-];
+namespace Infection\Plugins\Wrapper;
+
+use Infection\Container;
+use Infection\Plugins\Configuration;
+
+/**
+ * @internal
+ */
+final class ContainerWrapper implements Configuration
+{
+    // @phpstan-ignore-next-line
+    public function __construct(Container $container)
+    {
+    }
+}

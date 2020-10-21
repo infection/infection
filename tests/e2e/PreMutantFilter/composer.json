@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    },
+    "autoload": {
+        "psr-4": {
+            "PreMutantFilter\\": ["src/", "filter/"]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PreMutantFilter\\Test\\": "tests/"
+        }
+    }
+}

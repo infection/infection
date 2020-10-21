@@ -62,6 +62,10 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
+use Infection\Plugins\Configuration;
+use Infection\Plugins\Mutant;
+use Infection\Plugins\MutantFilterPlugin;
+use Infection\Plugins\Plugin;
 use Infection\Process\OriginalPhpProcess;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
@@ -132,6 +136,10 @@ final class ProjectCodeProvider
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
         SchemaValidator::class,
+        MutantFilterPlugin::class,
+        Plugin::class,
+        Mutant::class,
+        Configuration::class,
     ];
 
     /**

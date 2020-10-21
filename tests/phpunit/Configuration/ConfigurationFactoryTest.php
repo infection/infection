@@ -188,7 +188,8 @@ final class ConfigurationFactoryTest extends TestCase
             $inputMsiPrecision,
             $inputThreadsCount,
             $inputDryRun,
-            $expectedIgnoreSourceCodeMutatorsMap
+            $expectedIgnoreSourceCodeMutatorsMap,
+            [],
         );
     }
 
@@ -210,7 +211,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -609,7 +611,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -685,7 +688,8 @@ final class ConfigurationFactoryTest extends TestCase
                 'phpunit',
                 'config/bootstrap.php',
                 '-d zend_extension=wrong_xdebug.so',
-                '--debug'
+                '--debug',
+                [],
             ),
             'dist/coverage',
             '-d zend_extension=xdebug.so',
@@ -770,7 +774,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -838,7 +843,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -907,7 +913,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             $existingCoveragePath,
             null,
@@ -975,7 +982,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -1044,7 +1052,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -1113,7 +1122,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -1182,7 +1192,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -1251,7 +1262,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -1321,7 +1333,8 @@ final class ConfigurationFactoryTest extends TestCase
                 $configTestFramework,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -1390,7 +1403,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 $configInitialTestsPhpOptions,
-                null
+                null,
+                []
             ),
             null,
             $inputInitialTestsPhpOptions,
@@ -1460,7 +1474,8 @@ final class ConfigurationFactoryTest extends TestCase
                 $configTestFramework,
                 null,
                 null,
-                $configTestFrameworkExtraOptions
+                $configTestFrameworkExtraOptions,
+                []
             ),
             null,
             null,
@@ -1529,7 +1544,8 @@ final class ConfigurationFactoryTest extends TestCase
                 $configTestFramework,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -1601,7 +1617,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,
@@ -1673,7 +1690,8 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
+                []
             ),
             null,
             null,

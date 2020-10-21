@@ -37,6 +37,8 @@ namespace Infection\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
+use Infection\Plugins\Mutant as PublicMutant;
+use Infection\Plugins\Wrapper\MutantWrapper;
 
 /**
  * @internal
@@ -49,6 +51,11 @@ class Mutant
     private $mutatedCode;
     private $diff;
     private $prettyPrintedOriginalCode;
+
+    /**
+     * @var PublicMutant|null
+     */
+    private $wrapper;
 
     public function __construct(
         string $mutantFilePath,
@@ -100,5 +107,10 @@ class Mutant
     public function getTests(): array
     {
         return $this->mutation->getAllTests();
+    }
+
+    public function getMutantWrapper(): PublicMutant
+    {
+        return $this->wrapper ?? $this->wrapper = new MutantWrapper($this);
     }
 }

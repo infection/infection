@@ -57,7 +57,6 @@ final class ConfigurationTest extends TestCase
      * @param string[] $sourceFilesExcludes
      * @param SplFileInfo[] $sourceFiles
      * @param Mutator[] $mutators
-     * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function test_it_can_be_instantiated(
         float $timeout,
@@ -87,7 +86,8 @@ final class ConfigurationTest extends TestCase
         int $msiPrecision,
         int $threadsCount,
         bool $dryRun,
-        array $ignoreSourceCodeMutatorsMap
+        array $ignoreSourceCodeMutatorsMap,
+        array $plugins
     ): void {
         $config = new Configuration(
             $timeout,
@@ -117,7 +117,8 @@ final class ConfigurationTest extends TestCase
             $msiPrecision,
             $threadsCount,
             $dryRun,
-            $ignoreSourceCodeMutatorsMap
+            $ignoreSourceCodeMutatorsMap,
+            $plugins
         );
 
         $this->assertConfigurationStateIs(
@@ -149,7 +150,8 @@ final class ConfigurationTest extends TestCase
             $msiPrecision,
             $threadsCount,
             $dryRun,
-            $ignoreSourceCodeMutatorsMap
+            $ignoreSourceCodeMutatorsMap,
+            $plugins
         );
     }
 
@@ -183,6 +185,7 @@ final class ConfigurationTest extends TestCase
             2,
             0,
             false,
+            [],
             [],
         ];
 
@@ -229,6 +232,7 @@ final class ConfigurationTest extends TestCase
             [
                 'For_' => ['.*someMethod.*'],
             ],
+            ['Foo'],
         ];
     }
 }

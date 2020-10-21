@@ -33,16 +33,17 @@
 
 declare(strict_types=1);
 
-return [
-    'whitelist' => [
-        \Composer\Autoload\ClassLoader::class,
-        'Safe\*',
-        \Infection\Plugins\Plugin::class,
-        \Infection\Plugins\MutantFilterPlugin::class,
-        \Infection\Plugins\Mutant::class,
-        \Infection\Plugins\Configuration::class,
-    ],
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
-];
+namespace Infection\Plugins;
+
+/**
+ * Plugin to filter mutations with external tools.
+ */
+interface MutantFilterPlugin extends Plugin
+{
+    /**
+     * Optionally returns a callable, taking a path to mutated file, that will determine if a mutation shall run.
+     *
+     * @psalm-return null|callable(Mutant): bool
+     */
+    public function getMutantFilter(): ?callable;
+}

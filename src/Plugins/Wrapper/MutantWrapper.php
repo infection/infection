@@ -33,16 +33,45 @@
 
 declare(strict_types=1);
 
-return [
-    'whitelist' => [
-        \Composer\Autoload\ClassLoader::class,
-        'Safe\*',
-        \Infection\Plugins\Plugin::class,
-        \Infection\Plugins\MutantFilterPlugin::class,
-        \Infection\Plugins\Mutant::class,
-        \Infection\Plugins\Configuration::class,
-    ],
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
-];
+namespace Infection\Plugins\Wrapper;
+
+use Infection\Mutant\Mutant;
+use Infection\Plugins\Mutant as PublicMutant;
+
+/**
+ * @internal
+ */
+final class MutantWrapper implements PublicMutant
+{
+    private $mutant;
+
+    public function __construct(Mutant $mutant)
+    {
+        $this->mutant = $mutant;
+    }
+
+    public function getFilePath(): string
+    {
+        return $this->mutant->getFilePath();
+    }
+
+    public function getMutatedCode(): string
+    {
+        return $this->mutant->getMutatedCode();
+    }
+
+    public function getDiff(): string
+    {
+        return $this->mutant->getDiff();
+    }
+
+    public function isCoveredByTest(): bool
+    {
+        return $this->mutant->isCoveredByTest();
+    }
+
+    public function getMutatorName(): string
+    {
+        return $this->mutant->getMutation()->getMutatorName();
+    }
+}
