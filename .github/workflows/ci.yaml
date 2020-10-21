@@ -57,7 +57,7 @@ jobs:
         run: |
           composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
 
-      - name: Run tests
+      - name: Run tests using Makefile
         if: runner.os != 'Windows'
         run: |
           make test-unit
