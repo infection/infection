@@ -41,6 +41,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use function min;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ArrayItem;
@@ -119,7 +120,22 @@ TXT
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Array_ && count($node->items);
+        if (!$node instanceof Node\Expr\Array_) {
+            return false;
+        }
+
+        if (!count($node->items)) {
+            return false;
+        }
+
+        $parent = ParentConnector::findParent($node);
+
+        // Arrays to the left of an assignments are not arrays but lists.
+        if ($parent instanceof Node\Expr\Assign && $parent->var === $node) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
