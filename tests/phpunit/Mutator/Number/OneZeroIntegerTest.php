@@ -442,5 +442,27 @@ if ($foo !== -0) {
 }
 PHP
         ];
+
+        yield 'It does not mutates limit argument of preg_split function when it equal to -1' => [
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', -1);
+PHP
+        ];
+
+        yield 'It mutates limit argument of preg_split function when it equal to 1' => [
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', 1);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', 0);
+PHP
+        ];
     }
 }
