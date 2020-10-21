@@ -67,4 +67,4 @@ jobs:
 
       - name: Run Infection
         run: |
-          ./bin/infection -j$(nproc) --test-framework-options="--group=default" --only-covered --ignore-msi-with-no-mutations
+          ./bin/infection -j2 --test-framework-options="--group=default" --only-covered --ignore-msi-with-no-mutations
