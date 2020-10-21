@@ -124,7 +124,7 @@ TXT
             return false;
         }
 
-        if (!count($node->items)) {
+        if (count($node->items) === 0) {
             return false;
         }
 
