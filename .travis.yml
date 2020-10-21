@@ -1,7 +1,5 @@
 language: php
 
-sudo: false
-
 env:
   global:
     - INFECTION_FLAGS="--threads=$(nproc) --coverage=coverage --log-verbosity=none --skip-initial-tests --no-progress"
@@ -31,14 +29,6 @@ before_install:
 
 jobs:
   include:
-    - stage: Static Code Analysis
-      php: 7.4
-      install:
-        - composer install $COMPOSER_FLAGS
-      script:
-        # Ensure that the whole autoreview target is run even if the first sub-target fails
-        - make autoreview --keep-going
-
     - &STANDARD_TEST_JOB
       stage: Test
       php: 7.4
