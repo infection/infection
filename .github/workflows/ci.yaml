@@ -25,7 +25,7 @@ jobs:
           - { operating-system: 'ubuntu-latest', php-version: '8.0', dependencies: '--ignore-platform-req=php', coverage-driver: 'pcov' }
 
     continue-on-error: ${{ matrix.php-version == '8.0' }}
-    name: ${{ matrix.operating-system }} CI with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} ${{ matrix.dependencies }}
+    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} ${{ matrix.dependencies }}
 
     steps:
       - name: Checkout code
@@ -63,8 +63,8 @@ jobs:
 
       - name: Run tests
         run: |
-          ./vendor/bin/phpunit --group default
+          php vendor/bin/phpunit --group default
 
       - name: Run Infection
         run: |
-          ./bin/infection -j2 --test-framework-options="--group=default" --only-covered --ignore-msi-with-no-mutations
+          php bin/infection -j2 --test-framework-options="--group=default" --only-covered --ignore-msi-with-no-mutations
