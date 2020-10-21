@@ -42,7 +42,7 @@
         }
     ],
     "require": {
-        "php": "^7.3",
+        "php": "^7.3 || ^8.0",
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",
@@ -51,8 +51,8 @@
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.4",
         "justinrainbow/json-schema": "^5.2",
-        "nikic/php-parser": "^4.9 <4.10",
-        "composer/package-versions-deprecated": "^1.2 || ^2.0",
+        "nikic/php-parser": "^4.10.2",
+        "ocramius/package-versions": "^1.2 || ^2.0",
         "ondram/ci-detector": "^3.3.0",
         "sanmai/pipeline": "^3.1 || ^5.0",
         "sebastian/diff": "^3.0.2 || ^4.0",
@@ -71,6 +71,7 @@
     },
     "require-dev": {
         "ext-simplexml": "*",
+        "composer/package-versions-deprecated": "^1.2 || ^2.0",
         "helmich/phpunit-json-assert": "^3.0",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/extension-installer": "^1.0",
