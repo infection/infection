@@ -51,9 +51,6 @@ jobs:
 
             - name: Run Infection for added files only
               run: |
-                  source .github/github-functions.sh;
-                  INFECTION_FLAGS=$(get_infection_pr_flags);
-                  echo "INFECTION FLAGS: ${INFECTION_FLAGS}";
-                  php bin/infection -j2 $INFECTION_FLAGS;
-                  php vendor/bin/cs2pr build/checkstyle.xml --colorize --graceful-warnings;
+                  echo "GITHUB_REF=${GITHUB_REF}";
+                  echo "GITHUB_HEAD_REF=${GITHUB_HEAD_REF}";
 
