@@ -1,3 +1,4 @@
+SHELL=bash
 .DEFAULT_GOAL := help
 
 # See https://tech.davis-hansson.com/p/make/
@@ -22,7 +23,7 @@ PHP_CS_FIXER_CACHE=build/cache/.php_cs.cache
 
 PHPSTAN=./vendor/bin/phpstan
 
-PHPUNIT=vendor/bin/phpunit
+PHPUNIT=vendor/phpunit/phpunit/phpunit
 
 INFECTION=./build/infection.phar
 
@@ -39,6 +40,8 @@ BENCHMARK_SOURCES=tests/benchmark/MutationGenerator/sources \
 				  tests/benchmark/Tracing/coverage \
 				  tests/benchmark/Tracing/sources
 
+E2E_PHPUNIT_GROUP=integration,e2e
+PHPUNIT_GROUP=default
 
 #
 # Commands (phony targets)
@@ -104,7 +107,7 @@ test-autoreview:
 .PHONY: test-unit
 test-unit:	 	## Runs the unit tests
 test-unit: $(PHPUNIT)
-	$(PHPUNIT) --group default
+	$(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
@@ -112,11 +115,11 @@ test-unit-docker: test-unit-74-docker test-unit-80-docker
 
 .PHONY: test-unit-74-docker
 test-unit-74-docker: $(DOCKER_RUN_74_IMAGE) $(PHPUNIT)
-	$(DOCKER_RUN_74) $(PHPUNIT) --group default
+	$(DOCKER_RUN_74) $(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-unit-80-docker
 test-unit-80-docker: $(DOCKER_RUN_80_IMAGE) $(PHPUNIT)
-	$(DOCKER_RUN_80) $(PHPUNIT) --group default
+	$(DOCKER_RUN_80) $(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests
@@ -126,7 +129,7 @@ test-e2e: test-e2e-phpunit
 .PHONY: test-e2e-phpunit
 test-e2e-phpunit:	## Runs PHPUnit-enabled subset of end-to-end tests
 test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES)
-	$(PHPUNIT) --group integration,e2e
+	$(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 
 .PHONY: test-e2e-docker
 test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
@@ -137,12 +140,12 @@ test-e2e-phpdbg-docker: test-e2e-phpdbg-74-docker test-e2e-phpdbg-80-docker
 
 .PHONY: test-e2e-phpdbg-74-docker
 test-e2e-phpdbg-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_74) $(PHPUNIT) --group integration,e2e
+	$(DOCKER_RUN_74) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 	$(DOCKER_RUN_74) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-phpdbg-80-docker
 test-e2e-phpdbg-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_80) $(PHPUNIT) --group integration,e2e
+	$(DOCKER_RUN_80) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 	$(DOCKER_RUN_80) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-xdebug-docker
@@ -150,12 +153,12 @@ test-e2e-xdebug-docker: test-e2e-xdebug-74-docker test-e2e-xdebug-80-docker
 
 .PHONY: test-e2e-xdebug-74-docker
 test-e2e-xdebug-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_74) $(PHPUNIT) --group integration,e2e
+	$(DOCKER_RUN_74) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 	$(DOCKER_RUN_74) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-xdebug-80-docker
 test-e2e-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_80) $(PHPUNIT) --group integration,e2e
+	$(DOCKER_RUN_80) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 	$(DOCKER_RUN_80) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection

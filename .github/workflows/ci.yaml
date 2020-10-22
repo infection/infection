@@ -16,11 +16,12 @@ jobs:
 
     strategy:
       matrix:
-        operating-system: [ubuntu-latest, windows-latest]
+        operating-system: [ubuntu-latest]
         php-version: ['7.4']
         dependencies: ['']
         coverage-driver: [pcov, xdebug]
         include:
+          - { operating-system: 'windows-latest', php-version: '7.4', dependencies: '', coverage-driver: 'xdebug' }
           - { operating-system: 'ubuntu-latest', php-version: '7.4', dependencies: '--prefer-lowest', coverage-driver: 'pcov' }
           - { operating-system: 'ubuntu-latest', php-version: '8.0', dependencies: '--ignore-platform-req=php', coverage-driver: 'pcov' }
 
@@ -36,6 +37,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           coverage: ${{ matrix.coverage-driver }}
+          ini-values: memory_limit=512M
           tools: composer:v2
 
       - name: Get composer cache directory
@@ -46,9 +48,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-${{ matrix.dependencies }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-${{ matrix.dependencies }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
             composer-${{ runner.os }}-${{ matrix.php-version }}-
             composer-${{ runner.os }}-
             composer-
@@ -57,16 +59,48 @@ jobs:
         run: |
           composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
 
-      - name: Run tests using Makefile
-        if: runner.os != 'Windows'
+      - name: Run tests
+        shell: bash
         run: |
           make test-unit
 
-      - name: Run tests without Makefile
-        if: runner.os == 'Windows'
+      - name: Run integration tests
+        shell: bash
         run: |
-          vendor/bin/phpunit --group default
+          make test-unit PHPUNIT_GROUP=integration
 
-      - name: Run Infection
+      - name: Cache E2E tests dependencies
+        if: runner.os == 'Windows'
+        uses: actions/cache@v2
+        with:
+          path: tests/e2e/*/vendor
+          key: e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}-${{ matrix.dependencies }}
+          restore-keys: |
+            e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}-
+            e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-
+            e2e-vendor-${{ runner.os }}-
+            composer-
+
+      - name: Install Composer dependencies for E2E tests
+        shell: bash
         run: |
-          php bin/infection -j2 --test-framework-options="--group=default" --ignore-msi-with-no-mutations
+          ls tests/e2e/*/composer.json | xargs dirname |
+             xargs -I{} composer --working-dir={} update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
+
+      - name: Run a subset of E2E tests
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          make test-e2e-phpunit PHP='phpdbg -qrr' E2E_PHPUNIT_GROUP=e2e BENCHMARK_SOURCES=
+
+      - name: Install Linux dependencies for E2E tests
+        if: runner.os != 'Windows'
+        run: |
+          sudo apt-get install -y --no-install-recommends expect
+
+      - name: Run the whole set of E2E tests
+        if: runner.os != 'Windows'
+        env:
+          TERM: xterm-256color
+        run: |
+          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection BENCHMARK_SOURCES=

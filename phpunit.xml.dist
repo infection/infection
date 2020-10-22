@@ -31,7 +31,7 @@
 
     <groups>
         <exclude>
-            <group>large</group>
+            <group>e2e</group>
         </exclude>
     </groups>
 
