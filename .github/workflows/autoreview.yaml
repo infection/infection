@@ -30,14 +30,19 @@ jobs:
           php-version: ${{ matrix.php-version }}
           tools: composer:v2
 
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
-          path: ~/.cache/composer
-          key: composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-${{ matrix.dependencies }}
           restore-keys: |
-            composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-
-            composer-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-
             composer-
 
       - name: Install dependencies

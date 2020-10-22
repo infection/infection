@@ -12,18 +12,20 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.operating-system }}
 
     strategy:
       matrix:
+        operating-system: [ubuntu-latest, windows-latest]
         php-version: ['7.4']
         dependencies: ['']
+        coverage-driver: [pcov, xdebug]
         include:
-          - { php-version: '7.4', dependencies: '--prefer-lowest' }
-          - { php-version: '8.0', dependencies: '--ignore-platform-req=php' }
+          - { operating-system: 'ubuntu-latest', php-version: '7.4', dependencies: '--prefer-lowest', coverage-driver: 'pcov' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.0', dependencies: '--ignore-platform-req=php', coverage-driver: 'pcov' }
 
     continue-on-error: ${{ matrix.php-version == '8.0' }}
-    name: CI with PHP ${{ matrix.php-version }} ${{ matrix.dependencies }}
+    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} ${{ matrix.dependencies }}
 
     steps:
       - name: Checkout code
@@ -33,27 +35,38 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          coverage: pcov
+          coverage: ${{ matrix.coverage-driver }}
           tools: composer:v2
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
-          path: ~/.cache/composer
-          key: composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-${{ matrix.dependencies }}
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-${{ matrix.dependencies }}
           restore-keys: |
-            composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-
-            composer-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('**/composer.*') }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-
             composer-
 
       - name: Install dependencies
         run: |
           composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
 
-      - name: Run tests
+      - name: Run tests using Makefile
+        if: runner.os != 'Windows'
         run: |
           make test-unit
 
+      - name: Run tests without Makefile
+        if: runner.os == 'Windows'
+        run: |
+          vendor/bin/phpunit --group default
+
       - name: Run Infection
         run: |
-          ./bin/infection -j$(nproc) --test-framework-options="--group=default"
+          php bin/infection -j2 --test-framework-options="--group=default" --ignore-msi-with-no-mutations
