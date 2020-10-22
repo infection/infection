@@ -64,4 +64,4 @@ jobs:
 
       - name: Run Infection
         run: |
-          php bin/infection -j2 --test-framework-options="--group=default" --only-covered --ignore-msi-with-no-mutations
+          php bin/infection -j2 --test-framework-options="--group=default" --ignore-msi-with-no-mutations
