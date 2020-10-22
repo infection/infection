@@ -6,7 +6,7 @@ env:
     # Warning: the min-msi flag is overridden in PRs (see .ci/travis-functions.sh)
     - MIN_MSI_FLAGS="--min-msi=68.00 --min-covered-msi=80.00"
     - PHPUNIT_BIN="vendor/bin/phpunit --stop-on-failure --prepend=tests/xdebug-filter.php --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml"
-    - COMPOSER_FLAGS="--no-interaction --no-progress --no-suggest --prefer-dist"
+    - COMPOSER_FLAGS="--no-interaction --no-progress --prefer-dist"
 
 cache:
   directories:
@@ -56,7 +56,13 @@ jobs:
       script:
         - if [[ "$DRIVER" == "xdebug" || "$DRIVER" == "none" ]]; then xdebug_enable; fi
         - make tests/benchmark/MutationGenerator/sources tests/benchmark/Tracing/coverage tests/benchmark/Tracing/sources
-        - if [[ "$DRIVER" != "phpdbg" ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
+        - |
+          if [[ "$DRIVER" != "phpdbg" ]]; then
+              $PHPUNIT_BIN;
+          else
+              sed -i s/stream_get_contents/@stream_get_contents/ vendor/phpunit/phpunit/src/Util/PHP/Template/* # Should not be required for PHPUnit 9.4.3+, 8.5.9+
+              phpdbg -qrr $PHPUNIT_BIN;
+          fi
         - |
           if [[ "$DEPS" == "LOW" ]]; then
             ./tests/e2e_tests bin/infection;
@@ -66,7 +72,7 @@ jobs:
           fi
         - if [[ "$DRIVER" == "none" ]]; then xdebug_disable; fi
         - |
-          echo "Infection falgs: ${INFECTION_FLAGS}";
+          echo "Infection flags: ${INFECTION_FLAGS}";
 
           if [[ "$DRIVER" == "none" ]]; then
             exit 0
@@ -131,6 +137,4 @@ jobs:
 
   allow_failures:
     - php: nightly
-      env: DRIVER="phpdbg"
-    - php: 7.4
       env: DRIVER="phpdbg"
