@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use Infection\Metrics\MetricsCalculator;
+use function Safe\getcwd;
 
 /**
  * @internal
@@ -56,7 +57,7 @@ final class CheckstyleLogger implements LineMutationTestingResultsLogger
 
         foreach ($this->metricsCalculator->getEscapedExecutionResults() as $escapedExecutionResult) {
             $error = [
-                'line' => $escapedExecutionResult->getOriginalStartingLine(),
+                'line' => (string) $escapedExecutionResult->getOriginalStartingLine(),
                 'message' => <<<"TEXT"
 Escaped Mutant:
 
@@ -75,7 +76,7 @@ TEXT
     }
 
     /**
-     * @param array{line: string, severity: string, message: string, source: string} $error
+     * @param array{line: string, message: string} $error
      */
     private function buildAnnotation(string $filePath, array $error): string
     {
