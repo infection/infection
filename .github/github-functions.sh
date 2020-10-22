@@ -12,7 +12,7 @@ function get_infection_pr_flags() {
         git remote set-branches --add origin "$GITHUB_HEAD_REF";
         git fetch;
 
-        changed_files=$(git diff origin/master --diff-filter=A --name-only | grep src/ | paste -sd "," -);
+        changed_files=$(git diff master --diff-filter=A --name-only | grep src/ | paste -sd "," -);
 
         if [ -n "$changed_files" ]; then
             # Set those flags only if there is any changed files detected
