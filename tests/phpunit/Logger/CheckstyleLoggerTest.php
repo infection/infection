@@ -48,40 +48,26 @@ final class CheckstyleLoggerTest extends TestCase
      */
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
-        string $expectedContents
+        array $expectedLines
     ): void {
         $logger = new CheckstyleLogger($metricsCalculator);
 
-        $this->assertLoggedContentIs($expectedContents, $logger);
+        $this->assertSame($expectedLines, $logger->getLogLines());
     }
 
     public function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
-            <<<XML
-<?xml version="1.0"?>
-<checkstyle version="6.5"/>
-XML
+            [],
         ];
 
         yield 'all mutations' => [
             $this->createCompleteMetricsCalculator(),
-            <<<XML
-<?xml version="1.0"?>
-<checkstyle version="6.5">
-  <file name="foo/bar">
-    <error line="9" message="Escaped Mutant:&#10;&#10;--- Original&#10;+++ New&#10;@@ @@&#10;&#10;- echo 'original';&#10;+ echo 'escaped#1';&#10;" severity="warning" source="PregQuote"/>
-    <error line="10" message="Escaped Mutant:&#10;&#10;--- Original&#10;+++ New&#10;@@ @@&#10;&#10;- echo 'original';&#10;+ echo 'escaped#0';&#10;" severity="warning" source="For_"/>
-  </file>
-</checkstyle>
-XML
-            ,
+            [
+                "::warning file=foo/bar,line=9::Escaped Mutant:%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#1';%0A\n",
+                "::warning file=foo/bar,line=10::Escaped Mutant:%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A\n",
+            ],
         ];
-    }
-
-    private function assertLoggedContentIs(string $expectedXml, CheckstyleLogger $logger): void
-    {
-        $this->assertXmlStringEqualsXmlString($expectedXml, $logger->getLogLines()[0]);
     }
 }

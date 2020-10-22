@@ -10,7 +10,7 @@
         "badge": {
             "branch": "master"
         },
-        "checkstyle": "build/checkstyle.xml"
+        "checkstyle": "php://stdout"
     },
     "mutators": {
         "@default": true,

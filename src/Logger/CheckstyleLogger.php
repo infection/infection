@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use DOMDocument;
-use DOMElement;
 use Infection\Metrics\MetricsCalculator;
 
 /**
@@ -53,61 +51,43 @@ final class CheckstyleLogger implements LineMutationTestingResultsLogger
 
     public function getLogLines(): array
     {
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-
-        $checkstyleNode = $dom->createElement('checkstyle');
-        $checkstyleNode->setAttribute('version', '6.5');
-
-        $allErrors = [];
+        $lines = [];
+        $currentWorkingDirectory = getcwd();
 
         foreach ($this->metricsCalculator->getEscapedExecutionResults() as $escapedExecutionResult) {
-            $filePath = $escapedExecutionResult->getOriginalFilePath();
-
-            $allErrors[$filePath][] = [
+            $error = [
                 'line' => $escapedExecutionResult->getOriginalStartingLine(),
-                'severity' => 'warning',
                 'message' => <<<"TEXT"
 Escaped Mutant:
 
 {$escapedExecutionResult->getMutantDiff()}
 TEXT
             ,
-                'source' => $escapedExecutionResult->getMutatorName(),
             ];
+
+            $lines[] = $this->buildAnnotation(
+                $this->relativePath($currentWorkingDirectory, $escapedExecutionResult->getOriginalFilePath()),
+                $error
+            );
         }
 
-        /** @var array<string, array{line: string, severity: string, message: string, source: string}> $errors */
-        foreach ($allErrors as $filePath => $errors) {
-            $fileNode = $this->buildFileErrors($dom, $filePath, $errors);
-
-            $checkstyleNode->appendChild($fileNode);
-        }
-
-        $dom->appendChild($checkstyleNode);
-
-        return [(string) $dom->saveXML()];
+        return $lines;
     }
 
     /**
-     * @param array<string, array{line: string, severity: string, message: string, source: string}> $errors
+     * @param array{line: string, severity: string, message: string, source: string} $error
      */
-    private function buildFileErrors(DOMDocument $dom, string $filePath, array $errors): DOMElement
+    private function buildAnnotation(string $filePath, array $error): string
     {
-        $fileNode = $dom->createElement('file');
-        $fileNode->setAttribute('name', $filePath);
+        // newlines need to be encoded
+        // see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
+        $message = str_replace("\n", '%0A', $error['message']);
 
-        foreach ($errors as $error) {
-            $errorNode = $dom->createElement('error');
-            $errorNode->setAttribute('severity', 'warning');
-            $errorNode->setAttribute('line', (string) $error['line']);
-            $errorNode->setAttribute('message', $error['message']);
-            $errorNode->setAttribute('source', $error['source']);
+        return "::warning file={$filePath},line={$error['line']}::{$message}\n";
+    }
 
-            $fileNode->appendChild($errorNode);
-        }
-
-        return $fileNode;
+    private function relativePath(string $currentWorkingDirectory, string $path): string
+    {
+        return str_replace($currentWorkingDirectory . '/', '', $path);
     }
 }

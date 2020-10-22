@@ -55,5 +55,3 @@ jobs:
                   INFECTION_FLAGS=$(get_infection_pr_flags);
                   echo "INFECTION FLAGS: ${INFECTION_FLAGS}";
                   php bin/infection -j2 $INFECTION_FLAGS;
-                  php vendor/bin/cs2pr build/checkstyle.xml --colorize --graceful-warnings;
-
