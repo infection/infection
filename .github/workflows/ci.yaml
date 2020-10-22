@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        operating-system: [ubuntu-latest, windows-latest, macos-latest]
+        operating-system: [ubuntu-latest, windows-latest]
         php-version: ['7.4']
         dependencies: ['']
         coverage-driver: [pcov, xdebug]
