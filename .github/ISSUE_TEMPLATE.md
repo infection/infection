@@ -19,7 +19,7 @@
 - For general support, please use the Twitter @infection_php or Gitter channel https://gitter.im/infection/Lobby.
 -->
 
-<!-- Please past your phpunit.xml[.dist] if no Github link to the repo provided -->
+<!-- Please paste your phpunit.xml[.dist] if no Github link to the repo provided -->
 <details>
  <summary>phpunit.xml</summary>
 
