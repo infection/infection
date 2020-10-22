@@ -29,6 +29,8 @@ INFECTION=./build/infection.phar
 DOCKER_RUN=docker run --tty --rm --volume "$$PWD":/opt/infection --workdir /opt/infection
 DOCKER_RUN_74=$(FLOCK) devTools/*php74*.json $(DOCKER_RUN) infection_php74
 DOCKER_RUN_74_IMAGE=devTools/Dockerfile-php74-xdebug.json
+DOCKER_RUN_80=$(FLOCK) devTools/*php80*.json $(DOCKER_RUN) infection_php80
+DOCKER_RUN_80_IMAGE=devTools/Dockerfile-php80-xdebug.json
 
 FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
@@ -106,11 +108,15 @@ test-unit: $(PHPUNIT)
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker: test-unit-74-docker
+test-unit-docker: test-unit-80-docker
 
 .PHONY: test-unit-74-docker
 test-unit-74-docker: $(DOCKER_RUN_74_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_74) $(PHPUNIT) --group default
+
+.PHONY: test-unit-80-docker
+test-unit-80-docker: $(DOCKER_RUN_80_IMAGE) $(PHPUNIT)
+	$(DOCKER_RUN_80) $(PHPUNIT) --group default
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests on the different Docker platforms
@@ -126,24 +132,34 @@ test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
 test-e2e-docker: test-e2e-phpdbg-docker test-e2e-xdebug-docker
 
 .PHONY: test-e2e-phpdbg-docker
-test-e2e-phpdbg-docker: test-e2e-phpdbg-74-docker
+test-e2e-phpdbg-docker: test-e2e-phpdbg-74-docker test-e2e-phpdbg-80-docker
 
 .PHONY: test-e2e-phpdbg-74-docker
 test-e2e-phpdbg-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_74) $(PHPUNIT) --group integration,e2e
 	$(DOCKER_RUN_74) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
+.PHONY: test-e2e-phpdbg-80-docker
+test-e2e-phpdbg-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_80) $(PHPUNIT) --group integration,e2e
+	$(DOCKER_RUN_80) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
+
 .PHONY: test-e2e-xdebug-docker
-test-e2e-xdebug-docker: test-e2e-xdebug-74-docker
+test-e2e-xdebug-docker: test-e2e-xdebug-74-docker test-e2e-xdebug-80-docker
 
 .PHONY: test-e2e-xdebug-74-docker
 test-e2e-xdebug-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_74) $(PHPUNIT) --group integration,e2e
 	$(DOCKER_RUN_74) ./tests/e2e_tests $(INFECTION)
 
+.PHONY: test-e2e-xdebug-80-docker
+test-e2e-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_80) $(PHPUNIT) --group integration,e2e
+	$(DOCKER_RUN_80) ./tests/e2e_tests $(INFECTION)
+
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself
-test-infection:
+test-infection:MakefileTes
 	$(INFECTION) --threads=4
 
 .PHONY: test-infection-docker
@@ -151,19 +167,26 @@ test-infection-docker:	## Runs Infection against itself on the different Docker 
 test-infection-docker: test-infection-phpdbg-docker test-infection-xdebug-docker
 
 .PHONY: test-infection-phpdbg-docker
-test-infection-phpdbg-docker: test-infection-phpdbg-74-docker
+test-infection-phpdbg-docker: test-infection-phpdbg-74-docker test-infection-phpdbg-80-docker
 
 .PHONY: test-infection-phpdbg-74-docker
 test-infection-phpdbg-74-docker: $(DOCKER_RUN_74_IMAGE)
 	$(DOCKER_RUN_74) phpdbg -qrr bin/infection --threads=4
 
+.PHONY: test-infection-phpdbg-80-docker
+test-infection-phpdbg-80-docker: $(DOCKER_RUN_80_IMAGE)
+	$(DOCKER_RUN_80) phpdbg -qrr bin/infection --threads=4
+
 .PHONY: test-infection-xdebug-docker
-test-infection-xdebug-docker: test-infection-xdebug-74-docker
+test-infection-xdebug-docker: test-infection-xdebug-74-docker test-infection-xdebug-80-docker
 
 .PHONY: test-infection-xdebug-74-docker
 test-infection-xdebug-74-docker: $(DOCKER_RUN_74_IMAGE)
 	$(DOCKER_RUN_74) ./bin/infection --threads=4
 
+.PHONY: test-infection-xdebug-80-docker
+test-infection-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE)
+	$(DOCKER_RUN_80) ./bin/infection --threads=4
 
 #
 # Rules from files (non-phony targets)
@@ -190,11 +213,11 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	touch -c $@
 
 vendor: composer.lock
-	composer install
+	composer install --prefer-dist
 	touch $@
 
 composer.lock: composer.json
-	composer install
+	composer install --prefer-dist
 	touch -c $@
 
 $(PHPUNIT): vendor phpunit.xml.dist
@@ -207,6 +230,11 @@ phpunit.xml.dist:
 $(DOCKER_RUN_74_IMAGE): devTools/Dockerfile-php74-xdebug
 	docker build --tag infection_php74 --file devTools/Dockerfile-php74-xdebug .
 	docker image inspect infection_php74 > $(DOCKER_RUN_74_IMAGE)
+	touch $@
+
+$(DOCKER_RUN_80_IMAGE): devTools/Dockerfile-php80-xdebug
+	docker build --tag infection_php80 --file devTools/Dockerfile-php80-xdebug .
+	docker image inspect infection_php80 >> $(DOCKER_RUN_80_IMAGE)
 	touch $@
 
 tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
