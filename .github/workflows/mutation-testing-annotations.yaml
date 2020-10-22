@@ -54,6 +54,11 @@ jobs:
                   echo "GITHUB_REF=${GITHUB_REF}";
                   echo "GITHUB_HEAD_REF=${GITHUB_HEAD_REF}";
                   echo "GITHUB_BASE_REF=${GITHUB_BASE_REF}";
+                  echo "git branch:";
+                  git branch;
+                  git fetch;
+                  echo "git diff...";
+                  git diff master --diff-filter=A --name-only
                   source .github/github-functions.sh;
                   INFECTION_FLAGS=$(get_infection_pr_flags);
                   echo "INFECTION FLAGS: ${INFECTION_FLAGS}";
