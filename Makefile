@@ -108,7 +108,7 @@ test-unit: $(PHPUNIT)
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker: test-unit-80-docker
+test-unit-docker: test-unit-74-docker test-unit-80-docker
 
 .PHONY: test-unit-74-docker
 test-unit-74-docker: $(DOCKER_RUN_74_IMAGE) $(PHPUNIT)
