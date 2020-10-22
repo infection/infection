@@ -159,7 +159,7 @@ test-e2e-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
 
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself
-test-infection:MakefileTes
+test-infection:
 	$(INFECTION) --threads=4
 
 .PHONY: test-infection-docker

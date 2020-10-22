@@ -1,4 +1,4 @@
-reFROM php:8.0-rc-cli-alpine
+FROM php:8.0-rc-cli-alpine
 
 RUN apk add --no-cache \
         bash \
