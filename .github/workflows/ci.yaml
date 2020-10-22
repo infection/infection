@@ -62,6 +62,11 @@ jobs:
         run: |
           make test-unit
 
+      - name: Run tests without Makefile
+        if: runner.os == 'Windows'
+        run: |
+          vendor/bin/phpunit --group default
+
       - name: Run Infection
         run: |
           php bin/infection -j2 --test-framework-options="--group=default" --ignore-msi-with-no-mutations
