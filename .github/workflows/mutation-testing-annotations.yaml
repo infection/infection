@@ -58,7 +58,7 @@ jobs:
                   git branch;
                   git fetch;
                   echo "git diff...";
-                  git diff master --diff-filter=A --name-only
+                  git diff origin/master --diff-filter=A --name-only
                   source .github/github-functions.sh;
                   INFECTION_FLAGS=$(get_infection_pr_flags);
                   echo "INFECTION FLAGS: ${INFECTION_FLAGS}";
