@@ -39,6 +39,9 @@ use Infection\Logger\CheckstyleLogger;
 use Infection\Metrics\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group integration
+ */
 final class CheckstyleLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
