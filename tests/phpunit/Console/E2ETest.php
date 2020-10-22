@@ -326,8 +326,8 @@ final class E2ETest extends TestCase
 
     private function runInfection(int $expectedExitCode, array $argvExtra = []): string
     {
-        if (!extension_loaded('xdebug') && PHP_SAPI !== 'phpdbg') {
-            $this->markTestSkipped("Infection from within PHPUnit won't run without xdebug or phpdbg");
+        if (!extension_loaded('xdebug') && !extension_loaded('pcov') && PHP_SAPI !== 'phpdbg') {
+            $this->markTestSkipped("Infection from within PHPUnit won't run without Xdebug or PCOV or PHPDBG");
         }
 
         /*

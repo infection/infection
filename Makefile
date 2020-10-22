@@ -6,7 +6,7 @@ MAKEFLAGS += --no-builtin-rules
 
 .PHONY: help
 help:
-	@echo "\033[33mUsage:\033[0m\n  make TARGET\n\n\033[32m#\n# Commands\n#---------------------------------------------------------------------------\033[0m\n"
+	@printf "\033[33mUsage:\033[0m\n  make TARGET\n\n\033[32m#\n# Commands\n#---------------------------------------------------------------------------\033[0m\n\n"
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//' | awk 'BEGIN {FS = ":"}; {printf "\033[33m%s:\033[0m%s\n", $$1, $$2}'
 
 
@@ -119,13 +119,14 @@ test-unit-80-docker: $(DOCKER_RUN_80_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_80) $(PHPUNIT) --group default
 
 .PHONY: test-e2e
-test-e2e: 	 	## Runs the end-to-end tests on the different Docker platforms
-test-e2e: $(PHPUNIT) \
-			tests/benchmark/MutationGenerator/sources \
-            tests/benchmark/Tracing/coverage \
-            tests/benchmark/Tracing/sources
-	$(PHPUNIT) --group integration,e2e
+test-e2e: 	 	## Runs the end-to-end tests
+test-e2e: test-e2e-phpunit
 	./tests/e2e_tests $(INFECTION)
+
+.PHONY: test-e2e-phpunit
+test-e2e-phpunit:	## Runs PHPUnit-enabled subset of end-to-end tests
+test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES)
+	$(PHPUNIT) --group integration,e2e
 
 .PHONY: test-e2e-docker
 test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
@@ -158,7 +159,7 @@ test-e2e-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_80) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
-test-infection:		## Runs Infection against itself
+test-infection:	## Runs Infection against itself
 test-infection:
 	$(INFECTION) --threads=4
 
@@ -239,14 +240,19 @@ $(DOCKER_RUN_80_IMAGE): devTools/Dockerfile-php80-xdebug
 
 tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
-	touch $@
+	touch -c $@
 
 tests/benchmark/Tracing/coverage: tests/benchmark/Tracing/coverage.tar.gz
 	@echo "Untarring the coverage, this might take a while"
 	cd tests/benchmark/Tracing; tar -xzf coverage.tar.gz
-	touch $@
+	touch -c $@
 
 tests/benchmark/Tracing/sources: tests/benchmark/Tracing/sources.tar.gz
 	@echo "Untarring the sources, this might take a while"
 	cd tests/benchmark/Tracing; tar -xzf sources.tar.gz
-	touch $@
+	touch -c $@
+
+clean:
+	rm -fr tests/benchmark/MutationGenerator/sources
+	rm -fr tests/benchmark/Tracing/coverage
+	rm -fr tests/benchmark/Tracing/sources
