@@ -256,3 +256,4 @@ clean:
 	rm -fr tests/benchmark/MutationGenerator/sources
 	rm -fr tests/benchmark/Tracing/coverage
 	rm -fr tests/benchmark/Tracing/sources
+	git clean -f -X tests/e2e/
