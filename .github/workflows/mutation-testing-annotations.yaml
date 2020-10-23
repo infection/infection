@@ -49,4 +49,4 @@ jobs:
             - name: Run Infection for added files only
               run: |
                   git fetch;
-                  php bin/infection -j2 --filter=$(git diff origin/"${GITHUB_BASE_REF:-master}" --diff-filter=A --name-only | grep src/ | paste -sd "," -) --ignore-msi-with-no-mutations --only-covered;
+                  php bin/infection -j2 --filter=$(git diff origin/$GITHUB_BASE_REF --diff-filter=A --name-only | grep src/ | paste -sd "," -) --ignore-msi-with-no-mutations --only-covered;
