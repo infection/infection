@@ -25,7 +25,7 @@ RUN apk add --no-cache \
         zip
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-COPY devTools/memory-limit.ini ${PHP_INI_DIR}/conf.d/memory-limit.ini
+COPY devTools/memory-limit.ini ${PHP_INI_DIR}/conf.d/
 
 RUN adduser -h /opt/infection -s /bin/bash -D infection
 
