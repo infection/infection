@@ -1,17 +1,19 @@
-FROM php:7.4-cli-alpine
+FROM php:8.0-rc-cli-alpine
 
 RUN apk add --no-cache \
         bash \
         expect \
         zip
 
+ARG XDEBUG_VERSION=3.0.0beta1
+
 RUN set -eux; \
     apk add --no-cache --virtual .build-deps \
         ${PHPIZE_DEPS} \
         build-base \
     ; \
-    pecl install xdebug; \
-    pecl clear-cache; \
+    mkdir -p /usr/src/php/ext/xdebug && curl -fsSL https://pecl.php.net/get/xdebug-${XDEBUG_VERSION} | tar -xvz -C "/usr/src/php/ext/xdebug" --strip 1; \
+    docker-php-ext-install -j$(nproc) xdebug; \
     docker-php-ext-enable xdebug ;\
     runDeps="$( \
         scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
@@ -19,6 +21,7 @@ RUN set -eux; \
             | sort -u \
             | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     )"; \
+    rm -rf /usr/src/php; \
     apk add --no-cache --virtual .phpexts-rundeps ${runDeps}; \
     apk del .build-deps
 
