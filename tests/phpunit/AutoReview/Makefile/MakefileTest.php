@@ -84,9 +84,10 @@ final class MakefileTest extends TestCase
 [33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
 [33mtest-unit:[0m	 	 Runs the unit tests
 [33mtest-unit-docker:[0m	 Runs the unit tests on the different Docker platforms
-[33mtest-e2e:[0m 	 	 Runs the end-to-end tests on the different Docker platforms
+[33mtest-e2e:[0m 	 	 Runs the end-to-end tests
+[33mtest-e2e-phpunit:[0m	 Runs PHPUnit-enabled subset of end-to-end tests
 [33mtest-e2e-docker:[0m 	 Runs the end-to-end tests on the different Docker platforms
-[33mtest-infection:[0m		 Runs Infection against itself
+[33mtest-infection:[0m	 Runs Infection against itself
 [33mtest-infection-docker:[0m	 Runs Infection against itself on the different Docker platforms
 
 EOF;
