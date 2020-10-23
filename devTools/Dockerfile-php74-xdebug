@@ -1,10 +1,5 @@
 FROM php:7.4-cli-alpine
 
-RUN apk add --no-cache \
-        bash \
-        expect \
-        zip
-
 RUN set -eux; \
     apk add --no-cache --virtual .build-deps \
         ${PHPIZE_DEPS} \
@@ -21,6 +16,13 @@ RUN set -eux; \
     )"; \
     apk add --no-cache --virtual .phpexts-rundeps ${runDeps}; \
     apk del .build-deps
+
+RUN apk add --no-cache \
+        ncurses \
+        make \
+        bash \
+        expect \
+        zip
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY devTools/memory-limit.ini ${PHP_INI_DIR}/conf.d/memory-limit.ini

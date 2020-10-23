@@ -1,10 +1,5 @@
 FROM php:8.0-rc-cli-alpine
 
-RUN apk add --no-cache \
-        bash \
-        expect \
-        zip
-
 ARG XDEBUG_VERSION=3.0.0beta1
 
 RUN set -eux; \
@@ -25,8 +20,16 @@ RUN set -eux; \
     apk add --no-cache --virtual .phpexts-rundeps ${runDeps}; \
     apk del .build-deps
 
+RUN apk add --no-cache \
+        ncurses \
+        make \
+        bash \
+        expect \
+        zip
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY devTools/memory-limit.ini ${PHP_INI_DIR}/conf.d/memory-limit.ini
+COPY devTools/xdebug-coverage.ini ${PHP_INI_DIR}/conf.d/xdebug-coverage.ini
 
 RUN adduser -h /opt/infection -s /bin/bash -D infection
 
