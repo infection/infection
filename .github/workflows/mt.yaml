@@ -1,7 +1,7 @@
 # yamllint disable rule:line-length
 # yamllint disable rule:braces
 
-name: Autoreview
+name: Mutation Testing
 
 on:
   pull_request:
@@ -10,15 +10,22 @@ on:
       - main
       - master
 
+env:
+  MIN_MSI: 68.00
+  MIN_COVERED_MSI: 80.00
+
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.operating-system }}
 
     strategy:
       matrix:
+        operating-system: [ubuntu-latest, windows-latest]
         php-version: ['7.4']
+        dependencies: ['']
+        coverage-driver: [pcov]
 
-    name: Autoreview on PHP ${{ matrix.php-version }}
+    name: Mutation testing on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }}
 
     steps:
       - name: Checkout code
@@ -28,6 +35,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
+          coverage: ${{ matrix.coverage-driver }}
           tools: composer:v2
 
       - name: Get composer cache directory
@@ -47,9 +55,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer update --no-interaction --prefer-dist --no-progress
+          composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
 
-      - name: Run tests
+      - name: Collect coverage report
         run: |
-          make autoreview -k
+          php vendor/phpunit/phpunit/phpunit --stop-on-failure --coverage-xml=build/logs/coverage-xml --log-junit=build/logs/junit.xml
 
+      - name: Run Infection
+        run: |
+          php bin/infection -j2 --skip-initial-tests --min-msi=$MIN_MSI --min-covered-msi=$MIN_COVERED_MSI --coverage=build/logs --log-verbosity=none --skip-initial-tests --no-interaction --no-progress
