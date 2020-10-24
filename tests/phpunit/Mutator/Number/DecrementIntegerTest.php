@@ -62,15 +62,6 @@ PHP
             ,
         ];
 
-        yield 'It does not decrement the number one' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
-PHP
-            ,
-        ];
-
         yield 'It does not decrement zero when it is being compared as identical with result of count()' => [
             <<<'PHP'
 <?php
@@ -343,6 +334,86 @@ $foo = 1;
 PHP
         ];
 
+        yield 'It does not decrement 1 in greater comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo > 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in greater or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo >= 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in smaller comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo < 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in smaller or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo <= 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo == 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in not equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo != 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo === 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not decrement 1 in not identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo !== 1) {
+    echo 'bar';
+}
+PHP
+        ];
+
         yield 'It does not decrement zero when it is being compared as identical with result of grapheme_strlen()' => [
             <<<'PHP'
 <?php
@@ -397,6 +468,42 @@ PHP
             <<<'PHP'
 <?php
 $b = $a[0];
+PHP
+        ];
+
+        yield 'It does not decrement limit argument of preg_split function when it equals to 0' => [
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', 0);
+PHP
+        ];
+
+        yield 'It does decrement limit argument of preg_split function when it greater than 0' => [
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', 1);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', 0);
+PHP
+        ];
+
+        yield 'It does decrement limit argument of preg_split function when it equal to -1' => [
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', -1);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', -2);
 PHP
         ];
     }

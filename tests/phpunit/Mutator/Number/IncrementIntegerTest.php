@@ -70,7 +70,36 @@ PHP
             ,
         ];
 
-        yield 'It does not increment the number zero' => [
+        yield 'It does not increment assigment of 0' => [
+            <<<'PHP'
+<?php
+
+$foo = 0;
+PHP
+            ,
+        ];
+
+        yield 'It does not increment 0 in greater comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo > 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in greater or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo >= 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in smaller comparison' => [
             <<<'PHP'
 <?php
 
@@ -78,7 +107,56 @@ if ($foo < 0) {
     echo 'bar';
 }
 PHP
-            ,
+        ];
+
+        yield 'It does not increment 0 in smaller or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo <= 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo == 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in not equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo != 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo === 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in not identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo !== 0) {
+    echo 'bar';
+}
+PHP
         ];
 
         yield 'It increments one' => [
@@ -127,6 +205,41 @@ if ($foo === -9) {
 }
 PHP
             ,
+        ];
+
+        yield 'It does not increment limit argument of preg_split function when it equals to -1' => [
+            <<<'PHP'
+<?php
+preg_split('//', 'string', -1);
+PHP
+        ];
+
+        yield 'It does increment limit argument of preg_split function when it equals to 0' => [
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', 0);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', 1);
+PHP
+        ];
+
+        yield 'It does increment limit argument of preg_split function when it equals to -2' => [
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', -2);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', -1);
+PHP
         ];
     }
 }

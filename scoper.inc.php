@@ -37,6 +37,13 @@ return [
     'whitelist' => [
         \Composer\Autoload\ClassLoader::class,
         'Safe\*',
+        // PHP 8.0
+        'T_NAME_QUALIFIED',
+        'T_NAME_FULLY_QUALIFIED',
+        'T_NAME_RELATIVE',
+        'T_MATCH',
+        'T_NULLSAFE_OBJECT_OPERATOR',
+        'T_ATTRIBUTE',
     ],
     'whitelist-global-constants' => false,
     'whitelist-global-classes' => false,

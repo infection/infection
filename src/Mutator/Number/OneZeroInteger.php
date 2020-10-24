@@ -38,6 +38,7 @@ namespace Infection\Mutator\Number;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -77,8 +78,48 @@ TXT
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Scalar\LNumber
-            && ($node->value === 0 || $node->value === 1)
-            && !$this->isPartOfSizeComparison($node);
+        if (!$node instanceof Node\Scalar\LNumber) {
+            return false;
+        }
+
+        if ($this->isPartOfSizeComparison($node)) {
+            return false;
+        }
+
+        if ($node->value !== 0 && $node->value !== 1) {
+            return false;
+        }
+
+        if ($this->isPregSplitLimitZeroOrMinusOneArgument($node)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool
+    {
+        if ($node->value !== 1) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Expr\UnaryMinus) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($parentNode);
+
+        if (!$parentNode instanceof Node\Arg) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($parentNode);
+
+        return $parentNode instanceof Node\Expr\FuncCall
+            && $parentNode->name instanceof Node\Name
+            && $parentNode->name->toLowerString() === 'preg_split'
+        ;
     }
 }
