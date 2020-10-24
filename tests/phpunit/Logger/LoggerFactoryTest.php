@@ -216,14 +216,14 @@ final class LoggerFactoryTest extends TestCase
             [PerMutatorLogger::class],
         ];
 
-        yield 'checkstyle logger' => [
+        yield 'github logger' => [
             new Logs(
                 null,
                 null,
                 null,
                 null,
                 null,
-                'checkstyle',
+                'AM',
                 null
             ),
             [GitHubAnnotationsLogger::class],
@@ -249,7 +249,7 @@ final class LoggerFactoryTest extends TestCase
                 'json',
                 'debug',
                 'per_mutator',
-                'checkstyle',
+                'AM',
                 new Badge('branch')
             ),
             [

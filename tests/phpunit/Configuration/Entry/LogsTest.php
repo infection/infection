@@ -52,7 +52,7 @@ final class LogsTest extends TestCase
         ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
-        ?string $checkstyleFilePath,
+        ?string $gitHubAnnotationsLoggerDiffFilter,
         ?Badge $badge
     ): void {
         $logs = new Logs(
@@ -61,7 +61,7 @@ final class LogsTest extends TestCase
             $jsonLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
-            $checkstyleFilePath,
+            $gitHubAnnotationsLoggerDiffFilter,
             $badge
         );
 
@@ -72,7 +72,7 @@ final class LogsTest extends TestCase
             $jsonLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
-            $checkstyleFilePath,
+            $gitHubAnnotationsLoggerDiffFilter,
             $badge
         );
     }
@@ -111,7 +111,7 @@ final class LogsTest extends TestCase
             'json.log',
             'debug.log',
             'perMutator.log',
-            'checkstyle.xml',
+            'AM',
             new Badge('master'),
         ];
     }

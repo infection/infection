@@ -679,7 +679,7 @@ final class ConfigurationFactoryTest extends TestCase
                     'json.log',
                     'debug.log',
                     'mutator.log',
-                    'checkstyle.xml',
+                    'AM',
                     new Badge('master')
                 ),
                 'config/tmp',
@@ -729,7 +729,7 @@ final class ConfigurationFactoryTest extends TestCase
                 'json.log',
                 'debug.log',
                 'mutator.log',
-                'checkstyle.xml',
+                'AM',
                 new Badge('master')
             ),
             'none',
