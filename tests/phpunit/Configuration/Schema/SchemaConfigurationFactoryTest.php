@@ -380,7 +380,7 @@ JSON
         "json": "json.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
-        "checkstyle": "checkstyle.xml",
+        "github": "AM",
         "badge": {
             "branch": "master"
         }
@@ -396,7 +396,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
-                    'checkstyle.xml',
+                    'AM',
                     new Badge('master')
                 ),
             ]),
@@ -438,7 +438,7 @@ JSON
         "json": " json.log ",
         "debug": " debug.log ",
         "perMutator": " perMutator.log ",
-        "checkstyle": " checkstyle.xml ",
+        "github": "AM ",
         "badge": {
             "branch": " master "
         }
@@ -454,7 +454,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
-                    'checkstyle.xml',
+                    'AM',
                     new Badge('master')
                 ),
             ]),
@@ -2086,7 +2086,7 @@ JSON
         "json": "json.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
-        "checkstyle": "checkstyle.xml",
+        "github": "AM",
         "badge": {
             "branch": "master"
         }
@@ -2325,7 +2325,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
-                    'checkstyle.xml',
+                    'AM',
                     new Badge('master')
                 ),
                 'tmpDir' => 'custom-tmp',

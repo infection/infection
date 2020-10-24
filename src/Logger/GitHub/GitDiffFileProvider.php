@@ -33,62 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Logger\GitHub;
 
-use Infection\Metrics\MetricsCalculator;
-use function Safe\getcwd;
+use function Safe\sprintf;
 
 /**
+ * @final
+ *
  * @internal
  */
-final class CheckstyleLogger implements LineMutationTestingResultsLogger
+class GitDiffFileProvider
 {
-    private MetricsCalculator $metricsCalculator;
-
-    public function __construct(MetricsCalculator $metricsCalculator)
+    public function provide(string $diffFilter): string
     {
-        $this->metricsCalculator = $metricsCalculator;
-    }
-
-    public function getLogLines(): array
-    {
-        $lines = [];
-        $currentWorkingDirectory = getcwd();
-
-        foreach ($this->metricsCalculator->getEscapedExecutionResults() as $escapedExecutionResult) {
-            $error = [
-                'line' => (string) $escapedExecutionResult->getOriginalStartingLine(),
-                'message' => <<<"TEXT"
-Escaped Mutant:
-
-{$escapedExecutionResult->getMutantDiff()}
-TEXT
-            ,
-            ];
-
-            $lines[] = $this->buildAnnotation(
-                $this->relativePath($currentWorkingDirectory, $escapedExecutionResult->getOriginalFilePath()),
-                $error
-            );
-        }
-
-        return $lines;
-    }
-
-    /**
-     * @param array{line: string, message: string} $error
-     */
-    private function buildAnnotation(string $filePath, array $error): string
-    {
-        // newlines need to be encoded
-        // see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
-        $message = str_replace("\n", '%0A', $error['message']);
-
-        return "::warning file={$filePath},line={$error['line']}::{$message}\n";
-    }
-
-    private function relativePath(string $currentWorkingDirectory, string $path): string
-    {
-        return str_replace($currentWorkingDirectory . '/', '', $path);
+        return (string) shell_exec(sprintf('git diff origin/"${GITHUB_BASE_REF:-master}" --diff-filter=%s --name-only | grep src/ | paste -sd ","', $diffFilter));
     }
 }

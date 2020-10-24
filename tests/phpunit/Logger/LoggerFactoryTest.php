@@ -41,9 +41,9 @@ use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
-use Infection\Logger\CheckstyleLogger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\FileLogger;
+use Infection\Logger\GitHubAnnotationsLogger;
 use Infection\Logger\JsonLogger;
 use Infection\Logger\LoggerFactory;
 use Infection\Logger\LoggerRegistry;
@@ -226,7 +226,7 @@ final class LoggerFactoryTest extends TestCase
                 'checkstyle',
                 null
             ),
-            [CheckstyleLogger::class],
+            [GitHubAnnotationsLogger::class],
         ];
 
         yield 'badge logger' => [
@@ -258,7 +258,7 @@ final class LoggerFactoryTest extends TestCase
                 JsonLogger::class,
                 DebugFileLogger::class,
                 PerMutatorLogger::class,
-                CheckstyleLogger::class,
+                GitHubAnnotationsLogger::class,
                 BadgeLogger::class,
             ],
         ];

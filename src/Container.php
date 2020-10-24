@@ -75,6 +75,7 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
@@ -154,6 +155,7 @@ final class Container
     public const DEFAULT_DEBUG = false;
     public const DEFAULT_ONLY_COVERED = false;
     public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
+    public const DEFAULT_GITHUB_LOGGER_DIFF_CONFIG = null;
     public const DEFAULT_NO_PROGRESS = false;
     public const DEFAULT_FORCE_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
@@ -383,7 +385,8 @@ final class Container
                     $container->getMutatorFactory(),
                     $container->getMutatorParser(),
                     $container->getSourceFileCollector(),
-                    $container->getCiDetector()
+                    $container->getCiDetector(),
+                    $container->getGitDiffFileProvider()
                 );
             },
             MutatorResolver::class => static function (): MutatorResolver {
@@ -595,6 +598,9 @@ final class Container
             DiffSourceCodeMatcher::class => static function (): DiffSourceCodeMatcher {
                 return new DiffSourceCodeMatcher();
             },
+            GitDiffFileProvider::class => static function (): GitDiffFileProvider {
+                return new GitDiffFileProvider();
+            },
         ]);
 
         return $container->withValues(
@@ -620,7 +626,8 @@ final class Container
             self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
             self::DEFAULT_FILTER,
             self::DEFAULT_THREAD_COUNT,
-            self::DEFAULT_DRY_RUN
+            self::DEFAULT_DRY_RUN,
+            self::DEFAULT_GITHUB_LOGGER_DIFF_CONFIG
         );
     }
 
@@ -647,7 +654,8 @@ final class Container
         ?string $testFrameworkExtraOptions,
         string $filter,
         int $threadCount,
-        bool $dryRun
+        bool $dryRun,
+        ?string $gitHubAnnotationsLoggerDiffFilter
     ): self {
         $clone = clone $this;
 
@@ -718,7 +726,8 @@ final class Container
                 $testFrameworkExtraOptions,
                 $filter,
                 $threadCount,
-                $dryRun
+                $dryRun,
+                $gitHubAnnotationsLoggerDiffFilter
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -739,7 +748,8 @@ final class Container
                     $testFrameworkExtraOptions,
                     $filter,
                     $threadCount,
-                    $dryRun
+                    $dryRun,
+                    $gitHubAnnotationsLoggerDiffFilter
                 );
             }
         );
@@ -1142,6 +1152,11 @@ final class Container
     public function getDiffSourceCodeMatcher(): DiffSourceCodeMatcher
     {
         return $this->get(DiffSourceCodeMatcher::class);
+    }
+
+    public function getGitDiffFileProvider(): GitDiffFileProvider
+    {
+        return $this->get(GitDiffFileProvider::class);
     }
 
     /**

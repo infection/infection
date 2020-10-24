@@ -38,10 +38,12 @@ namespace Infection\Configuration;
 use function array_fill_keys;
 use function array_key_exists;
 use function dirname;
+use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
@@ -71,6 +73,7 @@ class ConfigurationFactory
     private MutatorParser $mutatorParser;
     private SourceFileCollector $sourceFileCollector;
     private CiDetector $ciDetector;
+    private GitDiffFileProvider $gitDiffFileProvider;
 
     public function __construct(
         TmpDirProvider $tmpDirProvider,
@@ -78,7 +81,8 @@ class ConfigurationFactory
         MutatorFactory $mutatorFactory,
         MutatorParser $mutatorParser,
         SourceFileCollector $sourceFileCollector,
-        CiDetector $ciDetector
+        CiDetector $ciDetector,
+        GitDiffFileProvider $gitDiffFileProvider
     ) {
         $this->tmpDirProvider = $tmpDirProvider;
         $this->mutatorResolver = $mutatorResolver;
@@ -86,6 +90,7 @@ class ConfigurationFactory
         $this->mutatorParser = $mutatorParser;
         $this->sourceFileCollector = $sourceFileCollector;
         $this->ciDetector = $ciDetector;
+        $this->gitDiffFileProvider = $gitDiffFileProvider;
     }
 
     public function create(
@@ -107,7 +112,8 @@ class ConfigurationFactory
         ?string $testFrameworkExtraOptions,
         string $filter,
         int $threadCount,
-        bool $dryRun
+        bool $dryRun,
+        ?string $gitHubAnnotationsLoggerDiffFilter
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -135,9 +141,9 @@ class ConfigurationFactory
                 $schema->getSource()->getDirectories(),
                 $schema->getSource()->getExcludes()
             ),
-            $filter,
+            $this->retrieveFilter($filter, $gitHubAnnotationsLoggerDiffFilter),
             $schema->getSource()->getExcludes(),
-            $schema->getLogs(),
+            $this->retrieveLogs($schema->getLogs(), $gitHubAnnotationsLoggerDiffFilter),
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
@@ -282,5 +288,25 @@ class ConfigurationFactory
         }
 
         return $map;
+    }
+
+    private function retrieveFilter(string $filter, ?string $gitHubAnnotationsLoggerDiffFilter): string
+    {
+        if ($gitHubAnnotationsLoggerDiffFilter === null) {
+            return $filter;
+        }
+
+        Assert::isEmpty($filter, '--filter and --logger-github options can not be used together');
+
+        return $this->gitDiffFileProvider->provide($gitHubAnnotationsLoggerDiffFilter);
+    }
+
+    private function retrieveLogs(Logs $logs, ?string $gitHubAnnotationsLoggerDiffFilter): Logs
+    {
+        if ($gitHubAnnotationsLoggerDiffFilter !== null) {
+            $logs->setGitHubAnnotationsLoggerDiffFilter($gitHubAnnotationsLoggerDiffFilter);
+        }
+
+        return $logs;
     }
 }

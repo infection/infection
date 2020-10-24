@@ -33,44 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger;
+namespace Infection\Logger;
 
-use Infection\Logger\CheckstyleLogger;
 use Infection\Metrics\MetricsCalculator;
-use PHPUnit\Framework\TestCase;
+use function Safe\getcwd;
 
 /**
- * @group integration
+ * @internal
  */
-final class CheckstyleLoggerTest extends TestCase
+final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 {
-    use CreateMetricsCalculator;
+    private MetricsCalculator $metricsCalculator;
 
-    /**
-     * @dataProvider metricsProvider
-     */
-    public function test_it_logs_correctly_with_mutations(
-        MetricsCalculator $metricsCalculator,
-        array $expectedLines
-    ): void {
-        $logger = new CheckstyleLogger($metricsCalculator);
-
-        $this->assertSame($expectedLines, $logger->getLogLines());
+    public function __construct(MetricsCalculator $metricsCalculator)
+    {
+        $this->metricsCalculator = $metricsCalculator;
     }
 
-    public function metricsProvider(): iterable
+    public function getLogLines(): array
     {
-        yield 'no mutations' => [
-            new MetricsCalculator(2),
-            [],
-        ];
+        $lines = [];
+        $currentWorkingDirectory = getcwd();
 
-        yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
-            [
-                "::warning file=foo/bar,line=9::Escaped Mutant:%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#1';%0A\n",
-                "::warning file=foo/bar,line=10::Escaped Mutant:%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A\n",
-            ],
-        ];
+        foreach ($this->metricsCalculator->getEscapedExecutionResults() as $escapedExecutionResult) {
+            $error = [
+                'line' => (string) $escapedExecutionResult->getOriginalStartingLine(),
+                'message' => <<<"TEXT"
+Escaped Mutant:
+
+{$escapedExecutionResult->getMutantDiff()}
+TEXT
+            ,
+            ];
+
+            $lines[] = $this->buildAnnotation(
+                $this->relativePath($currentWorkingDirectory, $escapedExecutionResult->getOriginalFilePath()),
+                $error
+            );
+        }
+
+        return $lines;
+    }
+
+    /**
+     * @param array{line: string, message: string} $error
+     */
+    private function buildAnnotation(string $filePath, array $error): string
+    {
+        // newlines need to be encoded
+        // see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
+        $message = str_replace("\n", '%0A', $error['message']);
+
+        return "::warning file={$filePath},line={$error['line']}::{$message}\n";
+    }
+
+    private function relativePath(string $currentWorkingDirectory, string $path): string
+    {
+        return str_replace($currentWorkingDirectory . '/', '', $path);
     }
 }

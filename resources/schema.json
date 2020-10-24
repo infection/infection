@@ -74,9 +74,9 @@
                         }
                     }
                 },
-                "checkstyle": {
+                "github": {
                     "type": "string",
-                    "description": "Checkstyle based XML report, see https://github.com/FriendsOfPHP/PHP-CS-Fixer/blob/master/doc/checkstyle.xsd"
+                    "description": "GitHub Annotations for escaped Mutants in the added/modifies files"
                 }
             }
         },

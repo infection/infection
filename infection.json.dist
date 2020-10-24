@@ -9,8 +9,7 @@
         "text": "infection.log",
         "badge": {
             "branch": "master"
-        },
-        "checkstyle": "php://stdout"
+        }
     },
     "mutators": {
         "@default": true,

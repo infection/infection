@@ -159,6 +159,13 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_FORMATTER_NAME
             )
             ->addOption(
+                'logger-github',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Log escaped Mutants as GitHub Annotations. A - only for added files, AM - for added and modified. See git\'s --diff-filter values',
+                Container::DEFAULT_GITHUB_LOGGER_DIFF_CONFIG
+            )
+            ->addOption(
                 'min-msi',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -318,7 +325,8 @@ final class RunCommand extends BaseCommand
             // TODO: more validation here?
             (int) $input->getOption('threads'),
             // To keep in sync with Container::DEFAULT_DRY_RUN
-            (bool) $input->getOption('dry-run')
+            (bool) $input->getOption('dry-run'),
+            $input->getOption('logger-github'),
         );
     }
 
