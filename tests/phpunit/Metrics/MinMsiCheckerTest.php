@@ -60,10 +60,8 @@ final class MinMsiCheckerTest extends TestCase
 
     protected function setUp(): void
     {
-        $terminalWidth = (new Terminal())->getWidth();
-
-        if ($terminalWidth !== 100 || PHP_EOL === "\r\n") {
-            $this->markTestSkipped("This test assumes 100 columns wide display (seeing $terminalWidth) and Unix line endings");
+        if ((new Terminal())->getWidth() !== 100 || PHP_EOL === "\r\n") {
+            $this->markTestSkipped('This test assumes 100 columns wide display and Unix line endings');
         }
 
         $this->output = new BufferedOutput();
