@@ -74,12 +74,27 @@ final class DecrementInteger extends AbstractNumberMutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Scalar\LNumber($node->value - 1);
+        $parentNode = ParentConnector::getParent($node);
+
+        $value = $node->value - 1;
+
+        if ($parentNode instanceof Node\Expr\UnaryMinus) {
+            $value = $node->value + 1;
+        }
+
+        yield new Node\Scalar\LNumber($value);
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Scalar\LNumber || $node->value === 1) {
+        if (!$node instanceof Node\Scalar\LNumber) {
+            return false;
+        }
+
+        if (
+            $node->value === 1
+            && ($this->isPartOfComparison($node) || ParentConnector::getParent($node) instanceof Node\Expr\Assign)
+        ) {
             return false;
         }
 
@@ -88,6 +103,10 @@ final class DecrementInteger extends AbstractNumberMutator
         }
 
         if ($this->isPartOfSizeComparison($node)) {
+            return false;
+        }
+
+        if ($this->isPregSplitLimitZeroOrMinusOneArgument($node)) {
             return false;
         }
 
@@ -100,11 +119,12 @@ final class DecrementInteger extends AbstractNumberMutator
             return true;
         }
 
-        $parentNode = ParentConnector::getParent($node);
-
-        if (!$this->isComparison($parentNode)) {
+        if (!$this->isPartOfComparison($node)) {
             return true;
         }
+
+        $parentNode = ParentConnector::getParent($node);
+
         /** @var Node\Expr\BinaryOp $parentNode */
         if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
             && in_array(
@@ -129,26 +149,8 @@ final class DecrementInteger extends AbstractNumberMutator
         return true;
     }
 
-    private function isComparison(Node $parentNode): bool
+    private function isArrayZeroIndexAccess(Node\Scalar\LNumber $node): bool
     {
-        return $parentNode instanceof Node\Expr\BinaryOp\Identical
-            || $parentNode instanceof Node\Expr\BinaryOp\NotIdentical
-            || $parentNode instanceof Node\Expr\BinaryOp\Equal
-            || $parentNode instanceof Node\Expr\BinaryOp\NotEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual
-        ;
-    }
-
-    private function isArrayZeroIndexAccess(Node $node): bool
-    {
-        if (!$node instanceof Node\Scalar\LNumber) {
-            return false;
-        }
-
-        /** @var Node\Scalar\LNumber $node */
         if ($node->value !== 0) {
             return false;
         }
@@ -158,5 +160,33 @@ final class DecrementInteger extends AbstractNumberMutator
         }
 
         return false;
+    }
+
+    private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool
+    {
+        if ($node->value !== 0) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Arg) {
+            if (!$parentNode instanceof Node\Expr\UnaryMinus) {
+                return false;
+            }
+
+            $parentNode = ParentConnector::getParent($node);
+
+            if (!$parentNode instanceof Node\Arg) {
+                return false;
+            }
+        }
+
+        $parentNode = ParentConnector::getParent($parentNode);
+
+        return $parentNode instanceof Node\Expr\FuncCall
+            && $parentNode->name instanceof Node\Name
+            && $parentNode->name->toLowerString() === 'preg_split'
+        ;
     }
 }

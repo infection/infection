@@ -33,19 +33,52 @@
 
 declare(strict_types=1);
 
-return [
-    'whitelist' => [
-        \Composer\Autoload\ClassLoader::class,
-        'Safe\*',
-        // PHP 8.0
-        'T_NAME_QUALIFIED',
-        'T_NAME_FULLY_QUALIFIED',
-        'T_NAME_RELATIVE',
-        'T_MATCH',
-        'T_NULLSAFE_OBJECT_OPERATOR',
-        'T_ATTRIBUTE',
-    ],
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
-];
+namespace Infection\Tests\Mutator\ReturnValue;
+
+use Infection\Tests\Mutator\BaseMutatorTestCase;
+
+final class YieldValueTest extends BaseMutatorTestCase
+{
+    /**
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
+     */
+    public function test_it_can_mutate(string $input, $expected = []): void
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function mutationsProvider(): iterable
+    {
+        yield 'It mutates a yield with key and value to a yield with a value only' => [
+            <<<'PHP'
+<?php
+
+$a = function () {
+    (yield $a => $b);
+};
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = function () {
+    (yield $b);
+};
+PHP
+            ,
+        ];
+
+        yield 'It does not mutate yields without a double arrow operator' => [
+            <<<'PHP'
+<?php
+
+$a = function () {
+    (yield $b);
+};
+PHP
+            ,
+        ];
+    }
+}

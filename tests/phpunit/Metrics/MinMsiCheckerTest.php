@@ -44,6 +44,7 @@ use function Infection\Tests\normalize_trailing_spaces;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Terminal;
 
 final class MinMsiCheckerTest extends TestCase
 {
@@ -59,6 +60,10 @@ final class MinMsiCheckerTest extends TestCase
 
     protected function setUp(): void
     {
+        if ((new Terminal())->getWidth() !== 100 || PHP_EOL === "\r\n") {
+            $this->markTestSkipped('This test assumes 100 columns wide display and Unix line endings');
+        }
+
         $this->output = new BufferedOutput();
 
         $this->consoleOutput = new ConsoleOutput(
@@ -113,8 +118,8 @@ final class MinMsiCheckerTest extends TestCase
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The MSI is 70% percent points over the required MSI. Consider increasing the required MSI
- !        percentage the next time you run infection.
+ ! [NOTE] The MSI is 70% percentage points over the required MSI. Consider increasing the required
+ !        MSI percentage the next time you run Infection.
 
 
 TXT
@@ -132,8 +137,8 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The Covered Code MSI is 70% percent points over the required Covered Code MSI. Consider
- !        increasing the required Covered Code MSI percentage the next time you run infection.
+ ! [NOTE] The Covered Code MSI is 70% percentage points over the required Covered Code MSI. Consider
+ !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
 TXT
@@ -151,11 +156,11 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The MSI is 70% percent points over the required MSI. Consider increasing the required MSI
- !        percentage the next time you run infection.
+ ! [NOTE] The MSI is 70% percentage points over the required MSI. Consider increasing the required
+ !        MSI percentage the next time you run Infection.
 
- ! [NOTE] The Covered Code MSI is 70% percent points over the required Covered Code MSI. Consider
- !        increasing the required Covered Code MSI percentage the next time you run infection.
+ ! [NOTE] The Covered Code MSI is 70% percentage points over the required Covered Code MSI. Consider
+ !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
 TXT

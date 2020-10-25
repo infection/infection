@@ -33,18 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\Mutator\ReturnValue;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @see Yield_
  */
-final class OneZeroInteger extends AbstractNumberMutator
+final class YieldValue implements Mutator
 {
     use GetMutatorName;
 
@@ -52,7 +54,8 @@ final class OneZeroInteger extends AbstractNumberMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a zero integer value (`0`) with a non-zero integer value (`1`) and vice-versa.
+Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only;
+For example `yield $b->bar;`.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
@@ -61,65 +64,19 @@ TXT
     }
 
     /**
-     * @param Node\Scalar\LNumber $node
+     * @param Node\Expr\Yield_ $node
      *
-     * @return iterable<Node\Scalar\LNumber>
+     * @return iterable<Node\Expr\Yield_>
      */
     public function mutate(Node $node): iterable
     {
-        if ($node->value === 0) {
-            yield new Node\Scalar\LNumber(1);
+        $node->key = null;
 
-            return;
-        }
-
-        yield new Node\Scalar\LNumber(0);
+        yield $node;
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Scalar\LNumber) {
-            return false;
-        }
-
-        if ($this->isPartOfSizeComparison($node)) {
-            return false;
-        }
-
-        if ($node->value !== 0 && $node->value !== 1) {
-            return false;
-        }
-
-        if ($this->isPregSplitLimitZeroOrMinusOneArgument($node)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool
-    {
-        if ($node->value !== 1) {
-            return false;
-        }
-
-        $parentNode = ParentConnector::getParent($node);
-
-        if (!$parentNode instanceof Node\Expr\UnaryMinus) {
-            return false;
-        }
-
-        $parentNode = ParentConnector::getParent($parentNode);
-
-        if (!$parentNode instanceof Node\Arg) {
-            return false;
-        }
-
-        $parentNode = ParentConnector::getParent($parentNode);
-
-        return $parentNode instanceof Node\Expr\FuncCall
-            && $parentNode->name instanceof Node\Name
-            && $parentNode->name->toLowerString() === 'preg_split'
-        ;
+        return $node instanceof Node\Expr\Yield_ && $node->key;
     }
 }

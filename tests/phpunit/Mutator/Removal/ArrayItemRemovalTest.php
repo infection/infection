@@ -102,5 +102,17 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
             ],
             ['remove' => 'all', 'limit' => 1],
         ];
+
+        yield 'It does not mutate lists with missing elements' => [
+            '<?php [, $a] = [];',
+        ];
+
+        yield 'It does not mutate lists with one element' => [
+            '<?php [$a] = [];',
+        ];
+
+        yield 'It does not mutate lists with any number of elements' => [
+            '<?php [$a, $b] = [];',
+        ];
     }
 }

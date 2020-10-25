@@ -98,6 +98,10 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_preserves_white_spaces_and_formatting(): void
     {
+        if (PHP_EOL === "\r\n") {
+            $this->markTestSkipped('Test fixture uses Unix line endings');
+        }
+
         $builder = $this->createConfigBuilder(
             self::FIXTURES . '/format-whitespace/original-phpunit.xml',
             true
