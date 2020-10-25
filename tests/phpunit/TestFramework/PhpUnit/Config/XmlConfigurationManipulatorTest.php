@@ -73,7 +73,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
     public function test_it_replaces_with_absolute_paths(): void
     {
-        $this->assertItChangesStandardConfiguration(
+        $this->assertItChangesPrePHPUnit93Configuration(
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->replaceWithAbsolutePaths($xPath);
             },
@@ -110,9 +110,9 @@ XML
         );
     }
 
-    public function test_it_removes_existing_loggers(): void
+    public function test_it_removes_existing_loggers_from_pre_93_configuration(): void
     {
-        $this->assertItChangesStandardConfiguration(
+        $this->assertItChangesPrePHPUnit93Configuration(
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->removeExistingLoggers($xPath);
             },
@@ -146,9 +146,31 @@ XML
         );
     }
 
+    public function test_it_removes_existing_loggers_from_post_93_configuration(): void
+    {
+        $this->assertItChangesPostPHPUnit93Configuration(
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->removeExistingLoggers($xPath);
+            },
+            <<<'XML'
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage disableCodeCoverageIgnore="true" ignoreDeprecatedCodeUnits="true" includeUncoveredFiles="true" processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <exclude>
+      <directory suffix=".php">src/generated</directory>
+      <file>src/autoload.php</file>
+    </exclude>
+  </coverage>
+</phpunit>
+XML
+        );
+    }
+
     public function test_it_sets_set_stop_on_failure(): void
     {
-        $this->assertItChangesStandardConfiguration(
+        $this->assertItChangesPrePHPUnit93Configuration(
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->setStopOnFailure($xPath);
             },
@@ -231,7 +253,7 @@ XML
 
     public function test_it_deactivates_colors(): void
     {
-        $this->assertItChangesStandardConfiguration(
+        $this->assertItChangesPrePHPUnit93Configuration(
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateColours($xPath);
             },
@@ -714,7 +736,57 @@ EOF
         ];
     }
 
-    private function assertItChangesStandardConfiguration(Closure $changeXml, string $expectedXml): void
+    private function assertItChangesPostPHPUnit93Configuration(Closure $changeXml, string $expectedXml): void
+    {
+        $xPath = $this->createXPath(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+
+    <coverage includeUncoveredFiles="true"
+              processUncoveredFiles="true"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+
+        <exclude>
+            <directory suffix=".php">src/generated</directory>
+            <file>src/autoload.php</file>
+        </exclude>
+
+        <report>
+            <clover outputFile="clover.xml"/>
+            <crap4j outputFile="crap4j.xml" threshold="50"/>
+            <html outputDirectory="html-coverage" lowUpperBound="50" highLowerBound="90"/>
+            <php outputFile="coverage.php"/>
+            <text outputFile="coverage.txt" showUncoveredFiles="false" showOnlySummary="true"/>
+            <xml outputDirectory="xml-coverage"/>
+        </report>
+    </coverage>
+
+    <logging>
+        <junit outputFile="junit.xml"/>
+        <teamcity outputFile="teamcity.txt"/>
+        <testdoxHtml outputFile="testdox.html"/>
+        <testdoxText outputFile="testdox.txt"/>
+        <testdoxXml outputFile="testdox.xml"/>
+        <text outputFile="logfile.txt"/>
+    </logging>
+</phpunit>
+XML
+            );
+
+        $changeXml($this->configManipulator, $xPath);
+
+        $actualXml = $xPath->document->saveXML();
+
+        $this->assertNotFalse($actualXml);
+        $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
+    }
+
+    private function assertItChangesPrePHPUnit93Configuration(Closure $changeXml, string $expectedXml): void
     {
         $xPath = $this->createXPath(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -775,7 +847,9 @@ XML
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
-        $dom->loadXML($xml);
+        $success = $dom->loadXML($xml);
+
+        $this->assertTrue($success);
 
         return new SafeDOMXPath($dom);
     }
