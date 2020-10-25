@@ -64,9 +64,7 @@ jobs:
               phpdbg -qrr $PHPUNIT_BIN;
           fi
         - |
-          if [[ "$DEPS" == "LOW" ]]; then
-            ./tests/e2e_tests bin/infection;
-          else
+          if [[ "$DEPS" != "LOW" ]]; then
             make compile;
             ./tests/e2e_tests build/infection.phar;
           fi
@@ -74,12 +72,13 @@ jobs:
         - |
           echo "Infection flags: ${INFECTION_FLAGS}";
 
-          if [[ "$DRIVER" == "none" ]]; then
+          if [[ "$DEPS" == "LOW" || "$DRIVER" == "none" || "$MIN_MSI_CHECK" != "true" ]]; then
+            echo "Not running Infection during this build."
             exit 0
           elif [[ "$DRIVER" != "phpdbg" ]]; then
-            bin/infection $INFECTION_FLAGS;
+            build/infection.phar $INFECTION_FLAGS;
           else
-            phpdbg -qrr bin/infection $INFECTION_FLAGS;
+            phpdbg -qrr build/infection.phar $INFECTION_FLAGS;
           fi
 
     -
@@ -98,17 +97,6 @@ jobs:
       <<: *STANDARD_TEST_JOB
       php: 7.4
       env: DRIVER="phpdbg"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: nightly
-      env: DRIVER="phpdbg"
-      script:
-        # We don't have Xdebug on the nightly build, so we always run with phpdbg
-        - make compile
-        - ./tests/e2e_tests build/infection.phar
-        - phpdbg -qrr $PHPUNIT_BIN
-        - phpdbg -qrr bin/infection $INFECTION_FLAGS
 
     - stage: Deploy
       php: 7.4
@@ -135,6 +123,3 @@ jobs:
           tags: true
           repo: infection/infection
 
-  allow_failures:
-    - php: nightly
-      env: DRIVER="phpdbg"
