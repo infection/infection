@@ -8,7 +8,7 @@ parameters:
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
     inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
-        - '#Return type \(void\) of method .*(Visitor|Traverser).* should be compatible with return type .* of method PhpParser\\Node.*#'
+        - '#Return type \((void|mixed)\) of method .*(Visitor|Traverser).* should be compatible with return type .* of method PhpParser\\Node.*#'
         - '#^Cannot call method (willReturn|shouldBeCalledTimes)\(\) on iterable<Infection\\Mutation\\Mutation>\.$#'
         - '#Offset .*\\.* does not exist on array<class-string<.*>.*#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
