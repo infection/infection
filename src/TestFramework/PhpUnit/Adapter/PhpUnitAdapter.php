@@ -99,7 +99,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
             $extraOptions = trim(sprintf(
                 '%s --coverage-xml=%s --log-junit=%s',
                 $extraOptions,
-                $this->tmpDir . DIRECTORY_SEPARATOR . self::COVERAGE_DIR,
+                $this->tmpDir . '/' . self::COVERAGE_DIR,
                 $this->jUnitFilePath // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
             ));
         }
