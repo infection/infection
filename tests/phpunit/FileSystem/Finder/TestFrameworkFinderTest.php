@@ -49,7 +49,8 @@ use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires I/O read & writes via the MockVendor
+ * @group integration
+ * Requires I/O read & writes via the MockVendor
  *
  * @see MockVendor
  */

@@ -563,7 +563,8 @@ XML
     /**
      * @dataProvider schemaProvider
      *
-     * @group integration Might require an external connection to download the XSD
+     * @group integration
+     * Might require an external connection to download the XSD
      */
     public function test_it_validates_xml_by_xsd(string $xsdSchema): void
     {
@@ -614,7 +615,8 @@ EOF
     /**
      * @dataProvider schemaProvider
      *
-     * @group integration Might require an external connection to download the XSD
+     * @group integration
+     * Might require an external connection to download the XSD
      */
     public function test_it_passes_validation_by_xsd(string $xsdSchema): void
     {
