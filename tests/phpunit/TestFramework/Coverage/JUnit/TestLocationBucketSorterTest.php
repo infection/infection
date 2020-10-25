@@ -163,7 +163,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         for ($i = 0; $i < $tries; ++$i) {
             $start = microtime(true);
-            iterator_to_array(
+            $dummy = iterator_to_array(
                 TestLocationBucketSorter::bucketSort($uniqueTestLocations),
                 false
             );
