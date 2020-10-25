@@ -103,8 +103,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         }
 
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/format-whitespace/original-phpunit.xml',
-            true
+            self::FIXTURES . '/format-whitespace/original-phpunit.xml'
         );
 
         $configurationPath = $builder->build('6.5');
@@ -119,8 +118,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         try {
             $this->createConfigBuilder(
-                self::FIXTURES . '/invalid/empty-phpunit.xml',
-                true
+                self::FIXTURES . '/invalid/empty-phpunit.xml'
             );
 
             $this->fail('Expected an exception to be thrown.');
@@ -135,8 +133,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     public function test_the_original_xml_config_must_be_a_valid_phpunit_config_file(): void
     {
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/invalid/invalid-phpunit.xml',
-            true
+            self::FIXTURES . '/invalid/invalid-phpunit.xml'
         );
 
         try {
@@ -220,30 +217,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(0, $logEntries->length);
     }
 
-    public function test_it_adds_needed_loggers(): void
+    public function test_it_does_not_add_loggers_ever(): void
     {
         $xml = file_get_contents($this->builder->build('6.5'));
-
-        $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
-
-        $this->assertInstanceOf(DOMNodeList::class, $logEntries);
-
-        $this->assertSame(2, $logEntries->length);
-
-        // XML coverage logger
-        $this->assertSame($this->tmp . '/coverage-xml', $logEntries[0]->getAttribute('target'));
-        $this->assertSame('coverage-xml', $logEntries[0]->getAttribute('type'));
-
-        // JUnit coverage logger
-        $this->assertSame('junit', $logEntries[1]->getAttribute('type'));
-        $this->assertSame('/path/to/junit.xml', $logEntries[1]->getAttribute('target'));
-    }
-
-    public function test_it_does_not_add_coverage_loggers_if_should_be_skipped(): void
-    {
-        $builder = $this->createConfigBuilder(null, true);
-
-        $xml = file_get_contents($builder->build('6.5'));
 
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
 
@@ -371,8 +347,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     public function test_it_creates_a_configuration(): void
     {
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/phpunit.xml',
-            true
+            self::FIXTURES . '/phpunit.xml'
         );
 
         $configurationPath = $builder->build('6.5');
@@ -498,12 +473,10 @@ XML
     }
 
     private function createConfigBuilder(
-        ?string $originalPhpUnitXmlConfigPath = null,
-        bool $skipCoverage = false
+        ?string $originalPhpUnitXmlConfigPath = null
     ): InitialConfigBuilder {
         $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
 
-        $jUnitFilePath = '/path/to/junit.xml';
         $srcDirs = ['src', 'app'];
 
         $replacer = new PathReplacer(new Filesystem(), $this->projectPath);
@@ -512,9 +485,7 @@ XML
             $this->tmp,
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationManipulator($replacer, ''),
-            $jUnitFilePath,
-            $srcDirs,
-            $skipCoverage
+            $srcDirs
         );
     }
 }

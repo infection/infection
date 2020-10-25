@@ -52,19 +52,28 @@ final class PhpUnitAdapterTest extends TestCase
      */
     private $adapter;
 
+    private $initialConfigBuilder;
+    private $mutationConfigBuilder;
+    private $cliArgumentsBuilder;
+    private $commandLineBuilder;
+
     protected function setUp(): void
     {
-        $initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
-        $mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
-        $cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
+        $this->initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
+        $this->mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
+        $this->cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
+        $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
 
         $this->adapter = new PhpUnitAdapter(
             '/path/to/phpunit',
-            $initialConfigBuilder,
-            $mutationConfigBuilder,
-            $cliArgumentsBuilder,
+            '/tmp',
+            '/tmp/infection/junit.xml',
+            $this->initialConfigBuilder,
+            $this->mutationConfigBuilder,
+            $this->cliArgumentsBuilder,
             new VersionParser(),
-            new CommandLineBuilder()
+            $this->commandLineBuilder,
+            '9.0'
         );
     }
 
@@ -117,6 +126,76 @@ final class PhpUnitAdapterTest extends TestCase
         $this->assertSame(
             [PhpUnitCodeCoverageAnnotationIgnorer::class],
             $nodeIgnorers
+        );
+    }
+
+    /**
+     * @group integration
+     */
+    public function test_it_provides_initial_test_run_command_line_when_no_coverage_is_expected(): void
+    {
+        $this->cliArgumentsBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('', '--group=default')
+        ;
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpunit', ['-d', 'memory_limit=-1'], [])
+            ->willReturn(['/path/to/phpunit', '--dummy-argument'])
+        ;
+
+        $initialTestRunCommandLine = $this->adapter->getInitialTestRunCommandLine('--group=default', ['-d', 'memory_limit=-1'], true);
+
+        $this->assertSame(
+            [
+                '/path/to/phpunit',
+                '--dummy-argument',
+            ],
+            $initialTestRunCommandLine
+        );
+    }
+
+    /**
+     * @group integration
+     */
+    public function test_it_provides_initial_test_run_command_line_when_coverage_report_is_requested(): void
+    {
+        $this->cliArgumentsBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('', '--group=default --coverage-xml=/tmp/coverage-xml --log-junit=/tmp/infection/junit.xml')
+            ->willReturn([
+                '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
+            ])
+        ;
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpunit', ['-d', 'memory_limit=-1'], [
+                '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
+            ])
+            ->willReturn([
+                '/path/to/phpunit',
+                '--group=default',
+                '--coverage-xml=/tmp/coverage-xml',
+                '--log-junit=/tmp/infection/junit.xml',
+            ])
+        ;
+
+        $initialTestRunCommandLine = $this->adapter->getInitialTestRunCommandLine('--group=default', ['-d', 'memory_limit=-1'], false);
+
+        $this->assertSame(
+            [
+                '/path/to/phpunit',
+                '--group=default',
+                '--coverage-xml=/tmp/coverage-xml',
+                '--log-junit=/tmp/infection/junit.xml',
+            ],
+            $initialTestRunCommandLine
         );
     }
 

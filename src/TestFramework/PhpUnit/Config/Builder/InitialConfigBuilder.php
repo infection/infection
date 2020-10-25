@@ -39,7 +39,6 @@ use DOMDocument;
 use DOMElement;
 use DOMNode;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
@@ -55,9 +54,7 @@ class InitialConfigBuilder implements ConfigBuilder
     private $tmpDir;
     private $originalXmlConfigContent;
     private $configManipulator;
-    private $jUnitFilePath;
     private $srcDirs;
-    private $skipCoverage;
 
     /**
      * @param string[] $srcDirs
@@ -66,9 +63,7 @@ class InitialConfigBuilder implements ConfigBuilder
         string $tmpDir,
         string $originalXmlConfigContent,
         XmlConfigurationManipulator $configManipulator,
-        string $jUnitFilePath,
-        array $srcDirs,
-        bool $skipCoverage
+        array $srcDirs
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,
@@ -78,9 +73,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->tmpDir = $tmpDir;
         $this->originalXmlConfigContent = $originalXmlConfigContent;
         $this->configManipulator = $configManipulator;
-        $this->jUnitFilePath = $jUnitFilePath;
         $this->srcDirs = $srcDirs;
-        $this->skipCoverage = $skipCoverage;
     }
 
     public function build(string $version): string
@@ -109,11 +102,6 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
 
-        if (!$this->skipCoverage) {
-            $this->addCodeCoverageLogger($xPath);
-            $this->addJUnitLogger($xPath);
-        }
-
         file_put_contents($path, $dom->saveXML());
 
         return $path;
@@ -122,28 +110,6 @@ class InitialConfigBuilder implements ConfigBuilder
     private function buildPath(): string
     {
         return $this->tmpDir . '/phpunitConfiguration.initial.infection.xml';
-    }
-
-    private function addJUnitLogger(SafeDOMXPath $xPath): void
-    {
-        $logging = $this->getOrCreateNode($xPath, 'logging');
-
-        $junitLog = $xPath->document->createElement('log');
-        $junitLog->setAttribute('type', 'junit');
-        $junitLog->setAttribute('target', $this->jUnitFilePath);
-
-        $logging->appendChild($junitLog);
-    }
-
-    private function addCodeCoverageLogger(SafeDOMXPath $xPath): void
-    {
-        $logging = $this->getOrCreateNode($xPath, 'logging');
-
-        $coverageXmlLog = $xPath->document->createElement('log');
-        $coverageXmlLog->setAttribute('type', 'coverage-xml');
-        $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . PhpUnitAdapter::COVERAGE_DIR);
-
-        $logging->appendChild($coverageXmlLog);
     }
 
     private function addCoverageFilterWhitelistIfDoesNotExist(SafeDOMXPath $xPath): void
@@ -166,18 +132,6 @@ class InitialConfigBuilder implements ConfigBuilder
 
             $filterNode->appendChild($whiteListNode);
         }
-    }
-
-    private function getOrCreateNode(SafeDOMXPath $xPath, string $nodeName): DOMElement
-    {
-        $node = $this->getNode($xPath, $nodeName);
-
-        if (!$node) {
-            $node = $this->createNode($xPath->document, $nodeName);
-        }
-        Assert::isInstanceOf($node, DOMElement::class);
-
-        return $node;
     }
 
     private function getNode(SafeDOMXPath $xPath, string $nodeName): ?DOMNode

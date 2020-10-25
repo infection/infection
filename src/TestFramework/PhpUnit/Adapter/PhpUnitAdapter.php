@@ -38,8 +38,13 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
+use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Config\InitialConfigBuilder;
+use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
+use Infection\TestFramework\VersionParser;
 use function Safe\preg_match;
 use function Safe\sprintf;
 use function version_compare;
@@ -52,9 +57,54 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
+    private $tmpDir;
+
+    private $jUnitFilePath;
+
+    public function __construct(
+        string $testFrameworkExecutable,
+        string $tmpDir,
+        string $jUnitFilePath,
+        InitialConfigBuilder $initialConfigBuilder,
+        MutationConfigBuilder $mutationConfigBuilder,
+        CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        VersionParser $versionParser,
+        CommandLineBuilder $commandLineBuilder,
+        ?string $version = null
+    ) {
+        parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser, $commandLineBuilder, $version);
+
+        $this->tmpDir = $tmpDir;
+        $this->jUnitFilePath = $jUnitFilePath;
+    }
+
     public function hasJUnitReport(): bool
     {
         return true;
+    }
+
+    /**
+     * Returns array of arguments to pass them into the Initial Run Process
+     *
+     * @param string[] $phpExtraArgs
+     *
+     * @return string[]
+     */
+    public function getInitialTestRunCommandLine(
+        string $extraOptions,
+        array $phpExtraArgs,
+        bool $skipCoverage
+    ): array {
+        if ($skipCoverage === false) {
+            $extraOptions = trim(sprintf(
+                '%s --coverage-xml=%s --log-junit=%s',
+                $extraOptions,
+                $this->tmpDir . DIRECTORY_SEPARATOR . self::COVERAGE_DIR,
+                $this->jUnitFilePath // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
+            ));
+        }
+
+        return parent::getInitialTestRunCommandLine($extraOptions, $phpExtraArgs, $skipCoverage);
     }
 
     public function testsPass(string $output): bool
