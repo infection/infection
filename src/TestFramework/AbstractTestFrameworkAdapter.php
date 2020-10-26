@@ -53,10 +53,6 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     private $mutationConfigBuilder;
     private $versionParser;
     private $commandLineBuilder;
-
-    /**
-     * @var string|null
-     */
     private $version;
 
     public function __construct(
@@ -65,7 +61,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser,
-        CommandLineBuilder $commandLineBuilder
+        CommandLineBuilder $commandLineBuilder,
+        ?string $version = null
     ) {
         $this->testFrameworkExecutable = $testFrameworkExecutable;
         $this->initialConfigBuilder = $initialConfigBuilder;
@@ -73,6 +70,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
         $this->versionParser = $versionParser;
         $this->commandLineBuilder = $commandLineBuilder;
+        $this->version = $version;
     }
 
     abstract public function testsPass(string $output): bool;
@@ -82,7 +80,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     abstract public function hasJUnitReport(): bool;
 
     /**
-     * Returns array of arguments to pass them into the Initial Run Symfony Process
+     * Returns array of arguments to pass them into the Initial Run Process
      *
      * @param string[] $phpExtraArgs
      *
@@ -97,7 +95,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     }
 
     /**
-     * Returns array of arguments to pass them into the Mutant Symfony Process
+     * Returns array of arguments to pass them into the Mutant Process
      *
      * @param TestLocation[] $tests
      *

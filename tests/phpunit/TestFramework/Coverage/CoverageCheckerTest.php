@@ -55,7 +55,8 @@ use Webmozart\PathUtil\Path;
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  *
- * @group integration Requires some I/O operations
+ * @group integration
+ * Requires some I/O operations
  */
 final class CoverageCheckerTest extends TestCase
 {

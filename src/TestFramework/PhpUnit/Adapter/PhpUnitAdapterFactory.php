@@ -81,13 +81,13 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 
         return new PhpUnitAdapter(
             $testFrameworkExecutable,
+            $tmpDir,
+            $jUnitFilePath,
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
-                $jUnitFilePath,
-                $sourceDirectories,
-                $skipCoverage
+                $sourceDirectories
             ),
             new MutationConfigBuilder(
                 $tmpDir,
