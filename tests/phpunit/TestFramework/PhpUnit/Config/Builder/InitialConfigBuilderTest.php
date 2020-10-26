@@ -217,7 +217,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(0, $logEntries->length);
     }
 
-    public function test_it_does_not_add_loggers_ever(): void
+    public function test_it_does_not_add_coverage_loggers_ever(): void
     {
         $xml = file_get_contents($this->builder->build('6.5'));
 
