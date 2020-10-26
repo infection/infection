@@ -52,7 +52,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
                 '--configuration',
                 $configPath,
             ],
-            explode(' ', $extraOptions)
+            explode(' ', $extraOptions) // FIXME might break space-containing paths
         );
 
         return array_filter($options);
