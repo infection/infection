@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="app/autoload2.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         syntaxCheck="false"
+         printerClass="Fake\Printer\Class"
+         defaultTestSuite="unit"
+>
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>./*Bundle</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage includeUncoveredFiles="true"
+              processUncoveredFiles="true"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+
+        <exclude>
+            <directory suffix=".php">src/generated</directory>
+            <file>src/autoload.php</file>
+        </exclude>
+
+        <report>
+            <clover outputFile="clover.xml"/>
+            <crap4j outputFile="crap4j.xml" threshold="50"/>
+            <html outputDirectory="html-coverage" lowUpperBound="50" highLowerBound="90"/>
+            <php outputFile="coverage.php"/>
+            <text outputFile="coverage.txt" showUncoveredFiles="false" showOnlySummary="true"/>
+            <xml outputDirectory="xml-coverage"/>
+        </report>
+    </coverage>
+
+    <logging>
+        <junit outputFile="junit.xml"/>
+        <teamcity outputFile="teamcity.txt"/>
+        <testdoxHtml outputFile="testdox.html"/>
+        <testdoxText outputFile="testdox.txt"/>
+        <testdoxXml outputFile="testdox.xml"/>
+        <text outputFile="logfile.txt"/>
+    </logging>
+</phpunit>
