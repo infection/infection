@@ -58,6 +58,8 @@ final class LogicalLowerAnd implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * Replaces "and" with "or"
      *
      * @param Node\Expr\BinaryOp\LogicalAnd $node

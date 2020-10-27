@@ -58,6 +58,8 @@ final class BitwiseAnd implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\BinaryOp\BooleanAnd $node
      *
      * @return iterable<Node\Expr\BinaryOp\BitwiseOr>

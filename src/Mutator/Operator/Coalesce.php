@@ -71,6 +71,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\BinaryOp\Coalesce $node
      *
      * @return iterable<Node\Expr>

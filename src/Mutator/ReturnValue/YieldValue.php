@@ -64,19 +64,19 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\Yield_ $node
      *
      * @return iterable<Node\Expr\Yield_>
      */
     public function mutate(Node $node): iterable
     {
-        $node->key = null;
-
-        yield $node;
+        yield new Node\Expr\Yield_($node->value);
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Yield_ && $node->key;
+        return $node instanceof Node\Expr\Yield_ && $node->key !== null;
     }
 }

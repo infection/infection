@@ -62,6 +62,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\PostInc|Node\Expr\PreInc $node
      *
      * @return iterable<Node\Expr\PreDec|Node\Expr\PostDec>

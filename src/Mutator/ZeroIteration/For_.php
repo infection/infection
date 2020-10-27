@@ -76,6 +76,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Stmt\For_ $node
      *
      * @return iterable<Node\Stmt\For_>

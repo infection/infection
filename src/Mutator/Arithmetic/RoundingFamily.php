@@ -68,6 +68,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\FuncCall $node
      *
      * @return iterable<Node\Expr\FuncCall>
@@ -76,6 +78,7 @@ TXT
     {
         /** @var Node\Name $name */
         $name = $node->name;
+        /** @psalm-suppress ImpureMethodCall */
         $currentFunctionName = $name->toLowerString();
 
         $mutateToFunctions = array_diff(self::MUTATORS_MAP, [$currentFunctionName]);

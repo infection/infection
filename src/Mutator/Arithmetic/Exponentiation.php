@@ -61,6 +61,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\BinaryOp\Pow $node
      *
      * @return iterable<Node\Expr\BinaryOp\Div>

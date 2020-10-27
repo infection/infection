@@ -72,6 +72,9 @@ TXT
         return 'array_chunk';
     }
 
+    /**
+     * @psalm-pure
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield 0;

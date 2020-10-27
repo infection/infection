@@ -53,6 +53,9 @@ final class ParentConnector
         $node->setAttribute(self::PARENT_ATTRIBUTE, $parent);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public static function getParent(Node $node): Node
     {
         Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));

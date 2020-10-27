@@ -63,6 +63,8 @@ TXT
     /**
      * Replaces "**=" with "/="
      *
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\AssignOp\Pow $node
      *
      * @return iterable<Node\Expr\AssignOp\Div>

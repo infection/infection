@@ -47,6 +47,8 @@ abstract class AbstractCastMutator implements Mutator
     use GetMutatorName;
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\Cast $node
      *
      * @return iterable<Node\Expr>

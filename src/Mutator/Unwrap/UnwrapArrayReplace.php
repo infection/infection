@@ -78,6 +78,9 @@ TXT
         return 'array_replace';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_keys($node->args);

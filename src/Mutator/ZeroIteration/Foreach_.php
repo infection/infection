@@ -76,6 +76,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Stmt\Foreach_ $node
      *
      * @return iterable<Node\Stmt\Foreach_>

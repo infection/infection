@@ -58,6 +58,8 @@ final class Division implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\BinaryOp\Div $node
      *
      * @return iterable<Node\Expr\BinaryOp\Mul>

@@ -5,6 +5,10 @@
             "src"
         ]
     },
+    "mutators": {
+        "Yield_": true,
+        "YieldValue": true
+    },
     "logs": {
         "perMutator": "infection.log"
     },
