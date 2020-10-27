@@ -114,24 +114,27 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addCoverageFilterWhitelistIfDoesNotExist(SafeDOMXPath $xPath): void
     {
-        $filterNode = $this->getNode($xPath, 'filter');
+        $filterWhitelistNode = $this->getNode($xPath, 'filter/whitelist');
+        $coverageIncludeNode = $this->getNode($xPath, 'coverage/include');
 
-        if (!$filterNode) {
-            $filterNode = $this->createNode($xPath->document, 'filter');
-
-            $whiteListNode = $xPath->document->createElement('whitelist');
-
-            foreach ($this->srcDirs as $srcDir) {
-                $directoryNode = $xPath->document->createElement(
-                    'directory',
-                    $srcDir
-                );
-
-                $whiteListNode->appendChild($directoryNode);
-            }
-
-            $filterNode->appendChild($whiteListNode);
+        if ($filterWhitelistNode || $coverageIncludeNode) {
+            return;
         }
+
+        $filterNode = $this->createNode($xPath->document, 'filter');
+
+        $whiteListNode = $xPath->document->createElement('whitelist');
+
+        foreach ($this->srcDirs as $srcDir) {
+            $directoryNode = $xPath->document->createElement(
+                'directory',
+                $srcDir
+            );
+
+            $whiteListNode->appendChild($directoryNode);
+        }
+
+        $filterNode->appendChild($whiteListNode);
     }
 
     private function getNode(SafeDOMXPath $xPath, string $nodeName): ?DOMNode

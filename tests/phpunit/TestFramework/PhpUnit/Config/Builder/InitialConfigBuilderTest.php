@@ -217,11 +217,24 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(0, $logEntries->length);
     }
 
-    public function test_it_does_not_add_coverage_loggers_ever(): void
+    public function test_it_does_not_add_coverage_loggers_ever_for_legacy_configuration(): void
     {
         $xml = file_get_contents($this->builder->build('6.5'));
 
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
+
+        $this->assertInstanceOf(DOMNodeList::class, $logEntries);
+
+        $this->assertSame(0, $logEntries->length);
+    }
+
+    public function test_it_does_not_add_coverage_loggers_ever_for_latest_configuration(): void
+    {
+        $builder = $this->createConfigBuilderForPHPUnit93();
+
+        $xml = file_get_contents($builder->build('9.4'));
+
+        $logEntries = $this->queryXpath($xml, '/phpunit/logging');
 
         $this->assertInstanceOf(DOMNodeList::class, $logEntries);
 
@@ -250,6 +263,19 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
 
         $this->assertSame(1, $whitelistedDirectories->length);
+    }
+
+    public function test_it_does_not_create_coverage_include_node_if_already_exist(): void
+    {
+        $builder = $this->createConfigBuilderForPHPUnit93();
+
+        $xml = file_get_contents($builder->build('9.4'));
+
+        $includedDirectories = $this->queryXpath($xml, '/phpunit/coverage/include');
+
+        $this->assertInstanceOf(DOMNodeList::class, $includedDirectories);
+
+        $this->assertSame(1, $includedDirectories->length);
     }
 
     public function test_it_removes_printer_class(): void
@@ -470,6 +496,12 @@ XML
         $dom->loadXML($xml);
 
         return (new DOMXPath($dom))->query($query);
+    }
+
+    private function createConfigBuilderForPHPUnit93(
+        ?string $originalPhpUnitXmlConfigPath = null
+    ): InitialConfigBuilder {
+        return $this->createConfigBuilder(self::FIXTURES . '/phpunit_93.xml');
     }
 
     private function createConfigBuilder(
