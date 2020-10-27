@@ -48,6 +48,12 @@ class GitDiffFileProvider
 
     public function provide(string $gitDiffFilter, string $gitDiffBase): string
     {
-        return (string) shell_exec(sprintf('git diff %s --diff-filter=%s --name-only | grep src/ | paste -sd ","', $gitDiffBase, $gitDiffFilter));
+        return (string) shell_exec(
+            sprintf(
+                'git diff %s --diff-filter=%s --name-only | grep src/ | paste -sd ","',
+                escapeshellarg($gitDiffBase),
+                escapeshellarg($gitDiffFilter)
+            )
+        );
     }
 }
