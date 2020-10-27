@@ -67,7 +67,9 @@ $container = Container::create()->withValues(
     Container::DEFAULT_FILTER,
     Container::DEFAULT_THREAD_COUNT,
     Container::DEFAULT_DRY_RUN,
-    Container::DEFAULT_GITHUB_LOGGER_DIFF_CONFIG
+    Container::DEFAULT_GIT_DIFF_FILTER,
+    Container::DEFAULT_GIT_DIFF_BASE,
+    Container::DEFAULT_USE_GITHUB_LOGGER
 );
 
 $generateTraces = static function (?int $maxCount) use ($container): iterable {

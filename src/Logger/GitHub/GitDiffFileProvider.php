@@ -44,8 +44,10 @@ use function Safe\sprintf;
  */
 class GitDiffFileProvider
 {
-    public function provide(string $diffFilter): string
+    public const DEFAULT_BASE = 'origin/master';
+
+    public function provide(string $gitDiffFilter, string $gitDiffBase): string
     {
-        return (string) shell_exec(sprintf('git diff origin/"${GITHUB_BASE_REF:-master}" --diff-filter=%s --name-only | grep src/ | paste -sd ","', $diffFilter));
+        return (string) shell_exec(sprintf('git diff %s --diff-filter=%s --name-only | grep src/ | paste -sd ","', $gitDiffBase, $gitDiffFilter));
     }
 }

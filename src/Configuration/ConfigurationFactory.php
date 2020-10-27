@@ -113,7 +113,9 @@ class ConfigurationFactory
         string $filter,
         int $threadCount,
         bool $dryRun,
-        ?string $gitHubAnnotationsLoggerDiffFilter
+        ?string $gitDiffFilter,
+        ?string $gitDiffBase,
+        bool $useGitHubLogger
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -141,9 +143,9 @@ class ConfigurationFactory
                 $schema->getSource()->getDirectories(),
                 $schema->getSource()->getExcludes()
             ),
-            $this->retrieveFilter($filter, $gitHubAnnotationsLoggerDiffFilter),
+            $this->retrieveFilter($filter, $gitDiffFilter, $gitDiffBase),
             $schema->getSource()->getExcludes(),
-            $this->retrieveLogs($schema->getLogs(), $gitHubAnnotationsLoggerDiffFilter),
+            $this->retrieveLogs($schema->getLogs(), $useGitHubLogger),
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
@@ -290,21 +292,19 @@ class ConfigurationFactory
         return $map;
     }
 
-    private function retrieveFilter(string $filter, ?string $gitHubAnnotationsLoggerDiffFilter): string
+    private function retrieveFilter(string $filter, ?string $gitDiffFilter, ?string $gitDiffBase): string
     {
-        if ($gitHubAnnotationsLoggerDiffFilter === null) {
+        if ($gitDiffFilter === null) {
             return $filter;
         }
 
-        Assert::isEmpty($filter, '--filter and --logger-github options can not be used together');
-
-        return $this->gitDiffFileProvider->provide($gitHubAnnotationsLoggerDiffFilter);
+        return $this->gitDiffFileProvider->provide($gitDiffFilter, $gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE);
     }
 
-    private function retrieveLogs(Logs $logs, ?string $gitHubAnnotationsLoggerDiffFilter): Logs
+    private function retrieveLogs(Logs $logs, bool $useGitHubLogger): Logs
     {
-        if ($gitHubAnnotationsLoggerDiffFilter !== null) {
-            $logs->setGitHubAnnotationsLoggerDiffFilter($gitHubAnnotationsLoggerDiffFilter);
+        if ($useGitHubLogger) {
+            $logs->setUseGitHubAnnotationsLogger($useGitHubLogger);
         }
 
         return $logs;

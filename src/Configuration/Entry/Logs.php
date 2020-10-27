@@ -45,7 +45,7 @@ final class Logs
     private ?string $jsonLogFilePath;
     private ?string $debugLogFilePath;
     private ?string $perMutatorFilePath;
-    private ?string $gitHubAnnotationsLoggerDiffFilter;
+    private bool $useGitHubAnnotationsLogger;
     private ?Badge $badge;
 
     public function __construct(
@@ -54,7 +54,7 @@ final class Logs
         ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
-        ?string $gitHubAnnotationsLoggerDiffFilter,
+        bool $useGitHubAnnotationsLogger,
         ?Badge $badge
     ) {
         $this->textLogFilePath = $textLogFilePath;
@@ -62,7 +62,7 @@ final class Logs
         $this->jsonLogFilePath = $jsonLogFilePath;
         $this->debugLogFilePath = $debugLogFilePath;
         $this->perMutatorFilePath = $perMutatorFilePath;
-        $this->gitHubAnnotationsLoggerDiffFilter = $gitHubAnnotationsLoggerDiffFilter;
+        $this->useGitHubAnnotationsLogger = $useGitHubAnnotationsLogger;
         $this->badge = $badge;
     }
 
@@ -74,7 +74,7 @@ final class Logs
             null,
             null,
             null,
-            null,
+            false,
             null
         );
     }
@@ -104,14 +104,14 @@ final class Logs
         return $this->perMutatorFilePath;
     }
 
-    public function setGitHubAnnotationsLoggerDiffFilter(string $gitHubAnnotationsLoggerDiffFilter): void
+    public function setUseGitHubAnnotationsLogger(bool $useGitHubAnnotationsLogger): void
     {
-        $this->gitHubAnnotationsLoggerDiffFilter = $gitHubAnnotationsLoggerDiffFilter;
+        $this->useGitHubAnnotationsLogger = $useGitHubAnnotationsLogger;
     }
 
-    public function getGitHubAnnotationsLoggerDiffFilter(): ?string
+    public function getUseGitHubAnnotationsLogger(): bool
     {
-        return $this->gitHubAnnotationsLoggerDiffFilter;
+        return $this->useGitHubAnnotationsLogger;
     }
 
     public function getBadge(): ?Badge

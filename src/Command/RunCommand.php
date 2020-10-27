@@ -159,11 +159,24 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_FORMATTER_NAME
             )
             ->addOption(
-                'logger-github',
+                'git-diff-filter',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Log escaped Mutants as GitHub Annotations. A - only for added files, AM - for added and modified. See git\'s --diff-filter values',
-                Container::DEFAULT_GITHUB_LOGGER_DIFF_CONFIG
+                'Filter files to mutate git `--diff-filter` options. A - only for added files, AM - for added and modified.',
+                Container::DEFAULT_GIT_DIFF_FILTER
+            )
+            ->addOption(
+                'git-diff-base',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Base branch for `--git-diff-filter` option. Must be used only together with `--git-diff-filter`.',
+                Container::DEFAULT_GIT_DIFF_BASE
+            )
+            ->addOption(
+                'logger-github',
+                null,
+                InputOption::VALUE_NONE,
+                'Log escaped Mutants as GitHub Annotations.',
             )
             ->addOption(
                 'min-msi',
@@ -285,6 +298,19 @@ final class RunCommand extends BaseCommand
             throw new InvalidArgumentException('Cannot pass both "--no-progress" and "--force-progress" option: use none or only one of them');
         }
 
+        $gitDiffFilter = $input->getOption('git-diff-filter');
+        $gitDiffBase = $input->getOption('git-diff-base');
+
+        if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER) {
+            throw new InvalidArgumentException('Cannot pass "--git-diff-base" without "--git-diff-filter"');
+        }
+
+        $filter = trim((string) $input->getOption('filter'));
+
+        if ($filter !== '' && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_BASE) {
+            throw new InvalidArgumentException('Cannot pass both "--filter" and "--git-diff-filter" option: use none or only one of them');
+        }
+
         return $this->getApplication()->getContainer()->withValues(
             $logger,
             $io->getOutput(),
@@ -321,12 +347,14 @@ final class RunCommand extends BaseCommand
             $testFrameworkExtraOptions === ''
                 ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
                 : $testFrameworkExtraOptions,
-            trim((string) $input->getOption('filter')),
+            $filter,
             // TODO: more validation here?
             (int) $input->getOption('threads'),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             (bool) $input->getOption('dry-run'),
-            $input->getOption('logger-github'),
+            $gitDiffFilter,
+            $gitDiffBase,
+            (bool) $input->getOption('logger-github')
         );
     }
 

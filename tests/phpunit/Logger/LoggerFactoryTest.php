@@ -95,7 +95,7 @@ final class LoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 '/a/file',
-                '/a/file',
+                true,
                 null
             )
         );
@@ -118,7 +118,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null,
+                false,
                 new Badge('master')
             )
         );
@@ -158,7 +158,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null,
+                false,
                 null
             ),
             [TextFileLogger::class],
@@ -171,7 +171,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null,
+                false,
                 null
             ),
             [SummaryFileLogger::class],
@@ -184,7 +184,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 'debug_file',
                 null,
-                null,
+                false,
                 null
             ),
             [DebugFileLogger::class],
@@ -197,7 +197,7 @@ final class LoggerFactoryTest extends TestCase
                 'json_file',
                 null,
                 null,
-                null,
+                false,
                 null
             ),
             [JsonLogger::class],
@@ -210,7 +210,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 'per_muator',
-                null,
+                false,
                 null
             ),
             [PerMutatorLogger::class],
@@ -223,7 +223,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                'AM',
+                true,
                 null
             ),
             [GitHubAnnotationsLogger::class],
@@ -236,7 +236,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null,
+                false,
                 new Badge('foo')
             ),
             [BadgeLogger::class],
@@ -249,7 +249,7 @@ final class LoggerFactoryTest extends TestCase
                 'json',
                 'debug',
                 'per_mutator',
-                'AM',
+                true,
                 new Badge('branch')
             ),
             [

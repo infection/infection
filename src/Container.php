@@ -155,7 +155,9 @@ final class Container
     public const DEFAULT_DEBUG = false;
     public const DEFAULT_ONLY_COVERED = false;
     public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
-    public const DEFAULT_GITHUB_LOGGER_DIFF_CONFIG = null;
+    public const DEFAULT_GIT_DIFF_FILTER = null;
+    public const DEFAULT_GIT_DIFF_BASE = null;
+    public const DEFAULT_USE_GITHUB_LOGGER = false;
     public const DEFAULT_NO_PROGRESS = false;
     public const DEFAULT_FORCE_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
@@ -627,7 +629,9 @@ final class Container
             self::DEFAULT_FILTER,
             self::DEFAULT_THREAD_COUNT,
             self::DEFAULT_DRY_RUN,
-            self::DEFAULT_GITHUB_LOGGER_DIFF_CONFIG
+            self::DEFAULT_GIT_DIFF_FILTER,
+            self::DEFAULT_GIT_DIFF_BASE,
+            self::DEFAULT_USE_GITHUB_LOGGER
         );
     }
 
@@ -655,7 +659,9 @@ final class Container
         string $filter,
         int $threadCount,
         bool $dryRun,
-        ?string $gitHubAnnotationsLoggerDiffFilter
+        ?string $gitDiffFilter,
+        ?string $gitDiffBase,
+        bool $useGitHubLogger
     ): self {
         $clone = clone $this;
 
@@ -727,7 +733,9 @@ final class Container
                 $filter,
                 $threadCount,
                 $dryRun,
-                $gitHubAnnotationsLoggerDiffFilter
+                $gitDiffFilter,
+                $gitDiffBase,
+                $useGitHubLogger
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -749,7 +757,9 @@ final class Container
                     $filter,
                     $threadCount,
                     $dryRun,
-                    $gitHubAnnotationsLoggerDiffFilter
+                    $gitDiffFilter,
+                    $gitDiffBase,
+                    $useGitHubLogger
                 );
             }
         );

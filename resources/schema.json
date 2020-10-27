@@ -75,7 +75,7 @@
                     }
                 },
                 "github": {
-                    "type": "string",
+                    "type": "boolean",
                     "description": "GitHub Annotations for escaped Mutants in the added/modifies files"
                 }
             }
