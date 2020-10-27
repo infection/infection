@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use DOMDocument;
 use DOMElement;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
@@ -129,6 +130,22 @@ final class XmlConfigurationManipulator
         );
     }
 
+    /**
+     * @param string[] $srcDirs
+     */
+    public function addLegacyCoverageWhitelistNodesUnlessTheyExist(SafeDOMXPath $xPath, array $srcDirs): void
+    {
+        $this->addCoverageNodesUnlessTheyExist('filter', 'whitelist', $xPath, $srcDirs);
+    }
+
+    /**
+     * @param string[] $srcDirs
+     */
+    public function addCoverageIncludeNodesUnlessTheyExist(SafeDOMXPath $xPath, array $srcDirs): void
+    {
+        $this->addCoverageNodesUnlessTheyExist('coverage', 'include', $xPath, $srcDirs);
+    }
+
     public function validate(string $configPath, SafeDOMXPath $xPath): bool
     {
         if ($xPath->query('/phpunit')->length === 0) {
@@ -161,6 +178,47 @@ final class XmlConfigurationManipulator
             $xPath,
             'defaultTestSuite'
         );
+    }
+
+    /**
+     * @param string[] $srcDirs
+     */
+    private function addCoverageNodesUnlessTheyExist(string $parentName, string $listName, SafeDOMXPath $xPath, array $srcDirs): void
+    {
+        if ($this->nodeExists($xPath, "{$parentName}/{$listName}")) {
+            return;
+        }
+
+        $filterNode = $this->createNode($xPath->document, $parentName);
+
+        $listNode = $xPath->document->createElement($listName);
+
+        foreach ($srcDirs as $srcDir) {
+            $directoryNode = $xPath->document->createElement(
+                'directory',
+                $srcDir
+            );
+
+            $listNode->appendChild($directoryNode);
+        }
+
+        $filterNode->appendChild($listNode);
+    }
+
+    private function nodeExists(SafeDOMXPath $xPath, string $nodeName): bool
+    {
+        return $xPath->query(sprintf('/phpunit/%s', $nodeName))->length > 0;
+    }
+
+    private function createNode(DOMDocument $dom, string $nodeName): DOMElement
+    {
+        $node = $dom->createElement($nodeName);
+        $document = $dom->documentElement;
+
+        Assert::isInstanceOf($document, DOMElement::class);
+        $document->appendChild($node);
+
+        return $node;
     }
 
     private function getXmlErrorsString(): string

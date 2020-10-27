@@ -44,6 +44,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Filesystem;
@@ -87,6 +88,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
+                new XmlConfigurationVersionProvider(),
                 $sourceDirectories
             ),
             new MutationConfigBuilder(

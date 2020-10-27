@@ -42,6 +42,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use InvalidArgumentException;
@@ -252,6 +253,45 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
 
         $this->assertSame(2, $whitelistedDirectories->length);
+    }
+
+    public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist_and_version_situation_is_uncertain(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('9.3'));
+
+        $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
+
+        $this->assertSame(2, $whitelistedDirectories->length);
+    }
+
+    public function test_it_creates_coverage_include_node_if_does_not_exist_for_future_version_of_phpunit(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('10.0'));
+
+        $includedDirectories = $this->queryXpath($xml, '/phpunit/coverage/include/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $includedDirectories);
+
+        $this->assertSame(2, $includedDirectories->length);
+    }
+
+    public function test_it_does_not_create_legacy_coverage_filter_whitelist_node_for_future_version_of_phpunit(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('10.0'));
+
+        $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
+
+        $this->assertSame(0, $whitelistedDirectories->length);
     }
 
     public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist(): void
@@ -517,6 +557,7 @@ XML
             $this->tmp,
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationManipulator($replacer, ''),
+            new XmlConfigurationVersionProvider(),
             $srcDirs
         );
     }
