@@ -49,11 +49,14 @@ use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 
 final class MutationGeneratorTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
         $fileInfo = $this->createMock(SplFileInfo::class);

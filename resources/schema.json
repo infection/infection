@@ -122,6 +122,12 @@
                         "type": "string"
                     }
                 },
+                "global-ignoreSourceCodeByRegex": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
 
                 "@arithmetic": { "$ref": "#/definitions/default-mutator-config" },
                 "@boolean": { "$ref": "#/definitions/default-mutator-config" },
@@ -210,6 +216,7 @@
                     ]
                 },
                 "Yield_": { "$ref": "#/definitions/default-mutator-config" },
+                "YieldValue": { "$ref": "#/definitions/default-mutator-config" },
                 "GreaterThan": { "$ref": "#/definitions/default-mutator-config" },
                 "GreaterThanOrEqualTo": { "$ref": "#/definitions/default-mutator-config" },
                 "LessThan": { "$ref": "#/definitions/default-mutator-config" },
@@ -502,6 +509,12 @@
                     "additionalProperties": false,
                     "properties": {
                         "ignore": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "ignoreSourceCodeByRegex": {
                             "type": "array",
                             "items": {
                                 "type": "string"

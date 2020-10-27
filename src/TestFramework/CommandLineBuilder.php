@@ -45,8 +45,9 @@ use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
+ * @final
  */
-final class CommandLineBuilder
+class CommandLineBuilder
 {
     /**
      * @var string[]|null

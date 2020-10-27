@@ -1,8 +1,8 @@
-Total: 5
+Total: 6
 
 Killed: 2
 Errored: 0
-Escaped: 2
+Escaped: 3
 Timed Out: 1
 Skipped: 0
 Not Covered: 0

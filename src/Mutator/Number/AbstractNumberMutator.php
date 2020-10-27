@@ -51,6 +51,13 @@ abstract class AbstractNumberMutator implements Mutator
         return $this->isSizeComparison($parent);
     }
 
+    protected function isPartOfComparison(Node $node): bool
+    {
+        $parent = ParentConnector::getParent($node);
+
+        return $this->isComparison($parent);
+    }
+
     private function isSizeComparison(?Node $node): bool
     {
         if ($node === null) {
@@ -61,10 +68,33 @@ abstract class AbstractNumberMutator implements Mutator
             return $this->isSizeComparison(ParentConnector::findParent($node));
         }
 
+        return $this->isSizeNode($node);
+    }
+
+    private function isSizeNode(Node $node): bool
+    {
         return $node instanceof Node\Expr\BinaryOp\Greater
             || $node instanceof Node\Expr\BinaryOp\GreaterOrEqual
             || $node instanceof Node\Expr\BinaryOp\Smaller
             || $node instanceof Node\Expr\BinaryOp\SmallerOrEqual
+        ;
+    }
+
+    private function isComparison(?Node $node): bool
+    {
+        if ($node === null) {
+            return false;
+        }
+
+        if ($node instanceof Node\Expr\UnaryMinus) {
+            return $this->isComparison(ParentConnector::findParent($node));
+        }
+
+        return $node instanceof Node\Expr\BinaryOp\Identical
+            || $node instanceof Node\Expr\BinaryOp\NotIdentical
+            || $node instanceof Node\Expr\BinaryOp\Equal
+            || $node instanceof Node\Expr\BinaryOp\NotEqual
+            || $this->isSizeNode($node)
         ;
     }
 }

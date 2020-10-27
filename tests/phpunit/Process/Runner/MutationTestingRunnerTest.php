@@ -41,6 +41,7 @@ use function count;
 use function get_class;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
@@ -112,8 +113,10 @@ final class MutationTestingRunnerTest extends TestCase
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
+            new DiffSourceCodeMatcher(),
             false,
-            100.0
+            100.0,
+            []
         );
     }
 
@@ -285,8 +288,75 @@ final class MutationTestingRunnerTest extends TestCase
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
+            new DiffSourceCodeMatcher(),
             true,
-            100.0
+            100.0,
+            []
+        );
+
+        $this->runner->run($mutations, $testFrameworkExtraOptions);
+
+        $this->assertAreSameEvents(
+            [
+                new MutationTestingWasStarted(0),
+                new MutationTestingWasFinished(),
+            ],
+            $this->eventDispatcher->getEvents()
+        );
+    }
+
+    public function test_it_does_not_create_processes_when_code_is_ignored_by_regex(): void
+    {
+        $mutations = new ArrayIterator([
+            $mutation0 = $this->createMutation(0),
+        ]);
+
+        $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
+
+        $this->mutantFactoryMock
+            ->method('create')
+            ->withConsecutive(
+                [$mutation0],
+            )
+            ->willReturnOnConsecutiveCalls(
+                new Mutant(
+                    '/path/to/mutant0',
+                    $mutation0,
+                    'mutated code 0',
+                    '- Assert::integer(1)',
+                    '<?php $a = 1;'
+                ),
+            )
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $this->processFactoryMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $this->processRunnerMock
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->emptyIterable())
+        ;
+
+        $this->runner = new MutationTestingRunner(
+            $this->processFactoryMock,
+            $this->mutantFactoryMock,
+            $this->processRunnerMock,
+            $this->eventDispatcher,
+            $this->fileSystemMock,
+            new DiffSourceCodeMatcher(),
+            true,
+            100.0,
+            [
+                'For_' => ['Assert::.*'],
+            ]
         );
 
         $this->runner->run($mutations, $testFrameworkExtraOptions);
@@ -330,8 +400,10 @@ final class MutationTestingRunnerTest extends TestCase
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
+            new DiffSourceCodeMatcher(),
             true,
-            100.0
+            100.0,
+            []
         );
 
         $this->runner->run($mutations, '');

@@ -57,6 +57,7 @@ final class ConfigurationTest extends TestCase
      * @param string[] $sourceFilesExcludes
      * @param SplFileInfo[] $sourceFiles
      * @param Mutator[] $mutators
+     * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function test_it_can_be_instantiated(
         float $timeout,
@@ -85,7 +86,8 @@ final class ConfigurationTest extends TestCase
         ?float $minCoveredMsi,
         int $msiPrecision,
         int $threadsCount,
-        bool $dryRun
+        bool $dryRun,
+        array $ignoreSourceCodeMutatorsMap
     ): void {
         $config = new Configuration(
             $timeout,
@@ -114,7 +116,8 @@ final class ConfigurationTest extends TestCase
             $minCoveredMsi,
             $msiPrecision,
             $threadsCount,
-            $dryRun
+            $dryRun,
+            $ignoreSourceCodeMutatorsMap
         );
 
         $this->assertConfigurationStateIs(
@@ -145,7 +148,8 @@ final class ConfigurationTest extends TestCase
             $minCoveredMsi,
             $msiPrecision,
             $threadsCount,
-            $dryRun
+            $dryRun,
+            $ignoreSourceCodeMutatorsMap
         );
     }
 
@@ -179,6 +183,7 @@ final class ConfigurationTest extends TestCase
             2,
             0,
             false,
+            [],
         ];
 
         yield 'nominal' => [
@@ -221,6 +226,9 @@ final class ConfigurationTest extends TestCase
             2,
             4,
             true,
+            [
+                'For_' => ['.*someMethod.*'],
+            ],
         ];
     }
 }

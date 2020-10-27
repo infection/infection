@@ -36,12 +36,13 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use function array_fill_keys;
-use function count;
+use function array_key_exists;
 use function dirname;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
@@ -50,6 +51,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use OndraM\CiDetector\CiDetector;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
+use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -121,6 +123,11 @@ class ConfigurationFactory
             $namespacedTmpDir
         );
 
+        $resolvedMutatorsArray = $this->resolveMutators($schema->getMutators(), $mutatorsInput);
+
+        $mutators = $this->mutatorFactory->create($resolvedMutatorsArray);
+        $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
+
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
@@ -134,7 +141,7 @@ class ConfigurationFactory
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
-            $this->retrieveMutators($schema->getMutators(), $mutatorsInput),
+            $mutators,
             $testFramework,
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
@@ -151,8 +158,31 @@ class ConfigurationFactory
             self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
             $msiPrecision,
             $threadCount,
-            $dryRun
+            $dryRun,
+            $ignoreSourceCodeMutatorsMap
         );
+    }
+
+    /**
+     * @param array<string, mixed> $schemaMutators
+     *
+     * @return array<class-string<Mutator&ConfigurableMutator>, mixed[]>
+     */
+    private function resolveMutators(array $schemaMutators, string $mutatorsInput): array
+    {
+        if ($schemaMutators === []) {
+            $schemaMutators = ['@default' => true];
+        }
+
+        $parsedMutatorsInput = $this->mutatorParser->parse($mutatorsInput);
+
+        if ($parsedMutatorsInput === []) {
+            $mutatorsList = $schemaMutators;
+        } else {
+            $mutatorsList = array_fill_keys($parsedMutatorsInput, true);
+        }
+
+        return $this->mutatorResolver->resolve($mutatorsList);
     }
 
     private function retrieveTmpDir(
@@ -185,30 +215,6 @@ class ConfigurationFactory
         }
 
         return $phpUnit;
-    }
-
-    /**
-     * @param array<string, mixed> $schemaMutators
-     *
-     * @return array<string, Mutator>
-     */
-    private function retrieveMutators(array $schemaMutators, string $mutatorsInput): array
-    {
-        if (count($schemaMutators) === 0) {
-            $schemaMutators = ['@default' => true];
-        }
-
-        $parsedMutatorsInput = $this->mutatorParser->parse($mutatorsInput);
-
-        if ($parsedMutatorsInput === []) {
-            $mutatorsList = $schemaMutators;
-        } else {
-            $mutatorsList = array_fill_keys($parsedMutatorsInput, true);
-        }
-
-        return $this->mutatorFactory->create(
-            $this->mutatorResolver->resolve($mutatorsList)
-        );
     }
 
     private static function retrieveCoverageBasePath(
@@ -254,5 +260,27 @@ class ConfigurationFactory
     private static function retrieveMinCoveredMsi(?float $minCoveredMsi, SchemaConfiguration $schema): ?float
     {
         return $minCoveredMsi ?? $schema->getMinCoveredMsi();
+    }
+
+    /**
+     * @param array<string, mixed[]> $resolvedMutatorsMap
+     *
+     * @return array<string, array<int, string>>
+     */
+    private function retrieveIgnoreSourceCodeMutatorsMap(array $resolvedMutatorsMap): array
+    {
+        $map = [];
+
+        foreach ($resolvedMutatorsMap as $mutatorClassName => $config) {
+            if (array_key_exists('ignoreSourceCodeByRegex', $config)) {
+                $mutatorName = MutatorFactory::getMutatorNameForClassName($mutatorClassName);
+
+                Assert::isArray($config['ignoreSourceCodeByRegex']);
+
+                $map[$mutatorName] = $config['ignoreSourceCodeByRegex'];
+            }
+        }
+
+        return $map;
     }
 }

@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.18.0](https://github.com/infection/infection/tree/0.18.0) (2020-10-18)
+[Full Changelog](https://github.com/infection/infection/compare/0.17.7...0.18.0)
+
+**Added:**
+
+- Exclude mutations matching the source code by Regular Expression [\#1326](https://github.com/infection/infection/pull/1326)
+- [MUTATOR] Add mutator to remove shared cases [\#1326](https://github.com/infection/infection/pull/1306)
+
+**Changed:**
+
+- Allow fractional values for timeout  [\#1313](https://github.com/infection/infection/pull/1313)
+
 ## [0.17.0](https://github.com/infection/infection/tree/0.17.0) (2020-08-17)
 [Full Changelog](https://github.com/infection/infection/compare/0.16.4...0.17.0)
 

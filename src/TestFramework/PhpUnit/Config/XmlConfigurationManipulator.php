@@ -79,12 +79,17 @@ final class XmlConfigurationManipulator
         }
     }
 
+    /**
+     * Removes existing loggers to improve throughput during MT. Initial test loggers are added through CLI arguments.
+     */
     public function removeExistingLoggers(SafeDOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {
-            $document = $xPath->document->documentElement;
-            Assert::isInstanceOf($document, DOMElement::class);
-            $document->removeChild($node);
+            $node->parentNode->removeChild($node);
+        }
+
+        foreach ($xPath->query('/phpunit/coverage/report') as $node) {
+            $node->parentNode->removeChild($node);
         }
     }
 
@@ -137,9 +142,8 @@ final class XmlConfigurationManipulator
         $schema = $xPath->query('/phpunit/@xsi:noNamespaceSchemaLocation');
 
         $original = libxml_use_internal_errors(true);
-        $schemaPath = $this->buildSchemaPath($schema[0]->nodeValue);
 
-        if ($schema->length && !$xPath->document->schemaValidate($schemaPath)) {
+        if ($schema->length && !$xPath->document->schemaValidate($this->buildSchemaPath($schema[0]->nodeValue))) {
             throw InvalidPhpUnitConfiguration::byXsdSchema(
                 $configPath,
                 $this->getXmlErrorsString()

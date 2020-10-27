@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use function end;
-use function explode;
-
 /**
  * @internal
  */
@@ -45,8 +42,6 @@ trait GetMutatorName
 {
     final public function getName(): string
     {
-        $parts = explode('\\', static::class);
-
-        return (string) end($parts);
+        return MutatorFactory::getMutatorNameForClassName(static::class);
     }
 }

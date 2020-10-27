@@ -81,12 +81,14 @@ class Configuration
     private $msiPrecision;
     private $threadCount;
     private $dryRun;
+    private $ignoreSourceCodeMutatorsMap;
 
     /**
      * @param string[] $sourceDirectories
      * @param string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator> $mutators
+     * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
         float $timeout,
@@ -115,7 +117,8 @@ class Configuration
         ?float $minCoveredMsi,
         int $msiPrecision,
         int $threadCount,
-        bool $dryRun
+        bool $dryRun,
+        array $ignoreSourceCodeMutatorsMap
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
@@ -152,6 +155,7 @@ class Configuration
         $this->msiPrecision = $msiPrecision;
         $this->threadCount = $threadCount;
         $this->dryRun = $dryRun;
+        $this->ignoreSourceCodeMutatorsMap = $ignoreSourceCodeMutatorsMap;
     }
 
     public function getProcessTimeout(): float
@@ -299,5 +303,13 @@ class Configuration
     public function isDryRun(): bool
     {
         return $this->dryRun;
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function getIgnoreSourceCodeMutatorsMap(): array
+    {
+        return $this->ignoreSourceCodeMutatorsMap;
     }
 }
