@@ -1,5 +1,23 @@
 # Change Log
 
+## [0.19.0](https://github.com/infection/infection/tree/0.19.0) (2020-10-28)
+[Full Changelog](https://github.com/infection/infection/compare/0.18.2...0.19.0)
+
+**Added:**
+
+- [MUTATOR] Introduce YieldValue mutator [\#1342](https://github.com/infection/infection/pull/1342)
+
+**Changed:**
+
+- Drop support for PHP 7.3 [\#1340](https://github.com/infection/infection/pull/1340)
+- Don't mutate `$limit` argument from 0 to -1 and from -1 to 0 in `preg_split` function [\#1347](https://github.com/infection/infection/pull/1347)
+
+**Fixed:**
+
+- PHPUnit 9.3 compatibility issue [\#1283](https://github.com/infection/infection/issues/1283)
+- In Assert.php line 2042: Expected a value other than null [\#1357](https://github.com/infection/infection/issues/1357)
+- Don't mutant `$limit` 0, -1 in `preg_split` [\#1345](https://github.com/infection/infection/issues/1345)
+
 ## [0.18.0](https://github.com/infection/infection/tree/0.18.0) (2020-10-18)
 [Full Changelog](https://github.com/infection/infection/compare/0.17.7...0.18.0)
 
