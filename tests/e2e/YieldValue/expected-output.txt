@@ -1,8 +1,6 @@
-Total: 1
+# Effects per Mutator
 
-Killed: 1
-Errored: 0
-Escaped: 0
-Timed Out: 0
-Skipped: 0
-Not Covered: 0
+| Mutator          | Mutations | Killed | Escaped | Errors | Timed Out | Skipped | MSI (%s) | Covered MSI (%s) |
+| ---------------- | --------- | ------ | ------- | ------ | --------- | ------- | -------- | ---------------- |
+| PublicVisibility |         1 |      1 |       0 |      0 |         0 |       0 |   100.00 |           100.00 |
+| Yield_           |         2 |      1 |       0 |      0 |         0 |       0 |    50.00 |           100.00 |

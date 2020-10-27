@@ -6,8 +6,7 @@
         ]
     },
     "logs": {
-        "summary": "infection.log",
-        "text": "infection.txt"
+        "perMutator": "infection.log"
     },
     "tmpDir": "."
 }
