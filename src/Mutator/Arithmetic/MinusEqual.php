@@ -61,6 +61,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\AssignOp\Minus $node
      *
      * @return iterable<Node\Expr\AssignOp\Plus>

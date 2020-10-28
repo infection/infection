@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^9.3.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "YieldValue\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "YieldValue\\Test\\": "tests/"
+        }
+    }
+}

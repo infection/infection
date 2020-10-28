@@ -48,6 +48,8 @@ abstract class AbstractUnwrapMutator implements Mutator
     use GetMutatorName;
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\FuncCall $node
      *
      * @return iterable<Node\Arg>
@@ -81,7 +83,12 @@ abstract class AbstractUnwrapMutator implements Mutator
     abstract protected function getFunctionName(): string;
 
     /**
+     * @psalm-mutation-free
+     *
      * @return iterable<int>
      */
-    abstract protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable;
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
+    {
+        yield 0;
+    }
 }

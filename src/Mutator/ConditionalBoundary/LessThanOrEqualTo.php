@@ -61,6 +61,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\BinaryOp\SmallerOrEqual $node
      *
      * @return iterable<Node\Expr\BinaryOp\Smaller>

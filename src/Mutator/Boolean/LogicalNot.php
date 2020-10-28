@@ -58,6 +58,8 @@ final class LogicalNot implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\BooleanNot $node
      *
      * @return iterable<Node\Expr>

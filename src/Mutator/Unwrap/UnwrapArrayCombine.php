@@ -78,6 +78,9 @@ TXT
         return 'array_combine';
     }
 
+    /**
+     * @psalm-pure
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield 0;

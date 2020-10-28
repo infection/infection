@@ -102,6 +102,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\Array_ $arrayNode
      *
      * @return iterable<Node\Expr\Array_>
@@ -139,6 +141,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param ArrayItem[] $items
      *
      * @return int[]

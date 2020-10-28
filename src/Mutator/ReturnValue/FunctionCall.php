@@ -81,6 +81,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Stmt\Return_ $node
      *
      * @return iterable<array<Node\Stmt\Expression|Node\Stmt\Return_>>

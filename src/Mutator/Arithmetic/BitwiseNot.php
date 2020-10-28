@@ -58,6 +58,8 @@ final class BitwiseNot implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\BitwiseNot $node
      *
      * @return iterable<Node\Expr>

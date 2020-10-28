@@ -58,6 +58,8 @@ final class MethodCallRemoval implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Stmt\Expression $node
      *
      * @return iterable<Node\Stmt\Nop>

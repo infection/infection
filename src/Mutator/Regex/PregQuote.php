@@ -72,6 +72,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\FuncCall $node
      *
      * @return iterable<Node\Arg>

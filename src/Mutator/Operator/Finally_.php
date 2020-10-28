@@ -61,6 +61,8 @@ final class Finally_ implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Stmt\Finally_ $node
      *
      * @return iterable<Node\Stmt\Nop>

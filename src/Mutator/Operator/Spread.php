@@ -71,6 +71,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\ArrayItem $node
      *
      * @return iterable<Node\Expr\ArrayItem>

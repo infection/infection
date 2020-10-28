@@ -61,6 +61,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\AssignOp\Mul $node
      *
      * @return iterable<Node\Expr\AssignOp\Div>

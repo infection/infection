@@ -49,6 +49,8 @@ interface Mutator
     public function canMutate(Node $node): bool;
 
     /**
+     * @psalm-mutation-free
+     *
      * @return iterable<Node|Node[]>
      */
     public function mutate(Node $node): iterable;

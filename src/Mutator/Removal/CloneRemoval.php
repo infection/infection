@@ -58,6 +58,8 @@ final class CloneRemoval implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\Clone_ $node
      *
      * @return iterable<Node\Expr>

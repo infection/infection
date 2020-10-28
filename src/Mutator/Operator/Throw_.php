@@ -72,6 +72,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * Replaces "throw new Exception();" with "new Exception();"
      *
      * @param Node\Stmt\Throw_ $node
