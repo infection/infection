@@ -73,6 +73,8 @@ final class SharedCaseRemoval implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Stmt\Switch_ $node
      *
      * @return iterable<Node\Stmt\Switch_>

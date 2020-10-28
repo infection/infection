@@ -62,6 +62,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Stmt\Break_ $node
      *
      * @return iterable<Node\Stmt\Continue_>

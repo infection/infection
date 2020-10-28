@@ -58,6 +58,8 @@ final class FalseValue implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\ConstFetch $node
      *
      * @return iterable<Node\Expr\ConstFetch>

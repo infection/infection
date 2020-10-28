@@ -71,6 +71,8 @@ final class FunctionCallRemoval implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * Replaces "doSmth()" with ""
      *
      * @param Node\Stmt\Expression $node

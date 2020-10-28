@@ -58,6 +58,8 @@ final class Minus implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\BinaryOp\Minus $node
      *
      * @return iterable<Node\Expr\BinaryOp\Plus>

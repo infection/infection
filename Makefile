@@ -23,6 +23,8 @@ PHP_CS_FIXER_CACHE=build/cache/.php_cs.cache
 
 PHPSTAN=./vendor/bin/phpstan
 
+PSALM=./vendor/bin/psalm
+
 PHPUNIT=vendor/phpunit/phpunit/phpunit
 
 INFECTION=./build/infection.phar
@@ -67,6 +69,10 @@ phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress
 	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress
 
+.PHONY: psalm
+psalm: vendor $(PSALM)
+	$(PSALM)
+
 .PHONY: validate
 validate:
 	composer validate --strict
@@ -90,7 +96,7 @@ profile: vendor $(BENCHMARK_SOURCES)
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: phpstan validate test-autoreview
+autoreview: phpstan psalm validate test-autoreview
 
 .PHONY: test
 test:		 	## Runs all the tests
@@ -207,6 +213,8 @@ $(PHP_CS_FIXER): Makefile
 	touch $@
 
 $(PHPSTAN): vendor
+
+$(PSALM): vendor
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	composer require infection/codeception-adapter infection/phpspec-adapter

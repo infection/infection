@@ -58,6 +58,8 @@ final class LogicalOr implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * Replaces "||" with "&&"
      *
      * @param Node\Expr\BinaryOp\BooleanOr $node

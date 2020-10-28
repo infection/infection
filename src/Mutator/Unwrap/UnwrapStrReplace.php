@@ -71,6 +71,9 @@ TXT
         return 'str_replace';
     }
 
+    /**
+     * @psalm-pure
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield 2;

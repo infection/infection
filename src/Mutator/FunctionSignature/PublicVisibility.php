@@ -61,6 +61,8 @@ final class PublicVisibility implements Mutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Stmt\ClassMethod $node
      *
      * @return iterable<Node\Stmt\ClassMethod>

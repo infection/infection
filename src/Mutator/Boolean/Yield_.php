@@ -67,6 +67,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\Yield_ $node
      *
      * @return iterable<Node\Expr\Yield_>
@@ -78,10 +80,7 @@ TXT
         /** @var Node\Expr $value */
         $value = $node->value;
 
-        $node->value = new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
-        $node->key = null;
-
-        yield $node;
+        yield new Node\Expr\Yield_(new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes()));
     }
 
     public function canMutate(Node $node): bool

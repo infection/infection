@@ -64,6 +64,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\BinaryOp\NotIdentical $node
      *
      * @return iterable<Node\Expr\BinaryOp\NotEqual>

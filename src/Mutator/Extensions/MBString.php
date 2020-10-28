@@ -93,6 +93,9 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     * @psalm-suppress ImpureMethodCall
+     *
      * @param Node\Expr\FuncCall $node
      *
      * @return iterable<Node\Expr\FuncCall>

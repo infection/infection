@@ -61,6 +61,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Scalar\LNumber $node
      *
      * @return iterable<Node\Scalar\LNumber>

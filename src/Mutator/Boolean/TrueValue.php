@@ -73,6 +73,8 @@ final class TrueValue implements ConfigurableMutator
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\ConstFetch $node
      *
      * @return iterable<Node\Expr\ConstFetch>
