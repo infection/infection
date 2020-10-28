@@ -1,9 +1,3 @@
-# Title
+# YieldValue mutator does not work properly
 
-* Link to github ticket if relevant
-
-## Summary
-Short summary of the ticket
-
-## Full Ticket
-Full github ticket
+* Related to https://github.com/infection/infection/issues/1380
