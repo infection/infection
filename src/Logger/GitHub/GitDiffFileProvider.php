@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Logger\GitHub;
 
+use function escapeshellarg;
 use function Safe\sprintf;
+use function shell_exec;
 
 /**
  * @final

@@ -37,6 +37,8 @@ namespace Infection\Logger;
 
 use Infection\Metrics\MetricsCalculator;
 use function Safe\getcwd;
+use function str_replace;
+use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -57,7 +59,7 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 
         foreach ($this->metricsCalculator->getEscapedExecutionResults() as $escapedExecutionResult) {
             $error = [
-                'line' => (string) $escapedExecutionResult->getOriginalStartingLine(),
+                'line' => $escapedExecutionResult->getOriginalStartingLine(),
                 'message' => <<<"TEXT"
 Escaped Mutant:
 
@@ -67,8 +69,8 @@ TEXT
             ];
 
             $lines[] = $this->buildAnnotation(
-                $this->relativePath($currentWorkingDirectory, $escapedExecutionResult->getOriginalFilePath()),
-                $error
+                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $currentWorkingDirectory),
+                $error,
             );
         }
 
@@ -76,19 +78,14 @@ TEXT
     }
 
     /**
-     * @param array{line: string, message: string} $error
+     * @param array{line: int, message: string} $error
      */
     private function buildAnnotation(string $filePath, array $error): string
     {
-        // newlines need to be encoded
+        // new lines need to be encoded
         // see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
         $message = str_replace("\n", '%0A', $error['message']);
 
         return "::warning file={$filePath},line={$error['line']}::{$message}\n";
-    }
-
-    private function relativePath(string $currentWorkingDirectory, string $path): string
-    {
-        return str_replace($currentWorkingDirectory . '/', '', $path);
     }
 }
