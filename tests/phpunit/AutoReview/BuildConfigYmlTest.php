@@ -75,8 +75,6 @@ final class BuildConfigYmlTest extends TestCase
 
         yield [$rootPath . '.travis.yml'];
 
-        yield [$rootPath . 'appveyor.yml'];
-
         yield [$rootPath . 'codecov.yml'];
     }
 }
