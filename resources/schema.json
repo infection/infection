@@ -199,6 +199,12 @@
                                         "type": "string"
                                     }
                                 },
+                                "ignoreSourceCodeByRegex": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
                                 "settings": {
                                     "type": "object",
                                     "additionalProperties": false,
@@ -253,6 +259,12 @@
                             "additionalProperties": false,
                             "properties": {
                                 "ignore": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "ignoreSourceCodeByRegex": {
                                     "type": "array",
                                     "items": {
                                         "type": "string"
@@ -358,6 +370,12 @@
                                         "type": "string"
                                     }
                                 },
+                                "ignoreSourceCodeByRegex": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
                                 "settings": {
                                     "type": "object",
                                     "additionalProperties": false,
@@ -405,6 +423,12 @@
                             "additionalProperties": false,
                             "properties": {
                                 "ignore": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "ignoreSourceCodeByRegex": {
                                     "type": "array",
                                     "items": {
                                         "type": "string"
