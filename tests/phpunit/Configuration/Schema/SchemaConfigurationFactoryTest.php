@@ -1005,6 +1005,32 @@ JSON
             ]),
         ];
 
+        yield '[mutators][TrueValue] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'TrueValue' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
         yield '[mutators][TrueValue] empty & untrimmed ignore' => [
             <<<'JSON'
 {
@@ -1181,6 +1207,32 @@ JSON
                         'ignore' => [
                             'fileA',
                             'fileB',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][ArrayItemRemoval] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ArrayItemRemoval": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'ArrayItemRemoval' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
                         ],
                     ],
                 ],
@@ -1369,6 +1421,32 @@ JSON
             ]),
         ];
 
+        yield '[mutators][BCMath] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "BCMath": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'BCMath' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
         yield '[mutators][BCMath] empty & untrimmed ignore' => [
             <<<'JSON'
 {
@@ -1547,6 +1625,32 @@ JSON
                         'ignore' => [
                             'fileA',
                             'fileB',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][MBString] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "MBString": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'MBString' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
                         ],
                     ],
                 ],
