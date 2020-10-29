@@ -156,6 +156,7 @@ final class ProfileList
         Mutator\Operator\Coalesce::class,
         Mutator\Operator\Continue_::class,
         Mutator\Operator\Finally_::class,
+        Mutator\Operator\FlipCoalesce::class,
         Mutator\Operator\Spread::class,
         Mutator\Operator\Throw_::class,
     ];
@@ -344,6 +345,7 @@ final class ProfileList
         'Coalesce' => Mutator\Operator\Coalesce::class,
         'Continue_' => Mutator\Operator\Continue_::class,
         'Finally_' => Mutator\Operator\Finally_::class,
+        'FlipCoalesce' => Mutator\Operator\FlipCoalesce::class,
         'Spread' => Mutator\Operator\Spread::class,
         'Throw_' => Mutator\Operator\Throw_::class,
 

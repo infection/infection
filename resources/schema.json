@@ -247,6 +247,7 @@
                 "Throw_": { "$ref": "#/definitions/default-mutator-config" },
                 "Finally_": { "$ref": "#/definitions/default-mutator-config" },
                 "Coalesce": { "$ref": "#/definitions/default-mutator-config" },
+                "FlipCoalesce": { "$ref": "#/definitions/default-mutator-config" },
                 "PregQuote": { "$ref": "#/definitions/default-mutator-config" },
                 "PregMatchMatches": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItemRemoval": {
