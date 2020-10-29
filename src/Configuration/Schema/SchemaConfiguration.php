@@ -61,6 +61,8 @@ final class SchemaConfiguration
     private ?string $bootstrap;
     private ?string $initialTestsPhpOptions;
     private ?string $testFrameworkExtraOptions;
+    private ?string $xmlCoveragePath;
+    private ?string $junitLogPath;
 
     /**
      * @param array<string, mixed> $mutators
@@ -79,7 +81,9 @@ final class SchemaConfiguration
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkExtraOptions
+        ?string $testFrameworkExtraOptions,
+        ?string $xmlCoveragePath,
+        ?string $junitLogPath
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
@@ -98,6 +102,8 @@ final class SchemaConfiguration
         $this->bootstrap = $bootstrap;
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
         $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
+        $this->xmlCoveragePath = $xmlCoveragePath;
+        $this->junitLogPath = $junitLogPath;
     }
 
     public function getFile(): string
@@ -171,5 +177,15 @@ final class SchemaConfiguration
     public function getTestFrameworkExtraOptions(): ?string
     {
         return $this->testFrameworkExtraOptions;
+    }
+
+    public function getXmlCoveragePath(): ?string
+    {
+        return $this->xmlCoveragePath;
+    }
+
+    public function getJunitLogPath(): ?string
+    {
+        return $this->junitLogPath;
     }
 }

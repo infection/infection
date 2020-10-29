@@ -66,7 +66,9 @@ class SchemaConfigurationFactory
             $rawConfig->testFramework ?? null,
             self::normalizeString($rawConfig->bootstrap ?? null),
             self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
-            self::normalizeString($rawConfig->testFrameworkOptions ?? null)
+            self::normalizeString($rawConfig->testFrameworkOptions ?? null),
+            self::normalizeString($rawConfig->xmlCoveragePath ?? null),
+            self::normalizeString($rawConfig->junitLogPath ?? null)
         );
     }
 

@@ -77,7 +77,9 @@ final class SchemaConfigurationTest extends TestCase
             $testFramework,
             $bootstrap,
             $initialTestsPhpOptions,
-            $testFrameworkExtraOptions
+            $testFrameworkExtraOptions,
+            null,
+            null,
         );
 
         $this->assertSame($path, $config->getFile());

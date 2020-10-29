@@ -96,6 +96,8 @@ class ConfigurationFactory
     public function create(
         SchemaConfiguration $schema,
         ?string $existingCoveragePath,
+        ?string $existingXmlCoveragePath,
+        ?string $existingJunitLogPath,
         ?string $initialTestsPhpOptions,
         bool $skipInitialTests,
         string $logVerbosity,
@@ -123,13 +125,33 @@ class ConfigurationFactory
 
         $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
 
-        $skipCoverage = $existingCoveragePath !== null;
+        $existingXmlCoveragePath = $existingXmlCoveragePath ?? $schema->getXmlCoveragePath();
+        $existingJunitLogPath = $existingJunitLogPath ?? $schema->getJunitLogPath();
+
+        $skipCoverage = $existingCoveragePath !== null ||
+            ($existingXmlCoveragePath !== null && $existingJunitLogPath !== null);
 
         $coverageBasePath = self::retrieveCoverageBasePath(
             $existingCoveragePath,
             $configDir,
             $namespacedTmpDir
         );
+
+        $xmlCoveragePath = $junitLogPath = null;
+
+        if ($existingXmlCoveragePath !== null && $existingJunitLogPath !== null) {
+            $xmlCoveragePath = self::retrieveCoverageBasePath(
+                $existingXmlCoveragePath,
+                $configDir,
+                $namespacedTmpDir
+            );
+
+            $junitLogPath = self::retrieveCoverageBasePath(
+                $existingJunitLogPath,
+                $configDir,
+                $namespacedTmpDir
+            );
+        }
 
         $resolvedMutatorsArray = $this->resolveMutators($schema->getMutators(), $mutatorsInput);
 
@@ -155,6 +177,8 @@ class ConfigurationFactory
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
             $coverageBasePath,
+            $xmlCoveragePath,
+            $junitLogPath,
             $skipCoverage,
             $skipInitialTests,
             $debug,

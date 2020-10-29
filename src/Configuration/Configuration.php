@@ -73,6 +73,8 @@ class Configuration
     private ?string $initialTestsPhpOptions = null;
     private string $testFrameworkExtraOptions;
     private string $coveragePath;
+    private ?string $xmlCoveragePath;
+    private ?string $junitLogPath;
     private bool $skipCoverage;
     private bool $skipInitialTests;
     private bool $debug;
@@ -111,6 +113,8 @@ class Configuration
         ?string $initialTestsPhpOptions,
         string $testFrameworkExtraOptions,
         string $coveragePath,
+        ?string $xmlCoveragePath,
+        ?string $junitLogPath,
         bool $skipCoverage,
         bool $skipInitialTests,
         bool $debug,
@@ -148,6 +152,8 @@ class Configuration
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
         $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
         $this->coveragePath = $coveragePath;
+        $this->xmlCoveragePath = $xmlCoveragePath;
+        $this->junitLogPath = $junitLogPath;
         $this->skipCoverage = $skipCoverage;
         $this->skipInitialTests = $skipInitialTests;
         $this->debug = $debug;
@@ -248,6 +254,16 @@ class Configuration
     public function getCoveragePath(): string
     {
         return $this->coveragePath;
+    }
+
+    public function getXmlCoveragePath(): ?string
+    {
+        return $this->xmlCoveragePath;
+    }
+
+    public function getJunitLogPath(): ?string
+    {
+        return $this->junitLogPath;
     }
 
     public function shouldSkipCoverage(): bool

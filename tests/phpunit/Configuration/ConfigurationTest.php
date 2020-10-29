@@ -105,6 +105,8 @@ final class ConfigurationTest extends TestCase
             $initialTestsPhpOptions,
             $testFrameworkExtraOptions,
             $coveragePath,
+            null,
+            null,
             $skipCoverage,
             $skipInitialTests,
             $debug,

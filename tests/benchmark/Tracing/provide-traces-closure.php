@@ -56,6 +56,8 @@ $container = Container::create()->withValues(
     Container::DEFAULT_NO_PROGRESS,
     Container::DEFAULT_FORCE_PROGRESS,
     __DIR__ . '/coverage',
+    Container::DEFAULT_EXISTING_COVERAGE_XML_PATH,
+    Container::DEFAULT_EXISTING_JUNIT_LOG_FILE_PATH,
     Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
     Container::DEFAULT_SKIP_INITIAL_TESTS,
     Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,

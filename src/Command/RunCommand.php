@@ -97,6 +97,12 @@ final class RunCommand extends BaseCommand
     private const OPTION_COVERAGE = 'coverage';
 
     /** @var string */
+    private const OPTION_COVERAGE_XML_DIR = 'coverage-xml-dir';
+
+    /** @var string */
+    private const OPTION_JUNIT_LOG_FILE = 'junit-log-file';
+
+    /** @var string */
     private const OPTION_MUTATORS = 'mutators';
 
     /** @var string */
@@ -202,8 +208,34 @@ final class RunCommand extends BaseCommand
                 self::OPTION_COVERAGE,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Path to existing coverage directory',
+                sprintf(
+                    'Path to existing coverage directory (conflicts with --%s and --%s)',
+                    self::OPTION_COVERAGE_XML_DIR,
+                    self::OPTION_JUNIT_LOG_FILE
+                ),
                 Container::DEFAULT_EXISTING_COVERAGE_PATH
+            )
+            ->addOption(
+                self::OPTION_COVERAGE_XML_DIR,
+                null,
+                InputOption::VALUE_REQUIRED,
+                sprintf(
+                    'Path to existing xml coverage directory, require --%s (conflicts with --%s)',
+                    self::OPTION_JUNIT_LOG_FILE,
+                    self::OPTION_COVERAGE
+                ),
+                Container::DEFAULT_EXISTING_COVERAGE_XML_PATH
+            )
+            ->addOption(
+                self::OPTION_JUNIT_LOG_FILE,
+                null,
+                InputOption::VALUE_REQUIRED,
+                sprintf(
+                    'Path to existing junit log file, require --%s (conflicts with --%s)',
+                    self::OPTION_COVERAGE_XML_DIR,
+                    self::OPTION_COVERAGE
+                ),
+                Container::DEFAULT_EXISTING_JUNIT_LOG_FILE_PATH
             )
             ->addOption(
                 self::OPTION_MUTATORS,
@@ -354,6 +386,10 @@ final class RunCommand extends BaseCommand
         $configFile = trim((string) $input->getOption(self::OPTION_CONFIGURATION));
 
         $coverage = trim((string) $input->getOption(self::OPTION_COVERAGE));
+        // Get path to xml coverage dir from supplied options
+        $pathToXmlCoverage = trim((string) $input->getOption(self::OPTION_COVERAGE_XML_DIR));
+        // Get path to junit log from supplied options
+        $pathToJunitLogFile = trim((string) $input->getOption(self::OPTION_JUNIT_LOG_FILE));
         $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
         $testFrameworkExtraOptions = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK_OPTIONS));
         $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
@@ -392,6 +428,18 @@ final class RunCommand extends BaseCommand
             );
         }
 
+        // Check that we don't have both --coverage and --coverage-xml-dir --junit-log-file options
+        if ($coverage && ($pathToXmlCoverage || $pathToJunitLogFile)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot use "--%s" or "--%s" at the same time with "--%s"',
+                    self::OPTION_COVERAGE_XML_DIR,
+                    self::OPTION_JUNIT_LOG_FILE,
+                    self::OPTION_COVERAGE
+                )
+            );
+        }
+
         return $this->getApplication()->getContainer()->withValues(
             $logger,
             $io->getOutput(),
@@ -412,6 +460,12 @@ final class RunCommand extends BaseCommand
             $coverage === ''
                 ? Container::DEFAULT_EXISTING_COVERAGE_PATH
                 : $coverage,
+            $pathToXmlCoverage === ''
+                ? Container::DEFAULT_EXISTING_COVERAGE_XML_PATH
+                : $pathToXmlCoverage,
+            $pathToJunitLogFile === ''
+                ? Container::DEFAULT_EXISTING_JUNIT_LOG_FILE_PATH
+                : $pathToJunitLogFile,
             $initialTestsPhpOptions === ''
                 ? Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS
                 : $initialTestsPhpOptions,
@@ -470,6 +524,7 @@ final class RunCommand extends BaseCommand
         if ($customConfigPath = (string) $io->getInput()->getOption(self::OPTION_CONFIGURATION)) {
             $locator->locate($customConfigPath);
         } else {
+            $this->runConfigurationCommand($locator, $io);
             $this->runConfigurationCommand($locator, $io);
         }
 

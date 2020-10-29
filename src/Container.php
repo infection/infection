@@ -168,6 +168,8 @@ final class Container
     public const DEFAULT_NO_PROGRESS = false;
     public const DEFAULT_FORCE_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
+    public const DEFAULT_EXISTING_COVERAGE_XML_PATH = null;
+    public const DEFAULT_EXISTING_JUNIT_LOG_FILE_PATH = null;
     public const DEFAULT_INITIAL_TESTS_PHP_OPTIONS = null;
     public const DEFAULT_SKIP_INITIAL_TESTS = false;
     public const DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS = false;
@@ -268,8 +270,14 @@ final class Container
                 );
             },
             IndexXmlCoverageLocator::class => static function (self $container): IndexXmlCoverageLocator {
+                $coveragePath = $container->getConfiguration()->getXmlCoveragePath();
+
+                if ($coveragePath === null) {
+                    $coveragePath = $container->getConfiguration()->getCoveragePath();
+                }
+
                 return new IndexXmlCoverageLocator(
-                    $container->getConfiguration()->getCoveragePath()
+                    $coveragePath
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
@@ -669,6 +677,8 @@ final class Container
             self::DEFAULT_NO_PROGRESS,
             self::DEFAULT_FORCE_PROGRESS,
             self::DEFAULT_EXISTING_COVERAGE_PATH,
+            self::DEFAULT_EXISTING_COVERAGE_XML_PATH,
+            self::DEFAULT_EXISTING_JUNIT_LOG_FILE_PATH,
             self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
             self::DEFAULT_SKIP_INITIAL_TESTS,
             self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
@@ -699,6 +709,8 @@ final class Container
         bool $noProgress,
         bool $forceProgress,
         ?string $existingCoveragePath,
+        ?string $existingCoverageXmlPath,
+        ?string $existingJunitLogPath,
         ?string $initialTestsPhpOptions,
         bool $skipInitialTests,
         bool $ignoreMsiWithNoMutations,
@@ -767,6 +779,8 @@ final class Container
             Configuration::class,
             static function (self $container) use (
                 $existingCoveragePath,
+                $existingCoverageXmlPath,
+                $existingJunitLogPath,
                 $initialTestsPhpOptions,
                 $skipInitialTests,
                 $logVerbosity,
@@ -788,9 +802,11 @@ final class Container
                 $gitDiffBase,
                 $useGitHubLogger
             ): Configuration {
-                return $container->getConfigurationFactory()->create(
+                $configuration = $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
                     $existingCoveragePath,
+                    $existingCoverageXmlPath,
+                    $existingJunitLogPath,
                     $initialTestsPhpOptions,
                     $skipInitialTests,
                     $logVerbosity,
@@ -812,6 +828,14 @@ final class Container
                     $gitDiffBase,
                     $useGitHubLogger
                 );
+
+                $junitLogPath = $configuration->getJunitLogPath();
+
+                if ($junitLogPath !== null) {
+                    $container->defaultJUnitPath = $junitLogPath;
+                }
+
+                return $configuration;
             }
         );
 

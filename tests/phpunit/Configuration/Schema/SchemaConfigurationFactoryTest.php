@@ -2543,6 +2543,8 @@ JSON
             'bootstrap' => null,
             'initialTestsPhpOptions' => null,
             'testFrameworkOptions' => null,
+            'xmlCoveragePath' => null,
+            'junitLogPath' => null,
         ];
 
         $args = array_values(array_merge($defaultArgs, $args));

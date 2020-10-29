@@ -99,6 +99,16 @@
                 }
             }
         },
+        "xmlCoveragePath": {
+            "type": "string",
+            "default": null,
+            "description": "Path to generated xml coverage"
+        },
+        "junitLogPath": {
+            "type": "string",
+            "default": null,
+            "description": "Path to generated junit log"
+        },
         "ignoreMsiWithNoMutations": {
             "type": "boolean",
             "description": "Ignore MSI violations with zero mutations."
