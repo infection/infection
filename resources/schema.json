@@ -244,6 +244,7 @@
                 "AssignCoalesce": { "$ref": "#/definitions/default-mutator-config" },
                 "Break_": { "$ref": "#/definitions/default-mutator-config" },
                 "Continue_": { "$ref": "#/definitions/default-mutator-config" },
+                "Ternary": { "$ref": "#/definitions/default-mutator-config" },
                 "Throw_": { "$ref": "#/definitions/default-mutator-config" },
                 "Finally_": { "$ref": "#/definitions/default-mutator-config" },
                 "Coalesce": { "$ref": "#/definitions/default-mutator-config" },

@@ -158,6 +158,7 @@ final class ProfileList
         Mutator\Operator\Finally_::class,
         Mutator\Operator\FlipCoalesce::class,
         Mutator\Operator\Spread::class,
+        Mutator\Operator\Ternary::class,
         Mutator\Operator\Throw_::class,
     ];
 
@@ -347,6 +348,7 @@ final class ProfileList
         'Finally_' => Mutator\Operator\Finally_::class,
         'FlipCoalesce' => Mutator\Operator\FlipCoalesce::class,
         'Spread' => Mutator\Operator\Spread::class,
+        'Ternary' => Mutator\Operator\Ternary::class,
         'Throw_' => Mutator\Operator\Throw_::class,
 
         // Regex
