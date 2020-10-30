@@ -97,10 +97,10 @@ final class RunCommand extends BaseCommand
     private const OPTION_COVERAGE = 'coverage';
 
     /** @var string */
-    private const OPTION_COVERAGE_XML_DIR = 'coverage-xml-dir';
+    private const OPTION_COVERAGE_XML_DIR = 'coverage-xml';
 
     /** @var string */
-    private const OPTION_JUNIT_LOG_FILE = 'junit-log-file';
+    private const OPTION_JUNIT_LOG_FILE = 'log-junit';
 
     /** @var string */
     private const OPTION_MUTATORS = 'mutators';
@@ -524,7 +524,6 @@ final class RunCommand extends BaseCommand
         if ($customConfigPath = (string) $io->getInput()->getOption(self::OPTION_CONFIGURATION)) {
             $locator->locate($customConfigPath);
         } else {
-            $this->runConfigurationCommand($locator, $io);
             $this->runConfigurationCommand($locator, $io);
         }
 

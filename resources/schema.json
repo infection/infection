@@ -99,12 +99,12 @@
                 }
             }
         },
-        "xmlCoveragePath": {
+        "xmlCoverage": {
             "type": "string",
             "default": null,
             "description": "Path to generated xml coverage"
         },
-        "junitLogPath": {
+        "logJunit": {
             "type": "string",
             "default": null,
             "description": "Path to generated junit log"

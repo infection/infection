@@ -270,14 +270,10 @@ final class Container
                 );
             },
             IndexXmlCoverageLocator::class => static function (self $container): IndexXmlCoverageLocator {
-                $coveragePath = $container->getConfiguration()->getXmlCoveragePath();
-
-                if ($coveragePath === null) {
-                    $coveragePath = $container->getConfiguration()->getCoveragePath();
-                }
+                $configuration = $container->getConfiguration();
 
                 return new IndexXmlCoverageLocator(
-                    $coveragePath
+                    $configuration->getXmlCoveragePath() ?? $configuration->getCoveragePath()
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
