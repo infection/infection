@@ -69,7 +69,7 @@ class MetricsCalculator
 
     private int $totalMutantsCount = 0;
 
-    private ?\Infection\Metrics\Calculator $calculator = null;
+    private ?Calculator $calculator = null;
 
     public function __construct(int $roundingPrecision)
     {

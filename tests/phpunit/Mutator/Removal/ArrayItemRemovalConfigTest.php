@@ -78,10 +78,11 @@ final class ArrayItemRemovalConfigTest extends TestCase
 
             $this->fail();
         } catch (TypeError $exception) {
-            $this->assertSame(
-                'Typed property Infection\Mutator\Removal\ArrayItemRemovalConfig::$limit must be int, string used',
-                $exception->getMessage()
-            );
+            $message = PHP_VERSION_ID < 80000
+                ? 'Typed property Infection\Mutator\Removal\ArrayItemRemovalConfig::$limit must be int, string used'
+                : 'Cannot assign string to property Infection\Mutator\Removal\ArrayItemRemovalConfig::$limit of type int';
+
+            $this->assertSame($message, $exception->getMessage());
         }
     }
 
