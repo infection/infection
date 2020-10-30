@@ -57,7 +57,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     public const FUNCTION_SCOPE_KEY = 'functionScope';
     public const FUNCTION_NAME = 'functionName';
 
-    /** @var array<int, Node>  */
+    /** @var array<int, Node> */
     private array $functionScopeStack = [];
 
     /**

@@ -436,7 +436,7 @@ final class ProfileList
         'MBString' => Mutator\Extensions\MBString::class,
     ];
 
-    /** @var array<int, string>|null  */
+    /** @var array<int, string>|null */
     private static ?array $defaultProfileMutators = null;
 
     /**

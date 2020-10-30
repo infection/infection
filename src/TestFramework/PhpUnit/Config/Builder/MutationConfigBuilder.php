@@ -61,7 +61,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private ?string $originalBootstrapFile = null;
 
-    private ?\DOMDocument $dom = null;
+    private ?DOMDocument $dom = null;
 
     public function __construct(
         string $tmpDir,
