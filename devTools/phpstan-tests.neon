@@ -17,13 +17,13 @@ parameters:
         - '#Dynamic call to static method PHPUnit\\Framework\\Assert::(.*)#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
         -
-            path: 'tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php'
+            path: '../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php'
             message: '#Function simplexml_load_string is unsafe to use#'
             count: 1
         -
-            path: 'tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php'
+            path: '../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php'
             message: '#Function simplexml_load_string is unsafe to use#'
             count: 1
     level: 4
     paths:
-        - tests/phpunit
+        - ../tests/phpunit

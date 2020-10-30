@@ -3,810 +3,810 @@ parameters:
 		-
 			message: "#^Only booleans are allowed in an if condition, array\\<string\\> given\\.$#"
 			count: 2
-			path: src/Command/ConfigureCommand.php
+			path: ../src/Command/ConfigureCommand.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, string\\|null given\\.$#"
 			count: 3
-			path: src/Command/ConfigureCommand.php
+			path: ../src/Command/ConfigureCommand.php
 
 		-
 			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
 			count: 2
-			path: src/Command/RunCommand.php
+			path: ../src/Command/RunCommand.php
 
 		-
 			message: "#^Only booleans are allowed in a ternary operator condition, string\\|null given\\.$#"
 			count: 1
-			path: src/Config/ConsoleHelper.php
+			path: ../src/Config/ConsoleHelper.php
 
 		-
 			message: "#^Variable property access on mixed\\.$#"
 			count: 4
-			path: src/Config/Guesser/PhpUnitPathGuesser.php
+			path: ../src/Config/Guesser/PhpUnitPathGuesser.php
 
 		-
 			message: "#^Variable property access on mixed\\.$#"
 			count: 3
-			path: src/Config/Guesser/SourceDirGuesser.php
+			path: ../src/Config/Guesser/SourceDirGuesser.php
 
 		-
 			message: "#^Anonymous function should have native return typehint \"string\"\\.$#"
 			count: 1
-			path: src/Config/ValueProvider/ExcludeDirsProvider.php
+			path: ../src/Config/ValueProvider/ExcludeDirsProvider.php
 
 		-
 			message: "#^Anonymous function should have native return typehint \"string\"\\.$#"
 			count: 1
-			path: src/Config/ValueProvider/PhpUnitCustomExecutablePathProvider.php
+			path: ../src/Config/ValueProvider/PhpUnitCustomExecutablePathProvider.php
 
 		-
 			message: "#^Only booleans are allowed in a negated boolean, array\\|float\\|int\\|string\\|false\\|null given\\.$#"
 			count: 1
-			path: src/Config/ValueProvider/PhpUnitCustomExecutablePathProvider.php
+			path: ../src/Config/ValueProvider/PhpUnitCustomExecutablePathProvider.php
 
 		-
 			message: "#^Only booleans are allowed in a ternary operator condition, array\\<string\\> given\\.$#"
 			count: 1
-			path: src/Config/ValueProvider/SourceDirsProvider.php
+			path: ../src/Config/ValueProvider/SourceDirsProvider.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, string given\\.$#"
 			count: 1
-			path: src/Config/ValueProvider/TestFrameworkConfigPathProvider.php
+			path: ../src/Config/ValueProvider/TestFrameworkConfigPathProvider.php
 
 		-
 			message: "#^Only booleans are allowed in a negated boolean, string given\\.$#"
 			count: 1
-			path: src/Config/ValueProvider/TestFrameworkConfigPathProvider.php
+			path: ../src/Config/ValueProvider/TestFrameworkConfigPathProvider.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
 			count: 1
-			path: src/Configuration/Configuration.php
+			path: ../src/Configuration/Configuration.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<string, Infection\\\\Mutator\\\\Mutator\\> and 'Infection\\\\\\\\Mutator\\\\\\\\Mutator' will always evaluate to true\\.$#"
 			count: 1
-			path: src/Configuration/Configuration.php
+			path: ../src/Configuration/Configuration.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
 			count: 2
-			path: src/Configuration/Entry/Source.php
+			path: ../src/Configuration/Entry/Source.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
 			count: 1
-			path: src/Configuration/Schema/InvalidSchema.php
+			path: ../src/Configuration/Schema/InvalidSchema.php
 
 		-
 			message: "#^Anonymous function should have native return typehint \"string\"\\.$#"
 			count: 1
-			path: src/Differ/DiffColorizer.php
+			path: ../src/Differ/DiffColorizer.php
 
 		-
 			message: "#^Call to function is_string\\(\\) with string will always evaluate to true\\.$#"
 			count: 1
-			path: src/Environment/StrykerApiKeyResolver.php
+			path: ../src/Environment/StrykerApiKeyResolver.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, string\\|null given\\.$#"
 			count: 1
-			path: src/FileSystem/Finder/ComposerExecutableFinder.php
+			path: ../src/FileSystem/Finder/ComposerExecutableFinder.php
 
 		-
 			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
 			count: 1
-			path: src/FileSystem/Finder/NonExecutableFinder.php
+			path: ../src/FileSystem/Finder/NonExecutableFinder.php
 
 		-
 			message: "#^Only booleans are allowed in a negated boolean, string\\|false given\\.$#"
 			count: 1
-			path: src/FileSystem/Finder/NonExecutableFinder.php
+			path: ../src/FileSystem/Finder/NonExecutableFinder.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:string\\(\\) with string will always evaluate to true\\.$#"
 			count: 1
-			path: src/FileSystem/Finder/TestFrameworkFinder.php
+			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
 			message: "#^Only booleans are allowed in a negated boolean, string given\\.$#"
 			count: 1
-			path: src/FileSystem/Finder/TestFrameworkFinder.php
+			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
 			message: "#^Only booleans are allowed in a ternary operator condition, string\\|false given\\.$#"
 			count: 1
-			path: src/FileSystem/Finder/TestFrameworkFinder.php
+			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, string\\|null given\\.$#"
 			count: 1
-			path: src/FileSystem/Finder/TestFrameworkFinder.php
+			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
 			count: 1
-			path: src/FileSystem/Finder/TestFrameworkFinder.php
+			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
 			count: 3
-			path: src/FileSystem/Locator/FileNotFound.php
+			path: ../src/FileSystem/Locator/FileNotFound.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
 			count: 3
-			path: src/FileSystem/Locator/FileOrDirectoryNotFound.php
+			path: ../src/FileSystem/Locator/FileOrDirectoryNotFound.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
 			count: 1
-			path: src/FileSystem/Locator/RootsFileLocator.php
+			path: ../src/FileSystem/Locator/RootsFileLocator.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
 			count: 1
-			path: src/FileSystem/Locator/RootsFileOrDirectoryLocator.php
+			path: ../src/FileSystem/Locator/RootsFileOrDirectoryLocator.php
 
 		-
 			message: "#^Parameter \\#1 \\$level \\(string\\) of method Infection\\\\Logger\\\\ConsoleLogger\\:\\:log\\(\\) should be contravariant with parameter \\$level \\(mixed\\) of method Psr\\\\Log\\\\LoggerInterface\\:\\:log\\(\\)$#"
 			count: 2
-			path: src/Logger/ConsoleLogger.php
+			path: ../src/Logger/ConsoleLogger.php
 
 		-
 			message: "#^Variable method call on Infection\\\\Console\\\\IO\\.$#"
 			count: 1
-			path: src/Logger/ConsoleLogger.php
+			path: ../src/Logger/ConsoleLogger.php
 
 		-
 			message: "#^Casting to int\\<0, max\\> something that's already int\\<0, max\\>\\.$#"
 			count: 1
-			path: src/Logger/PerMutatorLogger.php
+			path: ../src/Logger/PerMutatorLogger.php
 
 		-
 			message: "#^Foreach overwrites \\$executionResults with its value variable\\.$#"
 			count: 1
-			path: src/Logger/PerMutatorLogger.php
+			path: ../src/Logger/PerMutatorLogger.php
 
 		-
 			message: "#^Implicit array creation is not allowed \\- variable \\$logs does not exist\\.$#"
 			count: 1
-			path: src/Logger/TextFileLogger.php
+			path: ../src/Logger/TextFileLogger.php
 
 		-
 			message: "#^Only booleans are allowed in &&, float given on the left side\\.$#"
 			count: 2
-			path: src/Metrics/MinMsiChecker.php
+			path: ../src/Metrics/MinMsiChecker.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<Infection\\\\Mutator\\\\Mutator\\> and 'Infection\\\\\\\\Mutator\\\\\\\\Mutator' will always evaluate to true\\.$#"
 			count: 1
-			path: src/Mutation/FileMutationGenerator.php
+			path: ../src/Mutation/FileMutationGenerator.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<Infection\\\\PhpParser\\\\Visitor\\\\IgnoreNode\\\\NodeIgnorer\\> and 'Infection\\\\\\\\PhpParser\\\\\\\\Visitor\\\\\\\\IgnoreNode\\\\\\\\NodeIgnorer' will always evaluate to true\\.$#"
 			count: 1
-			path: src/Mutation/FileMutationGenerator.php
+			path: ../src/Mutation/FileMutationGenerator.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<Infection\\\\Mutator\\\\Mutator\\> and 'Infection\\\\\\\\Mutator\\\\\\\\Mutator' will always evaluate to true\\.$#"
 			count: 1
-			path: src/Mutation/MutationGenerator.php
+			path: ../src/Mutation/MutationGenerator.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:boolean\\(\\) with bool and string will always evaluate to true\\.$#"
 			count: 1
-			path: src/Mutator/AllowedFunctionsConfig.php
+			path: ../src/Mutator/AllowedFunctionsConfig.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\AssignOp\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\Assignment\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Assignment.php
+			path: ../src/Mutator/Arithmetic/Assignment.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Equal\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\AssignmentEqual\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/AssignmentEqual.php
+			path: ../src/Mutator/Arithmetic/AssignmentEqual.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\BooleanAnd\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\BitwiseAnd\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/BitwiseAnd.php
+			path: ../src/Mutator/Arithmetic/BitwiseAnd.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BitwiseNot\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\BitwiseNot\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/BitwiseNot.php
+			path: ../src/Mutator/Arithmetic/BitwiseNot.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\BitwiseOr\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\BitwiseOr\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/BitwiseOr.php
+			path: ../src/Mutator/Arithmetic/BitwiseOr.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\BitwiseXor\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\BitwiseXor\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/BitwiseXor.php
+			path: ../src/Mutator/Arithmetic/BitwiseXor.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\PostDec\\|PhpParser\\\\Node\\\\Expr\\\\PreDec\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\Decrement\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Decrement.php
+			path: ../src/Mutator/Arithmetic/Decrement.php
 
 		-
 			message: "#^Instanceof between PhpParser\\\\Node\\\\Expr\\\\PostDec and PhpParser\\\\Node\\\\Expr\\\\PostDec will always evaluate to true\\.$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Decrement.php
+			path: ../src/Mutator/Arithmetic/Decrement.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\AssignOp\\\\Div\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\DivEqual\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/DivEqual.php
+			path: ../src/Mutator/Arithmetic/DivEqual.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Div\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\Division\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Division.php
+			path: ../src/Mutator/Arithmetic/Division.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Pow\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\Exponentiation\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Exponentiation.php
+			path: ../src/Mutator/Arithmetic/Exponentiation.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\PostInc\\|PhpParser\\\\Node\\\\Expr\\\\PreInc\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\Increment\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Increment.php
+			path: ../src/Mutator/Arithmetic/Increment.php
 
 		-
 			message: "#^Instanceof between PhpParser\\\\Node\\\\Expr\\\\PostInc and PhpParser\\\\Node\\\\Expr\\\\PostInc will always evaluate to true\\.$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Increment.php
+			path: ../src/Mutator/Arithmetic/Increment.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Minus\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\Minus\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Minus.php
+			path: ../src/Mutator/Arithmetic/Minus.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\AssignOp\\\\Minus\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\MinusEqual\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/MinusEqual.php
+			path: ../src/Mutator/Arithmetic/MinusEqual.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\AssignOp\\\\Mod\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\ModEqual\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/ModEqual.php
+			path: ../src/Mutator/Arithmetic/ModEqual.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Mod\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\Modulus\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Modulus.php
+			path: ../src/Mutator/Arithmetic/Modulus.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\AssignOp\\\\Mul\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\MulEqual\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/MulEqual.php
+			path: ../src/Mutator/Arithmetic/MulEqual.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Mul\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\Multiplication\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Multiplication.php
+			path: ../src/Mutator/Arithmetic/Multiplication.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Plus\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\Plus\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/Plus.php
+			path: ../src/Mutator/Arithmetic/Plus.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\AssignOp\\\\Plus\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\PlusEqual\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/PlusEqual.php
+			path: ../src/Mutator/Arithmetic/PlusEqual.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\AssignOp\\\\Pow\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\PowEqual\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/PowEqual.php
+			path: ../src/Mutator/Arithmetic/PowEqual.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\FuncCall\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\RoundingFamily\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/RoundingFamily.php
+			path: ../src/Mutator/Arithmetic/RoundingFamily.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\ShiftLeft\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\ShiftLeft\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/ShiftLeft.php
+			path: ../src/Mutator/Arithmetic/ShiftLeft.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\ShiftRight\\) of method Infection\\\\Mutator\\\\Arithmetic\\\\ShiftRight\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Arithmetic/ShiftRight.php
+			path: ../src/Mutator/Arithmetic/ShiftRight.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\ArrayItem\\) of method Infection\\\\Mutator\\\\Boolean\\\\ArrayItem\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/ArrayItem.php
+			path: ../src/Mutator/Boolean/ArrayItem.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Equal\\) of method Infection\\\\Mutator\\\\Boolean\\\\EqualIdentical\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/EqualIdentical.php
+			path: ../src/Mutator/Boolean/EqualIdentical.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\ConstFetch\\) of method Infection\\\\Mutator\\\\Boolean\\\\FalseValue\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/FalseValue.php
+			path: ../src/Mutator/Boolean/FalseValue.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Identical\\) of method Infection\\\\Mutator\\\\Boolean\\\\IdenticalEqual\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/IdenticalEqual.php
+			path: ../src/Mutator/Boolean/IdenticalEqual.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\LogicalOr\\) of method Infection\\\\Mutator\\\\Boolean\\\\LogicalAnd\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/LogicalAnd.php
+			path: ../src/Mutator/Boolean/LogicalAnd.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\LogicalAnd\\) of method Infection\\\\Mutator\\\\Boolean\\\\LogicalLowerAnd\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/LogicalLowerAnd.php
+			path: ../src/Mutator/Boolean/LogicalLowerAnd.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\LogicalOr\\) of method Infection\\\\Mutator\\\\Boolean\\\\LogicalLowerOr\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/LogicalLowerOr.php
+			path: ../src/Mutator/Boolean/LogicalLowerOr.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BooleanNot\\) of method Infection\\\\Mutator\\\\Boolean\\\\LogicalNot\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/LogicalNot.php
+			path: ../src/Mutator/Boolean/LogicalNot.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\BooleanOr\\) of method Infection\\\\Mutator\\\\Boolean\\\\LogicalOr\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/LogicalOr.php
+			path: ../src/Mutator/Boolean/LogicalOr.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\NotEqual\\) of method Infection\\\\Mutator\\\\Boolean\\\\NotEqualNotIdentical\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/NotEqualNotIdentical.php
+			path: ../src/Mutator/Boolean/NotEqualNotIdentical.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\NotIdentical\\) of method Infection\\\\Mutator\\\\Boolean\\\\NotIdenticalNotEqual\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/NotIdenticalNotEqual.php
+			path: ../src/Mutator/Boolean/NotIdenticalNotEqual.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\ConstFetch\\) of method Infection\\\\Mutator\\\\Boolean\\\\TrueValue\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/Boolean/TrueValue.php
+			path: ../src/Mutator/Boolean/TrueValue.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:boolean\\(\\) with bool and string will always evaluate to true\\.$#"
 			count: 1
-			path: src/Mutator/Boolean/TrueValueConfig.php
+			path: ../src/Mutator/Boolean/TrueValueConfig.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\Yield_\\) of method Infection\\\\Mutator\\\\Boolean\\\\Yield_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Boolean/Yield_.php
+			path: ../src/Mutator/Boolean/Yield_.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\Cast\\) of method Infection\\\\Mutator\\\\Cast\\\\AbstractCastMutator\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Cast/AbstractCastMutator.php
+			path: ../src/Mutator/Cast/AbstractCastMutator.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Greater\\) of method Infection\\\\Mutator\\\\ConditionalBoundary\\\\GreaterThan\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalBoundary/GreaterThan.php
+			path: ../src/Mutator/ConditionalBoundary/GreaterThan.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\GreaterOrEqual\\) of method Infection\\\\Mutator\\\\ConditionalBoundary\\\\GreaterThanOrEqualTo\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalBoundary/GreaterThanOrEqualTo.php
+			path: ../src/Mutator/ConditionalBoundary/GreaterThanOrEqualTo.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Smaller\\) of method Infection\\\\Mutator\\\\ConditionalBoundary\\\\LessThan\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalBoundary/LessThan.php
+			path: ../src/Mutator/ConditionalBoundary/LessThan.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\SmallerOrEqual\\) of method Infection\\\\Mutator\\\\ConditionalBoundary\\\\LessThanOrEqualTo\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalBoundary/LessThanOrEqualTo.php
+			path: ../src/Mutator/ConditionalBoundary/LessThanOrEqualTo.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Equal\\) of method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\Equal\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalNegotiation/Equal.php
+			path: ../src/Mutator/ConditionalNegotiation/Equal.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Greater\\) of method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\GreaterThanNegotiation\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalNegotiation/GreaterThanNegotiation.php
+			path: ../src/Mutator/ConditionalNegotiation/GreaterThanNegotiation.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\GreaterOrEqual\\) of method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\GreaterThanOrEqualToNegotiation\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalNegotiation/GreaterThanOrEqualToNegotiation.php
+			path: ../src/Mutator/ConditionalNegotiation/GreaterThanOrEqualToNegotiation.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Identical\\) of method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\Identical\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalNegotiation/Identical.php
+			path: ../src/Mutator/ConditionalNegotiation/Identical.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Smaller\\) of method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\LessThanNegotiation\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalNegotiation/LessThanNegotiation.php
+			path: ../src/Mutator/ConditionalNegotiation/LessThanNegotiation.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\SmallerOrEqual\\) of method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\LessThanOrEqualToNegotiation\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalNegotiation/LessThanOrEqualToNegotiation.php
+			path: ../src/Mutator/ConditionalNegotiation/LessThanOrEqualToNegotiation.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\NotEqual\\) of method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\NotEqual\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalNegotiation/NotEqual.php
+			path: ../src/Mutator/ConditionalNegotiation/NotEqual.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\NotIdentical\\) of method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\NotIdentical\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ConditionalNegotiation/NotIdentical.php
+			path: ../src/Mutator/ConditionalNegotiation/NotIdentical.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\FuncCall\\) of method Infection\\\\Mutator\\\\Extensions\\\\BCMath\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/Extensions/BCMath.php
+			path: ../src/Mutator/Extensions/BCMath.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\FuncCall\\) of method Infection\\\\Mutator\\\\Extensions\\\\MBString\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/Extensions/MBString.php
+			path: ../src/Mutator/Extensions/MBString.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\ClassMethod\\) of method Infection\\\\Mutator\\\\FunctionSignature\\\\ProtectedVisibility\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/FunctionSignature/ProtectedVisibility.php
+			path: ../src/Mutator/FunctionSignature/ProtectedVisibility.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\ClassMethod\\) of method Infection\\\\Mutator\\\\FunctionSignature\\\\PublicVisibility\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/FunctionSignature/PublicVisibility.php
+			path: ../src/Mutator/FunctionSignature/PublicVisibility.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:isArray\\(\\) with array and string will always evaluate to true\\.$#"
 			count: 1
-			path: src/Mutator/MutatorFactory.php
+			path: ../src/Mutator/MutatorFactory.php
 
 		-
 			message: "#^Casting to string something that's already string\\.$#"
 			count: 1
-			path: src/Mutator/MutatorFactory.php
+			path: ../src/Mutator/MutatorFactory.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<Infection\\\\Mutator\\\\Mutator\\> and 'Infection\\\\\\\\Mutator\\\\\\\\Mutator' will always evaluate to true\\.$#"
 			count: 1
-			path: src/Mutator/NodeMutationGenerator.php
+			path: ../src/Mutator/NodeMutationGenerator.php
 
 		-
 			message: "#^Anonymous function should have native return typehint \"Generator\"\\.$#"
 			count: 1
-			path: src/Mutator/NodeMutationGenerator.php
+			path: ../src/Mutator/NodeMutationGenerator.php
 
 		-
 			message: "#^Only booleans are allowed in a negated boolean, mixed given\\.$#"
 			count: 2
-			path: src/Mutator/NodeMutationGenerator.php
+			path: ../src/Mutator/NodeMutationGenerator.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Scalar\\\\LNumber\\) of method Infection\\\\Mutator\\\\Number\\\\DecrementInteger\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/Number/DecrementInteger.php
+			path: ../src/Mutator/Number/DecrementInteger.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Scalar\\\\LNumber\\) of method Infection\\\\Mutator\\\\Number\\\\IncrementInteger\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/Number/IncrementInteger.php
+			path: ../src/Mutator/Number/IncrementInteger.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Scalar\\\\DNumber\\) of method Infection\\\\Mutator\\\\Number\\\\OneZeroFloat\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/Number/OneZeroFloat.php
+			path: ../src/Mutator/Number/OneZeroFloat.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Scalar\\\\LNumber\\) of method Infection\\\\Mutator\\\\Number\\\\OneZeroInteger\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/Number/OneZeroInteger.php
+			path: ../src/Mutator/Number/OneZeroInteger.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\AssignOp\\\\Coalesce\\) of method Infection\\\\Mutator\\\\Operator\\\\AssignCoalesce\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Operator/AssignCoalesce.php
+			path: ../src/Mutator/Operator/AssignCoalesce.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Break_\\) of method Infection\\\\Mutator\\\\Operator\\\\Break_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Operator/Break_.php
+			path: ../src/Mutator/Operator/Break_.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Coalesce\\) of method Infection\\\\Mutator\\\\Operator\\\\Coalesce\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Operator/Coalesce.php
+			path: ../src/Mutator/Operator/Coalesce.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Continue_\\) of method Infection\\\\Mutator\\\\Operator\\\\Continue_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Operator/Continue_.php
+			path: ../src/Mutator/Operator/Continue_.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Finally_\\) of method Infection\\\\Mutator\\\\Operator\\\\Finally_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Operator/Finally_.php
+			path: ../src/Mutator/Operator/Finally_.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:isInstanceOf\\(\\) with PhpParser\\\\Node\\\\Stmt\\\\TryCatch and 'PhpParser\\\\\\\\Node\\\\\\\\Stmt\\\\\\\\TryCatch' will always evaluate to true\\.$#"
 			count: 1
-			path: src/Mutator/Operator/Finally_.php
+			path: ../src/Mutator/Operator/Finally_.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Coalesce\\) of method Infection\\\\Mutator\\\\Operator\\\\FlipCoalesce\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Operator/FlipCoalesce.php
+			path: ../src/Mutator/Operator/FlipCoalesce.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\ArrayItem\\) of method Infection\\\\Mutator\\\\Operator\\\\Spread\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Operator/Spread.php
+			path: ../src/Mutator/Operator/Spread.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\Ternary\\) of method Infection\\\\Mutator\\\\Operator\\\\Ternary\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Operator/Ternary.php
+			path: ../src/Mutator/Operator/Ternary.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Throw_\\) of method Infection\\\\Mutator\\\\Operator\\\\Throw_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Operator/Throw_.php
+			path: ../src/Mutator/Operator/Throw_.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\FuncCall\\) of method Infection\\\\Mutator\\\\Regex\\\\PregMatchMatches\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Regex/PregMatchMatches.php
+			path: ../src/Mutator/Regex/PregMatchMatches.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\FuncCall\\) of method Infection\\\\Mutator\\\\Regex\\\\PregQuote\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Regex/PregQuote.php
+			path: ../src/Mutator/Regex/PregQuote.php
 
 		-
 			message: "#^Parameter \\#1 \\$arrayNode \\(PhpParser\\\\Node\\\\Expr\\\\Array_\\) of method Infection\\\\Mutator\\\\Removal\\\\ArrayItemRemoval\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/Removal/ArrayItemRemoval.php
+			path: ../src/Mutator/Removal/ArrayItemRemoval.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\Clone_\\) of method Infection\\\\Mutator\\\\Removal\\\\CloneRemoval\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Removal/CloneRemoval.php
+			path: ../src/Mutator/Removal/CloneRemoval.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Expression\\) of method Infection\\\\Mutator\\\\Removal\\\\FunctionCallRemoval\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Removal/FunctionCallRemoval.php
+			path: ../src/Mutator/Removal/FunctionCallRemoval.php
 
 		-
 			message: "#^Call to function in_array\\(\\) requires parameter \\#3 to be set\\.$#"
 			count: 1
-			path: src/Mutator/Removal/FunctionCallRemoval.php
+			path: ../src/Mutator/Removal/FunctionCallRemoval.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Expression\\) of method Infection\\\\Mutator\\\\Removal\\\\MethodCallRemoval\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Removal/MethodCallRemoval.php
+			path: ../src/Mutator/Removal/MethodCallRemoval.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Switch_\\) of method Infection\\\\Mutator\\\\Removal\\\\SharedCaseRemoval\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Removal/SharedCaseRemoval.php
+			path: ../src/Mutator/Removal/SharedCaseRemoval.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Return_\\) of method Infection\\\\Mutator\\\\ReturnValue\\\\ArrayOneItem\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ReturnValue/ArrayOneItem.php
+			path: ../src/Mutator/ReturnValue/ArrayOneItem.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Return_\\) of method Infection\\\\Mutator\\\\ReturnValue\\\\FloatNegation\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ReturnValue/FloatNegation.php
+			path: ../src/Mutator/ReturnValue/FloatNegation.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Return_\\) of method Infection\\\\Mutator\\\\ReturnValue\\\\FunctionCall\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/ReturnValue/FunctionCall.php
+			path: ../src/Mutator/ReturnValue/FunctionCall.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Return_\\) of method Infection\\\\Mutator\\\\ReturnValue\\\\IntegerNegation\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ReturnValue/IntegerNegation.php
+			path: ../src/Mutator/ReturnValue/IntegerNegation.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Return_\\) of method Infection\\\\Mutator\\\\ReturnValue\\\\NewObject\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/ReturnValue/NewObject.php
+			path: ../src/Mutator/ReturnValue/NewObject.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Return_\\) of method Infection\\\\Mutator\\\\ReturnValue\\\\This\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
-			path: src/Mutator/ReturnValue/This.php
+			path: ../src/Mutator/ReturnValue/This.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\Yield_\\) of method Infection\\\\Mutator\\\\ReturnValue\\\\YieldValue\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ReturnValue/YieldValue.php
+			path: ../src/Mutator/ReturnValue/YieldValue.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Spaceship\\) of method Infection\\\\Mutator\\\\Sort\\\\Spaceship\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Sort/Spaceship.php
+			path: ../src/Mutator/Sort/Spaceship.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\FuncCall\\) of method Infection\\\\Mutator\\\\Unwrap\\\\AbstractUnwrapMutator\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/Unwrap/AbstractUnwrapMutator.php
+			path: ../src/Mutator/Unwrap/AbstractUnwrapMutator.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\For_\\) of method Infection\\\\Mutator\\\\ZeroIteration\\\\For_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ZeroIteration/For_.php
+			path: ../src/Mutator/ZeroIteration/For_.php
 
 		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Foreach_\\) of method Infection\\\\Mutator\\\\ZeroIteration\\\\Foreach_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
-			path: src/Mutator/ZeroIteration/Foreach_.php
+			path: ../src/Mutator/ZeroIteration/Foreach_.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<PhpParser\\\\Node\\> and 'PhpParser\\\\\\\\Node' will always evaluate to true\\.$#"
 			count: 1
-			path: src/PhpParser/MutatedNode.php
+			path: ../src/PhpParser/MutatedNode.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:isInstanceOf\\(\\) with PhpParser\\\\Node and 'PhpParser\\\\\\\\Node' will always evaluate to true\\.$#"
 			count: 1
-			path: src/PhpParser/MutatedNode.php
+			path: ../src/PhpParser/MutatedNode.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, mixed given\\.$#"
 			count: 1
-			path: src/PhpParser/Visitor/ReflectionVisitor.php
+			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 
 		-
 			message: "#^Parameter \\#2 \\$env \\(array\\<bool\\|string\\>\\|null\\) of method Infection\\\\Process\\\\OriginalPhpProcess\\:\\:start\\(\\) should be contravariant with parameter \\$env \\(array\\) of method Symfony\\\\Component\\\\Process\\\\Process\\:\\:start\\(\\)$#"
 			count: 1
-			path: src/Process/OriginalPhpProcess.php
+			path: ../src/Process/OriginalPhpProcess.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, string given\\.$#"
 			count: 2
-			path: src/Process/Runner/InitialTestsFailed.php
+			path: ../src/Process/Runner/InitialTestsFailed.php
 
 		-
 			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
 			count: 3
-			path: src/Process/Runner/MutationTestingRunner.php
+			path: ../src/Process/Runner/MutationTestingRunner.php
 
 		-
 			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
 			count: 1
-			path: src/TestFramework/Config/TestFrameworkConfigLocator.php
+			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
 
 		-
 			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
 			count: 1
-			path: src/TestFramework/Coverage/BufferedSourceFileFilter.php
+			path: ../src/TestFramework/Coverage/BufferedSourceFileFilter.php
 
 		-
 			message: "#^Only booleans are allowed in \\|\\|, string given on the right side\\.$#"
 			count: 1
-			path: src/TestFramework/Coverage/CoverageChecker.php
+			path: ../src/TestFramework/Coverage/CoverageChecker.php
 
 		-
 			message: "#^Anonymous function should have native return typehint \"int\"\\.$#"
 			count: 1
-			path: src/TestFramework/Coverage/JUnit/JUnitTestCaseSorter.php
+			path: ../src/TestFramework/Coverage/JUnit/JUnitTestCaseSorter.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:notNull\\(\\) with DOMNodeList\\<DOMElement\\> will always evaluate to true\\.$#"
 			count: 1
-			path: src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php
+			path: ../src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php
 
 		-
 			message: "#^Only numeric types are allowed in \\*, float\\|null given on the left side\\.$#"
 			count: 1
-			path: src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
+			path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:string\\(\\) with string will always evaluate to true\\.$#"
 			count: 1
-			path: src/TestFramework/Coverage/XmlReport/XPathFactory.php
+			path: ../src/TestFramework/Coverage/XmlReport/XPathFactory.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
 			count: 3
-			path: src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
 			message: "#^Only booleans are allowed in \\|\\|, int given on the left side\\.$#"
 			count: 1
-			path: src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
 			message: "#^Only booleans are allowed in \\|\\|, int given on the right side\\.$#"
 			count: 2
-			path: src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
 			message: "#^Parameter \\#7 \\$sourceDirectories \\(array\\<string\\>\\) of method Infection\\\\TestFramework\\\\PhpUnit\\\\Adapter\\\\PhpUnitAdapterFactory\\:\\:create\\(\\) should be contravariant with parameter \\$sourceDirectories \\(array\\) of method Infection\\\\AbstractTestFramework\\\\TestFrameworkAdapterFactory\\:\\:create\\(\\)$#"
 			count: 1
-			path: src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
 		-
 			message: "#^Only booleans are allowed in a negated boolean, int given\\.$#"
 			count: 1
-			path: src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
+			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
 			count: 2
-			path: src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
 		-
 			message: "#^Only booleans are allowed in a negated boolean, DOMElement\\|null given\\.$#"
 			count: 1
-			path: src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
 		-
 			message: "#^Only booleans are allowed in &&, int given on the left side\\.$#"
 			count: 1
-			path: src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, string given\\.$#"
 			count: 1
-			path: src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, string\\|false given\\.$#"
 			count: 1
-			path: src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
 			count: 2
-			path: src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
 			count: 6
-			path: src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
 
 		-
 			message: "#^Variable property access on \\$this\\(Infection\\\\TestFramework\\\\SafeDOMXPath\\)\\.$#"
 			count: 1
-			path: src/TestFramework/SafeDOMXPath.php
+			path: ../src/TestFramework/SafeDOMXPath.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:notNull\\(\\) with string will always evaluate to true\\.$#"
 			count: 1
-			path: src/TestFramework/TestFrameworkExtraOptionsFilter.php
+			path: ../src/TestFramework/TestFrameworkExtraOptionsFilter.php
 
 		-
 			message: "#^Casting to string something that's already string\\.$#"
 			count: 1
-			path: src/TestFramework/TestFrameworkExtraOptionsFilter.php
+			path: ../src/TestFramework/TestFrameworkExtraOptionsFilter.php
 
