@@ -65,7 +65,7 @@ isset($b) ? 'C' : 'B';
 PHP
         ];
 
-        yield 'asd' => [
+        yield 'Mutates ternary expression without values in the if condition' => [
             <<<'PHP'
 <?php
 
