@@ -556,11 +556,6 @@ parameters:
 			path: ../src/Mutator/Operator/Finally_.php
 
 		-
-			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\BinaryOp\\\\Coalesce\\) of method Infection\\\\Mutator\\\\Operator\\\\FlipCoalesce\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
-			count: 1
-			path: ../src/Mutator/Operator/FlipCoalesce.php
-
-		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\ArrayItem\\) of method Infection\\\\Mutator\\\\Operator\\\\Spread\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
 			path: ../src/Mutator/Operator/Spread.php
