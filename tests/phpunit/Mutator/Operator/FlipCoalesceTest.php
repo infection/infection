@@ -139,5 +139,29 @@ $bar ?? $foo ?? $baz ?? 'oof';
 PHP
             ],
         ];
+
+        yield 'It does not mutate when left operator is constant defined through `define` function' => [
+            <<<'PHP'
+<?php
+
+define('FOO', 'foo');
+FOO ?? 'bar';
+PHP
+        ];
+
+        yield 'It does not mutate when left operator is constant defined in class' => [
+            <<<'PHP'
+<?php
+
+new class {
+    private const FOO = 'foo';
+
+    public function getFoo(): string
+    {
+        return self::FOO ?? 'bar';
+    }
+};
+PHP
+        ];
     }
 }

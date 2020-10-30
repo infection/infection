@@ -83,6 +83,8 @@ TXT
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Coalesce;
+        return $node instanceof Node\Expr\BinaryOp\Coalesce
+            && !$node->left instanceof Node\Expr\ConstFetch
+            && !$node->left instanceof Node\Expr\ClassConstFetch;
     }
 }
