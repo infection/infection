@@ -51,93 +51,116 @@ final class CoalesceTest extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield 'Mutate coalesce with scalar values' => [
-            <<<PHP
+        yield 'Mutate coalesce and flip operands' => [
+            <<<'PHP'
 <?php
 
-'value' ?? 'otherValue';
+$foo = 'foo';
+$bar = 'bar';
+$foo ?? $bar;
 PHP
             ,
-            <<<PHP
+            <<<'PHP'
 <?php
 
-'otherValue';
+$foo = 'foo';
+$bar = 'bar';
+$bar ?? $foo;
 PHP
         ];
 
-        yield 'Mutate coalesce when left argument is variable' => [
+        yield 'Mutate more than one coalesce operators and flip operands' => [
             <<<'PHP'
 <?php
 
-$foo = 'value';
-$foo ?? 'otherValue';
+$foo = 'foo';
+$bar = 'bar';
+$baz = 'baz';
+$foo ?? $bar ?? $baz;
 PHP
             ,
+            [
+                <<<'PHP'
+<?php
+
+$foo = 'foo';
+$bar = 'bar';
+$baz = 'baz';
+$foo ?? $baz ?? $bar;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$foo = 'foo';
+$bar = 'bar';
+$baz = 'baz';
+$bar ?? $foo ?? $baz;
+PHP
+            ],
+        ];
+
+        yield 'Mutate more than two coalesce operators and flip operands' => [
             <<<'PHP'
 <?php
 
-$foo = 'value';
-'otherValue';
+$foo = 'foo';
+$bar = 'bar';
+$baz = 'baz';
+$foo ?? $bar ?? $baz ?? 'oof';
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$foo = 'foo';
+$bar = 'bar';
+$baz = 'baz';
+$foo ?? $bar ?? 'oof' ?? $baz;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$foo = 'foo';
+$bar = 'bar';
+$baz = 'baz';
+$foo ?? $baz ?? $bar ?? 'oof';
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$foo = 'foo';
+$bar = 'bar';
+$baz = 'baz';
+$bar ?? $foo ?? $baz ?? 'oof';
+PHP
+            ],
+        ];
+
+        yield 'It does not mutate when left operator is constant defined through `define` function' => [
+            <<<'PHP'
+<?php
+
+define('FOO', 'foo');
+FOO ?? 'bar';
 PHP
         ];
 
-        yield 'Mutate coalesce with expression' => [
-            <<<PHP
-<?php
-
-'value' . 'withConcat' ?? 'otherValue';
-PHP
-            ,
-            <<<PHP
-<?php
-
-'otherValue';
-PHP
-        ];
-
-        yield 'Mutate coalesce with expression as second param' => [
-            <<<PHP
-<?php
-
-'value' ?? 'value' . 'withConcat';
-PHP
-            ,
-            <<<PHP
-<?php
-
-'value' . 'withConcat';
-PHP
-        ];
-
-        yield 'Mutate coalesce with variable as second argument' => [
+        yield 'It does not mutate when left operator is constant defined in class' => [
             <<<'PHP'
 <?php
 
-$foo = 5;
-'value' ?? $foo;
-PHP
-            ,
-            <<<'PHP'
-<?php
+new class {
+    private const FOO = 'foo';
 
-$foo = 5;
-$foo;
-PHP
-        ];
-
-        yield 'Mutate coalesce with constants in a conditional' => [
-            <<<'PHP'
-<?php
-
-if ('value' ?? 5) {
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-if (5) {
-}
+    public function getFoo(): string
+    {
+        return self::FOO ?? 'bar';
+    }
+};
 PHP
         ];
     }
