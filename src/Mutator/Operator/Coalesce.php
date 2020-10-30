@@ -52,20 +52,11 @@ final class Coalesce implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a null coalescing operator (`??`) with its second operand. For example:
-
-```php
-$x = $y ?? $z;
-```
-
-Will be mutated to:
-
-```php
-$x = $z;
-```
+Swaps the coalesce operator (`??`) operands,
+e.g. replaces `$a ?? $b` with `$b ?? $a` or `$a ?? $b ?? $c` with `$b ?? $a ?? $c` and `$a ?? $c ?? $b`.
 TXT
             ,
-            MutatorCategory::SEMANTIC_ADDITION,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );
     }
@@ -79,11 +70,21 @@ TXT
      */
     public function mutate(Node $node): iterable
     {
-        yield $node->right;
+        $left = $node->left;
+        $right = $node->right;
+
+        if ($right instanceof Node\Expr\BinaryOp\Coalesce) {
+            $left = new Node\Expr\BinaryOp\Coalesce($node->left, $right->right, $right->getAttributes());
+            $right = $right->left;
+        }
+
+        yield new Node\Expr\BinaryOp\Coalesce($right, $left, $node->getAttributes());
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Coalesce;
+        return $node instanceof Node\Expr\BinaryOp\Coalesce
+            && !$node->left instanceof Node\Expr\ConstFetch
+            && !$node->left instanceof Node\Expr\ClassConstFetch;
     }
 }
