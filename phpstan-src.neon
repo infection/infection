@@ -1,5 +1,6 @@
 includes:
-    - ../vendor/phpstan/phpstan/conf/bleedingEdge.neon
+    - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+    - phpstan-src-baseline.neon
 
 parameters:
     inferPrivatePropertyTypeFromConstructor: true
@@ -9,28 +10,28 @@ parameters:
         - '#expects .*, array<string>\|bool\|string\|null given#'
         - '#cast array<string>\|bool\|string\|null to#'
         -
-            path: '../src/PhpParser/FileParser.php'
+            path: 'src/PhpParser/FileParser.php'
             message: '#Method Infection\\PhpParser\\FileParser::parse\(\) should return array<PhpParser\\Node> but returns array<PhpParser\\Node\\Stmt>\|null\.#'
             count: 1
         -
-            path: '../src/Reflection/AnonymousClassReflection.php'
+            path: 'src/Reflection/AnonymousClassReflection.php'
             message: '#Parameter \#1 \$argument of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object\, string given\.#'
             count: 1
         -
-            path: '../src/Reflection/CoreClassReflection.php'
+            path: 'src/Reflection/CoreClassReflection.php'
             message: '#Parameter \#1 \$argument of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object\, string given\.#'
             count: 1
         -
-            path: '../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php'
+            path: 'src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php'
             message: '#Function realpath is unsafe to use\.#'
             count: 1
         -
-            path: '../src/Container.php'
+            path: 'src/Container.php'
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
             count: 1
         -
-            path: '../src/FileSystem/DummyFileSystem.php'
+            path: 'src/FileSystem/DummyFileSystem.php'
             message: '#Infection\\FileSystem\\DummyFileSystem#'
     level: max
     paths:
-        - ../src
+        - src
