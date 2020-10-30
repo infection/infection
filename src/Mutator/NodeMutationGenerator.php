@@ -55,12 +55,14 @@ use Webmozart\Assert\Assert;
  */
 class NodeMutationGenerator
 {
-    private $mutators;
-    private $filePath;
-    private $fileNodes;
-    private $trace;
-    private $onlyCovered;
-    private $lineRangeCalculator;
+    /** @var Mutator[] */
+    private array $mutators;
+    private string $filePath;
+    /** @var Node[] */
+    private array $fileNodes;
+    private Trace $trace;
+    private bool $onlyCovered;
+    private LineRangeCalculator $lineRangeCalculator;
 
     /**
      * @param Mutator[] $mutators

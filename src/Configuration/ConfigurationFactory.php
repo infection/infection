@@ -65,12 +65,12 @@ class ConfigurationFactory
      */
     private const DEFAULT_TIMEOUT = 10;
 
-    private $tmpDirProvider;
-    private $mutatorResolver;
-    private $mutatorFactory;
-    private $mutatorParser;
-    private $sourceFileCollector;
-    private $ciDetector;
+    private TmpDirProvider $tmpDirProvider;
+    private MutatorResolver $mutatorResolver;
+    private MutatorFactory $mutatorFactory;
+    private MutatorParser $mutatorParser;
+    private SourceFileCollector $sourceFileCollector;
+    private CiDetector $ciDetector;
 
     public function __construct(
         TmpDirProvider $tmpDirProvider,

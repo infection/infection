@@ -57,20 +57,15 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     public const FUNCTION_SCOPE_KEY = 'functionScope';
     public const FUNCTION_NAME = 'functionName';
 
-    /**
-     * @var Node\Expr\Closure[]|Node\Stmt\ClassMethod[]|Node[]
-     */
-    private $functionScopeStack = [];
+    /** @var array<int, Node> */
+    private array $functionScopeStack = [];
 
     /**
      * @var ClassReflection[]
      */
-    private $classScopeStack = [];
+    private array $classScopeStack = [];
 
-    /**
-     * @var string|null
-     */
-    private $methodName;
+    private ?string $methodName = null;
 
     public function beforeTraverse(array $nodes): ?array
     {

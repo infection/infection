@@ -43,14 +43,11 @@ namespace Infection\TestFramework\Coverage;
  */
 final class UnionTraceProvider implements TraceProvider
 {
-    /**
-     * @var TraceProvider
-     */
-    private $coveredTraceProvider;
+    private TraceProvider $coveredTraceProvider;
 
-    private $uncoveredTraceProvider;
+    private TraceProvider $uncoveredTraceProvider;
 
-    private $onlyCovered;
+    private bool $onlyCovered;
 
     /**
      * @param CoveredTraceProvider|TraceProvider $coveredTraceProvider

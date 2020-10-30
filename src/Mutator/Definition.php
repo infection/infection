@@ -42,9 +42,9 @@ use Webmozart\Assert\Assert;
  */
 final class Definition
 {
-    private $description;
-    private $category;
-    private $remedies;
+    private string $description;
+    private string $category;
+    private ?string $remedies;
 
     /**
      * @param string $description Explanation on what the mutator is about

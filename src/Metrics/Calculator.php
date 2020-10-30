@@ -43,27 +43,18 @@ use function round;
  */
 final class Calculator
 {
-    private $roundingPrecision;
-    private $killedCount;
-    private $errorCount;
-    private $timedOutCount;
-    private $notTestedCount;
-    private $totalCount;
+    private int $roundingPrecision;
+    private int $killedCount;
+    private int $errorCount;
+    private int $timedOutCount;
+    private int $notTestedCount;
+    private int $totalCount;
 
-    /**
-     * @var float|null
-     */
-    private $mutationScoreIndicator;
+    private ?float $mutationScoreIndicator = null;
 
-    /**
-     * @var float|null
-     */
-    private $coverageRate;
+    private ?float $coverageRate = null;
 
-    /**
-     * @var float|null
-     */
-    private $coveredMutationScoreIndicator;
+    private ?float $coveredMutationScoreIndicator = null;
 
     public function __construct(
         int $roundingPrecision,

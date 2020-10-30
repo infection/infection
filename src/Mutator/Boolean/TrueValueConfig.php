@@ -52,7 +52,7 @@ final class TrueValueConfig implements MutatorConfig
     /**
      * @var string[]
      */
-    private $allowedFunctions = [];
+    private array $allowedFunctions = [];
 
     /**
      * @param array<string, bool> $settings

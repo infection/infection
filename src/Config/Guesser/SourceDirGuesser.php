@@ -48,7 +48,7 @@ use stdClass;
  */
 class SourceDirGuesser
 {
-    private $composerJsonContent;
+    private stdClass $composerJsonContent;
 
     public function __construct(stdClass $composerJsonContent)
     {

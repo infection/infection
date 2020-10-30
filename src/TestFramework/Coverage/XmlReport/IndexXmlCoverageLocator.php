@@ -53,13 +53,10 @@ use Webmozart\PathUtil\Path;
  */
 class IndexXmlCoverageLocator
 {
-    private $coveragePath;
-    private $defaultIndexPath;
+    private string $coveragePath;
+    private string $defaultIndexPath;
 
-    /**
-     * @var string|null
-     */
-    private $indexPath;
+    private ?string $indexPath = null;
 
     public function __construct(string $coveragePath)
     {

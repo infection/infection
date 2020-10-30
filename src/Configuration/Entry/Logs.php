@@ -40,12 +40,12 @@ namespace Infection\Configuration\Entry;
  */
 final class Logs
 {
-    private $textLogFilePath;
-    private $summaryLogFilePath;
-    private $jsonLogFilePath;
-    private $debugLogFilePath;
-    private $perMutatorFilePath;
-    private $badge;
+    private ?string $textLogFilePath;
+    private ?string $summaryLogFilePath;
+    private ?string $jsonLogFilePath;
+    private ?string $debugLogFilePath;
+    private ?string $perMutatorFilePath;
+    private ?Badge $badge;
 
     public function __construct(
         ?string $textLogFilePath,

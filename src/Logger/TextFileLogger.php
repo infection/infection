@@ -51,10 +51,10 @@ use function strlen;
  */
 final class TextFileLogger implements LineMutationTestingResultsLogger
 {
-    private $metricsCalculator;
-    private $debugVerbosity;
-    private $onlyCoveredMode;
-    private $debugMode;
+    private MetricsCalculator $metricsCalculator;
+    private bool $debugVerbosity;
+    private bool $onlyCoveredMode;
+    private bool $debugMode;
 
     public function __construct(
         MetricsCalculator $metricsCalculator,

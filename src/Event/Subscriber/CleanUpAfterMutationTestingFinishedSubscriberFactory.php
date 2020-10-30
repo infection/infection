@@ -43,9 +43,9 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class CleanUpAfterMutationTestingFinishedSubscriberFactory implements SubscriberFactory
 {
-    private $debug;
-    private $fileSystem;
-    private $tmpDir;
+    private bool $debug;
+    private Filesystem $fileSystem;
+    private string $tmpDir;
 
     public function __construct(bool $debug, Filesystem $fileSystem, string $tmpDir)
     {

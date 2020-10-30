@@ -53,11 +53,12 @@ use Webmozart\Assert\Assert;
  */
 class MutationGenerator
 {
-    private $traceProvider;
-    private $mutators;
-    private $eventDispatcher;
-    private $fileMutationGenerator;
-    private $runConcurrently;
+    private TraceProvider $traceProvider;
+    /** @var Mutator[] */
+    private array $mutators;
+    private EventDispatcher $eventDispatcher;
+    private FileMutationGenerator $fileMutationGenerator;
+    private bool $runConcurrently;
 
     /**
      * @param Mutator[] $mutators

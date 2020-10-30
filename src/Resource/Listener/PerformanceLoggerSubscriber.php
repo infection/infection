@@ -50,10 +50,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class PerformanceLoggerSubscriber implements EventSubscriber
 {
-    private $stopwatch;
-    private $output;
-    private $timeFormatter;
-    private $memoryFormatter;
+    private Stopwatch $stopwatch;
+    private OutputInterface $output;
+    private TimeFormatter $timeFormatter;
+    private MemoryFormatter $memoryFormatter;
 
     public function __construct(
         Stopwatch $stopwatch,

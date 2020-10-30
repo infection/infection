@@ -47,7 +47,7 @@ use Infection\TestFramework\Coverage\TestLocations;
  */
 class TestLocator
 {
-    private $testLocations;
+    private TestLocations $testLocations;
 
     public function __construct(TestLocations $testLocations)
     {

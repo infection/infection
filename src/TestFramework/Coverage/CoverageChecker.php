@@ -57,14 +57,14 @@ class CoverageChecker
     private const PHPUNIT = 'phpunit';
     private const CODECEPTION = 'codeception';
 
-    private $skipCoverage;
-    private $skipInitialTests;
-    private $initialTestPhpOptions;
-    private $coveragePath;
-    private $jUnitReport;
-    private $jUnitReportLocator;
-    private $frameworkAdapterName;
-    private $indexXmlCoverageLocator;
+    private bool $skipCoverage;
+    private bool $skipInitialTests;
+    private string $initialTestPhpOptions;
+    private string $coveragePath;
+    private bool $jUnitReport;
+    private JUnitReportLocator $jUnitReportLocator;
+    private string $frameworkAdapterName;
+    private IndexXmlCoverageLocator $indexXmlCoverageLocator;
 
     public function __construct(
         bool $skipCoverage,

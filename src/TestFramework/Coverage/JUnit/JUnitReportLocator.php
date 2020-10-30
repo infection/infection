@@ -53,13 +53,10 @@ use Webmozart\PathUtil\Path;
  */
 class JUnitReportLocator
 {
-    private $coveragePath;
-    private $defaultJUnitPath;
+    private string $coveragePath;
+    private string $defaultJUnitPath;
 
-    /**
-     * @var string|null
-     */
-    private $jUnitPath;
+    private ?string $jUnitPath = null;
 
     public function __construct(string $coveragePath, string $defaultJUnitPath)
     {

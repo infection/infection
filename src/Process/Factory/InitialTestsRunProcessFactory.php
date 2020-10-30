@@ -46,7 +46,7 @@ use Symfony\Component\Process\Process;
  */
 class InitialTestsRunProcessFactory
 {
-    private $testFrameworkAdapter;
+    private TestFrameworkAdapter $testFrameworkAdapter;
 
     public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
     {

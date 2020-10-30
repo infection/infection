@@ -54,15 +54,12 @@ use Webmozart\PathUtil\Path;
  */
 class SourceFileInfoProvider
 {
-    private $coverageIndexPath;
-    private $coverageDir;
-    private $relativeCoverageFilePath;
-    private $projectSource;
+    private string $coverageIndexPath;
+    private string $coverageDir;
+    private string $relativeCoverageFilePath;
+    private string $projectSource;
 
-    /**
-     * @var SafeDOMXPath|null
-     */
-    private $xPath;
+    private ?SafeDOMXPath $xPath = null;
 
     public function __construct(
         string $coverageIndexPath,

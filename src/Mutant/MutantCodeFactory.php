@@ -47,7 +47,7 @@ use PhpParser\PrettyPrinterAbstract;
  */
 class MutantCodeFactory
 {
-    private $printer;
+    private PrettyPrinterAbstract $printer;
 
     public function __construct(PrettyPrinterAbstract $prettyPrinter)
     {

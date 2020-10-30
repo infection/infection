@@ -49,7 +49,7 @@ final class FunctionCallRemoval implements Mutator
     use GetMutatorName;
 
     /** @var string[] */
-    private $doNotRemoveFunctions = [
+    private array $doNotRemoveFunctions = [
         'assert',
         'closedir',
         'curl_close',

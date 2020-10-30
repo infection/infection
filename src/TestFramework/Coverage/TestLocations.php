@@ -42,8 +42,10 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
  */
 final class TestLocations
 {
-    private $byLine;
-    private $byMethod;
+    /** @var array<int, array<int, TestLocation>> */
+    private array $byLine;
+    /** @var array<string, SourceMethodLineRange> */
+    private array $byMethod;
 
     /**
      * @param array<int, array<int, TestLocation>> $testLocationsBySourceLine

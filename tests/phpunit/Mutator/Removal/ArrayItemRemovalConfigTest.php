@@ -39,6 +39,7 @@ use Infection\Mutator\Removal\ArrayItemRemovalConfig;
 use InvalidArgumentException;
 use const PHP_INT_MAX;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 final class ArrayItemRemovalConfigTest extends TestCase
 {
@@ -76,11 +77,12 @@ final class ArrayItemRemovalConfigTest extends TestCase
             new ArrayItemRemovalConfig(['limit' => 'foo']);
 
             $this->fail();
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Expected the limit to be an integer. Got "string" instead',
-                $exception->getMessage()
-            );
+        } catch (TypeError $exception) {
+            $message = PHP_VERSION_ID < 80000
+                ? 'Typed property Infection\Mutator\Removal\ArrayItemRemovalConfig::$limit must be int, string used'
+                : 'Cannot assign string to property Infection\Mutator\Removal\ArrayItemRemovalConfig::$limit of type int';
+
+            $this->assertSame($message, $exception->getMessage());
         }
     }
 

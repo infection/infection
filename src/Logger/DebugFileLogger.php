@@ -51,8 +51,8 @@ use function strlen;
  */
 final class DebugFileLogger implements LineMutationTestingResultsLogger
 {
-    private $metricsCalculator;
-    private $onlyCoveredMode;
+    private MetricsCalculator $metricsCalculator;
+    private bool $onlyCoveredMode;
 
     public function __construct(MetricsCalculator $metricsCalculator, bool $onlyCoveredMode)
     {

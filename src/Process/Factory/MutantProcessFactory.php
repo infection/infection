@@ -50,10 +50,10 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcessFactory
 {
-    private $testFrameworkAdapter;
-    private $timeout;
-    private $eventDispatcher;
-    private $resultFactory;
+    private TestFrameworkAdapter $testFrameworkAdapter;
+    private float $timeout;
+    private EventDispatcher $eventDispatcher;
+    private MutantExecutionResultFactory $resultFactory;
 
     // TODO: is it necessary for the timeout to be an int?
     public function __construct(

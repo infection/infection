@@ -49,7 +49,7 @@ class ConsoleOutput
     private const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
     private const MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percentage points over the required %s. Consider increasing the required %s percentage the next time you run Infection.';
 
-    private $logger;
+    private ConsoleLogger $logger;
 
     public function __construct(ConsoleLogger $logger)
     {

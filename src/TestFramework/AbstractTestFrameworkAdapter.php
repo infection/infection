@@ -47,13 +47,13 @@ use Symfony\Component\Process\Process;
  */
 abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 {
-    private $testFrameworkExecutable;
-    private $argumentsAndOptionsBuilder;
-    private $initialConfigBuilder;
-    private $mutationConfigBuilder;
-    private $versionParser;
-    private $commandLineBuilder;
-    private $version;
+    private string $testFrameworkExecutable;
+    private CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder;
+    private InitialConfigBuilder $initialConfigBuilder;
+    private MutationConfigBuilder $mutationConfigBuilder;
+    private VersionParser $versionParser;
+    private CommandLineBuilder $commandLineBuilder;
+    private ?string $version;
 
     public function __construct(
         string $testFrameworkExecutable,

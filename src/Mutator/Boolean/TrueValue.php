@@ -56,7 +56,7 @@ final class TrueValue implements ConfigurableMutator
     /**
      * @var array<string, int>
      */
-    private $allowedFunctions;
+    private array $allowedFunctions;
 
     public function __construct(TrueValueConfig $config)
     {

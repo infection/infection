@@ -43,7 +43,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
  */
 final class ProgressFormatter extends AbstractOutputFormatter
 {
-    private $progressBar;
+    private ProgressBar $progressBar;
 
     public function __construct(ProgressBar $progressBar)
     {

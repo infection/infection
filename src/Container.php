@@ -172,22 +172,19 @@ final class Container
     /**
      * @var array<class-string<object>, true>
      */
-    private $keys = [];
+    private array $keys = [];
 
     /**
      * @var array<class-string<object>, object>
      */
-    private $values = [];
+    private array $values = [];
 
     /**
      * @var array<class-string<object>, Closure(self): object>
      */
-    private $factories = [];
+    private array $factories = [];
 
-    /**
-     * @var string|null
-     */
-    private $defaultJUnitPath;
+    private ?string $defaultJUnitPath = null;
 
     /**
      * @param array<class-string<object>, Closure(self): object> $values

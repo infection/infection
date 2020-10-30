@@ -47,10 +47,7 @@ use Webmozart\Assert\Assert;
  */
 abstract class BaseCommand extends Command
 {
-    /**
-     * @var IO|null
-     */
-    private $io;
+    private ?IO $io = null;
 
     final public function getApplication(): Application
     {

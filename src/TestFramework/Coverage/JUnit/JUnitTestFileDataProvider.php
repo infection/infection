@@ -48,12 +48,9 @@ use Webmozart\Assert\Assert;
  */
 final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
-    private $jUnitLocator;
+    private JUnitReportLocator $jUnitLocator;
 
-    /**
-     * @var SafeDOMXPath|null
-     */
-    private $xPath;
+    private ?SafeDOMXPath $xPath = null;
 
     public function __construct(JUnitReportLocator $jUnitLocator)
     {

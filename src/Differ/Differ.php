@@ -47,7 +47,7 @@ use SebastianBergmann\Diff\Differ as BaseDiffer;
  */
 class Differ
 {
-    private $differ;
+    private BaseDiffer $differ;
 
     public function __construct(BaseDiffer $differ)
     {

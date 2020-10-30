@@ -48,8 +48,9 @@ use Webmozart\PathUtil\Path;
  */
 final class RootsFileLocator implements Locator
 {
-    private $roots;
-    private $filesystem;
+    /** @var string[] */
+    private array $roots;
+    private \Symfony\Component\Filesystem\Filesystem $filesystem;
 
     /**
      * @param string[] $roots

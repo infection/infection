@@ -48,7 +48,7 @@ final class ParentConnectorVisitor implements NodeVisitor
     /**
      * @var Node[]
      */
-    private $stack = [];
+    private array $stack = [];
 
     public function beforeTraverse(array $nodes): ?array
     {

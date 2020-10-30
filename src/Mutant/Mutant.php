@@ -44,11 +44,11 @@ use Infection\Mutation\Mutation;
  */
 class Mutant
 {
-    private $mutantFilePath;
-    private $mutation;
-    private $mutatedCode;
-    private $diff;
-    private $prettyPrintedOriginalCode;
+    private string $mutantFilePath;
+    private Mutation $mutation;
+    private string $mutatedCode;
+    private string $diff;
+    private string $prettyPrintedOriginalCode;
 
     public function __construct(
         string $mutantFilePath,
