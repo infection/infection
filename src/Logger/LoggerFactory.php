@@ -54,13 +54,13 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class LoggerFactory
 {
-    private $metricsCalculator;
-    private $filesystem;
-    private $logVerbosity;
-    private $debugMode;
-    private $onlyCoveredCode;
-    private $ciDetector;
-    private $logger;
+    private MetricsCalculator $metricsCalculator;
+    private Filesystem $filesystem;
+    private string $logVerbosity;
+    private bool $debugMode;
+    private bool $onlyCoveredCode;
+    private CiDetector $ciDetector;
+    private LoggerInterface $logger;
 
     public function __construct(
         MetricsCalculator $metricsCalculator,

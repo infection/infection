@@ -67,7 +67,7 @@ final class Application extends BaseApplication
 
 ';
 
-    private $container;
+    private Container $container;
 
     public function __construct(Container $container)
     {

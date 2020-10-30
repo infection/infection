@@ -55,7 +55,7 @@ final class NodeLineRangeData
     /**
      * @var array<int, int>
      */
-    public $range;
+    public array $range;
 
     public function __construct(int $start, int $end)
     {

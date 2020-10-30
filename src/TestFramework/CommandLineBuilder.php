@@ -49,10 +49,8 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 class CommandLineBuilder
 {
-    /**
-     * @var string[]|null
-     */
-    private $cachedPhpCmdLine;
+    /** @var string[]|null */
+    private ?array $cachedPhpCmdLine = null;
 
     /**
      * @param string[] $frameworkArgs

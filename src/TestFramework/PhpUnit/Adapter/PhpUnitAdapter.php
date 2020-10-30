@@ -57,9 +57,9 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
-    private $tmpDir;
+    private string $tmpDir;
 
-    private $jUnitFilePath;
+    private string $jUnitFilePath;
 
     public function __construct(
         string $testFrameworkExecutable,

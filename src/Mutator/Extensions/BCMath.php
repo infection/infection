@@ -57,7 +57,7 @@ final class BCMath implements ConfigurableMutator
     /**
      * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr>>
      */
-    private $converters;
+    private array $converters;
 
     public function __construct(BCMathConfig $config)
     {

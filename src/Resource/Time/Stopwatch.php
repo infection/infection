@@ -45,10 +45,7 @@ use Webmozart\Assert\Assert;
  */
 final class Stopwatch
 {
-    /**
-     * @var float|null
-     */
-    private $microTime;
+    private ?float $microTime = null;
 
     public function start(): void
     {

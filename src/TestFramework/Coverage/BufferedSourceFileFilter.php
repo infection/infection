@@ -56,14 +56,14 @@ use Webmozart\Assert\Assert;
  */
 class BufferedSourceFileFilter implements FileFilter
 {
-    private $filter;
+    private FileFilter $filter;
 
     /**
      * An associative array mapping real paths to SplFileInfo objects.
      *
      * @var array<string, SplFileInfo>
      */
-    private $sourceFiles = [];
+    private array $sourceFiles = [];
 
     /**
      * @param SourceFileFilter|FileFilter $filter

@@ -57,8 +57,8 @@ use Webmozart\Assert\Assert;
  */
 final class XmlConfigurationManipulator
 {
-    private $pathReplacer;
-    private $phpUnitConfigDir;
+    private PathReplacer $pathReplacer;
+    private string $phpUnitConfigDir;
 
     public function __construct(PathReplacer $pathReplacer, string $phpUnitConfigDir)
     {

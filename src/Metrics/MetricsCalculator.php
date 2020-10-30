@@ -46,54 +46,30 @@ use function Safe\sprintf;
  */
 class MetricsCalculator
 {
-    private $roundingPrecision;
-    private $killedExecutionResults;
-    private $errorExecutionResults;
-    private $escapedExecutionResults;
-    private $timedOutExecutionResults;
-    private $skippedExecutionResults;
-    private $notCoveredExecutionResults;
-    private $allExecutionResults;
+    private int $roundingPrecision;
+    private SortableMutantExecutionResults $killedExecutionResults;
+    private SortableMutantExecutionResults $errorExecutionResults;
+    private SortableMutantExecutionResults $escapedExecutionResults;
+    private SortableMutantExecutionResults $timedOutExecutionResults;
+    private SortableMutantExecutionResults $skippedExecutionResults;
+    private SortableMutantExecutionResults $notCoveredExecutionResults;
+    private SortableMutantExecutionResults $allExecutionResults;
 
-    /**
-     * @var int
-     */
-    private $killedCount = 0;
+    private int $killedCount = 0;
 
-    /**
-     * @var int
-     */
-    private $errorCount = 0;
+    private int $errorCount = 0;
 
-    /**
-     * @var int
-     */
-    private $skippedCount = 0;
+    private int $skippedCount = 0;
 
-    /**
-     * @var int
-     */
-    private $escapedCount = 0;
+    private int $escapedCount = 0;
 
-    /**
-     * @var int
-     */
-    private $timedOutCount = 0;
+    private int $timedOutCount = 0;
 
-    /**
-     * @var int
-     */
-    private $notCoveredByTestsCount = 0;
+    private int $notCoveredByTestsCount = 0;
 
-    /**
-     * @var int
-     */
-    private $totalMutantsCount = 0;
+    private int $totalMutantsCount = 0;
 
-    /**
-     * @var Calculator|null
-     */
-    private $calculator;
+    private ?\Infection\Metrics\Calculator $calculator = null;
 
     public function __construct(int $roundingPrecision)
     {

@@ -45,15 +45,15 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResult
 {
-    private $processCommandLine;
-    private $processOutput;
-    private $detectionStatus;
-    private $mutantDiff;
-    private $mutatorName;
-    private $originalFilePath;
-    private $originalStartingLine;
-    private $originalCode;
-    private $mutatedCode;
+    private string $processCommandLine;
+    private string $processOutput;
+    private string $detectionStatus;
+    private string $mutantDiff;
+    private string $mutatorName;
+    private string $originalFilePath;
+    private int $originalStartingLine;
+    private string $originalCode;
+    private string $mutatedCode;
 
     public function __construct(
         string $processCommandLine,

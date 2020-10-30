@@ -45,7 +45,7 @@ use Infection\Metrics\MetricsCalculator;
  */
 final class SummaryFileLogger implements LineMutationTestingResultsLogger
 {
-    private $metricsCalculator;
+    private MetricsCalculator $metricsCalculator;
 
     public function __construct(MetricsCalculator $metricsCalculator)
     {

@@ -63,7 +63,7 @@ class TestFrameworkFinder
     /**
      * @var array<string, string>
      */
-    private $cachedPath = [];
+    private array $cachedPath = [];
 
     public function find(string $testFrameworkName, string $customPath = ''): string
     {

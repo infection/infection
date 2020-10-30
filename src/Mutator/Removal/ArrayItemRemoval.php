@@ -56,7 +56,7 @@ final class ArrayItemRemoval implements ConfigurableMutator
     use GetMutatorName;
     use GetConfigClassName;
 
-    private $config;
+    private ArrayItemRemovalConfig $config;
 
     public function __construct(ArrayItemRemovalConfig $config)
     {

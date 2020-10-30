@@ -53,9 +53,9 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
  */
 final class SourceDirsProvider
 {
-    private $consoleHelper;
-    private $questionHelper;
-    private $sourceDirGuesser;
+    private ConsoleHelper $consoleHelper;
+    private QuestionHelper $questionHelper;
+    private SourceDirGuesser $sourceDirGuesser;
 
     public function __construct(
         ConsoleHelper $consoleHelper,

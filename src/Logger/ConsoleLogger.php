@@ -86,7 +86,7 @@ final class ConsoleLogger extends AbstractLogger
         LogLevel::NOTICE => 'note',
     ];
 
-    private $io;
+    private \Infection\Console\IO $io;
 
     public function __construct(IO $io)
     {

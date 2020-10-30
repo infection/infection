@@ -40,7 +40,7 @@ namespace Infection\Configuration\Entry;
  */
 final class Badge
 {
-    private $branch;
+    private string $branch;
 
     public function __construct(string $branch)
     {

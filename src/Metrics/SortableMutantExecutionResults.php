@@ -46,12 +46,9 @@ final class SortableMutantExecutionResults
     /**
      * @var MutantExecutionResult[]
      */
-    private $executionResults = [];
+    private array $executionResults = [];
 
-    /**
-     * @var bool
-     */
-    private $sorted = false;
+    private bool $sorted = false;
 
     public function add(MutantExecutionResult $executionResult): void
     {

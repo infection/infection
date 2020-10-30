@@ -46,8 +46,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
 {
-    private $output;
-    private $progressBar;
+    private OutputInterface $output;
+    private ProgressBar $progressBar;
 
     public function __construct(OutputInterface $output)
     {

@@ -43,7 +43,7 @@ use Infection\Logger\MutationTestingResultsLogger;
  */
 final class MutationTestingResultsLoggerSubscriber implements EventSubscriber
 {
-    private $logger;
+    private MutationTestingResultsLogger $logger;
 
     public function __construct(MutationTestingResultsLogger $logger)
     {

@@ -44,8 +44,8 @@ use function Safe\sprintf;
  */
 class StrykerDashboardClient
 {
-    private $client;
-    private $logger;
+    private StrykerCurlClient $client;
+    private LoggerInterface $logger;
 
     public function __construct(StrykerCurlClient $client, LoggerInterface $logger)
     {

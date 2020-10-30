@@ -45,10 +45,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
-    private $metricsCalculator;
-    private $diffColorizer;
-    private $showMutations;
-    private $formatter;
+    private MetricsCalculator $metricsCalculator;
+    private DiffColorizer $diffColorizer;
+    private bool $showMutations;
+    private OutputFormatter $formatter;
 
     public function __construct(
         MetricsCalculator $metricsCalculator,

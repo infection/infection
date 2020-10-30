@@ -50,11 +50,12 @@ use Webmozart\Assert\Assert;
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
-    private $tmpDir;
-    private $originalXmlConfigContent;
-    private $configManipulator;
-    private $versionProvider;
-    private $srcDirs;
+    private string $tmpDir;
+    private string $originalXmlConfigContent;
+    private XmlConfigurationManipulator $configManipulator;
+    private XmlConfigurationVersionProvider $versionProvider;
+    /** @var string[] */
+    private array $srcDirs;
 
     /**
      * @param string[] $srcDirs

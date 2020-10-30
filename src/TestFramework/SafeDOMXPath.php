@@ -48,11 +48,9 @@ use Webmozart\Assert\Assert;
  */
 final class SafeDOMXPath
 {
-    /** @var DOMDocument */
-    private $document;
+    private \DOMDocument $document;
 
-    /** @var DOMXPath */
-    private $xPath;
+    private \DOMXPath $xPath;
 
     public function __construct(DOMDocument $document)
     {

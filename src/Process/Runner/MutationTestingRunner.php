@@ -56,16 +56,16 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MutationTestingRunner
 {
-    private $processFactory;
-    private $mutantFactory;
-    private $processRunner;
-    private $eventDispatcher;
-    private $fileSystem;
-    private $diffSourceCodeMatcher;
-    private $runConcurrently;
-    private $timeout;
+    private MutantProcessFactory $processFactory;
+    private MutantFactory $mutantFactory;
+    private ProcessRunner $processRunner;
+    private EventDispatcher $eventDispatcher;
+    private Filesystem $fileSystem;
+    private DiffSourceCodeMatcher $diffSourceCodeMatcher;
+    private bool $runConcurrently;
+    private float $timeout;
     /** @var array<string, array<int, string>> */
-    private $ignoreSourceCodeMutatorsMap;
+    private array $ignoreSourceCodeMutatorsMap;
 
     /**
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap

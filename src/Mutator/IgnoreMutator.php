@@ -55,8 +55,8 @@ use function Safe\sprintf;
  */
 final class IgnoreMutator implements Mutator
 {
-    private $config;
-    private $mutator;
+    private IgnoreConfig $config;
+    private Mutator $mutator;
 
     public function __construct(IgnoreConfig $config, Mutator $mutator)
     {

@@ -47,8 +47,9 @@ use Webmozart\PathUtil\Path;
  */
 final class RootsFileOrDirectoryLocator implements Locator
 {
-    private $roots;
-    private $filesystem;
+    /** @var string[] */
+    private array $roots;
+    private Filesystem $filesystem;
 
     /**
      * @param string[] $roots

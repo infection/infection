@@ -47,12 +47,9 @@ use stdClass;
  */
 final class SchemaConfigurationFile
 {
-    private $path;
+    private string $path;
 
-    /**
-     * @var stdClass|null
-     */
-    private $decodedContents;
+    private ?stdClass $decodedContents = null;
 
     public function __construct(string $path)
     {

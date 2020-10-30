@@ -55,9 +55,9 @@ use function trim;
  */
 final class PhpUnitCustomExecutablePathProvider
 {
-    private $phpUnitExecutableFinder;
-    private $consoleHelper;
-    private $questionHelper;
+    private TestFrameworkFinder $phpUnitExecutableFinder;
+    private ConsoleHelper $consoleHelper;
+    private QuestionHelper $questionHelper;
 
     public function __construct(TestFrameworkFinder $phpUnitExecutableFinder, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
     {

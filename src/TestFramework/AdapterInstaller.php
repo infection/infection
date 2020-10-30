@@ -52,7 +52,7 @@ final class AdapterInstaller
 
     private const TIMEOUT = 120.0; // 2 minutes
 
-    private $composerExecutableFinder;
+    private ComposerExecutableFinder $composerExecutableFinder;
 
     public function __construct(ComposerExecutableFinder $composerExecutableFinder)
     {

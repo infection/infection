@@ -48,25 +48,16 @@ use Webmozart\Assert\Assert;
  */
 class ProxyTrace implements Trace
 {
-    /**
-     * @var SplFileInfo
-     */
-    private $sourceFile;
+    private SplFileInfo $sourceFile;
 
-    /**
-     * @var TestLocations|null
-     */
-    private $testLocations;
+    private ?TestLocations $testLocations = null;
 
     /**
      * @var iterable<TestLocations>
      */
-    private $lazyTestLocations;
+    private iterable $lazyTestLocations;
 
-    /**
-     * @var TestLocator|null
-     */
-    private $tests;
+    private ?TestLocator $tests = null;
 
     /**
      * @param iterable<TestLocations> $lazyTestLocations

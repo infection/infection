@@ -46,20 +46,21 @@ use Webmozart\Assert\Assert;
  */
 final class SchemaConfiguration
 {
-    private $file;
-    private $timeout;
-    private $source;
-    private $logs;
-    private $tmpDir;
-    private $phpUnit;
-    private $ignoreMsiWithNoMutations;
-    private $minMsi;
-    private $minCoveredMsi;
-    private $mutators;
-    private $testFramework;
-    private $bootstrap;
-    private $initialTestsPhpOptions;
-    private $testFrameworkExtraOptions;
+    private string $file;
+    private ?float $timeout;
+    private Source $source;
+    private Logs $logs;
+    private ?string $tmpDir;
+    private PhpUnit $phpUnit;
+    private ?bool $ignoreMsiWithNoMutations;
+    private ?float $minMsi;
+    private ?float $minCoveredMsi;
+    /** @var array<string, mixed> */
+    private array $mutators;
+    private ?string $testFramework;
+    private ?string $bootstrap;
+    private ?string $initialTestsPhpOptions;
+    private ?string $testFrameworkExtraOptions;
 
     /**
      * @param array<string, mixed> $mutators

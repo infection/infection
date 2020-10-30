@@ -48,7 +48,7 @@ final class NonMutableNodesIgnorerVisitor extends NodeVisitorAbstract
     /**
      * @var NodeIgnorer[]
      */
-    private $nodeIgnorers;
+    private array $nodeIgnorers;
 
     /**
      * @param NodeIgnorer[] $nodeIgnorers

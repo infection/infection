@@ -51,10 +51,10 @@ final class ParallelProcessRunner implements ProcessRunner
     /**
      * @var ProcessBearer[]
      */
-    private $runningProcesses = [];
+    private array $runningProcesses = [];
 
-    private $threadCount;
-    private $poll;
+    private int $threadCount;
+    private int $poll;
 
     /**
      * @param int $poll Delay (in milliseconds) to wait in-between two polls

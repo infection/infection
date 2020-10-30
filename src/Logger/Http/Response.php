@@ -44,8 +44,8 @@ final class Response
 {
     public const CREATED_RESPONSE_CODE = 201;
 
-    private $statusCode;
-    private $body;
+    private int $statusCode;
+    private string $body;
 
     public function __construct(int $statusCode, string $body)
     {

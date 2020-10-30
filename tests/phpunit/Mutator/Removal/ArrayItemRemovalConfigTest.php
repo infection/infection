@@ -76,9 +76,9 @@ final class ArrayItemRemovalConfigTest extends TestCase
             new ArrayItemRemovalConfig(['limit' => 'foo']);
 
             $this->fail();
-        } catch (InvalidArgumentException $exception) {
+        } catch (\TypeError $exception) {
             $this->assertSame(
-                'Expected the limit to be an integer. Got "string" instead',
+                'Typed property Infection\Mutator\Removal\ArrayItemRemovalConfig::$limit must be int, string used',
                 $exception->getMessage()
             );
         }

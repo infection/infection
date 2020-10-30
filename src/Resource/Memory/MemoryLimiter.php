@@ -48,9 +48,9 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MemoryLimiter
 {
-    private $fileSystem;
-    private $phpIniPath;
-    private $environment;
+    private Filesystem $fileSystem;
+    private string $phpIniPath;
+    private MemoryLimiterEnvironment $environment;
 
     public function __construct(
         Filesystem $fileSystem,

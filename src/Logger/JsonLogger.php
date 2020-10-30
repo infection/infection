@@ -47,8 +47,8 @@ use function mb_convert_encoding;
  */
 final class JsonLogger implements LineMutationTestingResultsLogger
 {
-    private $metricsCalculator;
-    private $onlyCoveredMode;
+    private MetricsCalculator $metricsCalculator;
+    private bool $onlyCoveredMode;
 
     public function __construct(
         MetricsCalculator $metricsCalculator,

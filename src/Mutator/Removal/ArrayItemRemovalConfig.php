@@ -50,8 +50,8 @@ final class ArrayItemRemovalConfig implements MutatorConfig
         'all',
     ];
 
-    private $remove;
-    private $limit;
+    private string $remove;
+    private int $limit;
 
     /**
      * @param array{remove: string|null, limit: int|null} $settings

@@ -47,15 +47,15 @@ use function Safe\sprintf;
  */
 class MutantFactory
 {
-    private $tmpDir;
-    private $differ;
-    private $printer;
+    private string $tmpDir;
+    private Differ $differ;
+    private PrettyPrinterAbstract $printer;
 
     /**
      * @var string[]
      */
-    private $printedFileCache = [];
-    private $mutantCodeFactory;
+    private array $printedFileCache = [];
+    private MutantCodeFactory $mutantCodeFactory;
 
     public function __construct(
         string $tmpDir,

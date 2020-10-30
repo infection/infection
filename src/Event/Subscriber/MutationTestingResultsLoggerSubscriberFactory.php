@@ -44,8 +44,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
 {
-    private $loggerFactory;
-    private $logsConfig;
+    private LoggerFactory $loggerFactory;
+    private Logs $logsConfig;
 
     public function __construct(LoggerFactory $loggerFactory, Logs $logsConfig)
     {

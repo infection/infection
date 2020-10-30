@@ -48,7 +48,7 @@ final class JUnitTestCaseTimeAdder
     /**
      * @var TestLocation[]
      */
-    private $tests;
+    private array $tests;
 
     /**
      * @param TestLocation[] $tests
