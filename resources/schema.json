@@ -357,6 +357,7 @@
                 "UnwrapStrShuffle": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrToLower": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrToUpper": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapSubstr": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapTrim": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapUcFirst": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapUcWords": { "$ref": "#/definitions/default-mutator-config" },
