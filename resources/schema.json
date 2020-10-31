@@ -350,6 +350,7 @@
                 "UnwrapArrayValues": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapLcFirst": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapLtrim": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapRtrim": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrIreplace": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrRepeat": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrReplace": { "$ref": "#/definitions/default-mutator-config" },
