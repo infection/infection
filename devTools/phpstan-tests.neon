@@ -1,3 +1,6 @@
+includes:
+    - phpstan-tests-baseline.neon
+
 parameters:
     parallel:
         processTimeout: 120.0
@@ -11,6 +14,7 @@ parameters:
         - '#Return type \((void|mixed)\) of method .*(Visitor|Traverser).* should be compatible with return type .* of method PhpParser\\Node.*#'
         - '#^Cannot call method (willReturn|shouldBeCalledTimes)\(\) on iterable<Infection\\Mutation\\Mutation>\.$#'
         - '#Offset .*\\.* does not exist on array<class-string<.*>.*#'
+        - '#Dynamic call to static method PHPUnit\\Framework\\Assert::(.*)#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
         -
             path: '../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php'
