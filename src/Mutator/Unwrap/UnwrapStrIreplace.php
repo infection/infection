@@ -42,22 +42,22 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapStrReplace extends AbstractUnwrapMutator
+final class UnwrapStrIreplace extends AbstractUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a `str_replace` function call with its third operand. For example:
+Replaces a `str_ireplace` function call with its third operand. For example:
 
 ```php
-$x = str_replace('%body%', 'black', '<body text=%body%>');
+$x = str_ireplace('%body%', 'black', '<body text=%BODY%>');
 ```
 
 Will be mutated to:
 
 ```php
-$x = '<body text=%body%>';
+$x = '<body text=%BODY%>';
 ```
 TXT
             ,
@@ -68,7 +68,7 @@ TXT
 
     protected function getFunctionName(): string
     {
-        return 'str_replace';
+        return 'str_ireplace';
     }
 
     /**
