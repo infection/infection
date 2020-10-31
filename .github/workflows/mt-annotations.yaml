@@ -1,0 +1,52 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+name: Autoreview
+
+on:
+    pull_request:
+
+jobs:
+    tests:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                php-version: ['7.4']
+
+        name: Mutation Testing Code Review Annotations ${{ matrix.php-version }}
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-version }}
+                  tools: composer:v2
+                  coverage: pcov
+
+            - name: Get composer cache directory
+              id: composer-cache
+              run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            - name: Cache dependencies
+              uses: actions/cache@v2
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-${{ matrix.dependencies }}
+                  restore-keys: |
+                      composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
+                      composer-${{ runner.os }}-${{ matrix.php-version }}-
+                      composer-${{ runner.os }}-
+                      composer-
+
+            - name: Install dependencies
+              run: |
+                  composer update --no-interaction --prefer-dist --no-progress
+
+            - name: Run Infection for added files only
+              run: |
+                  git fetch --depth=1 origin $GITHUB_BASE_REF
+                  php bin/infection -j2 --git-diff-filter=A --git-diff-base=origin/$GITHUB_BASE_REF --logger-github --ignore-msi-with-no-mutations --only-covered

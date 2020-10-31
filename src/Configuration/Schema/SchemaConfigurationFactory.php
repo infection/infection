@@ -86,6 +86,7 @@ class SchemaConfigurationFactory
             self::normalizeString($logs->json ?? null),
             self::normalizeString($logs->debug ?? null),
             self::normalizeString($logs->perMutator ?? null),
+            $logs->github ?? false,
             self::createBadge($logs->badge ?? null)
         );
     }

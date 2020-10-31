@@ -43,6 +43,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
@@ -107,6 +108,9 @@ final class ConfigurationFactoryTest extends TestCase
         string $inputFilter,
         int $inputThreadsCount,
         bool $inputDryRun,
+        ?string $inputGitDiffFilter,
+        string $inputGitDiffBase,
+        bool $inputUseGitHubAnnotationsLogger,
         int $inputMsiPrecision,
         int $expectedTimeout,
         array $expectedSourceDirectories,
@@ -155,7 +159,10 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputTestFrameworkExtraOptions,
                 $inputFilter,
                 $inputThreadsCount,
-                $inputDryRun
+                $inputDryRun,
+                $inputGitDiffFilter,
+                $inputGitDiffBase,
+                $inputUseGitHubAnnotationsLogger
             )
         ;
 
@@ -194,6 +201,9 @@ final class ConfigurationFactoryTest extends TestCase
 
     public function valueProvider(): iterable
     {
+        $expectedLogs = Logs::createEmpty();
+        $expectedLogs->setUseGitHubAnnotationsLogger(true);
+
         yield 'minimal' => [
             false,
             new SchemaConfiguration(
@@ -229,13 +239,16 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            'AM',
+            'master',
+            true,
             2,
             10,
             [],
             [],
-            '',
+            'src/a.php,src/b.php',
             [],
-            Logs::createEmpty(),
+            $expectedLogs,
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -628,6 +641,9 @@ final class ConfigurationFactoryTest extends TestCase
             'src/Foo.php, src/Bar.php',
             0,
             false,
+            null,
+            'master',
+            false,
             2,
             10,
             ['src/'],
@@ -671,6 +687,7 @@ final class ConfigurationFactoryTest extends TestCase
                     'json.log',
                     'debug.log',
                     'mutator.log',
+                    true,
                     new Badge('master')
                 ),
                 'config/tmp',
@@ -704,6 +721,9 @@ final class ConfigurationFactoryTest extends TestCase
             'src/Foo.php, src/Bar.php',
             4,
             true,
+            null,
+            'master',
+            false,
             2,
             10,
             ['src/'],
@@ -719,6 +739,7 @@ final class ConfigurationFactoryTest extends TestCase
                 'json.log',
                 'debug.log',
                 'mutator.log',
+                true,
                 new Badge('master')
             ),
             'none',
@@ -789,6 +810,9 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            'master',
+            false,
             2,
             $expectedTimeOut,
             [],
@@ -856,6 +880,9 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
+            null,
+            'master',
             false,
             2,
             10,
@@ -926,6 +953,9 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            'master',
+            false,
             2,
             10,
             [],
@@ -993,6 +1023,9 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
+            null,
+            'master',
             false,
             2,
             10,
@@ -1063,6 +1096,9 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            'master',
+            false,
             2,
             10,
             [],
@@ -1131,6 +1167,9 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
+            null,
+            'master',
             false,
             2,
             10,
@@ -1201,6 +1240,9 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            'master',
+            false,
             2,
             10,
             [],
@@ -1269,6 +1311,9 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
+            null,
+            'master',
             false,
             2,
             10,
@@ -1340,6 +1385,9 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            'master',
+            false,
             2,
             10,
             [],
@@ -1408,6 +1456,9 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             0,
+            false,
+            null,
+            'master',
             false,
             2,
             10,
@@ -1479,6 +1530,9 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            'master',
+            false,
             2,
             10,
             [],
@@ -1547,6 +1601,9 @@ final class ConfigurationFactoryTest extends TestCase
             $inputTestFrameworkExtraOptions,
             '',
             0,
+            false,
+            null,
+            'master',
             false,
             2,
             10,
@@ -1620,6 +1677,9 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            'master',
+            false,
             2,
             10,
             [],
@@ -1692,6 +1752,9 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            'master',
+            false,
             2,
             10,
             [],
@@ -1759,13 +1822,17 @@ final class ConfigurationFactoryTest extends TestCase
             ])
         ;
 
+        $gitDiffFilesProviderMock = $this->createMock(GitDiffFileProvider::class);
+        $gitDiffFilesProviderMock->method('provide')->willReturn('src/a.php,src/b.php');
+
         return new ConfigurationFactory(
             new TmpDirProvider(),
             SingletonContainer::getContainer()->getMutatorResolver(),
             SingletonContainer::getContainer()->getMutatorFactory(),
             new MutatorParser(),
             $sourceFilesCollectorProphecy->reveal(),
-            new DummyCiDetector($ciDetected)
+            new DummyCiDetector($ciDetected),
+            $gitDiffFilesProviderMock
         );
     }
 }

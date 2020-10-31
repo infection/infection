@@ -230,6 +230,7 @@ JSON
                     null,
                     null,
                     null,
+                    false,
                     null
                 ),
             ]),
@@ -255,6 +256,7 @@ JSON
                     null,
                     null,
                     null,
+                    false,
                     null
                 ),
             ]),
@@ -280,6 +282,7 @@ JSON
                     'json.log',
                     null,
                     null,
+                    false,
                     null
                 ),
             ]),
@@ -305,6 +308,7 @@ JSON
                     null,
                     'debug.log',
                     null,
+                    false,
                     null
                 ),
             ]),
@@ -330,6 +334,7 @@ JSON
                     null,
                     null,
                     'perMutator.log',
+                    false,
                     null
                 ),
             ]),
@@ -357,6 +362,7 @@ JSON
                     null,
                     null,
                     null,
+                    false,
                     new Badge('master')
                 ),
             ]),
@@ -374,6 +380,7 @@ JSON
         "json": "json.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
+        "github": true,
         "badge": {
             "branch": "master"
         }
@@ -389,6 +396,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
+                    true,
                     new Badge('master')
                 ),
             ]),
@@ -430,6 +438,7 @@ JSON
         "json": " json.log ",
         "debug": " debug.log ",
         "perMutator": " perMutator.log ",
+        "github": true ,
         "badge": {
             "branch": " master "
         }
@@ -445,6 +454,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
+                    true,
                     new Badge('master')
                 ),
             ]),
@@ -2076,6 +2086,7 @@ JSON
         "json": "json.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
+        "github": true,
         "badge": {
             "branch": "master"
         }
@@ -2314,6 +2325,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
+                    true,
                     new Badge('master')
                 ),
                 'tmpDir' => 'custom-tmp',

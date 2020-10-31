@@ -73,6 +73,10 @@
                             "description": "Mutation score badge for your GitHub project."
                         }
                     }
+                },
+                "github": {
+                    "type": "boolean",
+                    "description": "GitHub Annotations for escaped Mutants in the added/modifies files"
                 }
             }
         },

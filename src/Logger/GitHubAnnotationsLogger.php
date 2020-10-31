@@ -33,39 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Logger;
 
-use Infection\Configuration\Entry\Badge;
-use Infection\Configuration\Entry\Logs;
+use Infection\Metrics\MetricsCalculator;
+use function Safe\getcwd;
+use function str_replace;
+use Webmozart\PathUtil\Path;
 
-trait LogsAssertions
+/**
+ * @internal
+ */
+final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 {
-    use BadgeAssertions;
+    private MetricsCalculator $metricsCalculator;
 
-    private function assertLogsStateIs(
-        Logs $logs,
-        ?string $expectedTextLogFilePath,
-        ?string $expectedSummaryLogFilePath,
-        ?string $expectedJsonLogFilePath,
-        ?string $expectedDebugLogFilePath,
-        ?string $expectedPerMutatorFilePath,
-        bool $expectedUseGitHubAnnotationsLogger,
-        ?Badge $expectedBadge
-    ): void {
-        $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
-        $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
-        $this->assertSame($expectedJsonLogFilePath, $logs->getJsonLogFilePath());
-        $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
-        $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
-        $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger());
+    public function __construct(MetricsCalculator $metricsCalculator)
+    {
+        $this->metricsCalculator = $metricsCalculator;
+    }
 
-        $badge = $logs->getBadge();
+    public function getLogLines(): array
+    {
+        $lines = [];
+        $currentWorkingDirectory = getcwd();
 
-        if ($expectedBadge === null) {
-            $this->assertNull($badge);
-        } else {
-            $this->assertNotNull($badge);
-            $this->assertBadgeStateIs($badge, $expectedBadge->getBranch());
+        foreach ($this->metricsCalculator->getEscapedExecutionResults() as $escapedExecutionResult) {
+            $error = [
+                'line' => $escapedExecutionResult->getOriginalStartingLine(),
+                'message' => <<<"TEXT"
+Escaped Mutant:
+
+{$escapedExecutionResult->getMutantDiff()}
+TEXT
+            ,
+            ];
+
+            $lines[] = $this->buildAnnotation(
+                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $currentWorkingDirectory),
+                $error,
+            );
         }
+
+        return $lines;
+    }
+
+    /**
+     * @param array{line: int, message: string} $error
+     */
+    private function buildAnnotation(string $filePath, array $error): string
+    {
+        // new lines need to be encoded
+        // see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
+        $message = str_replace("\n", '%0A', $error['message']);
+
+        return "::warning file={$filePath},line={$error['line']}::{$message}\n";
     }
 }

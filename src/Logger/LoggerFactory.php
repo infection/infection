@@ -90,6 +90,7 @@ class LoggerFactory
                     $this->createJsonLogger($logConfig->getJsonLogFilePath()),
                     $this->createDebugLogger($logConfig->getDebugLogFilePath()),
                     $this->createPerMutatorLogger($logConfig->getPerMutatorFilePath()),
+                    $this->createGitHubAnnotationsLogger($logConfig->getUseGitHubAnnotationsLogger()),
                     $this->createBadgeLogger($logConfig->getBadge()),
                 ],
                 function (?MutationTestingResultsLogger $logger): bool {
@@ -140,6 +141,19 @@ class LoggerFactory
                 new JsonLogger($this->metricsCalculator, $this->onlyCoveredCode),
                 $this->logger
             )
+        ;
+    }
+
+    private function createGitHubAnnotationsLogger(bool $useGitHubAnnotationsLogger): ?FileLogger
+    {
+        return $useGitHubAnnotationsLogger
+            ? new FileLogger(
+                'php://stdout',
+                $this->filesystem,
+                new GitHubAnnotationsLogger($this->metricsCalculator),
+                $this->logger
+            )
+            : null
         ;
     }
 

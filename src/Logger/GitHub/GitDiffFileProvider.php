@@ -33,39 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Logger\GitHub;
 
-use Infection\Configuration\Entry\Badge;
-use Infection\Configuration\Entry\Logs;
+use function escapeshellarg;
+use function Safe\sprintf;
+use function shell_exec;
 
-trait LogsAssertions
+/**
+ * @final
+ *
+ * @internal
+ */
+class GitDiffFileProvider
 {
-    use BadgeAssertions;
+    public const DEFAULT_BASE = 'origin/master';
 
-    private function assertLogsStateIs(
-        Logs $logs,
-        ?string $expectedTextLogFilePath,
-        ?string $expectedSummaryLogFilePath,
-        ?string $expectedJsonLogFilePath,
-        ?string $expectedDebugLogFilePath,
-        ?string $expectedPerMutatorFilePath,
-        bool $expectedUseGitHubAnnotationsLogger,
-        ?Badge $expectedBadge
-    ): void {
-        $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
-        $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
-        $this->assertSame($expectedJsonLogFilePath, $logs->getJsonLogFilePath());
-        $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
-        $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
-        $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger());
-
-        $badge = $logs->getBadge();
-
-        if ($expectedBadge === null) {
-            $this->assertNull($badge);
-        } else {
-            $this->assertNotNull($badge);
-            $this->assertBadgeStateIs($badge, $expectedBadge->getBranch());
-        }
+    public function provide(string $gitDiffFilter, string $gitDiffBase): string
+    {
+        return (string) shell_exec(
+            sprintf(
+                'git diff %s --diff-filter=%s --name-only | grep src/ | paste -sd ","',
+                escapeshellarg($gitDiffBase),
+                escapeshellarg($gitDiffFilter)
+            )
+        );
     }
 }

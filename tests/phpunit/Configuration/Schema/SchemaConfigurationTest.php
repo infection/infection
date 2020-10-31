@@ -125,6 +125,7 @@ final class SchemaConfigurationTest extends TestCase
                 'json.log',
                 'debug.log',
                 'mutator.log',
+                true,
                 new Badge('master')
             ),
             'path/to/tmp',

@@ -43,6 +43,7 @@ use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\FileLogger;
+use Infection\Logger\GitHubAnnotationsLogger;
 use Infection\Logger\JsonLogger;
 use Infection\Logger\LoggerFactory;
 use Infection\Logger\LoggerRegistry;
@@ -94,6 +95,7 @@ final class LoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 '/a/file',
+                true,
                 null
             )
         );
@@ -116,6 +118,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                false,
                 new Badge('master')
             )
         );
@@ -155,6 +158,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                false,
                 null
             ),
             [TextFileLogger::class],
@@ -167,6 +171,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                false,
                 null
             ),
             [SummaryFileLogger::class],
@@ -179,6 +184,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 'debug_file',
                 null,
+                false,
                 null
             ),
             [DebugFileLogger::class],
@@ -191,6 +197,7 @@ final class LoggerFactoryTest extends TestCase
                 'json_file',
                 null,
                 null,
+                false,
                 null
             ),
             [JsonLogger::class],
@@ -203,9 +210,23 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 'per_muator',
+                false,
                 null
             ),
             [PerMutatorLogger::class],
+        ];
+
+        yield 'github logger' => [
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                true,
+                null
+            ),
+            [GitHubAnnotationsLogger::class],
         ];
 
         yield 'badge logger' => [
@@ -215,6 +236,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                false,
                 new Badge('foo')
             ),
             [BadgeLogger::class],
@@ -227,6 +249,7 @@ final class LoggerFactoryTest extends TestCase
                 'json',
                 'debug',
                 'per_mutator',
+                true,
                 new Badge('branch')
             ),
             [
@@ -235,6 +258,7 @@ final class LoggerFactoryTest extends TestCase
                 JsonLogger::class,
                 DebugFileLogger::class,
                 PerMutatorLogger::class,
+                GitHubAnnotationsLogger::class,
                 BadgeLogger::class,
             ],
         ];

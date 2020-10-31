@@ -33,39 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Tests\Logger;
 
-use Infection\Configuration\Entry\Badge;
-use Infection\Configuration\Entry\Logs;
+use Infection\Logger\GitHubAnnotationsLogger;
+use Infection\Metrics\MetricsCalculator;
+use PHPUnit\Framework\TestCase;
 
-trait LogsAssertions
+/**
+ * @group integration
+ */
+final class GitHubAnnotationsLoggerTest extends TestCase
 {
-    use BadgeAssertions;
+    use CreateMetricsCalculator;
 
-    private function assertLogsStateIs(
-        Logs $logs,
-        ?string $expectedTextLogFilePath,
-        ?string $expectedSummaryLogFilePath,
-        ?string $expectedJsonLogFilePath,
-        ?string $expectedDebugLogFilePath,
-        ?string $expectedPerMutatorFilePath,
-        bool $expectedUseGitHubAnnotationsLogger,
-        ?Badge $expectedBadge
+    /**
+     * @dataProvider metricsProvider
+     */
+    public function test_it_logs_correctly_with_mutations(
+        MetricsCalculator $metricsCalculator,
+        array $expectedLines
     ): void {
-        $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
-        $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
-        $this->assertSame($expectedJsonLogFilePath, $logs->getJsonLogFilePath());
-        $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
-        $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
-        $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger());
+        $logger = new GitHubAnnotationsLogger($metricsCalculator);
 
-        $badge = $logs->getBadge();
+        $this->assertSame($expectedLines, $logger->getLogLines());
+    }
 
-        if ($expectedBadge === null) {
-            $this->assertNull($badge);
-        } else {
-            $this->assertNotNull($badge);
-            $this->assertBadgeStateIs($badge, $expectedBadge->getBranch());
-        }
+    public function metricsProvider(): iterable
+    {
+        yield 'no mutations' => [
+            new MetricsCalculator(2),
+            [],
+        ];
+
+        yield 'all mutations' => [
+            $this->createCompleteMetricsCalculator(),
+            [
+                "::warning file=foo/bar,line=9::Escaped Mutant:%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#1';%0A\n",
+                "::warning file=foo/bar,line=10::Escaped Mutant:%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A\n",
+            ],
+        ];
     }
 }
