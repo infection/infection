@@ -49,18 +49,12 @@ final class ContainerTest extends TestCase
 {
     public function test_it_can_be_instantiated_without_any_services(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown service "Symfony\Component\Filesystem\Filesystem"');
+
         $container = new Container([]);
 
-        try {
-            $container->getFileSystem();
-
-            $this->fail();
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Unknown service "Symfony\Component\Filesystem\Filesystem"',
-                $exception->getMessage()
-            );
-        }
+        $container->getFileSystem();
     }
 
     public function test_it_can_be_instantiated_with_the_project_services(): void
