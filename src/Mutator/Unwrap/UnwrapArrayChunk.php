@@ -47,10 +47,10 @@ final class UnwrapArrayChunk extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_column` function call with its first operand. For example:
+Replaces an `array_chunk` function call with its first operand. For example:
 
 ```php
-$x = array_column($array, 'id');
+$x = array_chunk($array, 2);
 ```
 
 Will be mutated to:
@@ -58,7 +58,6 @@ Will be mutated to:
 ```php
 $x = $array;
 ```
-
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
