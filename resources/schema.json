@@ -146,7 +146,7 @@
                 "@removal": { "$ref": "#/definitions/default-mutator-config" },
                 "@return_value": { "$ref": "#/definitions/default-mutator-config" },
                 "@sort": { "$ref": "#/definitions/default-mutator-config" },
-                "@zero_iteration": { "$ref": "#/definitions/default-mutator-config" },
+                "@loop": { "$ref": "#/definitions/default-mutator-config" },
                 "@cast": { "$ref": "#/definitions/default-mutator-config" },
                 "@unwrap": { "$ref": "#/definitions/default-mutator-config" },
                 "@extensions": { "$ref": "#/definitions/default-mutator-config" },

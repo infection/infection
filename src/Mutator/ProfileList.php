@@ -57,6 +57,7 @@ final class ProfileList
         '@extensions' => self::EXTENSIONS_PROFILE,
         '@function_signature' => self::FUNCTION_SIGNATURE_PROFILE,
         '@identical' => self::IDENTICAL_PROFILE,
+        '@loop' => self::LOOP_PROFILE,
         '@number' => self::NUMBER_PROFILE,
         '@operator' => self::OPERATOR_PROFILE,
         '@regex' => self::REGEX_PROFILE,
@@ -64,7 +65,6 @@ final class ProfileList
         '@return_value' => self::RETURN_VALUE_PROFILE,
         '@sort' => self::SORT_PROFILE,
         '@unwrap' => self::UNWRAP_PROFILE,
-        '@zero_iteration' => self::ZERO_ITERATION_PROFILE,
     ];
 
     public const ARITHMETIC_PROFILE = [
@@ -188,10 +188,10 @@ final class ProfileList
         Mutator\Sort\Spaceship::class,
     ];
 
-    public const ZERO_ITERATION_PROFILE = [
-        Mutator\ZeroIteration\For_::class,
-        Mutator\ZeroIteration\Foreach_::class,
-        Mutator\ZeroIteration\While_::class,
+    public const LOOP_PROFILE = [
+        Mutator\Loop\For_::class,
+        Mutator\Loop\Foreach_::class,
+        Mutator\Loop\While_::class,
     ];
 
     public const CAST_PROFILE = [
@@ -268,6 +268,7 @@ final class ProfileList
         '@conditional_negotiation',
         '@extensions',
         '@function_signature',
+        '@loop',
         '@number',
         '@operator',
         '@regex',
@@ -275,7 +276,6 @@ final class ProfileList
         '@return_value',
         '@sort',
         '@unwrap',
-        '@zero_iteration',
     ];
 
     public const ALL_MUTATORS = [
@@ -379,10 +379,10 @@ final class ProfileList
         // Sort
         'Spaceship' => Mutator\Sort\Spaceship::class,
 
-        // Zero Iteration
-        'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
-        'For_' => Mutator\ZeroIteration\For_::class,
-        'While_' => Mutator\ZeroIteration\While_::class,
+        // Loop
+        'Foreach_' => Mutator\Loop\Foreach_::class,
+        'For_' => Mutator\Loop\For_::class,
+        'While_' => Mutator\Loop\While_::class,
 
         // Cast
         'CastArray' => Mutator\Cast\CastArray::class,

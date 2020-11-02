@@ -82,7 +82,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
         '@removal',
         '@return_value',
         '@sort',
-        '@zero_iteration',
+        '@loop',
         '@default',
     ];
 
@@ -2045,7 +2045,7 @@ JSON
         "@removal": true,
         "@return_value": true,
         "@sort": true,
-        "@zero_iteration": true,
+        "@loop": true,
         "@default": true
     }
 }
@@ -2066,7 +2066,7 @@ JSON
                     '@removal' => true,
                     '@return_value' => true,
                     '@sort' => true,
-                    '@zero_iteration' => true,
+                    '@loop' => true,
                     '@default' => true,
                 ],
             ]),
@@ -2307,7 +2307,7 @@ JSON
         "@removal": true,
         "@return_value": true,
         "@sort": true,
-        "@zero_iteration": true,
+        "@loop": true,
         "@default": true
     }
 }
@@ -2521,7 +2521,7 @@ JSON
                     '@removal' => true,
                     '@return_value' => true,
                     '@sort' => true,
-                    '@zero_iteration' => true,
+                    '@loop' => true,
                     '@default' => true,
                 ],
             ]),

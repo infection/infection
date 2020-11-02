@@ -481,6 +481,21 @@ parameters:
 			path: ../src/Mutator/FunctionSignature/PublicVisibility.php
 
 		-
+			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\For_\\) of method Infection\\\\Mutator\\\\Loop\\\\For_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
+			count: 1
+			path: ../src/Mutator/Loop/For_.php
+
+		-
+			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Foreach_\\) of method Infection\\\\Mutator\\\\Loop\\\\Foreach_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
+			count: 1
+			path: ../src/Mutator/Loop/Foreach_.php
+
+		-
+			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\While_\\) of method Infection\\\\Mutator\\\\Loop\\\\While_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
+			count: 1
+			path: ../src/Mutator/Loop/While_.php
+
+		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:isArray\\(\\) with array and string will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/Mutator/MutatorFactory.php
@@ -654,21 +669,6 @@ parameters:
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\FuncCall\\) of method Infection\\\\Mutator\\\\Unwrap\\\\AbstractUnwrapMutator\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
 			path: ../src/Mutator/Unwrap/AbstractUnwrapMutator.php
-
-		-
-			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\For_\\) of method Infection\\\\Mutator\\\\ZeroIteration\\\\For_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
-			count: 1
-			path: ../src/Mutator/ZeroIteration/For_.php
-
-		-
-			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Foreach_\\) of method Infection\\\\Mutator\\\\ZeroIteration\\\\Foreach_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
-			count: 1
-			path: ../src/Mutator/ZeroIteration/Foreach_.php
-
-		-
-			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\While_\\) of method Infection\\\\Mutator\\\\ZeroIteration\\\\While_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
-			count: 1
-			path: ../src/Mutator/ZeroIteration/While_.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<PhpParser\\\\Node\\> and 'PhpParser\\\\\\\\Node' will always evaluate to true\\.$#"

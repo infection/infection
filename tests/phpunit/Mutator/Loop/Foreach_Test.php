@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\ZeroIteration;
+namespace Infection\Tests\Mutator\Loop;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class While_Test extends BaseMutatorTestCase
+final class Foreach_Test extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -51,51 +51,42 @@ final class While_Test extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield 'It mutates expression part from variable to false' => [
+        yield 'It mutates to new array in foreach' => [
             <<<'PHP'
 <?php
 
-$condition = true;
-
-while ($condition) {
+$array = [1, 2];
+foreach ($array as $value) {
 }
-
 PHP
             ,
             <<<'PHP'
 <?php
 
-$condition = true;
-while (false) {
+$array = [1, 2];
+foreach (array() as $value) {
 }
 PHP
+            ,
         ];
 
-        yield 'It mutates expression part from boolean true to false' => [
+        yield 'It does not change whether items were passed by reference' => [
             <<<'PHP'
 <?php
 
-while (true) {
+$array = [1, 2];
+foreach ($array as $key => &$value) {
+    echo $value;
 }
-
 PHP
             ,
             <<<'PHP'
 <?php
 
-while (false) {
+$array = [1, 2];
+foreach (array() as $key => &$value) {
+    echo $value;
 }
-PHP
-        ];
-
-        yield 'It does not mutate expression part in do-while loop to false' => [
-            <<<'PHP'
-<?php
-
-do {
-
-} while (true);
-
 PHP
         ];
     }

@@ -41,7 +41,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
-use Infection\Mutator\ZeroIteration\For_;
+use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;

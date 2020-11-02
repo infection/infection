@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\ZeroIteration;
+namespace Infection\Mutator\Loop;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
@@ -44,7 +44,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class While_ implements Mutator
+final class For_ implements Mutator
 {
     use GetMutatorName;
 
@@ -52,13 +52,11 @@ final class While_ implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces the iterable being iterated over with a `while` expression with false, preventing
-any iteration within the block to be executed. For example:
+Replaces the looping condition of a `for` block statement preventing any statement within the block
+to be executed. For example:
 
 ```php`
-
-$condition = true;
-while ($condition) {
+for ($i=0; $i<10; $i++) {
     // ...
 }
 ```
@@ -66,9 +64,7 @@ while ($condition) {
 Will be mutated to:
 
 ```php
-
-$condition = true;
-while (false) {
+for ($i=0; false; $i++) {
     // ...
 }
 ```
@@ -82,21 +78,25 @@ TXT
     /**
      * @psalm-mutation-free
      *
-     * @param Node\Stmt\While_ $node
+     * @param Node\Stmt\For_ $node
      *
-     * @return iterable<Node\Stmt\While_>
+     * @return iterable<Node\Stmt\For_>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Stmt\While_(
-            new Node\Expr\ConstFetch(new Node\Name('false')),
-            $node->stmts,
+        yield new Node\Stmt\For_(
+            [
+                'init' => $node->init,
+                'cond' => [new Node\Expr\ConstFetch(new Node\Name('false'))],
+                'loop' => $node->loop,
+                'stmts' => $node->stmts,
+            ],
             $node->getAttributes()
         );
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\While_;
+        return $node instanceof Node\Stmt\For_;
     }
 }

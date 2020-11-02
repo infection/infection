@@ -33,67 +33,71 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\ZeroIteration;
+namespace Infection\Mutator\Loop;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
+use PhpParser\Node;
 
-final class For_Test extends BaseMutatorTestCase
+/**
+ * @internal
+ */
+final class Foreach_ implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces the iterable being iterated over with a `foreach` statement with an empty array, preventing
+any statement within the block to be executed. For example:
+
+```php`
+foreach ($a as $b) {
+    // ...
+}
+```
+
+Will be mutated to:
+
+```php
+for ([] as $b]) {
+    // ...
+}
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
-     * @dataProvider mutationsProvider
+     * @psalm-mutation-free
      *
-     * @param string|string[] $expected
+     * @param Node\Stmt\Foreach_ $node
+     *
+     * @return iterable<Node\Stmt\Foreach_>
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function mutate(Node $node): iterable
     {
-        $this->doTest($input, $expected);
+        yield new Node\Stmt\Foreach_(
+            new Node\Expr\Array_(),
+            $node->valueVar,
+            [
+                'keyVar' => $node->keyVar,
+                'byRef' => $node->byRef,
+                'stmts' => $node->stmts,
+            ],
+            $node->getAttributes()
+        );
     }
 
-    public function mutationsProvider(): iterable
+    public function canMutate(Node $node): bool
     {
-        yield 'It mutates to false in for loop condition' => [
-            <<<'PHP'
-<?php
-
-$array = [1, 2];
-
-for($i = 0; $i < count($array); $i++) {
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$array = [1, 2];
-for ($i = 0; false; $i++) {
-}
-PHP
-            ,
-        ];
-
-        yield 'It does not mutate the body of the for loop' => [
-            <<<'PHP'
-<?php
-
-$array = [1, 2];
-for($i = 0; $i < count($array); $i++) {
-    if ($i == 1) {
-        echo '$i is one';
-    }
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$array = [1, 2];
-for ($i = 0; false; $i++) {
-    if ($i == 1) {
-        echo '$i is one';
-    }
-}
-PHP
-            ,
-        ];
+        return $node instanceof Node\Stmt\Foreach_;
     }
 }

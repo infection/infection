@@ -38,8 +38,8 @@ namespace Infection\Tests\Logger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutator\Loop\For_;
 use Infection\Mutator\Regex\PregQuote;
-use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
 use function Infection\Tests\normalize_trailing_spaces;
 
