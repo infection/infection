@@ -132,12 +132,12 @@ final class MutatorResolver
             return false;
         }
 
-        if (count($globalSettings) === 0) {
-            return (array) $settings;
-        }
-
         if ($settings === true) {
             return $globalSettings;
+        }
+
+        if (count($globalSettings) === 0) {
+            return (array) $settings;
         }
 
         return array_merge_recursive($globalSettings, (array) $settings);
@@ -219,8 +219,16 @@ final class MutatorResolver
     ): void {
         if ($settings === false) {
             unset($mutators[$mutatorClassName]);
-        } else {
-            $mutators[$mutatorClassName] = (array) $settings;
+
+            return;
         }
+
+        if ($settings === true || $settings === []) {
+            $mutators[$mutatorClassName] = $mutators[$mutatorClassName] ?? [];
+
+            return;
+        }
+
+        $mutators[$mutatorClassName] = $settings;
     }
 }

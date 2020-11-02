@@ -353,13 +353,10 @@ final class MutatorResolverTest extends TestCase
                     ],
                 ],
                 IncrementInteger::class => [
-                    true,
                 ],
                 OneZeroFloat::class => [
-                    true,
                 ],
                 OneZeroInteger::class => [
-                    true,
                 ],
             ],
             $resolvedMutators
@@ -385,13 +382,10 @@ final class MutatorResolverTest extends TestCase
                     ],
                 ],
                 IncrementInteger::class => [
-                    true,
                 ],
                 OneZeroFloat::class => [
-                    true,
                 ],
                 OneZeroInteger::class => [
-                    true,
                 ],
             ],
             $resolvedMutators
