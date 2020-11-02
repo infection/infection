@@ -429,7 +429,7 @@ final class RunCommand extends BaseCommand
         }
 
         // Check that we don't have both --coverage and --coverage-xml-dir --junit-log-file options
-        if ($coverage && ($pathToXmlCoverage || $pathToJunitLogFile)) {
+        if ($coverage !== '' && ($pathToXmlCoverage !== '' || $pathToJunitLogFile !== '')) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Cannot use "--%s" or "--%s" at the same time with "--%s"',
