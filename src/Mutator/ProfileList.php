@@ -191,6 +191,7 @@ final class ProfileList
     public const ZERO_ITERATION_PROFILE = [
         Mutator\ZeroIteration\For_::class,
         Mutator\ZeroIteration\Foreach_::class,
+        Mutator\ZeroIteration\While_::class,
     ];
 
     public const CAST_PROFILE = [
@@ -381,6 +382,7 @@ final class ProfileList
         // Zero Iteration
         'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
         'For_' => Mutator\ZeroIteration\For_::class,
+        'While_' => Mutator\ZeroIteration\While_::class,
 
         // Cast
         'CastArray' => Mutator\Cast\CastArray::class,
