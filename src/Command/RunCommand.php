@@ -67,13 +67,82 @@ use function trim;
  */
 final class RunCommand extends BaseCommand
 {
+    /** @var string */
+    private const OPTION_TEST_FRAMEWORK = 'test-framework';
+
+    /** @var string */
+    private const OPTION_TEST_FRAMEWORK_OPTIONS = 'test-framework-options';
+
+    /** @var string */
+    private const OPTION_THREADS = 'threads';
+
+    /** @var string */
+    private const OPTION_ONLY_COVERED = 'only-covered';
+
+    /** @var string */
+    private const OPTION_SHOW_MUTATIONS = 'show-mutations';
+
+    /** @var string */
+    private const OPTION_NO_PROGRESS = 'no-progress';
+
+    /** @var string */
+    private const OPTION_FORCE_PROGRESS = 'force-progress';
+
+    /** @var string */
+    private const OPTION_CONFIGURATION = 'configuration';
+
+    /** @var string */
+    private const OPTION_COVERAGE = 'coverage';
+
+    /** @var string */
+    private const OPTION_MUTATORS = 'mutators';
+
+    /** @var string */
+    private const OPTION_FILTER = 'filter';
+
+    /** @var string */
+    private const OPTION_FORMATTER = 'formatter';
+
+    /** @var string */
+    private const OPTION_GIT_DIFF_FILTER = 'git-diff-filter';
+
+    /** @var string */
+    private const OPTION_GIT_DIFF_BASE = 'git-diff-base';
+
+    /** @var string */
+    private const OPTION_LOGGER_GITHUB = 'logger-github';
+
+    /** @var string */
+    private const OPTION_MIN_MSI = 'min-msi';
+
+    /** @var string */
+    private const OPTION_MIN_COVERED_MSI = 'min-covered-msi';
+
+    /** @var string */
+    private const OPTION_LOG_VERBOSITY = 'log-verbosity';
+
+    /** @var string */
+    private const OPTION_INITIAL_TESTS_PHP_OPTIONS = 'initial-tests-php-options';
+
+    /** @var string */
+    private const OPTION_SKIP_INITIAL_TESTS = 'skip-initial-tests';
+
+    /** @var string */
+    private const OPTION_IGNORE_MSI_WITH_NO_MUTATIONS = 'ignore-msi-with-no-mutations';
+
+    /** @var string */
+    private const OPTION_DEBUG = 'debug';
+
+    /** @var string */
+    private const OPTION_DRY_RUN = 'dry-run';
+
     protected function configure(): void
     {
         $this
             ->setName('run')
             ->setDescription('Runs the mutation testing.')
             ->addOption(
-                'test-framework',
+                self::OPTION_TEST_FRAMEWORK,
                 null,
                 InputOption::VALUE_REQUIRED,
                 sprintf(
@@ -83,73 +152,73 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_TEST_FRAMEWORK
             )
             ->addOption(
-                'test-framework-options',
+                self::OPTION_TEST_FRAMEWORK_OPTIONS,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Options to be passed to the test framework',
                 Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
             )
             ->addOption(
-                'threads',
+                self::OPTION_THREADS,
                 'j',
                 InputOption::VALUE_REQUIRED,
                 'Number of threads to use by the runner when executing the mutations',
                 Container::DEFAULT_THREAD_COUNT
             )
             ->addOption(
-                'only-covered',
+                self::OPTION_ONLY_COVERED,
                 null,
                 InputOption::VALUE_NONE,
                 'Mutate only covered by tests lines of code'
             )
             ->addOption(
-                'show-mutations',
+                self::OPTION_SHOW_MUTATIONS,
                 's',
                 InputOption::VALUE_NONE,
                 'Show escaped (and non-covered in verbose mode) mutations to the console'
             )
             ->addOption(
-                'no-progress',
+                self::OPTION_NO_PROGRESS,
                 null,
                 InputOption::VALUE_NONE,
                 'Do not output progress bars and mutation count during progress. Automatically enabled if a CI is detected'
             )
             ->addOption(
-                'force-progress',
+                self::OPTION_FORCE_PROGRESS,
                 null,
                 InputOption::VALUE_NONE,
                 'Output progress bars and mutation count during progress even if a CI is detected'
             )
             ->addOption(
-                'configuration',
+                self::OPTION_CONFIGURATION,
                 'c',
                 InputOption::VALUE_REQUIRED,
                 'Path to the configuration file to use',
                 Container::DEFAULT_CONFIG_FILE
             )
             ->addOption(
-                'coverage',
+                self::OPTION_COVERAGE,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Path to existing coverage directory',
                 Container::DEFAULT_EXISTING_COVERAGE_PATH
             )
             ->addOption(
-                'mutators',
+                self::OPTION_MUTATORS,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Specify particular mutators, e.g. "--mutators=Plus,PublicVisibility"',
+                sprintf('Specify particular mutators, e.g. "--%s=Plus,PublicVisibility"', self::OPTION_MUTATORS),
                 Container::DEFAULT_MUTATORS_INPUT
             )
             ->addOption(
-                'filter',
+                self::OPTION_FILTER,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Filter which files to mutate',
                 Container::DEFAULT_FILTER
             )
             ->addOption(
-                'formatter',
+                self::OPTION_FORMATTER,
                 null,
                 InputOption::VALUE_REQUIRED,
                 sprintf(
@@ -159,73 +228,76 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_FORMATTER_NAME
             )
             ->addOption(
-                'git-diff-filter',
+                self::OPTION_GIT_DIFF_FILTER,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Filter files to mutate git `--diff-filter` options. A - only for added files, AM - for added and modified.',
                 Container::DEFAULT_GIT_DIFF_FILTER
             )
             ->addOption(
-                'git-diff-base',
+                self::OPTION_GIT_DIFF_BASE,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Base branch for `--git-diff-filter` option. Must be used only together with `--git-diff-filter`.',
+                sprintf('Base branch for `--%1$s` option. Must be used only together with `--%1$s`.', self::OPTION_GIT_DIFF_FILTER),
                 Container::DEFAULT_GIT_DIFF_BASE
             )
             ->addOption(
-                'logger-github',
+                self::OPTION_LOGGER_GITHUB,
                 null,
                 InputOption::VALUE_NONE,
                 'Log escaped Mutants as GitHub Annotations.',
             )
             ->addOption(
-                'min-msi',
+                self::OPTION_MIN_MSI,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Minimum Mutation Score Indicator (MSI) percentage value',
                 Container::DEFAULT_MIN_MSI
             )
             ->addOption(
-                'min-covered-msi',
+                self::OPTION_MIN_COVERED_MSI,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Minimum Covered Code Mutation Score Indicator (MSI) percentage value',
                 Container::DEFAULT_MIN_COVERED_MSI
             )
             ->addOption(
-                'log-verbosity',
+                self::OPTION_LOG_VERBOSITY,
                 null,
                 InputOption::VALUE_REQUIRED,
                 '"all" - full logs format, "default" - short logs format, "none" - no logs',
                 Container::DEFAULT_LOG_VERBOSITY
             )
             ->addOption(
-                'initial-tests-php-options',
+                self::OPTION_INITIAL_TESTS_PHP_OPTIONS,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'PHP options passed to the PHP executable when executing the initial tests. Will be ignored if "--coverage" option presented',
+                sprintf(
+                    'PHP options passed to the PHP executable when executing the initial tests. Will be ignored if "--%s" option presented',
+                    self::OPTION_COVERAGE
+                ),
                 Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS
             )
             ->addOption(
-                'skip-initial-tests',
+                self::OPTION_SKIP_INITIAL_TESTS,
                 null,
                 InputOption::VALUE_NONE,
-                'Skips the initial test runs. Requires the coverage to be provided via the "--coverage" option'
+                sprintf('Skips the initial test runs. Requires the coverage to be provided via the "--%s" option', self::OPTION_COVERAGE)
             )
             ->addOption(
-                'ignore-msi-with-no-mutations',
+                self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS,
                 null,
                 InputOption::VALUE_NONE,
                 'Ignore MSI violations with zero mutations'
             )
             ->addOption(
-                'debug',
+                self::OPTION_DEBUG,
                 null,
                 InputOption::VALUE_NONE,
                 'Will not clean up Infection temporary folder'
             )
             ->addOption(
-                'dry-run',
+                self::OPTION_DRY_RUN,
                 null,
                 InputOption::VALUE_NONE,
                 'Will not apply the mutations'
@@ -277,54 +349,61 @@ final class RunCommand extends BaseCommand
         // say "do not use a config". If this becomes possible in the future
         // though, it will likely be a `--no-config` option rather than relying
         // on this value to be set to an empty string.
-        $configFile = trim((string) $input->getOption('configuration'));
+        $configFile = trim((string) $input->getOption(self::OPTION_CONFIGURATION));
 
-        $coverage = trim((string) $input->getOption('coverage'));
-        $testFramework = trim((string) $input->getOption('test-framework'));
-        $testFrameworkExtraOptions = trim((string) $input->getOption('test-framework-options'));
-        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
+        $coverage = trim((string) $input->getOption(self::OPTION_COVERAGE));
+        $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
+        $testFrameworkExtraOptions = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK_OPTIONS));
+        $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
 
         /** @var string|null $minMsi */
-        $minMsi = $input->getOption('min-msi');
+        $minMsi = $input->getOption(self::OPTION_MIN_MSI);
         /** @var string|null $minCoveredMsi */
-        $minCoveredMsi = $input->getOption('min-covered-msi');
+        $minCoveredMsi = $input->getOption(self::OPTION_MIN_COVERED_MSI);
 
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
-        $noProgress = (bool) $input->getOption('no-progress');
-        $forceProgress = (bool) $input->getOption('force-progress');
+        $noProgress = (bool) $input->getOption(self::OPTION_NO_PROGRESS);
+        $forceProgress = (bool) $input->getOption(self::OPTION_FORCE_PROGRESS);
 
         if ($noProgress && $forceProgress) {
-            throw new InvalidArgumentException('Cannot pass both "--no-progress" and "--force-progress" option: use none or only one of them');
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot pass both "%s" and "%s" option: use none or only one of them',
+                    self::OPTION_NO_PROGRESS,
+                    self::OPTION_FORCE_PROGRESS)
+            );
         }
 
-        $gitDiffFilter = $input->getOption('git-diff-filter');
-        $gitDiffBase = $input->getOption('git-diff-base');
+        $gitDiffFilter = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
+        $gitDiffBase = $input->getOption(self::OPTION_GIT_DIFF_BASE);
 
         if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER) {
-            throw new InvalidArgumentException('Cannot pass "--git-diff-base" without "--git-diff-filter"');
+            throw new InvalidArgumentException(sprintf('Cannot pass "--%s" without "--%s"', self::OPTION_GIT_DIFF_BASE, self::OPTION_GIT_DIFF_FILTER));
         }
 
-        $filter = trim((string) $input->getOption('filter'));
+        $filter = trim((string) $input->getOption(self::OPTION_FILTER));
 
         if ($filter !== '' && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_BASE) {
-            throw new InvalidArgumentException('Cannot pass both "--filter" and "--git-diff-filter" option: use none or only one of them');
+            throw new InvalidArgumentException(
+                sprintf('Cannot pass both "--%s" and "--%s" option: use none or only one of them', self::OPTION_FILTER, self::OPTION_GIT_DIFF_FILTER)
+            );
         }
 
         return $this->getApplication()->getContainer()->withValues(
             $logger,
             $io->getOutput(),
             $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
-            trim((string) $input->getOption('mutators')),
+            trim((string) $input->getOption(self::OPTION_MUTATORS)),
             // To keep in sync with Container::DEFAULT_SHOW_MUTATIONS
-            (bool) $input->getOption('show-mutations'),
-            trim((string) $input->getOption('log-verbosity')),
+            (bool) $input->getOption(self::OPTION_SHOW_MUTATIONS),
+            trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
             // To keep in sync with Container::DEFAULT_DEBUG
-            (bool) $input->getOption('debug'),
+            (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_ONLY_COVERED
-            (bool) $input->getOption('only-covered'),
+            (bool) $input->getOption(self::OPTION_ONLY_COVERED),
             // TODO: add more type check like we do for the test frameworks
-            trim((string) $input->getOption('formatter')),
+            trim((string) $input->getOption(self::OPTION_FORMATTER)),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             $noProgress,
             $forceProgress,
@@ -335,11 +414,11 @@ final class RunCommand extends BaseCommand
                 ? Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS
                 : $initialTestsPhpOptions,
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
-            (bool) $input->getOption('skip-initial-tests'),
+            (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
-            (bool) $input->getOption('ignore-msi-with-no-mutations'),
-            MsiParser::parse($minMsi, $msiPrecision, 'min-msi'),
-            MsiParser::parse($minCoveredMsi, $msiPrecision, 'min-covered-msi'),
+            (bool) $input->getOption(self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS),
+            MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
+            MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
             $msiPrecision,
             $testFramework === ''
                 ? Container::DEFAULT_TEST_FRAMEWORK
@@ -349,12 +428,12 @@ final class RunCommand extends BaseCommand
                 : $testFrameworkExtraOptions,
             $filter,
             // TODO: more validation here?
-            (int) $input->getOption('threads'),
+            (int) $input->getOption(self::OPTION_THREADS),
             // To keep in sync with Container::DEFAULT_DRY_RUN
-            (bool) $input->getOption('dry-run'),
+            (bool) $input->getOption(self::OPTION_DRY_RUN),
             $gitDiffFilter,
             $gitDiffBase,
-            (bool) $input->getOption('logger-github')
+            (bool) $input->getOption(self::OPTION_LOGGER_GITHUB)
         );
     }
 
@@ -363,7 +442,7 @@ final class RunCommand extends BaseCommand
         $installationDecider = $container->getAdapterInstallationDecider();
         $configTestFramework = $container->getConfiguration()->getTestFramework();
 
-        $adapterName = trim((string) $io->getInput()->getOption('test-framework')) ?: $configTestFramework;
+        $adapterName = trim((string) $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK)) ?: $configTestFramework;
 
         if (!$installationDecider->shouldBeInstalled($adapterName, $io)) {
             return;
@@ -386,7 +465,7 @@ final class RunCommand extends BaseCommand
     ): void {
         $locator = $container->getRootsFileOrDirectoryLocator();
 
-        if ($customConfigPath = (string) $io->getInput()->getOption('configuration')) {
+        if ($customConfigPath = (string) $io->getInput()->getOption(self::OPTION_CONFIGURATION)) {
             $locator->locate($customConfigPath);
         } else {
             $this->runConfigurationCommand($locator, $io);
@@ -439,7 +518,7 @@ final class RunCommand extends BaseCommand
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
-                '--test-framework' => $io->getInput()->getOption('test-framework') ?: TestFrameworkTypes::PHPUNIT,
+                sprintf('--%s', self::OPTION_TEST_FRAMEWORK) => $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK) ?: TestFrameworkTypes::PHPUNIT,
             ];
 
             $newInput = new ArrayInput($args);

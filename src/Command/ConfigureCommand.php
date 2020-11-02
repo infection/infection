@@ -67,13 +67,16 @@ final class ConfigureCommand extends BaseCommand
 {
     public const NONINTERACTIVE_MODE_ERROR = 'Infection config generator requires an interactive mode.';
 
+    /** @var string */
+    private const OPTION_TEST_FRAMEWORK = 'test-framework';
+
     protected function configure(): void
     {
         $this
             ->setName('configure')
             ->setDescription('Create Infection config')
             ->addOption(
-                'test-framework',
+                self::OPTION_TEST_FRAMEWORK,
                 null,
                 InputOption::VALUE_REQUIRED,
                 sprintf(
@@ -138,7 +141,7 @@ final class ConfigureCommand extends BaseCommand
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get(
             $io,
             $dirsInCurrentDir,
-            $io->getInput()->getOption('test-framework')
+            $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK)
         );
 
         $phpUnitExecutableFinder = new TestFrameworkFinder();
