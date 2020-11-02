@@ -44,6 +44,10 @@ use Infection\Mutator\Boolean\IdenticalEqual;
 use Infection\Mutator\Boolean\NotIdenticalNotEqual;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\MutatorResolver;
+use Infection\Mutator\Number\DecrementInteger;
+use Infection\Mutator\Number\IncrementInteger;
+use Infection\Mutator\Number\OneZeroFloat;
+use Infection\Mutator\Number\OneZeroInteger;
 use Infection\Mutator\ProfileList;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\SingletonContainer;
@@ -328,6 +332,70 @@ final class MutatorResolverTest extends TestCase
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_it_works_wrong(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            'DecrementInteger' => [
+                'ignore' => [
+                    'Infected\\SourceClass::add',
+                ],
+            ],
+            '@number' => true,
+        ]);
+
+        $this->assertSame(
+            [
+                DecrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::add',
+                    ],
+                ],
+                IncrementInteger::class => [
+                    true,
+                ],
+                OneZeroFloat::class => [
+                    true,
+                ],
+                OneZeroInteger::class => [
+                    true,
+                ],
+            ],
+            $resolvedMutators
+        );
+    }
+
+    public function test_it_works_right(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            '@number' => true,
+            'DecrementInteger' => [
+                'ignore' => [
+                    'Infected\\SourceClass::add',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                DecrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::add',
+                    ],
+                ],
+                IncrementInteger::class => [
+                    true,
+                ],
+                OneZeroFloat::class => [
+                    true,
+                ],
+                OneZeroInteger::class => [
+                    true,
+                ],
+            ],
+            $resolvedMutators
+        );
     }
 
     /**
