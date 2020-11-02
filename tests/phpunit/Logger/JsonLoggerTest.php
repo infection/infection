@@ -38,7 +38,7 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\JsonLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutator\ZeroIteration\For_;
+use Infection\Mutator\Loop\For_;
 use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;

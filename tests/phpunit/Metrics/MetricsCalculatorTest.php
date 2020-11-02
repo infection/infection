@@ -39,7 +39,7 @@ use function array_merge;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutator\ZeroIteration\For_;
+use Infection\Mutator\Loop\For_;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 

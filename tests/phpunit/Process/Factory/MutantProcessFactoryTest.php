@@ -43,7 +43,7 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
-use Infection\Mutator\ZeroIteration\For_;
+use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
