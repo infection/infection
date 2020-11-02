@@ -334,7 +334,7 @@ final class MutatorResolverTest extends TestCase
         }
     }
 
-    public function test_it_works_wrong(): void
+    public function test_it_correct_when_profile_overrides_mutator(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve([
             'DecrementInteger' => [
@@ -363,7 +363,7 @@ final class MutatorResolverTest extends TestCase
         );
     }
 
-    public function test_it_works_right(): void
+    public function test_it_correct_when_mutator_overrides_profile(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve([
             '@number' => true,
@@ -386,6 +386,49 @@ final class MutatorResolverTest extends TestCase
                 OneZeroFloat::class => [
                 ],
                 OneZeroInteger::class => [
+                ],
+            ],
+            $resolvedMutators
+        );
+    }
+
+    public function test_it_correct_when_mutator_overrides_profile_with_settings(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            '@number' => [
+                'ignore' => [
+                    'Infected\\SourceClass::substract',
+                ],
+            ],
+            'DecrementInteger' => [
+                'ignore' => [
+                    'Infected\\SourceClass::add',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                DecrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::add',
+                        'Infected\\SourceClass::substract',
+                    ],
+                ],
+                IncrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::substract',
+                    ],
+                ],
+                OneZeroFloat::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::substract',
+                    ],
+                ],
+                OneZeroInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::substract',
+                    ],
                 ],
             ],
             $resolvedMutators

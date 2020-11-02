@@ -229,6 +229,12 @@ final class MutatorResolver
             return;
         }
 
-        $mutators[$mutatorClassName] = $settings;
+        if (!array_key_exists($mutatorClassName, $mutators)) {
+            $mutators[$mutatorClassName] = $settings;
+
+            return;
+        }
+
+        $mutators[$mutatorClassName] = array_merge_recursive($settings, $mutators[$mutatorClassName]);
     }
 }
