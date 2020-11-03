@@ -38,7 +38,6 @@ namespace Infection\Mutator;
 use function array_key_exists;
 use function array_merge_recursive;
 use function class_exists;
-use function count;
 use InvalidArgumentException;
 use function Safe\sprintf;
 use stdClass;
@@ -132,12 +131,12 @@ final class MutatorResolver
             return false;
         }
 
-        if (count($globalSettings) === 0) {
-            return (array) $settings;
-        }
-
         if ($settings === true) {
             return $globalSettings;
+        }
+
+        if ($globalSettings === []) {
+            return (array) $settings;
         }
 
         return array_merge_recursive($globalSettings, (array) $settings);
@@ -219,8 +218,22 @@ final class MutatorResolver
     ): void {
         if ($settings === false) {
             unset($mutators[$mutatorClassName]);
-        } else {
-            $mutators[$mutatorClassName] = (array) $settings;
+
+            return;
         }
+
+        if ($settings === true || $settings === []) {
+            $mutators[$mutatorClassName] = $mutators[$mutatorClassName] ?? [];
+
+            return;
+        }
+
+        if (!array_key_exists($mutatorClassName, $mutators)) {
+            $mutators[$mutatorClassName] = $settings;
+
+            return;
+        }
+
+        $mutators[$mutatorClassName] = array_merge_recursive($settings, $mutators[$mutatorClassName]);
     }
 }
