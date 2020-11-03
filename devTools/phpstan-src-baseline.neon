@@ -481,6 +481,11 @@ parameters:
 			path: ../src/Mutator/FunctionSignature/PublicVisibility.php
 
 		-
+			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\Do_\\) of method Infection\\\\Mutator\\\\Loop\\\\DoWhile\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
+			count: 1
+			path: ../src/Mutator/Loop/DoWhile.php
+
+		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Stmt\\\\For_\\) of method Infection\\\\Mutator\\\\Loop\\\\For_\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
 			path: ../src/Mutator/Loop/For_.php
