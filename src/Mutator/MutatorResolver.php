@@ -38,7 +38,6 @@ namespace Infection\Mutator;
 use function array_key_exists;
 use function array_merge_recursive;
 use function class_exists;
-use function count;
 use InvalidArgumentException;
 use function Safe\sprintf;
 use stdClass;
