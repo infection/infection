@@ -136,7 +136,7 @@ final class MutatorResolver
             return $globalSettings;
         }
 
-        if (count($globalSettings) === 0) {
+        if ($globalSettings === []) {
             return (array) $settings;
         }
 
