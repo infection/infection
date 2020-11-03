@@ -129,7 +129,8 @@
                 "global-ignoreSourceCodeByRegex": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "regex"
                     }
                 },
 
@@ -206,7 +207,8 @@
                                 "ignoreSourceCodeByRegex": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -272,7 +274,8 @@
                                 "ignoreSourceCodeByRegex": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -384,7 +387,8 @@
                                 "ignoreSourceCodeByRegex": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -442,7 +446,8 @@
                                 "ignoreSourceCodeByRegex": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -552,7 +557,8 @@
                         "ignoreSourceCodeByRegex": {
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "regex"
                             }
                         }
                     }
