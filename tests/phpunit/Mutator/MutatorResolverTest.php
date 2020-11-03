@@ -45,6 +45,10 @@ use Infection\Mutator\Boolean\NotIdenticalNotEqual;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\Loop\For_;
 use Infection\Mutator\MutatorResolver;
+use Infection\Mutator\Number\DecrementInteger;
+use Infection\Mutator\Number\IncrementInteger;
+use Infection\Mutator\Number\OneZeroFloat;
+use Infection\Mutator\Number\OneZeroInteger;
 use Infection\Mutator\ProfileList;
 use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
@@ -328,6 +332,107 @@ final class MutatorResolverTest extends TestCase
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_it_correct_when_profile_overrides_mutator(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            'DecrementInteger' => [
+                'ignore' => [
+                    'Infected\\SourceClass::add',
+                ],
+            ],
+            '@number' => true,
+        ]);
+
+        $this->assertSame(
+            [
+                DecrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::add',
+                    ],
+                ],
+                IncrementInteger::class => [
+                ],
+                OneZeroFloat::class => [
+                ],
+                OneZeroInteger::class => [
+                ],
+            ],
+            $resolvedMutators
+        );
+    }
+
+    public function test_it_correct_when_mutator_overrides_profile(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            '@number' => true,
+            'DecrementInteger' => [
+                'ignore' => [
+                    'Infected\\SourceClass::add',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                DecrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::add',
+                    ],
+                ],
+                IncrementInteger::class => [
+                ],
+                OneZeroFloat::class => [
+                ],
+                OneZeroInteger::class => [
+                ],
+            ],
+            $resolvedMutators
+        );
+    }
+
+    public function test_it_correct_when_mutator_overrides_profile_with_settings(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            '@number' => [
+                'ignore' => [
+                    'Infected\\SourceClass::substract',
+                ],
+            ],
+            'DecrementInteger' => [
+                'ignore' => [
+                    'Infected\\SourceClass::add',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                DecrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::add',
+                        'Infected\\SourceClass::substract',
+                    ],
+                ],
+                IncrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::substract',
+                    ],
+                ],
+                OneZeroFloat::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::substract',
+                    ],
+                ],
+                OneZeroInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::substract',
+                    ],
+                ],
+            ],
+            $resolvedMutators
+        );
     }
 
     /**
