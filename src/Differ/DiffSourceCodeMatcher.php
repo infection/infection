@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use function Safe\preg_match;
+use function strpos;
 
 /**
  * @internal
@@ -64,7 +65,7 @@ final class DiffSourceCodeMatcher
             }
         }
 
-        // Let it fail naturally, for now
-        return $possibleDelimiter;
+        // Let it fail naturally, for now. Later this might be a good place to throw an exception.
+        return '/';
     }
 }
