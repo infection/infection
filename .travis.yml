@@ -21,7 +21,7 @@ addons:
       - expect
 
 before_install:
-  - composer self-update -1
+  - composer self-update --1
   - source .ci/travis-functions.sh
   - xdebug_disable
   # Since the Makefile timestamp is used in the Makefile as a dependency, we must
