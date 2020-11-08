@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
+use function Later\now;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -107,7 +108,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
         $proxyTrace = new ProxyTrace(
             new SplFileInfo('/path/to/Foo.php', 'Foo.php', 'Foo.php'),
-            [$tests]
+            now($tests)
         );
 
         $expected = [$proxyTrace];
