@@ -37,6 +37,7 @@ namespace Infection\Mutant;
 
 use function array_keys;
 use Infection\Mutator\ProfileList;
+use Later\Interfaces\Deferred;
 use Webmozart\Assert\Assert;
 
 /**
@@ -48,23 +49,28 @@ class MutantExecutionResult
     private string $processCommandLine;
     private string $processOutput;
     private string $detectionStatus;
-    private string $mutantDiff;
+    private Deferred $mutantDiff;
     private string $mutatorName;
     private string $originalFilePath;
     private int $originalStartingLine;
-    private string $originalCode;
-    private string $mutatedCode;
+    private Deferred $originalCode;
+    private Deferred $mutatedCode;
 
+    /**
+     * @param Deferred<string> $mutantDiff
+     * @param Deferred<string> $originalCode
+     * @param Deferred<string> $mutatedCode
+     */
     public function __construct(
         string $processCommandLine,
         string $processOutput,
         string $detectionStatus,
-        string $mutantDiff,
+        Deferred $mutantDiff,
         string $mutatorName,
         string $originalFilePath,
         int $originalStartingLine,
-        string $originalCode,
-        string $mutatedCode
+        Deferred $originalCode,
+        Deferred $mutatedCode
     ) {
         Assert::oneOf($detectionStatus, DetectionStatus::ALL);
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
@@ -107,7 +113,7 @@ class MutantExecutionResult
 
     public function getMutantDiff(): string
     {
-        return $this->mutantDiff;
+        return $this->mutantDiff->get();
     }
 
     public function getMutatorName(): string
@@ -127,12 +133,12 @@ class MutantExecutionResult
 
     public function getOriginalCode(): string
     {
-        return $this->originalCode;
+        return $this->originalCode->get();
     }
 
     public function getMutatedCode(): string
     {
-        return $this->mutatedCode;
+        return $this->mutatedCode->get();
     }
 
     private static function createFromMutant(Mutant $mutant, string $detectionStatus): self

@@ -80,19 +80,28 @@ class Mutant
         return $this->mutation;
     }
 
-    public function getMutatedCode(): string
+    /**
+     * @return Deferred<string>
+     */
+    public function getMutatedCode(): Deferred
     {
-        return $this->mutatedCode->get();
+        return $this->mutatedCode;
     }
 
-    public function getPrettyPrintedOriginalCode(): string
+    /**
+     * @return Deferred<string>
+     */
+    public function getPrettyPrintedOriginalCode(): Deferred
     {
-        return $this->prettyPrintedOriginalCode->get();
+        return $this->prettyPrintedOriginalCode;
     }
 
-    public function getDiff(): string
+    /**
+     * @return Deferred<string>
+     */
+    public function getDiff(): Deferred
     {
-        return $this->diff->get();
+        return $this->diff;
     }
 
     public function isCoveredByTest(): bool
