@@ -48,6 +48,7 @@ use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
+use function Later\now;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -62,8 +63,8 @@ final class MutationGeneratorTest extends TestCase
         $fileInfo = $this->createMock(SplFileInfo::class);
 
         // Prophecy compares arguments on equality, therefore these have to be somewhat unique
-        $proxyTraceA = new ProxyTrace($fileInfo, [1]);
-        $proxyTraceB = new ProxyTrace($fileInfo, [2]);
+        $proxyTraceA = new ProxyTrace($fileInfo, now(1));
+        $proxyTraceB = new ProxyTrace($fileInfo, now(2));
 
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
@@ -162,16 +163,14 @@ final class MutationGeneratorTest extends TestCase
                         'fileA',
                         'relativePathToFileA',
                         'relativePathnameToFileA'
-                    ),
-                    []
+                    )
                 ),
                 new ProxyTrace(
                     new SplFileInfo(
                         'fileB',
                         'relativePathToFileB',
                         'relativePathnameToFileB'
-                    ),
-                    []
+                    )
                 ),
             ])
         ;
@@ -223,16 +222,14 @@ final class MutationGeneratorTest extends TestCase
                         'fileA',
                         'relativePathToFileA',
                         'relativePathnameToFileA'
-                    ),
-                    []
+                    )
                 ),
                 new ProxyTrace(
                     new SplFileInfo(
                         'fileB',
                         'relativePathToFileB',
                         'relativePathnameToFileB'
-                    ),
-                    []
+                    )
                 ),
             ])
         ;

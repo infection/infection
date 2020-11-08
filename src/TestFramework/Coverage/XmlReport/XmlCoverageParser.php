@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\SafeDOMXPath;
+use function Later\lazy;
 use Webmozart\Assert\Assert;
 
 /**
@@ -59,7 +60,7 @@ class XmlCoverageParser
     {
         return new ProxyTrace(
             $provider->provideFileInfo(),
-            self::createTestLocationsGenerator($provider->provideXPath())
+            lazy(self::createTestLocationsGenerator($provider->provideXPath()))
         );
     }
 
