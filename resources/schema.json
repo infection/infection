@@ -314,6 +314,7 @@
                 "Spread": { "$ref": "#/definitions/default-mutator-config" },
                 "Foreach_": { "$ref": "#/definitions/default-mutator-config" },
                 "For_": { "$ref": "#/definitions/default-mutator-config" },
+                "DoWhile": { "$ref": "#/definitions/default-mutator-config" },
                 "While_": { "$ref": "#/definitions/default-mutator-config" },
                 "CastArray": { "$ref": "#/definitions/default-mutator-config" },
                 "CastBool": { "$ref": "#/definitions/default-mutator-config" },

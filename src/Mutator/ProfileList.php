@@ -189,6 +189,7 @@ final class ProfileList
     ];
 
     public const LOOP_PROFILE = [
+        Mutator\Loop\DoWhile::class,
         Mutator\Loop\For_::class,
         Mutator\Loop\Foreach_::class,
         Mutator\Loop\While_::class,
@@ -380,6 +381,7 @@ final class ProfileList
         'Spaceship' => Mutator\Sort\Spaceship::class,
 
         // Loop
+        'DoWhile' => Mutator\Loop\DoWhile::class,
         'Foreach_' => Mutator\Loop\Foreach_::class,
         'For_' => Mutator\Loop\For_::class,
         'While_' => Mutator\Loop\While_::class,
