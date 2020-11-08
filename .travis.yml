@@ -21,6 +21,7 @@ addons:
       - expect
 
 before_install:
+  - composer self-update --1 # v2 needs Box 3.9.0+ 
   - source .ci/travis-functions.sh
   - xdebug_disable
   # Since the Makefile timestamp is used in the Makefile as a dependency, we must
@@ -123,4 +124,3 @@ jobs:
         on:
           tags: true
           repo: infection/infection
-
