@@ -168,8 +168,11 @@ final class MutantFactoryTest extends TestCase
             ->willReturn('code diff')
         ;
 
-        $this->mutantFactory->create($mutation);
-        $this->mutantFactory->create($mutation);
+        $this->mutantFactory->create($mutation)->getPrettyPrintedOriginalCode()->get();
+        $this->mutantFactory->create($mutation)->getDiff()->get();
+
+        $this->mutantFactory->create($mutation)->getPrettyPrintedOriginalCode()->get();
+        $this->mutantFactory->create($mutation)->getDiff()->get();
     }
 
     /**

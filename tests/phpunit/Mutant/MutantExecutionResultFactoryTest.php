@@ -38,7 +38,6 @@ namespace Infection\Tests\Mutant;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
@@ -96,7 +95,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            new Mutant(
+            MutantBuilder::build(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -166,7 +165,7 @@ DIFF,
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            new Mutant(
+            MutantBuilder::build(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -248,7 +247,7 @@ DIFF,
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            new Mutant(
+            MutantBuilder::build(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -331,7 +330,7 @@ DIFF,
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            new Mutant(
+            MutantBuilder::build(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -414,7 +413,7 @@ DIFF,
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            new Mutant(
+            MutantBuilder::build(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',

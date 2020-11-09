@@ -41,6 +41,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
+use function Later\now;
 use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
 
@@ -62,7 +63,7 @@ final class MutantTest extends TestCase
         array $expectedTests,
         string $originalCode
     ): void {
-        $mutant = new Mutant($filePath, $mutation, $mutatedCode, $diff, $originalCode);
+        $mutant = new Mutant($filePath, $mutation, now($mutatedCode), now($diff), now($originalCode));
 
         $this->assertMutantStateIs(
             $mutant,

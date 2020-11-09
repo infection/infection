@@ -37,12 +37,12 @@ namespace Infection\Tests\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
+use function Later\now;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\TestCase;
 
@@ -75,12 +75,12 @@ DIFF;
             $processCommandLine,
             $processOutput,
             $processResultCode,
-            $mutantDiff,
+            now($mutantDiff),
             $mutatorName,
             $originalFilePath,
             $originalStartingLine,
-            $originalCode,
-            $mutatedCode
+            now($originalCode),
+            now($mutatedCode)
         );
 
         $this->assertResultStateIs(
@@ -102,7 +102,7 @@ DIFF;
         $originalCode = '<?php $a = 1;';
         $mutatedCode = '<?php $a = 1;';
 
-        $mutant = new Mutant(
+        $mutant = MutantBuilder::build(
             '/path/to/mutant',
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
