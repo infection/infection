@@ -516,16 +516,6 @@ parameters:
 			path: ../src/Mutator/NodeMutationGenerator.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"Generator\"\\.$#"
-			count: 1
-			path: ../src/Mutator/NodeMutationGenerator.php
-
-		-
-			message: "#^Only booleans are allowed in a negated boolean, mixed given\\.$#"
-			count: 2
-			path: ../src/Mutator/NodeMutationGenerator.php
-
-		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Scalar\\\\LNumber\\) of method Infection\\\\Mutator\\\\Number\\\\DecrementInteger\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 2
 			path: ../src/Mutator/Number/DecrementInteger.php
