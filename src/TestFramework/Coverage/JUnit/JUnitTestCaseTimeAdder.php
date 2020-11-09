@@ -71,7 +71,7 @@ final class JUnitTestCaseTimeAdder
     /**
      * Returns unique'd test cases with timings. Timings are per test suite, not per test, therefore we have to unique by test suite name.
      *
-     * @return Traversable<string, float|null>
+     * @return Traversable<float|null>
      */
     private function uniqueTestLocations(): Traversable
     {
