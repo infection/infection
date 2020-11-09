@@ -91,13 +91,17 @@ class MutantFactory
         );
     }
 
+    /** @return iterable<string> */
     private function createMutatedCode(Mutation $mutation): iterable
     {
         yield $this->mutantCodeFactory->createCode($mutation);
     }
 
     /**
+     * @param Deferred<string> $originalPrettyPrintedFile
      * @param Deferred<string> $mutantCode
+     *
+     * @return iterable<string>
      */
     private function createMutantDiff(Deferred $originalPrettyPrintedFile, Mutation $mutation, Deferred $mutantCode): iterable
     {
@@ -106,6 +110,8 @@ class MutantFactory
 
     /**
      * @param Node[] $originalStatements
+     *
+     * @return iterable<string>
      */
     private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): iterable
     {

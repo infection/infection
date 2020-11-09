@@ -49,11 +49,23 @@ class MutantExecutionResult
     private string $processCommandLine;
     private string $processOutput;
     private string $detectionStatus;
+
+    /**
+     * @var Deferred<string>
+     */
     private Deferred $mutantDiff;
     private string $mutatorName;
     private string $originalFilePath;
     private int $originalStartingLine;
+
+    /**
+     * @var Deferred<string>
+     */
     private Deferred $originalCode;
+
+    /**
+     * @var Deferred<string>
+     */
     private Deferred $mutatedCode;
 
     /**

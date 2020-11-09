@@ -47,8 +47,11 @@ class Mutant
 {
     private string $mutantFilePath;
     private Mutation $mutation;
+    /** @var Deferred<string> */
     private Deferred $mutatedCode;
+    /** @var Deferred<string> */
     private Deferred $diff;
+    /** @var Deferred<string> */
     private Deferred $prettyPrintedOriginalCode;
 
     /**
