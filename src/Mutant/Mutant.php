@@ -37,6 +37,7 @@ namespace Infection\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
+use Later\Interfaces\Deferred;
 
 /**
  * @internal
@@ -46,16 +47,21 @@ class Mutant
 {
     private string $mutantFilePath;
     private Mutation $mutation;
-    private string $mutatedCode;
-    private string $diff;
-    private string $prettyPrintedOriginalCode;
+    private Deferred $mutatedCode;
+    private Deferred $diff;
+    private Deferred $prettyPrintedOriginalCode;
 
+    /**
+     * @param Deferred<string> $mutatedCode
+     * @param Deferred<string> $diff
+     * @param Deferred<string> $prettyPrintedOriginalCode
+     */
     public function __construct(
         string $mutantFilePath,
         Mutation $mutation,
-        string $mutatedCode,
-        string $diff,
-        string $prettyPrintedOriginalCode
+        Deferred $mutatedCode,
+        Deferred $diff,
+        Deferred $prettyPrintedOriginalCode
     ) {
         $this->mutantFilePath = $mutantFilePath;
         $this->mutation = $mutation;
@@ -76,17 +82,17 @@ class Mutant
 
     public function getMutatedCode(): string
     {
-        return $this->mutatedCode;
+        return $this->mutatedCode->get();
     }
 
     public function getPrettyPrintedOriginalCode(): string
     {
-        return $this->prettyPrintedOriginalCode;
+        return $this->prettyPrintedOriginalCode->get();
     }
 
     public function getDiff(): string
     {
-        return $this->diff;
+        return $this->diff->get();
     }
 
     public function isCoveredByTest(): bool
