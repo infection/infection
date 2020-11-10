@@ -71,10 +71,12 @@ final class JUnitTestCaseTimeAdder
     /**
      * Returns unique'd test cases with timings. Timings are per test suite, not per test, therefore we have to unique by test suite name.
      *
-     * @return Traversable<string, float|null>
+     * @return Traversable<float|null>
      */
     private function uniqueTestLocations(): Traversable
     {
+        $seenTestSuites = [];
+
         foreach ($this->tests as $testLocation) {
             $methodName = $testLocation->getMethod();
             $methodSeparatorPos = strpos($methodName, '::');
@@ -85,7 +87,15 @@ final class JUnitTestCaseTimeAdder
             }
 
             // For each test we discard method name, and return a single timing for an entire suite
-            yield substr($methodName, 0, $methodSeparatorPos) => $testLocation->getExecutionTime();
+            $testSuiteName = substr($methodName, 0, $methodSeparatorPos);
+
+            if (array_key_exists($testSuiteName, $seenTestSuites)) {
+                continue;
+            }
+
+            $seenTestSuites[$testSuiteName] = true;
+
+            yield $testLocation->getExecutionTime();
         }
     }
 }
