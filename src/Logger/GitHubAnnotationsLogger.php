@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use function Safe\getcwd;
 use function str_replace;
 use Webmozart\PathUtil\Path;
@@ -45,11 +45,11 @@ use Webmozart\PathUtil\Path;
  */
 final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 {
-    private MetricsCalculator $metricsCalculator;
+    private ResultsCollector $resultsCollector;
 
-    public function __construct(MetricsCalculator $metricsCalculator)
+    public function __construct(ResultsCollector $resultsCollector)
     {
-        $this->metricsCalculator = $metricsCalculator;
+        $this->resultsCollector = $resultsCollector;
     }
 
     public function getLogLines(): array
@@ -57,7 +57,7 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
         $lines = [];
         $currentWorkingDirectory = getcwd();
 
-        foreach ($this->metricsCalculator->getEscapedExecutionResults() as $escapedExecutionResult) {
+        foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
             $error = [
                 'line' => $escapedExecutionResult->getOriginalStartingLine(),
                 'message' => <<<"TEXT"

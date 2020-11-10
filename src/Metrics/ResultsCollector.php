@@ -43,121 +43,100 @@ use function Safe\sprintf;
 /**
  * @internal
  */
-class MetricsCalculator implements Collector
+class ResultsCollector implements Collector
 {
-    private int $roundingPrecision;
-
     /**
-     * @var array<string, int>
+     * @var array<string, SortableMutantExecutionResults>
      */
-    private array $countByStatus = [];
+    private array $resultsByStatus = [];
 
-    private int $totalMutantsCount = 0;
+    private SortableMutantExecutionResults $allExecutionResults;
 
-    private ?Calculator $calculator = null;
-
-    public function __construct(int $roundingPrecision)
+    public function __construct()
     {
-        $this->roundingPrecision = $roundingPrecision;
-
         foreach (DetectionStatus::ALL as $status) {
-            $this->countByStatus[$status] = 0;
+            $this->resultsByStatus[$status] = new SortableMutantExecutionResults();
         }
+
+        $this->allExecutionResults = new SortableMutantExecutionResults();
     }
 
     public function collect(MutantExecutionResult ...$executionResults): void
     {
-        if ($this->calculator !== null && $executionResults !== []) {
-            // Reset the calculator if any result is added
-            $this->calculator = null;
-        }
-
         foreach ($executionResults as $executionResult) {
+            $this->allExecutionResults->add($executionResult);
+
             $detectionStatus = $executionResult->getDetectionStatus();
 
-            if (!array_key_exists($detectionStatus, $this->countByStatus)) {
+            if (!array_key_exists($detectionStatus, $this->resultsByStatus)) {
                 throw new InvalidArgumentException(sprintf(
                     'Unknown execution result process result code "%s"',
                     $executionResult->getDetectionStatus()
                 ));
             }
 
-            ++$this->totalMutantsCount;
-            ++$this->countByStatus[$detectionStatus];
+            $this->resultsByStatus[$detectionStatus]->add($executionResult);
         }
     }
 
-    public function getRoundingPrecision(): int
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getAllExecutionResults(): array
     {
-        return $this->roundingPrecision;
-    }
-
-    public function getKilledCount(): int
-    {
-        return $this->countByStatus[DetectionStatus::KILLED];
-    }
-
-    public function getErrorCount(): int
-    {
-        return $this->countByStatus[DetectionStatus::ERROR];
-    }
-
-    public function getSkippedCount(): int
-    {
-        return $this->countByStatus[DetectionStatus::SKIPPED];
-    }
-
-    public function getEscapedCount(): int
-    {
-        return $this->countByStatus[DetectionStatus::ESCAPED];
-    }
-
-    public function getTimedOutCount(): int
-    {
-        return $this->countByStatus[DetectionStatus::TIMED_OUT];
-    }
-
-    public function getNotTestedCount(): int
-    {
-        return $this->countByStatus[DetectionStatus::NOT_COVERED];
-    }
-
-    public function getTotalMutantsCount(): int
-    {
-        return $this->totalMutantsCount;
-    }
-
-    public function getTestedMutantsCount(): int
-    {
-        return $this->getTotalMutantsCount() - $this->getSkippedCount();
+        return $this->allExecutionResults->getSortedExecutionResults();
     }
 
     /**
-     * Mutation Score Indicator (MSI)
+     * @return MutantExecutionResult[]
      */
-    public function getMutationScoreIndicator(): float
+    public function getKilledExecutionResults(): array
     {
-        return $this->getCalculator()->getMutationScoreIndicator();
+        return $this->getResultListForStatus(DetectionStatus::KILLED)->getSortedExecutionResults();
     }
 
     /**
-     * Mutation coverage percentage
+     * @return MutantExecutionResult[]
      */
-    public function getCoverageRate(): float
+    public function getErrorExecutionResults(): array
     {
-        return $this->getCalculator()->getCoverageRate();
+        return $this->getResultListForStatus(DetectionStatus::ERROR)->getSortedExecutionResults();
     }
 
     /**
-     * Mutation Score Indicator relative to the covered mutants
+     * @return MutantExecutionResult[]
      */
-    public function getCoveredCodeMutationScoreIndicator(): float
+    public function getSkippedExecutionResults(): array
     {
-        return $this->getCalculator()->getCoveredCodeMutationScoreIndicator();
+        return $this->getResultListForStatus(DetectionStatus::SKIPPED)->getSortedExecutionResults();
     }
 
-    private function getCalculator(): Calculator
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getEscapedExecutionResults(): array
     {
-        return $this->calculator ?? $this->calculator = Calculator::fromMetrics($this);
+        return $this->getResultListForStatus(DetectionStatus::ESCAPED)->getSortedExecutionResults();
+    }
+
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getTimedOutExecutionResults(): array
+    {
+        return $this->getResultListForStatus(DetectionStatus::TIMED_OUT)->getSortedExecutionResults();
+    }
+
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getNotCoveredExecutionResults(): array
+    {
+        return $this->getResultListForStatus(DetectionStatus::NOT_COVERED)->getSortedExecutionResults();
+    }
+
+    private function getResultListForStatus(string $detectionStatus): SortableMutantExecutionResults
+    {
+        return $this->resultsByStatus[$detectionStatus];
     }
 }

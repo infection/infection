@@ -40,6 +40,7 @@ use function array_unshift;
 use function count;
 use function implode;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
@@ -57,10 +58,14 @@ use function strlen;
 final class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
     private MetricsCalculator $metricsCalculator;
+    private ResultsCollector $resultsCollector;
 
-    public function __construct(MetricsCalculator $metricsCalculator)
-    {
+    public function __construct(
+        MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector
+    ) {
         $this->metricsCalculator = $metricsCalculator;
+        $this->resultsCollector = $resultsCollector;
     }
 
     public function getLogLines(): array
@@ -173,7 +178,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
      */
     private function createMetricsPerMutators(): array
     {
-        $executionResults = $this->metricsCalculator->getAllExecutionResults();
+        $executionResults = $this->resultsCollector->getAllExecutionResults();
 
         $processPerMutator = [];
 
