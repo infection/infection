@@ -40,6 +40,7 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use function Later\now;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -49,7 +50,7 @@ final class ProxyTraceTest extends TestCase
     {
         $fileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $actual = (new ProxyTrace($fileInfoMock, []))->getSourceFileInfo();
+        $actual = (new ProxyTrace($fileInfoMock))->getSourceFileInfo();
 
         $this->assertSame(
             $fileInfoMock,
@@ -67,7 +68,7 @@ final class ProxyTraceTest extends TestCase
             ->willReturn($expected)
         ;
 
-        $actual = (new ProxyTrace($fileInfoMock, []))->getRealPath();
+        $actual = (new ProxyTrace($fileInfoMock))->getRealPath();
 
         $this->assertSame($expected, $actual);
     }
@@ -77,7 +78,7 @@ final class ProxyTraceTest extends TestCase
         $fileInfoMock = $this->createMock(SplFileInfo::class);
         $tests = new TestLocations();
 
-        $trace = new ProxyTrace($fileInfoMock, [$tests]);
+        $trace = new ProxyTrace($fileInfoMock, now($tests));
 
         $actual = $trace->getTests();
         $this->assertSame($tests, $actual);
@@ -91,7 +92,7 @@ final class ProxyTraceTest extends TestCase
     {
         $fileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $trace = new ProxyTrace($fileInfoMock, [new TestLocations()]);
+        $trace = new ProxyTrace($fileInfoMock, now(new TestLocations()));
 
         $this->assertFalse($trace->hasTests());
     }
@@ -114,7 +115,7 @@ final class ProxyTraceTest extends TestCase
             ]
         );
 
-        $trace = new ProxyTrace($fileInfoMock, [$tests]);
+        $trace = new ProxyTrace($fileInfoMock, now($tests));
 
         $this->assertTrue($trace->hasTests());
 
