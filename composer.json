@@ -54,6 +54,7 @@
         "nikic/php-parser": "^4.10.2",
         "ocramius/package-versions": "^1.2 || ^2.0",
         "ondram/ci-detector": "^3.3.0",
+        "sanmai/later": "^0.1.1",
         "sanmai/pipeline": "^5.1",
         "sebastian/diff": "^3.0.2 || ^4.0",
         "seld/jsonlint": "^1.7",
