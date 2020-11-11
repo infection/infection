@@ -101,7 +101,7 @@ class MutationTestingRunner
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
         $processes = take($mutations)
-            ->map(function (Mutation $mutation): Mutant {
+            ->cast(function (Mutation $mutation): Mutant {
                 return $this->mutantFactory->create($mutation);
             })
             ->filter(function (Mutant $mutant) {
@@ -132,6 +132,7 @@ class MutationTestingRunner
                 return true;
             })
             ->filter(function (Mutant $mutant) {
+                // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
                 if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
                     return true;
                 }
@@ -142,7 +143,7 @@ class MutationTestingRunner
 
                 return false;
             })
-            ->map(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
+            ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode());
 
                 $process = $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
