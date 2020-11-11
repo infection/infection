@@ -101,7 +101,7 @@ class MutationTestingRunner
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
         $processes = take($mutations)
-            ->map(function (Mutation $mutation): Mutant {
+            ->cast(function (Mutation $mutation): Mutant {
                 return $this->mutantFactory->create($mutation);
             })
             ->filter(function (Mutant $mutant) {
@@ -143,7 +143,7 @@ class MutationTestingRunner
 
                 return false;
             })
-            ->map(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
+            ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
 
                 $process = $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
