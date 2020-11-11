@@ -38,7 +38,6 @@ namespace Infection\TestFramework\Coverage\JUnit;
 use function array_sum;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use function Safe\substr;
-use Traversable;
 
 /**
  * @internal
@@ -61,19 +60,16 @@ final class JUnitTestCaseTimeAdder
     public function getTotalTestTime(): float
     {
         return array_sum(
-            iterator_to_array(
-                $this->uniqueTestLocations(),
-                true // Duplicate keys must be overwritten.
-            )
+            $this->uniqueTestLocations()
         );
     }
 
     /**
      * Returns unique'd test cases with timings. Timings are per test suite, not per test, therefore we have to unique by test suite name.
      *
-     * @return Traversable<float|null>
+     * @return array<float|null>
      */
-    private function uniqueTestLocations(): Traversable
+    private function uniqueTestLocations(): array
     {
         $seenTestSuites = [];
 
@@ -93,9 +89,9 @@ final class JUnitTestCaseTimeAdder
                 continue;
             }
 
-            $seenTestSuites[$testSuiteName] = true;
-
-            yield $testLocation->getExecutionTime();
+            $seenTestSuites[$testSuiteName] = $testLocation->getExecutionTime();
         }
+
+        return $seenTestSuites;
     }
 }
