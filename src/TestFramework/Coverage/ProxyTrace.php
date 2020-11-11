@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
+use Later\Interfaces\Deferred;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -50,19 +51,17 @@ class ProxyTrace implements Trace
 {
     private SplFileInfo $sourceFile;
 
-    private ?TestLocations $testLocations = null;
-
     /**
-     * @var iterable<TestLocations>
+     * @var ?Deferred<TestLocations>
      */
-    private iterable $lazyTestLocations;
+    private ?Deferred $lazyTestLocations;
 
     private ?TestLocator $tests = null;
 
     /**
-     * @param iterable<TestLocations> $lazyTestLocations
+     * @param Deferred<TestLocations> $lazyTestLocations
      */
-    public function __construct(SplFileInfo $sourceFile, iterable $lazyTestLocations)
+    public function __construct(SplFileInfo $sourceFile, ?Deferred $lazyTestLocations = null)
     {
         $this->sourceFile = $sourceFile;
 
@@ -96,25 +95,11 @@ class ProxyTrace implements Trace
 
     public function getTests(): TestLocations
     {
-        if ($this->testLocations !== null) {
-            return $this->testLocations;
+        if ($this->lazyTestLocations !== null) {
+            return $this->lazyTestLocations->get();
         }
 
-        // TODO: maybe instead of having iterable<CoverageReport> lazyCoverageReport, we could have
-        // `Closure<() => TestLocations> testLocationsFactory`: it returns only one element but
-        // remains lazy
-        foreach ($this->lazyTestLocations as $testLocations) {
-            // is a Generator with one yield, thus it'll only trigger here
-            // (or this can be an array with one element)
-            $this->testLocations = $testLocations;
-
-            break;
-        }
-
-        Assert::isInstanceOf($this->testLocations, TestLocations::class);
-        $this->lazyTestLocations = []; // let GC have it
-
-        return $this->testLocations;
+        return new TestLocations();
     }
 
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
