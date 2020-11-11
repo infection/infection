@@ -124,7 +124,7 @@ class MutationTestingRunner
                 }
 
                 foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] as $sourceCodeRegex) {
-                    if ($this->diffSourceCodeMatcher->matches($mutant->getDiff(), $sourceCodeRegex)) {
+                    if ($this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {
                         return false;
                     }
                 }
@@ -132,6 +132,7 @@ class MutationTestingRunner
                 return true;
             })
             ->filter(function (Mutant $mutant) {
+                // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
                 if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
                     return true;
                 }
@@ -143,7 +144,7 @@ class MutationTestingRunner
                 return false;
             })
             ->map(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
-                $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode());
+                $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
 
                 $process = $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 

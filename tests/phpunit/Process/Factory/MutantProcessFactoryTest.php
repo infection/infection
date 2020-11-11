@@ -39,7 +39,6 @@ use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\MutantProcessWasFinished;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
@@ -47,6 +46,7 @@ use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutator\MutatorName;
 use const PHP_OS_FAMILY;
 use PhpParser\Node\Stmt\Nop;
@@ -56,7 +56,7 @@ final class MutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
-        $mutant = new Mutant(
+        $mutant = MutantBuilder::build(
             $mutantFilePath = '/path/to/mutant',
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
