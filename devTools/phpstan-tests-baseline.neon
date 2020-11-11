@@ -281,14 +281,24 @@ parameters:
 			path: ../tests/phpunit/Event/Subscriber/MutationTestingConsoleLoggerSubscriberFactoryTest.php
 
 		-
+			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
+			count: 5
+			path: ../tests/phpunit/Event/Subscriber/MutationTestingConsoleLoggerSubscriberTest.php
+
+		-
 			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
 			count: 1
 			path: ../tests/phpunit/Event/Subscriber/MutationTestingConsoleLoggerSubscriberTest.php
 
 		-
+			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
+			count: 1
+			path: ../tests/phpunit/Event/Subscriber/MutationTestingResultsCollectorSubscriberFactoryTest.php
+
+		-
 			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 5
-			path: ../tests/phpunit/Event/Subscriber/MutationTestingConsoleLoggerSubscriberTest.php
+			count: 2
+			path: ../tests/phpunit/Event/Subscriber/MutationTestingResultsCollectorSubscriberTest.php
 
 		-
 			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
