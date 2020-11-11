@@ -37,6 +37,7 @@ namespace Infection\Mutator;
 
 use function count;
 use function get_class;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
@@ -44,7 +45,6 @@ use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
 use PhpParser\Node;
-use function Pipeline\take;
 use Throwable;
 use Traversable;
 use Webmozart\Assert\Assert;
@@ -63,6 +63,12 @@ class NodeMutationGenerator
     private Trace $trace;
     private bool $onlyCovered;
     private LineRangeCalculator $lineRangeCalculator;
+
+    private Node $currentNode;
+    /** @var TestLocation[]|null */
+    private ?array $testsMemoized = null;
+    private ?bool $isOnFunctionSignatureMemoized = null;
+    private ?bool $isInsideFunctionMemoized = null;
 
     /**
      * @param Mutator[] $mutators
@@ -91,9 +97,20 @@ class NodeMutationGenerator
      */
     public function generate(Node $node): iterable
     {
-        yield from take($this->mutators)->map(function (Mutator $mutator) use ($node) {
+        $this->currentNode = $node;
+        $this->testsMemoized = null;
+        $this->isOnFunctionSignatureMemoized = null;
+        $this->isInsideFunctionMemoized = null;
+
+        if (!$this->isOnFunctionSignature()
+            && !$this->isInsideFunction()
+        ) {
+            return;
+        }
+
+        foreach ($this->mutators as $mutator) {
             yield from $this->generateForMutator($node, $mutator);
-        });
+        }
     }
 
     /**
@@ -113,22 +130,7 @@ class NodeMutationGenerator
             );
         }
 
-        $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
-
-        if (!$isOnFunctionSignature
-            && !$node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY)
-        ) {
-            return;
-        }
-
-        $tests = $this->trace->getAllTestsForMutation(
-            $this->lineRangeCalculator->calculateRange($node),
-            $isOnFunctionSignature
-        );
-
-        if ($tests instanceof Traversable) {
-            $tests = iterator_to_array($tests, false);
-        }
+        $tests = $this->getAllTestsForMutation();
 
         if ($this->onlyCovered && count($tests) === 0) {
             return;
@@ -150,5 +152,38 @@ class NodeMutationGenerator
 
             ++$mutationByMutatorIndex;
         }
+    }
+
+    private function isOnFunctionSignature(): bool
+    {
+        return $this->isOnFunctionSignatureMemoized ??
+            $this->isOnFunctionSignatureMemoized = $this->currentNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+    }
+
+    private function isInsideFunction(): bool
+    {
+        return $this->isInsideFunctionMemoized ??
+            $this->isInsideFunctionMemoized = $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
+    }
+
+    /**
+     * @return TestLocation[]
+     */
+    private function getAllTestsForMutation(): array
+    {
+        if ($this->testsMemoized !== null) {
+            return $this->testsMemoized;
+        }
+
+        $testsMemoized = $this->trace->getAllTestsForMutation(
+            $this->lineRangeCalculator->calculateRange($this->currentNode),
+            $this->isOnFunctionSignature()
+        );
+
+        if ($testsMemoized instanceof Traversable) {
+            $testsMemoized = iterator_to_array($testsMemoized, false);
+        }
+
+        return $this->testsMemoized = $testsMemoized;
     }
 }
