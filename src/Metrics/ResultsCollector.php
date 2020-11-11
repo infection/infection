@@ -42,6 +42,7 @@ use function Safe\sprintf;
 
 /**
  * @internal
+ * @final
  */
 class ResultsCollector implements Collector
 {
