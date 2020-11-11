@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
@@ -50,7 +52,23 @@ trait CreateMetricsCalculator
     {
         $calculator = new MetricsCalculator(2);
 
-        $calculator->collect(
+        $this->feedCollector($calculator);
+
+        return $calculator;
+    }
+
+    private function createCompleteResultsCollector(): ResultsCollector
+    {
+        $collector = new ResultsCollector();
+
+        $this->feedCollector($collector);
+
+        return $collector;
+    }
+
+    private function feedCollector(Collector $collector): void
+    {
+        $collector->collect(
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
@@ -124,8 +142,6 @@ trait CreateMetricsCalculator
                 'notCovered#1'
             )
         );
-
-        return $calculator;
     }
 
     private function createMutantExecutionResult(

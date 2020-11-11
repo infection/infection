@@ -33,44 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger;
+namespace Infection\Tests\Metrics;
 
-use Infection\Logger\GitHubAnnotationsLogger;
-use Infection\Metrics\ResultsCollector;
-use PHPUnit\Framework\TestCase;
+use Infection\Metrics\Collector;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutator\Loop\For_;
+use Infection\Tests\Mutator\MutatorName;
+use function Later\now;
 
-/**
- * @group integration
- */
-final class GitHubAnnotationsLoggerTest extends TestCase
+trait CreateMutantExecutionResult
 {
-    use CreateMetricsCalculator;
+    private $id = 0;
 
     /**
-     * @dataProvider metricsProvider
+     * @return MutantExecutionResult[]
      */
-    public function test_it_logs_correctly_with_mutations(
-        ResultsCollector $resultsCollector,
-        array $expectedLines
-    ): void {
-        $logger = new GitHubAnnotationsLogger($resultsCollector);
+    private function addMutantExecutionResult(
+        Collector $collector,
+        string $detectionStatus,
+        int $count
+    ): array {
+        $executionResults = [];
 
-        $this->assertSame($expectedLines, $logger->getLogLines());
+        for ($i = 0; $i < $count; ++$i) {
+            $executionResults[] = $this->createMutantExecutionResult($detectionStatus);
+        }
+
+        $collector->collect(...$executionResults);
+
+        return $executionResults;
     }
 
-    public function metricsProvider(): iterable
+    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
     {
-        yield 'no mutations' => [
-            new ResultsCollector(),
-            [],
-        ];
+        $id = $this->id;
+        ++$this->id;
 
-        yield 'all mutations' => [
-            $this->createCompleteResultsCollector(),
-            [
-                "::warning file=foo/bar,line=9::Escaped Mutant:%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#1';%0A\n",
-                "::warning file=foo/bar,line=10::Escaped Mutant:%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A\n",
-            ],
-        ];
+        return new MutantExecutionResult(
+            'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
+            'process output',
+            $detectionStatus,
+            now(str_replace(
+                "\n",
+                PHP_EOL,
+                <<<DIFF
+--- Original
++++ New
+@@ @@
+                
+- echo 'original';
++ echo 'mutated';
+                
+DIFF
+                )),
+            MutatorName::getName(For_::class),
+            'foo/bar',
+            $id,
+            now('<?php $a = 1;'),
+            now('<?php $a = 1;')
+        );
     }
 }
