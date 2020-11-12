@@ -44,6 +44,7 @@ use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use OndraM\CiDetector\CiDetector;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -55,6 +56,8 @@ use Symfony\Component\Filesystem\Filesystem;
 class LoggerFactory
 {
     private MetricsCalculator $metricsCalculator;
+    private ResultsCollector $resultsCollector;
+
     private Filesystem $filesystem;
     private string $logVerbosity;
     private bool $debugMode;
@@ -64,6 +67,7 @@ class LoggerFactory
 
     public function __construct(
         MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
         Filesystem $filesystem,
         string $logVerbosity,
         bool $debugMode,
@@ -72,6 +76,7 @@ class LoggerFactory
         LoggerInterface $logger
     ) {
         $this->metricsCalculator = $metricsCalculator;
+        $this->resultsCollector = $resultsCollector;
         $this->filesystem = $filesystem;
         $this->logVerbosity = $logVerbosity;
         $this->debugMode = $debugMode;
@@ -108,7 +113,7 @@ class LoggerFactory
                 $filePath,
                 $this->filesystem,
                 new TextFileLogger(
-                    $this->metricsCalculator,
+                    $this->resultsCollector,
                     $this->logVerbosity === LogVerbosity::DEBUG,
                     $this->onlyCoveredCode,
                     $this->debugMode
@@ -138,7 +143,11 @@ class LoggerFactory
             : new FileLogger(
                 $filePath,
                 $this->filesystem,
-                new JsonLogger($this->metricsCalculator, $this->onlyCoveredCode),
+                new JsonLogger(
+                    $this->metricsCalculator,
+                    $this->resultsCollector,
+                    $this->onlyCoveredCode
+                ),
                 $this->logger
             )
         ;
@@ -150,7 +159,7 @@ class LoggerFactory
             ? new FileLogger(
                 'php://stdout',
                 $this->filesystem,
-                new GitHubAnnotationsLogger($this->metricsCalculator),
+                new GitHubAnnotationsLogger($this->resultsCollector),
                 $this->logger
             )
             : null
@@ -164,7 +173,11 @@ class LoggerFactory
             : new FileLogger(
                 $filePath,
                 $this->filesystem,
-                new DebugFileLogger($this->metricsCalculator, $this->onlyCoveredCode),
+                new DebugFileLogger(
+                    $this->metricsCalculator,
+                    $this->resultsCollector,
+                    $this->onlyCoveredCode
+                ),
                 $this->logger
             )
         ;
@@ -177,7 +190,10 @@ class LoggerFactory
             : new FileLogger(
                 $filePath,
                 $this->filesystem,
-                new PerMutatorLogger($this->metricsCalculator),
+                new PerMutatorLogger(
+                    $this->metricsCalculator,
+                    $this->resultsCollector
+                ),
                 $this->logger
             )
         ;

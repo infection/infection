@@ -37,6 +37,7 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\JsonLogger;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
 use const JSON_THROW_ON_ERROR;
@@ -59,9 +60,10 @@ final class JsonLoggerTest extends TestCase
     public function test_it_logs_correctly_with_mutations(
         bool $onlyCovered,
         MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
         array $expectedContents
     ): void {
-        $logger = new JsonLogger($metricsCalculator, $onlyCovered);
+        $logger = new JsonLogger($metricsCalculator, $resultsCollector, $onlyCovered);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
@@ -71,6 +73,7 @@ final class JsonLoggerTest extends TestCase
         yield 'no mutations; only covered' => [
             true,
             new MetricsCalculator(2),
+            new ResultsCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 0,
@@ -95,6 +98,7 @@ final class JsonLoggerTest extends TestCase
         yield 'all mutations; only covered' => [
             true,
             $this->createCompleteMetricsCalculator(),
+            $this->createCompleteResultsCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 12,
@@ -210,12 +214,13 @@ final class JsonLoggerTest extends TestCase
 
         yield 'uncovered mutations' => [
             false,
-            $this->createUncoveredMetricsCalculator(),
+            new MetricsCalculator(2),
+            $this->createUncoveredResultsCollector(),
             [
                 'stats' => [
-                    'totalMutantsCount' => 1,
+                    'totalMutantsCount' => 0,
                     'killedCount' => 0,
-                    'notCoveredCount' => 1,
+                    'notCoveredCount' => 0,
                     'escapedCount' => 0,
                     'errorCount' => 0,
                     'skippedCount' => 0,
@@ -246,12 +251,13 @@ final class JsonLoggerTest extends TestCase
 
         yield 'Non UTF-8 characters' => [
             false,
-            $this->createNonUtf8CharactersCalculator(),
+            new MetricsCalculator(2),
+            $this->createNonUtf8CharactersCollector(),
             [
                 'stats' => [
-                    'totalMutantsCount' => 1,
+                    'totalMutantsCount' => 0,
                     'killedCount' => 0,
-                    'notCoveredCount' => 1,
+                    'notCoveredCount' => 0,
                     'escapedCount' => 0,
                     'errorCount' => 0,
                     'skippedCount' => 0,
@@ -286,11 +292,11 @@ final class JsonLoggerTest extends TestCase
         $this->assertSame($expectedJson, json_decode($logger->getLogLines()[0], true, JSON_THROW_ON_ERROR));
     }
 
-    private function createUncoveredMetricsCalculator(): MetricsCalculator
+    private function createUncoveredResultsCollector(): ResultsCollector
     {
-        $calculator = new MetricsCalculator(2);
+        $collector = new ResultsCollector();
 
-        $calculator->collect(
+        $collector->collect(
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
@@ -299,14 +305,14 @@ final class JsonLoggerTest extends TestCase
             ),
         );
 
-        return $calculator;
+        return $collector;
     }
 
-    private function createNonUtf8CharactersCalculator(): MetricsCalculator
+    private function createNonUtf8CharactersCollector(): ResultsCollector
     {
-        $calculator = new MetricsCalculator(2);
+        $collector = new ResultsCollector();
 
-        $calculator->collect(
+        $collector->collect(
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
@@ -315,6 +321,6 @@ final class JsonLoggerTest extends TestCase
             ),
         );
 
-        return $calculator;
+        return $collector;
     }
 }

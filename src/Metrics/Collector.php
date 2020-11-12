@@ -33,48 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Metrics;
 
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffColorizer;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+interface Collector
 {
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-    private DiffColorizer $diffColorizer;
-    private bool $showMutations;
-    private OutputFormatter $formatter;
-
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector,
-        DiffColorizer $diffColorizer,
-        bool $showMutations,
-        OutputFormatter $formatter
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
-        $this->diffColorizer = $diffColorizer;
-        $this->showMutations = $showMutations;
-        $this->formatter = $formatter;
-    }
-
-    public function create(OutputInterface $output): EventSubscriber
-    {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->showMutations
-        );
-    }
+    public function collect(MutantExecutionResult ...$executionResults): void;
 }

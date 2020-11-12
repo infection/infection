@@ -33,48 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Metrics;
 
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffColorizer;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Metrics\Collector;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutator\Loop\For_;
+use Infection\Tests\Mutator\MutatorName;
+use function Later\now;
 
-/**
- * @internal
- */
-final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+trait CreateMutantExecutionResult
 {
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-    private DiffColorizer $diffColorizer;
-    private bool $showMutations;
-    private OutputFormatter $formatter;
+    private $id = 0;
 
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector,
-        DiffColorizer $diffColorizer,
-        bool $showMutations,
-        OutputFormatter $formatter
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
-        $this->diffColorizer = $diffColorizer;
-        $this->showMutations = $showMutations;
-        $this->formatter = $formatter;
+    /**
+     * @return MutantExecutionResult[]
+     */
+    private function addMutantExecutionResult(
+        Collector $collector,
+        string $detectionStatus,
+        int $count
+    ): array {
+        $executionResults = [];
+
+        for ($i = 0; $i < $count; ++$i) {
+            $executionResults[] = $this->createMutantExecutionResult($detectionStatus);
+        }
+
+        $collector->collect(...$executionResults);
+
+        return $executionResults;
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->showMutations
+        $id = $this->id;
+        ++$this->id;
+
+        return new MutantExecutionResult(
+            'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
+            'process output',
+            $detectionStatus,
+            now(str_replace(
+                "\n",
+                PHP_EOL,
+                <<<DIFF
+--- Original
++++ New
+@@ @@
+                
+- echo 'original';
++ echo 'mutated';
+                
+DIFF
+                )),
+            MutatorName::getName(For_::class),
+            'foo/bar',
+            $id,
+            now('<?php $a = 1;'),
+            now('<?php $a = 1;')
         );
     }
 }

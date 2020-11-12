@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\TextFileLogger;
-use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use PHPUnit\Framework\TestCase;
 
 final class TextFileLoggerTest extends TestCase
@@ -54,7 +54,7 @@ final class TextFileLoggerTest extends TestCase
         string $expectedContents
     ): void {
         $logger = new TextFileLogger(
-            new MetricsCalculator(2),
+            new ResultsCollector(),
             $debugVerbosity,
             $onlyCoveredMode,
             $debugMode
@@ -73,7 +73,7 @@ final class TextFileLoggerTest extends TestCase
         string $expectedContents
     ): void {
         $logger = new TextFileLogger(
-            $this->createCompleteMetricsCalculator(),
+            $this->createCompleteResultsCollector(),
             $debugVerbosity,
             $onlyCoveredMode,
             $debugMode
