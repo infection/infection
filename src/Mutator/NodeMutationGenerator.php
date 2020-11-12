@@ -130,7 +130,7 @@ class NodeMutationGenerator
             );
         }
 
-        $tests = $this->getAllTestsForMutation();
+        $tests = $this->getAllTestsCurrentNode();
 
         if ($this->onlyCovered && count($tests) === 0) {
             return;
@@ -169,7 +169,7 @@ class NodeMutationGenerator
     /**
      * @return TestLocation[]
      */
-    private function getAllTestsForMutation(): array
+    private function getAllTestsCurrentNode(): array
     {
         if ($this->testsMemoized !== null) {
             return $this->testsMemoized;
