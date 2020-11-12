@@ -41,6 +41,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Tests\Mutator\MutatorName;
+use function Later\now;
 use PHPUnit\Framework\TestCase;
 
 final class MetricsCalculatorTest extends TestCase
@@ -181,7 +182,7 @@ final class MetricsCalculatorTest extends TestCase
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
             $detectionStatus,
-            str_replace(
+            now(str_replace(
                 "\n",
                 PHP_EOL,
                 <<<DIFF
@@ -193,12 +194,12 @@ final class MetricsCalculatorTest extends TestCase
 + echo 'mutated';
 
 DIFF
-            ),
+            )),
             MutatorName::getName(For_::class),
             'foo/bar',
             $id,
-            '<?php $a = 1;',
-            '<?php $a = 1;'
+            now('<?php $a = 1;'),
+            now('<?php $a = 1;')
         );
     }
 }

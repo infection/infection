@@ -35,31 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
+use function Later\now;
 
-trait MutantAssertions
+final class MutantBuilder
 {
-    /**
-     * @param TestLocation[] $expectedTests
-     */
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        bool $expectedCoveredByTests,
-        array $expectedTests,
-        string $originalCode
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertSame($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
-        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedCoveredByTests, $mutant->isCoveredByTest());
-        $this->assertSame($expectedTests, $mutant->getTests());
-        $this->assertSame($originalCode, $mutant->getPrettyPrintedOriginalCode()->get());
+    public static function build(
+        string $mutantFilePath,
+        Mutation $mutation,
+        string $mutatedCode,
+        string $diff,
+        string $prettyPrintedOriginalCode
+    ): Mutant {
+        return new Mutant($mutantFilePath, $mutation, now($mutatedCode), now($diff), now($prettyPrintedOriginalCode));
     }
 }

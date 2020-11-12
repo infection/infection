@@ -37,6 +37,7 @@ namespace Infection\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
+use Later\Interfaces\Deferred;
 
 /**
  * @internal
@@ -46,16 +47,24 @@ class Mutant
 {
     private string $mutantFilePath;
     private Mutation $mutation;
-    private string $mutatedCode;
-    private string $diff;
-    private string $prettyPrintedOriginalCode;
+    /** @var Deferred<string> */
+    private Deferred $mutatedCode;
+    /** @var Deferred<string> */
+    private Deferred $diff;
+    /** @var Deferred<string> */
+    private Deferred $prettyPrintedOriginalCode;
 
+    /**
+     * @param Deferred<string> $mutatedCode
+     * @param Deferred<string> $diff
+     * @param Deferred<string> $prettyPrintedOriginalCode
+     */
     public function __construct(
         string $mutantFilePath,
         Mutation $mutation,
-        string $mutatedCode,
-        string $diff,
-        string $prettyPrintedOriginalCode
+        Deferred $mutatedCode,
+        Deferred $diff,
+        Deferred $prettyPrintedOriginalCode
     ) {
         $this->mutantFilePath = $mutantFilePath;
         $this->mutation = $mutation;
@@ -74,17 +83,26 @@ class Mutant
         return $this->mutation;
     }
 
-    public function getMutatedCode(): string
+    /**
+     * @return Deferred<string>
+     */
+    public function getMutatedCode(): Deferred
     {
         return $this->mutatedCode;
     }
 
-    public function getPrettyPrintedOriginalCode(): string
+    /**
+     * @return Deferred<string>
+     */
+    public function getPrettyPrintedOriginalCode(): Deferred
     {
         return $this->prettyPrintedOriginalCode;
     }
 
-    public function getDiff(): string
+    /**
+     * @return Deferred<string>
+     */
+    public function getDiff(): Deferred
     {
         return $this->diff;
     }

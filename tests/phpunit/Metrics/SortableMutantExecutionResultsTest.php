@@ -40,6 +40,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Tests\Mutator\MutatorName;
+use function Later\now;
 use PHPUnit\Framework\TestCase;
 
 final class SortableMutantExecutionResultsTest extends TestCase
@@ -191,12 +192,12 @@ final class SortableMutantExecutionResultsTest extends TestCase
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'Passed!',
             DetectionStatus::ESCAPED,
-            '#' . $id,
+            now('#' . $id),
             MutatorName::getName(For_::class),
             $originalFilePath,
             $originalStartingLine,
-            '<?php $a = 1;',
-            '<?php $a = 1;'
+            now('<?php $a = 1;'),
+            now('<?php $a = 1;')
         );
     }
 }

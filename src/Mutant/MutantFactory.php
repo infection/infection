@@ -37,6 +37,8 @@ namespace Infection\Mutant;
 
 use Infection\Differ\Differ;
 use Infection\Mutation\Mutation;
+use Later\Interfaces\Deferred;
+use function Later\lazy;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use function Safe\sprintf;
@@ -77,34 +79,44 @@ class MutantFactory
             $mutation->getHash()
         );
 
-        $mutatedCode = $this->mutantCodeFactory->createCode($mutation);
+        $mutatedCode = lazy($this->createMutatedCode($mutation));
+        $originalPrettyPrintedFile = lazy($this->getOriginalPrettyPrintedFile($mutation->getOriginalFilePath(), $mutation->getOriginalFileAst()));
 
         return new Mutant(
             $mutantFilePath,
             $mutation,
             $mutatedCode,
-            $this->createMutantDiff($mutation, $mutatedCode),
-            $this->getOriginalPrettyPrintedFile($mutation->getOriginalFilePath(), $mutation->getOriginalFileAst())
+            lazy($this->createMutantDiff($originalPrettyPrintedFile, $mutation, $mutatedCode)),
+            $originalPrettyPrintedFile
         );
     }
 
-    private function createMutantDiff(Mutation $mutation, string $mutantCode): string
+    /** @return iterable<string> */
+    private function createMutatedCode(Mutation $mutation): iterable
     {
-        $originalPrettyPrintedFile = $this->getOriginalPrettyPrintedFile(
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalFileAst()
-        );
+        yield $this->mutantCodeFactory->createCode($mutation);
+    }
 
-        return $this->differ->diff($originalPrettyPrintedFile, $mutantCode);
+    /**
+     * @param Deferred<string> $originalPrettyPrintedFile
+     * @param Deferred<string> $mutantCode
+     *
+     * @return iterable<string>
+     */
+    private function createMutantDiff(Deferred $originalPrettyPrintedFile, Mutation $mutation, Deferred $mutantCode): iterable
+    {
+        yield $this->differ->diff($originalPrettyPrintedFile->get(), $mutantCode->get());
     }
 
     /**
      * @param Node[] $originalStatements
+     *
+     * @return iterable<string>
      */
-    private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): string
+    private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): iterable
     {
         // The same file may be mutated multiple times hence we can memoize that call
-        return $this->printedFileCache[$originalFilePath]
+        yield $this->printedFileCache[$originalFilePath]
             ?? $this->printedFileCache[$originalFilePath] = $this->printer->prettyPrintFile($originalStatements);
     }
 }
