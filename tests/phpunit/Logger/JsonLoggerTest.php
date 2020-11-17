@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\JsonLogger;
+use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
@@ -214,13 +215,13 @@ final class JsonLoggerTest extends TestCase
 
         yield 'uncovered mutations' => [
             false,
-            new MetricsCalculator(2),
+            $this->createUncoveredMetricsCalculator(),
             $this->createUncoveredResultsCollector(),
             [
                 'stats' => [
-                    'totalMutantsCount' => 0,
+                    'totalMutantsCount' => 1,
                     'killedCount' => 0,
-                    'notCoveredCount' => 0,
+                    'notCoveredCount' => 1,
                     'escapedCount' => 0,
                     'errorCount' => 0,
                     'skippedCount' => 0,
@@ -292,10 +293,26 @@ final class JsonLoggerTest extends TestCase
         $this->assertSame($expectedJson, json_decode($logger->getLogLines()[0], true, JSON_THROW_ON_ERROR));
     }
 
+    private function createUncoveredMetricsCalculator(): MetricsCalculator
+    {
+        $collector = new MetricsCalculator(2);
+
+        $this->initUncoveredCollector($collector);
+
+        return $collector;
+    }
+
     private function createUncoveredResultsCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
+        $this->initUncoveredCollector($collector);
+
+        return $collector;
+    }
+
+    private function initUncoveredCollector(Collector $collector): void
+    {
         $collector->collect(
             $this->createMutantExecutionResult(
                 0,
@@ -304,8 +321,6 @@ final class JsonLoggerTest extends TestCase
                 'uncovered#0'
             ),
         );
-
-        return $collector;
     }
 
     private function createNonUtf8CharactersCollector(): ResultsCollector
