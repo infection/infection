@@ -12,8 +12,10 @@
 
 Please read documentation here: [infection.github.io][doc]
 
-Twitter: [@infection_php][twitter]
-
+* Twitter: [@infection_php][twitter]
+* Discord: https://discord.gg/ZUmyHTJ
+* Gitter: https://gitter.im/infection/Lobby
+* Slack: https://symfony.com/slack  `#infection` channel
 
 ### Contributing
 
