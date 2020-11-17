@@ -711,7 +711,7 @@ parameters:
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"int\"\\.$#"
+			message: "#^Anonymous function should have native return typehint \"int\\<\\-1, 1\\>\"\\.$#"
 			count: 1
 			path: ../src/TestFramework/Coverage/JUnit/JUnitTestCaseSorter.php
 
