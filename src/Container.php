@@ -63,6 +63,7 @@ use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFact
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
 use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
@@ -79,6 +80,7 @@ use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
@@ -340,6 +342,9 @@ final class Container
             MetricsCalculator::class => static function (self $container): MetricsCalculator {
                 return new MetricsCalculator($container->getConfiguration()->getMsiPrecision());
             },
+            ResultsCollector::class => static function (self $container): ResultsCollector {
+                return new ResultsCollector();
+            },
             Stopwatch::class => static function (): Stopwatch {
                 return new Stopwatch();
             },
@@ -440,6 +445,7 @@ final class Container
                 return new ChainSubscriberFactory(
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
                     $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
+                    $container->getMutationTestingResultsCollectorSubscriberFactory(),
                     $container->getMutationTestingConsoleLoggerSubscriberFactory(),
                     $container->getMutationTestingResultsLoggerSubscriberFactory(),
                     $container->getPerformanceLoggerSubscriberFactory(),
@@ -469,11 +475,19 @@ final class Container
                     $container->getConfiguration()->noProgress()
                 );
             },
+            MutationTestingResultsCollectorSubscriberFactory::class => static function (self $container): MutationTestingResultsCollectorSubscriberFactory {
+                return new MutationTestingResultsCollectorSubscriberFactory(
+                    $container->getMetricsCalculator(),
+                    // TODO ResultsCollector can have multiple strategies on results accumulations, e.g. whenever uncovered results need saving
+                    $container->getResultsCollector()
+                );
+            },
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
 
                 return new MutationTestingConsoleLoggerSubscriberFactory(
                     $container->getMetricsCalculator(),
+                    $container->getResultsCollector(),
                     $container->getDiffColorizer(),
                     $config->showMutations(),
                     $container->getOutputFormatter()
@@ -513,6 +527,7 @@ final class Container
 
                 return new LoggerFactory(
                     $container->getMetricsCalculator(),
+                    $container->getResultsCollector(),
                     $container->getFileSystem(),
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
@@ -929,6 +944,11 @@ final class Container
         return $this->get(MetricsCalculator::class);
     }
 
+    public function getResultsCollector(): ResultsCollector
+    {
+        return $this->get(ResultsCollector::class);
+    }
+
     public function getStopwatch(): Stopwatch
     {
         return $this->get(Stopwatch::class);
@@ -1027,6 +1047,11 @@ final class Container
     public function getMutationGeneratingConsoleLoggerSubscriberFactory(): MutationGeneratingConsoleLoggerSubscriberFactory
     {
         return $this->get(MutationGeneratingConsoleLoggerSubscriberFactory::class);
+    }
+
+    public function getMutationTestingResultsCollectorSubscriberFactory(): MutationTestingResultsCollectorSubscriberFactory
+    {
+        return $this->get(MutationTestingResultsCollectorSubscriberFactory::class);
     }
 
     public function getMutationTestingConsoleLoggerSubscriberFactory(): MutationTestingConsoleLoggerSubscriberFactory

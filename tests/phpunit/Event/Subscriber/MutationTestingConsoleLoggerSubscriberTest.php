@@ -43,6 +43,7 @@ use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -66,6 +67,11 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     private $metricsCalculator;
 
     /**
+     * @var ResultsCollector|MockObject
+     */
+    private $resultsCollector;
+
+    /**
      * @var DiffColorizer|MockObject
      */
     private $diffColorizer;
@@ -75,6 +81,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->output = $this->createMock(OutputInterface::class);
         $this->outputFormatter = $this->createMock(OutputFormatter::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $this->resultsCollector = $this->createMock(ResultsCollector::class);
         $this->diffColorizer = $this->createMock(DiffColorizer::class);
     }
 
@@ -89,6 +96,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->output,
             $this->outputFormatter,
             $this->metricsCalculator,
+            $this->resultsCollector,
             $this->diffColorizer,
             false
         ));
@@ -99,7 +107,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     public function test_it_reacts_on_mutation_process_finished(): void
     {
         $this->metricsCalculator
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('collect');
 
         $this->outputFormatter
@@ -111,6 +119,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->output,
             $this->outputFormatter,
             $this->metricsCalculator,
+            $this->resultsCollector,
             $this->diffColorizer,
             false
         ));
@@ -133,6 +142,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->output,
             $this->outputFormatter,
             $this->metricsCalculator,
+            $this->resultsCollector,
             $this->diffColorizer,
             false
         ));
@@ -154,6 +164,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->output,
             $this->outputFormatter,
             $this->metricsCalculator,
+            $this->resultsCollector,
             $this->diffColorizer,
             true
         ));

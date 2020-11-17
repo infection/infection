@@ -52,6 +52,7 @@ use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\FakeCiDetector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -70,6 +71,11 @@ final class LoggerFactoryTest extends TestCase
     private $metricsCalculator;
 
     /**
+     * @var ResultsCollector
+     */
+    private $resultsCollector;
+
+    /**
      * @var Filesystem|MockObject
      */
     private $fileSystemMock;
@@ -77,6 +83,8 @@ final class LoggerFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->metricsCalculator = new MetricsCalculator(2);
+        $this->resultsCollector = new ResultsCollector();
+
         $this->fileSystemMock = $this->createMock(Filesystem::class);
     }
 
@@ -271,6 +279,7 @@ final class LoggerFactoryTest extends TestCase
     ): LoggerFactory {
         return new LoggerFactory(
             $this->metricsCalculator,
+            $this->resultsCollector,
             $this->fileSystemMock,
             $logVerbosity,
             $debugMode,

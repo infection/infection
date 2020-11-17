@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\GitHubAnnotationsLogger;
-use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -50,10 +50,10 @@ final class GitHubAnnotationsLoggerTest extends TestCase
      * @dataProvider metricsProvider
      */
     public function test_it_logs_correctly_with_mutations(
-        MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
         array $expectedLines
     ): void {
-        $logger = new GitHubAnnotationsLogger($metricsCalculator);
+        $logger = new GitHubAnnotationsLogger($resultsCollector);
 
         $this->assertSame($expectedLines, $logger->getLogLines());
     }
@@ -61,12 +61,12 @@ final class GitHubAnnotationsLoggerTest extends TestCase
     public function metricsProvider(): iterable
     {
         yield 'no mutations' => [
-            new MetricsCalculator(2),
+            new ResultsCollector(),
             [],
         ];
 
         yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
+            $this->createCompleteResultsCollector(),
             [
                 "::warning file=foo/bar,line=9::Escaped Mutant:%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#1';%0A\n",
                 "::warning file=foo/bar,line=10::Escaped Mutant:%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A\n",

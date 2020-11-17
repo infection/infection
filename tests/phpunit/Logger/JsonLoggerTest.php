@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\JsonLogger;
+use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
 use const JSON_THROW_ON_ERROR;
@@ -59,9 +61,10 @@ final class JsonLoggerTest extends TestCase
     public function test_it_logs_correctly_with_mutations(
         bool $onlyCovered,
         MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
         array $expectedContents
     ): void {
-        $logger = new JsonLogger($metricsCalculator, $onlyCovered);
+        $logger = new JsonLogger($metricsCalculator, $resultsCollector, $onlyCovered);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
@@ -71,6 +74,7 @@ final class JsonLoggerTest extends TestCase
         yield 'no mutations; only covered' => [
             true,
             new MetricsCalculator(2),
+            new ResultsCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 0,
@@ -95,6 +99,7 @@ final class JsonLoggerTest extends TestCase
         yield 'all mutations; only covered' => [
             true,
             $this->createCompleteMetricsCalculator(),
+            $this->createCompleteResultsCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 12,
@@ -211,6 +216,7 @@ final class JsonLoggerTest extends TestCase
         yield 'uncovered mutations' => [
             false,
             $this->createUncoveredMetricsCalculator(),
+            $this->createUncoveredResultsCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 1,
@@ -246,12 +252,13 @@ final class JsonLoggerTest extends TestCase
 
         yield 'Non UTF-8 characters' => [
             false,
-            $this->createNonUtf8CharactersCalculator(),
+            new MetricsCalculator(2),
+            $this->createNonUtf8CharactersCollector(),
             [
                 'stats' => [
-                    'totalMutantsCount' => 1,
+                    'totalMutantsCount' => 0,
                     'killedCount' => 0,
-                    'notCoveredCount' => 1,
+                    'notCoveredCount' => 0,
                     'escapedCount' => 0,
                     'errorCount' => 0,
                     'skippedCount' => 0,
@@ -288,9 +295,25 @@ final class JsonLoggerTest extends TestCase
 
     private function createUncoveredMetricsCalculator(): MetricsCalculator
     {
-        $calculator = new MetricsCalculator(2);
+        $collector = new MetricsCalculator(2);
 
-        $calculator->collect(
+        $this->initUncoveredCollector($collector);
+
+        return $collector;
+    }
+
+    private function createUncoveredResultsCollector(): ResultsCollector
+    {
+        $collector = new ResultsCollector();
+
+        $this->initUncoveredCollector($collector);
+
+        return $collector;
+    }
+
+    private function initUncoveredCollector(Collector $collector): void
+    {
+        $collector->collect(
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
@@ -298,15 +321,13 @@ final class JsonLoggerTest extends TestCase
                 'uncovered#0'
             ),
         );
-
-        return $calculator;
     }
 
-    private function createNonUtf8CharactersCalculator(): MetricsCalculator
+    private function createNonUtf8CharactersCollector(): ResultsCollector
     {
-        $calculator = new MetricsCalculator(2);
+        $collector = new ResultsCollector();
 
-        $calculator->collect(
+        $collector->collect(
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
@@ -315,6 +336,6 @@ final class JsonLoggerTest extends TestCase
             ),
         );
 
-        return $calculator;
+        return $collector;
     }
 }

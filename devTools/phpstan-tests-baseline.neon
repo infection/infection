@@ -277,13 +277,28 @@ parameters:
 
 		-
 			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 2
+			count: 3
 			path: ../tests/phpunit/Event/Subscriber/MutationTestingConsoleLoggerSubscriberFactoryTest.php
 
 		-
 			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 6
+			count: 5
 			path: ../tests/phpunit/Event/Subscriber/MutationTestingConsoleLoggerSubscriberTest.php
+
+		-
+			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
+			count: 1
+			path: ../tests/phpunit/Event/Subscriber/MutationTestingConsoleLoggerSubscriberTest.php
+
+		-
+			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
+			count: 1
+			path: ../tests/phpunit/Event/Subscriber/MutationTestingResultsCollectorSubscriberFactoryTest.php
+
+		-
+			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
+			count: 2
+			path: ../tests/phpunit/Event/Subscriber/MutationTestingResultsCollectorSubscriberTest.php
 
 		-
 			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
@@ -436,6 +451,11 @@ parameters:
 			path: ../tests/phpunit/Process/Factory/MutantProcessFactoryTest.php
 
 		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Infection\\\\\\\\Event\\\\\\\\MutantProcessWasFinished' and false will always evaluate to false\\.$#"
+			count: 1
+			path: ../tests/phpunit/Process/Factory/MutantProcessFactoryTest.php
+
+		-
 			message: "#^Anonymous function should have native return typehint \"Generator\"\\.$#"
 			count: 1
 			path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
@@ -531,7 +551,7 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestFileNameNotFoundExceptionTest.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"int\"\\.$#"
+			message: "#^Anonymous function should have native return typehint \"int\\<\\-1, 1\\>\"\\.$#"
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
 

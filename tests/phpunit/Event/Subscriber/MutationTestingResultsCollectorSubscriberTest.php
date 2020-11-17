@@ -33,48 +33,72 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
+use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
+use Infection\Mutant\MutantExecutionResult;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
-final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final class MutationTestingResultsCollectorSubscriberTest extends TestCase
 {
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-    private DiffColorizer $diffColorizer;
-    private bool $showMutations;
-    private OutputFormatter $formatter;
+    /**
+     * @var OutputInterface|MockObject
+     */
+    private $output;
 
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector,
-        DiffColorizer $diffColorizer,
-        bool $showMutations,
-        OutputFormatter $formatter
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
-        $this->diffColorizer = $diffColorizer;
-        $this->showMutations = $showMutations;
-        $this->formatter = $formatter;
-    }
+    /**
+     * @var OutputFormatter|MockObject
+     */
+    private $outputFormatter;
 
-    public function create(OutputInterface $output): EventSubscriber
+    /**
+     * @var MetricsCalculator|MockObject
+     */
+    private $metricsCalculator;
+
+    /**
+     * @var ResultsCollector|MockObject
+     */
+    private $resultsCollector;
+
+    /**
+     * @var DiffColorizer|MockObject
+     */
+    private $diffColorizer;
+
+    public function test_it_reacts_on_mutation_process_finished(): void
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->showMutations
+        $collectorA = $this->createMock(Collector::class);
+        $collectorA
+            ->expects($this->once())
+            ->method('collect')
+        ;
+
+        $collectorB = $this->createMock(Collector::class);
+        $collectorB
+            ->expects($this->once())
+            ->method('collect')
+        ;
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingResultsCollectorSubscriber(
+            $collectorA,
+            $collectorB
+        ));
+
+        $dispatcher->dispatch(
+            new MutantProcessWasFinished(
+                $this->createMock(MutantExecutionResult::class)
+            )
         );
     }
 }

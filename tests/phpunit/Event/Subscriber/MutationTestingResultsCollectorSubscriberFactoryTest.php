@@ -33,48 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffColorizer;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
+use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
+use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
+use Infection\Metrics\Collector;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
-final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final class MutationTestingResultsCollectorSubscriberFactoryTest extends TestCase
 {
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-    private DiffColorizer $diffColorizer;
-    private bool $showMutations;
-    private OutputFormatter $formatter;
-
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector,
-        DiffColorizer $diffColorizer,
-        bool $showMutations,
-        OutputFormatter $formatter
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
-        $this->diffColorizer = $diffColorizer;
-        $this->showMutations = $showMutations;
-        $this->formatter = $formatter;
-    }
-
-    public function create(OutputInterface $output): EventSubscriber
+    public function test_it_creates_a_subscriber(): void
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->showMutations
+        $factory = new MutationTestingResultsCollectorSubscriberFactory(
+            $this->createMock(Collector::class),
+            $this->createMock(Collector::class)
         );
+
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $subscriber = $factory->create($outputMock);
+
+        $this->assertInstanceOf(MutationTestingResultsCollectorSubscriber::class, $subscriber);
     }
 }

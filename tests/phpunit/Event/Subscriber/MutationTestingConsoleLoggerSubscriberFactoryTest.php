@@ -39,6 +39,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\Console\FakeOutputFormatter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -52,6 +53,11 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     private $metricsCalculatorMock;
 
     /**
+     * @var ResultsCollector|MockObject
+     */
+    private $resultsCollectorMock;
+
+    /**
      * @var DiffColorizer|MockObject
      */
     private $diffColorizerMock;
@@ -60,6 +66,12 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     {
         $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
         $this->metricsCalculatorMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $this->resultsCollectorMock = $this->createMock(ResultsCollector::class);
+        $this->resultsCollectorMock
             ->expects($this->never())
             ->method($this->anything())
         ;
@@ -78,6 +90,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     {
         $factory = new MutationTestingConsoleLoggerSubscriberFactory(
             $this->metricsCalculatorMock,
+            $this->resultsCollectorMock,
             $this->diffColorizerMock,
             $showMutations,
             new FakeOutputFormatter()

@@ -37,6 +37,7 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\PerMutatorLogger;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use PHPUnit\Framework\TestCase;
 
 final class PerMutatorLoggerTest extends TestCase
@@ -49,9 +50,10 @@ final class PerMutatorLoggerTest extends TestCase
      */
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
         string $expectedContents
     ): void {
-        $logger = new PerMutatorLogger($metricsCalculator);
+        $logger = new PerMutatorLogger($metricsCalculator, $resultsCollector);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
@@ -60,6 +62,7 @@ final class PerMutatorLoggerTest extends TestCase
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
+            new ResultsCollector(),
             <<<'TXT'
 # Effects per Mutator
 
@@ -71,6 +74,7 @@ TXT
 
         yield 'all mutations' => [
             $this->createCompleteMetricsCalculator(),
+            $this->createCompleteResultsCollector(),
             <<<'TXT'
 # Effects per Mutator
 
