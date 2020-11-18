@@ -15,7 +15,7 @@ help:
 # Variables
 #---------------------------------------------------------------------------
 BOX=./.tools/box
-BOX_URL="https://github.com/humbug/box/releases/download/3.8.5/box.phar"
+BOX_URL="https://github.com/humbug/box/releases/download/3.9.1/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
 PHP_CS_FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
@@ -23,7 +23,8 @@ PHP_CS_FIXER_CACHE=build/cache/.php_cs.cache
 
 PHPSTAN=./vendor/bin/phpstan
 
-PSALM=./vendor/bin/psalm
+PSALM=./.tools/psalm
+PSALM_URL="https://github.com/vimeo/psalm/releases/download/4.1.1/psalm.phar"
 
 PHPUNIT=vendor/phpunit/phpunit/phpunit
 
@@ -71,7 +72,7 @@ phpstan: vendor $(PHPSTAN)
 
 .PHONY: psalm
 psalm: vendor $(PSALM)
-	$(PSALM)
+	$(PSALM) --threads=4
 
 .PHONY: validate
 validate:
@@ -203,18 +204,21 @@ test-infection-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE)
 #---------------------------------------------------------------------------
 
 $(BOX): Makefile
-	wget $(BOX_URL) --output-document=$(BOX)
+	wget -q $(BOX_URL) --output-document=$(BOX)
 	chmod a+x $(BOX)
 	touch $@
 
 $(PHP_CS_FIXER): Makefile
-	wget $(PHP_CS_FIXER_URL) --output-document=$(PHP_CS_FIXER)
+	wget -q $(PHP_CS_FIXER_URL) --output-document=$(PHP_CS_FIXER)
 	chmod a+x $(PHP_CS_FIXER)
 	touch $@
 
 $(PHPSTAN): vendor
 
-$(PSALM): vendor
+$(PSALM): Makefile
+	wget -q $(PSALM_URL) --output-document=$(PSALM)
+	chmod a+x $(PSALM)
+	touch $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	composer require infection/codeception-adapter infection/phpspec-adapter
