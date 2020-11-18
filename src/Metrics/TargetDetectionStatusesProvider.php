@@ -74,6 +74,11 @@ final class TargetDetectionStatusesProvider
             return $targetDetectionStatuses;
         }
 
+        // Per mutator logger uses mutation results to make a summary
+        if ($this->logConfig->getPerMutatorFilePath() !== null) {
+            return $targetDetectionStatuses;
+        }
+
         if ($this->logVerbosity !== LogVerbosity::DEBUG) {
             unset($targetDetectionStatuses[DetectionStatus::KILLED]);
             unset($targetDetectionStatuses[DetectionStatus::ERROR]);
