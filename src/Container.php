@@ -78,9 +78,11 @@ use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\LoggerFactory;
+use Infection\Metrics\FilteringResultsCollector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
+use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
@@ -478,8 +480,10 @@ final class Container
             MutationTestingResultsCollectorSubscriberFactory::class => static function (self $container): MutationTestingResultsCollectorSubscriberFactory {
                 return new MutationTestingResultsCollectorSubscriberFactory(
                     $container->getMetricsCalculator(),
-                    // TODO ResultsCollector can have multiple strategies on results accumulations, e.g. whenever uncovered results need saving
-                    $container->getResultsCollector()
+                    new FilteringResultsCollector(
+                        $container->getResultsCollector(),
+                        $container->getTargetDetectionStatusesProvider()->get()
+                    )
                 );
             },
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
@@ -534,6 +538,15 @@ final class Container
                     $config->mutateOnlyCoveredCode(),
                     $container->getCiDetector(),
                     $container->getLogger()
+                );
+            },
+            TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
+                $config = $container->getConfiguration();
+
+                return new TargetDetectionStatusesProvider(
+                    $container->getConfiguration()->getLogs(),
+                    $config->getLogVerbosity(),
+                    $config->mutateOnlyCoveredCode()
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
@@ -1087,6 +1100,11 @@ final class Container
     public function getLoggerFactory(): LoggerFactory
     {
         return $this->get(LoggerFactory::class);
+    }
+
+    public function getTargetDetectionStatusesProvider(): TargetDetectionStatusesProvider
+    {
+        return $this->get(TargetDetectionStatusesProvider::class);
     }
 
     public function getTestFrameworkAdapter(): TestFrameworkAdapter
