@@ -46,6 +46,7 @@ use Infection\Mutant\MutantExecutionResult;
 class FilteringResultsCollector implements Collector
 {
     private Collector $targetCollector;
+    /** @var array<string, mixed> */
     private array $targetDetectionStatuses;
 
     /**

@@ -39,6 +39,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\DetectionStatus;
+use function Safe\array_flip;
 
 /**
  * @internal
