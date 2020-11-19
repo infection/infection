@@ -97,10 +97,14 @@ class TargetDetectionStatusesProvider
     /**
      * TODO This has to be a responsibility of loggers.
      *
-     * @return iterable<string>
+     * @return Generator<string>
      */
     private function findRequired(): Generator
     {
+        if ($this->showMutations) {
+            yield DetectionStatus::ESCAPED;
+        }
+
         if ($this->logConfig->getUseGitHubAnnotationsLogger()) {
             yield DetectionStatus::ESCAPED;
         }

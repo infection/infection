@@ -41,6 +41,7 @@ use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
 use PHPUnit\Framework\TestCase;
 use function Safe\array_flip;
+use function Safe\ksort;
 
 final class TargetDetectionStatusesProviderTest extends TestCase
 {
@@ -53,12 +54,9 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('debug.log')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
 
-        $this->assertSame(
-            $this->getDetectionStatusesIndexExcluding([]),
-            $provider->get()
-        );
+        $this->assertProvidesExcluding([], $provider->get());
     }
 
     public function test_it_provides_all_statuses_when_per_mutator_report_is_expected(): void
@@ -70,37 +68,40 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('per_mutator.md')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
 
-        $this->assertSame(
-            $this->getDetectionStatusesIndexExcluding([]),
-            $provider->get()
-        );
+        $this->assertProvidesExcluding([], $provider->get());
     }
 
     public function test_it_provides_all_statuses_when_debugging_is_enabled(): void
     {
         $logs = $this->createMock(Logs::class);
+        $logs
+        ->expects($this->once())
+        ->method('getTextLogFilePath')
+        ->willReturn('infection.log')
+        ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::DEBUG, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::DEBUG, false, false);
 
-        $this->assertSame(
-            $this->getDetectionStatusesIndexExcluding([]),
-            $provider->get()
-        );
+        $this->assertProvidesExcluding([], $provider->get());
     }
 
     public function test_it_ignores_some_statuses_when_debugging_is_not_enabled(): void
     {
         $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getTextLogFilePath')
+            ->willReturn('infection.log')
+        ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
 
-        $this->assertSame(
-            $this->getDetectionStatusesIndexExcluding([
+        $this->assertProvidesExcluding([
                 DetectionStatus::KILLED,
                 DetectionStatus::ERROR,
-            ]),
+            ],
             $provider->get()
         );
     }
@@ -108,17 +109,32 @@ final class TargetDetectionStatusesProviderTest extends TestCase
     public function test_it_ignores_more_statuses_when_running_in_only_covered_mode(): void
     {
         $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getTextLogFilePath')
+            ->willReturn('infection.log')
+        ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
 
-        $this->assertSame(
-            $this->getDetectionStatusesIndexExcluding([
+        $this->assertProvidesExcluding([
                 DetectionStatus::KILLED,
                 DetectionStatus::ERROR,
                 DetectionStatus::NOT_COVERED,
-            ]),
+            ],
             $provider->get()
         );
+    }
+
+    private function assertProvidesExcluding(array $excluding, array $actual): void
+    {
+        ksort($actual);
+
+        $expected = $this->getDetectionStatusesIndexExcluding($excluding);
+
+        ksort($expected);
+
+        $this->assertSame(array_keys($expected), array_keys($actual));
     }
 
     private function getDetectionStatusesIndexExcluding(array $excludeList): array
