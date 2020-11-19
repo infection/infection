@@ -547,7 +547,8 @@ final class Container
                 return new TargetDetectionStatusesProvider(
                     $config->getLogs(),
                     $config->getLogVerbosity(),
-                    $config->mutateOnlyCoveredCode()
+                    $config->mutateOnlyCoveredCode(),
+                    $config->showMutations()
                 );
             },
             FilteringResultsCollectorFactory::class => static function (self $container): FilteringResultsCollectorFactory {

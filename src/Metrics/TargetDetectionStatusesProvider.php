@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
+use Generator;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\DetectionStatus;
+use function iterator_to_array;
 use function Safe\array_flip;
 
 /**
@@ -50,19 +52,22 @@ class TargetDetectionStatusesProvider
     private Logs $logConfig;
     private string $logVerbosity;
     private bool $onlyCoveredMode;
+    private bool $showMutations;
 
     public function __construct(
         Logs $logConfig,
         string $logVerbosity,
-        bool $onlyCoveredMode
+        bool $onlyCoveredMode,
+        bool $showMutations
     ) {
         $this->logConfig = $logConfig;
         $this->logVerbosity = $logVerbosity;
         $this->onlyCoveredMode = $onlyCoveredMode;
+        $this->showMutations = $showMutations;
     }
 
     /**
-     * Implementation follows the logic in TextFileLogger.
+     * Implementation follows the logic in LoggerFactory, TextFileLogger, etc.
      *
      * @see TextFileLogger
      *
@@ -70,26 +75,66 @@ class TargetDetectionStatusesProvider
      */
     public function get(): array
     {
-        $targetDetectionStatuses = array_flip(DetectionStatus::ALL);
+        if ($this->logVerbosity === LogVerbosity::NONE) {
+            return [];
+        }
 
+        $allDetectionStatuses = array_flip(DetectionStatus::ALL);
+
+        // This one requires them all.
         if ($this->logConfig->getDebugLogFilePath() !== null) {
-            return $targetDetectionStatuses;
+            return $allDetectionStatuses;
         }
 
-        // Per mutator logger uses mutation results to make a summary
+        // Per mutator logger needs all mutation results to make a summary.
         if ($this->logConfig->getPerMutatorFilePath() !== null) {
-            return $targetDetectionStatuses;
+            return $allDetectionStatuses;
         }
 
-        if ($this->logVerbosity !== LogVerbosity::DEBUG) {
-            unset($targetDetectionStatuses[DetectionStatus::KILLED]);
-            unset($targetDetectionStatuses[DetectionStatus::ERROR]);
+        return array_flip(iterator_to_array($this->findRequired(), false));
+    }
+
+    /**
+     * TODO This has to be a responsibility of loggers.
+     *
+     * @return iterable<string>
+     */
+    private function findRequired(): Generator
+    {
+        if ($this->logConfig->getUseGitHubAnnotationsLogger()) {
+            yield DetectionStatus::ESCAPED;
         }
 
-        if ($this->onlyCoveredMode) {
-            unset($targetDetectionStatuses[DetectionStatus::NOT_COVERED]);
+        if ($this->logConfig->getJsonLogFilePath() !== null) {
+            yield DetectionStatus::KILLED;
+
+            yield DetectionStatus::ESCAPED;
+
+            yield DetectionStatus::ERROR;
+
+            yield DetectionStatus::TIMED_OUT;
+
+            if (!$this->onlyCoveredMode) {
+                yield DetectionStatus::NOT_COVERED;
+            }
         }
 
-        return $targetDetectionStatuses;
+        if ($this->logConfig->getTextLogFilePath() !== null) {
+            yield DetectionStatus::ESCAPED;
+
+            yield DetectionStatus::TIMED_OUT;
+
+            yield DetectionStatus::SKIPPED;
+
+            if ($this->logVerbosity === LogVerbosity::DEBUG) {
+                yield DetectionStatus::KILLED;
+
+                yield DetectionStatus::ERROR;
+            }
+
+            if (!$this->onlyCoveredMode) {
+                yield DetectionStatus::NOT_COVERED;
+            }
+        }
     }
 }
