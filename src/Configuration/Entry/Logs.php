@@ -37,8 +37,9 @@ namespace Infection\Configuration\Entry;
 
 /**
  * @internal
+ * @final
  */
-final class Logs
+class Logs
 {
     private ?string $textLogFilePath;
     private ?string $summaryLogFilePath;
