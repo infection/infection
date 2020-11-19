@@ -545,7 +545,7 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new TargetDetectionStatusesProvider(
-                    $container->getConfiguration()->getLogs(),
+                    $config->getLogs(),
                     $config->getLogVerbosity(),
                     $config->mutateOnlyCoveredCode()
                 );
