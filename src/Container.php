@@ -78,7 +78,7 @@ use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\LoggerFactory;
-use Infection\Metrics\FilteringResultsCollector;
+use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
@@ -479,11 +479,12 @@ final class Container
             },
             MutationTestingResultsCollectorSubscriberFactory::class => static function (self $container): MutationTestingResultsCollectorSubscriberFactory {
                 return new MutationTestingResultsCollectorSubscriberFactory(
-                    $container->getMetricsCalculator(),
-                    new FilteringResultsCollector(
-                        $container->getResultsCollector(),
-                        $container->getTargetDetectionStatusesProvider()->get()
-                    )
+                   ...array_filter([
+                       $container->getMetricsCalculator(),
+                       $container->getFilteringResultsCollectorFactory()->create(
+                           $container->getResultsCollector()
+                       ),
+                   ])
                 );
             },
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
@@ -548,6 +549,9 @@ final class Container
                     $config->getLogVerbosity(),
                     $config->mutateOnlyCoveredCode()
                 );
+            },
+            FilteringResultsCollectorFactory::class => static function (self $container): FilteringResultsCollectorFactory {
+                return new FilteringResultsCollectorFactory($container->getTargetDetectionStatusesProvider());
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
                 $config = $container->getConfiguration();
@@ -1105,6 +1109,11 @@ final class Container
     public function getTargetDetectionStatusesProvider(): TargetDetectionStatusesProvider
     {
         return $this->get(TargetDetectionStatusesProvider::class);
+    }
+
+    public function getFilteringResultsCollectorFactory(): FilteringResultsCollectorFactory
+    {
+        return $this->get(FilteringResultsCollectorFactory::class);
     }
 
     public function getTestFrameworkAdapter(): TestFrameworkAdapter

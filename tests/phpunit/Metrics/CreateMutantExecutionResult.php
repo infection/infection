@@ -51,7 +51,7 @@ trait CreateMutantExecutionResult
     private function addMutantExecutionResult(
         Collector $collector,
         string $detectionStatus,
-        int $count
+        int $count = 1
     ): array {
         $executionResults = [];
 

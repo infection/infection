@@ -35,61 +35,35 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Console\LogVerbosity;
-use Infection\Logger\TextFileLogger;
+use function count;
 use Infection\Mutant\DetectionStatus;
-use function Safe\array_flip;
 
 /**
  * @internal
- * @final
  */
-class TargetDetectionStatusesProvider
+final class FilteringResultsCollectorFactory
 {
-    private Logs $logConfig;
-    private string $logVerbosity;
-    private bool $onlyCoveredMode;
+    private TargetDetectionStatusesProvider $statusesProvider;
 
-    public function __construct(
-        Logs $logConfig,
-        string $logVerbosity,
-        bool $onlyCoveredMode
-    ) {
-        $this->logConfig = $logConfig;
-        $this->logVerbosity = $logVerbosity;
-        $this->onlyCoveredMode = $onlyCoveredMode;
+    public function __construct(TargetDetectionStatusesProvider $statusesProvider)
+    {
+        $this->statusesProvider = $statusesProvider;
     }
 
-    /**
-     * Implementation follows the logic in TextFileLogger.
-     *
-     * @see TextFileLogger
-     *
-     * @return array<string, mixed>
-     */
-    public function get(): array
+    public function create(Collector $targetCollector): ?Collector
     {
-        $targetDetectionStatuses = array_flip(DetectionStatus::ALL);
+        $targetDetectionStatuses = $this->statusesProvider->get();
 
-        if ($this->logConfig->getDebugLogFilePath() !== null) {
-            return $targetDetectionStatuses;
+        if ($targetDetectionStatuses === []) {
+            // Need not collect nothing.
+            return null;
         }
 
-        // Per mutator logger uses mutation results to make a summary
-        if ($this->logConfig->getPerMutatorFilePath() !== null) {
-            return $targetDetectionStatuses;
+        if (count($targetDetectionStatuses) === count(DetectionStatus::ALL)) {
+            // No need to filter anything at all.
+            return $targetCollector;
         }
 
-        if ($this->logVerbosity !== LogVerbosity::DEBUG) {
-            unset($targetDetectionStatuses[DetectionStatus::KILLED]);
-            unset($targetDetectionStatuses[DetectionStatus::ERROR]);
-        }
-
-        if ($this->onlyCoveredMode) {
-            unset($targetDetectionStatuses[DetectionStatus::NOT_COVERED]);
-        }
-
-        return $targetDetectionStatuses;
+        return new FilteringResultsCollector($targetCollector, $targetDetectionStatuses);
     }
 }
