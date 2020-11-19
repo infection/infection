@@ -14,7 +14,7 @@ parameters:
         - '#Return type \((void|mixed)\) of method .*(Visitor|Traverser).* should be compatible with return type .* of method PhpParser\\Node.*#'
         - '#^Cannot call method (willReturn|shouldBeCalledTimes)\(\) on iterable<Infection\\Mutation\\Mutation>\.$#'
         - '#Offset .*\\.* does not exist on array<class-string<.*>.*#'
-        - '#Dynamic call to static method PHPUnit\\Framework\\Assert::(.*)#'
+        - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'
         - '#Call to method PHPUnit\\Framework\\Assert::.* with array.* and array.* will always evaluate to false#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
         -
