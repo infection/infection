@@ -73,13 +73,13 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $this->assertProvidesExcluding([], $provider->get());
     }
 
-    public function test_it_provides_all_statuses_when_debugging_is_enabled(): void
+    public function test_it_provides_all_statuses_when_debugging_is_enabled_for_text_logger(): void
     {
         $logs = $this->createMock(Logs::class);
         $logs
-        ->expects($this->once())
-        ->method('getTextLogFilePath')
-        ->willReturn('infection.log')
+            ->expects($this->once())
+            ->method('getTextLogFilePath')
+            ->willReturn('infection.log')
         ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::DEBUG, false, false);
@@ -87,7 +87,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $this->assertProvidesExcluding([], $provider->get());
     }
 
-    public function test_it_ignores_some_statuses_when_debugging_is_not_enabled(): void
+    public function test_it_ignores_some_statuses_when_debugging_is_not_enabled_for_text_logger(): void
     {
         $logs = $this->createMock(Logs::class);
         $logs
@@ -106,7 +106,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         );
     }
 
-    public function test_it_ignores_more_statuses_when_running_in_only_covered_mode(): void
+    public function test_it_ignores_more_statuses_when_running_in_only_covered_mode_for_text_logger(): void
     {
         $logs = $this->createMock(Logs::class);
         $logs
@@ -126,13 +126,91 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         );
     }
 
-    private function assertProvidesExcluding(array $excluding, array $actual): void
+    public function test_it_includes_escaped_when_requested(): void
     {
+        $logs = $this->createMock(Logs::class);
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, true);
+
+        $this->assertProvides([
+            DetectionStatus::ESCAPED,
+        ], $provider->get());
+    }
+
+    public function test_it_provides_nothing_when_logging_verbosity_is_none(): void
+    {
+        $logs = $this->createMock(Logs::class);
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, false);
+
+        $this->assertSame([], $provider->get());
+    }
+
+    public function test_it_provides_escaped_when_using_github_annotations_logger(): void
+    {
+        $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getUseGitHubAnnotationsLogger')
+            ->willReturn(true)
+        ;
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+
+        $this->assertProvides([
+            DetectionStatus::ESCAPED,
+        ], $provider->get());
+    }
+
+    public function test_it_provides_certain_statuses_for_json_logger(): void
+    {
+        $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getJsonLogFilePath')
+            ->willReturn('infection.json')
+        ;
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+
+        $this->assertProvidesExcluding([
+            DetectionStatus::NOT_COVERED,
+            DetectionStatus::SKIPPED,
+        ], $provider->get());
+    }
+
+    public function test_it_provides_certain_statuses_includin_not_covered_for_json_logger(): void
+    {
+        $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getJsonLogFilePath')
+            ->willReturn('infection.json')
+        ;
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
+
+        $this->assertProvidesExcluding([
+            DetectionStatus::SKIPPED,
+        ], $provider->get());
+    }
+
+    private function assertProvides(array $expected, array $actual): void
+    {
+        $expected = array_flip($expected);
+        ksort($expected);
+
         ksort($actual);
 
-        $expected = $this->getDetectionStatusesIndexExcluding($excluding);
+        $this->assertSame(array_keys($expected), array_keys($actual));
+    }
 
+    private function assertProvidesExcluding(array $excluding, array $actual): void
+    {
+        $expected = $this->getDetectionStatusesIndexExcluding($excluding);
         ksort($expected);
+
+        ksort($actual);
 
         $this->assertSame(array_keys($expected), array_keys($actual));
     }

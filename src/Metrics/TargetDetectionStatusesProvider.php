@@ -75,22 +75,6 @@ class TargetDetectionStatusesProvider
      */
     public function get(): array
     {
-        if ($this->logVerbosity === LogVerbosity::NONE) {
-            return [];
-        }
-
-        $allDetectionStatuses = array_flip(DetectionStatus::ALL);
-
-        // This one requires them all.
-        if ($this->logConfig->getDebugLogFilePath() !== null) {
-            return $allDetectionStatuses;
-        }
-
-        // Per mutator logger needs all mutation results to make a summary.
-        if ($this->logConfig->getPerMutatorFilePath() !== null) {
-            return $allDetectionStatuses;
-        }
-
         return array_flip(iterator_to_array($this->findRequired(), false));
     }
 
@@ -105,10 +89,30 @@ class TargetDetectionStatusesProvider
             yield DetectionStatus::ESCAPED;
         }
 
+        // This one stops all file logging.
+        if ($this->logVerbosity === LogVerbosity::NONE) {
+            return;
+        }
+
+        // This one requires them all.
+        if ($this->logConfig->getDebugLogFilePath() !== null) {
+            yield from DetectionStatus::ALL;
+
+            return;
+        }
+
+        // Per mutator logger needs all mutation results to make a summary.
+        if ($this->logConfig->getPerMutatorFilePath() !== null) {
+            yield from DetectionStatus::ALL;
+
+            return;
+        }
+
         if ($this->logConfig->getUseGitHubAnnotationsLogger()) {
             yield DetectionStatus::ESCAPED;
         }
 
+        // Follows the logic in JsonLogger
         if ($this->logConfig->getJsonLogFilePath() !== null) {
             yield DetectionStatus::KILLED;
 
@@ -123,6 +127,7 @@ class TargetDetectionStatusesProvider
             }
         }
 
+        // Follows the logic in TextFileLogger
         if ($this->logConfig->getTextLogFilePath() !== null) {
             yield DetectionStatus::ESCAPED;
 
