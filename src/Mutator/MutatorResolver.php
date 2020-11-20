@@ -70,20 +70,16 @@ final class MutatorResolver
                 /** @var string[] $globalSetting */
                 $globalSetting = $setting;
 
-                $globalSettings = ['ignore' => $globalSetting];
+                $globalSettings['ignore'] = $globalSetting;
                 unset($mutatorSettings[self::GLOBAL_IGNORE_SETTING]);
-
-                break;
             }
 
             if ($mutatorOrProfileOrGlobalSettingKey === self::GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING) {
                 /** @var string[] $globalSetting */
                 $globalSetting = $setting;
 
-                $globalSettings = ['ignoreSourceCodeByRegex' => $globalSetting];
+                $globalSettings['ignoreSourceCodeByRegex'] = $globalSetting;
                 unset($mutatorSettings[self::GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING]);
-
-                break;
             }
         }
 
