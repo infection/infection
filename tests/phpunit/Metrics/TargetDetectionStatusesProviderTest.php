@@ -179,7 +179,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         ], $provider->get());
     }
 
-    public function test_it_provides_certain_statuses_includin_not_covered_for_json_logger(): void
+    public function test_it_provides_certain_statuses_including_not_covered_for_json_logger(): void
     {
         $logs = $this->createMock(Logs::class);
         $logs
