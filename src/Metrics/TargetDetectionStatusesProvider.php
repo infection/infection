@@ -81,6 +81,9 @@ class TargetDetectionStatusesProvider
     /**
      * TODO This has to be a responsibility of loggers.
      *
+     * @see https://github.com/infection/infection/pull/1430#pullrequestreview-535715334
+     * @deprecated
+     *
      * @return Generator<string>
      */
     private function findRequired(): Generator
