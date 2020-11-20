@@ -292,6 +292,43 @@ final class MutatorResolverTest extends TestCase
         $this->assertSame(['ignoreSourceCodeByRegex' => ['A::B', 'B::C']], $resolvedMutators[IdenticalEqual::class]);
     }
 
+    public function test_it_can_resolve_mutators_with_both_global_settings_at_the_same_time(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            'global-ignore' => ['A::B'],
+            'global-ignoreSourceCodeByRegex' => ['A::B'],
+            MutatorName::getName(Plus::class) => true,
+            MutatorName::getName(For_::class) => false,
+            MutatorName::getName(IdenticalEqual::class) => [
+                'ignore' => ['B::C'],
+                'ignoreSourceCodeByRegex' => ['B::C'],
+            ],
+        ]);
+
+        $this->assertSameMutatorsByClass(
+            [
+                Plus::class,
+                IdenticalEqual::class,
+            ],
+            $resolvedMutators
+        );
+
+        $this->assertSame(
+            [
+                'ignore' => ['A::B'],
+                'ignoreSourceCodeByRegex' => ['A::B'],
+            ],
+            $resolvedMutators[Plus::class]
+        );
+        $this->assertSame(
+            [
+                'ignore' => ['A::B', 'B::C'],
+                'ignoreSourceCodeByRegex' => ['A::B', 'B::C'],
+            ],
+            $resolvedMutators[IdenticalEqual::class]
+        );
+    }
+
     public function test_it_always_enrich_global_settings_for_a_mutator_regardless_of_the_order(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve([
