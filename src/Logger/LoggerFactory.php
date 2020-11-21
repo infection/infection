@@ -87,7 +87,7 @@ class LoggerFactory
 
     public function createFromLogEntries(Logs $logConfig): MutationTestingResultsLogger
     {
-        return new LoggerRegistry(
+        return new FederatedLogger(
             ...array_filter(
                 [
                     $this->createTextLogger($logConfig->getTextLogFilePath()),
@@ -107,114 +107,133 @@ class LoggerFactory
 
     private function createTextLogger(?string $filePath): ?FileLogger
     {
-        return $filePath === null
-            ? null
-            : new FileLogger(
-                $filePath,
-                $this->filesystem,
-                new TextFileLogger(
-                    $this->resultsCollector,
-                    $this->logVerbosity === LogVerbosity::DEBUG,
-                    $this->onlyCoveredCode,
-                    $this->debugMode
-                ),
-                $this->logger
-            )
-        ;
+        if ($filePath === null) {
+            return null;
+        }
+
+        $textLogger = new TextFileLogger(
+            $this->resultsCollector,
+            $this->logVerbosity === LogVerbosity::DEBUG,
+            $this->onlyCoveredCode,
+            $this->debugMode
+        );
+
+        return new FileLogger(
+            $filePath,
+            $this->filesystem,
+            $textLogger,
+            $this->logger
+        );
     }
 
     private function createSummaryLogger(?string $filePath): ?FileLogger
     {
-        return $filePath === null
-            ? null
-            : new FileLogger(
-                $filePath,
-                $this->filesystem,
-                new SummaryFileLogger($this->metricsCalculator),
-                $this->logger
-            )
-        ;
+        if ($filePath === null) {
+            return null;
+        }
+
+        $summaryFileLogger = new SummaryFileLogger($this->metricsCalculator);
+
+        return new FileLogger(
+            $filePath,
+            $this->filesystem,
+            $summaryFileLogger,
+            $this->logger
+        );
     }
 
     private function createJsonLogger(?string $filePath): ?FileLogger
     {
-        return $filePath === null
-            ? null
-            : new FileLogger(
-                $filePath,
-                $this->filesystem,
-                new JsonLogger(
-                    $this->metricsCalculator,
-                    $this->resultsCollector,
-                    $this->onlyCoveredCode
-                ),
-                $this->logger
-            )
-        ;
+        if ($filePath === null) {
+            return null;
+        }
+
+        $jsonLogger = new JsonLogger(
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->onlyCoveredCode
+        );
+
+        return new FileLogger(
+            $filePath,
+            $this->filesystem,
+            $jsonLogger,
+            $this->logger
+        );
     }
 
     private function createGitHubAnnotationsLogger(bool $useGitHubAnnotationsLogger): ?FileLogger
     {
-        return $useGitHubAnnotationsLogger
-            ? new FileLogger(
-                'php://stdout',
-                $this->filesystem,
-                new GitHubAnnotationsLogger($this->resultsCollector),
-                $this->logger
-            )
-            : null
-        ;
+        if ($useGitHubAnnotationsLogger === false) {
+            return null;
+        }
+
+        $annotationsLogger = new GitHubAnnotationsLogger($this->resultsCollector);
+
+        return new FileLogger(
+            'php://stdout',
+            $this->filesystem,
+            $annotationsLogger,
+            $this->logger
+        );
     }
 
     private function createDebugLogger(?string $filePath): ?FileLogger
     {
-        return $filePath === null
-            ? null
-            : new FileLogger(
-                $filePath,
-                $this->filesystem,
-                new DebugFileLogger(
-                    $this->metricsCalculator,
-                    $this->resultsCollector,
-                    $this->onlyCoveredCode
-                ),
-                $this->logger
-            )
-        ;
+        if ($filePath === null) {
+            return null;
+        }
+
+        $debugLogger = new DebugFileLogger(
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->onlyCoveredCode
+        );
+
+        return new FileLogger(
+            $filePath,
+            $this->filesystem,
+            $debugLogger,
+            $this->logger
+        );
     }
 
     private function createPerMutatorLogger(?string $filePath): ?FileLogger
     {
-        return $filePath === null
-            ? null
-            : new FileLogger(
-                $filePath,
-                $this->filesystem,
-                new PerMutatorLogger(
-                    $this->metricsCalculator,
-                    $this->resultsCollector
-                ),
-                $this->logger
-            )
-        ;
+        if ($filePath === null) {
+            return null;
+        }
+
+        $perMutatorLogger = new PerMutatorLogger(
+            $this->metricsCalculator,
+            $this->resultsCollector
+        );
+
+        return new FileLogger(
+            $filePath,
+            $this->filesystem,
+            $perMutatorLogger,
+            $this->logger
+        );
     }
 
     private function createBadgeLogger(?Badge $badge): ?BadgeLogger
     {
-        return $badge === null
-            ? null
-            : new BadgeLogger(
-                new BuildContextResolver($this->ciDetector),
-                new StrykerApiKeyResolver(),
-                new StrykerDashboardClient(
-                    new StrykerCurlClient(),
-                    $this->logger
-                ),
-                $this->metricsCalculator,
-                $badge->getBranch(),
+        if ($badge === null) {
+            return null;
+        }
+
+        return new BadgeLogger(
+            new BuildContextResolver($this->ciDetector),
+            new StrykerApiKeyResolver(),
+            new StrykerDashboardClient(
+                new StrykerCurlClient(),
                 $this->logger
-            )
-        ;
+            ),
+            $this->metricsCalculator,
+            $badge->getBranch(),
+            $this->logger
+        );
     }
 
     private function isAllowedToLog(MutationTestingResultsLogger $logger): bool

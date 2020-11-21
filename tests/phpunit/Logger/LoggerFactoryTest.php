@@ -42,11 +42,11 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
+use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
 use Infection\Logger\GitHubAnnotationsLogger;
 use Infection\Logger\JsonLogger;
 use Infection\Logger\LoggerFactory;
-use Infection\Logger\LoggerRegistry;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\SummaryFileLogger;
@@ -293,9 +293,9 @@ final class LoggerFactoryTest extends TestCase
         array $expectedLoggerClasses,
         MutationTestingResultsLogger $logger
     ): void {
-        $this->assertInstanceOf(LoggerRegistry::class, $logger);
+        $this->assertInstanceOf(FederatedLogger::class, $logger);
 
-        $loggersReflection = (new ReflectionClass(LoggerRegistry::class))->getProperty('loggers');
+        $loggersReflection = (new ReflectionClass(FederatedLogger::class))->getProperty('loggers');
         $loggersReflection->setAccessible(true);
 
         $loggers = $loggersReflection->getValue($logger);

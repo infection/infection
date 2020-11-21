@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Infection\Logger\LoggerRegistry;
+use Infection\Logger\FederatedLogger;
 use Infection\Logger\MutationTestingResultsLogger;
 use PHPUnit\Framework\TestCase;
 
-final class LoggerRegistryTest extends TestCase
+final class FederatedLoggerTest extends TestCase
 {
     public function test_it_logs_with_all_the_registered_loggers(): void
     {
@@ -55,6 +55,6 @@ final class LoggerRegistryTest extends TestCase
             ->method('log')
         ;
 
-        (new LoggerRegistry($logger1, $logger2))->log();
+        (new FederatedLogger($logger1, $logger2))->log();
     }
 }
