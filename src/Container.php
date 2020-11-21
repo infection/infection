@@ -76,8 +76,10 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Logger\BadgeLoggerFactory;
+use Infection\Logger\FederatedLogger;
+use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\GitHub\GitDiffFileProvider;
-use Infection\Logger\LoggerFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
@@ -500,8 +502,7 @@ final class Container
             },
             MutationTestingResultsLoggerSubscriberFactory::class => static function (self $container): MutationTestingResultsLoggerSubscriberFactory {
                 return new MutationTestingResultsLoggerSubscriberFactory(
-                    $container->getLoggerFactory(),
-                    $container->getConfiguration()->getLogs()
+                    $container->getFederatedLogger()
                 );
             },
             PerformanceLoggerSubscriberFactory::class => static function (self $container): PerformanceLoggerSubscriberFactory {
@@ -527,19 +528,35 @@ final class Container
                     $container->getLineRangeCalculator()
                 );
             },
-            LoggerFactory::class => static function (self $container): LoggerFactory {
+            BadgeLoggerFactory::class => static function (self $container): BadgeLoggerFactory {
+                return new BadgeLoggerFactory(
+                    $container->getMetricsCalculator(),
+                    $container->getCiDetector(),
+                    $container->getLogger()
+                );
+            },
+            FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
 
-                return new LoggerFactory(
+                return new FileLoggerFactory(
                     $container->getMetricsCalculator(),
                     $container->getResultsCollector(),
                     $container->getFileSystem(),
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
                     $config->mutateOnlyCoveredCode(),
-                    $container->getCiDetector(),
                     $container->getLogger()
                 );
+            },
+            FederatedLogger::class => static function (self $container): FederatedLogger {
+                return new FederatedLogger(...array_filter([
+                    $container->getFileLoggerFactory()->createFromLogEntries(
+                        $container->getConfiguration()->getLogs()
+                    ),
+                    $container->getBadgeLoggerFactory()->createFromLogEntries(
+                        $container->getConfiguration()->getLogs()
+                    ),
+                ]));
             },
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
@@ -1102,9 +1119,19 @@ final class Container
         return $this->get(FileMutationGenerator::class);
     }
 
-    public function getLoggerFactory(): LoggerFactory
+    public function getFileLoggerFactory(): FileLoggerFactory
     {
-        return $this->get(LoggerFactory::class);
+        return $this->get(FileLoggerFactory::class);
+    }
+
+    public function getBadgeLoggerFactory(): BadgeLoggerFactory
+    {
+        return $this->get(BadgeLoggerFactory::class);
+    }
+
+    public function getFederatedLogger(): FederatedLogger
+    {
+        return $this->get(FederatedLogger::class);
     }
 
     public function getTargetDetectionStatusesProvider(): TargetDetectionStatusesProvider

@@ -33,26 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger;
 
-use Infection\Logger\MutationTestingResultsLogger;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Configuration\Entry\Logs;
+use Infection\Environment\BuildContextResolver;
+use Infection\Environment\StrykerApiKeyResolver;
+use Infection\Logger\Http\StrykerCurlClient;
+use Infection\Logger\Http\StrykerDashboardClient;
+use Infection\Metrics\MetricsCalculator;
+use OndraM\CiDetector\CiDetector;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
+ * @final
  */
-final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
+class BadgeLoggerFactory
 {
-    private MutationTestingResultsLogger $logger;
+    private MetricsCalculator $metricsCalculator;
+    private CiDetector $ciDetector;
+    private LoggerInterface $logger;
 
-    public function __construct(MutationTestingResultsLogger $logger)
-    {
+    public function __construct(
+        MetricsCalculator $metricsCalculator,
+        CiDetector $ciDetector,
+        LoggerInterface $logger
+    ) {
+        $this->metricsCalculator = $metricsCalculator;
+        $this->ciDetector = $ciDetector;
         $this->logger = $logger;
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function createFromLogEntries(Logs $logConfig): ?MutationTestingResultsLogger
     {
-        return new MutationTestingResultsLoggerSubscriber(
+        if ($logConfig->getBadge() === null) {
+            return null;
+        }
+
+        return new BadgeLogger(
+            new BuildContextResolver($this->ciDetector),
+            new StrykerApiKeyResolver(),
+            new StrykerDashboardClient(
+                new StrykerCurlClient(),
+                $this->logger
+            ),
+            $this->metricsCalculator,
+            $logConfig->getBadge()->getBranch(),
             $this->logger
         );
     }
