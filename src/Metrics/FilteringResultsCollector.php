@@ -33,64 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Metrics;
+namespace Infection\Metrics;
 
-use Infection\Metrics\Collector;
+use function array_filter;
+use function array_key_exists;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutator\Loop\For_;
-use Infection\Tests\Mutator\MutatorName;
-use function Later\now;
 
-trait CreateMutantExecutionResult
+/**
+ * @internal
+ * @final
+ */
+class FilteringResultsCollector implements Collector
 {
-    private $id = 0;
+    private Collector $targetCollector;
+    /** @var array<string, mixed> */
+    private array $targetDetectionStatuses;
 
     /**
-     * @return MutantExecutionResult[]
+     * @param array<string, mixed> $targetDetectionStatuses
      */
-    private function addMutantExecutionResult(
-        Collector $collector,
-        string $detectionStatus,
-        int $count = 1
-    ): array {
-        $executionResults = [];
-
-        for ($i = 0; $i < $count; ++$i) {
-            $executionResults[] = $this->createMutantExecutionResult($detectionStatus);
-        }
-
-        $collector->collect(...$executionResults);
-
-        return $executionResults;
+    public function __construct(Collector $targetCollector, array $targetDetectionStatuses)
+    {
+        $this->targetCollector = $targetCollector;
+        $this->targetDetectionStatuses = $targetDetectionStatuses;
     }
 
-    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
+    public function collect(MutantExecutionResult ...$executionResults): void
     {
-        $id = $this->id;
-        ++$this->id;
-
-        return new MutantExecutionResult(
-            'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            'process output',
-            $detectionStatus,
-            now(str_replace(
-                "\n",
-                PHP_EOL,
-                <<<DIFF
---- Original
-+++ New
-@@ @@
-                
-- echo 'original';
-+ echo 'mutated';
-                
-DIFF
-                )),
-            MutatorName::getName(For_::class),
-            'foo/bar',
-            $id,
-            now('<?php $a = 1;'),
-            now('<?php $a = 1;')
+        $executionResults = array_filter(
+            $executionResults,
+            function (MutantExecutionResult $executionResults): bool {
+                return array_key_exists($executionResults->getDetectionStatus(), $this->targetDetectionStatuses);
+            }
         );
+
+        if ($executionResults !== []) {
+            $this->targetCollector->collect(...$executionResults);
+        }
     }
 }

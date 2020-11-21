@@ -78,9 +78,11 @@ use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\LoggerFactory;
+use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
+use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
@@ -477,9 +479,12 @@ final class Container
             },
             MutationTestingResultsCollectorSubscriberFactory::class => static function (self $container): MutationTestingResultsCollectorSubscriberFactory {
                 return new MutationTestingResultsCollectorSubscriberFactory(
-                    $container->getMetricsCalculator(),
-                    // TODO ResultsCollector can have multiple strategies on results accumulations, e.g. whenever uncovered results need saving
-                    $container->getResultsCollector()
+                   ...array_filter([
+                       $container->getMetricsCalculator(),
+                       $container->getFilteringResultsCollectorFactory()->create(
+                           $container->getResultsCollector()
+                       ),
+                   ])
                 );
             },
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
@@ -535,6 +540,19 @@ final class Container
                     $container->getCiDetector(),
                     $container->getLogger()
                 );
+            },
+            TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
+                $config = $container->getConfiguration();
+
+                return new TargetDetectionStatusesProvider(
+                    $config->getLogs(),
+                    $config->getLogVerbosity(),
+                    $config->mutateOnlyCoveredCode(),
+                    $config->showMutations()
+                );
+            },
+            FilteringResultsCollectorFactory::class => static function (self $container): FilteringResultsCollectorFactory {
+                return new FilteringResultsCollectorFactory($container->getTargetDetectionStatusesProvider());
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
                 $config = $container->getConfiguration();
@@ -1087,6 +1105,16 @@ final class Container
     public function getLoggerFactory(): LoggerFactory
     {
         return $this->get(LoggerFactory::class);
+    }
+
+    public function getTargetDetectionStatusesProvider(): TargetDetectionStatusesProvider
+    {
+        return $this->get(TargetDetectionStatusesProvider::class);
+    }
+
+    public function getFilteringResultsCollectorFactory(): FilteringResultsCollectorFactory
+    {
+        return $this->get(FilteringResultsCollectorFactory::class);
     }
 
     public function getTestFrameworkAdapter(): TestFrameworkAdapter

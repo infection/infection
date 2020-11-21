@@ -33,64 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Metrics;
+namespace Infection\Metrics;
 
-use Infection\Metrics\Collector;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutator\Loop\For_;
-use Infection\Tests\Mutator\MutatorName;
-use function Later\now;
+use function count;
+use Infection\Mutant\DetectionStatus;
 
-trait CreateMutantExecutionResult
+/**
+ * @internal
+ */
+final class FilteringResultsCollectorFactory
 {
-    private $id = 0;
+    private TargetDetectionStatusesProvider $statusesProvider;
 
-    /**
-     * @return MutantExecutionResult[]
-     */
-    private function addMutantExecutionResult(
-        Collector $collector,
-        string $detectionStatus,
-        int $count = 1
-    ): array {
-        $executionResults = [];
-
-        for ($i = 0; $i < $count; ++$i) {
-            $executionResults[] = $this->createMutantExecutionResult($detectionStatus);
-        }
-
-        $collector->collect(...$executionResults);
-
-        return $executionResults;
+    public function __construct(TargetDetectionStatusesProvider $statusesProvider)
+    {
+        $this->statusesProvider = $statusesProvider;
     }
 
-    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
+    public function create(Collector $targetCollector): ?Collector
     {
-        $id = $this->id;
-        ++$this->id;
+        $targetDetectionStatuses = $this->statusesProvider->get();
 
-        return new MutantExecutionResult(
-            'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            'process output',
-            $detectionStatus,
-            now(str_replace(
-                "\n",
-                PHP_EOL,
-                <<<DIFF
---- Original
-+++ New
-@@ @@
-                
-- echo 'original';
-+ echo 'mutated';
-                
-DIFF
-                )),
-            MutatorName::getName(For_::class),
-            'foo/bar',
-            $id,
-            now('<?php $a = 1;'),
-            now('<?php $a = 1;')
-        );
+        if ($targetDetectionStatuses === []) {
+            // Need not collect nothing.
+            return null;
+        }
+
+        if (count($targetDetectionStatuses) === count(DetectionStatus::ALL)) {
+            // No need to filter anything at all.
+            return $targetCollector;
+        }
+
+        return new FilteringResultsCollector($targetCollector, $targetDetectionStatuses);
     }
 }
