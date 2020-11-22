@@ -40,20 +40,18 @@ use function get_class;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
-use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
+use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\GitHubAnnotationsLogger;
 use Infection\Logger\JsonLogger;
-use Infection\Logger\LoggerFactory;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
-use Infection\Tests\Fixtures\FakeCiDetector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -63,7 +61,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @group integration
  */
-final class LoggerFactoryTest extends TestCase
+final class FileLoggerFactoryTest extends TestCase
 {
     /**
      * @var MetricsCalculator
@@ -109,29 +107,6 @@ final class LoggerFactoryTest extends TestCase
         );
 
         $this->assertRegisteredLoggersAre([], $logger);
-    }
-
-    public function test_it_creates_a_bade_logger_on_no_verbosity(): void
-    {
-        $factory = $this->createLoggerFactory(
-            LogVerbosity::NONE,
-            true,
-            true
-        );
-
-        $logger = $factory->createFromLogEntries(
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                new Badge('master')
-            )
-        );
-
-        $this->assertRegisteredLoggersAre([BadgeLogger::class], $logger);
     }
 
     /**
@@ -237,19 +212,6 @@ final class LoggerFactoryTest extends TestCase
             [GitHubAnnotationsLogger::class],
         ];
 
-        yield 'badge logger' => [
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                new Badge('foo')
-            ),
-            [BadgeLogger::class],
-        ];
-
         yield 'all loggers' => [
             new Logs(
                 'text',
@@ -267,7 +229,6 @@ final class LoggerFactoryTest extends TestCase
                 DebugFileLogger::class,
                 PerMutatorLogger::class,
                 GitHubAnnotationsLogger::class,
-                BadgeLogger::class,
             ],
         ];
     }
@@ -276,15 +237,14 @@ final class LoggerFactoryTest extends TestCase
         string $logVerbosity,
         bool $debugMode,
         bool $onlyCoveredCode
-    ): LoggerFactory {
-        return new LoggerFactory(
+    ): FileLoggerFactory {
+        return new FileLoggerFactory(
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->fileSystemMock,
             $logVerbosity,
             $debugMode,
             $onlyCoveredCode,
-            new FakeCiDetector(),
             new FakeLogger(),
         );
     }
