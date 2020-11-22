@@ -84,7 +84,13 @@ class JUnitTestExecutionInfoAdder
     {
         /** @var Trace $trace */
         foreach ($traces as $trace) {
-            foreach ($trace->getTests()->getTestsLocationsBySourceLine() as &$testsLocations) {
+            $tests = $trace->getTests();
+
+            if ($tests === null) {
+                continue;
+            }
+
+            foreach ($tests->getTestsLocationsBySourceLine() as &$testsLocations) {
                 foreach ($testsLocations as $line => $test) {
                     $testsLocations[$line] = $this->createCompleteTestLocation($test);
                 }
