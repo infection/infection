@@ -80,6 +80,7 @@ use Infection\Logger\BadgeLoggerFactory;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
@@ -502,7 +503,7 @@ final class Container
             },
             MutationTestingResultsLoggerSubscriberFactory::class => static function (self $container): MutationTestingResultsLoggerSubscriberFactory {
                 return new MutationTestingResultsLoggerSubscriberFactory(
-                    $container->getFederatedLogger()
+                    $container->getMutationTestingResultsLogger()
                 );
             },
             PerformanceLoggerSubscriberFactory::class => static function (self $container): PerformanceLoggerSubscriberFactory {
@@ -548,7 +549,7 @@ final class Container
                     $container->getLogger()
                 );
             },
-            FederatedLogger::class => static function (self $container): FederatedLogger {
+            MutationTestingResultsLogger::class => static function (self $container): MutationTestingResultsLogger {
                 return new FederatedLogger(...array_filter([
                     $container->getFileLoggerFactory()->createFromLogEntries(
                         $container->getConfiguration()->getLogs()
@@ -1129,9 +1130,9 @@ final class Container
         return $this->get(BadgeLoggerFactory::class);
     }
 
-    public function getFederatedLogger(): FederatedLogger
+    public function getMutationTestingResultsLogger(): MutationTestingResultsLogger
     {
-        return $this->get(FederatedLogger::class);
+        return $this->get(MutationTestingResultsLogger::class);
     }
 
     public function getTargetDetectionStatusesProvider(): TargetDetectionStatusesProvider
