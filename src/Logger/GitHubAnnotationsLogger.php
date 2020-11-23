@@ -45,6 +45,8 @@ use Webmozart\PathUtil\Path;
  */
 final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 {
+    public const DEFAULT_OUTPUT = 'php://stdout';
+
     private ResultsCollector $resultsCollector;
 
     public function __construct(ResultsCollector $resultsCollector)

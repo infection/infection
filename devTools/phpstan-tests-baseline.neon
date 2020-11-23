@@ -333,7 +333,7 @@ parameters:
 		-
 			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
 			count: 2
-			path: ../tests/phpunit/Logger/LoggerRegistryTest.php
+			path: ../tests/phpunit/Logger/FederatedLoggerTest.php
 
 		-
 			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"

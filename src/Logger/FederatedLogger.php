@@ -38,7 +38,7 @@ namespace Infection\Logger;
 /**
  * @internal
  */
-final class LoggerRegistry implements MutationTestingResultsLogger
+final class FederatedLogger implements MutationTestingResultsLogger
 {
     /**
      * @var MutationTestingResultsLogger[]
