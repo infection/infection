@@ -46,49 +46,9 @@ parameters:
 			path: ../tests/phpunit/AutoReview/SourceTestClassNameScheme.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Config/ConsoleHelperTest.php
-
-		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:resource\\(\\) with resource will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/Config/ValueProvider/BaseProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/Config/ValueProvider/PhpUnitCustomExecutablePathProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:throwException\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Config/ValueProvider/PhpUnitCustomExecutablePathProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Config/ValueProvider/TestFrameworkConfigPathProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:exactly\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/Config/ValueProvider/TestFrameworkConfigPathProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:onConsecutiveCalls\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/Config/ValueProvider/TestFrameworkConfigPathProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:throwException\\(\\)\\.$#"
-			count: 5
-			path: ../tests/phpunit/Config/ValueProvider/TestFrameworkConfigPathProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Config/ValueProvider/TestFrameworkConfigPathProviderTest.php
 
 		-
 			message: "#^Call to static method Infection\\\\Tests\\\\Configuration\\\\ConfigurationFactoryTest\\:\\:createValueForMinCoveredMsi\\(\\) with incorrect case\\: createValueForminCoveredMsi$#"
@@ -101,19 +61,9 @@ parameters:
 			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationFileLoaderTest.php
-
-		-
 			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
 			count: 1
 			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationFileLoaderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationLoaderTest.php
 
 		-
 			message: "#^Only booleans are allowed in an if condition, Composer\\\\Autoload\\\\ClassLoader\\|null given\\.$#"
@@ -126,53 +76,13 @@ parameters:
 			path: ../tests/phpunit/Console/E2ETest.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Console/LogVerbosityTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 4
-			path: ../tests/phpunit/Console/LogVerbosityTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 9
-			path: ../tests/phpunit/Console/OutputFormatter/DotFormatterTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:exactly\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Console/OutputFormatterStyleConfiguratorTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Console/OutputFormatterStyleConfiguratorTest.php
-
-		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertIsIterable\\(\\) with iterable\\<Infection\\\\TestFramework\\\\Coverage\\\\Trace\\> will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/ContainerTest.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 18
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 12
-			path: ../tests/phpunit/EngineTest.php
-
-		-
 			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
 			count: 2
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:exactly\\(\\)\\.$#"
-			count: 1
 			path: ../tests/phpunit/EngineTest.php
 
 		-
@@ -188,16 +98,6 @@ parameters:
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:notNull\\(\\) with Infection\\\\Tests\\\\EnvVariableManipulation\\\\EnvBackup and 'Attempted to…' will always evaluate to true\\.$#"
 			count: 1
-			path: ../tests/phpunit/Logger/BadgeLoggerTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 6
-			path: ../tests/phpunit/Logger/BadgeLoggerTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 2
 			path: ../tests/phpunit/Logger/BadgeLoggerTest.php
 
 		-
@@ -241,71 +141,6 @@ parameters:
 			path: ../tests/phpunit/Event/MutationTestingWasFinishedTest.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/Event/Subscriber/CiInitialTestsConsoleLoggerSubscriberTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/CiMutationGeneratingConsoleLoggerSubscriberTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriberFactoryTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriberTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/InitialTestsConsoleLoggerSubscriberFactoryTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 4
-			path: ../tests/phpunit/Event/Subscriber/InitialTestsConsoleLoggerSubscriberTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:throwException\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/InitialTestsConsoleLoggerSubscriberTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/Event/Subscriber/MutationTestingConsoleLoggerSubscriberFactoryTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 5
-			path: ../tests/phpunit/Event/Subscriber/MutationTestingConsoleLoggerSubscriberTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/MutationTestingConsoleLoggerSubscriberTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/MutationTestingResultsCollectorSubscriberFactoryTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Event/Subscriber/MutationTestingResultsCollectorSubscriberTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/MutationTestingResultsLoggerSubscriberTest.php
-
-		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Infection\\\\\\\\FileSystem\\\\\\\\Finder\\\\\\\\Exception\\\\\\\\FinderException' and Infection\\\\FileSystem\\\\Finder\\\\Exception\\\\FinderException will always evaluate to true\\.$#"
 			count: 4
 			path: ../tests/phpunit/FileSystem/Finder/Exception/FinderExceptionTest.php
@@ -321,64 +156,9 @@ parameters:
 			path: ../tests/phpunit/Logger/DummyLogger.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Logger/FileLoggerTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Logger/Http/StrykerDashboardClientTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Logger/FederatedLoggerTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/Mutant/MutantExecutionResultFactoryTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 5
-			path: ../tests/phpunit/Mutant/MutantExecutionResultFactoryTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 4
-			path: ../tests/phpunit/Mutant/MutantFactoryTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:atLeastOnce\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Mutant/MutantFactoryTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/Mutation/FileMutationGeneratorTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 4
-			path: ../tests/phpunit/Mutation/FileMutationGeneratorTest.php
-
-		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Infection\\\\\\\\Mutation\\\\\\\\Mutation' and Infection\\\\Mutation\\\\Mutation will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/Mutation/FileMutationGeneratorTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/Mutation/MutationGeneratorTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:exactly\\(\\)\\.$#"
-			count: 4
-			path: ../tests/phpunit/Mutation/MutationGeneratorTest.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:string\\(\\) with string will always evaluate to true\\.$#"
@@ -396,21 +176,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/Extensions/BCMathTest.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 7
-			path: ../tests/phpunit/Mutator/IgnoreMutatorTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:exactly\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Mutator/IgnoreMutatorTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
-
-		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Infection\\\\\\\\Mutator\\\\\\\\Mutator' and Infection\\\\Mutator\\\\Mutator will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
@@ -419,11 +184,6 @@ parameters:
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertIsArray\\(\\) with array will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/PhpParser/FileParserTest.php
 
 		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'PhpParser\\\\\\\\Node' and PhpParser\\\\Node will always evaluate to true\\.$#"
@@ -446,11 +206,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/ReflectionVisitorTest.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Process/Factory/MutantProcessFactoryTest.php
-
-		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Infection\\\\\\\\Event\\\\\\\\MutantProcessWasFinished' and false will always evaluate to false\\.$#"
 			count: 1
 			path: ../tests/phpunit/Process/Factory/MutantProcessFactoryTest.php
@@ -459,26 +214,6 @@ parameters:
 			message: "#^Anonymous function should have native return typehint \"Generator\"\\.$#"
 			count: 1
 			path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 6
-			path: ../tests/phpunit/Process/Runner/InitialTestsFailedTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 6
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:exactly\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 8
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
 			message: "#^Instanceof between Infection\\\\Event\\\\MutationTestingWasFinished\\|Infection\\\\Event\\\\MutationTestingWasStarted and class\\-string will always evaluate to true\\.$#"
@@ -491,59 +226,9 @@ parameters:
 			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 6
-			path: ../tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/Resource/Listener/PerformanceLoggerSubscriberTest.php
-
-		-
 			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
 			count: 1
 			path: ../tests/phpunit/Resource/Listener/PerformanceLoggerSubscriberTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/Resource/Memory/MemoryLimiterTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 4
-			path: ../tests/phpunit/Resource/Memory/MemoryLimiterTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:exactly\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/BufferedSourceFileFilterTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/TestFramework/Coverage/CoverageCheckerTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/TestFramework/Coverage/CoveredTraceProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/MemoizedTestFileDataProviderTest.php
 
 		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Infection\\\\\\\\TestFramework\\\\\\\\Coverage\\\\\\\\JUnit\\\\\\\\TestFileNameNotFoundException' and Infection\\\\TestFramework\\\\Coverage\\\\JUnit\\\\TestFileNameNotFoundException will always evaluate to true\\.$#"
@@ -554,36 +239,6 @@ parameters:
 			message: "#^Anonymous function should have native return typehint \"int\\<\\-1, 1\\>\"\\.$#"
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/UncoveredTraceProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 3
-			path: ../tests/phpunit/TestFramework/Coverage/UnionTraceProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/UnionTraceProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:never\\(\\)\\.$#"
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/PhpUnitXmlCoverageTraceProviderTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 2
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\TestCase\\:\\:once\\(\\)\\.$#"
-			count: 4
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
 
 		-
 			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
