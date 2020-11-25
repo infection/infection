@@ -78,44 +78,61 @@ TXT
             return false;
         }
 
+        if ($this->isCompareWithZero($node)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function isCompareWithZero(Node\Expr\BinaryOp\Spaceship $node): bool
+    {
         $parentAttribute = $node->getAttribute('parent');
 
         if ($parentAttribute instanceof Node\Expr\BinaryOp\Identical) {
             if ($parentAttribute->right instanceof Node\Scalar\LNumber && $parentAttribute->right->value === 0) {
-                return false;
+                return true;
             }
 
             if ($parentAttribute->left instanceof Node\Scalar\LNumber && $parentAttribute->left->value === 0) {
-                return false;
+                return true;
             }
         }
 
         if ($parentAttribute instanceof Node\Expr\BinaryOp\Equal) {
             if ($parentAttribute->right instanceof Node\Scalar\LNumber && $parentAttribute->right->value === 0) {
-                return false;
+                return true;
+            }
+
+            if ($parentAttribute->right instanceof Node\Scalar\DNumber && $parentAttribute->right->value === 0.0) {
+                return true;
             }
 
             if (
                 $parentAttribute->right instanceof Node\Scalar\String_
                 && is_numeric($parentAttribute->right->value)
-                && $parentAttribute->right->value === '0'
+                && ($parentAttribute->right->value === '0' || $parentAttribute->right->value === '0.0')
             ) {
-                return false;
+                return true;
             }
 
             if ($parentAttribute->left instanceof Node\Scalar\LNumber && $parentAttribute->left->value === 0) {
-                return false;
+                return true;
+            }
+
+            if ($parentAttribute->left instanceof Node\Scalar\DNumber && $parentAttribute->left->value === 0.0) {
+                return true;
             }
 
             if (
                 $parentAttribute->left instanceof Node\Scalar\String_
                 && is_numeric($parentAttribute->left->value)
-                && $parentAttribute->left->value === '0'
+                && ($parentAttribute->left->value === '0' || $parentAttribute->left->value === '0.0')
             ) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 }
