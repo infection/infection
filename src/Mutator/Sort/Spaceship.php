@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use function is_numeric;
 use PhpParser\Node;
 
 /**
@@ -90,47 +91,61 @@ TXT
         $parentAttribute = $node->getAttribute('parent');
 
         if ($parentAttribute instanceof Node\Expr\BinaryOp\Identical) {
-            if ($parentAttribute->right instanceof Node\Scalar\LNumber && $parentAttribute->right->value === 0) {
-                return true;
-            }
-
-            if ($parentAttribute->left instanceof Node\Scalar\LNumber && $parentAttribute->left->value === 0) {
-                return true;
-            }
+            return $this->isIntegerScalarEqualToZero($parentAttribute);
         }
 
         if ($parentAttribute instanceof Node\Expr\BinaryOp\Equal) {
-            if ($parentAttribute->right instanceof Node\Scalar\LNumber && $parentAttribute->right->value === 0) {
-                return true;
-            }
+            return $this->isEqualToZero($parentAttribute);
+        }
 
-            if ($parentAttribute->right instanceof Node\Scalar\DNumber && $parentAttribute->right->value === 0.0) {
-                return true;
-            }
+        return false;
+    }
 
-            if (
-                $parentAttribute->right instanceof Node\Scalar\String_
-                && is_numeric($parentAttribute->right->value)
-                && ($parentAttribute->right->value === '0' || $parentAttribute->right->value === '0.0')
-            ) {
-                return true;
-            }
+    private function isIntegerScalarEqualToZero(Node\Expr\BinaryOp $node): bool
+    {
+        if (!$node instanceof Node\Expr\BinaryOp\Identical && !$node instanceof Node\Expr\BinaryOp\Equal) {
+            return false;
+        }
 
-            if ($parentAttribute->left instanceof Node\Scalar\LNumber && $parentAttribute->left->value === 0) {
-                return true;
-            }
+        if ($node->right instanceof Node\Scalar\LNumber && $node->right->value === 0) {
+            return true;
+        }
 
-            if ($parentAttribute->left instanceof Node\Scalar\DNumber && $parentAttribute->left->value === 0.0) {
-                return true;
-            }
+        if ($node->left instanceof Node\Scalar\LNumber && $node->left->value === 0) {
+            return true;
+        }
 
-            if (
-                $parentAttribute->left instanceof Node\Scalar\String_
-                && is_numeric($parentAttribute->left->value)
-                && ($parentAttribute->left->value === '0' || $parentAttribute->left->value === '0.0')
-            ) {
-                return true;
-            }
+        return false;
+    }
+
+    private function isEqualToZero(Node\Expr\BinaryOp\Equal $node): bool
+    {
+        if ($this->isIntegerScalarEqualToZero($node)) {
+            return true;
+        }
+
+        if ($node->right instanceof Node\Scalar\DNumber && $node->right->value === 0.0) {
+            return true;
+        }
+
+        if ($node->left instanceof Node\Scalar\DNumber && $node->left->value === 0.0) {
+            return true;
+        }
+
+        if (
+            $node->right instanceof Node\Scalar\String_
+            && is_numeric($node->right->value)
+            && ($node->right->value === '0' || $node->right->value === '0.0')
+        ) {
+            return true;
+        }
+
+        if (
+            $node->left instanceof Node\Scalar\String_
+            && is_numeric($node->left->value)
+            && ($node->left->value === '0' || $node->left->value === '0.0')
+        ) {
+            return true;
         }
 
         return false;
