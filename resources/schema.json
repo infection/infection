@@ -245,7 +245,6 @@
                 "ProtectedVisibility": { "$ref": "#/definitions/default-mutator-config" },
                 "DecrementInteger": { "$ref": "#/definitions/default-mutator-config" },
                 "IncrementInteger": { "$ref": "#/definitions/default-mutator-config" },
-                "OneZeroInteger": { "$ref": "#/definitions/default-mutator-config" },
                 "OneZeroFloat": { "$ref": "#/definitions/default-mutator-config" },
                 "AssignCoalesce": { "$ref": "#/definitions/default-mutator-config" },
                 "Break_": { "$ref": "#/definitions/default-mutator-config" },

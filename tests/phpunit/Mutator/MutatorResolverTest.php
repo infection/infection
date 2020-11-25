@@ -48,7 +48,6 @@ use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\Number\DecrementInteger;
 use Infection\Mutator\Number\IncrementInteger;
 use Infection\Mutator\Number\OneZeroFloat;
-use Infection\Mutator\Number\OneZeroInteger;
 use Infection\Mutator\ProfileList;
 use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
@@ -393,8 +392,6 @@ final class MutatorResolverTest extends TestCase
                 ],
                 OneZeroFloat::class => [
                 ],
-                OneZeroInteger::class => [
-                ],
             ],
             $resolvedMutators
         );
@@ -421,8 +418,6 @@ final class MutatorResolverTest extends TestCase
                 IncrementInteger::class => [
                 ],
                 OneZeroFloat::class => [
-                ],
-                OneZeroInteger::class => [
                 ],
             ],
             $resolvedMutators
@@ -458,11 +453,6 @@ final class MutatorResolverTest extends TestCase
                     ],
                 ],
                 OneZeroFloat::class => [
-                    'ignore' => [
-                        'Infected\\SourceClass::substract',
-                    ],
-                ],
-                OneZeroInteger::class => [
                     'ignore' => [
                         'Infected\\SourceClass::substract',
                     ],

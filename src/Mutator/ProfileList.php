@@ -147,7 +147,6 @@ final class ProfileList
         Mutator\Number\DecrementInteger::class,
         Mutator\Number\IncrementInteger::class,
         Mutator\Number\OneZeroFloat::class,
-        Mutator\Number\OneZeroInteger::class,
     ];
 
     public const OPERATOR_PROFILE = [
@@ -345,7 +344,6 @@ final class ProfileList
         'DecrementInteger' => Mutator\Number\DecrementInteger::class,
         'IncrementInteger' => Mutator\Number\IncrementInteger::class,
         'OneZeroFloat' => Mutator\Number\OneZeroFloat::class,
-        'OneZeroInteger' => Mutator\Number\OneZeroInteger::class,
 
         // Operator
         'AssignCoalesce' => Mutator\Operator\AssignCoalesce::class,
