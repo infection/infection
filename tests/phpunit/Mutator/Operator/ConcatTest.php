@@ -104,39 +104,54 @@ PHP
             <<<'PHP'
 <?php
 
-$a = 'foo';
-$b = 'bar';
-$c = 'baz';
-$a . $b . $c . 'd';
+$a = 'a';
+$b = 'b';
+$c = 'c';
+$e = 'e';
+$a . $b . $c . 'd' . $e;
 PHP
             ,
             [
                 <<<'PHP'
 <?php
 
-$a = 'foo';
-$b = 'bar';
-$c = 'baz';
-$b . $a . $c . 'd';
+$a = 'a';
+$b = 'b';
+$c = 'c';
+$e = 'e';
+$b . $a . $c . 'd' . $e;
 PHP
                 ,
                 <<<'PHP'
 <?php
 
-$a = 'foo';
-$b = 'bar';
-$c = 'baz';
-$a . $c . $b . 'd';
+$a = 'a';
+$b = 'b';
+$c = 'c';
+$e = 'e';
+$a . $c . $b . 'd' . $e;
 PHP
                 ,
                 <<<'PHP'
 <?php
 
-$a = 'foo';
-$b = 'bar';
-$c = 'baz';
-$a . $b . 'd' . $c;
+$a = 'a';
+$b = 'b';
+$c = 'c';
+$e = 'e';
+$a . $b . 'd'. $c . $e;
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$c = 'c';
+$e = 'e';
+$a . $b . $c . $e . 'd';
+PHP
+                ,
             ],
         ];
     }

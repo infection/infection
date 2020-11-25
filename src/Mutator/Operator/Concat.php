@@ -75,15 +75,14 @@ TXT
     {
         assert($node instanceof Node\Expr\BinaryOp\Concat);
 
-        $left = $node->left;
-        $right = $node->right;
+        if ($node->left instanceof Node\Expr\BinaryOp\Concat) {
+            $left = $node->left->left;
+            $right = new Node\Expr\BinaryOp\Concat($node->right, $node->left->right);
 
-        if ($right instanceof Node\Expr\BinaryOp\Concat) {
-            $left = new Node\Expr\BinaryOp\Concat($node->left, $right->right, $right->getAttributes());
-            $right = $right->left;
+            yield new Node\Expr\BinaryOp\Concat($left, $right);
+        } else {
+            yield new Node\Expr\BinaryOp\Concat($node->right, $node->left);
         }
-
-        yield new Node\Expr\BinaryOp\Concat($right, $left, $node->getAttributes());
     }
 
     public function canMutate(Node $node): bool
