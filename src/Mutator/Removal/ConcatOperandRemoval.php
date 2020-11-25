@@ -89,8 +89,14 @@ TxT
     {
         assert($node instanceof Node\Expr\BinaryOp\Concat);
 
-        yield $node->left;
+        if ($node->left instanceof Node\Expr\BinaryOp\Concat) {
+            yield $node->left;
+
+            return;
+        }
 
         yield $node->right;
+
+        yield $node->left;
     }
 }

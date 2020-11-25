@@ -61,13 +61,109 @@ PHP
                 <<<'PHP'
 <?php
 
-'foo';
+'bar';
 PHP
                 ,
                 <<<'PHP'
 <?php
 
-'bar';
+'foo';
+PHP
+                ,
+            ],
+        ];
+
+        yield 'Removes each part of a 3-string concatenation' => [
+            <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$a . $b . 'c';
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$b . 'c';
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$a . 'c';
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$a . $b;
+PHP
+                ,
+            ],
+        ];
+
+        yield 'Removes each part of multiple concatenations' => [
+            <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$d = 'd';
+$a . $b . 'c' . $d . 'e';
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$d = 'd';
+$b . 'c' . $d . 'e';
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$d = 'd';
+$a . 'c' . $d . 'e';
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$d = 'd';
+$a . $b . $d . 'e';
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$d = 'd';
+$a . $b . 'c' . 'e';
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = 'a';
+$b = 'b';
+$d = 'd';
+$a . $b . 'c' . $d;
 PHP
                 ,
             ],
