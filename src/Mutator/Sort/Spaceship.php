@@ -74,6 +74,48 @@ TXT
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Spaceship;
+        if (!$node instanceof Node\Expr\BinaryOp\Spaceship) {
+            return false;
+        }
+
+        $parentAttribute = $node->getAttribute('parent');
+
+        if ($parentAttribute instanceof Node\Expr\BinaryOp\Identical) {
+            if ($parentAttribute->right instanceof Node\Scalar\LNumber && $parentAttribute->right->value === 0) {
+                return false;
+            }
+
+            if ($parentAttribute->left instanceof Node\Scalar\LNumber && $parentAttribute->left->value === 0) {
+                return false;
+            }
+        }
+
+        if ($parentAttribute instanceof Node\Expr\BinaryOp\Equal) {
+            if ($parentAttribute->right instanceof Node\Scalar\LNumber && $parentAttribute->right->value === 0) {
+                return false;
+            }
+
+            if (
+                $parentAttribute->right instanceof Node\Scalar\String_
+                && is_numeric($parentAttribute->right->value)
+                && $parentAttribute->right->value === '0'
+            ) {
+                return false;
+            }
+
+            if ($parentAttribute->left instanceof Node\Scalar\LNumber && $parentAttribute->left->value === 0) {
+                return false;
+            }
+
+            if (
+                $parentAttribute->left instanceof Node\Scalar\String_
+                && is_numeric($parentAttribute->left->value)
+                && $parentAttribute->left->value === '0'
+            ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

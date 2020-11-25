@@ -70,5 +70,61 @@ $b <=> $a;
 PHP
             ,
         ];
+
+        yield 'It does not swap operators when result is identical zero on the right side' => [
+            <<<'PHP'
+<?php
+
+($a <=> $b) === 0;
+PHP
+        ];
+
+        yield 'It does not swap operators when result is equal to zero on the right side' => [
+            <<<'PHP'
+<?php
+
+($a <=> $b) == 0;
+PHP
+        ];
+
+        yield 'It does not swap operators when result is equal to zero as string on the right side' => [
+            <<<'PHP'
+<?php
+
+($a <=> $b) == '0';
+PHP
+        ];
+
+        yield 'It does not swap operators when result is identical zero on the left side' => [
+            <<<'PHP'
+<?php
+
+0 === ($a <=> $b);
+PHP
+        ];
+
+        yield 'It does not swap operators when result is equal to zero on the left side' => [
+            <<<'PHP'
+<?php
+
+0 == ($a <=> $b);
+PHP
+        ];
+
+        yield 'It does not swap operators when result is equal to zero as string on the left side' => [
+            <<<'PHP'
+<?php
+
+'0' == ($a <=> $b);
+PHP
+        ];
+
+        yield 'It does not swap operators when result is equal to zero as string on the left side' => [
+            <<<'PHP'
+<?php
+
+'0' == ($a <=> $b);
+PHP
+        ];
     }
 }
