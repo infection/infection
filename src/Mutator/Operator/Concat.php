@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use function assert;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -44,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Concat>
  */
 final class Concat implements Mutator
 {
@@ -76,8 +77,6 @@ TXT
      */
     public function mutate(Node $node): iterable
     {
-        assert($node instanceof Node\Expr\BinaryOp\Concat);
-
         if ($node->left instanceof Node\Expr\BinaryOp\Concat) {
             $left = new Node\Expr\BinaryOp\Concat($node->left->left, $node->right);
             $right = $node->left->right;
