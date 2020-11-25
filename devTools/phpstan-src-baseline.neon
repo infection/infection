@@ -531,11 +531,6 @@ parameters:
 			path: ../src/Mutator/Number/OneZeroFloat.php
 
 		-
-			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Scalar\\\\LNumber\\) of method Infection\\\\Mutator\\\\Number\\\\OneZeroInteger\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
-			count: 2
-			path: ../src/Mutator/Number/OneZeroInteger.php
-
-		-
 			message: "#^Parameter \\#1 \\$node \\(PhpParser\\\\Node\\\\Expr\\\\AssignOp\\\\Coalesce\\) of method Infection\\\\Mutator\\\\Operator\\\\AssignCoalesce\\:\\:mutate\\(\\) should be contravariant with parameter \\$node \\(PhpParser\\\\Node\\) of method Infection\\\\Mutator\\\\Mutator\\:\\:mutate\\(\\)$#"
 			count: 1
 			path: ../src/Mutator/Operator/AssignCoalesce.php
