@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use function assert;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
-
-use function assert;
 
 /**
  * @internal
@@ -91,6 +90,7 @@ TxT
         assert($node instanceof Node\Expr\BinaryOp\Concat);
 
         yield $node->left;
+
         yield $node->right;
     }
 }
