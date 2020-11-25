@@ -84,11 +84,11 @@ TxT
 
     /**
      * @psalm-mutation-free
+     *
+     * @param Node\Expr\BinaryOp\Concat $node
      */
     public function mutate(Node $node): iterable
     {
-        assert($node instanceof Node\Expr\BinaryOp\Concat);
-
         if ($node->left instanceof Node\Expr\BinaryOp\Concat) {
             yield $node->left;
 
