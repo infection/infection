@@ -76,8 +76,8 @@ TXT
         assert($node instanceof Node\Expr\BinaryOp\Concat);
 
         if ($node->left instanceof Node\Expr\BinaryOp\Concat) {
-            $left = $node->left->left;
-            $right = new Node\Expr\BinaryOp\Concat($node->right, $node->left->right);
+            $left = new Node\Expr\BinaryOp\Concat($node->left->left, $node->right);
+            $right = $node->left->right;
 
             yield new Node\Expr\BinaryOp\Concat($left, $right);
         } else {
