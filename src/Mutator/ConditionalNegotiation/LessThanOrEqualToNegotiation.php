@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\SmallerOrEqual>
  */
 final class LessThanOrEqualToNegotiation implements Mutator
 {
@@ -62,8 +64,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\SmallerOrEqual $node
      *
      * @return iterable<Node\Expr\BinaryOp\Greater>
      */

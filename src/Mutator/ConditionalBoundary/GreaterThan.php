@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Greater>
  */
 final class GreaterThan implements Mutator
 {
@@ -64,8 +66,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Greater $node
      *
      * @return iterable<Node\Expr\BinaryOp\GreaterOrEqual>
      */

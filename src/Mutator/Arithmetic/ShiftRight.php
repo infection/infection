@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\ShiftRight>
  */
 final class ShiftRight implements Mutator
 {
@@ -62,8 +64,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\ShiftRight $node
      *
      * @return iterable<Node\Expr\BinaryOp\ShiftLeft>
      */

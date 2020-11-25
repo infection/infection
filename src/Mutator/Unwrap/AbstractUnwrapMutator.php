@@ -42,6 +42,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\FuncCall>
  */
 abstract class AbstractUnwrapMutator implements Mutator
 {
@@ -49,8 +51,6 @@ abstract class AbstractUnwrapMutator implements Mutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\FuncCall $node
      *
      * @return iterable<Node\Arg>
      */

@@ -42,6 +42,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractValueToNullReturnValue<Node\Stmt\Return_>
  */
 final class This extends AbstractValueToNullReturnValue
 {
@@ -58,8 +60,6 @@ final class This extends AbstractValueToNullReturnValue
      * Replaces "return $this;" with "return null;"
      *
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Return_ $node
      *
      * @return iterable<Node\Stmt\Return_>
      */

@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Mod>
  */
 final class Modulus implements Mutator
 {
@@ -59,8 +61,6 @@ final class Modulus implements Mutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Mod $node
      *
      * @return iterable<Node\Expr\BinaryOp\Mul>
      */

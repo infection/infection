@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\PreDec|Node\Expr\PostDec>
  */
 final class Decrement implements Mutator
 {
@@ -63,8 +65,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\PreDec|Node\Expr\PostDec $node
      *
      * @return iterable<Node\Expr\PreInc|Node\Expr\PostInc>
      */

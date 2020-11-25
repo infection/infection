@@ -39,6 +39,7 @@ use PhpParser\Node;
 
 /**
  * @internal
+ * @template TNode of Node
  */
 interface Mutator
 {
@@ -50,6 +51,8 @@ interface Mutator
 
     /**
      * @psalm-mutation-free
+     *
+     * @param TNode $node
      *
      * @return iterable<Node|Node[]>
      */

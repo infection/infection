@@ -45,6 +45,8 @@ use PhpParser\Node;
  * @internal
  *
  * @deprecated This mutator is a semantic addition
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Identical>
  */
 final class IdenticalEqual implements Mutator
 {
@@ -65,8 +67,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Identical $node
      *
      * @return iterable<Node\Expr\BinaryOp\Equal>
      */

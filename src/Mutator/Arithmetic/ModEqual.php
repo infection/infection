@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Mod>
  */
 final class ModEqual implements Mutator
 {
@@ -62,8 +64,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\AssignOp\Mod $node
      *
      * @return iterable<Node\Expr\AssignOp\Mul>
      */

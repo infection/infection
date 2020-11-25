@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Plus>
  */
 final class PlusEqual implements Mutator
 {
@@ -64,8 +66,6 @@ TXT
      * Replaces "+=" with "-="
      *
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\AssignOp\Plus $node
      *
      * @return iterable<Node\Expr\AssignOp\Minus>
      */

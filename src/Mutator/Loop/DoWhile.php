@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Do_>
  */
 final class DoWhile implements Mutator
 {
@@ -81,8 +83,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Do_ $node
      *
      * @return iterable<Node\Stmt\Do_>
      */

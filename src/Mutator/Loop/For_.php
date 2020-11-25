@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\For_>
  */
 final class For_ implements Mutator
 {
@@ -77,8 +79,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\For_ $node
      *
      * @return iterable<Node\Stmt\For_>
      */

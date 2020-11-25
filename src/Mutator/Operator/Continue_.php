@@ -44,6 +44,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Continue_>
  */
 final class Continue_ implements Mutator
 {
@@ -63,8 +65,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Continue_ $node
      *
      * @return iterable<Node\Stmt\Break_>
      */

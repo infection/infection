@@ -46,6 +46,8 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Finally_>
  */
 final class Finally_ implements Mutator
 {
@@ -62,8 +64,6 @@ final class Finally_ implements Mutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Finally_ $node
      *
      * @return iterable<Node\Stmt\Nop>
      */

@@ -47,6 +47,8 @@ use function Safe\array_flip;
 
 /**
  * @internal
+ *
+ * @implements ConfigurableMutator<Node\Expr\ConstFetch>
  */
 final class TrueValue implements ConfigurableMutator
 {
@@ -74,8 +76,6 @@ final class TrueValue implements ConfigurableMutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\ConstFetch $node
      *
      * @return iterable<Node\Expr\ConstFetch>
      */

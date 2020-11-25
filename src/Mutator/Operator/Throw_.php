@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Throw_>
  */
 final class Throw_ implements Mutator
 {
@@ -75,8 +77,6 @@ TXT
      * @psalm-mutation-free
      *
      * Replaces "throw new Exception();" with "new Exception();"
-     *
-     * @param Node\Stmt\Throw_ $node
      *
      * @return iterable<Node\Stmt\Expression>
      */

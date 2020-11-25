@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\Ternary>
  */
 final class Ternary implements Mutator
 {
@@ -67,8 +69,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\Ternary $node
      *
      * @return iterable<Node\Expr>
      */

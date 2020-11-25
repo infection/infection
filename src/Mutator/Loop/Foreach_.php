@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Foreach_>
  */
 final class Foreach_ implements Mutator
 {
@@ -77,8 +79,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Foreach_ $node
      *
      * @return iterable<Node\Stmt\Foreach_>
      */

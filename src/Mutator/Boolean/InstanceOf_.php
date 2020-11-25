@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node>
  */
 final class InstanceOf_ implements Mutator
 {

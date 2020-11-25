@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\BooleanAnd>
  */
 final class BitwiseAnd implements Mutator
 {
@@ -59,8 +61,6 @@ final class BitwiseAnd implements Mutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\BooleanAnd $node
      *
      * @return iterable<Node\Expr\BinaryOp\BitwiseOr>
      */

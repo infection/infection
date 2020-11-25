@@ -42,6 +42,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractValueToNullReturnValue<Node\Stmt\Return_>
  */
 final class FunctionCall extends AbstractValueToNullReturnValue
 {
@@ -82,8 +84,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Return_ $node
      *
      * @return iterable<array<Node\Stmt\Expression|Node\Stmt\Return_>>
      */

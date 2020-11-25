@@ -44,6 +44,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\FuncCall>
  */
 final class PregMatchMatches implements Mutator
 {
@@ -78,8 +80,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\FuncCall $node
      *
      * @return iterable<Node\Expr\Cast\Int_>
      */

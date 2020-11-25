@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\While_>
  */
 final class While_ implements Mutator
 {
@@ -81,8 +83,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\While_ $node
      *
      * @return iterable<Node\Stmt\While_>
      */

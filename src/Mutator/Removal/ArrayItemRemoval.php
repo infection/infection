@@ -50,6 +50,8 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ *
+ * @implements ConfigurableMutator<Node\Expr\Array_>
  */
 final class ArrayItemRemoval implements ConfigurableMutator
 {
@@ -103,8 +105,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\Array_ $arrayNode
      *
      * @return iterable<Node\Expr\Array_>
      */
