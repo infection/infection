@@ -71,6 +71,9 @@ TXT
         );
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function mutate(Node $node): iterable
     {
         assert($node instanceof Node\Expr\BinaryOp\Concat);
