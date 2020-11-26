@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use function assert;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -44,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Concat>
  */
 final class ConcatOperandRemoval implements Mutator
 {
@@ -84,8 +85,6 @@ TxT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Concat $node
      */
     public function mutate(Node $node): iterable
     {
