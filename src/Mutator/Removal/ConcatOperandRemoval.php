@@ -53,7 +53,7 @@ final class ConcatOperandRemoval implements Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            <<<'TxT'
+            <<<'TXT'
 Removes an operand from a string concatenation.
 
 ```php
