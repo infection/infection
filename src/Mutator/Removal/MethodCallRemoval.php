@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Expression>
  */
 final class MethodCallRemoval implements Mutator
 {
@@ -59,8 +61,6 @@ final class MethodCallRemoval implements Mutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Expression $node
      *
      * @return iterable<Node\Stmt\Nop>
      */

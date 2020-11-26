@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Smaller>
  */
 final class LessThan implements Mutator
 {
@@ -64,8 +66,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Smaller $node
      *
      * @return iterable<Node\Expr\BinaryOp\SmallerOrEqual>
      */

@@ -54,14 +54,14 @@ use Webmozart\Assert\Assert;
 class MutationGenerator
 {
     private TraceProvider $traceProvider;
-    /** @var Mutator[] */
+    /** @var Mutator<\PhpParser\Node>[] */
     private array $mutators;
     private EventDispatcher $eventDispatcher;
     private FileMutationGenerator $fileMutationGenerator;
     private bool $runConcurrently;
 
     /**
-     * @param Mutator[] $mutators
+     * @param Mutator<\PhpParser\Node>[] $mutators
      */
     public function __construct(
         TraceProvider $traceProvider,

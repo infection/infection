@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BitwiseNot>
  */
 final class BitwiseNot implements Mutator
 {
@@ -59,8 +61,6 @@ final class BitwiseNot implements Mutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BitwiseNot $node
      *
      * @return iterable<Node\Expr>
      */

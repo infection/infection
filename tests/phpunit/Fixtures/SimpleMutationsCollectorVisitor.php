@@ -15,7 +15,7 @@ use PhpParser\NodeVisitorAbstract;
 final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var Mutator[]
+     * @var Mutator<\PhpParser\Node>
      */
     private $mutator;
 
@@ -29,6 +29,9 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
      */
     private $fileAst;
 
+    /**
+     * @param Mutator<Node> $mutator
+     */
     public function __construct(Mutator $mutator, array $fileAst)
     {
         $this->mutator = $mutator;

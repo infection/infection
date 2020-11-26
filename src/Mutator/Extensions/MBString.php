@@ -53,6 +53,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements ConfigurableMutator<Node\Expr\FuncCall>
  */
 final class MBString implements ConfigurableMutator
 {
@@ -95,8 +97,6 @@ TXT
     /**
      * @psalm-mutation-free
      * @psalm-suppress ImpureMethodCall
-     *
-     * @param Node\Expr\FuncCall $node
      *
      * @return iterable<Node\Expr\FuncCall>
      */

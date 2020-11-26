@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Identical>
  */
 final class Identical implements Mutator
 {
@@ -62,8 +64,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Identical $node
      *
      * @return iterable<Node\Expr\BinaryOp\NotIdentical>
      */

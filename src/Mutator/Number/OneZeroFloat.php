@@ -42,6 +42,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractNumberMutator<Node\Scalar\DNumber>
  */
 final class OneZeroFloat extends AbstractNumberMutator
 {
@@ -61,8 +63,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Scalar\DNumber $node
      *
      * @return iterable<Node\Scalar\DNumber>
      */

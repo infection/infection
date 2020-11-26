@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\LogicalAnd>
  */
 final class LogicalLowerAnd implements Mutator
 {
@@ -61,8 +63,6 @@ final class LogicalLowerAnd implements Mutator
      * @psalm-mutation-free
      *
      * Replaces "and" with "or"
-     *
-     * @param Node\Expr\BinaryOp\LogicalAnd $node
      *
      * @return iterable<Node\Expr\BinaryOp\LogicalOr>
      */

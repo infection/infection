@@ -48,9 +48,9 @@ use Webmozart\Assert\Assert;
 final class MutatorFactory
 {
     /**
-     * @param array<class-string<Mutator&ConfigurableMutator>, mixed[]> $resolvedMutators
+     * @param array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, mixed[]> $resolvedMutators
      *
-     * @return array<string, Mutator>
+     * @return array<string, Mutator<\PhpParser\Node>>
      */
     public function create(array $resolvedMutators): array
     {
@@ -105,8 +105,10 @@ final class MutatorFactory
     }
 
     /**
-     * @param class-string<ConfigurableMutator> $mutatorClassName
+     * @param class-string<ConfigurableMutator<\PhpParser\Node>> $mutatorClassName
      * @param mixed[] $settings
+     *
+     * @return ConfigurableMutator<\PhpParser\Node>
      */
     private static function getConfigurableMutator(string $mutatorClassName, array $settings): ConfigurableMutator
     {

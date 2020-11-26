@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\ArrayItem>
  */
 final class Spread implements Mutator
 {
@@ -72,8 +74,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\ArrayItem $node
      *
      * @return iterable<Node\Expr\ArrayItem>
      */

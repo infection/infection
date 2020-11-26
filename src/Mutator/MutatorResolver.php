@@ -57,7 +57,7 @@ final class MutatorResolver
      *
      * @param array<string, bool|stdClass> $mutatorSettings
      *
-     * @return array<class-string<Mutator&ConfigurableMutator>, mixed[]>
+     * @return array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, mixed[]>
      */
     public function resolve(array $mutatorSettings): array
     {

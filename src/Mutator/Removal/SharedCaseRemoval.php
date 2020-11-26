@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Switch_>
  */
 final class SharedCaseRemoval implements Mutator
 {
@@ -74,8 +76,6 @@ final class SharedCaseRemoval implements Mutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Switch_ $node
      *
      * @return iterable<Node\Stmt\Switch_>
      */

@@ -45,6 +45,8 @@ use PhpParser\Node;
  * @internal
  *
  * @see Yield_
+ *
+ * @implements Mutator<Node\Expr\Yield_>
  */
 final class YieldValue implements Mutator
 {
@@ -65,8 +67,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\Yield_ $node
      *
      * @return iterable<Node\Expr\Yield_>
      */

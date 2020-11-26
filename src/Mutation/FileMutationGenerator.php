@@ -67,7 +67,7 @@ class FileMutationGenerator
     }
 
     /**
-     * @param Mutator[] $mutators
+     * @param Mutator<\PhpParser\Node>[] $mutators
      * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws UnparsableFile

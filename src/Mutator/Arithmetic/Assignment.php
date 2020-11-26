@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp>
  */
 final class Assignment implements Mutator
 {
@@ -63,8 +65,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\AssignOp $node
      *
      * @return iterable<Node\Expr\Assign>
      */

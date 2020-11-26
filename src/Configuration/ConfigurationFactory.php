@@ -174,7 +174,7 @@ class ConfigurationFactory
     /**
      * @param array<string, mixed> $schemaMutators
      *
-     * @return array<class-string<Mutator&ConfigurableMutator>, mixed[]>
+     * @return array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, mixed[]>
      */
     private function resolveMutators(array $schemaMutators, string $mutatorsInput): array
     {

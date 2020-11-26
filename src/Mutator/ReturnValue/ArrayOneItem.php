@@ -45,6 +45,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Return_>
  */
 final class ArrayOneItem implements Mutator
 {
@@ -78,8 +80,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Return_ $node
      *
      * @return iterable<Node\Stmt\Return_>
      */

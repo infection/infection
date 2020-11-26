@@ -52,12 +52,19 @@ use function Safe\sprintf;
  * better performance optimization in our case.
  *
  * @internal
+ *
+ * @template TNode of Node
+ * @implements Mutator<TNode>
  */
 final class IgnoreMutator implements Mutator
 {
     private IgnoreConfig $config;
+    /** @var Mutator<TNode> */
     private Mutator $mutator;
 
+    /**
+     * @param Mutator<TNode> $mutator
+     */
     public function __construct(IgnoreConfig $config, Mutator $mutator)
     {
         $this->config = $config;

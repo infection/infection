@@ -66,7 +66,7 @@ class Configuration
     private string $logVerbosity;
     private string $tmpDir;
     private PhpUnit $phpUnit;
-    /** @var array<string, Mutator> */
+    /** @var array<string, Mutator<\PhpParser\Node>> */
     private array $mutators;
     private string $testFramework;
     private ?string $bootstrap = null;
@@ -92,7 +92,7 @@ class Configuration
      * @param string[] $sourceDirectories
      * @param string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
-     * @param array<string, Mutator> $mutators
+     * @param array<string, Mutator<\PhpParser\Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
@@ -218,7 +218,7 @@ class Configuration
     }
 
     /**
-     * @return array<string, Mutator>
+     * @return array<string, Mutator<\PhpParser\Node>>
      */
     public function getMutators(): array
     {

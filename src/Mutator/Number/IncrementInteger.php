@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractNumberMutator<Node\Scalar\LNumber>
  */
 final class IncrementInteger extends AbstractNumberMutator
 {
@@ -59,8 +61,6 @@ final class IncrementInteger extends AbstractNumberMutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Scalar\LNumber $node
      *
      * @return iterable<Node\Scalar\LNumber>
      */

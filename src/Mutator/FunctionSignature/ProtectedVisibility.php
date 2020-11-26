@@ -46,6 +46,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\ClassMethod>
  */
 final class ProtectedVisibility implements Mutator
 {
@@ -62,8 +64,6 @@ final class ProtectedVisibility implements Mutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\ClassMethod $node
      *
      * @return iterable<Node\Stmt\ClassMethod>
      */

@@ -41,6 +41,9 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @template TNode of Node
+ * @implements Mutator<TNode>
  */
 abstract class AbstractNumberMutator implements Mutator
 {

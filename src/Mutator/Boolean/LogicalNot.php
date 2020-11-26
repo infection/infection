@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BooleanNot>
  */
 final class LogicalNot implements Mutator
 {
@@ -59,8 +61,6 @@ final class LogicalNot implements Mutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BooleanNot $node
      *
      * @return iterable<Node\Expr>
      */

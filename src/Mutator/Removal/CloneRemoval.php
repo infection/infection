@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\Clone_>
  */
 final class CloneRemoval implements Mutator
 {
@@ -59,8 +61,6 @@ final class CloneRemoval implements Mutator
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\Clone_ $node
      *
      * @return iterable<Node\Expr>
      */

@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\PostInc|Node\Expr\PreInc>
  */
 final class Increment implements Mutator
 {
@@ -63,8 +65,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\PostInc|Node\Expr\PreInc $node
      *
      * @return iterable<Node\Expr\PreDec|Node\Expr\PostDec>
      */

@@ -55,7 +55,7 @@ use Webmozart\Assert\Assert;
  */
 class NodeMutationGenerator
 {
-    /** @var Mutator[] */
+    /** @var Mutator<Node>[] */
     private array $mutators;
     private string $filePath;
     /** @var Node[] */
@@ -71,7 +71,7 @@ class NodeMutationGenerator
     private ?bool $isInsideFunctionMemoized = null;
 
     /**
-     * @param Mutator[] $mutators
+     * @param Mutator<Node>[] $mutators
      * @param Node[] $fileNodes
      */
     public function __construct(
@@ -114,6 +114,8 @@ class NodeMutationGenerator
     }
 
     /**
+     * @param Mutator<Node> $mutator
+     *
      * @return iterable<Mutation>
      */
     private function generateForMutator(Node $node, Mutator $mutator): iterable

@@ -44,6 +44,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Spaceship>
  */
 final class Spaceship implements Mutator
 {
@@ -63,8 +65,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Spaceship $node
      *
      * @return iterable<Node\Expr\BinaryOp\Spaceship>
      */

@@ -44,6 +44,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Break_>
  */
 final class Break_ implements Mutator
 {
@@ -63,8 +65,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Break_ $node
      *
      * @return iterable<Node\Stmt\Continue_>
      */

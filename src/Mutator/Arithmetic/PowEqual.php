@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Pow>
  */
 final class PowEqual implements Mutator
 {
@@ -64,8 +66,6 @@ TXT
      * Replaces "**=" with "/="
      *
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\AssignOp\Pow $node
      *
      * @return iterable<Node\Expr\AssignOp\Div>
      */
