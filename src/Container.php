@@ -798,7 +798,7 @@ final class Container
                 $gitDiffBase,
                 $useGitHubLogger
             ): Configuration {
-                $configuration = $container->getConfigurationFactory()->create(
+                return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
                     $existingCoveragePath,
                     $existingCoverageXmlPath,
@@ -824,14 +824,6 @@ final class Container
                     $gitDiffBase,
                     $useGitHubLogger
                 );
-
-                $junitLogPath = $configuration->getJunitLogPath();
-
-                if ($junitLogPath !== null) {
-                    $container->defaultJUnitPath = $junitLogPath;
-                }
-
-                return $configuration;
             }
         );
 
@@ -856,6 +848,8 @@ final class Container
 
     public function getDefaultJUnitFilePath(): string
     {
+        $this->defaultJUnitPath = $this->get(Configuration::class)->getJunitLogPath();
+
         return $this->defaultJUnitPath ?? $this->defaultJUnitPath = sprintf(
             '%s/%s',
             Path::canonicalize(

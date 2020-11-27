@@ -69,79 +69,54 @@ use function trim;
  */
 final class RunCommand extends BaseCommand
 {
-    /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
 
-    /** @var string */
     private const OPTION_TEST_FRAMEWORK_OPTIONS = 'test-framework-options';
 
-    /** @var string */
     private const OPTION_THREADS = 'threads';
 
-    /** @var string */
     private const OPTION_ONLY_COVERED = 'only-covered';
 
-    /** @var string */
     private const OPTION_SHOW_MUTATIONS = 'show-mutations';
 
-    /** @var string */
     private const OPTION_NO_PROGRESS = 'no-progress';
 
-    /** @var string */
     private const OPTION_FORCE_PROGRESS = 'force-progress';
 
-    /** @var string */
     private const OPTION_CONFIGURATION = 'configuration';
 
-    /** @var string */
     private const OPTION_COVERAGE = 'coverage';
 
-    /** @var string */
     private const OPTION_COVERAGE_XML_DIR = 'coverage-xml';
 
-    /** @var string */
     private const OPTION_JUNIT_LOG_FILE = 'log-junit';
 
-    /** @var string */
     private const OPTION_MUTATORS = 'mutators';
 
-    /** @var string */
     private const OPTION_FILTER = 'filter';
 
-    /** @var string */
     private const OPTION_FORMATTER = 'formatter';
 
-    /** @var string */
     private const OPTION_GIT_DIFF_FILTER = 'git-diff-filter';
 
-    /** @var string */
     private const OPTION_GIT_DIFF_BASE = 'git-diff-base';
 
-    /** @var string */
     private const OPTION_LOGGER_GITHUB = 'logger-github';
 
-    /** @var string */
     private const OPTION_MIN_MSI = 'min-msi';
 
-    /** @var string */
     private const OPTION_MIN_COVERED_MSI = 'min-covered-msi';
 
-    /** @var string */
     private const OPTION_LOG_VERBOSITY = 'log-verbosity';
 
-    /** @var string */
     private const OPTION_INITIAL_TESTS_PHP_OPTIONS = 'initial-tests-php-options';
 
-    /** @var string */
     private const OPTION_SKIP_INITIAL_TESTS = 'skip-initial-tests';
 
-    /** @var string */
     private const OPTION_IGNORE_MSI_WITH_NO_MUTATIONS = 'ignore-msi-with-no-mutations';
 
-    /** @var string */
     private const OPTION_DEBUG = 'debug';
 
-    /** @var string */
     private const OPTION_DRY_RUN = 'dry-run';
 
     protected function configure(): void
