@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\FileSystem\Finder\Iterator;
 
 use const DIRECTORY_SEPARATOR;
+use function preg_quote;
+use function str_replace;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
 /**

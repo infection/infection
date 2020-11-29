@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
+use function array_keys;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Metrics\TargetDetectionStatusesProvider;

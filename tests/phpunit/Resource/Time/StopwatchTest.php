@@ -38,6 +38,7 @@ namespace Infection\Tests\Resource\Time;
 use Infection\Resource\Time\Stopwatch;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function usleep;
 
 // Cannot import this one as it would remove the ability to mock it
 // use function usleep()

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-if (!function_exists('xdebug_set_filter')) {
+if (!\function_exists('xdebug_set_filter')) {
     return;
 }
 
@@ -41,5 +41,5 @@ if (!function_exists('xdebug_set_filter')) {
 xdebug_set_filter(
     XDEBUG_FILTER_CODE_COVERAGE,
     XDEBUG_PATH_WHITELIST,
-    [dirname(__DIR__) . '/src/']
+    [\dirname(__DIR__) . '/src/']
 );

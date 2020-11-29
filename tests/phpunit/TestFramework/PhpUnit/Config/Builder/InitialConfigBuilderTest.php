@@ -46,6 +46,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use InvalidArgumentException;
+use const PHP_EOL;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 use function Safe\sprintf;

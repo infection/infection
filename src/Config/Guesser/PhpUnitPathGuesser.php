@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Config\Guesser;
 
 use stdClass;
+use function strpos;
+use function trim;
 
 /**
  * @internal

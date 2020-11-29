@@ -38,6 +38,7 @@ namespace Infection\Logger;
 use DateTime;
 use DateTimeInterface;
 use function get_class;
+use function gettype;
 use Infection\Console\IO;
 use function is_object;
 use function is_scalar;

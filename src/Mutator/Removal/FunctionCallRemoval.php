@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;

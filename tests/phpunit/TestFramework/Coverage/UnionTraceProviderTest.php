@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use function array_merge;
 use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\Coverage\UnionTraceProvider;
+use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 
 final class UnionTraceProviderTest extends TestCase

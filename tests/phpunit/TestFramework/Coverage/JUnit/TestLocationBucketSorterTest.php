@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use function abs;
 use function array_map;
+use function array_reverse;
 use function array_slice;
 use ArrayIterator;
 use function extension_loaded;

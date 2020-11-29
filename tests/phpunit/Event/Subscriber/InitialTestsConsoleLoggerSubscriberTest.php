@@ -41,6 +41,7 @@ use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use InvalidArgumentException;
+use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 

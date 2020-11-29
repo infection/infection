@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use function array_keys;
 use function array_slice;
 use function count;
 use Infection\Mutator\Definition;

@@ -39,6 +39,7 @@ use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function range;
 
 /**
  * @internal

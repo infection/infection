@@ -39,6 +39,7 @@ use Infection\FileSystem\Finder\Exception\FinderException;
 use function Safe\getcwd;
 use function Safe\realpath;
 use function Safe\sprintf;
+use function strpos;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
 

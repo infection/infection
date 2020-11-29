@@ -39,6 +39,7 @@ use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use function sys_get_temp_dir;
 
 /**
  * @group integration

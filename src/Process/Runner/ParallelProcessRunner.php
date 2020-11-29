@@ -38,6 +38,8 @@ namespace Infection\Process\Runner;
 use function array_shift;
 use function count;
 use Generator;
+use function max;
+use function microtime;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use function usleep;
 

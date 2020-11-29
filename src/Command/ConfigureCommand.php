@@ -37,6 +37,7 @@ namespace Infection\Command;
 
 use function count;
 use function file_exists;
+use const GLOB_ONLYDIR;
 use function implode;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
@@ -50,6 +51,7 @@ use Infection\Console\IO;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
+use const JSON_PRETTY_PRINT;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\file_put_contents;
