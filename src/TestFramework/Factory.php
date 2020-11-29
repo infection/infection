@@ -43,6 +43,7 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
+use function is_a;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 

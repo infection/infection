@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use const PHP_VERSION_ID;
 
 final class TernaryTest extends BaseMutatorTestCase
 {

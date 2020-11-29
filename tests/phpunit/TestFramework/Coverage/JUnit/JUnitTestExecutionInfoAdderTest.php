@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
+use function iterator_to_array;
 use function Later\now;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;

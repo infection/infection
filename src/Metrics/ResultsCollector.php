@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
+use function array_key_exists;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;

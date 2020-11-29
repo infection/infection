@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutator\Removal;
 use Infection\Mutator\Removal\ArrayItemRemovalConfig;
 use InvalidArgumentException;
 use const PHP_INT_MAX;
+use const PHP_VERSION_ID;
 use PHPUnit\Framework\TestCase;
 use TypeError;
 

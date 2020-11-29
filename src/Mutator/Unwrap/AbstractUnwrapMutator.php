@@ -39,6 +39,7 @@ use function array_key_exists;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
+use function strtolower;
 
 /**
  * @internal

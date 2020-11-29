@@ -46,6 +46,7 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use function Safe\sprintf;
 use function str_pad;
+use const STR_PAD_LEFT;
 use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;

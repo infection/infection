@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_filter;
+use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use function implode;
 use Infection\TestFramework\SafeDOMXPath;

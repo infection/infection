@@ -45,6 +45,7 @@ use Infection\Resource\Time\TimeFormatter;
 use function is_array;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function strpos;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class PerformanceLoggerSubscriberTest extends TestCase

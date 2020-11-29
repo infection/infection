@@ -40,6 +40,7 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use function iterator_to_array;
 use function Later\now;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;

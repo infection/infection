@@ -39,6 +39,7 @@ use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
+use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 

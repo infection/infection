@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function extension_loaded;
 use function file_exists;
 use function implode;
 use Infection\Configuration\Configuration;
@@ -56,6 +57,7 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
+use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function Safe\sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
