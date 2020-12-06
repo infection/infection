@@ -94,13 +94,13 @@ PHP
                     <<<'PHP'
 <?php
 
-true ? false : 'true' ? 't' : 'f';
+(true ? false : 'true') ? 't' : 'f';
 PHP
                     ,
                     <<<'PHP'
 <?php
 
-true ? 'true' : false ? 'f' : 't';
+(true ? 'true' : false) ? 'f' : 't';
 PHP
                 ],
             ];
@@ -116,13 +116,13 @@ PHP
                     <<<'PHP'
 <?php
 
-true ? false : true ?: 'f';
+(true ? false : true) ?: 'f';
 PHP
                     ,
                     <<<'PHP'
 <?php
 
-true ?: false ? 'f' : (true ?: false);
+(true ?: false) ? 'f' : (true ?: false);
 PHP
                 ],
             ];
@@ -138,13 +138,13 @@ PHP
                     <<<'PHP'
 <?php
 
-true ? false : 'true' ? 't' : 'f';
+(true ? false : 'true') ? 't' : 'f';
 PHP
                     ,
                     <<<'PHP'
 <?php
 
-true ? 'true' : false ? 'f' : 't';
+(true ? 'true' : false) ? 'f' : 't';
 PHP
                 ],
             ];
@@ -160,13 +160,13 @@ PHP
                     <<<'PHP'
 <?php
 
-true ? false : true ? 't' : 'f';
+(true ? false : true) ? 't' : 'f';
 PHP
                     ,
                     <<<'PHP'
 <?php
 
-true ?: false ? 'f' : 't';
+(true ?: false) ? 'f' : 't';
 PHP
                 ],
             ];
