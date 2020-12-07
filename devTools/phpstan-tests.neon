@@ -2,6 +2,7 @@ includes:
     - phpstan-tests-baseline.neon
 
 parameters:
+    tmpDir: ../build/cache/phpstan-tests
     parallel:
         processTimeout: 120.0
     checkGenericClassInNonGenericObjectType: false
