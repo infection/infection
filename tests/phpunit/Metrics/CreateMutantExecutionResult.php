@@ -82,10 +82,10 @@ trait CreateMutantExecutionResult
 --- Original
 +++ New
 @@ @@
-                
+
 - echo 'original';
 + echo 'mutated';
-                
+
 DIFF
                 )),
             MutatorName::getName(For_::class),

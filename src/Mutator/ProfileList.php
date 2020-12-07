@@ -165,6 +165,8 @@ final class ProfileList
 
     public const REGEX_PROFILE = [
         Mutator\Regex\PregMatchMatches::class,
+        Mutator\Regex\PregMatchRemoveCaret::class,
+        Mutator\Regex\PregMatchRemoveDollar::class,
         Mutator\Regex\PregQuote::class,
     ];
 
@@ -364,6 +366,8 @@ final class ProfileList
 
         // Regex
         'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
+        'PregMatchRemoveCaret' => Mutator\Regex\PregMatchRemoveCaret::class,
+        'PregMatchRemoveDollar' => Mutator\Regex\PregMatchRemoveDollar::class,
         'PregQuote' => Mutator\Regex\PregQuote::class,
 
         // Removal

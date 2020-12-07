@@ -1,55 +1,91 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
+use function strtolower;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\FuncCall>
  */
-abstract class AbstractPregMatch extends Mutator
+abstract class AbstractPregMatch implements Mutator
 {
+    use GetMutatorName;
+
     /**
      * Replaces regex in "preg_match"
      *
-     * @param Node $node
+     * @psalm-mutation-free
      *
-     * @return mixed
+     * @return iterable<Node\Expr\FuncCall>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): iterable
     {
         $arguments = $node->args;
-        $pattern = $this->pullOutPattern($arguments[0]);
-        $arguments[0] = $this->setNewPattern($this->manipulatePattern($pattern), $arguments[0]);
+        $firstArgument = $arguments[0];
+        $pattern = $this->pullOutPattern($firstArgument);
+        $newArgument = $this->getNewPatternArgument($this->manipulatePattern($pattern), $firstArgument);
 
-        return new FuncCall($node->name, $arguments, $node->getAttributes());
+        yield new FuncCall($node->name, [$newArgument] + $arguments, $node->getAttributes());
     }
 
-    /**
-     * todo in future also work with 'concat' type of attribute  or passed in variable or const
-     *
-     * @param Node $node
-     *
-     * @return bool
-     */
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
-        return $node instanceof FuncCall &&
-            $node->name instanceof Node\Name &&
-            strtolower((string) $node->name) === 'preg_match'
+        return $node instanceof FuncCall
+            && $node->name instanceof Node\Name
+            && strtolower((string) $node->name) === 'preg_match'
             && $node->args[0]->value instanceof Node\Scalar\String_
             && $this->isProperRegexToMutate($this->pullOutPattern($node->args[0]));
     }
 
+    abstract protected function isProperRegexToMutate(string $pattern): bool;
+
+    /**
+     * @psalm-mutation-free
+     */
+    abstract protected function manipulatePattern(string $pattern): string;
+
+    /**
+     * @psalm-mutation-free
+     */
     private function pullOutPattern(Node\Arg $argument): string
     {
         /** @var Node\Scalar\String_ $stringNode */
@@ -58,16 +94,14 @@ abstract class AbstractPregMatch extends Mutator
         return $stringNode->value;
     }
 
-    abstract protected function manipulatePattern(string $pattern): string;
-
-    abstract protected function isProperRegexToMutate(string $pattern): bool;
-
-    private function setNewPattern(string $pattern, Node\Arg $argument): Node\Arg
+    /**
+     * @psalm-mutation-free
+     */
+    private function getNewPatternArgument(string $pattern, Node\Arg $argument): Node\Arg
     {
-        /** @var Node\Scalar\String_ $stringNode */
-        $stringNode = $argument->value;
-        $stringNode->value = $pattern;
-
-        return $argument;
+        return new Node\Arg(
+            new Node\Scalar\String_($pattern, $argument->value->getAttributes()),
+            $argument->byRef, $argument->unpack, $argument->getAttributes()
+        );
     }
 }
