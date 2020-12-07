@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutator\Operator;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use const PHP_VERSION_ID;
 
-class NullSafePropertyCallTest extends BaseMutatorTestCase
+final class NullSafePropertyCallTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider

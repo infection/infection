@@ -71,8 +71,6 @@ TXT
     public function mutate(Node $node): iterable
     {
         yield new Node\Expr\PropertyFetch($node->var, $node->name, $node->getAttributes());
-
-//        yield new Node\Expr\MethodCall($node->var, $node->name, $node->args, $node->getAttributes());
     }
 
     public function canMutate(Node $node): bool
