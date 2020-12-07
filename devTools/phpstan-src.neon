@@ -3,6 +3,7 @@ includes:
     - phpstan-src-baseline.neon
 
 parameters:
+    tmpDir: ../build/cache/phpstan-src
     inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
         - '#.* value type specified in iterable type Symfony\\Component\\Process\\Process#'
