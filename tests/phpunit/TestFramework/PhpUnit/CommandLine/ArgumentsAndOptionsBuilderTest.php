@@ -77,4 +77,18 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             $this->builder->build($configPath, '--verbose --debug')
         );
     }
+
+    public function test_it_can_build_the_command_with_extra_options_that_contains_spaces(): void
+    {
+        $configPath = '/the config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--path=/a path/with spaces',
+            ],
+            $this->builder->build($configPath, '--path=/a path/with spaces')
+        );
+    }
 }
