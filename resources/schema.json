@@ -256,6 +256,8 @@
                 "Concat": { "$ref": "#/definitions/default-mutator-config" },
                 "PregQuote": { "$ref": "#/definitions/default-mutator-config" },
                 "PregMatchMatches": { "$ref": "#/definitions/default-mutator-config" },
+                "NullSafePropertyCall": { "$ref": "#/definitions/default-mutator-config" },
+                "NullSafeMethodCall": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItemRemoval": {
                     "anyOf": [
                         {
