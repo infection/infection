@@ -104,5 +104,32 @@ $class?->property->nextProperty;
 PHP
             ],
         ];
+
+        yield 'Mutate nullsafe applied right when class has been instantiated' => [
+            <<<'PHP'
+<?php
+
+(new \stdClass())?->property;
+PHP,
+            <<<'PHP'
+<?php
+
+(new \stdClass())->property;
+PHP,
+        ];
+
+        yield 'Mutate nullsafe with dynamic property name' => [
+            <<<'PHP'
+<?php
+
+
+$class?->{$property};
+PHP,
+            <<<'PHP'
+<?php
+
+$class->{$property};
+PHP
+        ];
     }
 }

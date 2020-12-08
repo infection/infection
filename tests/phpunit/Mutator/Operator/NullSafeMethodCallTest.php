@@ -104,5 +104,31 @@ $class?->getObject()->getName();
 PHP
                 ],
         ];
+
+        yield 'Mutate nullsafe applied right when class has been instantiated' => [
+            <<<'PHP'
+<?php
+
+(new SomeClass())?->methodCall();
+PHP,
+            <<<'PHP'
+<?php
+
+(new SomeClass())->methodCall();
+PHP,
+        ];
+
+        yield 'Mutate nullsafe with dynamic method name' => [
+            <<<'PHP'
+<?php
+
+$class?->{$methodCall}();
+PHP,
+            <<<'PHP'
+<?php
+
+$class->{$methodCall}();
+PHP
+        ];
     }
 }
