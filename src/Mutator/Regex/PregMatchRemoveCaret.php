@@ -33,66 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Metrics;
+namespace Infection\Mutator\Regex;
 
-use Infection\Metrics\Collector;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutator\Loop\For_;
-use Infection\Tests\Mutator\MutatorName;
-use function Later\now;
-use const PHP_EOL;
-use function str_replace;
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
+use function Safe\preg_match;
 
-trait CreateMutantExecutionResult
+/**
+ * @internal
+ */
+final class PregMatchRemoveCaret extends AbstractPregMatch
 {
-    private $id = 0;
+    public const ANALYSE_REGEX = '/^([^\w\s\\\\])([\^]?)([^\^]*)\1([gmixXsuUAJD]*)$/';
 
-    /**
-     * @return MutantExecutionResult[]
-     */
-    private function addMutantExecutionResult(
-        Collector $collector,
-        string $detectionStatus,
-        int $count = 1
-    ): array {
-        $executionResults = [];
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Removes a "^" character from a regular expression in `preg_match()`. For example:
 
-        for ($i = 0; $i < $count; ++$i) {
-            $executionResults[] = $this->createMutantExecutionResult($detectionStatus);
-        }
+```php
+preg_match('/^test/', $string);
+```
 
-        $collector->collect(...$executionResults);
+Will be mutated to:
 
-        return $executionResults;
+```php
+preg_match('/test/', $string);
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
-    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
+    /**
+     * @psalm-mutation-free
+     */
+    protected function manipulatePattern(string $pattern): string
     {
-        $id = $this->id;
-        ++$this->id;
+        preg_match(self::ANALYSE_REGEX, $pattern, $matches);
 
-        return new MutantExecutionResult(
-            'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            'process output',
-            $detectionStatus,
-            now(str_replace(
-                "\n",
-                PHP_EOL,
-                <<<DIFF
---- Original
-+++ New
-@@ @@
+        $delimiter = $matches[1] ?? '';
+        $regexBody = $matches[3] ?? '';
+        $flags = $matches[4] ?? '';
 
-- echo 'original';
-+ echo 'mutated';
+        return $delimiter . $regexBody . $delimiter . $flags;
+    }
 
-DIFF
-                )),
-            MutatorName::getName(For_::class),
-            'foo/bar',
-            $id,
-            now('<?php $a = 1;'),
-            now('<?php $a = 1;')
-        );
+    protected function isProperRegexToMutate(string $pattern): bool
+    {
+        preg_match(self::ANALYSE_REGEX, $pattern, $matches);
+
+        return ($matches[2] ?? null) === '^';
     }
 }
