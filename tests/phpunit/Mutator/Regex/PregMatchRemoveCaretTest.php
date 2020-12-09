@@ -145,6 +145,15 @@ PHP
             ,
         ];
 
+        yield 'It does not mutate regular expression when provided with an unpacked array' => [
+            <<<'PHP'
+<?php
+
+preg_match(...foo());
+PHP
+            ,
+        ];
+
         yield 'It does not mutate when provided with a variable function name' => [
             <<<'PHP'
 <?php
