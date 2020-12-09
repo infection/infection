@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
-use function array_key_exists;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use function Safe\preg_match;
@@ -88,6 +87,6 @@ TXT
     {
         preg_match(self::ANALYSE_REGEX, $pattern, $matches);
 
-        return array_key_exists(3, $matches) && $matches[3] === '$';
+        return ($matches[3] ?? null) === '$';
     }
 }
