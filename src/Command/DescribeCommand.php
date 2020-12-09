@@ -96,6 +96,20 @@ final class DescribeCommand extends BaseCommand
         $io->writeln('Mutator Category: ' . $definition->getCategory());
         $io->writeln(['', 'Description:']);
         $io->writeln($definition->getDescription());
+
+        $diff = $definition->getDiff();
+
+        if ($diff !== null) {
+            $diffColorizer = $this->getApplication()->getContainer()->getDiffColorizer();
+            $io->writeln(
+                [
+                    '',
+                    'For example:',
+                    $diffColorizer->colorize($diff),
+                ]
+            );
+        }
+
         $remedy = $definition->getRemedies();
 
         if ($remedy !== null) {

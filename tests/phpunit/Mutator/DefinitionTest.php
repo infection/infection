@@ -47,13 +47,15 @@ final class DefinitionTest extends TestCase
     public function test_it_can_be_instantiated(
         string $description,
         string $category,
-        ?string $remedies
+        ?string $remedies,
+        ?string $diff
     ): void {
-        $definition = new Definition($description, $category, $remedies);
+        $definition = new Definition($description, $category, $remedies, $diff);
 
         $this->assertSame($description, $definition->getDescription());
         $this->assertSame($category, $definition->getCategory());
         $this->assertSame($remedies, $definition->getRemedies());
+        $this->assertSame($diff, $definition->getDiff());
     }
 
     public function valuesProvider(): iterable
@@ -62,12 +64,14 @@ final class DefinitionTest extends TestCase
             '',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
+            null,
         ];
 
         yield 'nominal' => [
             'This text is for explaining what the mutator is about.',
             MutatorCategory::SEMANTIC_REDUCTION,
             'This text is for providing guidelines on how to kill the mutant.',
+            'The diff',
         ];
     }
 }
