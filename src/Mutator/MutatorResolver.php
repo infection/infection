@@ -36,7 +36,10 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use function array_key_exists;
+use function array_map;
 use function array_merge_recursive;
+use function array_unique;
+use function array_values;
 use function class_exists;
 use InvalidArgumentException;
 use function Safe\sprintf;
@@ -78,7 +81,7 @@ final class MutatorResolver
                 /** @var string[] $globalSetting */
                 $globalSetting = $setting;
 
-                $globalSettings['ignoreSourceCodeByRegex'] = $globalSetting;
+                $globalSettings['ignoreSourceCodeByRegex'] = array_values(array_unique($globalSetting));
                 unset($mutatorSettings[self::GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING]);
             }
         }
@@ -135,7 +138,10 @@ final class MutatorResolver
             return (array) $settings;
         }
 
-        return array_merge_recursive($globalSettings, (array) $settings);
+        return array_map(
+            static fn (array $values): array => array_values(array_unique($values)),
+            array_merge_recursive($globalSettings, (array) $settings)
+        );
     }
 
     /**
