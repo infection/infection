@@ -58,7 +58,11 @@ Replaces an addition operator (`+`) with a subtraction operator (`-`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b + $c;
++ $a = $b - $c;
+DIFF
         );
     }
 

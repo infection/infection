@@ -37,6 +37,7 @@ namespace Infection\Console;
 
 use function array_merge;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\DescribeCommand;
 use Infection\Command\RunCommand;
 use Infection\Container;
 use OutOfBoundsException;
@@ -116,6 +117,7 @@ final class Application extends BaseApplication
             [
                 new ConfigureCommand(),
                 new RunCommand(),
+                new DescribeCommand(),
             ]
         );
 
