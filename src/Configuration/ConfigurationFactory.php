@@ -37,6 +37,8 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
+use function array_unique;
+use function array_values;
 use function dirname;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
@@ -285,7 +287,7 @@ class ConfigurationFactory
 
                 Assert::isArray($config['ignoreSourceCodeByRegex']);
 
-                $map[$mutatorName] = $config['ignoreSourceCodeByRegex'];
+                $map[$mutatorName] = array_values(array_unique($config['ignoreSourceCodeByRegex']));
             }
         }
 

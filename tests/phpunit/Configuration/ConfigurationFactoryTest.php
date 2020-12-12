@@ -588,6 +588,21 @@ final class ConfigurationFactoryTest extends TestCase
             ['MethodCallRemoval' => ['Assert::.*']]
         );
 
+        yield 'ignore source code by regex with duplicates' => self::createValueForIgnoreSourceCodeByRegex(
+            [
+                '@default' => false,
+                'MethodCallRemoval' => (object) [
+                    'ignoreSourceCodeByRegex' => [
+                        'Assert::.*',
+                        'Assert::.*',
+                        'Test::.*',
+                        'Test::.*',
+                    ],
+                ],
+            ],
+            ['MethodCallRemoval' => ['Assert::.*', 'Test::.*']]
+        );
+
         yield 'mutators from config & input' => self::createValueForMutators(
             [
                 '@default' => true,
