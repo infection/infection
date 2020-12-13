@@ -41,7 +41,7 @@ use Infection\Tests\Mutator\BaseMutatorTestCase;
 /**
  * @internal
  */
-final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
+final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases
@@ -53,60 +53,84 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
 
     public function provideMutationCases(): Generator
     {
-        yield 'It mutates correctly removing dollar when provided with a string and flags' => [
+        yield 'It removes flags one by one' => [
             <<<'PHP'
+<?php
+
+preg_match('~some-regexp$~igu', 'irrelevant');
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+preg_match('~some-regexp$~gu', 'irrelevant');
+PHP
+            ,
+                <<<'PHP'
+<?php
+
+preg_match('~some-regexp$~iu', 'irrelevant');
+PHP
+            ,
+                <<<'PHP'
 <?php
 
 preg_match('~some-regexp$~ig', 'irrelevant');
 PHP
-            ,
+            ],
+        ];
+
+        yield 'It does not mutate when no flags are used' => [
             <<<'PHP'
 <?php
 
-preg_match('~some-regexp~ig', 'irrelevant');
+preg_match('~some-regexp$~', 'irrelevant');
 PHP
         ];
 
-        yield 'It mutates correctly removing dollar when preg_match function is wrongly capitalized' => [
+        yield 'It mutates correctly preg_match function is wrongly capitalized' => [
             <<<'PHP'
 <?php
 
 pReG_MaTcH('~some-regexp$~ig', 'irrelevant');
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
-pReG_MaTcH('~some-regexp~ig', 'irrelevant');
+pReG_MaTcH('~some-regexp$~g', 'irrelevant');
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+pReG_MaTcH('~some-regexp$~i', 'irrelevant');
+PHP
+            ],
         ];
 
-        yield 'It mutates correctly removing dollar when provided with a string and without flags' => [
+        yield 'It mutates correctly when delimeter is not standard' => [
             <<<'PHP'
 <?php
 
-preg_match('~some-regexp$~', 'irrelevant');
+pReG_MaTcH('^some-regexp$^ig', 'irrelevant');
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
-preg_match('~some-regexp~', 'irrelevant');
+pReG_MaTcH('^some-regexp$^g', 'irrelevant');
 PHP
-        ];
-
-        yield 'It mutates correctly removing dollar when delimiter is not standard' => [
-            <<<'PHP'
+                ,
+                <<<'PHP'
 <?php
 
-preg_match('^some-regexp$^i', 'irrelevant');
+pReG_MaTcH('^some-regexp$^i', 'irrelevant');
 PHP
-            ,
-            <<<'PHP'
-<?php
-
-preg_match('^some-regexp^i', 'irrelevant');
-PHP
+            ],
         ];
 
         yield 'It does not mutate regular expression with an encapsed variable' => [
@@ -114,24 +138,6 @@ PHP
 <?php
 
 preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff);
-PHP
-            ,
-        ];
-
-        yield 'It does not mutate regular expression when no "$" is present' => [
-            <<<'PHP'
-<?php
-
-preg_match('~some-regexp~ig', 'irrelevant');
-PHP
-            ,
-        ];
-
-        yield 'It does not mutate regular expression when "$" is used as an exact character' => [
-            <<<'PHP'
-<?php
-
-preg_match('~some-reg\$exp~ig', 'irrelevant');
 PHP
             ,
         ];

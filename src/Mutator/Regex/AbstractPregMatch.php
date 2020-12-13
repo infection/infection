@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
+use Generator;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
@@ -61,10 +62,13 @@ abstract class AbstractPregMatch implements Mutator
     {
         $arguments = $node->args;
         $firstArgument = $arguments[0];
-        $pattern = $this->pullOutPattern($firstArgument);
-        $newArgument = $this->getNewPatternArgument($this->manipulatePattern($pattern), $firstArgument);
+        $originalRegex = $this->pullOutRegex($firstArgument);
 
-        yield new FuncCall($node->name, [$newArgument] + $arguments, $node->getAttributes());
+        foreach ($this->mutateRegex($originalRegex) as $mutatedRegex) {
+            $newArgument = $this->getNewRegexArgument($mutatedRegex, $firstArgument);
+
+            yield new FuncCall($node->name, [$newArgument] + $arguments, $node->getAttributes());
+        }
     }
 
     public function canMutate(Node $node): bool
@@ -73,20 +77,22 @@ abstract class AbstractPregMatch implements Mutator
             && $node->name instanceof Node\Name
             && strtolower((string) $node->name) === 'preg_match'
             && $node->args[0]->value instanceof Node\Scalar\String_
-            && $this->isProperRegexToMutate($this->pullOutPattern($node->args[0]));
+            && $this->isProperRegexToMutate($this->pullOutRegex($node->args[0]));
     }
 
-    abstract protected function isProperRegexToMutate(string $pattern): bool;
+    abstract protected function isProperRegexToMutate(string $regex): bool;
+
+    /**
+     * @psalm-mutation-free
+     *
+     * @return Generator<string>
+     */
+    abstract protected function mutateRegex(string $regex): Generator;
 
     /**
      * @psalm-mutation-free
      */
-    abstract protected function manipulatePattern(string $pattern): string;
-
-    /**
-     * @psalm-mutation-free
-     */
-    private function pullOutPattern(Node\Arg $argument): string
+    private function pullOutRegex(Node\Arg $argument): string
     {
         /** @var Node\Scalar\String_ $stringNode */
         $stringNode = $argument->value;
@@ -97,10 +103,10 @@ abstract class AbstractPregMatch implements Mutator
     /**
      * @psalm-mutation-free
      */
-    private function getNewPatternArgument(string $pattern, Node\Arg $argument): Node\Arg
+    private function getNewRegexArgument(string $regex, Node\Arg $argument): Node\Arg
     {
         return new Node\Arg(
-            new Node\Scalar\String_($pattern, $argument->value->getAttributes()),
+            new Node\Scalar\String_($regex, $argument->value->getAttributes()),
             $argument->byRef, $argument->unpack, $argument->getAttributes()
         );
     }

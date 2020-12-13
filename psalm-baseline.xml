@@ -10,4 +10,9 @@
       <code>preg_match</code>
     </ImpureFunctionCall>
   </file>
+  <file src="src/Mutator/Regex/PregMatchRemoveFlags.php">
+    <ImpureFunctionCall occurrences="1">
+      <code>preg_match</code>
+    </ImpureFunctionCall>
+  </file>
 </files>

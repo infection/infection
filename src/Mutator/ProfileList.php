@@ -167,6 +167,7 @@ final class ProfileList
         Mutator\Regex\PregMatchMatches::class,
         Mutator\Regex\PregMatchRemoveCaret::class,
         Mutator\Regex\PregMatchRemoveDollar::class,
+        Mutator\Regex\PregMatchRemoveFlags::class,
         Mutator\Regex\PregQuote::class,
     ];
 
@@ -368,6 +369,7 @@ final class ProfileList
         'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
         'PregMatchRemoveCaret' => Mutator\Regex\PregMatchRemoveCaret::class,
         'PregMatchRemoveDollar' => Mutator\Regex\PregMatchRemoveDollar::class,
+        'PregMatchRemoveFlags' => Mutator\Regex\PregMatchRemoveFlags::class,
         'PregQuote' => Mutator\Regex\PregQuote::class,
 
         // Removal
