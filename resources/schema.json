@@ -122,6 +122,7 @@
             "properties": {
                 "global-ignore": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
                         "type": "string"
                     }
