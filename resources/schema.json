@@ -122,12 +122,14 @@
             "properties": {
                 "global-ignore": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
                         "type": "string"
                     }
                 },
                 "global-ignoreSourceCodeByRegex": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
                         "type": "string",
                         "format": "regex"
@@ -200,12 +202,14 @@
                             "properties": {
                                 "ignore": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string"
                                     }
                                 },
                                 "ignoreSourceCodeByRegex": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string",
                                         "format": "regex"
@@ -271,12 +275,14 @@
                             "properties": {
                                 "ignore": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string"
                                     }
                                 },
                                 "ignoreSourceCodeByRegex": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string",
                                         "format": "regex"
@@ -387,12 +393,14 @@
                             "properties": {
                                 "ignore": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string"
                                     }
                                 },
                                 "ignoreSourceCodeByRegex": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string",
                                         "format": "regex"
@@ -452,6 +460,7 @@
                                 },
                                 "ignoreSourceCodeByRegex": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string",
                                         "format": "regex"
@@ -557,12 +566,14 @@
                     "properties": {
                         "ignore": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
                                 "type": "string"
                             }
                         },
                         "ignoreSourceCodeByRegex": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
                                 "type": "string",
                                 "format": "regex"
