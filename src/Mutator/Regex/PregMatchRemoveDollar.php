@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use function Safe\preg_match;
@@ -72,20 +73,20 @@ TXT
     /**
      * @psalm-mutation-free
      */
-    protected function manipulatePattern(string $pattern): string
+    protected function mutateRegex(string $regex): Generator
     {
-        preg_match(self::ANALYSE_REGEX, $pattern, $matches);
+        preg_match(self::ANALYSE_REGEX, $regex, $matches);
 
         $delimiter = $matches[1] ?? '';
         $regexBody = $matches[2] ?? '';
         $flags = $matches[4] ?? '';
 
-        return $delimiter . $regexBody . $delimiter . $flags;
+        yield $delimiter . $regexBody . $delimiter . $flags;
     }
 
-    protected function isProperRegexToMutate(string $pattern): bool
+    protected function isProperRegexToMutate(string $regex): bool
     {
-        preg_match(self::ANALYSE_REGEX, $pattern, $matches);
+        preg_match(self::ANALYSE_REGEX, $regex, $matches);
 
         return ($matches[3] ?? null) === '$';
     }

@@ -39,35 +39,56 @@ use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use function Safe\preg_match;
+use function str_replace;
+use function str_split;
 
 /**
  * @internal
  */
-final class PregMatchRemoveCaret extends AbstractPregMatch
+final class PregMatchRemoveFlags extends AbstractPregMatch
 {
-    public const ANALYSE_REGEX = '/^([^\w\s\\\\])([\^]?)([^\^]*)\1([gmixXsuUAJD]*)$/';
+    public const ANALYSE_REGEX = '/^([^\w\s\\\\])(.*)([^\w\s\\\\])([gmixXsuUAJD]*)$/';
 
     public static function getDefinition(): ?Definition
     {
         return new Definition(
             <<<'TXT'
-Removes a "^" character from a regular expression in `preg_match()`. For example:
+Removes one by one flags ("gmixXsuUAJD") in a Regular Expression in `preg_match()` function. For example:
 
 ```php
-preg_match('/^test/', $string);
+preg_match('/^test$/ig', $string);
 ```
 
 Will be mutated to:
 
 ```php
-preg_match('/test/', $string);
+preg_match('/^test/i', $string);
+```
+
+and
+
+```php
+preg_match('/^test/g', $string);
 ```
 
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            'In order to kill this Mutant, write tests that cover every single flag used in a Regular Expression',
+            <<<'DIFF'
+- preg_match('/^test$/ig', $string);
++ preg_match('/^test$/i', $string);
++ preg_match('/^test$/g', $string);
+
+DIFF
         );
+    }
+
+    protected function isProperRegexToMutate(string $regex): bool
+    {
+        preg_match(self::ANALYSE_REGEX, $regex, $matches);
+
+        return ($matches[4] ?? null) !== '';
     }
 
     /**
@@ -78,16 +99,11 @@ TXT
         preg_match(self::ANALYSE_REGEX, $regex, $matches);
 
         $delimiter = $matches[1] ?? '';
-        $regexBody = $matches[3] ?? '';
+        $regexBody = $matches[2] ?? '';
         $flags = $matches[4] ?? '';
 
-        yield $delimiter . $regexBody . $delimiter . $flags;
-    }
-
-    protected function isProperRegexToMutate(string $regex): bool
-    {
-        preg_match(self::ANALYSE_REGEX, $regex, $matches);
-
-        return ($matches[2] ?? null) === '^';
+        foreach (str_split($flags) as $flag) {
+            yield $delimiter . $regexBody . $delimiter . str_replace($flag, '', $flags);
+        }
     }
 }

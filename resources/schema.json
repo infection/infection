@@ -262,6 +262,7 @@
                 "PregMatchMatches": { "$ref": "#/definitions/default-mutator-config" },
                 "PregMatchRemoveCaret": { "$ref": "#/definitions/default-mutator-config" },
                 "PregMatchRemoveDollar": { "$ref": "#/definitions/default-mutator-config" },
+                "PregMatchRemoveFlags": { "$ref": "#/definitions/default-mutator-config" },
                 "NullSafePropertyCall": { "$ref": "#/definitions/default-mutator-config" },
                 "NullSafeMethodCall": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItemRemoval": {
