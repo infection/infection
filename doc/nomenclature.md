@@ -38,7 +38,7 @@ New program that differs from the original by applying a mutation.
 
 ### Mutation
 
-The result of applying a mutator to the AST of a subject and represents a change to be applied.
+The result of applying a mutator to a representation of a subject (e.g. AST, bytecode) and represents a change to be applied.
 
 
 ### Mutator
