@@ -40,6 +40,9 @@ New program that differs from the original by applying a mutation.
 
 The result of applying a mutator to a representation of a subject (e.g. AST, bytecode) and represents a change to be applied.
 
+In the Mutation Testing literature, the terms "mutant" and "mutation" are often interchanged as in most cases
+one wants to refer to the change which both terms capture well.
+
 
 ### Mutator
 
