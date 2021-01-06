@@ -59,7 +59,11 @@ assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment opera
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a += $b;
++ $a = $b;
+DIFF
         );
     }
 

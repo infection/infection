@@ -58,7 +58,11 @@ final class PublicVisibility implements Mutator
         return new Definition(
             'Replaces the `public` method visibility keyword with `protected`.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- public function foo() {
++ protected function foo() {
+DIFF
         );
     }
 

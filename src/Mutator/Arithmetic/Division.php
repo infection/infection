@@ -55,7 +55,11 @@ final class Division implements Mutator
         return new Definition(
             'Replaces a division operator (`/`) with a multiplication operator (`*`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b / $c;
++ $a = $b * $c;
+DIFF
         );
     }
 

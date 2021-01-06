@@ -87,7 +87,7 @@ final class DescribeCommand extends BaseCommand
 
         if ($definition === null) {
             $io->error(sprintf(
-                'Mutator "%s" does not have a defenition',
+                'Mutator "%s" does not have a definition',
                 $mutator
             ));
 

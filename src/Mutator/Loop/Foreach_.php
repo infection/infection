@@ -73,7 +73,13 @@ for ([] as $b]) {
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- foreach ($a as $b) {
++ for ([] as $b]) {
+      // ...
+}
+DIFF
         );
     }
 

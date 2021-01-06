@@ -61,7 +61,11 @@ $x = 'abcde';
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = substr('abcde', 0, -1);
++ $x = 'abcde';
+DIFF
         );
     }
 

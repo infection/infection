@@ -59,7 +59,11 @@ Replaces the nullsafe property call operator (`?->`) with (`->`).
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $object?->property;
++ $object->property;
+DIFF
         );
     }
 

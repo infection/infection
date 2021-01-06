@@ -61,7 +61,11 @@ $x = $array;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_column($array, 'id');
++ $x = $array;
+DIFF
         );
     }
 

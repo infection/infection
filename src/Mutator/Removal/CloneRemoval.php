@@ -55,7 +55,11 @@ final class CloneRemoval implements Mutator
         return new Definition(
             'Removes the clone keyword, e.g. replacing `clone $x` with `$x`.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = clone $x;
++ $a = $x;
+DIFF
         );
     }
 

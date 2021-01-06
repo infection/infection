@@ -58,7 +58,11 @@ Replaces an exponentiation assignment operator (`**=`) with a division assignmen
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a **= $b;
++ $a /= $b;
+DIFF
         );
     }
 

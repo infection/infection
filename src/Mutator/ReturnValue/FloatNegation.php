@@ -58,7 +58,11 @@ Replaces a float value with its negated value. For example will replace `-33.4` 
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = -33.4;
++ $a = 33.4;
+DIFF
         );
     }
 

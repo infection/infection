@@ -64,7 +64,11 @@ TXT
 This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
 - completely disregarding the actual yielded pair. The yielded content should either be checked or
 the impure calls should be made outside of the scope of the yielded value.
-TXT
+TXT,
+            <<<'DIFF'
+- yield $key => $value;
++ yield $key > $value;
+DIFF
         );
     }
 

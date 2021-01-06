@@ -90,7 +90,11 @@ $x = strlen($str) < 10;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = mb_strlen($str) < 10;
++ $x = strlen($str) < 10;
+DIFF
         );
     }
 

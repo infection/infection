@@ -69,7 +69,11 @@ $x = $string;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = preg_quote($string, $delimiter);
++ $x = $string;
+DIFF
         );
     }
 

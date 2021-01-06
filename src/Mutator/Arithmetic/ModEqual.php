@@ -58,7 +58,11 @@ Replaces a modulo assignment operator (`%=`) with a multiplication assignment op
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a %= $b;
++ $a *= $b;
+DIFF
         );
     }
 

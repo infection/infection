@@ -61,7 +61,11 @@ inequality comparison (using a not-equal operator (`!=`)).
 TXT
             ,
             MutatorCategory::SEMANTIC_ADDITION,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b !== $c;
++ $a = $b != $c;
+DIFF
         );
     }
 

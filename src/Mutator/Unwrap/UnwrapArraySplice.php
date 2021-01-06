@@ -61,7 +61,11 @@ $x = ['foo', 'bar', 'baz'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_splice(['foo', 'bar', 'baz'], 1);
++ $x = ['foo', 'bar', 'baz'];
+DIFF
         );
     }
 

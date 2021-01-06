@@ -58,7 +58,11 @@ Replaces a bitwise shift left operator (`<<`) with a bitwise shift right operato
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b << 1;
++ $a = $b >> 1;
+DIFF
         );
     }
 

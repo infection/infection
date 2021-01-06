@@ -61,7 +61,11 @@ $x = ['foo => 'bar'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_udiff(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func);
++ $x = ['foo => 'bar'];
+DIFF
         );
     }
 

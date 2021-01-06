@@ -74,7 +74,12 @@ $x = 'bar';
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = 'foo' . 'bar';
++ $x = 'foo';
++ $x = 'bar';
+DIFF
         );
     }
 

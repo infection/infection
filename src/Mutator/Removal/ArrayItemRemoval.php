@@ -90,7 +90,7 @@ $x = [0, 2];
 And:
 
 ```php
-$x = [1, 2];
+$x = [0, 1];
 ```
 
 Which elements it removes or how many elements it will attempt to remove will depend on its
@@ -99,7 +99,13 @@ configuration.
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = [0, 1, 2];
++ $x = [1, 2];
++ $x = [0, 2];
++ $x = [0, 1];
+DIFF
         );
     }
 

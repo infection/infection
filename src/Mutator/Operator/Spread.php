@@ -68,7 +68,11 @@ $x = [[...$collection][0], 4, 5];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = [...$collection, 4, 5];
++ $x = [[...$collection][0], 4, 5];
+DIFF
         );
     }
 

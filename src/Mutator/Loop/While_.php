@@ -77,7 +77,13 @@ while (false) {
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- while ($condition) {
++ while (false) {
+      // ...
+}
+DIFF
         );
     }
 

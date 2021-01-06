@@ -57,7 +57,11 @@ Replaces a zero float value (`0.0`) with a non-zero float value (`1.0`) and vice
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = 0.0;
++ $a = 1.0;
+DIFF
         );
     }
 

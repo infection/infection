@@ -66,7 +66,12 @@ Replaces rounding operations. For example `floor()` will be replaced with `ceil(
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = floor($b);
++ $a = ceil($b);
++ $a = round($b);
+DIFF
         );
     }
 

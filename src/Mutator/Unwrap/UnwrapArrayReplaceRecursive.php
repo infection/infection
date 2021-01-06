@@ -63,7 +63,11 @@ $x = ['foo', 'bar', 'baz'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
++ $x = ['foo', 'bar', 'baz'];
+DIFF
         );
     }
 

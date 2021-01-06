@@ -61,7 +61,11 @@ $x = ['foo'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_pad(['foo'], 2, ' ');
++ $x = ['foo'];
+DIFF
         );
     }
 

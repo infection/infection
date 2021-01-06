@@ -64,7 +64,11 @@ $x = ['foo', 'bar', 'baz'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_map($callback, ['foo', 'bar', 'baz']);
++ $x = ['foo', 'bar', 'baz'];
+DIFF
         );
     }
 

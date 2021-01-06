@@ -55,7 +55,17 @@ final class SharedCaseRemoval implements Mutator
         return new Definition(
             'Removes `case`s from `switch`.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+switch ($x) {
+-   case 1:
+    case 2:
+        fooBar();
+        break;
+    default:
+        baz();
+}
+DIFF
         );
     }
 

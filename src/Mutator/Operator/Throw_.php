@@ -69,7 +69,11 @@ new Exception();
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- throw new Exception();
++ new Exception();
+DIFF
         );
     }
 

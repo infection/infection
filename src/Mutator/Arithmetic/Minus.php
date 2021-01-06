@@ -55,7 +55,11 @@ final class Minus implements Mutator
         return new Definition(
             'Replaces a subtraction operator (`-`) with an addition operator (`+`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b - $c;
++ $a = $b + $c;
+DIFF
         );
     }
 

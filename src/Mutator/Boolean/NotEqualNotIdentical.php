@@ -59,7 +59,11 @@ comparison (using a not-identical operator (`!==`)).
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b != $c;
++ $a = $b !== $c;
+DIFF
         );
     }
 

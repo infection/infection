@@ -61,7 +61,11 @@ $x = 'Hello!';
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = strrev('Hello!');
++ $x = 'Hello!';
+DIFF
         );
     }
 

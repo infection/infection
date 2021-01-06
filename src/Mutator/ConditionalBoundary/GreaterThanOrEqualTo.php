@@ -58,7 +58,11 @@ Replaces a greater-than-or-equal-to operator (`>=`) with the greater-than operat
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b >= $c;
++ $a = $b > $c;
+DIFF
         );
     }
 

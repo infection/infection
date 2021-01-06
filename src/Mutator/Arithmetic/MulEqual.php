@@ -58,7 +58,11 @@ Replaces a multiplication assignment operator (`*=`) with a division assignment 
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a *= $b;
++ $a /= $b;
+DIFF
         );
     }
 

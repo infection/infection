@@ -70,7 +70,12 @@ $x = ['oof'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_replace(['foo', 'bar', 'baz'], ['oof']);
++ $x = ['foo', 'bar', 'baz'];
++ $x = ['oof'];
+DIFF
         );
     }
 

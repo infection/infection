@@ -68,7 +68,11 @@ Will be mutated to:
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- 'foo' . 'bar';
++ 'bar' . 'foo';
+DIFF
         );
     }
 

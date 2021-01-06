@@ -55,7 +55,10 @@ final class MethodCallRemoval implements Mutator
         return new Definition(
             'Removes the method call.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $this->fooBar();
+DIFF
         );
     }
 

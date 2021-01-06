@@ -58,7 +58,11 @@ Replaces a not identical operator (`!==`) with its counterpart the not identical
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b !== $c;
++ $a = $b === $c;
+DIFF
         );
     }
 

@@ -70,7 +70,11 @@ final class TrueValue implements ConfigurableMutator
         return new Definition(
             'Replaces a boolean literal (`true`) with its opposite value (`false`). ',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = true;
++ $a = false;
+DIFF
         );
     }
 

@@ -55,7 +55,11 @@ final class BitwiseOr implements Mutator
         return new Definition(
             'Replaces a bitwise OR operator (`|`) with a bitwise AND operator (`&`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b | $c;
++ $a = $b & $c;
+DIFF
         );
     }
 

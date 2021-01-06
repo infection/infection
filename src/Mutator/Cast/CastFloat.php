@@ -49,7 +49,11 @@ final class CastFloat extends AbstractCastMutator
         return new Definition(
             'Removes a float cast operator (`(float)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = (float) $value;
++ $a = $value;
+DIFF
         );
     }
 

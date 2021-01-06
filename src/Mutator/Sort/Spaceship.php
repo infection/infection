@@ -59,7 +59,11 @@ Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b <=> $c;
++ $a = $c <=> $b;
+DIFF
         );
     }
 

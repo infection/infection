@@ -58,7 +58,11 @@ Swaps the ternary operator operands, e.g. replaces `true ? true : false` with `t
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $x = true ? true : false;
++ $x = true ? false : true;
+DIFF
         );
     }
 

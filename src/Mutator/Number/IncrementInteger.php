@@ -55,7 +55,11 @@ final class IncrementInteger extends AbstractNumberMutator
         return new Definition(
             'Increments an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = 20;
++ $a = 21;
+DIFF
         );
     }
 
