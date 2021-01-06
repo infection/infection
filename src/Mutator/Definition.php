@@ -45,7 +45,7 @@ final class Definition
     private string $description;
     private string $category;
     private ?string $remedies;
-    private ?string $diff;
+    private string $diff;
 
     /**
      * @param string $description Explanation on what the mutator is about
@@ -55,7 +55,7 @@ final class Definition
         string $description,
         string $category,
         ?string $remedies,
-        ?string $diff = null
+        string $diff
     ) {
         Assert::oneOf($category, MutatorCategory::ALL);
 
@@ -80,7 +80,7 @@ final class Definition
         return $this->remedies;
     }
 
-    public function getDiff(): ?string
+    public function getDiff(): string
     {
         return $this->diff;
     }
