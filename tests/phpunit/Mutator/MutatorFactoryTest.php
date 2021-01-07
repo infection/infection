@@ -71,7 +71,7 @@ final class MutatorFactoryTest extends TestCase
 
     public function test_it_creates_no_mutator_if_no_profile_or_mutator_is_passed(): void
     {
-        $mutators = $this->mutatorFactory->create([]);
+        $mutators = $this->mutatorFactory->create([], false);
 
         $this->assertSame([], $mutators);
     }
@@ -81,7 +81,7 @@ final class MutatorFactoryTest extends TestCase
         $mutators = $this->mutatorFactory->create(array_fill_keys(
             ProfileList::ALL_MUTATORS,
             []
-        ));
+        ), false);
 
         $this->assertSameMutatorsByClass(
             array_values(ProfileList::ALL_MUTATORS),
@@ -95,7 +95,7 @@ final class MutatorFactoryTest extends TestCase
             TrueValue::class => [
                 'ignore' => ['A::B'],
             ],
-        ]);
+        ], false);
 
         $this->assertContainsOnlyInstancesOf(IgnoreMutator::class, $mutators);
         $this->assertSameMutatorsByClass([TrueValue::class], $mutators);
@@ -122,7 +122,7 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_cannot_create_a_mutator_with_invalid_settings(): void
     {
         try {
-            $this->mutatorFactory->create([Plus::class => false]);
+            $this->mutatorFactory->create([Plus::class => false], false);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
@@ -137,7 +137,7 @@ final class MutatorFactoryTest extends TestCase
     {
         $mutators = $this->mutatorFactory->create([
             Plus::class => ['unknown' => 'dunno'],
-        ]);
+        ], false);
 
         $this->assertSameMutatorsByClass([Plus::class], $mutators);
     }
@@ -149,7 +149,7 @@ final class MutatorFactoryTest extends TestCase
 
         $mutators = $this->mutatorFactory->create([
             TrueValue::class => ['settings' => $settings],
-        ]);
+        ], false);
 
         $this->assertSameMutatorsByClass([TrueValue::class], $mutators);
     }
@@ -157,7 +157,7 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_cannot_create_an_unknown_mutator(): void
     {
         try {
-            $this->mutatorFactory->create(['Unknown\Mutator' => []]);
+            $this->mutatorFactory->create(['Unknown\Mutator' => []], false);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {

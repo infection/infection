@@ -165,6 +165,7 @@ final class Container
     public const DEFAULT_GIT_DIFF_FILTER = null;
     public const DEFAULT_GIT_DIFF_BASE = null;
     public const DEFAULT_USE_GITHUB_LOGGER = false;
+    public const DEFAULT_USE_NOOP_MUTATORS = false;
     public const DEFAULT_NO_PROGRESS = false;
     public const DEFAULT_FORCE_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
@@ -682,7 +683,8 @@ final class Container
             self::DEFAULT_DRY_RUN,
             self::DEFAULT_GIT_DIFF_FILTER,
             self::DEFAULT_GIT_DIFF_BASE,
-            self::DEFAULT_USE_GITHUB_LOGGER
+            self::DEFAULT_USE_GITHUB_LOGGER,
+            self::DEFAULT_USE_NOOP_MUTATORS
         );
     }
 
@@ -712,7 +714,8 @@ final class Container
         bool $dryRun,
         ?string $gitDiffFilter,
         ?string $gitDiffBase,
-        bool $useGitHubLogger
+        bool $useGitHubLogger,
+        bool $useNoopMutators
     ): self {
         $clone = clone $this;
 
@@ -786,7 +789,8 @@ final class Container
                 $dryRun,
                 $gitDiffFilter,
                 $gitDiffBase,
-                $useGitHubLogger
+                $useGitHubLogger,
+                $useNoopMutators
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -810,7 +814,8 @@ final class Container
                     $dryRun,
                     $gitDiffFilter,
                     $gitDiffBase,
-                    $useGitHubLogger
+                    $useGitHubLogger,
+                    $useNoopMutators
                 );
             }
         );
