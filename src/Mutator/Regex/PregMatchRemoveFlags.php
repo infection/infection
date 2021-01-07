@@ -77,7 +77,9 @@ TXT
             'In order to kill this Mutant, write tests that cover every single flag used in a Regular Expression',
             <<<'DIFF'
 - preg_match('/^test$/ig', $string);
+# Mutation 1
 + preg_match('/^test$/i', $string);
+# Mutation 2
 + preg_match('/^test$/g', $string);
 
 DIFF

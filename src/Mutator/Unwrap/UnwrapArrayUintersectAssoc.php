@@ -83,7 +83,9 @@ TXT
 -     ['baz' => 'bar'],
 -     $value_compare_func
 - );
+# Mutation 1
 + $x = ['foo' => 'bar'];
+# Mutation 2
 + $x = ['baz' => 'bar'];
 DIFF
         );

@@ -73,7 +73,9 @@ TXT
             null,
             <<<'DIFF'
 - $x = array_intersect($array1, $array2);
+# Mutation 1
 + $x = $array1;
+# Mutation 2
 + $x = $array2;
 DIFF
         );

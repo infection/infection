@@ -58,7 +58,9 @@ final class InstanceOf_ implements Mutator
             null,
             <<<'DIFF'
 - $a = $b instanceof User;
+# Mutation 1
 + $a = true;
+# Mutation 2
 + $a = false;
 DIFF
         );

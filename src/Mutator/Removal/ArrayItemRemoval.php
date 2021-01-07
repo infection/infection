@@ -102,8 +102,11 @@ TXT
             null,
             <<<'DIFF'
 - $x = [0, 1, 2];
+# Mutation 1
 + $x = [1, 2];
+# Mutation 2
 + $x = [0, 2];
+# Mutation 3
 + $x = [0, 1];
 DIFF
         );

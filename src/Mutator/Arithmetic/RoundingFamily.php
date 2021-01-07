@@ -69,7 +69,9 @@ TXT
             null,
             <<<'DIFF'
 - $a = floor($b);
+# Mutation 1
 + $a = ceil($b);
+# Mutation 2
 + $a = round($b);
 DIFF
         );

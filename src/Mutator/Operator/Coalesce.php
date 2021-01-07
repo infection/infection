@@ -62,7 +62,9 @@ TXT
             null,
             <<<'DIFF'
 - $d = $a ?? $b ?? $c;
+# Mutation 1
 + $d = $b ?? $a ?? $c;
+# Mutation 2
 + $d = $a ?? $c ?? $b;
 DIFF
         );
