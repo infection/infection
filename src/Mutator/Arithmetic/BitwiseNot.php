@@ -55,7 +55,11 @@ final class BitwiseNot implements Mutator
         return new Definition(
             'Removes a bitwise NOT operator (`~`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = ~$b;
++ $a = $b;
+DIFF
         );
     }
 

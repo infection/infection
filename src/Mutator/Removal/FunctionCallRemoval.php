@@ -69,7 +69,10 @@ final class FunctionCallRemoval implements Mutator
         return new Definition(
             'Removes the function call.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- fooBar();
+DIFF
         );
     }
 

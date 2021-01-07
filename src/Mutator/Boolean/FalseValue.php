@@ -55,7 +55,11 @@ final class FalseValue implements Mutator
         return new Definition(
             'Replaces a boolean literal (`false`) with its opposite value (`true`). ',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = false;
++ $a = true;
+DIFF
         );
     }
 

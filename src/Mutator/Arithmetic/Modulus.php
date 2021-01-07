@@ -55,7 +55,11 @@ final class Modulus implements Mutator
         return new Definition(
             'Replaces a modulo operator (`%`) with a multiplication operator (`*`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b % $c;
++ $a = $b * $c;
+DIFF
         );
     }
 

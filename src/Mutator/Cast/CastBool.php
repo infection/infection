@@ -49,7 +49,11 @@ final class CastBool extends AbstractCastMutator
         return new Definition(
             'Removes an boolean cast operator (`(bool)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = (bool) $value;
++ $a = $value;
+DIFF
         );
     }
 

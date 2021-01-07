@@ -59,7 +59,11 @@ Replaces a pre- or post-decrement operator (`--`) with the analogue pre- or post
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a--;
++ $a++;
+DIFF
         );
     }
 

@@ -38,6 +38,7 @@ namespace Infection\Command;
 use function array_key_exists;
 use function array_keys;
 use Infection\Console\IO;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use function Safe\sprintf;
@@ -83,11 +84,12 @@ final class DescribeCommand extends BaseCommand
 
         Assert::subclassOf($mutatorClass, Mutator::class);
 
+        /** @var ?Definition $definition */
         $definition = $mutatorClass::getDefinition();
 
         if ($definition === null) {
             $io->error(sprintf(
-                'Mutator "%s" does not have a defenition',
+                'Mutator "%s" does not have a definition',
                 $mutator
             ));
 
@@ -100,16 +102,14 @@ final class DescribeCommand extends BaseCommand
 
         $diff = $definition->getDiff();
 
-        if ($diff !== null) {
-            $diffColorizer = $this->getApplication()->getContainer()->getDiffColorizer();
-            $io->writeln(
-                [
-                    '',
-                    'For example:',
-                    $diffColorizer->colorize($diff),
-                ]
-            );
-        }
+        $diffColorizer = $this->getApplication()->getContainer()->getDiffColorizer();
+        $io->writeln(
+            [
+                '',
+                'For example:',
+                $diffColorizer->colorize($diff),
+            ]
+        );
 
         $remedy = $definition->getRemedies();
 

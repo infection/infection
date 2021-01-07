@@ -55,7 +55,11 @@ final class LogicalOr implements Mutator
         return new Definition(
             'Replaces an OR operator (`||`) with an AND operator (`&&`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b || $c;
++ $a = $b && $c;
+DIFF
         );
     }
 

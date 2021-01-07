@@ -78,7 +78,17 @@ class X {
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+class X {
+    function foo()
+    {
+-        return bar();
++        bar();
++        return null;
+    }
+}
+DIFF
         );
     }
 

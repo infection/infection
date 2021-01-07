@@ -58,7 +58,11 @@ Replaces an integer value with its negated value. For example will replace `-5` 
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = -5;
++ $a = 5;
+DIFF
         );
     }
 

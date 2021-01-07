@@ -76,7 +76,16 @@ $x = ['baz' => 'bar'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_uintersect_assoc(
+-     ['foo' => 'bar'],
+-     ['baz' => 'bar'],
+-     $value_compare_func
+- );
++ $x = ['foo' => 'bar'];
++ $x = ['baz' => 'bar'];
+DIFF
         );
     }
 

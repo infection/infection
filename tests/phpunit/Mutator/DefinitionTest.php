@@ -64,7 +64,7 @@ final class DefinitionTest extends TestCase
             '',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
-            null,
+            '',
         ];
 
         yield 'nominal' => [

@@ -65,7 +65,11 @@ final class DecrementInteger extends AbstractNumberMutator
         return new Definition(
             'Decrements an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = 20;
++ $a = 19;
+DIFF
         );
     }
 

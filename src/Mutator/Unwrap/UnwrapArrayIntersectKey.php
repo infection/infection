@@ -70,7 +70,12 @@ $x = $array2;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_intersect_key($array1, $array2);
++ $x = $array1;
++ $x = $array2;
+DIFF
         );
     }
 

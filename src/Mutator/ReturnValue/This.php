@@ -52,7 +52,16 @@ final class This extends AbstractValueToNullReturnValue
         return new Definition(
             'Replaces a `return $this` statement with `return null` instead.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+class X {
+    function foo()
+    {
+-        return $this;
++        return null;
+    }
+}
+DIFF
         );
     }
 

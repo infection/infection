@@ -58,7 +58,11 @@ Replaces an equal (`==`) or identical (`===`) comparison operator with an assign
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- if ($a === self::VALUE);
++ if ($a = self::VALUE);
+DIFF
         );
     }
 

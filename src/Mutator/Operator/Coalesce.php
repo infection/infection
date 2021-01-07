@@ -59,7 +59,12 @@ e.g. replaces `$a ?? $b` with `$b ?? $a` or `$a ?? $b ?? $c` with `$b ?? $a ?? $
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $d = $a ?? $b ?? $c;
++ $d = $b ?? $a ?? $c;
++ $d = $a ?? $c ?? $b;
+DIFF
         );
     }
 

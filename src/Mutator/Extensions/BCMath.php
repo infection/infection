@@ -84,7 +84,11 @@ $x = (string) ($a + $b);
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = bcadd($a, $b);
++ $x = (string) ($a + $b);
+DIFF
         );
     }
 

@@ -61,7 +61,11 @@ $x = ['a', 'a', 'b'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_unique(['a', 'a', 'b']);
++ $x = ['a', 'a', 'b'];
+DIFF
         );
     }
 

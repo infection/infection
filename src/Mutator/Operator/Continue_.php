@@ -59,7 +59,15 @@ Replaces a continue statement (`continue`) with its counterpart break statement 
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+foreach ($collection as $item) {
+    if ($condition) {
+-       continue;
++       break;
+    }
+}
+DIFF
         );
     }
 

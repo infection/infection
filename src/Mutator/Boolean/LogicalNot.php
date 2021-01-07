@@ -55,7 +55,11 @@ final class LogicalNot implements Mutator
         return new Definition(
             'Removes a negation operator (`!`), e.g. transforms `!$foo` with `$foo`.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = !$b;
++ $a = $b;
+DIFF
         );
     }
 

@@ -58,7 +58,11 @@ Replaces a less-than-or-equal to operator (`<=`) with the greater-than operator 
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b <= $c;
++ $a = $b > $c;
+DIFF
         );
     }
 

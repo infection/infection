@@ -58,7 +58,15 @@ final class Finally_ implements Mutator
         return new Definition(
             'Removes the `finally` block.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+try {
+    // do smth
++ }
+- } finally {
+-
+- }
+DIFF
         );
     }
 

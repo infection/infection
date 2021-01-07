@@ -55,7 +55,12 @@ final class InstanceOf_ implements Mutator
         return new Definition(
             'Replaces an instanceof comparison with `true` and `false`.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b instanceof User;
++ $a = true;
++ $a = false;
+DIFF
         );
     }
 

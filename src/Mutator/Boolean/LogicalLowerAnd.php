@@ -55,7 +55,11 @@ final class LogicalLowerAnd implements Mutator
         return new Definition(
             'Replaces an AND logical operator (`and`) with an OR logical operator (`or`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b and $c;
++ $a = $b or $c;
+DIFF
         );
     }
 

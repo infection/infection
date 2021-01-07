@@ -73,7 +73,13 @@ for ($i=0; false; $i++) {
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- for ($i=0; $i<10; $i++) {
++ for ($i=0; false; $i++) {
+      // ...
+}
+DIFF
         );
     }
 

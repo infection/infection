@@ -55,7 +55,11 @@ final class BitwiseXor implements Mutator
         return new Definition(
             'Replaces a bitwise XOR operator (`^`) with a bitwise AND operator (`&`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b ^ $c;
++ $a = $b & $c;
+DIFF
         );
     }
 

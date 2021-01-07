@@ -62,7 +62,11 @@ $x = '<body text=%body%>';
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = str_replace('%body%', 'black', '<body text=%body%>');
++ $x = '<body text=%body%>';
+DIFF
         );
     }
 

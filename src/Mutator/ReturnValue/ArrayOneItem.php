@@ -74,7 +74,11 @@ return count($array) > 1 ?
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- return $array;
++ return count($array) > 1 ? array_slice($array, 0, 1, true) : $array;
+DIFF
         );
     }
 

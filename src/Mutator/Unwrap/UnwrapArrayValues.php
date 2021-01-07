@@ -61,7 +61,11 @@ $x = [10 => 'Hello!'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_values([10 => 'Hello!']);
++ $x = [10 => 'Hello!'];
+DIFF
         );
     }
 

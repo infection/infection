@@ -62,7 +62,11 @@ $x = $array1;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_diff($array1, $array2);
++ $x = $array1;
+DIFF
         );
     }
 

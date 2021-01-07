@@ -49,7 +49,11 @@ final class CastObject extends AbstractCastMutator
         return new Definition(
             'Removes an object cast operator (`(object)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = (object) $value;
++ $a = $value;
+DIFF
         );
     }
 

@@ -66,7 +66,11 @@ preg_match('/test/', $string);
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- preg_match('/^test/', $string);
++ preg_match('/test/', $string);
+DIFF
         );
     }
 

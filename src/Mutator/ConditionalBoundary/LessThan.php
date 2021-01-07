@@ -60,7 +60,11 @@ TXT
             MutatorCategory::SEMANTIC_ADDITION,
             <<<'TXT'
 This mutator shifts the compared values highlighting an untested boundary.
-TXT
+TXT,
+            <<<'DIFF'
+- $a = $b < $c;
++ $a = $b <= $c;
+DIFF
         );
     }
 

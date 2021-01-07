@@ -74,7 +74,11 @@ if ((int) $matches = []) {
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- preg_match('/pattern/', $subject, $matches, $flags);
++ (int) $matches = [];
+DIFF
         );
     }
 
