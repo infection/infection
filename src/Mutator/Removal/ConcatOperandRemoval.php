@@ -77,7 +77,9 @@ TXT
             null,
             <<<'DIFF'
 - $x = 'foo' . 'bar';
+# Mutation 1
 + $x = 'foo';
+# Mutation 2
 + $x = 'bar';
 DIFF
         );

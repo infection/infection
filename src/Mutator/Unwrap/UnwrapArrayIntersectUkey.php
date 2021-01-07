@@ -75,7 +75,9 @@ TXT
             null,
             <<<'DIFF'
 - $x = array_intersect_ukey($array1, $array2, $keyCompareFunc);
+# Mutation 1
 + $x = $array1;
+# Mutation 2
 + $x = $array2;
 DIFF
         );

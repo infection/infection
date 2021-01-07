@@ -73,7 +73,9 @@ TXT
             null,
             <<<'DIFF'
 - $x = array_replace(['foo', 'bar', 'baz'], ['oof']);
+# Mutation 1
 + $x = ['foo', 'bar', 'baz'];
+# Mutation 2
 + $x = ['oof'];
 DIFF
         );
