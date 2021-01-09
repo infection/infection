@@ -120,18 +120,18 @@ TXT
 
         yield 'string with leading, trailing & in-between line returns & dirty empty strings' => [
             <<<'TXT'
-  
+
 
   Hello...
-    
+
  ...World!
-  
+
 
 TXT
             ,
             <<<'TXT'
   Hello...
-    
+
  ...World!
 TXT
         ];

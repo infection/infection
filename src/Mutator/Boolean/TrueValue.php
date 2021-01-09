@@ -52,8 +52,8 @@ use function Safe\array_flip;
  */
 final class TrueValue implements ConfigurableMutator
 {
-    use GetMutatorName;
     use GetConfigClassName;
+    use GetMutatorName;
 
     /**
      * @var array<string, int>

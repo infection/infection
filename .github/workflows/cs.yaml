@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PHP_CS_FIXER_VERSION: v2.16.4
+      PHP_CS_FIXER_VERSION: v2.17.3
 
     steps:
       - name: Checkout

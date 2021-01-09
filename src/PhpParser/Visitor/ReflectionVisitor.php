@@ -122,7 +122,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             array_pop($this->functionScopeStack);
         }
 
-        if ($node instanceof  Node\Stmt\ClassLike) {
+        if ($node instanceof Node\Stmt\ClassLike) {
             array_pop($this->classScopeStack);
         }
 
