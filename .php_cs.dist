@@ -121,6 +121,7 @@ return Config::create()
         'native_function_invocation' => true,
         'no_alternative_syntax' => true,
         'no_superfluous_phpdoc_tags' => true,
+        'no_trailing_whitespace_in_string' => false,
         'no_unset_cast' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,

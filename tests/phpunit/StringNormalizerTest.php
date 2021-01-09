@@ -57,8 +57,8 @@ final class StringNormalizerTest extends TestCase
 
         yield 'multi-line spaces' => [
             <<<'TXT'
-
-
+ 
+ 
 TXT
             ,
             <<<'TXT'
@@ -73,10 +73,10 @@ TXT
 
         yield 'multi-line text with spaces' => [
             <<<'TXT'
-
+ 
  foo
- bar
-
+ bar 
+ 
 TXT
             ,
             <<<'TXT'
