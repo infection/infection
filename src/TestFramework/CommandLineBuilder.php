@@ -76,7 +76,7 @@ class CommandLineBuilder
          *
          * This lets folks use, say, a bash wrapper over phpunit.
          */
-        if ('cli' === PHP_SAPI && $phpExtraArgs === [] && is_executable($testFrameworkExecutable) && shell_exec('command -v php')) {
+        if ('cli' === PHP_SAPI && $phpExtraArgs === [] && is_executable($testFrameworkExecutable) && shell_exec('command -v php') !== null) {
             return array_merge([$testFrameworkExecutable], $frameworkArgs);
         }
 
