@@ -35,35 +35,71 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
+use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PHPUnit\Framework\TestCase;
 
-abstract class BaseNodeIgnorerTestCase extends TestCase
+final class ChangingIgnorerTest extends BaseNodeIgnorerTestCase
 {
-    abstract protected function getIgnore(): NodeIgnorer;
-
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy, ?NodeIgnorer $ignorer = null): void
+    private const CODE_WITH_ONE_IGNORED_NODE = <<<'PHP'
+<?php
+        
+class Foo
+{
+    public function bar()
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
+        $ignored + 1;
+    }
+}
 
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([
-            $ignorer ?? $this->getIgnore(),
-        ]));
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
+PHP;
 
-        $this->addToAssertionCount(1);
+    private const CODE_WITH_ONE_COUNTED_NODE = <<<'PHP'
+<?php
+        
+class Foo
+{
+    public function bar()
+    {
+        $counted + 1;
+    }
+}
+
+PHP;
+
+    public function test_it_ignores_when_enabled(): ChangingIgnorer
+    {
+        $ignorer = new ChangingIgnorer();
+        $ignorer->startIgnoring();
+
+        $this->parseAndTraverse(
+            self::CODE_WITH_ONE_IGNORED_NODE,
+            $spy = $this->createSpy(),
+            $ignorer
+        );
+
+        $this->assertSame(0, $spy->nodeCounter);
+
+        return $ignorer;
     }
 
-    protected function createSpy(): IgnoreSpyVisitor
+    /**
+     * @depends test_it_ignores_when_enabled
+     */
+    public function test_it_does_not_ignore_when_disabled(ChangingIgnorer $ignorer): void
     {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
+        $ignorer->stopIgnoring();
+
+        $this->parseAndTraverse(
+            self::CODE_WITH_ONE_COUNTED_NODE,
+            $spy = $this->createSpy(),
+            $ignorer
+        );
+
+        $this->assertSame(1, $spy->nodeCounter);
+    }
+
+    protected function getIgnore(): NodeIgnorer
+    {
+        return new ChangingIgnorer();
     }
 }
