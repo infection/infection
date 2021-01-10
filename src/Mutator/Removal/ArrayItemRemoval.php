@@ -55,8 +55,8 @@ use Webmozart\Assert\Assert;
  */
 final class ArrayItemRemoval implements ConfigurableMutator
 {
-    use GetMutatorName;
     use GetConfigClassName;
+    use GetMutatorName;
 
     private ArrayItemRemovalConfig $config;
 

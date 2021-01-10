@@ -53,8 +53,8 @@ use PhpParser\Node;
  */
 final class BCMath implements ConfigurableMutator
 {
-    use GetMutatorName;
     use GetConfigClassName;
+    use GetMutatorName;
 
     /**
      * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr>>
