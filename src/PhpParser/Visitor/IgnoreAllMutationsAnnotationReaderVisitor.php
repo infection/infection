@@ -49,6 +49,10 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
     private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
 
     private ChangingIgnorer $changingIgnorer;
+
+    /**
+     * @var SplObjectStorage<object, mixed>
+     */
     private SplObjectStorage $ignoreAllMutationsNodes;
 
     public function __construct(ChangingIgnorer $changingIgnorer)

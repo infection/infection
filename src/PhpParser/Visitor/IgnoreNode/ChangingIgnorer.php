@@ -42,7 +42,7 @@ use PhpParser\Node;
  */
 final class ChangingIgnorer implements NodeIgnorer
 {
-    private $ignore = false;
+    private bool $ignore = false;
 
     public function ignores(Node $node): bool
     {
