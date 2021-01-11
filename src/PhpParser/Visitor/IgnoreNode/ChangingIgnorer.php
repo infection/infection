@@ -39,8 +39,9 @@ use PhpParser\Node;
 
 /**
  * @internal
+ * @final
  */
-final class ChangingIgnorer implements NodeIgnorer
+class ChangingIgnorer implements NodeIgnorer
 {
     private bool $ignore = false;
 

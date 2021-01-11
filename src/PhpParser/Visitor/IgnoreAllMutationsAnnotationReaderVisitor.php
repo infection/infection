@@ -50,17 +50,15 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
 
     private ChangingIgnorer $changingIgnorer;
 
-    /**
-     * @var SplObjectStorage<object, mixed>
-     */
-    private SplObjectStorage $ignoreAllMutationsNodes;
+    private SplObjectStorage $ignoredNodes;
 
-    public function __construct(ChangingIgnorer $changingIgnorer)
+    /**
+     * @param SplObjectStorage<object, mixed> $listOfIgnoredNodes
+     */
+    public function __construct(ChangingIgnorer $changingIgnorer, SplObjectStorage $ignoredNodes)
     {
         $this->changingIgnorer = $changingIgnorer;
-
-        // TODO DI this
-        $this->ignoreAllMutationsNodes = new SplObjectStorage();
+        $this->ignoredNodes = $ignoredNodes;
     }
 
     public function enterNode(Node $node): ?Node
@@ -68,7 +66,7 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
         foreach ($node->getComments() as $comment) {
             if (strpos($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION) !== false) {
                 $this->changingIgnorer->startIgnoring();
-                $this->ignoreAllMutationsNodes->attach($node);
+                $this->ignoredNodes->attach($node);
             }
         }
 
@@ -77,8 +75,8 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
 
     public function leaveNode(Node $node): ?Node
     {
-        if ($this->ignoreAllMutationsNodes->contains($node)) {
-            $this->ignoreAllMutationsNodes->detach($node);
+        if ($this->ignoredNodes->contains($node)) {
+            $this->ignoredNodes->detach($node);
             $this->changingIgnorer->stopIgnoring();
         }
 

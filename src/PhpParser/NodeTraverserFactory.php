@@ -48,6 +48,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\NameResolver;
+use SplObjectStorage;
 
 /**
  * @internal
@@ -68,7 +69,7 @@ class NodeTraverserFactory
 
         $traverser = new NodeTraverser();
 
-        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer));
+        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
         $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
         $traverser->addVisitor(new NameResolver(
             null,

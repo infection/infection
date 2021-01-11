@@ -38,7 +38,9 @@ namespace Infection\Tests\PhpParser;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
+use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
@@ -69,6 +71,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $this->assertSame(
             [
+                IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
                 ParentConnectorVisitor::class,
@@ -96,6 +99,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $this->assertSame(
             [
+                IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
                 ParentConnectorVisitor::class,
@@ -111,13 +115,14 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $actualNodeIgnorers = array_map(
             'get_class',
-            $nodeIgnorersReflection->getValue($visitors[0])
+            $nodeIgnorersReflection->getValue($visitors[1])
         );
 
         $this->assertSame(
             [
                 FakeIgnorer::class,
                 FakeIgnorer::class,
+                ChangingIgnorer::class,
                 InterfaceIgnorer::class,
                 AbstractMethodIgnorer::class,
             ],
