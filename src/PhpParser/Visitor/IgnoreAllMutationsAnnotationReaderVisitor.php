@@ -50,10 +50,13 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
 
     private ChangingIgnorer $changingIgnorer;
 
+    /**
+     * @var SplObjectStorage<object, mixed>
+     */
     private SplObjectStorage $ignoredNodes;
 
     /**
-     * @param SplObjectStorage<object, mixed> $listOfIgnoredNodes
+     * @param SplObjectStorage<object, mixed> $ignoredNodes
      */
     public function __construct(ChangingIgnorer $changingIgnorer, SplObjectStorage $ignoredNodes)
     {
