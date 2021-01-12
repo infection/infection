@@ -33,56 +33,56 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 use SplObjectStorage;
+use function strpos;
 
 /**
  * @internal
- * @final
  */
-class NodeTraverserFactory
+final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstract
 {
+    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
+
+    private ChangingIgnorer $changingIgnorer;
+
     /**
-     * @param NodeIgnorer[] $nodeIgnorers
+     * @var SplObjectStorage<object, mixed>
      */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    private SplObjectStorage $ignoredNodes;
+
+    /**
+     * @param SplObjectStorage<object, mixed> $ignoredNodes
+     */
+    public function __construct(ChangingIgnorer $changingIgnorer, SplObjectStorage $ignoredNodes)
     {
-        $changingIgnorer = new ChangingIgnorer();
-        $nodeIgnorers[] = $changingIgnorer;
+        $this->changingIgnorer = $changingIgnorer;
+        $this->ignoredNodes = $ignoredNodes;
+    }
 
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
+    public function enterNode(Node $node): ?Node
+    {
+        foreach ($node->getComments() as $comment) {
+            if (strpos($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION) !== false) {
+                $this->changingIgnorer->startIgnoring();
+                $this->ignoredNodes->attach($node);
+            }
+        }
 
-        $traverser = new NodeTraverser();
+        return null;
+    }
 
-        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                'replaceNodes' => false,
-            ])
-        );
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
+    public function leaveNode(Node $node): ?Node
+    {
+        if ($this->ignoredNodes->contains($node)) {
+            $this->ignoredNodes->detach($node);
+            $this->changingIgnorer->stopIgnoring();
+        }
 
-        return $traverser;
+        return null;
     }
 }

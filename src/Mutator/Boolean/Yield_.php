@@ -89,6 +89,6 @@ DIFF
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Yield_ && $node->key;
+        return $node instanceof Node\Expr\Yield_ && $node->key !== null;
     }
 }

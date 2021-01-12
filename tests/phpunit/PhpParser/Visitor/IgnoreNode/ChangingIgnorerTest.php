@@ -33,56 +33,73 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
-use SplObjectStorage;
 
-/**
- * @internal
- * @final
- */
-class NodeTraverserFactory
+final class ChangingIgnorerTest extends BaseNodeIgnorerTestCase
 {
-    /**
-     * @param NodeIgnorer[] $nodeIgnorers
-     */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    private const CODE_WITH_ONE_IGNORED_NODE = <<<'PHP'
+<?php
+        
+class Foo
+{
+    public function bar()
     {
-        $changingIgnorer = new ChangingIgnorer();
-        $nodeIgnorers[] = $changingIgnorer;
+        $ignored + 1;
+    }
+}
 
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
+PHP;
 
-        $traverser = new NodeTraverser();
+    private const CODE_WITH_ONE_COUNTED_NODE = <<<'PHP'
+<?php
+        
+class Foo
+{
+    public function bar()
+    {
+        $counted + 1;
+    }
+}
 
-        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                'replaceNodes' => false,
-            ])
+PHP;
+
+    public function test_it_ignores_when_enabled(): ChangingIgnorer
+    {
+        $ignorer = new ChangingIgnorer();
+        $ignorer->startIgnoring();
+
+        $this->parseAndTraverse(
+            self::CODE_WITH_ONE_IGNORED_NODE,
+            $spy = $this->createSpy(),
+            $ignorer
         );
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
 
-        return $traverser;
+        $this->assertSame(0, $spy->nodeCounter);
+
+        return $ignorer;
+    }
+
+    /**
+     * @depends test_it_ignores_when_enabled
+     */
+    public function test_it_does_not_ignore_when_disabled(ChangingIgnorer $ignorer): void
+    {
+        $ignorer->stopIgnoring();
+
+        $this->parseAndTraverse(
+            self::CODE_WITH_ONE_COUNTED_NODE,
+            $spy = $this->createSpy(),
+            $ignorer
+        );
+
+        $this->assertSame(1, $spy->nodeCounter);
+    }
+
+    protected function getIgnore(): NodeIgnorer
+    {
+        return new ChangingIgnorer();
     }
 }

@@ -33,37 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\PhpParser\Visitor\IgnoreNode;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PHPUnit\Framework\TestCase;
+use PhpParser\Node;
 
-abstract class BaseNodeIgnorerTestCase extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class ChangingIgnorer implements NodeIgnorer
 {
-    abstract protected function getIgnore(): NodeIgnorer;
+    private bool $ignore = false;
 
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy, ?NodeIgnorer $ignorer = null): void
+    public function ignores(Node $node): bool
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
-
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([
-            $ignorer ?? $this->getIgnore(),
-        ]));
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-
-        $this->addToAssertionCount(1);
+        return $this->ignore;
     }
 
-    protected function createSpy(): IgnoreSpyVisitor
+    public function startIgnoring(): void
     {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
+        $this->ignore = true;
+    }
+
+    public function stopIgnoring(): void
+    {
+        $this->ignore = false;
     }
 }
