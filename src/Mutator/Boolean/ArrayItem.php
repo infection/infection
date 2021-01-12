@@ -89,7 +89,9 @@ DIFF
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\ArrayItem && $node->key && ($this->isNodeWithSideEffects($node->value) || $this->isNodeWithSideEffects($node->key));
+        return $node instanceof Node\Expr\ArrayItem && $node->key !== null && (
+            $this->isNodeWithSideEffects($node->value) || $this->isNodeWithSideEffects($node->key)
+        );
     }
 
     private function isNodeWithSideEffects(Node $node): bool
