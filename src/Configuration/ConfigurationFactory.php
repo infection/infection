@@ -117,7 +117,8 @@ class ConfigurationFactory
         bool $dryRun,
         ?string $gitDiffFilter,
         ?string $gitDiffBase,
-        bool $useGitHubLogger
+        bool $useGitHubLogger,
+        bool $useNoopMutators
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -135,7 +136,7 @@ class ConfigurationFactory
 
         $resolvedMutatorsArray = $this->resolveMutators($schema->getMutators(), $mutatorsInput);
 
-        $mutators = $this->mutatorFactory->create($resolvedMutatorsArray);
+        $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
         return new Configuration(

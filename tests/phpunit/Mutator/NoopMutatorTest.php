@@ -37,17 +37,14 @@ namespace Infection\Tests\Mutator;
 
 use DomainException;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\IgnoreConfig;
-use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\Reflection\CoreClassReflection;
+use Infection\Mutator\NoopMutator;
 use function iterator_to_array;
 use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-final class IgnoreMutatorTest extends TestCase
+final class NoopMutatorTest extends TestCase
 {
     /**
      * @var MockObject&Mutator
@@ -68,12 +65,12 @@ final class IgnoreMutatorTest extends TestCase
     public function test_it_cannot_give_a_definition(): void
     {
         try {
-            IgnoreMutator::getDefinition();
+            NoopMutator::getDefinition();
 
             $this->fail();
         } catch (DomainException $exception) {
             $this->assertSame(
-                'The class "Infection\Mutator\IgnoreMutator" does not have a definition',
+                'The class "Infection\Mutator\NoopMutator" does not have a definition',
                 $exception->getMessage()
             );
         }
@@ -81,7 +78,7 @@ final class IgnoreMutatorTest extends TestCase
 
     public function test_it_should_not_mutate_node_if_its_decorated_mutator_cannot(): void
     {
-        $ignoreMutator = new IgnoreMutator(new IgnoreConfig([]), $this->mutatorMock);
+        $ignoreMutator = new NoopMutator($this->mutatorMock);
 
         $this->mutatorMock
             ->expects($this->once())
@@ -95,22 +92,15 @@ final class IgnoreMutatorTest extends TestCase
         $this->assertFalse($mutate);
     }
 
-    public function test_it_should_mutate_node_if_its_decorated_mutator_can_and_no_reflection_class_could_be_found_for_the_node(): void
+    public function test_it_should_mutate_node_if_its_decorated_mutator_can(): void
     {
-        $ignoreMutator = new IgnoreMutator(new IgnoreConfig([]), $this->mutatorMock);
+        $ignoreMutator = new NoopMutator($this->mutatorMock);
 
         $this->mutatorMock
             ->expects($this->once())
             ->method('canMutate')
             ->with($this->nodeMock)
             ->willReturn(true)
-        ;
-
-        $this->nodeMock
-            ->expects($this->once())
-            ->method('getAttribute')
-            ->with(ReflectionVisitor::REFLECTION_CLASS_KEY)
-            ->willReturn(null)
         ;
 
         $mutate = $ignoreMutator->canMutate($this->nodeMock);
@@ -118,73 +108,18 @@ final class IgnoreMutatorTest extends TestCase
         $this->assertTrue($mutate);
     }
 
-    public function test_it_should_not_mutate_node_if_its_decorated_mutator_can_and_a_reflection_class_could_be_found_for_the_node_and_the_node_is_ignored(): void
+    public function test_it_does_not_mutate_the_node(): void
     {
-        $this->mutatorMock
-            ->expects($this->once())
-            ->method('canMutate')
-            ->with($this->nodeMock)
-            ->willReturn(true)
-        ;
-
-        $this->nodeMock
-            ->expects($this->exactly(2))
-            ->method('getAttribute')
-            ->withConsecutive(
-                [ReflectionVisitor::REFLECTION_CLASS_KEY, false],
-                [ReflectionVisitor::FUNCTION_NAME, '']
-            )
-            ->willReturnOnConsecutiveCalls(
-                CoreClassReflection::fromClassName(self::class),
-                'foo'
-            )
-        ;
-
-        $this->nodeMock
-            ->expects($this->once())
-            ->method('getLine')
-            ->willReturn(10)
-        ;
-
-        $ignoreConfigMock = $this->createMock(IgnoreConfig::class);
-
-        $ignoreConfigMock
-            ->expects($this->once())
-            ->method('isIgnored')
-            ->with(self::class, 'foo', 10)
-            ->willReturn(true)
-        ;
-
-        $ignoreMutator = new IgnoreMutator($ignoreConfigMock, $this->mutatorMock);
-
-        $mutate = $ignoreMutator->canMutate($this->nodeMock);
-
-        $this->assertFalse($mutate);
-    }
-
-    public function test_it_mutates_the_node_via_its_decorated_mutator(): void
-    {
-        $ignoreMutator = new IgnoreMutator(new IgnoreConfig([]), $this->mutatorMock);
-
-        $mutatedNodeMock = $this->createMock(Node::class);
-
-        $this->mutatorMock
-            ->expects($this->once())
-            ->method('mutate')
-            ->with($this->nodeMock)
-            ->willReturnCallback(static function () use ($mutatedNodeMock): iterable {
-                yield $mutatedNodeMock;
-            })
-        ;
+        $ignoreMutator = new NoopMutator($this->mutatorMock);
 
         $mutatedNode = $ignoreMutator->mutate($this->nodeMock);
 
-        $this->assertSame([$mutatedNodeMock], iterator_to_array($mutatedNode));
+        $this->assertSame([$this->nodeMock], iterator_to_array($mutatedNode));
     }
 
     public function test_it_exposes_its_decorated_mutator_name(): void
     {
-        $ignoreMutator = new IgnoreMutator(new IgnoreConfig([]), new Plus());
+        $ignoreMutator = new NoopMutator(new Plus());
 
         $this->assertSame(
             MutatorName::getName(Plus::class),

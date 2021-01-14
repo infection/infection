@@ -114,6 +114,8 @@ final class RunCommand extends BaseCommand
     /** @var string */
     private const OPTION_LOGGER_GITHUB = 'logger-github';
 
+    private const OPTION_USE_NOOP_MUTATORS = 'noop';
+
     /** @var string */
     private const OPTION_MIN_MSI = 'min-msi';
 
@@ -248,6 +250,12 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Log escaped Mutants as GitHub Annotations.',
+            )
+            ->addOption(
+                self::OPTION_USE_NOOP_MUTATORS,
+                null,
+                InputOption::VALUE_NONE,
+                'Use noop mutators that do not change AST. For debugging purposes.',
             )
             ->addOption(
                 self::OPTION_MIN_MSI,
@@ -435,7 +443,8 @@ final class RunCommand extends BaseCommand
             (bool) $input->getOption(self::OPTION_DRY_RUN),
             $gitDiffFilter,
             $gitDiffBase,
-            (bool) $input->getOption(self::OPTION_LOGGER_GITHUB)
+            (bool) $input->getOption(self::OPTION_LOGGER_GITHUB),
+            (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS)
         );
     }
 

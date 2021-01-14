@@ -52,7 +52,7 @@ final class MutatorFactory
      *
      * @return array<string, Mutator<\PhpParser\Node>>
      */
-    public function create(array $resolvedMutators): array
+    public function create(array $resolvedMutators, bool $useNoopMutators): array
     {
         $mutators = [];
 
@@ -82,16 +82,15 @@ final class MutatorFactory
                     self::getConfigurableMutator($mutatorClassName, $settings) :
                     new $mutatorClassName();
 
-            if ($ignored === []) {
-                $mutators[$mutator->getName()] = $mutator;
-
-                continue;
+            if ($ignored !== []) {
+                $mutator = new IgnoreMutator(new IgnoreConfig($ignored), $mutator);
             }
 
-            $mutators[$mutator->getName()] = new IgnoreMutator(
-                new IgnoreConfig($ignored),
-                $mutator
-            );
+            if ($useNoopMutators) {
+                $mutator = new NoopMutator($mutator);
+            }
+
+            $mutators[$mutator->getName()] = $mutator;
         }
 
         return $mutators;

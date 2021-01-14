@@ -38,9 +38,11 @@ namespace Infection\Tests\Mutator;
 use function array_filter;
 use const ARRAY_FILTER_USE_KEY;
 use function array_values;
+use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NoopMutator;
 use Infection\Mutator\ProfileList;
 use ReflectionClass;
 use function Safe\ksort;
@@ -96,7 +98,7 @@ final class ProfileListProvider
             $shortClassName = substr($file->getFilename(), 0, -4);
             $className = self::getMutatorClassNameFromPath($file->getPathname());
 
-            if ($className === IgnoreMutator::class) {
+            if (in_array($className, [IgnoreMutator::class, NoopMutator::class], true)) {
                 continue;
             }
 

@@ -92,7 +92,7 @@ final class MutatorRobustnessTest extends TestCase
                 yield $title => [
                     $fileName,
                     $fileContents,
-                    $mutatorFactory->create([$mutatorClassName => []])[MutatorName::getName($mutatorClassName)],
+                    $mutatorFactory->create([$mutatorClassName => []], false)[MutatorName::getName($mutatorClassName)],
                 ];
             }
         }

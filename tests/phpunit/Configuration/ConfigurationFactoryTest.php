@@ -52,6 +52,7 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorParser;
+use Infection\Mutator\NoopMutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use function Infection\Tests\normalizePath;
@@ -111,6 +112,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $inputGitDiffFilter,
         string $inputGitDiffBase,
         bool $inputUseGitHubAnnotationsLogger,
+        bool $inputUseNoopMutators,
         int $inputMsiPrecision,
         int $expectedTimeout,
         array $expectedSourceDirectories,
@@ -162,7 +164,8 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputDryRun,
                 $inputGitDiffFilter,
                 $inputGitDiffBase,
-                $inputUseGitHubAnnotationsLogger
+                $inputUseGitHubAnnotationsLogger,
+                $inputUseNoopMutators
             )
         ;
 
@@ -242,6 +245,7 @@ final class ConfigurationFactoryTest extends TestCase
             'AM',
             'master',
             true,
+            false,
             2,
             10,
             [],
@@ -555,7 +559,8 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'no mutator' => self::createValueForMutators(
             [],
             '',
-            self::getDefaultMutators()
+            false,
+            self::getDefaultMutators(),
         );
 
         yield 'mutators from config' => self::createValueForMutators(
@@ -568,6 +573,7 @@ final class ConfigurationFactoryTest extends TestCase
                 ],
             ],
             '',
+            false,
             [
                 'MethodCallRemoval' => new IgnoreMutator(
                     new IgnoreConfig([
@@ -575,6 +581,27 @@ final class ConfigurationFactoryTest extends TestCase
                     ]),
                     new MethodCallRemoval()
                 ),
+            ]
+        );
+
+        yield 'noop mutators from config' => self::createValueForMutators(
+            [
+                '@default' => false,
+                'MethodCallRemoval' => (object) [
+                    'ignore' => [
+                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                    ],
+                ],
+            ],
+            '',
+            true,
+            [
+                'MethodCallRemoval' => new NoopMutator(new IgnoreMutator(
+                    new IgnoreConfig([
+                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                    ]),
+                    new MethodCallRemoval()
+                )),
             ]
         );
 
@@ -613,6 +640,7 @@ final class ConfigurationFactoryTest extends TestCase
                 ],
             ],
             'AssignmentEqual,EqualIdentical',
+            false,
             (static function (): array {
                 return [
                     'AssignmentEqual' => new AssignmentEqual(),
@@ -658,6 +686,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             'master',
+            false,
             false,
             2,
             10,
@@ -738,6 +767,7 @@ final class ConfigurationFactoryTest extends TestCase
             true,
             null,
             'master',
+            false,
             false,
             2,
             10,
@@ -828,6 +858,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             'master',
             false,
+            false,
             2,
             $expectedTimeOut,
             [],
@@ -898,6 +929,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             'master',
+            false,
             false,
             2,
             10,
@@ -971,6 +1003,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             'master',
             false,
+            false,
             2,
             10,
             [],
@@ -1041,6 +1074,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             'master',
+            false,
             false,
             2,
             10,
@@ -1114,6 +1148,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             'master',
             false,
+            false,
             2,
             10,
             [],
@@ -1185,6 +1220,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             'master',
+            false,
             false,
             2,
             10,
@@ -1258,6 +1294,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             'master',
             false,
+            false,
             2,
             10,
             [],
@@ -1329,6 +1366,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             'master',
+            false,
             false,
             2,
             10,
@@ -1403,6 +1441,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             'master',
             false,
+            false,
             2,
             10,
             [],
@@ -1474,6 +1513,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             'master',
+            false,
             false,
             2,
             10,
@@ -1548,6 +1588,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             'master',
             false,
+            false,
             2,
             10,
             [],
@@ -1620,6 +1661,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             'master',
             false,
+            false,
             2,
             10,
             [],
@@ -1655,6 +1697,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForMutators(
         array $configMutators,
         string $inputMutators,
+        bool $useNoopMutatos,
         array $expectedMutators
     ): array {
         return [
@@ -1695,6 +1738,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             'master',
             false,
+            $useNoopMutatos,
             2,
             10,
             [],
@@ -1770,6 +1814,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             'master',
             false,
+            false,
             2,
             10,
             [],
@@ -1812,7 +1857,8 @@ final class ConfigurationFactoryTest extends TestCase
                 ->create(
                     SingletonContainer::getContainer()
                         ->getMutatorResolver()
-                        ->resolve(['@default' => true])
+                        ->resolve(['@default' => true]),
+                    false
                 )
             ;
         }
