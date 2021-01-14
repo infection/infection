@@ -255,7 +255,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_USE_NOOP_MUTATORS,
                 null,
                 InputOption::VALUE_NONE,
-                'Use noop mutators that do not change AST. For debugging purposes..',
+                'Use noop mutators that do not change AST. For debugging purposes.',
             )
             ->addOption(
                 self::OPTION_MIN_MSI,
