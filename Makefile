@@ -15,7 +15,7 @@ help:
 # Variables
 #---------------------------------------------------------------------------
 BOX=./.tools/box
-BOX_URL="https://github.com/humbug/box/releases/download/3.9.1/box.phar"
+BOX_URL="https://github.com/humbug/box/releases/download/3.10.0/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
 PHP_CS_FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
