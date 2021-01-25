@@ -42,6 +42,7 @@ use Webmozart\Assert\Assert;
  */
 final class Response
 {
+    public const OK_RESPONSE_CODE = 200;
     public const CREATED_RESPONSE_CODE = 201;
 
     private int $statusCode;
