@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.20.1](https://github.com/infection/infection/tree/0.21.0) (2021-01-27)
+## [0.21.0](https://github.com/infection/infection/tree/0.21.0) (2021-01-27)
 [Full Changelog](https://github.com/infection/infection/compare/0.20.2...0.21.0)
 
 **Added:**
