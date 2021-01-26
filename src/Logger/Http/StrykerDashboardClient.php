@@ -69,7 +69,7 @@ class StrykerDashboardClient
 
         $statusCode = $response->getStatusCode();
 
-        if (!in_array($statusCode, [Response::OK_RESPONSE_CODE, Response::CREATED_RESPONSE_CODE], true)) {
+        if (!in_array($statusCode, [Response::HTTP_OK, Response::HTTP_CREATED], true)) {
             $this->logger->warning(sprintf(
                 'Stryker dashboard returned an unexpected response code: %s',
                 $statusCode)

@@ -124,9 +124,9 @@ EOF
 
     public function provideResponseStatusCodes(): Generator
     {
-        yield '200 OK' => [Response::OK_RESPONSE_CODE];
+        yield '200 OK' => [Response::HTTP_OK];
 
-        yield '201 CREATED' => [Response::CREATED_RESPONSE_CODE];
+        yield '201 CREATED' => [Response::HTTP_CREATED];
     }
 
     public function test_it_issues_a_warning_when_the_report_could_not_be_sent(): void
