@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\Http;
 
+use Generator;
 use Infection\Logger\Http\Response;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
@@ -76,7 +77,10 @@ final class StrykerDashboardClientTest extends TestCase
         );
     }
 
-    public function test_it_can_send_a_report(): void
+    /**
+     * @dataProvider provideResponseStatusCodes
+     */
+    public function test_it_can_send_a_report_with_expected_response_status_code(): void
     {
         $this->clientMock
             ->expects($this->once())
@@ -116,6 +120,13 @@ EOF
             ],
             $this->logger->getLogs()
         );
+    }
+
+    public function provideResponseStatusCodes(): Generator
+    {
+        yield '200 OK' => [Response::HTTP_OK];
+
+        yield '201 CREATED' => [Response::HTTP_CREATED];
     }
 
     public function test_it_issues_a_warning_when_the_report_could_not_be_sent(): void

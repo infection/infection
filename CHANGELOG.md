@@ -1,5 +1,48 @@
 # Change Log
 
+## [0.20.1](https://github.com/infection/infection/tree/0.21.0) (2021-01-27)
+[Full Changelog](https://github.com/infection/infection/compare/0.20.2...0.21.0)
+
+**Added:**
+
+- Introduce `--noop` option to run Noop mutators that does not change the source code (AST) https://github.com/infection/infection/pull/1465
+- Add support for `@infection-ignore-all` annotation https://github.com/infection/infection/pull/1468
+- Introduce `--noop` option to run Noop mutators that do not change the source code (AST) https://github.com/infection/infection/pull/1465
+- Add a `describe` command https://github.com/infection/infection/pull/1442
+- [MUTATOR] Add `Concat` operator mutator https://github.com/infection/infection/pull/1440
+- [MUTATOR] Add `ConcatOperandRemoval` operator mutator https://github.com/infection/infection/pull/1440
+- [MUTATOR] Add `While` expression mutator https://github.com/infection/infection/pull/1405
+- [MUTATOR] Add `DoWhile` expression mutator https://github.com/infection/infection/pull/1411
+- [MUTATOR] Add `PregMatchRemoveFlags` mutator - remove flags one by one https://github.com/infection/infection/pull/1462
+- [MUTATOR] Add `PregMatchRemoveCaret` https://github.com/infection/infection/pull/1455
+- [MUTATOR] Add `PregMatchRemoveDollar` mutator https://github.com/infection/infection/pull/1455
+- [MUTATOR] Add `NullSafe` operator mutator https://github.com/infection/infection/pull/1457
+
+**Changed:**
+
+- [BC BREAK] Removed `OneZeroInteger` mutator in favor of `IncrementInteger`/`DecrementInteger` mutators
+- [BC BREAK] Rename `@zero_iteration` profile to the `@loop` #1407
+
+## [0.20.0](https://github.com/infection/infection/tree/0.20.0) (2020-11-01)
+[Full Changelog](https://github.com/infection/infection/compare/0.19.2...0.20.0)
+
+**Added:**
+
+- Add github logger to be able to use Annotations on GitHub Actions https://github.com/infection/infection/pull/1368
+- Add `--diff-git-filter` & `--git-diff-base` options https://github.com/infection/infection/pull/1368
+- [MUTATOR] Implement UnwrapSubstr mutator https://github.com/infection/infection/pull/1400
+- [MUTATOR] Implement UnwrapStrRev mutator https://github.com/infection/infection/pull/1399
+- [MUTATOR] Implement UnwrapRtrim mutator https://github.com/infection/infection/pull/1396
+- [MUTATOR] Implement UnwrapStrIreplace mutator https://github.com/infection/infection/pull/1397
+- [MUTATOR] Implement UnwrapStrShuffle mutator https://github.com/infection/infection/pull/1398
+- [MUTATOR] Implement UnwrapLtrim mutator https://github.com/infection/infection/pull/1395
+- [MUTATOR] Add Ternary operator mutator https://github.com/infection/infection/pull/1390
+- [MUTATOR] Add Flip Coalesce operator mutator  https://github.com/infection/infection/pull/1389
+
+**Changed:**
+
+- Remove redundant Coalesce Mutator and rename FlipCoalesce to Coalesce https://github.com/infection/infection/pull/1391
+
 ## [0.19.0](https://github.com/infection/infection/tree/0.19.0) (2020-10-28)
 [Full Changelog](https://github.com/infection/infection/compare/0.18.2...0.19.0)
 
