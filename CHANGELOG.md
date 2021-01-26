@@ -5,7 +5,6 @@
 
 **Added:**
 
-- Introduce `--noop` option to run Noop mutators that does not change the source code (AST) https://github.com/infection/infection/pull/1465
 - Add support for `@infection-ignore-all` annotation https://github.com/infection/infection/pull/1468
 - Introduce `--noop` option to run Noop mutators that do not change the source code (AST) https://github.com/infection/infection/pull/1465
 - Add a `describe` command https://github.com/infection/infection/pull/1442
