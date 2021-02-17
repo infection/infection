@@ -40,6 +40,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use function Safe\sprintf;
+use function str_ends_with;
 use Symfony\Component\Process\Process;
 
 /**
@@ -108,15 +109,37 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         string $mutationOriginalFilePath,
         string $extraOptions
     ): array {
-        return $this->getCommandLine(
+        if (str_ends_with($this->testFrameworkExecutable, '.bat')) {
+            return $this->getCommandLine(
+                $this->buildMutationConfigFile(
+                    $tests,
+                    $mutantFilePath,
+                    $mutationHash,
+                    $mutationOriginalFilePath
+                ),
+                $extraOptions,
+                []
+            );
+        }
+
+        $frameworkArgs = $this->argumentsAndOptionsBuilder->build(
             $this->buildMutationConfigFile(
                 $tests,
                 $mutantFilePath,
                 $mutationHash,
                 $mutationOriginalFilePath
             ),
-            $extraOptions,
-            []
+            $extraOptions
+        );
+
+        return $this->commandLineBuilder->build(
+            $this->buildMutationExecutableFile($tests,
+                $mutantFilePath,
+                $mutationHash,
+                $mutationOriginalFilePath
+            ),
+            [],
+            $frameworkArgs
         );
     }
 
@@ -149,6 +172,21 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
             $mutantFilePath,
             $mutationHash,
             $mutationOriginalFilePath
+        );
+    }
+
+    protected function buildMutationExecutableFile(
+        array $tests,
+        string $mutantFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath
+    ): string {
+        return $this->mutationConfigBuilder->buildExecutable(
+            $tests,
+            $mutantFilePath,
+            $mutationHash,
+            $mutationOriginalFilePath,
+            $this->testFrameworkExecutable
         );
     }
 
