@@ -21,7 +21,8 @@ granular tests, you can run `make` to see the available commands.
 <br />
 <hr />
 
-« [Go back to the readme](README.md) »
+« [Go back to the readme][readme] »
 
 
 [docker]: https://www.docker.com/get-docker
+[readme]: /README.md
