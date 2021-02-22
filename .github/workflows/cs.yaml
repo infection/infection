@@ -12,9 +12,6 @@ jobs:
     name: Coding Standards
     runs-on: ubuntu-latest
 
-    env:
-      PHP_CS_FIXER_VERSION: v2.17.3
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,7 +20,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
-          tools: php-cs-fixer:${{ env.PHP_CS_FIXER_VERSION }}
 
       - name: Restore PHP-CS-Fixer cache
         uses: actions/cache@v2
@@ -32,6 +28,5 @@ jobs:
           key: "php-cs-fixer"
           restore-keys: "php-cs-fixer"
 
-      - name: Run PHP-CS-Fixer, version ${{ env.PHP_CS_FIXER_VERSION }}
-        run: |
-          php-cs-fixer fix --diff --diff-format=udiff --dry-run --verbose
+      - name: Run PHP-CS-Fixer
+        run: make cs-check
