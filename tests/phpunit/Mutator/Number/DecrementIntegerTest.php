@@ -506,5 +506,15 @@ PHP
 preg_split('//', 'string', -2);
 PHP
         ];
+
+        yield 'It does not decrement min int' => [
+            <<<'PHP'
+<?php
+
+if ($a === -9223372036854775808) {
+    echo 'bar';
+}
+PHP
+        ];
     }
 }
