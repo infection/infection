@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
+use const PHP_INT_MAX;
 use PhpParser\Node;
 
 /**
@@ -84,6 +85,10 @@ DIFF
     public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Scalar\LNumber) {
+            return false;
+        }
+
+        if ($node->value === PHP_INT_MAX) {
             return false;
         }
 
