@@ -42,7 +42,7 @@ final class ChangingIgnorerTest extends BaseNodeIgnorerTestCase
 {
     private const CODE_WITH_ONE_IGNORED_NODE = <<<'PHP'
 <?php
-        
+
 class Foo
 {
     public function bar()
@@ -55,7 +55,7 @@ PHP;
 
     private const CODE_WITH_ONE_COUNTED_NODE = <<<'PHP'
 <?php
-        
+
 class Foo
 {
     public function bar()
