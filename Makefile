@@ -61,8 +61,15 @@ check_trailing_whitespaces:
 .PHONY: cs
 cs:	  	 	## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
-	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE)
+	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff --diff-format=udiff
 	LC_ALL=C sort -u .gitignore -o .gitignore
+	$(MAKE) check_trailing_whitespaces
+
+.PHONY: cs-check
+cs-check:		## Runs PHP-CS-Fixer in dry-run mode
+cs-check: $(PHP_CS_FIXER)
+	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff --diff-format=udiff --dry-run
+	LC_ALL=C sort -c -u .gitignore
 	$(MAKE) check_trailing_whitespaces
 
 .PHONY: phpstan
@@ -174,7 +181,7 @@ test-e2e-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_80) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
-test-infection:	## Runs Infection against itself
+test-infection:		## Runs Infection against itself
 test-infection:
 	$(INFECTION) --threads=4
 
