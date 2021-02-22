@@ -241,5 +241,19 @@ PHP
 preg_split('//', 'string', -1);
 PHP
         ];
+
+        yield 'It does not increment max int' => [
+            <<<'PHP'
+<?php
+
+random_int(10000000, 9223372036854775807);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+random_int(10000001, 9223372036854775807);
+PHP
+        ];
     }
 }
