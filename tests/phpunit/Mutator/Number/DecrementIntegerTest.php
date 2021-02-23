@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Number;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use const PHP_INT_MIN;
 
 final class DecrementIntegerTest extends BaseMutatorTestCase
 {
@@ -507,11 +508,13 @@ preg_split('//', 'string', -2);
 PHP
         ];
 
+        $minInt = PHP_INT_MIN;
+
         yield 'It does not decrement min int' => [
-            <<<'PHP'
+            <<<"PHP"
 <?php
 
-if ($a === -9223372036854775808) {
+if (1 === {$minInt}) {
     echo 'bar';
 }
 PHP
