@@ -77,6 +77,7 @@ final class MakefileTest extends TestCase
 #---------------------------------------------------------------------------[0m
 
 [33mcompile:[0m	 	 Bundles Infection into a PHAR
+[33mcompile-docker:[0m	 	 Bundles Infection into a PHAR using docker
 [33mcs:[0m	  	 	 Runs PHP-CS-Fixer
 [33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
 [33mprofile:[0m 	 	 Runs Blackfire

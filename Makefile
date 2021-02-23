@@ -54,6 +54,11 @@ PHPUNIT_GROUP=default
 compile:	 	## Bundles Infection into a PHAR
 compile: $(INFECTION)
 
+.PHONY: compile-docker
+compile-docker:	 	## Bundles Infection into a PHAR using docker
+compile-docker: $(DOCKER_RUN_74_IMAGE)
+	$(DOCKER_RUN_74) make compile
+
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:
 	./devTools/check_trailing_whitespaces.sh
