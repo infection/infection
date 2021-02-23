@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Number;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use const PHP_INT_MAX;
 
 final class IncrementIntegerTest extends BaseMutatorTestCase
 {
@@ -242,17 +243,19 @@ preg_split('//', 'string', -1);
 PHP
         ];
 
+        $maxInt = PHP_INT_MAX;
+
         yield 'It does not increment max int' => [
-            <<<'PHP'
+            <<<"PHP"
 <?php
 
-random_int(10000000, 9223372036854775807);
+random_int(10000000, {$maxInt});
 PHP
             ,
-            <<<'PHP'
+            <<<"PHP"
 <?php
 
-random_int(10000001, 9223372036854775807);
+random_int(10000001, {$maxInt});
 PHP
         ];
     }
