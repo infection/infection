@@ -52,7 +52,7 @@ class GitDiffFileProvider
     {
         return (string) shell_exec(
             sprintf(
-                'git diff %s --diff-filter=%s --name-only | grep src/ | paste -sd ","',
+                'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
                 escapeshellarg($gitDiffBase),
                 escapeshellarg($gitDiffFilter)
             )
