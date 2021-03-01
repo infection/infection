@@ -109,6 +109,15 @@ final class ProxyTraceTest extends TestCase
         $this->assertNull($trace->getTests());
     }
 
+    public function test_it_returns_empty_iterable_for_no_tests(): void
+    {
+        $fileInfoMock = $this->createMock(SplFileInfo::class);
+
+        $trace = new ProxyTrace($fileInfoMock, null);
+
+        $this->assertCount(0, $trace->getAllTestsForMutation(new NodeLineRangeData(1, 2), false));
+    }
+
     public function test_it_exposes_its_test_locations(): void
     {
         $fileInfoMock = $this->createMock(SplFileInfo::class);
