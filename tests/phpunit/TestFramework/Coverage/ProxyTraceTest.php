@@ -115,9 +115,7 @@ final class ProxyTraceTest extends TestCase
 
         $trace = new ProxyTrace($fileInfoMock, null);
 
-        $nodeLineRangeMock = $this->createMock(NodeLineRangeData::class);
-
-        $this->assertCount(0, $trace->getAllTestsForMutation($nodeLineRangeMock, false));
+        $this->assertCount(0, $trace->getAllTestsForMutation(new NodeLineRangeData(1, 2), false));
     }
 
     public function test_it_exposes_its_test_locations(): void
