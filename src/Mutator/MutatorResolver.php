@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use function array_key_exists;
-use function array_map;
 use function array_merge_recursive;
 use function array_unique;
 use function array_values;
 use function class_exists;
+use function in_array;
 use InvalidArgumentException;
 use function Safe\sprintf;
 use stdClass;
@@ -50,6 +50,9 @@ use stdClass;
  */
 final class MutatorResolver
 {
+    private const IGNORE_SETTING = 'ignore';
+    private const IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'ignoreSourceCodeByRegex';
+
     private const GLOBAL_IGNORE_SETTING = 'global-ignore';
     private const GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'global-ignoreSourceCodeByRegex';
 
@@ -73,7 +76,7 @@ final class MutatorResolver
                 /** @var string[] $globalSetting */
                 $globalSetting = $setting;
 
-                $globalSettings['ignore'] = $globalSetting;
+                $globalSettings[self::IGNORE_SETTING] = $globalSetting;
                 unset($mutatorSettings[self::GLOBAL_IGNORE_SETTING]);
             }
 
@@ -81,7 +84,7 @@ final class MutatorResolver
                 /** @var string[] $globalSetting */
                 $globalSetting = $setting;
 
-                $globalSettings['ignoreSourceCodeByRegex'] = array_values(array_unique($globalSetting));
+                $globalSettings[self::IGNORE_SOURCE_CODE_BY_REGEX_SETTING] = array_values(array_unique($globalSetting));
                 unset($mutatorSettings[self::GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING]);
             }
         }
@@ -138,10 +141,16 @@ final class MutatorResolver
             return (array) $settings;
         }
 
-        return array_map(
-            static fn (array $values): array => array_values(array_unique($values)),
-            array_merge_recursive($globalSettings, (array) $settings)
-        );
+        $resultSettings = array_merge_recursive($globalSettings, (array) $settings);
+
+        foreach ($resultSettings as $key => &$settingValues) {
+            if (in_array($key, [self::IGNORE_SETTING, self::IGNORE_SOURCE_CODE_BY_REGEX_SETTING], true)) {
+                $settingValues = array_values(array_unique($settingValues));
+            }
+        }
+        unset($settingValues);
+
+        return $resultSettings;
     }
 
     /**
