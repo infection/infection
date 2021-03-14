@@ -42,7 +42,7 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^7.4.7 || ^8.0",
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",
@@ -52,7 +52,7 @@
         "infection/include-interceptor": "^0.2.4",
         "justinrainbow/json-schema": "^5.2",
         "nikic/php-parser": "^4.10.3",
-        "ocramius/package-versions": "^1.2 || ^2.0",
+        "ocramius/package-versions": "^1.11.0 || ^2.0",
         "ondram/ci-detector": "^3.3.0",
         "sanmai/later": "^0.1.1",
         "sanmai/pipeline": "^5.1",
@@ -86,7 +86,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.4.0"
+            "php": "7.4.7"
         },
         "sort-packages": true
     },
