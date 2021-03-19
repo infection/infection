@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
+use const DIRECTORY_SEPARATOR;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
@@ -240,7 +241,7 @@ final class PhpUnitAdapterTest extends TestCase
                 '-d',
                 'memory_limit=-1',
                 '-d',
-                "pcov.directory='.'",
+                '\\' === DIRECTORY_SEPARATOR ? 'pcov.directory="."' : "pcov.directory='.'",
             ], [
                 '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
             ])
