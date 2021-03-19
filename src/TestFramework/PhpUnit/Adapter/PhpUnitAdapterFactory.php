@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -84,6 +85,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
+            new PCOVDirectoryProvider(),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,

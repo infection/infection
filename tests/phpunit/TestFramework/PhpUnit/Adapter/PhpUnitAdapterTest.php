@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
+use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
@@ -52,6 +53,7 @@ final class PhpUnitAdapterTest extends TestCase
      */
     private $adapter;
 
+    private $pcovDirectoryProvider;
     private $initialConfigBuilder;
     private $mutationConfigBuilder;
     private $cliArgumentsBuilder;
@@ -59,6 +61,7 @@ final class PhpUnitAdapterTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->pcovDirectoryProvider = $this->createMock(PCOVDirectoryProvider::class);
         $this->initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
         $this->mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
         $this->cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
@@ -68,6 +71,7 @@ final class PhpUnitAdapterTest extends TestCase
             '/path/to/phpunit',
             '/tmp',
             '/tmp/infection/junit.xml',
+            $this->pcovDirectoryProvider,
             $this->initialConfigBuilder,
             $this->mutationConfigBuilder,
             $this->cliArgumentsBuilder,
@@ -147,6 +151,11 @@ final class PhpUnitAdapterTest extends TestCase
             ->willReturn(['/path/to/phpunit', '--dummy-argument'])
         ;
 
+        $this->pcovDirectoryProvider
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
         $initialTestRunCommandLine = $this->adapter->getInitialTestRunCommandLine('--group=default', ['-d', 'memory_limit=-1'], true);
 
         $this->assertSame(
@@ -184,6 +193,75 @@ final class PhpUnitAdapterTest extends TestCase
                 '--coverage-xml=/tmp/coverage-xml',
                 '--log-junit=/tmp/infection/junit.xml',
             ])
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->once())
+            ->method('shallProvide')
+            ->willReturn(false)
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->never())
+            ->method('getDirectory')
+        ;
+
+        $initialTestRunCommandLine = $this->adapter->getInitialTestRunCommandLine('--group=default', ['-d', 'memory_limit=-1'], false);
+
+        $this->assertSame(
+            [
+                '/path/to/phpunit',
+                '--group=default',
+                '--coverage-xml=/tmp/coverage-xml',
+                '--log-junit=/tmp/infection/junit.xml',
+            ],
+            $initialTestRunCommandLine
+        );
+    }
+
+    /**
+     * @group integration
+     */
+    public function test_it_provides_initial_test_run_command_line_when_coverage_report_is_requested_and_pcov_is_in_use(): void
+    {
+        $this->cliArgumentsBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('', '--group=default --coverage-xml=/tmp/coverage-xml --log-junit=/tmp/infection/junit.xml')
+            ->willReturn([
+                '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
+            ])
+        ;
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpunit', [
+                '-d',
+                'memory_limit=-1',
+                '-d',
+                "pcov.directory='.'",
+            ], [
+                '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
+            ])
+            ->willReturn([
+                '/path/to/phpunit',
+                '--group=default',
+                '--coverage-xml=/tmp/coverage-xml',
+                '--log-junit=/tmp/infection/junit.xml',
+            ])
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->once())
+            ->method('shallProvide')
+            ->willReturn(true)
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->once())
+            ->method('getDirectory')
+            ->willReturn('.')
         ;
 
         $initialTestRunCommandLine = $this->adapter->getInitialTestRunCommandLine('--group=default', ['-d', 'memory_limit=-1'], false);
