@@ -1,0 +1,12 @@
+{
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "example"
+        ]
+    },
+    "logs": {
+        "summary": "infection.log"
+    },
+    "tmpDir": "."
+}
