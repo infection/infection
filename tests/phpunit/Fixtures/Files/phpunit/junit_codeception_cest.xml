@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="acceptance" tests="3" assertions="10" errors="0" failures="0" skipped="0" time="0.000003">
+    <testcase file="/app/controllers/ExampleCest.php" name="FeatureA" class="app\controllers\ExampleCest" feature="featureA" assertions="2" time="0.000001"/>
+    <testcase file="/app/controllers/ExampleCest.php" name="FeatureB" class="app\controllers\ExampleCest" feature="featureB" assertions="1" time="0.000001"/>
+    <testcase file="/app/controllers/ExampleCest.php" name="FeatureC" class="app\controllers\ExampleCest" feature="featureC" assertions="7" time="0.000001"/>
+  </testsuite>
+</testsuites>
