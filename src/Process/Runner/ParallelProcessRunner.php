@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Webmozart\Assert\Assert;
 use function array_shift;
 use function count;
 use Generator;
@@ -44,6 +43,7 @@ use function microtime;
 use function range;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use function usleep;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

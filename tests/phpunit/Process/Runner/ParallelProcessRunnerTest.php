@@ -113,6 +113,8 @@ final class ParallelProcessRunnerTest extends TestCase
         yield 'invalid thread' => [-1];
 
         yield 'nominal' => [4];
+
+        yield 'thread count more than processes' => [20];
     }
 
     private function runWithAllKindsOfProcesses(int $threadCount): void
