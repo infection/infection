@@ -41,7 +41,6 @@ use Infection\Process\Runner\ProcessBearer;
 use Infection\Tests\Fixtures\Event\DummyEvent;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Fixtures\Process\DummyProcessBearer;
-use const PHP_INT_MAX;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -61,13 +60,15 @@ final class ParallelProcessRunnerTest extends TestCase
     {
         $eventDispatcher = new EventDispatcherCollector();
 
-        $processes = (function () use ($eventDispatcher): iterable {
+        $threadsCount = 4;
+
+        $processes = (function () use ($eventDispatcher, $threadsCount): iterable {
             for ($i = 0; $i < 10; ++$i) {
-                yield $this->createProcessBearer($eventDispatcher);
+                yield $this->createProcessBearer($eventDispatcher, ($i % $threadsCount) + 1);
             }
         })();
 
-        $runner = new ParallelProcessRunner(4, 0);
+        $runner = new ParallelProcessRunner($threadsCount, 0);
 
         $this->assertDummyEventCounts(0, $eventDispatcher->getEvents());
 
@@ -112,17 +113,17 @@ final class ParallelProcessRunnerTest extends TestCase
         yield 'invalid thread' => [-1];
 
         yield 'nominal' => [4];
-
-        yield 'infinite' => [PHP_INT_MAX];
     }
 
     private function runWithAllKindsOfProcesses(int $threadCount): void
     {
         $eventDispatcher = new EventDispatcherCollector();
 
-        $processes = (function () use ($eventDispatcher): iterable {
+        $processes = (function () use ($eventDispatcher, $threadCount): iterable {
             for ($i = 0; $i < 5; ++$i) {
-                yield $this->createProcessBearer($eventDispatcher);
+                $threadIndex = $threadCount === 0 ? 1 : ($i * 2 % $threadCount) + 1;
+
+                yield $this->createProcessBearer($eventDispatcher, $threadIndex);
 
                 yield $this->createTimeOutProcessBearer($eventDispatcher);
             }
@@ -137,12 +138,16 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertDummyEventCounts(10, $eventDispatcher->getEvents());
     }
 
-    private function createProcessBearer(EventDispatcher $eventDispatcher): ProcessBearer
+    private function createProcessBearer(EventDispatcher $eventDispatcher, int $threadIndex): ProcessBearer
     {
         $processMock = $this->createMock(Process::class);
         $processMock
             ->expects($this->once())
             ->method('start')
+            ->with(null, [
+                'INFECTION' => '1',
+                'TEST_TOKEN' => $threadIndex,
+            ])
         ;
         $processMock
             ->expects($this->once())
