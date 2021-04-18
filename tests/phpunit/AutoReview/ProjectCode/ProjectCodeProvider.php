@@ -66,6 +66,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\OriginalPhpProcess;
+use Infection\Process\Runner\IndexedProcessBearer;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -227,10 +228,12 @@ final class ProjectCodeProvider
                     && !in_array(
                         $className,
                         [
+                            // having public properties on DTO is for performance reasons
                             TestLocations::class,
                             SourceMethodLineRange::class,
                             NodeLineRangeData::class,
                             TestFileTimeData::class,
+                            IndexedProcessBearer::class,
                         ],
                         true
                     )

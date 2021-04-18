@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Webmozart\Assert\Assert;
 use function array_shift;
 use function count;
 use Generator;
 use function max;
 use function microtime;
+use function range;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use function usleep;
 
@@ -51,9 +53,13 @@ use function usleep;
 final class ParallelProcessRunner implements ProcessRunner
 {
     /**
-     * @var ProcessBearer[]
+     * @var array<int, IndexedProcessBearer>
      */
     private array $runningProcesses = [];
+    /**
+     * @var array<int, int>
+     */
+    private array $availableThreadIndexes = [];
 
     private int $threadCount;
     private int $poll;
@@ -87,10 +93,15 @@ final class ParallelProcessRunner implements ProcessRunner
         self::fillBucketOnce($bucket, $generator, 1);
 
         $threadCount = max(1, $this->threadCount);
+        $this->availableThreadIndexes = range(1, $threadCount);
 
         // start the initial batch of processes
         while ($process = array_shift($bucket)) {
-            $this->startProcess($process);
+            $threadIndex = array_shift($this->availableThreadIndexes);
+
+            Assert::integer($threadIndex, 'Thread index can not be null.');
+
+            $this->startProcess($process, $threadIndex);
 
             if (count($this->runningProcesses) >= $threadCount) {
                 do {
@@ -114,7 +125,8 @@ final class ParallelProcessRunner implements ProcessRunner
     private function freeTerminatedProcesses(): bool
     {
         // remove any finished process from the stack
-        foreach ($this->runningProcesses as $index => $processBearer) {
+        foreach ($this->runningProcesses as $index => $indexedProcessBearer) {
+            $processBearer = $indexedProcessBearer->processBearer;
             $process = $processBearer->getProcess();
 
             try {
@@ -126,6 +138,9 @@ final class ParallelProcessRunner implements ProcessRunner
             if (!$process->isRunning()) {
                 $processBearer->terminateProcess();
 
+                $this->availableThreadIndexes[] = $indexedProcessBearer->threadIndex;
+
+                unset($this->runningProcesses[$index]->processBearer);
                 unset($this->runningProcesses[$index]);
 
                 return true;
@@ -135,11 +150,14 @@ final class ParallelProcessRunner implements ProcessRunner
         return false;
     }
 
-    private function startProcess(ProcessBearer $processBearer): void
+    private function startProcess(ProcessBearer $processBearer, int $threadIndex): void
     {
-        $processBearer->getProcess()->start();
+        $processBearer->getProcess()->start(null, [
+            'INFECTION' => '1',
+            'TEST_TOKEN' => $threadIndex,
+        ]);
 
-        $this->runningProcesses[] = $processBearer;
+        $this->runningProcesses[] = new IndexedProcessBearer($threadIndex, $processBearer);
     }
 
     /**
