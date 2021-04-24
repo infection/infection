@@ -46,9 +46,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class PerformanceLoggerSubscriberFactory implements SubscriberFactory
 {
-    private $stopwatch;
-    private $timeFormatter;
-    private $memoryFormatter;
+    private Stopwatch $stopwatch;
+    private TimeFormatter $timeFormatter;
+    private MemoryFormatter $memoryFormatter;
 
     public function __construct(
         Stopwatch $stopwatch,

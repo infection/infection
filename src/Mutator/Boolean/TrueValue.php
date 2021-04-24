@@ -47,16 +47,18 @@ use function Safe\array_flip;
 
 /**
  * @internal
+ *
+ * @implements ConfigurableMutator<Node\Expr\ConstFetch>
  */
 final class TrueValue implements ConfigurableMutator
 {
-    use GetMutatorName;
     use GetConfigClassName;
+    use GetMutatorName;
 
     /**
      * @var array<string, int>
      */
-    private $allowedFunctions;
+    private array $allowedFunctions;
 
     public function __construct(TrueValueConfig $config)
     {
@@ -68,12 +70,16 @@ final class TrueValue implements ConfigurableMutator
         return new Definition(
             'Replaces a boolean literal (`true`) with its opposite value (`false`). ',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = true;
++ $a = false;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\ConstFetch $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\ConstFetch>
      */

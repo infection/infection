@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Identical>
  */
 final class Identical implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces an identical operator (`===`) with its counterpart the not identical op
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b === $c;
++ $a = $b !== $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\Identical $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\NotIdentical>
      */

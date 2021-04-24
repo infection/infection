@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Mod>
  */
 final class Modulus implements Mutator
 {
@@ -53,12 +55,16 @@ final class Modulus implements Mutator
         return new Definition(
             'Replaces a modulo operator (`%`) with a multiplication operator (`*`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b % $c;
++ $a = $b * $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\Mod $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\Mul>
      */

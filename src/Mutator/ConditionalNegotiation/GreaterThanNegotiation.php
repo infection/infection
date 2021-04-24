@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Greater>
  */
 final class GreaterThanNegotiation implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces a greater-than operator (`>`) with the less-than-or-equal-to operator (
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b > $c;
++ $a = $b <= $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\Greater $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\SmallerOrEqual>
      */

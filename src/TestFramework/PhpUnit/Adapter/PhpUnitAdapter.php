@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function escapeshellarg;
 use Infection\AbstractTestFramework\MemoryUsageAware;
+use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
@@ -47,6 +49,7 @@ use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\VersionParser;
 use function Safe\preg_match;
 use function Safe\sprintf;
+use function trim;
 use function version_compare;
 
 /**
@@ -57,14 +60,17 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
-    private $tmpDir;
+    private string $tmpDir;
 
-    private $jUnitFilePath;
+    private string $jUnitFilePath;
+
+    private PCOVDirectoryProvider $pcovDirectoryProvider;
 
     public function __construct(
         string $testFrameworkExecutable,
         string $tmpDir,
         string $jUnitFilePath,
+        PCOVDirectoryProvider $pcovDirectoryProvider,
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
@@ -76,6 +82,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
 
         $this->tmpDir = $tmpDir;
         $this->jUnitFilePath = $jUnitFilePath;
+        $this->pcovDirectoryProvider = $pcovDirectoryProvider;
     }
 
     public function hasJUnitReport(): bool
@@ -102,6 +109,11 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
                 $this->tmpDir . '/' . self::COVERAGE_DIR,
                 $this->jUnitFilePath // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
             ));
+
+            if ($this->pcovDirectoryProvider->shallProvide()) {
+                $phpExtraArgs[] = '-d';
+                $phpExtraArgs[] = sprintf('pcov.directory=%s', escapeshellarg($this->pcovDirectoryProvider->getDirectory()));
+            }
         }
 
         return parent::getInitialTestRunCommandLine($extraOptions, $phpExtraArgs, $skipCoverage);

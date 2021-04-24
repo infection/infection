@@ -38,6 +38,7 @@ namespace Infection\Logger;
 use DateTime;
 use DateTimeInterface;
 use function get_class;
+use function gettype;
 use Infection\Console\IO;
 use function is_object;
 use function is_scalar;
@@ -86,7 +87,7 @@ final class ConsoleLogger extends AbstractLogger
         LogLevel::NOTICE => 'note',
     ];
 
-    private $io;
+    private IO $io;
 
     public function __construct(IO $io)
     {

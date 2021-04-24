@@ -37,6 +37,7 @@ namespace Infection\Logger;
 
 use function implode;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use const PHP_EOL;
 use function Safe\sprintf;
@@ -51,12 +52,17 @@ use function strlen;
  */
 final class DebugFileLogger implements LineMutationTestingResultsLogger
 {
-    private $metricsCalculator;
-    private $onlyCoveredMode;
+    private MetricsCalculator $metricsCalculator;
+    private ResultsCollector $resultsCollector;
+    private bool $onlyCoveredMode;
 
-    public function __construct(MetricsCalculator $metricsCalculator, bool $onlyCoveredMode)
-    {
+    public function __construct(
+        MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
+        bool $onlyCoveredMode
+    ) {
         $this->metricsCalculator = $metricsCalculator;
+        $this->resultsCollector = $resultsCollector;
         $this->onlyCoveredMode = $onlyCoveredMode;
     }
 
@@ -69,34 +75,34 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
         $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
         $logs[] = '';
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getKilledExecutionResults(),
+            $this->resultsCollector->getKilledExecutionResults(),
             'Killed',
             $separateSections
         );
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getErrorExecutionResults(),
+            $this->resultsCollector->getErrorExecutionResults(),
             'Errors',
             $separateSections
         );
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getEscapedExecutionResults(),
+            $this->resultsCollector->getEscapedExecutionResults(),
             'Escaped',
             $separateSections
         );
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getTimedOutExecutionResults(),
+            $this->resultsCollector->getTimedOutExecutionResults(),
             'Timed Out',
             $separateSections
         );
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getSkippedExecutionResults(),
+            $this->resultsCollector->getSkippedExecutionResults(),
             'Skipped',
             $separateSections
         );
 
         if (!$this->onlyCoveredMode) {
             $logs[] = $this->getResultsLine(
-                $this->metricsCalculator->getNotCoveredExecutionResults(),
+                $this->resultsCollector->getNotCoveredExecutionResults(),
                 'Not Covered',
                 $separateSections
             );

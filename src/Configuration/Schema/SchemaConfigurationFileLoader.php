@@ -40,8 +40,8 @@ namespace Infection\Configuration\Schema;
  */
 class SchemaConfigurationFileLoader
 {
-    private $schemaValidator;
-    private $factory;
+    private SchemaValidator $schemaValidator;
+    private SchemaConfigurationFactory $factory;
 
     public function __construct(SchemaValidator $schemaValidator, SchemaConfigurationFactory $factory)
     {

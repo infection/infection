@@ -15,13 +15,16 @@ help:
 # Variables
 #---------------------------------------------------------------------------
 BOX=./.tools/box
-BOX_URL="https://github.com/humbug/box/releases/download/3.8.5/box.phar"
+BOX_URL="https://github.com/humbug/box/releases/download/3.10.0/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
-PHP_CS_FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
-PHP_CS_FIXER_CACHE=build/cache/.php_cs.cache
+PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.18.2/php-cs-fixer.phar"
+PHP_CS_FIXER_CACHE=.php_cs.cache
 
 PHPSTAN=./vendor/bin/phpstan
+
+PSALM=./.tools/psalm
+PSALM_URL="https://github.com/vimeo/psalm/releases/download/4.1.1/psalm.phar"
 
 PHPUNIT=vendor/phpunit/phpunit/phpunit
 
@@ -51,6 +54,11 @@ PHPUNIT_GROUP=default
 compile:	 	## Bundles Infection into a PHAR
 compile: $(INFECTION)
 
+.PHONY: compile-docker
+compile-docker:	 	## Bundles Infection into a PHAR using docker
+compile-docker: $(DOCKER_RUN_74_IMAGE)
+	$(DOCKER_RUN_74) make compile
+
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:
 	./devTools/check_trailing_whitespaces.sh
@@ -58,14 +66,30 @@ check_trailing_whitespaces:
 .PHONY: cs
 cs:	  	 	## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
-	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE)
+	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff --diff-format=udiff
 	LC_ALL=C sort -u .gitignore -o .gitignore
+	$(MAKE) check_trailing_whitespaces
+
+.PHONY: cs-check
+cs-check:		## Runs PHP-CS-Fixer in dry-run mode
+cs-check: $(PHP_CS_FIXER)
+	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff --diff-format=udiff --dry-run
+	LC_ALL=C sort -c -u .gitignore
 	$(MAKE) check_trailing_whitespaces
 
 .PHONY: phpstan
 phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress
 	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress
+
+.PHONY: phpstan-baseline
+phpstan-baseline: vendor $(PHPSTAN)
+	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-src-baseline.neon || true
+	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-tests-baseline.neon || true
+
+.PHONY: psalm
+psalm: vendor $(PSALM)
+	$(PSALM) --threads=4
 
 .PHONY: validate
 validate:
@@ -90,7 +114,7 @@ profile: vendor $(BENCHMARK_SOURCES)
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: phpstan validate test-autoreview
+autoreview: phpstan psalm validate test-autoreview
 
 .PHONY: test
 test:		 	## Runs all the tests
@@ -162,7 +186,7 @@ test-e2e-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_80) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
-test-infection:	## Runs Infection against itself
+test-infection:		## Runs Infection against itself
 test-infection:
 	$(INFECTION) --threads=4
 
@@ -197,16 +221,21 @@ test-infection-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE)
 #---------------------------------------------------------------------------
 
 $(BOX): Makefile
-	wget $(BOX_URL) --output-document=$(BOX)
+	wget -q $(BOX_URL) --output-document=$(BOX)
 	chmod a+x $(BOX)
 	touch $@
 
 $(PHP_CS_FIXER): Makefile
-	wget $(PHP_CS_FIXER_URL) --output-document=$(PHP_CS_FIXER)
+	wget -q $(PHP_CS_FIXER_URL) --output-document=$(PHP_CS_FIXER)
 	chmod a+x $(PHP_CS_FIXER)
 	touch $@
 
 $(PHPSTAN): vendor
+
+$(PSALM): Makefile
+	wget -q $(PSALM_URL) --output-document=$(PSALM)
+	chmod a+x $(PSALM)
+	touch $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	composer require infection/codeception-adapter infection/phpspec-adapter

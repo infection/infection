@@ -1,4 +1,8 @@
+includes:
+    - phpstan-tests-baseline.neon
+
 parameters:
+    tmpDir: ../build/cache/phpstan-tests
     parallel:
         processTimeout: 120.0
     checkGenericClassInNonGenericObjectType: false
@@ -11,6 +15,8 @@ parameters:
         - '#Return type \((void|mixed)\) of method .*(Visitor|Traverser).* should be compatible with return type .* of method PhpParser\\Node.*#'
         - '#^Cannot call method (willReturn|shouldBeCalledTimes)\(\) on iterable<Infection\\Mutation\\Mutation>\.$#'
         - '#Offset .*\\.* does not exist on array<class-string<.*>.*#'
+        - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'
+        - '#Call to method PHPUnit\\Framework\\Assert::.* with array.* and array.* will always evaluate to false#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
         -
             path: '../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php'

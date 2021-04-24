@@ -39,16 +39,19 @@ use function array_key_exists;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
+use function strtolower;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\FuncCall>
  */
 abstract class AbstractUnwrapMutator implements Mutator
 {
     use GetMutatorName;
 
     /**
-     * @param Node\Expr\FuncCall $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Arg>
      */
@@ -81,7 +84,12 @@ abstract class AbstractUnwrapMutator implements Mutator
     abstract protected function getFunctionName(): string;
 
     /**
+     * @psalm-mutation-free
+     *
      * @return iterable<int>
      */
-    abstract protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable;
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
+    {
+        yield 0;
+    }
 }

@@ -45,16 +45,16 @@ use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\Mutator\ZeroIteration\For_;
+use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutator\MutatorName;
 use Iterator;
 use PhpParser\Node\Stmt\Nop;
@@ -159,21 +159,21 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation2]
             )
             ->willReturnOnConsecutiveCalls(
-                $mutant0 = new Mutant(
+                $mutant0 = MutantBuilder::build(
                     '/path/to/mutant0',
                     $mutation0,
                     'mutated code 0',
                     'diff0',
                     '<?php $a = 1;'
                 ),
-                $mutant1 = new Mutant(
+                $mutant1 = MutantBuilder::build(
                     '/path/to/mutant1',
                     $mutation1,
                     'mutated code 1',
                     'diff1',
                     '<?php $a = 1;'
                 ),
-                new Mutant(
+                MutantBuilder::build(
                     '/path/to/mutant2',
                     $mutation2,
                     'mutated code 2',
@@ -238,14 +238,14 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation1]
             )
             ->willReturnOnConsecutiveCalls(
-                $mutant0 = new Mutant(
+                $mutant0 = MutantBuilder::build(
                     '/path/to/mutant0',
                     $mutation0,
                     'mutated code 0',
                     'diff0',
                     '<?php $a = 1;'
                 ),
-                $mutant1 = new Mutant(
+                $mutant1 = MutantBuilder::build(
                     '/path/to/mutant1',
                     $mutation1,
                     'mutated code 1',
@@ -319,7 +319,7 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation0],
             )
             ->willReturnOnConsecutiveCalls(
-                new Mutant(
+                MutantBuilder::build(
                     '/path/to/mutant0',
                     $mutation0,
                     'mutated code 0',

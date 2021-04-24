@@ -46,14 +46,11 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
  */
 final class CoveredTraceProvider implements TraceProvider
 {
-    /**
-     * @var TraceProvider
-     */
-    private $primaryTraceProvider;
+    private TraceProvider $primaryTraceProvider;
 
-    private $testFileDataAdder;
+    private JUnitTestExecutionInfoAdder $testFileDataAdder;
 
-    private $bufferedFilter;
+    private FileFilter $bufferedFilter;
 
     /**
      * @param PhpUnitXmlCoverageTraceProvider|TraceProvider $primaryTraceProvider

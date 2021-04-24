@@ -68,7 +68,17 @@ $x = ['foo', 'bar', 'baz'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_reduce(
+-     ['foo', 'bar', 'baz'],
+-     static function ($carry, $item) {
+-        return $item;
+-     },
+-     ['oof']
+- );
++ $x = ['foo', 'bar', 'baz'];
+DIFF
         );
     }
 
@@ -77,6 +87,9 @@ TXT
         return 'array_reduce';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield 2;

@@ -52,9 +52,9 @@ use Webmozart\Assert\Assert;
  */
 class FileMutationGenerator
 {
-    private $parser;
-    private $traverserFactory;
-    private $lineRangeCalculator;
+    private FileParser $parser;
+    private NodeTraverserFactory $traverserFactory;
+    private LineRangeCalculator $lineRangeCalculator;
 
     public function __construct(
         FileParser $parser,
@@ -67,7 +67,7 @@ class FileMutationGenerator
     }
 
     /**
-     * @param Mutator[] $mutators
+     * @param Mutator<\PhpParser\Node>[] $mutators
      * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws UnparsableFile

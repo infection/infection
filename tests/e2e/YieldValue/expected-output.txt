@@ -1,0 +1,6 @@
+# Effects per Mutator
+
+| Mutator    | Mutations | Killed | Escaped | Errors | Timed Out | Skipped | MSI (%s) | Covered MSI (%s) |
+| ---------- | --------- | ------ | ------- | ------ | --------- | ------- | -------- | ---------------- |
+| YieldValue |         2 |      1 |       0 |      0 |         0 |       0 |    50.00 |           100.00 |
+| Yield_     |         2 |      1 |       0 |      0 |         0 |       0 |    50.00 |           100.00 |

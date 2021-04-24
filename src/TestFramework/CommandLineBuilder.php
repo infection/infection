@@ -41,6 +41,7 @@ use Infection\FileSystem\Finder\Exception\FinderException;
 use function is_executable;
 use const PHP_SAPI;
 use function Safe\substr;
+use function shell_exec;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -49,10 +50,8 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 class CommandLineBuilder
 {
-    /**
-     * @var string[]|null
-     */
-    private $cachedPhpCmdLine;
+    /** @var string[]|null */
+    private ?array $cachedPhpCmdLine = null;
 
     /**
      * @param string[] $frameworkArgs
@@ -77,7 +76,7 @@ class CommandLineBuilder
          *
          * This lets folks use, say, a bash wrapper over phpunit.
          */
-        if ('cli' === PHP_SAPI && $phpExtraArgs === [] && is_executable($testFrameworkExecutable) && `command -v php`) {
+        if ('cli' === PHP_SAPI && $phpExtraArgs === [] && is_executable($testFrameworkExecutable) && shell_exec('command -v php') !== null) {
             return array_merge([$testFrameworkExecutable], $frameworkArgs);
         }
 

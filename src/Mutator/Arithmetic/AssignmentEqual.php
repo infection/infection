@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Equal>
  */
 final class AssignmentEqual implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces an equal (`==`) or identical (`===`) comparison operator with an assign
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- if ($a === self::VALUE);
++ if ($a = self::VALUE);
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\Equal $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\Assign>
      */

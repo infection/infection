@@ -46,12 +46,14 @@ abstract class BaseNodeIgnorerTestCase extends TestCase
 {
     abstract protected function getIgnore(): NodeIgnorer;
 
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
+    final protected function parseAndTraverse(string $code, NodeVisitor $spy, ?NodeIgnorer $ignorer = null): void
     {
         $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
 
         $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
+        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([
+            $ignorer ?? $this->getIgnore(),
+        ]));
         $traverser->addVisitor($spy);
         $traverser->traverse($nodes);
 

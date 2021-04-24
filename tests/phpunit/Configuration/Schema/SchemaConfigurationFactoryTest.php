@@ -82,7 +82,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
         '@removal',
         '@return_value',
         '@sort',
-        '@zero_iteration',
+        '@loop',
         '@default',
     ];
 
@@ -230,6 +230,7 @@ JSON
                     null,
                     null,
                     null,
+                    false,
                     null
                 ),
             ]),
@@ -255,6 +256,7 @@ JSON
                     null,
                     null,
                     null,
+                    false,
                     null
                 ),
             ]),
@@ -280,6 +282,7 @@ JSON
                     'json.log',
                     null,
                     null,
+                    false,
                     null
                 ),
             ]),
@@ -305,6 +308,7 @@ JSON
                     null,
                     'debug.log',
                     null,
+                    false,
                     null
                 ),
             ]),
@@ -330,6 +334,7 @@ JSON
                     null,
                     null,
                     'perMutator.log',
+                    false,
                     null
                 ),
             ]),
@@ -357,6 +362,7 @@ JSON
                     null,
                     null,
                     null,
+                    false,
                     new Badge('master')
                 ),
             ]),
@@ -374,6 +380,7 @@ JSON
         "json": "json.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
+        "github": true,
         "badge": {
             "branch": "master"
         }
@@ -389,6 +396,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
+                    true,
                     new Badge('master')
                 ),
             ]),
@@ -430,6 +438,7 @@ JSON
         "json": " json.log ",
         "debug": " debug.log ",
         "perMutator": " perMutator.log ",
+        "github": true ,
         "badge": {
             "branch": " master "
         }
@@ -445,6 +454,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
+                    true,
                     new Badge('master')
                 ),
             ]),
@@ -1005,6 +1015,32 @@ JSON
             ]),
         ];
 
+        yield '[mutators][TrueValue] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'TrueValue' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
         yield '[mutators][TrueValue] empty & untrimmed ignore' => [
             <<<'JSON'
 {
@@ -1181,6 +1217,32 @@ JSON
                         'ignore' => [
                             'fileA',
                             'fileB',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][ArrayItemRemoval] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ArrayItemRemoval": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'ArrayItemRemoval' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
                         ],
                     ],
                 ],
@@ -1369,6 +1431,32 @@ JSON
             ]),
         ];
 
+        yield '[mutators][BCMath] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "BCMath": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'BCMath' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
         yield '[mutators][BCMath] empty & untrimmed ignore' => [
             <<<'JSON'
 {
@@ -1547,6 +1635,32 @@ JSON
                         'ignore' => [
                             'fileA',
                             'fileB',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][MBString] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "MBString": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'MBString' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
                         ],
                     ],
                 ],
@@ -1931,7 +2045,7 @@ JSON
         "@removal": true,
         "@return_value": true,
         "@sort": true,
-        "@zero_iteration": true,
+        "@loop": true,
         "@default": true
     }
 }
@@ -1952,7 +2066,7 @@ JSON
                     '@removal' => true,
                     '@return_value' => true,
                     '@sort' => true,
-                    '@zero_iteration' => true,
+                    '@loop' => true,
                     '@default' => true,
                 ],
             ]),
@@ -1972,6 +2086,7 @@ JSON
         "json": "json.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
+        "github": true,
         "badge": {
             "branch": "master"
         }
@@ -2111,7 +2226,6 @@ JSON
         "ProtectedVisibility": true,
         "DecrementInteger": true,
         "IncrementInteger": true,
-        "OneZeroInteger": true,
         "OneZeroFloat": true,
         "AssignCoalesce": true,
         "Break_": true,
@@ -2192,7 +2306,7 @@ JSON
         "@removal": true,
         "@return_value": true,
         "@sort": true,
-        "@zero_iteration": true,
+        "@loop": true,
         "@default": true
     }
 }
@@ -2210,6 +2324,7 @@ JSON
                     'json.log',
                     'debug.log',
                     'perMutator.log',
+                    true,
                     new Badge('master')
                 ),
                 'tmpDir' => 'custom-tmp',
@@ -2324,7 +2439,6 @@ JSON
                     'ProtectedVisibility' => true,
                     'DecrementInteger' => true,
                     'IncrementInteger' => true,
-                    'OneZeroInteger' => true,
                     'OneZeroFloat' => true,
                     'AssignCoalesce' => true,
                     'Break_' => true,
@@ -2405,7 +2519,7 @@ JSON
                     '@removal' => true,
                     '@return_value' => true,
                     '@sort' => true,
-                    '@zero_iteration' => true,
+                    '@loop' => true,
                     '@default' => true,
                 ],
             ]),

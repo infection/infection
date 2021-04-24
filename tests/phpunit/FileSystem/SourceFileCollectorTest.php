@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use function array_keys;
 use function array_map;
 use function array_values;
+use function count;
 use Infection\FileSystem\SourceFileCollector;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
+use function range;
 use function Safe\natcasesort;
 use Webmozart\PathUtil\Path;
 

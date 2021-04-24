@@ -36,10 +36,9 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use DOMDocument;
-use DOMElement;
-use DOMNode;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
@@ -51,10 +50,12 @@ use Webmozart\Assert\Assert;
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
-    private $tmpDir;
-    private $originalXmlConfigContent;
-    private $configManipulator;
-    private $srcDirs;
+    private string $tmpDir;
+    private string $originalXmlConfigContent;
+    private XmlConfigurationManipulator $configManipulator;
+    private XmlConfigurationVersionProvider $versionProvider;
+    /** @var string[] */
+    private array $srcDirs;
 
     /**
      * @param string[] $srcDirs
@@ -63,6 +64,7 @@ class InitialConfigBuilder implements ConfigBuilder
         string $tmpDir,
         string $originalXmlConfigContent,
         XmlConfigurationManipulator $configManipulator,
+        XmlConfigurationVersionProvider $versionProvider,
         array $srcDirs
     ) {
         Assert::notEmpty(
@@ -73,6 +75,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->tmpDir = $tmpDir;
         $this->originalXmlConfigContent = $originalXmlConfigContent;
         $this->configManipulator = $configManipulator;
+        $this->versionProvider = $versionProvider;
         $this->srcDirs = $srcDirs;
     }
 
@@ -91,7 +94,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $this->configManipulator->validate($path, $xPath);
 
-        $this->addCoverageFilterWhitelistIfDoesNotExist($xPath);
+        $this->addCoverageNodes($version, $xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
         $this->addFailOnAttributesIfNotSet($version, $xPath);
         $this->configManipulator->replaceWithAbsolutePaths($xPath);
@@ -112,47 +115,28 @@ class InitialConfigBuilder implements ConfigBuilder
         return $this->tmpDir . '/phpunitConfiguration.initial.infection.xml';
     }
 
-    private function addCoverageFilterWhitelistIfDoesNotExist(SafeDOMXPath $xPath): void
+    private function addCoverageNodes(string $version, SafeDOMXPath $xPath): void
     {
-        $filterNode = $this->getNode($xPath, 'filter');
+        if (version_compare($version, '10', '>=')) {
+            $this->configManipulator->addCoverageIncludeNodesUnlessTheyExist($xPath, $this->srcDirs);
 
-        if (!$filterNode) {
-            $filterNode = $this->createNode($xPath->document, 'filter');
-
-            $whiteListNode = $xPath->document->createElement('whitelist');
-
-            foreach ($this->srcDirs as $srcDir) {
-                $directoryNode = $xPath->document->createElement(
-                    'directory',
-                    $srcDir
-                );
-
-                $whiteListNode->appendChild($directoryNode);
-            }
-
-            $filterNode->appendChild($whiteListNode);
-        }
-    }
-
-    private function getNode(SafeDOMXPath $xPath, string $nodeName): ?DOMNode
-    {
-        $nodeList = $xPath->query(sprintf('/phpunit/%s', $nodeName));
-
-        if ($nodeList->length) {
-            return $nodeList->item(0);
+            return;
         }
 
-        return null;
-    }
+        if (version_compare($version, '9.3', '<')) {
+            $this->configManipulator->addLegacyCoverageWhitelistNodesUnlessTheyExist($xPath, $this->srcDirs);
 
-    private function createNode(DOMDocument $dom, string $nodeName): DOMElement
-    {
-        $node = $dom->createElement($nodeName);
-        $document = $dom->documentElement;
-        Assert::isInstanceOf($document, DOMElement::class);
-        $document->appendChild($node);
+            return;
+        }
 
-        return $node;
+        // For versions between 9.3 and 10.0, fallback to version provider
+        if (version_compare($this->versionProvider->provide($xPath), '9.3', '>=')) {
+            $this->configManipulator->addCoverageIncludeNodesUnlessTheyExist($xPath, $this->srcDirs);
+
+            return;
+        }
+
+        $this->configManipulator->addLegacyCoverageWhitelistNodesUnlessTheyExist($xPath, $this->srcDirs);
     }
 
     private function addRandomTestsOrderAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void

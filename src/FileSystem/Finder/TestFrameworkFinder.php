@@ -42,6 +42,7 @@ use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
+use const PATH_SEPARATOR;
 use function rtrim;
 use RuntimeException;
 use function Safe\file_get_contents;
@@ -63,7 +64,7 @@ class TestFrameworkFinder
     /**
      * @var array<string, string>
      */
-    private $cachedPath = [];
+    private array $cachedPath = [];
 
     public function find(string $testFrameworkName, string $customPath = ''): string
     {

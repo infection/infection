@@ -43,6 +43,7 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
+use function is_a;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
@@ -51,17 +52,17 @@ use Webmozart\Assert\Assert;
  */
 final class Factory
 {
-    private $tmpDir;
-    private $projectDir;
-    private $configLocator;
-    private $testFrameworkFinder;
-    private $jUnitFilePath;
-    private $infectionConfig;
+    private string $tmpDir;
+    private string $projectDir;
+    private TestFrameworkConfigLocatorInterface $configLocator;
+    private TestFrameworkFinder $testFrameworkFinder;
+    private string $jUnitFilePath;
+    private Configuration $infectionConfig;
 
     /**
      * @var array<string, array<string, mixed>>
      */
-    private $installedExtensions;
+    private array $installedExtensions;
 
     /**
      * @param array<string, array<string, mixed>> $installedExtensions

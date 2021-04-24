@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use function array_keys;
 use function array_slice;
 use function count;
 use Infection\Mutator\Definition;
@@ -75,7 +76,18 @@ $x = ['baz' => 'bar'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_uintersect(
+-     ['foo' => 'bar'],
+-     ['baz' => 'bar'],
+-     $value_compare_func
+- );
+# Mutation 1
++ $x = ['foo' => 'bar'];
+# Mutation 2
++ $x = ['baz' => 'bar'];
+DIFF
         );
     }
 
@@ -84,6 +96,9 @@ TXT
         return 'array_uintersect';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_slice(

@@ -43,10 +43,7 @@ final class Visibility
     public const PUBLIC = 'public';
     public const PROTECTED = 'protected';
 
-    /**
-     * @var string
-     */
-    private $variant;
+    private string $variant;
 
     private function __construct(string $variant)
     {

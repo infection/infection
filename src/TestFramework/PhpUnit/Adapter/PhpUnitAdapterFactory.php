@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -44,6 +45,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Filesystem;
@@ -83,10 +85,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
+            new PCOVDirectoryProvider(),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
+                new XmlConfigurationVersionProvider(),
                 $sourceDirectories
             ),
             new MutationConfigBuilder(

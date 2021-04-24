@@ -73,6 +73,10 @@
                             "description": "Mutation score badge for your GitHub project."
                         }
                     }
+                },
+                "github": {
+                    "type": "boolean",
+                    "description": "GitHub Annotations for escaped Mutants in the added/modifies files"
                 }
             }
         },
@@ -118,14 +122,17 @@
             "properties": {
                 "global-ignore": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
                         "type": "string"
                     }
                 },
                 "global-ignoreSourceCodeByRegex": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "regex"
                     }
                 },
 
@@ -142,7 +149,7 @@
                 "@removal": { "$ref": "#/definitions/default-mutator-config" },
                 "@return_value": { "$ref": "#/definitions/default-mutator-config" },
                 "@sort": { "$ref": "#/definitions/default-mutator-config" },
-                "@zero_iteration": { "$ref": "#/definitions/default-mutator-config" },
+                "@loop": { "$ref": "#/definitions/default-mutator-config" },
                 "@cast": { "$ref": "#/definitions/default-mutator-config" },
                 "@unwrap": { "$ref": "#/definitions/default-mutator-config" },
                 "@extensions": { "$ref": "#/definitions/default-mutator-config" },
@@ -195,8 +202,17 @@
                             "properties": {
                                 "ignore": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string"
+                                    }
+                                },
+                                "ignoreSourceCodeByRegex": {
+                                    "type": "array",
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -233,16 +249,22 @@
                 "ProtectedVisibility": { "$ref": "#/definitions/default-mutator-config" },
                 "DecrementInteger": { "$ref": "#/definitions/default-mutator-config" },
                 "IncrementInteger": { "$ref": "#/definitions/default-mutator-config" },
-                "OneZeroInteger": { "$ref": "#/definitions/default-mutator-config" },
                 "OneZeroFloat": { "$ref": "#/definitions/default-mutator-config" },
                 "AssignCoalesce": { "$ref": "#/definitions/default-mutator-config" },
                 "Break_": { "$ref": "#/definitions/default-mutator-config" },
                 "Continue_": { "$ref": "#/definitions/default-mutator-config" },
+                "Ternary": { "$ref": "#/definitions/default-mutator-config" },
                 "Throw_": { "$ref": "#/definitions/default-mutator-config" },
                 "Finally_": { "$ref": "#/definitions/default-mutator-config" },
                 "Coalesce": { "$ref": "#/definitions/default-mutator-config" },
+                "Concat": { "$ref": "#/definitions/default-mutator-config" },
                 "PregQuote": { "$ref": "#/definitions/default-mutator-config" },
                 "PregMatchMatches": { "$ref": "#/definitions/default-mutator-config" },
+                "PregMatchRemoveCaret": { "$ref": "#/definitions/default-mutator-config" },
+                "PregMatchRemoveDollar": { "$ref": "#/definitions/default-mutator-config" },
+                "PregMatchRemoveFlags": { "$ref": "#/definitions/default-mutator-config" },
+                "NullSafePropertyCall": { "$ref": "#/definitions/default-mutator-config" },
+                "NullSafeMethodCall": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItemRemoval": {
                     "anyOf": [
                         {
@@ -254,8 +276,17 @@
                             "properties": {
                                 "ignore": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string"
+                                    }
+                                },
+                                "ignoreSourceCodeByRegex": {
+                                    "type": "array",
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -283,6 +314,7 @@
                 "FunctionCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "MethodCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "CloneRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "ConcatOperandRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "SharedCaseRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayOneItem": { "$ref": "#/definitions/default-mutator-config" },
                 "FloatNegation": { "$ref": "#/definitions/default-mutator-config" },
@@ -294,6 +326,8 @@
                 "Spread": { "$ref": "#/definitions/default-mutator-config" },
                 "Foreach_": { "$ref": "#/definitions/default-mutator-config" },
                 "For_": { "$ref": "#/definitions/default-mutator-config" },
+                "DoWhile": { "$ref": "#/definitions/default-mutator-config" },
+                "While_": { "$ref": "#/definitions/default-mutator-config" },
                 "CastArray": { "$ref": "#/definitions/default-mutator-config" },
                 "CastBool": { "$ref": "#/definitions/default-mutator-config" },
                 "CastFloat": { "$ref": "#/definitions/default-mutator-config" },
@@ -336,10 +370,16 @@
                 "UnwrapArrayUnique": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapArrayValues": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapLcFirst": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapLtrim": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapRtrim": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapStrIreplace": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrRepeat": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrReplace": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapStrRev": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapStrShuffle": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrToLower": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrToUpper": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapSubstr": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapTrim": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapUcFirst": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapUcWords": { "$ref": "#/definitions/default-mutator-config" },
@@ -354,8 +394,17 @@
                             "properties": {
                                 "ignore": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string"
+                                    }
+                                },
+                                "ignoreSourceCodeByRegex": {
+                                    "type": "array",
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -408,6 +457,14 @@
                                     "type": "array",
                                     "items": {
                                         "type": "string"
+                                    }
+                                },
+                                "ignoreSourceCodeByRegex": {
+                                    "type": "array",
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -510,14 +567,17 @@
                     "properties": {
                         "ignore": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
                                 "type": "string"
                             }
                         },
                         "ignoreSourceCodeByRegex": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "regex"
                             }
                         }
                     }

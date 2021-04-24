@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;

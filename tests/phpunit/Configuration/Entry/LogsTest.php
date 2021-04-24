@@ -52,6 +52,7 @@ final class LogsTest extends TestCase
         ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
+        bool $useGitHubAnnotationsLogger,
         ?Badge $badge
     ): void {
         $logs = new Logs(
@@ -60,6 +61,7 @@ final class LogsTest extends TestCase
             $jsonLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
+            $useGitHubAnnotationsLogger,
             $badge
         );
 
@@ -70,6 +72,7 @@ final class LogsTest extends TestCase
             $jsonLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
+            $useGitHubAnnotationsLogger,
             $badge
         );
     }
@@ -85,6 +88,7 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            false,
             null
         );
     }
@@ -97,6 +101,7 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            false,
             null,
         ];
 
@@ -106,6 +111,7 @@ final class LogsTest extends TestCase
             'json.log',
             'debug.log',
             'perMutator.log',
+            true,
             new Badge('master'),
         ];
     }

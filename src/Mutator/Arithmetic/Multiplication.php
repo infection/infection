@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Mul>
  */
 final class Multiplication implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces a multiplication operator (`*`) with a division assignment operator (`/
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b * $c;
++ $a = $b / $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\Mul $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\Div>
      */

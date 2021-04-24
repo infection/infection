@@ -47,8 +47,8 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class PathReplacer
 {
-    private $filesystem;
-    private $phpUnitConfigDir;
+    private Filesystem $filesystem;
+    private ?string $phpUnitConfigDir = null;
 
     public function __construct(Filesystem $filesystem, ?string $phpUnitConfigDir = null)
     {

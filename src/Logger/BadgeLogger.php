@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function getenv;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
@@ -49,12 +50,12 @@ use function Safe\sprintf;
  */
 final class BadgeLogger implements MutationTestingResultsLogger
 {
-    private $buildContextResolver;
-    private $strykerApiKeyResolver;
-    private $strykerDashboardClient;
-    private $metricsCalculator;
-    private $branch;
-    private $logger;
+    private BuildContextResolver $buildContextResolver;
+    private StrykerApiKeyResolver $strykerApiKeyResolver;
+    private StrykerDashboardClient $strykerDashboardClient;
+    private MetricsCalculator $metricsCalculator;
+    private string $branch;
+    private LoggerInterface $logger;
 
     public function __construct(
         BuildContextResolver $buildContextResolver,

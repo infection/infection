@@ -50,7 +50,7 @@ final class SyncEventDispatcher implements EventDispatcher
     /**
      * @var callable[][]
      */
-    private $listeners = [];
+    private array $listeners = [];
 
     public function dispatch(object $event): void
     {

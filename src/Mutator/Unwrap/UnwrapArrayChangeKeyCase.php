@@ -37,7 +37,6 @@ namespace Infection\Mutator\Unwrap;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
-use PhpParser\Node;
 
 /**
  * @internal
@@ -62,17 +61,16 @@ $x = $array;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_change_key_case($array, CASE_UPPER);
++ $x = $array;
+DIFF
         );
     }
 
     protected function getFunctionName(): string
     {
         return 'array_change_key_case';
-    }
-
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
-    {
-        yield 0;
     }
 }

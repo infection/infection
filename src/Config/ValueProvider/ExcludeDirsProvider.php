@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
 
+use function array_map;
+use function array_unique;
+use function array_values;
 use Closure;
 use function count;
 use const GLOB_ONLYDIR;
@@ -44,6 +47,8 @@ use Infection\Console\IO;
 use Infection\FileSystem\Locator\Locator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use function Safe\glob;
+use function str_replace;
+use function strpos;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
@@ -55,9 +60,9 @@ final class ExcludeDirsProvider
 {
     public const EXCLUDED_ROOT_DIRS = ['vendor', 'tests', 'test'];
 
-    private $consoleHelper;
-    private $questionHelper;
-    private $filesystem;
+    private ConsoleHelper $consoleHelper;
+    private QuestionHelper $questionHelper;
+    private Filesystem $filesystem;
 
     public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper, Filesystem $filesystem)
     {

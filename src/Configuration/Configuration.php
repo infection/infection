@@ -54,40 +54,45 @@ class Configuration
         'default',
     ];
 
-    private $timeout;
-    private $sourceDirectories;
-    private $sourceFiles;
-    private $sourceFilesFilter;
-    private $sourceFilesExcludes;
-    private $logs;
-    private $logVerbosity;
-    private $tmpDir;
-    private $phpUnit;
-    private $mutators;
-    private $testFramework;
-    private $bootstrap;
-    private $initialTestsPhpOptions;
-    private $testFrameworkExtraOptions;
-    private $coveragePath;
-    private $skipCoverage;
-    private $skipInitialTests;
-    private $debug;
-    private $onlyCovered;
-    private $noProgress;
-    private $ignoreMsiWithNoMutations;
-    private $minMsi;
-    private $showMutations;
-    private $minCoveredMsi;
-    private $msiPrecision;
-    private $threadCount;
-    private $dryRun;
-    private $ignoreSourceCodeMutatorsMap;
+    private float $timeout;
+    /** @var string[] */
+    private array $sourceDirectories;
+    /** @var iterable<SplFileInfo> */
+    private iterable $sourceFiles;
+    private string $sourceFilesFilter;
+    /** @var string[] */
+    private array $sourceFilesExcludes;
+    private Logs $logs;
+    private string $logVerbosity;
+    private string $tmpDir;
+    private PhpUnit $phpUnit;
+    /** @var array<string, Mutator<\PhpParser\Node>> */
+    private array $mutators;
+    private string $testFramework;
+    private ?string $bootstrap = null;
+    private ?string $initialTestsPhpOptions = null;
+    private string $testFrameworkExtraOptions;
+    private string $coveragePath;
+    private bool $skipCoverage;
+    private bool $skipInitialTests;
+    private bool $debug;
+    private bool $onlyCovered;
+    private bool $noProgress;
+    private bool $ignoreMsiWithNoMutations;
+    private ?float $minMsi = null;
+    private bool $showMutations;
+    private ?float $minCoveredMsi = null;
+    private int $msiPrecision;
+    private int $threadCount;
+    private bool $dryRun;
+    /** @var array<string, array<int, string>> */
+    private array $ignoreSourceCodeMutatorsMap;
 
     /**
      * @param string[] $sourceDirectories
      * @param string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
-     * @param array<string, Mutator> $mutators
+     * @param array<string, Mutator<\PhpParser\Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
@@ -213,7 +218,7 @@ class Configuration
     }
 
     /**
-     * @return array<string, Mutator>
+     * @return array<string, Mutator<\PhpParser\Node>>
      */
     public function getMutators(): array
     {

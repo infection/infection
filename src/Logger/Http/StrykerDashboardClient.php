@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger\Http;
 
+use function in_array;
 use Psr\Log\LoggerInterface;
 use function Safe\json_encode;
 use function Safe\sprintf;
@@ -44,8 +45,8 @@ use function Safe\sprintf;
  */
 class StrykerDashboardClient
 {
-    private $client;
-    private $logger;
+    private StrykerCurlClient $client;
+    private LoggerInterface $logger;
 
     public function __construct(StrykerCurlClient $client, LoggerInterface $logger)
     {
@@ -68,7 +69,7 @@ class StrykerDashboardClient
 
         $statusCode = $response->getStatusCode();
 
-        if ($statusCode !== Response::CREATED_RESPONSE_CODE) {
+        if (!in_array($statusCode, [Response::HTTP_OK, Response::HTTP_CREATED], true)) {
             $this->logger->warning(sprintf(
                 'Stryker dashboard returned an unexpected response code: %s',
                 $statusCode)

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Event;
 
+use function class_exists;
 use function in_array;
 use Infection\Event\Subscriber\EventSubscriber;
 use PHPUnit\Framework\TestCase;

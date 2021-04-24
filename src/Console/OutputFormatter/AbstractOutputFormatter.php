@@ -49,10 +49,7 @@ abstract class AbstractOutputFormatter implements OutputFormatter
      */
     public const UNKNOWN_COUNT = 0;
 
-    /**
-     * @var int
-     */
-    protected $callsCount = 0;
+    protected int $callsCount = 0;
 
     public function start(int $mutationCount): void
     {

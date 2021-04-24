@@ -42,7 +42,7 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^7.4.7 || ^8.0",
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",
@@ -51,10 +51,11 @@
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.4",
         "justinrainbow/json-schema": "^5.2",
-        "nikic/php-parser": "^4.10.2",
-        "ocramius/package-versions": "^1.2 || ^2.0",
+        "nikic/php-parser": "^4.10.3",
+        "ocramius/package-versions": "^1.11.0 || ^2.0",
         "ondram/ci-detector": "^3.3.0",
-        "sanmai/pipeline": "^3.1 || ^5.0",
+        "sanmai/later": "^0.1.1",
+        "sanmai/pipeline": "^5.1",
         "sebastian/diff": "^3.0.2 || ^4.0",
         "seld/jsonlint": "^1.7",
         "symfony/console": "^3.4.29 || ^4.1.19 || ^5.0",
@@ -76,15 +77,16 @@
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan": "^0.12.8",
         "phpstan/phpstan-phpunit": "^0.12.6",
+        "phpstan/phpstan-strict-rules": "^0.12.5",
         "phpstan/phpstan-webmozart-assert": "^0.12.2",
         "phpunit/phpunit": "^9.3.11",
-        "symfony/phpunit-bridge": "^4.4.14 || ^5.1.6",
+        "symfony/phpunit-bridge": "^4.4.18 || ^5.1.10",
         "symfony/yaml": "^5.0",
         "thecodingmachine/phpstan-safe-rule": "^1.0"
     },
     "config": {
         "platform": {
-            "php": "7.4.0"
+            "php": "7.4.7"
         },
         "sort-packages": true
     },

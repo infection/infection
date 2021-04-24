@@ -42,7 +42,7 @@ namespace Infection\TestFramework\Coverage;
  */
 final class UncoveredTraceProvider implements TraceProvider
 {
-    private $bufferedFilter;
+    private BufferedSourceFileFilter $bufferedFilter;
 
     public function __construct(BufferedSourceFileFilter $bufferedFilter)
     {
@@ -55,7 +55,7 @@ final class UncoveredTraceProvider implements TraceProvider
     public function provideTraces(): iterable
     {
         foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, [new TestLocations()]);
+            yield new ProxyTrace($splFileInfo, null);
         }
     }
 }

@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\NotEqual>
  */
 final class NotEqualNotIdentical implements Mutator
 {
@@ -57,12 +59,16 @@ comparison (using a not-identical operator (`!==`)).
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b != $c;
++ $a = $b !== $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\NotEqual $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\NotIdentical>
      */

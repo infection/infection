@@ -43,8 +43,8 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscriber
 {
-    private $filesystem;
-    private $tmpDir;
+    private Filesystem $filesystem;
+    private string $tmpDir;
 
     public function __construct(Filesystem $filesystem, string $tmpDir)
     {

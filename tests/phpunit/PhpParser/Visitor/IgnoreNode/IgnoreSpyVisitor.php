@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
+use function is_string;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\NodeVisitorAbstract;

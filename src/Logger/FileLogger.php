@@ -50,10 +50,10 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class FileLogger implements MutationTestingResultsLogger
 {
-    private $filePath;
-    private $fileSystem;
-    private $lineLogger;
-    private $logger;
+    private string $filePath;
+    private Filesystem $fileSystem;
+    private LineMutationTestingResultsLogger $lineLogger;
+    private LoggerInterface $logger;
 
     public function __construct(
         string $filePath,

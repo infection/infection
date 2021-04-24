@@ -37,7 +37,6 @@ namespace Infection\Mutator\Unwrap;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
-use PhpParser\Node;
 
 /**
  * @internal
@@ -62,17 +61,16 @@ $x = ['foo => 'bar'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
++ $x = ['foo => 'bar'];
+DIFF
         );
     }
 
     protected function getFunctionName(): string
     {
         return 'array_udiff_uassoc';
-    }
-
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
-    {
-        yield 0;
     }
 }

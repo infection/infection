@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Div>
  */
 final class DivEqual implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces a division assignment operator (`/=`) with a multiplication assignment 
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a /= $b;
++ $a *= $b;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\AssignOp\Div $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\AssignOp\Mul>
      */

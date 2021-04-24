@@ -35,10 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
+use function array_key_exists;
 use function array_sum;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use function Safe\substr;
-use Traversable;
+use function strpos;
 
 /**
  * @internal
@@ -48,7 +49,7 @@ final class JUnitTestCaseTimeAdder
     /**
      * @var TestLocation[]
      */
-    private $tests;
+    private array $tests;
 
     /**
      * @param TestLocation[] $tests
@@ -61,20 +62,19 @@ final class JUnitTestCaseTimeAdder
     public function getTotalTestTime(): float
     {
         return array_sum(
-            iterator_to_array(
-                $this->uniqueTestLocations(),
-                true // Duplicate keys must be overwritten.
-            )
+            $this->uniqueTestLocations()
         );
     }
 
     /**
      * Returns unique'd test cases with timings. Timings are per test suite, not per test, therefore we have to unique by test suite name.
      *
-     * @return Traversable<string, float|null>
+     * @return array<float|null>
      */
-    private function uniqueTestLocations(): Traversable
+    private function uniqueTestLocations(): array
     {
+        $seenTestSuites = [];
+
         foreach ($this->tests as $testLocation) {
             $methodName = $testLocation->getMethod();
             $methodSeparatorPos = strpos($methodName, '::');
@@ -85,7 +85,15 @@ final class JUnitTestCaseTimeAdder
             }
 
             // For each test we discard method name, and return a single timing for an entire suite
-            yield substr($methodName, 0, $methodSeparatorPos) => $testLocation->getExecutionTime();
+            $testSuiteName = substr($methodName, 0, $methodSeparatorPos);
+
+            if (array_key_exists($testSuiteName, $seenTestSuites)) {
+                continue;
+            }
+
+            $seenTestSuites[$testSuiteName] = $testLocation->getExecutionTime();
         }
+
+        return $seenTestSuites;
     }
 }

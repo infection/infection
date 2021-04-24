@@ -36,16 +36,36 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use function Safe\preg_match;
+use function strpos;
 
 /**
  * @internal
  */
 final class DiffSourceCodeMatcher
 {
+    private const POSSIBLE_DELIMITERS = [
+            '#', '%', ':', ';', '=', '?', '@', '^', '~',
+    ];
+
     public function matches(string $diff, string $sourceCodeRegex): bool
     {
-        $regexWithEscapedDelimiters = str_replace('/', '\/', $sourceCodeRegex);
+        // https://www.php.net/manual/en/regexp.reference.delimiters.php
 
-        return preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff) === 1;
+        $delimiter = $this->findDelimiter($sourceCodeRegex);
+        // There's no need to escape delimiters since we're assuming there's none.
+
+        return preg_match("{$delimiter}^-\s*{$sourceCodeRegex}\${$delimiter}mu", $diff) === 1;
+    }
+
+    private function findDelimiter(string $sourceCodeRegex): string
+    {
+        foreach (self::POSSIBLE_DELIMITERS as $possibleDelimiter) {
+            if (strpos($sourceCodeRegex, $possibleDelimiter) === false) {
+                return $possibleDelimiter;
+            }
+        }
+
+        // Let it fail naturally, for now. Later this might be a good place to throw an exception.
+        return '/';
     }
 }

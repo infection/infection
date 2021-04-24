@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\SmallerOrEqual>
  */
 final class LessThanOrEqualTo implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces a greater-than-or-equal-to operator (`<=`) with the greater-than operat
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b <= $c;
++ $a = $b < $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\SmallerOrEqual $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\Smaller>
      */

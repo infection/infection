@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Coalesce>
  */
 final class AssignCoalesce implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces the null coalescing assignment operator (`??=`) with a plain assignment
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $this->request->data['comments']['user_id'] ??= 'value';
++ $this->request->data['comments']['user_id'] = 'value';
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\AssignOp\Coalesce $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\Assign>
      */

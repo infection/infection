@@ -43,9 +43,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class InitialTestsConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
-    private $skipProgressBar;
-    private $testFrameworkAdapter;
-    private $debug;
+    private bool $skipProgressBar;
+    private TestFrameworkAdapter $testFrameworkAdapter;
+    private bool $debug;
 
     public function __construct(
         bool $skipProgressBar,

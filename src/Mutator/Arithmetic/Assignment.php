@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp>
  */
 final class Assignment implements Mutator
 {
@@ -57,12 +59,16 @@ assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment opera
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a += $b;
++ $a = $b;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\AssignOp $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\Assign>
      */

@@ -40,8 +40,8 @@ namespace Infection\Configuration\Entry;
  */
 final class PhpUnit
 {
-    private $configDir;
-    private $customPath;
+    private ?string $configDir;
+    private ?string $customPath;
 
     public function __construct(?string $configDir, ?string $executablePath)
     {

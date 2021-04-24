@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\PostInc|Node\Expr\PreInc>
  */
 final class Increment implements Mutator
 {
@@ -57,12 +59,16 @@ Replaces a pre- or post-increment operator (`++`) with the analogue pre- or post
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a++;
++ $a--;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\PostInc|Node\Expr\PreInc $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\PreDec|Node\Expr\PostDec>
      */

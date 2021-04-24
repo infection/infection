@@ -1,6 +1,6 @@
-FROM php:8.0-rc-cli-alpine
+FROM php:8.0-cli-alpine
 
-ARG XDEBUG_VERSION=3.0.0beta1
+ARG XDEBUG_VERSION=3.0.1
 
 RUN set -eux; \
     apk add --no-cache --virtual .build-deps \

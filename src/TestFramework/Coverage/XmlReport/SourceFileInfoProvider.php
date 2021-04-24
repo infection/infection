@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_filter;
+use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use function implode;
 use Infection\TestFramework\SafeDOMXPath;
@@ -54,15 +55,12 @@ use Webmozart\PathUtil\Path;
  */
 class SourceFileInfoProvider
 {
-    private $coverageIndexPath;
-    private $coverageDir;
-    private $relativeCoverageFilePath;
-    private $projectSource;
+    private string $coverageIndexPath;
+    private string $coverageDir;
+    private string $relativeCoverageFilePath;
+    private string $projectSource;
 
-    /**
-     * @var SafeDOMXPath|null
-     */
-    private $xPath;
+    private ?SafeDOMXPath $xPath = null;
 
     public function __construct(
         string $coverageIndexPath,

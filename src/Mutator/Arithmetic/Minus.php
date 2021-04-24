@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Minus>
  */
 final class Minus implements Mutator
 {
@@ -53,12 +55,16 @@ final class Minus implements Mutator
         return new Definition(
             'Replaces a subtraction operator (`-`) with an addition operator (`+`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b - $c;
++ $a = $b + $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\Minus $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\Plus>
      */

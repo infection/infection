@@ -46,8 +46,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
 {
-    private $output;
-    private $testFrameworkAdapter;
+    private OutputInterface $output;
+    private TestFrameworkAdapter $testFrameworkAdapter;
 
     public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter)
     {

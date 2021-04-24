@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Throw_>
  */
 final class Throw_ implements Mutator
 {
@@ -67,14 +69,18 @@ new Exception();
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- throw new Exception();
++ new Exception();
+DIFF
         );
     }
 
     /**
-     * Replaces "throw new Exception();" with "new Exception();"
+     * @psalm-mutation-free
      *
-     * @param Node\Stmt\Throw_ $node
+     * Replaces "throw new Exception();" with "new Exception();"
      *
      * @return iterable<Node\Stmt\Expression>
      */

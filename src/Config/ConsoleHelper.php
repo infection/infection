@@ -44,7 +44,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConsoleHelper
 {
-    private $formatterHelper;
+    private FormatterHelper $formatterHelper;
 
     public function __construct(FormatterHelper $formatterHelper)
     {

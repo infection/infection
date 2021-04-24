@@ -100,6 +100,7 @@ trait ConfigurationAssertions
             $expectedLogs->getJsonLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
+            $expectedLogs->getUseGitHubAnnotationsLogger(),
             $expectedLogs->getBadge()
         );
         $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity());

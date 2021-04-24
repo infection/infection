@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Config\Guesser;
 
 use stdClass;
+use function strpos;
+use function trim;
 
 /**
  * @internal
@@ -44,7 +46,7 @@ final class PhpUnitPathGuesser
 {
     private const CURRENT_DIR_PATH = '.';
 
-    private $composerJsonContent;
+    private stdClass $composerJsonContent;
 
     public function __construct(stdClass $composerJsonContent)
     {

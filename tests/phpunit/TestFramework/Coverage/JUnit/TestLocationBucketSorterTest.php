@@ -37,7 +37,9 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use function abs;
 use function array_map;
+use function array_reverse;
 use function array_slice;
+use ArrayIterator;
 use function extension_loaded;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
@@ -106,10 +108,12 @@ final class TestLocationBucketSorterTest extends TestCase
     /**
      * @dataProvider locationsArrayProvider
      *
-     * @param TestLocation[] $uniqueTestLocations
+     * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
-    public function test_it_sorts_correctly(array $uniqueTestLocations): void
+    public function test_it_sorts_correctly(ArrayIterator $uniqueTestLocations): void
     {
+        $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
+
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort($uniqueTestLocations),
             false
@@ -126,10 +130,12 @@ final class TestLocationBucketSorterTest extends TestCase
      *
      * @dataProvider locationsArrayProvider
      *
-     * @param TestLocation[] $uniqueTestLocations
+     * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
-    public function test_quicksort_sorts_correctly(array $uniqueTestLocations): void
+    public function test_quicksort_sorts_correctly(ArrayIterator $uniqueTestLocations): void
     {
+        $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
+
         self::quicksort($uniqueTestLocations);
 
         $this->assertTrue(
@@ -141,13 +147,15 @@ final class TestLocationBucketSorterTest extends TestCase
     /**
      * @dataProvider locationsArrayProvider
      *
-     * @param TestLocation[] $uniqueTestLocations
+     * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
-    public function test_it_sorts_faster_than_quicksort(array $uniqueTestLocations): void
+    public function test_it_sorts_faster_than_quicksort(ArrayIterator $uniqueTestLocations): void
     {
         if (extension_loaded('xdebug') || PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('Benchmarks under xdebug or phpdbg are brittle');
         }
+
+        $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
 
         if (self::areConstraintsOrderValid($uniqueTestLocations)) {
             // Ignore silently as to not pollute to the log.
@@ -193,9 +201,9 @@ final class TestLocationBucketSorterTest extends TestCase
             JUnitTimes::JUNIT_TIMES
         );
 
-        yield [array_slice($locations, 0, JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * 10)];
+        yield 'Ten times the minimal amount of locations' => [new ArrayIterator(array_slice($locations, 0, JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * 10))];
 
-        yield [$locations];
+        yield 'All locations' => [new ArrayIterator($locations)];
     }
 
     private static function quicksort(&$uniqueTestLocations): void

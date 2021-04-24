@@ -48,12 +48,9 @@ use Webmozart\Assert\Assert;
  */
 final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
-    private $jUnitLocator;
+    private JUnitReportLocator $jUnitLocator;
 
-    /**
-     * @var SafeDOMXPath|null
-     */
-    private $xPath;
+    private ?SafeDOMXPath $xPath = null;
 
     public function __construct(JUnitReportLocator $jUnitLocator)
     {
@@ -108,6 +105,9 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
         // A format where the class name is inside `file` attribute of `testcase` tag
         yield '//testcase[contains(@file, "%s")][1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
+
+        // A format where the class name parsed from feature and is inside `class` attribute of `testcase` tag
+        yield '//testcase[@class="%s"][1]' => preg_replace('/^(.*):+.*$/', '$1', $fullyQualifiedClassName);
     }
 
     private function getXPath(): SafeDOMXPath

@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
+use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
@@ -46,6 +48,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\NameResolver;
+use SplObjectStorage;
 
 /**
  * @internal
@@ -58,11 +61,15 @@ class NodeTraverserFactory
      */
     public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
     {
+        $changingIgnorer = new ChangingIgnorer();
+        $nodeIgnorers[] = $changingIgnorer;
+
         $nodeIgnorers[] = new InterfaceIgnorer();
         $nodeIgnorers[] = new AbstractMethodIgnorer();
 
         $traverser = new NodeTraverser();
 
+        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
         $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
         $traverser->addVisitor(new NameResolver(
             null,

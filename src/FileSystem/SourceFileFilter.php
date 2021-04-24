@@ -53,12 +53,12 @@ class SourceFileFilter implements FileFilter
     /**
      * @var string[]
      */
-    private $filters;
+    private array $filters;
 
     /**
      * @var string[]
      */
-    private $excludeDirectories;
+    private array $excludeDirectories;
 
     /**
      * @param string[] $excludeDirectories

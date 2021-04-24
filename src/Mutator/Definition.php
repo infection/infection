@@ -42,9 +42,10 @@ use Webmozart\Assert\Assert;
  */
 final class Definition
 {
-    private $description;
-    private $category;
-    private $remedies;
+    private string $description;
+    private string $category;
+    private ?string $remedies;
+    private string $diff;
 
     /**
      * @param string $description Explanation on what the mutator is about
@@ -53,13 +54,15 @@ final class Definition
     public function __construct(
         string $description,
         string $category,
-        ?string $remedies
+        ?string $remedies,
+        string $diff
     ) {
         Assert::oneOf($category, MutatorCategory::ALL);
 
         $this->description = $description;
         $this->category = $category;
         $this->remedies = $remedies;
+        $this->diff = $diff;
     }
 
     public function getDescription(): string
@@ -75,5 +78,10 @@ final class Definition
     public function getRemedies(): ?string
     {
         return $this->remedies;
+    }
+
+    public function getDiff(): string
+    {
+        return $this->diff;
     }
 }

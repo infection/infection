@@ -45,6 +45,8 @@ use PhpParser\Node;
  * @internal
  *
  * @see Yield_
+ *
+ * @implements Mutator<Node\Expr\Yield_>
  */
 final class YieldValue implements Mutator
 {
@@ -55,28 +57,30 @@ final class YieldValue implements Mutator
         return new Definition(
             <<<'TXT'
 Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only;
-For example `yield $b->bar;`.
+For example `yield $value;`.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- yield $key => $value;
++ yield $value;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\Yield_ $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\Yield_>
      */
     public function mutate(Node $node): iterable
     {
-        $node->key = null;
-
-        yield $node;
+        yield new Node\Expr\Yield_($node->value);
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Yield_ && $node->key;
+        return $node instanceof Node\Expr\Yield_ && $node->key !== null;
     }
 }

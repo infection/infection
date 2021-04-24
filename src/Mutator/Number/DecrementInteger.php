@@ -40,10 +40,13 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
+use const PHP_INT_MIN;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractNumberMutator<Node\Scalar\LNumber>
  */
 final class DecrementInteger extends AbstractNumberMutator
 {
@@ -63,12 +66,16 @@ final class DecrementInteger extends AbstractNumberMutator
         return new Definition(
             'Decrements an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = 20;
++ $a = 19;
+DIFF
         );
     }
 
     /**
-     * @param Node\Scalar\LNumber $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Scalar\LNumber>
      */
@@ -88,6 +95,10 @@ final class DecrementInteger extends AbstractNumberMutator
     public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Scalar\LNumber) {
+            return false;
+        }
+
+        if ($node->value === PHP_INT_MIN) {
             return false;
         }
 

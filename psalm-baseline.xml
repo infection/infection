@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="4.1.1@16bfbd9224698bd738c665f33039fade2a1a3977">
+  <file src="src/Mutator/Regex/PregMatchRemoveCaret.php">
+    <ImpureFunctionCall occurrences="1">
+      <code>preg_match</code>
+    </ImpureFunctionCall>
+  </file>
+  <file src="src/Mutator/Regex/PregMatchRemoveDollar.php">
+    <ImpureFunctionCall occurrences="1">
+      <code>preg_match</code>
+    </ImpureFunctionCall>
+  </file>
+  <file src="src/Mutator/Regex/PregMatchRemoveFlags.php">
+    <ImpureFunctionCall occurrences="1">
+      <code>preg_match</code>
+    </ImpureFunctionCall>
+  </file>
+</files>

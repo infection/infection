@@ -56,10 +56,10 @@ trait MutantAssertions
     ): void {
         $this->assertSame($expectedFilePath, $mutant->getFilePath());
         $this->assertSame($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode());
-        $this->assertSame($expectedDiff, $mutant->getDiff());
+        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
+        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
         $this->assertSame($expectedCoveredByTests, $mutant->isCoveredByTest());
         $this->assertSame($expectedTests, $mutant->getTests());
-        $this->assertSame($originalCode, $mutant->getPrettyPrintedOriginalCode());
+        $this->assertSame($originalCode, $mutant->getPrettyPrintedOriginalCode()->get());
     }
 }

@@ -146,6 +146,30 @@ XML
         );
     }
 
+    public function test_it_adds_coverage_whitelist_to_pre_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addLegacyCoverageWhitelistNodesUnlessTheyExist($xPath, ['src/', 'examples/']);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <filter>
+    <whitelist>
+      <directory>src/</directory>
+      <directory>examples/</directory>
+    </whitelist>
+  </filter>
+</phpunit>
+XML
+            );
+    }
+
     public function test_it_removes_existing_loggers_from_post_93_configuration(): void
     {
         $this->assertItChangesPostPHPUnit93Configuration(
@@ -740,7 +764,7 @@ EOF
 
     private function assertItChangesPostPHPUnit93Configuration(Closure $changeXml, string $expectedXml): void
     {
-        $xPath = $this->createXPath(<<<'XML'
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
@@ -778,19 +802,15 @@ EOF
     </logging>
 </phpunit>
 XML
-            );
-
-        $changeXml($this->configManipulator, $xPath);
-
-        $actualXml = $xPath->document->saveXML();
-
-        $this->assertNotFalse($actualXml);
-        $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
+            ,
+            $changeXml,
+            $expectedXml
+        );
     }
 
     private function assertItChangesPrePHPUnit93Configuration(Closure $changeXml, string $expectedXml): void
     {
-        $xPath = $this->createXPath(<<<'XML'
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -822,14 +842,10 @@ XML
     </logging>
 </phpunit>
 XML
+        ,
+            $changeXml,
+            $expectedXml
         );
-
-        $changeXml($this->configManipulator, $xPath);
-
-        $actualXml = $xPath->document->saveXML();
-
-        $this->assertNotFalse($actualXml);
-        $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
     }
 
     private function assertItChangesXML(string $inputXml, Closure $changeXml, string $expectedXml): void

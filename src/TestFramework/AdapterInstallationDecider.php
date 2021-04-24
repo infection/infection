@@ -52,7 +52,7 @@ final class AdapterInstallationDecider
         TestFrameworkTypes::PHPSPEC => 'Infection\TestFramework\PhpSpec\PhpSpecAdapter',
     ];
 
-    private $questionHelper;
+    private QuestionHelper $questionHelper;
 
     public function __construct(QuestionHelper $questionHelper)
     {

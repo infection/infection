@@ -42,12 +42,12 @@ use function array_key_exists;
  */
 final class MemoizedTestFileDataProvider implements TestFileDataProvider
 {
-    private $provider;
+    private TestFileDataProvider $provider;
 
     /**
      * @var array<string, TestFileTimeData>
      */
-    private $cache = [];
+    private array $cache = [];
 
     public function __construct(TestFileDataProvider $decoratedProvider)
     {

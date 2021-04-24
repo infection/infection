@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\ConstFetch>
  */
 final class FalseValue implements Mutator
 {
@@ -53,12 +55,16 @@ final class FalseValue implements Mutator
         return new Definition(
             'Replaces a boolean literal (`false`) with its opposite value (`true`). ',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = false;
++ $a = true;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\ConstFetch $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\ConstFetch>
      */

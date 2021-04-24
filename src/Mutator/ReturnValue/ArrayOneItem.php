@@ -45,6 +45,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Return_>
  */
 final class ArrayOneItem implements Mutator
 {
@@ -72,12 +74,16 @@ return count($array) > 1 ?
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- return $array;
++ return count($array) > 1 ? array_slice($array, 0, 1, true) : $array;
+DIFF
         );
     }
 
     /**
-     * @param Node\Stmt\Return_ $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Stmt\Return_>
      */

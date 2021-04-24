@@ -50,13 +50,15 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ *
+ * @implements ConfigurableMutator<Node\Expr\Array_>
  */
 final class ArrayItemRemoval implements ConfigurableMutator
 {
-    use GetMutatorName;
     use GetConfigClassName;
+    use GetMutatorName;
 
-    private $config;
+    private ArrayItemRemovalConfig $config;
 
     public function __construct(ArrayItemRemovalConfig $config)
     {
@@ -88,7 +90,7 @@ $x = [0, 2];
 And:
 
 ```php
-$x = [1, 2];
+$x = [0, 1];
 ```
 
 Which elements it removes or how many elements it will attempt to remove will depend on its
@@ -97,12 +99,21 @@ configuration.
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = [0, 1, 2];
+# Mutation 1
++ $x = [1, 2];
+# Mutation 2
++ $x = [0, 2];
+# Mutation 3
++ $x = [0, 1];
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\Array_ $arrayNode
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\Array_>
      */
@@ -139,6 +150,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param ArrayItem[] $items
      *
      * @return int[]

@@ -50,12 +50,12 @@ use PHPUnit\Framework\TestCase;
 final class IgnoreMutatorTest extends TestCase
 {
     /**
-     * @var MockObject|Mutator
+     * @var MockObject&Mutator
      */
     private $mutatorMock;
 
     /**
-     * @var MockObject|Node
+     * @var MockObject&Node
      */
     private $nodeMock;
 

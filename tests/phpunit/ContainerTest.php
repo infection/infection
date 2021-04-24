@@ -49,18 +49,12 @@ final class ContainerTest extends TestCase
 {
     public function test_it_can_be_instantiated_without_any_services(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown service "Symfony\Component\Filesystem\Filesystem"');
+
         $container = new Container([]);
 
-        try {
-            $container->getFileSystem();
-
-            $this->fail();
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Unknown service "Symfony\Component\Filesystem\Filesystem"',
-                $exception->getMessage()
-            );
-        }
+        $container->getFileSystem();
     }
 
     public function test_it_can_be_instantiated_with_the_project_services(): void
@@ -97,7 +91,11 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
             Container::DEFAULT_FILTER,
             Container::DEFAULT_THREAD_COUNT,
-            Container::DEFAULT_DRY_RUN
+            Container::DEFAULT_DRY_RUN,
+            Container::DEFAULT_GIT_DIFF_FILTER,
+            Container::DEFAULT_GIT_DIFF_BASE,
+            Container::DEFAULT_USE_GITHUB_LOGGER,
+            Container::DEFAULT_USE_NOOP_MUTATORS
         );
 
         $traces = $newContainer->getUnionTraceProvider()->provideTraces();
@@ -142,7 +140,11 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
             Container::DEFAULT_FILTER,
             Container::DEFAULT_THREAD_COUNT,
-            Container::DEFAULT_DRY_RUN
+            Container::DEFAULT_DRY_RUN,
+            Container::DEFAULT_GIT_DIFF_FILTER,
+            Container::DEFAULT_GIT_DIFF_BASE,
+            Container::DEFAULT_USE_GITHUB_LOGGER,
+            Container::DEFAULT_USE_NOOP_MUTATORS
         );
     }
 }

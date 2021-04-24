@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node>
  */
 final class InstanceOf_ implements Mutator
 {
@@ -53,11 +55,20 @@ final class InstanceOf_ implements Mutator
         return new Definition(
             'Replaces an instanceof comparison with `true` and `false`.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b instanceof User;
+# Mutation 1
++ $a = true;
+# Mutation 2
++ $a = false;
+DIFF
         );
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @return iterable<Node\Expr\ConstFetch>
      */
     public function mutate(Node $node): iterable

@@ -99,6 +99,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends expect
 
       - name: Run the whole set of E2E tests
+        continue-on-error: ${{ matrix.php-version == '8.0' }}
         if: runner.os != 'Windows'
         env:
           TERM: xterm-256color

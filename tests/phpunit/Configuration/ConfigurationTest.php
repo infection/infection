@@ -201,6 +201,7 @@ final class ConfigurationTest extends TestCase
                 'json.log',
                 'debug.log',
                 'mutator.log',
+                true,
                 new Badge('master')
             ),
             'default',

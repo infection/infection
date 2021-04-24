@@ -38,6 +38,8 @@ namespace Infection\Tests\Resource\Time;
 use Infection\Resource\Time\Stopwatch;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function round;
+use function usleep;
 
 // Cannot import this one as it would remove the ability to mock it
 // use function usleep()
@@ -68,7 +70,7 @@ final class StopwatchTest extends TestCase
 
         $actualTimeInSeconds = $this->stopwatch->stop();
 
-        $this->assertSame($expectedTime, $actualTimeInSeconds);
+        $this->assertSame($expectedTime, round($actualTimeInSeconds, 2));
     }
 
     public function test_it_cannot_be_started_twice(): void
@@ -105,6 +107,6 @@ final class StopwatchTest extends TestCase
     {
         yield 'no time' => [0, 0.];
 
-        yield 'nominal' => [10000000, 10.0];
+        yield 'nominal' => [1000000, 1.0];
     }
 }

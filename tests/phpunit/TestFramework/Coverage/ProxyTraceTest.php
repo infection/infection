@@ -40,6 +40,8 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use function iterator_to_array;
+use function Later\now;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -49,7 +51,7 @@ final class ProxyTraceTest extends TestCase
     {
         $fileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $actual = (new ProxyTrace($fileInfoMock, []))->getSourceFileInfo();
+        $actual = (new ProxyTrace($fileInfoMock))->getSourceFileInfo();
 
         $this->assertSame(
             $fileInfoMock,
@@ -67,7 +69,7 @@ final class ProxyTraceTest extends TestCase
             ->willReturn($expected)
         ;
 
-        $actual = (new ProxyTrace($fileInfoMock, []))->getRealPath();
+        $actual = (new ProxyTrace($fileInfoMock))->getRealPath();
 
         $this->assertSame($expected, $actual);
     }
@@ -77,7 +79,7 @@ final class ProxyTraceTest extends TestCase
         $fileInfoMock = $this->createMock(SplFileInfo::class);
         $tests = new TestLocations();
 
-        $trace = new ProxyTrace($fileInfoMock, [$tests]);
+        $trace = new ProxyTrace($fileInfoMock, now($tests));
 
         $actual = $trace->getTests();
         $this->assertSame($tests, $actual);
@@ -91,9 +93,29 @@ final class ProxyTraceTest extends TestCase
     {
         $fileInfoMock = $this->createMock(SplFileInfo::class);
 
-        $trace = new ProxyTrace($fileInfoMock, [new TestLocations()]);
+        $trace = new ProxyTrace($fileInfoMock, now(new TestLocations()));
 
         $this->assertFalse($trace->hasTests());
+    }
+
+    public function test_it_returns_null_for_no_tests(): void
+    {
+        $fileInfoMock = $this->createMock(SplFileInfo::class);
+
+        $trace = new ProxyTrace($fileInfoMock, null);
+
+        $this->assertFalse($trace->hasTests());
+
+        $this->assertNull($trace->getTests());
+    }
+
+    public function test_it_returns_empty_iterable_for_no_tests(): void
+    {
+        $fileInfoMock = $this->createMock(SplFileInfo::class);
+
+        $trace = new ProxyTrace($fileInfoMock, null);
+
+        $this->assertCount(0, $trace->getAllTestsForMutation(new NodeLineRangeData(1, 2), false));
     }
 
     public function test_it_exposes_its_test_locations(): void
@@ -114,7 +136,7 @@ final class ProxyTraceTest extends TestCase
             ]
         );
 
-        $trace = new ProxyTrace($fileInfoMock, [$tests]);
+        $trace = new ProxyTrace($fileInfoMock, now($tests));
 
         $this->assertTrue($trace->hasTests());
 

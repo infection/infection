@@ -37,7 +37,6 @@ namespace Infection\Mutator\Unwrap;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
-use PhpParser\Node;
 
 /**
  * @internal
@@ -62,17 +61,16 @@ $x = 'Hello!';
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = lcfirst('Hello!');
++ $x = 'Hello!';
+DIFF
         );
     }
 
     protected function getFunctionName(): string
     {
         return 'lcfirst';
-    }
-
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
-    {
-        yield 0;
     }
 }

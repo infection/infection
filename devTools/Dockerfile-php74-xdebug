@@ -22,10 +22,11 @@ RUN apk add --no-cache \
         make \
         bash \
         expect \
+        git \
         zip
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-COPY devTools/memory-limit.ini ${PHP_INI_DIR}/conf.d/
+COPY devTools/memory-limit.ini devTools/xdebug-coverage.ini ${PHP_INI_DIR}/conf.d/
 
 RUN adduser -h /opt/infection -s /bin/bash -D infection
 

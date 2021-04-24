@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use function array_diff;
 use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
@@ -44,6 +45,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\FuncCall>
  */
 final class RoundingFamily implements Mutator
 {
@@ -63,12 +66,19 @@ Replaces rounding operations. For example `floor()` will be replaced with `ceil(
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = floor($b);
+# Mutation 1
++ $a = ceil($b);
+# Mutation 2
++ $a = round($b);
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\FuncCall $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\FuncCall>
      */
@@ -76,6 +86,7 @@ TXT
     {
         /** @var Node\Name $name */
         $name = $node->name;
+        /** @psalm-suppress ImpureMethodCall */
         $currentFunctionName = $name->toLowerString();
 
         $mutateToFunctions = array_diff(self::MUTATORS_MAP, [$currentFunctionName]);

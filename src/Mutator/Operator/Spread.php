@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\ArrayItem>
  */
 final class Spread implements Mutator
 {
@@ -66,12 +68,16 @@ $x = [[...$collection][0], 4, 5];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = [...$collection, 4, 5];
++ $x = [[...$collection][0], 4, 5];
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\ArrayItem $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\ArrayItem>
      */

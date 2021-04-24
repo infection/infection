@@ -51,7 +51,7 @@ final class BitwiseXorTest extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield[
+        yield [
             <<<'PHP'
 <?php
 

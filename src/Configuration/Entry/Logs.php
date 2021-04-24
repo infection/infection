@@ -37,15 +37,17 @@ namespace Infection\Configuration\Entry;
 
 /**
  * @internal
+ * @final
  */
-final class Logs
+class Logs
 {
-    private $textLogFilePath;
-    private $summaryLogFilePath;
-    private $jsonLogFilePath;
-    private $debugLogFilePath;
-    private $perMutatorFilePath;
-    private $badge;
+    private ?string $textLogFilePath;
+    private ?string $summaryLogFilePath;
+    private ?string $jsonLogFilePath;
+    private ?string $debugLogFilePath;
+    private ?string $perMutatorFilePath;
+    private bool $useGitHubAnnotationsLogger;
+    private ?Badge $badge;
 
     public function __construct(
         ?string $textLogFilePath,
@@ -53,6 +55,7 @@ final class Logs
         ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
+        bool $useGitHubAnnotationsLogger,
         ?Badge $badge
     ) {
         $this->textLogFilePath = $textLogFilePath;
@@ -60,6 +63,7 @@ final class Logs
         $this->jsonLogFilePath = $jsonLogFilePath;
         $this->debugLogFilePath = $debugLogFilePath;
         $this->perMutatorFilePath = $perMutatorFilePath;
+        $this->useGitHubAnnotationsLogger = $useGitHubAnnotationsLogger;
         $this->badge = $badge;
     }
 
@@ -71,6 +75,7 @@ final class Logs
             null,
             null,
             null,
+            false,
             null
         );
     }
@@ -98,6 +103,16 @@ final class Logs
     public function getPerMutatorFilePath(): ?string
     {
         return $this->perMutatorFilePath;
+    }
+
+    public function setUseGitHubAnnotationsLogger(bool $useGitHubAnnotationsLogger): void
+    {
+        $this->useGitHubAnnotationsLogger = $useGitHubAnnotationsLogger;
+    }
+
+    public function getUseGitHubAnnotationsLogger(): bool
+    {
+        return $this->useGitHubAnnotationsLogger;
     }
 
     public function getBadge(): ?Badge

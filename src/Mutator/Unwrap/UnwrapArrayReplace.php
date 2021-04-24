@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use function array_keys;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
@@ -69,7 +70,14 @@ $x = ['oof'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_replace(['foo', 'bar', 'baz'], ['oof']);
+# Mutation 1
++ $x = ['foo', 'bar', 'baz'];
+# Mutation 2
++ $x = ['oof'];
+DIFF
         );
     }
 
@@ -78,6 +86,9 @@ TXT
         return 'array_replace';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_keys($node->args);

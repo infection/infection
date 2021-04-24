@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BitwiseNot>
  */
 final class BitwiseNot implements Mutator
 {
@@ -53,12 +55,16 @@ final class BitwiseNot implements Mutator
         return new Definition(
             'Removes a bitwise NOT operator (`~`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = ~$b;
++ $a = $b;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BitwiseNot $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr>
      */

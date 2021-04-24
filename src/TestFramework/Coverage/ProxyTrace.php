@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
+use Later\Interfaces\Deferred;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -48,30 +49,19 @@ use Webmozart\Assert\Assert;
  */
 class ProxyTrace implements Trace
 {
-    /**
-     * @var SplFileInfo
-     */
-    private $sourceFile;
+    private SplFileInfo $sourceFile;
 
     /**
-     * @var TestLocations|null
+     * @var ?Deferred<TestLocations>
      */
-    private $testLocations;
+    private ?Deferred $lazyTestLocations;
+
+    private ?TestLocator $tests = null;
 
     /**
-     * @var iterable<TestLocations>
+     * @param Deferred<TestLocations> $lazyTestLocations
      */
-    private $lazyTestLocations;
-
-    /**
-     * @var TestLocator|null
-     */
-    private $tests;
-
-    /**
-     * @param iterable<TestLocations> $lazyTestLocations
-     */
-    public function __construct(SplFileInfo $sourceFile, iterable $lazyTestLocations)
+    public function __construct(SplFileInfo $sourceFile, ?Deferred $lazyTestLocations = null)
     {
         $this->sourceFile = $sourceFile;
 
@@ -100,34 +90,28 @@ class ProxyTrace implements Trace
 
     public function hasTests(): bool
     {
+        if ($this->lazyTestLocations === null) {
+            return false;
+        }
+
         return $this->getTestLocator()->hasTests();
     }
 
-    public function getTests(): TestLocations
+    public function getTests(): ?TestLocations
     {
-        if ($this->testLocations !== null) {
-            return $this->testLocations;
+        if ($this->lazyTestLocations !== null) {
+            return $this->lazyTestLocations->get();
         }
 
-        // TODO: maybe instead of having iterable<CoverageReport> lazyCoverageReport, we could have
-        // `Closure<() => TestLocations> testLocationsFactory`: it returns only one element but
-        // remains lazy
-        foreach ($this->lazyTestLocations as $testLocations) {
-            // is a Generator with one yield, thus it'll only trigger here
-            // (or this can be an array with one element)
-            $this->testLocations = $testLocations;
-
-            break;
-        }
-
-        Assert::isInstanceOf($this->testLocations, TestLocations::class);
-        $this->lazyTestLocations = []; // let GC have it
-
-        return $this->testLocations;
+        return null;
     }
 
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
     {
+        if ($this->lazyTestLocations === null) {
+            return [];
+        }
+
         return $this->getTestLocator()->getAllTestsForMutation($lineRange, $isOnFunctionSignature);
     }
 
@@ -137,7 +121,11 @@ class ProxyTrace implements Trace
             return $this->tests;
         }
 
-        $this->tests = new TestLocator($this->getTests());
+        $testLocations = $this->getTests();
+
+        Assert::notNull($testLocations);
+
+        $this->tests = new TestLocator($testLocations);
 
         return $this->tests;
     }

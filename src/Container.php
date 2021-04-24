@@ -63,6 +63,7 @@ use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFact
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
 use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
@@ -75,9 +76,16 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
-use Infection\Logger\LoggerFactory;
+use Infection\Logger\BadgeLoggerFactory;
+use Infection\Logger\FederatedLogger;
+use Infection\Logger\FileLoggerFactory;
+use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Logger\MutationTestingResultsLogger;
+use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
+use Infection\Metrics\ResultsCollector;
+use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
@@ -154,6 +162,10 @@ final class Container
     public const DEFAULT_DEBUG = false;
     public const DEFAULT_ONLY_COVERED = false;
     public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
+    public const DEFAULT_GIT_DIFF_FILTER = null;
+    public const DEFAULT_GIT_DIFF_BASE = null;
+    public const DEFAULT_USE_GITHUB_LOGGER = false;
+    public const DEFAULT_USE_NOOP_MUTATORS = false;
     public const DEFAULT_NO_PROGRESS = false;
     public const DEFAULT_FORCE_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
@@ -172,22 +184,19 @@ final class Container
     /**
      * @var array<class-string<object>, true>
      */
-    private $keys = [];
+    private array $keys = [];
 
     /**
      * @var array<class-string<object>, object>
      */
-    private $values = [];
+    private array $values = [];
 
     /**
      * @var array<class-string<object>, Closure(self): object>
      */
-    private $factories = [];
+    private array $factories = [];
 
-    /**
-     * @var string|null
-     */
-    private $defaultJUnitPath;
+    private ?string $defaultJUnitPath = null;
 
     /**
      * @param array<class-string<object>, Closure(self): object> $values
@@ -339,6 +348,9 @@ final class Container
             MetricsCalculator::class => static function (self $container): MetricsCalculator {
                 return new MetricsCalculator($container->getConfiguration()->getMsiPrecision());
             },
+            ResultsCollector::class => static function (self $container): ResultsCollector {
+                return new ResultsCollector();
+            },
             Stopwatch::class => static function (): Stopwatch {
                 return new Stopwatch();
             },
@@ -386,7 +398,8 @@ final class Container
                     $container->getMutatorFactory(),
                     $container->getMutatorParser(),
                     $container->getSourceFileCollector(),
-                    $container->getCiDetector()
+                    $container->getCiDetector(),
+                    $container->getGitDiffFileProvider()
                 );
             },
             MutatorResolver::class => static function (): MutatorResolver {
@@ -438,6 +451,7 @@ final class Container
                 return new ChainSubscriberFactory(
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
                     $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
+                    $container->getMutationTestingResultsCollectorSubscriberFactory(),
                     $container->getMutationTestingConsoleLoggerSubscriberFactory(),
                     $container->getMutationTestingResultsLoggerSubscriberFactory(),
                     $container->getPerformanceLoggerSubscriberFactory(),
@@ -467,11 +481,22 @@ final class Container
                     $container->getConfiguration()->noProgress()
                 );
             },
+            MutationTestingResultsCollectorSubscriberFactory::class => static function (self $container): MutationTestingResultsCollectorSubscriberFactory {
+                return new MutationTestingResultsCollectorSubscriberFactory(
+                   ...array_filter([
+                       $container->getMetricsCalculator(),
+                       $container->getFilteringResultsCollectorFactory()->create(
+                           $container->getResultsCollector()
+                       ),
+                   ])
+                );
+            },
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
 
                 return new MutationTestingConsoleLoggerSubscriberFactory(
                     $container->getMetricsCalculator(),
+                    $container->getResultsCollector(),
                     $container->getDiffColorizer(),
                     $config->showMutations(),
                     $container->getOutputFormatter()
@@ -479,8 +504,7 @@ final class Container
             },
             MutationTestingResultsLoggerSubscriberFactory::class => static function (self $container): MutationTestingResultsLoggerSubscriberFactory {
                 return new MutationTestingResultsLoggerSubscriberFactory(
-                    $container->getLoggerFactory(),
-                    $container->getConfiguration()->getLogs()
+                    $container->getMutationTestingResultsLogger()
                 );
             },
             PerformanceLoggerSubscriberFactory::class => static function (self $container): PerformanceLoggerSubscriberFactory {
@@ -506,18 +530,48 @@ final class Container
                     $container->getLineRangeCalculator()
                 );
             },
-            LoggerFactory::class => static function (self $container): LoggerFactory {
+            BadgeLoggerFactory::class => static function (self $container): BadgeLoggerFactory {
+                return new BadgeLoggerFactory(
+                    $container->getMetricsCalculator(),
+                    $container->getCiDetector(),
+                    $container->getLogger()
+                );
+            },
+            FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
 
-                return new LoggerFactory(
+                return new FileLoggerFactory(
                     $container->getMetricsCalculator(),
+                    $container->getResultsCollector(),
                     $container->getFileSystem(),
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
                     $config->mutateOnlyCoveredCode(),
-                    $container->getCiDetector(),
                     $container->getLogger()
                 );
+            },
+            MutationTestingResultsLogger::class => static function (self $container): MutationTestingResultsLogger {
+                return new FederatedLogger(...array_filter([
+                    $container->getFileLoggerFactory()->createFromLogEntries(
+                        $container->getConfiguration()->getLogs()
+                    ),
+                    $container->getBadgeLoggerFactory()->createFromLogEntries(
+                        $container->getConfiguration()->getLogs()
+                    ),
+                ]));
+            },
+            TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
+                $config = $container->getConfiguration();
+
+                return new TargetDetectionStatusesProvider(
+                    $config->getLogs(),
+                    $config->getLogVerbosity(),
+                    $config->mutateOnlyCoveredCode(),
+                    $config->showMutations()
+                );
+            },
+            FilteringResultsCollectorFactory::class => static function (self $container): FilteringResultsCollectorFactory {
+                return new FilteringResultsCollectorFactory($container->getTargetDetectionStatusesProvider());
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
                 $config = $container->getConfiguration();
@@ -598,6 +652,9 @@ final class Container
             DiffSourceCodeMatcher::class => static function (): DiffSourceCodeMatcher {
                 return new DiffSourceCodeMatcher();
             },
+            GitDiffFileProvider::class => static function (): GitDiffFileProvider {
+                return new GitDiffFileProvider();
+            },
         ]);
 
         return $container->withValues(
@@ -623,7 +680,11 @@ final class Container
             self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
             self::DEFAULT_FILTER,
             self::DEFAULT_THREAD_COUNT,
-            self::DEFAULT_DRY_RUN
+            self::DEFAULT_DRY_RUN,
+            self::DEFAULT_GIT_DIFF_FILTER,
+            self::DEFAULT_GIT_DIFF_BASE,
+            self::DEFAULT_USE_GITHUB_LOGGER,
+            self::DEFAULT_USE_NOOP_MUTATORS
         );
     }
 
@@ -650,7 +711,11 @@ final class Container
         ?string $testFrameworkExtraOptions,
         string $filter,
         int $threadCount,
-        bool $dryRun
+        bool $dryRun,
+        ?string $gitDiffFilter,
+        ?string $gitDiffBase,
+        bool $useGitHubLogger,
+        bool $useNoopMutators
     ): self {
         $clone = clone $this;
 
@@ -721,7 +786,11 @@ final class Container
                 $testFrameworkExtraOptions,
                 $filter,
                 $threadCount,
-                $dryRun
+                $dryRun,
+                $gitDiffFilter,
+                $gitDiffBase,
+                $useGitHubLogger,
+                $useNoopMutators
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -742,7 +811,11 @@ final class Container
                     $testFrameworkExtraOptions,
                     $filter,
                     $threadCount,
-                    $dryRun
+                    $dryRun,
+                    $gitDiffFilter,
+                    $gitDiffBase,
+                    $useGitHubLogger,
+                    $useNoopMutators
                 );
             }
         );
@@ -912,6 +985,11 @@ final class Container
         return $this->get(MetricsCalculator::class);
     }
 
+    public function getResultsCollector(): ResultsCollector
+    {
+        return $this->get(ResultsCollector::class);
+    }
+
     public function getStopwatch(): Stopwatch
     {
         return $this->get(Stopwatch::class);
@@ -1012,6 +1090,11 @@ final class Container
         return $this->get(MutationGeneratingConsoleLoggerSubscriberFactory::class);
     }
 
+    public function getMutationTestingResultsCollectorSubscriberFactory(): MutationTestingResultsCollectorSubscriberFactory
+    {
+        return $this->get(MutationTestingResultsCollectorSubscriberFactory::class);
+    }
+
     public function getMutationTestingConsoleLoggerSubscriberFactory(): MutationTestingConsoleLoggerSubscriberFactory
     {
         return $this->get(MutationTestingConsoleLoggerSubscriberFactory::class);
@@ -1042,9 +1125,29 @@ final class Container
         return $this->get(FileMutationGenerator::class);
     }
 
-    public function getLoggerFactory(): LoggerFactory
+    public function getFileLoggerFactory(): FileLoggerFactory
     {
-        return $this->get(LoggerFactory::class);
+        return $this->get(FileLoggerFactory::class);
+    }
+
+    public function getBadgeLoggerFactory(): BadgeLoggerFactory
+    {
+        return $this->get(BadgeLoggerFactory::class);
+    }
+
+    public function getMutationTestingResultsLogger(): MutationTestingResultsLogger
+    {
+        return $this->get(MutationTestingResultsLogger::class);
+    }
+
+    public function getTargetDetectionStatusesProvider(): TargetDetectionStatusesProvider
+    {
+        return $this->get(TargetDetectionStatusesProvider::class);
+    }
+
+    public function getFilteringResultsCollectorFactory(): FilteringResultsCollectorFactory
+    {
+        return $this->get(FilteringResultsCollectorFactory::class);
     }
 
     public function getTestFrameworkAdapter(): TestFrameworkAdapter
@@ -1145,6 +1248,11 @@ final class Container
     public function getDiffSourceCodeMatcher(): DiffSourceCodeMatcher
     {
         return $this->get(DiffSourceCodeMatcher::class);
+    }
+
+    public function getGitDiffFileProvider(): GitDiffFileProvider
+    {
+        return $this->get(GitDiffFileProvider::class);
     }
 
     /**

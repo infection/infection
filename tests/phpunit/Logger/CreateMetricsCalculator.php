@@ -35,14 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutator\Loop\For_;
 use Infection\Mutator\Regex\PregQuote;
-use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
-use const PHP_EOL;
-use function str_replace;
+use function Infection\Tests\normalize_trailing_spaces;
+use function Later\now;
 
 trait CreateMetricsCalculator
 {
@@ -50,7 +52,23 @@ trait CreateMetricsCalculator
     {
         $calculator = new MetricsCalculator(2);
 
-        $calculator->collect(
+        $this->feedCollector($calculator);
+
+        return $calculator;
+    }
+
+    private function createCompleteResultsCollector(): ResultsCollector
+    {
+        $collector = new ResultsCollector();
+
+        $this->feedCollector($collector);
+
+        return $collector;
+    }
+
+    private function feedCollector(Collector $collector): void
+    {
+        $collector->collect(
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
@@ -124,8 +142,6 @@ trait CreateMetricsCalculator
                 'notCovered#1'
             )
         );
-
-        return $calculator;
     }
 
     private function createMutantExecutionResult(
@@ -138,9 +154,7 @@ trait CreateMetricsCalculator
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
             $detectionStatus,
-            str_replace(
-                "\n",
-                PHP_EOL,
+            now(normalize_trailing_spaces(
                 <<<DIFF
 --- Original
 +++ New
@@ -150,12 +164,12 @@ trait CreateMetricsCalculator
 + echo '$echoMutatedMessage';
 
 DIFF
-            ),
+            )),
             MutatorName::getName($mutatorClassName),
             'foo/bar',
             10 - $i,
-            '<?php $a = 1;',
-            '<?php $a = 2;'
+            now('<?php $a = 1;'),
+            now('<?php $a = 2;')
         );
     }
 }

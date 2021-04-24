@@ -42,13 +42,14 @@ use function is_string;
 use LogicException;
 use function Safe\array_walk_recursive;
 use stdClass;
+use function trim;
 
 /**
  * @internal
  */
 class SourceDirGuesser
 {
-    private $composerJsonContent;
+    private stdClass $composerJsonContent;
 
     public function __construct(stdClass $composerJsonContent)
     {

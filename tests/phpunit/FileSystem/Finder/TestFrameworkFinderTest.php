@@ -36,12 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Finder;
 
 use const DIRECTORY_SEPARATOR;
+use function explode;
+use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
+use const PATH_SEPARATOR;
 use function Safe\putenv;
 use function Safe\realpath;
 use function Safe\sprintf;

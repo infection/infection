@@ -45,10 +45,7 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @var Node\Name|null
-     */
-    private $namespace;
+    private ?Node\Name $namespace = null;
 
     public function enterNode(Node $node): ?Node
     {

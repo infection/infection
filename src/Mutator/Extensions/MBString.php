@@ -53,16 +53,18 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements ConfigurableMutator<Node\Expr\FuncCall>
  */
 final class MBString implements ConfigurableMutator
 {
-    use GetMutatorName;
     use GetConfigClassName;
+    use GetMutatorName;
 
     /**
      * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>>
      */
-    private $converters;
+    private array $converters;
 
     public function __construct(MBStringConfig $config)
     {
@@ -88,12 +90,17 @@ $x = strlen($str) < 10;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = mb_strlen($str) < 10;
++ $x = strlen($str) < 10;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\FuncCall $node
+     * @psalm-mutation-free
+     * @psalm-suppress ImpureMethodCall
      *
      * @return iterable<Node\Expr\FuncCall>
      */

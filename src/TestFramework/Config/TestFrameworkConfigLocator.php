@@ -54,10 +54,7 @@ final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInte
         'dist.yml',
     ];
 
-    /**
-     * @var string
-     */
-    private $configDir;
+    private string $configDir;
 
     public function __construct(string $configDir)
     {

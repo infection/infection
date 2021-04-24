@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\FuncCall>
  */
 final class PregQuote implements Mutator
 {
@@ -67,12 +69,16 @@ $x = $string;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = preg_quote($string, $delimiter);
++ $x = $string;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\FuncCall $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Arg>
      */

@@ -48,7 +48,7 @@ class ConsoleOutput
 {
     private const MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percentage points over the required %s. Consider increasing the required %s percentage the next time you run Infection.';
 
-    private $logger;
+    private ConsoleLogger $logger;
 
     public function __construct(ConsoleLogger $logger)
     {

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Str;
 use function json_encode;
@@ -47,14 +48,17 @@ use function mb_convert_encoding;
  */
 final class JsonLogger implements LineMutationTestingResultsLogger
 {
-    private $metricsCalculator;
-    private $onlyCoveredMode;
+    private MetricsCalculator $metricsCalculator;
+    private ResultsCollector $resultsCollector;
+    private bool $onlyCoveredMode;
 
     public function __construct(
         MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
         bool $onlyCoveredMode
     ) {
         $this->metricsCalculator = $metricsCalculator;
+        $this->resultsCollector = $resultsCollector;
         $this->onlyCoveredMode = $onlyCoveredMode;
     }
 
@@ -76,11 +80,11 @@ final class JsonLogger implements LineMutationTestingResultsLogger
                 'mutationCodeCoverage' => $this->metricsCalculator->getCoverageRate(),
                 'coveredCodeMsi' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
             ],
-            'escaped' => $this->getResultsLine($this->metricsCalculator->getEscapedExecutionResults()),
-            'timeouted' => $this->getResultsLine($this->metricsCalculator->getTimedOutExecutionResults()),
-            'killed' => $this->getResultsLine($this->metricsCalculator->getKilledExecutionResults()),
-            'errored' => $this->getResultsLine($this->metricsCalculator->getErrorExecutionResults()),
-            'uncovered' => $this->onlyCoveredMode ? [] : $this->getResultsLine($this->metricsCalculator->getNotCoveredExecutionResults()),
+            'escaped' => $this->getResultsLine($this->resultsCollector->getEscapedExecutionResults()),
+            'timeouted' => $this->getResultsLine($this->resultsCollector->getTimedOutExecutionResults()),
+            'killed' => $this->getResultsLine($this->resultsCollector->getKilledExecutionResults()),
+            'errored' => $this->getResultsLine($this->resultsCollector->getErrorExecutionResults()),
+            'uncovered' => $this->onlyCoveredMode ? [] : $this->getResultsLine($this->resultsCollector->getNotCoveredExecutionResults()),
         ];
 
         return [json_encode($data, JSON_THROW_ON_ERROR)];

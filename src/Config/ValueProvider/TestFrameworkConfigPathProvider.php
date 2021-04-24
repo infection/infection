@@ -37,6 +37,7 @@ namespace Infection\Config\ValueProvider;
 
 use Closure;
 use Exception;
+use function file_exists;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use Infection\Console\IO;
@@ -49,15 +50,16 @@ use function Safe\json_decode;
 use function Safe\sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
+use function trim;
 
 /**
  * @internal
  */
 final class TestFrameworkConfigPathProvider
 {
-    private $testFrameworkConfigLocator;
-    private $consoleHelper;
-    private $questionHelper;
+    private TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator;
+    private ConsoleHelper $consoleHelper;
+    private QuestionHelper $questionHelper;
 
     public function __construct(TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
     {

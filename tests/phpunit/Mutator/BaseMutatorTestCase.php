@@ -119,7 +119,7 @@ abstract class BaseMutatorTestCase extends TestCase
             ->getMutatorFactory()
             ->create([
                 $mutatorClassName => ['settings' => $settings],
-            ])[MutatorName::getName($mutatorClassName)]
+            ], false)[MutatorName::getName($mutatorClassName)]
         ;
     }
 

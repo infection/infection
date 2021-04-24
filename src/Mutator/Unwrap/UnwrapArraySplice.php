@@ -37,7 +37,6 @@ namespace Infection\Mutator\Unwrap;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
-use PhpParser\Node;
 
 /**
  * @internal
@@ -62,17 +61,16 @@ $x = ['foo', 'bar', 'baz'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_splice(['foo', 'bar', 'baz'], 1);
++ $x = ['foo', 'bar', 'baz'];
+DIFF
         );
     }
 
     protected function getFunctionName(): string
     {
         return 'array_splice';
-    }
-
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
-    {
-        yield 0;
     }
 }

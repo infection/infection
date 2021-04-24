@@ -67,7 +67,7 @@ final class TextLogFileProviderTest extends BaseProviderTest
             []
         );
 
-        $this->assertSame(TextLogFileProvider::TEXT_LOG_FILE_NAME, $textLogFilePath);
+        $this->assertNull($textLogFilePath);
     }
 
     public function test_it_uses_typed_value(): void

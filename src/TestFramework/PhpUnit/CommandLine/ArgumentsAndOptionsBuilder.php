@@ -35,10 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
-use function array_filter;
+use function array_map;
 use function array_merge;
 use function explode;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
+use function ltrim;
 
 /**
  * @internal
@@ -47,14 +48,20 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 {
     public function build(string $configPath, string $extraOptions): array
     {
-        $options = array_merge(
-            [
-                '--configuration',
-                $configPath,
-            ],
-            explode(' ', $extraOptions) // FIXME might break space-containing paths
-        );
+        $options = [
+            '--configuration',
+            $configPath,
+        ];
 
-        return array_filter($options);
+        if ($extraOptions !== '') {
+            $options = array_merge(
+                $options,
+                array_map(static function ($option): string {
+                    return '--' . $option;
+                }, explode(' --', ltrim($extraOptions, '-')))
+            );
+        }
+
+        return $options;
     }
 }

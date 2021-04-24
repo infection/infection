@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use function array_filter;
+use function array_map;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
@@ -56,6 +58,7 @@ use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
@@ -74,10 +77,12 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
+use function ltrim;
 use ReflectionClass;
 use function Safe\sort;
 use function Safe\sprintf;
 use const SORT_STRING;
+use function str_replace;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -108,6 +113,7 @@ final class ProjectCodeProvider
         XdebugHandler::class,
         NullSubscriber::class,
         FormatterName::class,
+        GitDiffFileProvider::class,
     ];
 
     /**

@@ -41,13 +41,15 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\Cast>
  */
 abstract class AbstractCastMutator implements Mutator
 {
     use GetMutatorName;
 
     /**
-     * @param Node\Expr\Cast $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr>
      */

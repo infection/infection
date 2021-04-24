@@ -49,7 +49,11 @@ final class CastInt extends AbstractCastMutator
         return new Definition(
             'Removes an integer cast operator (`(int)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = (int) $value;
++ $a = $value;
+DIFF
         );
     }
 

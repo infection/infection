@@ -42,6 +42,7 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\TestCase;
+use function range;
 
 final class LineRangeCalculatorTest extends TestCase
 {

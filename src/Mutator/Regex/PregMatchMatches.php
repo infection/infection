@@ -44,6 +44,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\FuncCall>
  */
 final class PregMatchMatches implements Mutator
 {
@@ -72,12 +74,16 @@ if ((int) $matches = []) {
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- preg_match('/pattern/', $subject, $matches, $flags);
++ (int) $matches = [];
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\FuncCall $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\Cast\Int_>
      */

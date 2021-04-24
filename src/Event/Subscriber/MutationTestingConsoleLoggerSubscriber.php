@@ -42,9 +42,11 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use function Safe\sprintf;
 use function str_pad;
+use const STR_PAD_LEFT;
 use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -56,27 +58,27 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 {
     private const PAD_LENGTH = 8;
 
-    private $output;
-    private $outputFormatter;
-    private $metricsCalculator;
-    private $showMutations;
-    private $diffColorizer;
+    private OutputInterface $output;
+    private OutputFormatter $outputFormatter;
+    private MetricsCalculator $metricsCalculator;
+    private ResultsCollector $resultsCollector;
+    private bool $showMutations;
+    private DiffColorizer $diffColorizer;
 
-    /**
-     * @var int
-     */
-    private $mutationCount = 0;
+    private int $mutationCount = 0;
 
     public function __construct(
         OutputInterface $output,
         OutputFormatter $outputFormatter,
         MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
         DiffColorizer $diffColorizer,
         bool $showMutations
     ) {
         $this->output = $output;
         $this->outputFormatter = $outputFormatter;
         $this->metricsCalculator = $metricsCalculator;
+        $this->resultsCollector = $resultsCollector;
         $this->showMutations = $showMutations;
         $this->diffColorizer = $diffColorizer;
     }
@@ -92,8 +94,6 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         $executionResult = $event->getExecutionResult();
 
-        $this->metricsCalculator->collect($executionResult);
-
         $this->outputFormatter->advance($executionResult, $this->mutationCount);
     }
 
@@ -102,10 +102,10 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->outputFormatter->finish();
 
         if ($this->showMutations) {
-            $this->showMutations($this->metricsCalculator->getEscapedExecutionResults(), 'Escaped');
+            $this->showMutations($this->resultsCollector->getEscapedExecutionResults(), 'Escaped');
 
             if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-                $this->showMutations($this->metricsCalculator->getNotCoveredExecutionResults(), 'Not covered');
+                $this->showMutations($this->resultsCollector->getNotCoveredExecutionResults(), 'Not covered');
             }
         }
 

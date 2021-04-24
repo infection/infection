@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use function class_exists;
+use function interface_exists;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 use function trait_exists;

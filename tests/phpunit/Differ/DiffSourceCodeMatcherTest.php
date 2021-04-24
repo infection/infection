@@ -170,17 +170,32 @@ DIFF
             false,
         ];
 
-        yield 'Regex contains delimiters should not lead to syntax error' => [
-            '/getString/',
+        yield 'Regex containing common delimiters should not lead to syntax error' => [
+            '.*# comment\s*',
             <<<'DIFF'
 --- Original
 +++ New
 @@ @@
 
-+ $a - 2 + $this->getString();
+- $a - 2 + $this->getString() / 2; # comment
++ $a - 2 + $this->getString(); # comment
 DIFF
             ,
-            false,
+                true,
+        ];
+
+        yield 'Regex containing less common delimiters should not lead to syntax error' => [
+            '.*%.*',
+                <<<'DIFF'
+--- Original
++++ New
+@@ @@
+
+- $a % 2;
++ $a % 3;
+DIFF
+                ,
+                true,
         ];
     }
 }

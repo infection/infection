@@ -53,24 +53,21 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
-    private $originalFilePath;
-    private $mutatorName;
-    private $mutatedNodeClass;
-    private $mutatedNode;
-    private $mutationByMutatorIndex;
-    private $attributes;
-    private $originalFileAst;
-    private $tests;
-    private $coveredByTests;
-    /**
-     * @var float|null
-     */
-    private $nominalTimeToTest;
+    private string $originalFilePath;
+    private string $mutatorName;
+    private string $mutatedNodeClass;
+    private MutatedNode $mutatedNode;
+    private int $mutationByMutatorIndex;
+    /** @var array<string|int|float> */
+    private array $attributes;
+    /** @var Node[] */
+    private array $originalFileAst;
+    /** @var TestLocation[] */
+    private array $tests;
+    private bool $coveredByTests;
+    private ?float $nominalTimeToTest = null;
 
-    /**
-     * @var string|null
-     */
-    private $hash;
+    private ?string $hash = null;
 
     /**
      * @param Node[] $originalFileAst

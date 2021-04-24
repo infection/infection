@@ -43,7 +43,7 @@ use ReflectionException;
  */
 final class CoreClassReflection implements ClassReflection
 {
-    private $reflectionClass;
+    private ReflectionClass $reflectionClass;
 
     private function __construct(ReflectionClass $reflectionClass)
     {
