@@ -1,6 +1,24 @@
 # Change Log
 
-## [0.20.1](https://github.com/infection/infection/tree/0.21.0) (2021-01-27)
+## [0.22.0](https://github.com/infection/infection/tree/0.22.0) (2021-04-24)
+[Full Changelog](https://github.com/infection/infection/compare/0.21.5...0.22.0)
+
+**Added:**
+
+- Add `INFECTION` and `TEST_TOKEN` environment variables for each Mutant process #1504
+
+**Fixed:**
+
+- composer install --no-scripts installs 0.13.4 instead of 0.15.0 https://github.com/infection/infection/issues/876
+- Invalid mutator config Bug https://github.com/infection/infection/issues/1479
+- Error: Expected a value other than null https://github.com/infection/infection/issues/1480
+- git-diff-filter option on MacOS doesn't work https://github.com/infection/infection/issues/1492
+- TypeError: Argument 1 passed to PhpParser\Node\Scalar\LNumber::__construct() must be of the type int, float given https://github.com/infection/infection/issues/1484
+- Do not increment max integer value https://github.com/infection/infection/pull/1486
+- Do not decrement min integer value https://github.com/infection/infection/pull/1488
+- Fix file not found exception for Codeception Cests
+
+## [0.21.0](https://github.com/infection/infection/tree/0.21.0) (2021-01-27)
 [Full Changelog](https://github.com/infection/infection/compare/0.20.2...0.21.0)
 
 **Added:**
