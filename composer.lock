@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2cf9f7ad9129eedccb617b0efc35bd51",
+    "content-hash": "a17ea31907197add595219668c95d804",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -115,6 +115,82 @@
             "time": "2020-08-30T13:50:12+00:00"
         },
         {
+            "name": "infection/codeception-adapter",
+            "version": "0.3.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/infection/codeception-adapter.git",
+                "reference": "2b68c8e24354e2b748e1300e51fd8340183769e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/infection/codeception-adapter/zipball/2b68c8e24354e2b748e1300e51fd8340183769e4",
+                "reference": "2b68c8e24354e2b748e1300e51fd8340183769e4",
+                "shasum": ""
+            },
+            "require": {
+                "infection/abstract-testframework-adapter": "^0.3.1",
+                "infection/include-interceptor": "^0.2.0",
+                "php": "^7.4 || ^8.0",
+                "symfony/filesystem": "^3.4.29 || ^4.0 || ^5.0",
+                "symfony/process": "^3.4.29 || ^4.0 || ^5.0",
+                "symfony/yaml": "^3.4.29 || ^4.0 || ^5.0"
+            },
+            "conflict": {
+                "codeception/codeception": "<4.1.9"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.18",
+                "infection/infection": "^0.21.0",
+                "php-coveralls/php-coveralls": "^2.4",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^0.12.70",
+                "phpstan/phpstan-phpunit": "^0.12.17",
+                "phpstan/phpstan-strict-rules": "^0.12.9",
+                "phpstan/phpstan-webmozart-assert": "^0.12.9",
+                "phpunit/phpunit": "^9.5",
+                "thecodingmachine/safe": "^1.3",
+                "vimeo/psalm": "^4.4"
+            },
+            "type": "infection-extension",
+            "extra": {
+                "infection": {
+                    "class": "Infection\\TestFramework\\Codeception\\CodeceptionAdapterFactory"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Infection\\TestFramework\\Codeception\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Maks Rafalko",
+                    "email": "maks.rafalko@gmail.com"
+                }
+            ],
+            "description": "Codeception Test Framework Adapter for Infection",
+            "support": {
+                "issues": "https://github.com/infection/codeception-adapter/issues",
+                "source": "https://github.com/infection/codeception-adapter/tree/0.3.4"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/infection",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/infection",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2021-02-01T17:37:25+00:00"
+        },
+        {
             "name": "infection/extension-installer",
             "version": "0.1.1",
             "source": {
@@ -215,6 +291,79 @@
                 "source": "https://github.com/infection/include-interceptor/tree/0.2.4"
             },
             "time": "2020-08-07T22:40:37+00:00"
+        },
+        {
+            "name": "infection/phpspec-adapter",
+            "version": "0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/infection/phpspec-adapter.git",
+                "reference": "49853c9132bedb324b7844c49617b4164da97385"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/infection/phpspec-adapter/zipball/49853c9132bedb324b7844c49617b4164da97385",
+                "reference": "49853c9132bedb324b7844c49617b4164da97385",
+                "shasum": ""
+            },
+            "require": {
+                "infection/abstract-testframework-adapter": "^0.3.1",
+                "infection/include-interceptor": "^0.2.3",
+                "php": "^7.4 || ^8.0",
+                "symfony/filesystem": "^3.4.29 || ^4.0 || ^5.0",
+                "symfony/process": "^3.4.29 || ^4.0 || ^5.0",
+                "symfony/yaml": "^3.4.29 || ^4.0 || ^5.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.17",
+                "infection/infection": "^0.20.2",
+                "php-coveralls/php-coveralls": "^2.4",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^0.12.66",
+                "phpstan/phpstan-phpunit": "^0.12.17",
+                "phpstan/phpstan-strict-rules": "^0.12.8",
+                "phpstan/phpstan-webmozart-assert": "^0.12.8",
+                "phpunit/phpunit": "^8.5",
+                "thecodingmachine/safe": "^1.3",
+                "vimeo/psalm": "^4.4"
+            },
+            "type": "infection-extension",
+            "extra": {
+                "infection": {
+                    "class": "Infection\\TestFramework\\PhpSpec\\PhpSpecAdapterFactory"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Infection\\TestFramework\\PhpSpec\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Maks Rafalko",
+                    "email": "maks.rafalko@gmail.com"
+                }
+            ],
+            "description": "PHPSpec Test Framework Adapter for Infection",
+            "support": {
+                "issues": "https://github.com/infection/phpspec-adapter/issues",
+                "source": "https://github.com/infection/phpspec-adapter/tree/0.1.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/infection",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/infection",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2021-01-16T17:43:52+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -931,6 +1080,73 @@
                 }
             ],
             "time": "2020-12-18T08:03:05+00:00"
+        },
+        {
+            "name": "symfony/deprecation-contracts",
+            "version": "v2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/deprecation-contracts.git",
+                "reference": "5fa56b4074d1ae755beb55617ddafe6f5d78f665"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/5fa56b4074d1ae755beb55617ddafe6f5d78f665",
+                "reference": "5fa56b4074d1ae755beb55617ddafe6f5d78f665",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.2-dev"
+                },
+                "thanks": {
+                    "name": "symfony/contracts",
+                    "url": "https://github.com/symfony/contracts"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "function.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "A generic function and convention to trigger deprecation notices",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/deprecation-contracts/tree/master"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-09-07T11:33:47+00:00"
         },
         {
             "name": "symfony/filesystem",
@@ -1764,6 +1980,81 @@
                 }
             ],
             "time": "2020-12-05T07:33:16+00:00"
+        },
+        {
+            "name": "symfony/yaml",
+            "version": "v5.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "290ea5e03b8cf9b42c783163123f54441fb06939"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/290ea5e03b8cf9b42c783163123f54441fb06939",
+                "reference": "290ea5e03b8cf9b42c783163123f54441fb06939",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.5",
+                "symfony/deprecation-contracts": "^2.1",
+                "symfony/polyfill-ctype": "~1.8"
+            },
+            "conflict": {
+                "symfony/console": "<4.4"
+            },
+            "require-dev": {
+                "symfony/console": "^4.4|^5.0"
+            },
+            "suggest": {
+                "symfony/console": "For validating YAML files using the lint command"
+            },
+            "bin": [
+                "Resources/bin/yaml-lint"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Yaml Component",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/yaml/tree/v5.2.1"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-12-08T17:02:38+00:00"
         },
         {
             "name": "thecodingmachine/safe",
@@ -4233,73 +4524,6 @@
             "time": "2020-10-27T11:37:08+00:00"
         },
         {
-            "name": "symfony/deprecation-contracts",
-            "version": "v2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/deprecation-contracts.git",
-                "reference": "5fa56b4074d1ae755beb55617ddafe6f5d78f665"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/5fa56b4074d1ae755beb55617ddafe6f5d78f665",
-                "reference": "5fa56b4074d1ae755beb55617ddafe6f5d78f665",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.1"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.2-dev"
-                },
-                "thanks": {
-                    "name": "symfony/contracts",
-                    "url": "https://github.com/symfony/contracts"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "function.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "A generic function and convention to trigger deprecation notices",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/master"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2020-09-07T11:33:47+00:00"
-        },
-        {
             "name": "symfony/phpunit-bridge",
             "version": "v5.2.1",
             "source": {
@@ -4381,81 +4605,6 @@
                 }
             ],
             "time": "2020-12-14T22:27:17+00:00"
-        },
-        {
-            "name": "symfony/yaml",
-            "version": "v5.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "290ea5e03b8cf9b42c783163123f54441fb06939"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/290ea5e03b8cf9b42c783163123f54441fb06939",
-                "reference": "290ea5e03b8cf9b42c783163123f54441fb06939",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2.5",
-                "symfony/deprecation-contracts": "^2.1",
-                "symfony/polyfill-ctype": "~1.8"
-            },
-            "conflict": {
-                "symfony/console": "<4.4"
-            },
-            "require-dev": {
-                "symfony/console": "^4.4|^5.0"
-            },
-            "suggest": {
-                "symfony/console": "For validating YAML files using the lint command"
-            },
-            "bin": [
-                "Resources/bin/yaml-lint"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Yaml\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Yaml Component",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/yaml/tree/v5.2.1"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2020-12-08T17:02:38+00:00"
         },
         {
             "name": "thecodingmachine/phpstan-safe-rule",
