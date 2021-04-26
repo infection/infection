@@ -50,8 +50,6 @@ final class XdebugHandler
 
     public static function check(LoggerInterface $logger): void
     {
-        // We force the color option unconditionally since it is able to detect the --no-ansi option
-        // to disable it if necessary
         (new ComposerXdebugHandler(self::PREFIX))
             ->setLogger($logger)
             ->setPersistent()
