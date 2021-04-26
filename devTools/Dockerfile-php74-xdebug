@@ -1,11 +1,13 @@
 FROM php:7.4-cli-alpine
 
+ARG XDEBUG_VERSION=3.0.4
+
 RUN set -eux; \
     apk add --no-cache --virtual .build-deps \
         ${PHPIZE_DEPS} \
         build-base \
     ; \
-    pecl install xdebug; \
+    pecl install xdebug-${XDEBUG_VERSION}; \
     pecl clear-cache; \
     docker-php-ext-enable xdebug ;\
     runDeps="$( \
@@ -25,7 +27,7 @@ RUN apk add --no-cache \
         git \
         zip
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY devTools/memory-limit.ini devTools/xdebug-coverage.ini ${PHP_INI_DIR}/conf.d/
 
 RUN adduser -h /opt/infection -s /bin/bash -D infection
