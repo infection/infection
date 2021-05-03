@@ -306,6 +306,11 @@ parameters:
 			path: ../src/TestFramework/Coverage/XmlReport/XPathFactory.php
 
 		-
+			message: "#^Method Infection\\\\TestFramework\\\\PhpUnit\\\\Adapter\\\\PestAdapterFactory\\:\\:create\\(\\) has parameter \\$sourceDirectories with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PestAdapterFactory.php
+
+		-
 			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
 			count: 3
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php

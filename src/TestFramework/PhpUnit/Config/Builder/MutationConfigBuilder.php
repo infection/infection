@@ -115,7 +115,6 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
         $this->setFilteredTestsToRun($tests, $dom, $xPath);
 
-        // todo where is caching? we had it before I guess
         file_put_contents(
             $customAutoloadFilePath,
             $this->createCustomAutoloadWithInterceptor(
