@@ -39,6 +39,9 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use function is_string;
 use PhpParser\Node;
 
 /**
@@ -94,7 +97,25 @@ DIFF
             return false;
         }
 
-        return true;
+        $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
+
+        if (!$functionScope instanceof Node\Stmt\ClassMethod) {
+            return true;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Stmt\Return_) {
+            return true;
+        }
+
+        $returnType = $functionScope->getReturnType();
+
+        if ($returnType instanceof Node\Identifier) {
+            $returnType = $returnType->name;
+        }
+
+        return !(is_string($returnType) && $returnType === 'int');
     }
 
     private function isNumericOne(Node $node): bool
