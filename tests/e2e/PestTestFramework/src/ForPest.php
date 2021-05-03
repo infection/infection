@@ -2,7 +2,7 @@
 
 namespace PestTestFramework;
 
-class SourceClass
+class ForPest
 {
     public function hello(): string
     {

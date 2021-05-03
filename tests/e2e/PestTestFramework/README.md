@@ -7,6 +7,12 @@
 
 This test ensures Pest is working correctly with Infection.
 
+Cases:
+
+- `ForPest.php` file is tested only by Pest
+- `ForPhpUnit.php` file is tested only by PhpUnit
+- `Calculator.php` file is tested by Pest and PhpUnit
+
 To manually check it, run:
 
 ```
