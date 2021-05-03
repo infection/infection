@@ -35,13 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
+use Infection\TestFramework\IgnoresAdditionalNodes;
+use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use function Safe\preg_match;
-use function sprintf;
+use function Safe\sprintf;
 
-class PestAdapter implements TestFrameworkAdapter
+/**
+ * @internal
+ */
+final class PestAdapter implements IgnoresAdditionalNodes, MemoryUsageAware, ProvidesInitialRunOnlyOptions, TestFrameworkAdapter
 {
-    private const NAME = 'pest';
+    private const NAME = 'Pest';
 
     private PhpUnitAdapter $phpUnitAdapter;
 
@@ -100,5 +107,26 @@ class PestAdapter implements TestFrameworkAdapter
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
         return $this->phpUnitAdapter->getInitialTestsFailRecommendations($commandLine);
+    }
+
+    public function getMemoryUsed(string $output): float
+    {
+        return $this->phpUnitAdapter->getMemoryUsed($output);
+    }
+
+    /**
+     * @return PhpUnitCodeCoverageAnnotationIgnorer[]
+     */
+    public function getNodeIgnorers(): array
+    {
+        return $this->phpUnitAdapter->getNodeIgnorers();
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getInitialRunOnlyOptions(): array
+    {
+        return $this->phpUnitAdapter->getInitialRunOnlyOptions();
     }
 }

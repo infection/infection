@@ -66,7 +66,7 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
         array $sourceDirectories,
         bool $skipCoverage
     ): TestFrameworkAdapter {
-        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the phpunit adapter');
+        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
