@@ -59,7 +59,7 @@ final class CoveredPhpProcess extends Process
     {
         if (!extension_loaded('pcov')) {
             $env = array_merge($env ?? [], [
-                'XDEBUG_MODE' => 'debug',
+                'XDEBUG_MODE' => 'coverage',
             ]);
         }
 
