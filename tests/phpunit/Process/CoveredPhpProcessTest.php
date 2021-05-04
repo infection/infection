@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use function extension_loaded;
 use Infection\Process\CoveredPhpProcess;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
@@ -63,6 +64,10 @@ final class CoveredPhpProcessTest extends TestCase
         $process = new CoveredPhpProcess(['env']);
         $process->run();
 
-        $this->assertStringContainsString('XDEBUG_MODE=debug' . PHP_EOL, $process->getOutput());
+        if (!extension_loaded('pcov')) {
+            $this->assertStringContainsString('XDEBUG_MODE=debug' . PHP_EOL, $process->getOutput());
+        } else {
+            $this->assertStringNotContainsString('XDEBUG_MODE=debug' . PHP_EOL, $process->getOutput());
+        }
     }
 }
