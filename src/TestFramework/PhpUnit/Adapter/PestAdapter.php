@@ -37,8 +37,6 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
-use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use function Safe\preg_match;
 use function Safe\sprintf;
@@ -46,7 +44,7 @@ use function Safe\sprintf;
 /**
  * @internal
  */
-final class PestAdapter implements IgnoresAdditionalNodes, MemoryUsageAware, ProvidesInitialRunOnlyOptions, TestFrameworkAdapter
+final class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, TestFrameworkAdapter
 {
     private const NAME = 'Pest';
 
@@ -112,14 +110,6 @@ final class PestAdapter implements IgnoresAdditionalNodes, MemoryUsageAware, Pro
     public function getMemoryUsed(string $output): float
     {
         return $this->phpUnitAdapter->getMemoryUsed($output);
-    }
-
-    /**
-     * @return PhpUnitCodeCoverageAnnotationIgnorer[]
-     */
-    public function getNodeIgnorers(): array
-    {
-        return $this->phpUnitAdapter->getNodeIgnorers();
     }
 
     /**
