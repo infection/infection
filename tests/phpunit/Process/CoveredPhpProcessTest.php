@@ -53,7 +53,7 @@ final class CoveredPhpProcessTest extends TestCase
     public function test_it_takes_command_line(): void
     {
         $process = new CoveredPhpProcess(['foo']);
-        $this->assertSame("'foo'", $process->getCommandLine());
+        $this->assertStringContainsString('foo', $process->getCommandLine());
     }
 
     /**
