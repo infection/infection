@@ -37,7 +37,6 @@ namespace Infection\Tests\Process;
 
 use function extension_loaded;
 use Infection\Process\CoveredPhpProcess;
-use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
