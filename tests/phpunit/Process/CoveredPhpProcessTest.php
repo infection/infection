@@ -65,9 +65,9 @@ final class CoveredPhpProcessTest extends TestCase
         $process->run();
 
         if (!extension_loaded('pcov')) {
-            $this->assertStringContainsString('XDEBUG_MODE=coverage' . PHP_EOL, $process->getOutput());
+            $this->assertStringContainsString('XDEBUG_MODE=coverage', $process->getOutput());
         } else {
-            $this->assertStringNotContainsString('XDEBUG_MODE=coverage' . PHP_EOL, $process->getOutput());
+            $this->assertStringNotContainsString('XDEBUG_MODE=coverage', $process->getOutput());
         }
     }
 }
