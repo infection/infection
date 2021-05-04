@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use function array_map;
 use const DIRECTORY_SEPARATOR;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
@@ -121,16 +119,6 @@ final class PhpUnitAdapterTest extends TestCase
         $this->assertSame(
             ['--configuration', '--filter', '--testsuite'],
             $options
-        );
-    }
-
-    public function test_it_provides_node_ignorers(): void
-    {
-        $nodeIgnorers = array_map('get_class', $this->adapter->getNodeIgnorers());
-
-        $this->assertSame(
-            [PhpUnitCodeCoverageAnnotationIgnorer::class],
-            $nodeIgnorers
         );
     }
 
