@@ -124,16 +124,6 @@ final class PhpUnitAdapterTest extends TestCase
         );
     }
 
-    public function test_it_provides_node_ignorers(): void
-    {
-        $nodeIgnorers = array_map('get_class', $this->adapter->getNodeIgnorers());
-
-        $this->assertSame(
-            [PhpUnitCodeCoverageAnnotationIgnorer::class],
-            $nodeIgnorers
-        );
-    }
-
     /**
      * @group integration
      */

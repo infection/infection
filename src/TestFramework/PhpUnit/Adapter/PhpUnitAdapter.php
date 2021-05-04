@@ -38,13 +38,11 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use function escapeshellarg;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\VersionParser;
 use function Safe\preg_match;
@@ -56,7 +54,7 @@ use function version_compare;
  * @internal
  * @final
  */
-class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditionalNodes, MemoryUsageAware, ProvidesInitialRunOnlyOptions
+class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
@@ -170,11 +168,6 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
         }
 
         return $recommendations;
-    }
-
-    public function getNodeIgnorers(): array
-    {
-        return [new PhpUnitCodeCoverageAnnotationIgnorer()];
     }
 
     /**
