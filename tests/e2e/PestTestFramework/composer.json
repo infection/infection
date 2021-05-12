@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "pestphp/pest": "dev-feat-junit"
+        "pestphp/pest": "master"
     },
     "autoload": {
         "psr-4": {
@@ -12,10 +12,6 @@
             "PestTestFramework\\Test\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/olivernybroe/pest-1"
-        }
-    ]
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
