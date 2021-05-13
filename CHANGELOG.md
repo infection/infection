@@ -1,5 +1,21 @@
 # Change Log
 
+## [0.23.0](https://github.com/infection/infection/tree/0.23.0) (2021-05-13)
+[Full Changelog](https://github.com/infection/infection/compare/0.22.1...0.23.0)
+
+**Added:**
+
+- Add support for `Pest` test framework  #1516
+
+**Fixed:**
+
+- Multiplication mutator should not mutate when return value is integer #1515
+
+**Changed**:
+
+* [BE BREAK] Remove `CodeCoverageAnnotationIgnorer` #1517
+* Upgrade xdebug-handler to v2 #1510
+
 ## [0.22.0](https://github.com/infection/infection/tree/0.22.0) (2021-04-24)
 [Full Changelog](https://github.com/infection/infection/compare/0.21.5...0.22.0)
 
