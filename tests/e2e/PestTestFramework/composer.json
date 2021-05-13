@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "pestphp/pest": "master"
+        "pestphp/pest": "^1.2.0"
     },
     "autoload": {
         "psr-4": {
@@ -11,7 +11,5 @@
         "psr-4": {
             "PestTestFramework\\Test\\": "tests/"
         }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }
