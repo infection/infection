@@ -73,8 +73,6 @@ final class BuildConfigYmlTest extends TestCase
     {
         $rootPath = __DIR__ . '/../../../';
 
-        yield [$rootPath . '.travis.yml'];
-
         yield [$rootPath . 'codecov.yml'];
     }
 }
