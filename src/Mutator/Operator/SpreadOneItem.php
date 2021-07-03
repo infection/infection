@@ -46,7 +46,7 @@ use PhpParser\Node;
  *
  * @implements Mutator<Node\Expr\ArrayItem>
  */
-final class Spread implements Mutator
+final class SpreadOneItem implements Mutator
 {
     use GetMutatorName;
 
