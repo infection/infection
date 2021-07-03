@@ -37,7 +37,12 @@ namespace Infection\TestFramework\PhpUnit\CommandLine;
 
 use function array_map;
 use function array_merge;
+use function array_unique;
+use function count;
+use function escapeshellcmd;
 use function explode;
+use function implode;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function ltrim;
 
@@ -46,7 +51,8 @@ use function ltrim;
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    public function build(string $configPath, string $extraOptions): array
+    // todo build & buildForMutant
+    public function build(string $configPath, string $extraOptions, array $tests): array
     {
         $options = [
             '--configuration',
@@ -60,6 +66,18 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
                     return '--' . $option;
                 }, explode(' --', ltrim($extraOptions, '-')))
             );
+        }
+
+//                preg_replace('/\swith data set (.*)/', '', $test->getMethod())
+
+        if (count($tests) > 0) {
+            $escapedTests = array_map(
+                static fn (TestLocation $testLocation): string => escapeshellcmd($testLocation->getMethod()),
+                $tests
+            );
+
+            $options[] = '--filter';
+            $options[] = implode('|', array_unique($escapedTests));
         }
 
         return $options;
