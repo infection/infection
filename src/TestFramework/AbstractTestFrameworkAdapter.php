@@ -91,7 +91,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         array $phpExtraArgs,
         bool $skipCoverage
     ): array {
-        return $this->getCommandLine($this->buildInitialConfigFile(), $extraOptions, $phpExtraArgs);
+        return $this->getCommandLine($this->buildInitialConfigFile(), $extraOptions, $phpExtraArgs, []);
     }
 
     /**
@@ -116,7 +116,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
                 $mutationOriginalFilePath
             ),
             $extraOptions,
-            []
+            [],
+            $tests,
         );
     }
 
@@ -154,15 +155,17 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
     /**
      * @param string[] $phpExtraArgs
+     * @param TestLocation[] $tests
      *
      * @return string[]
      */
     private function getCommandLine(
         string $configPath,
         string $extraOptions,
-        array $phpExtraArgs
+        array $phpExtraArgs,
+        array $tests
     ): array {
-        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
+        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions, $tests);
 
         return $this->commandLineBuilder->build(
             $this->testFrameworkExecutable,

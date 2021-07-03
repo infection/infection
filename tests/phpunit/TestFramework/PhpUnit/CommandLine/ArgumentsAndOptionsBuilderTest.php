@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -59,7 +60,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--configuration',
                 $configPath,
             ],
-            $this->builder->build($configPath, '')
+            $this->builder->build($configPath, '', [])
         );
     }
 
@@ -74,7 +75,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--verbose',
                 '--debug',
             ],
-            $this->builder->build($configPath, '--verbose --debug')
+            $this->builder->build($configPath, '--verbose --debug', [])
         );
     }
 
@@ -87,8 +88,17 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--configuration',
                 $configPath,
                 '--path=/a path/with spaces',
+                '--filter',
+                'App\\\\Test::test_case1|App\\\\Test::test_case2',
             ],
-            $this->builder->build($configPath, '--path=/a path/with spaces')
+            $this->builder->build(
+                $configPath,
+                '--path=/a path/with spaces',
+                [
+                    TestLocation::forTestMethod('App\Test::test_case1'),
+                    TestLocation::forTestMethod('App\Test::test_case2'),
+                ]
+            )
         );
     }
 }

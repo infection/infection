@@ -35,13 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+
 /**
  * @internal
  */
 interface CommandLineArgumentsAndOptionsBuilder
 {
     /**
+     * @param TestLocation[] $tests
+     *
      * @return string[]
      */
-    public function build(string $configPath, string $extraOptions): array;
+    public function build(string $configPath, string $extraOptions, array $tests): array;
 }
