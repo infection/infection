@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class SpreadTest extends BaseMutatorTestCase
+final class SpreadOneItemTest extends BaseMutatorTestCase
 {
     /**
      * @requires PHP >= 7.4
@@ -52,7 +52,7 @@ final class SpreadTest extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield 'Spread for a raw array' => [
+        yield 'Spread one item for a raw array' => [
             <<<'PHP'
 <?php
 
@@ -67,7 +67,7 @@ PHP
             ,
         ];
 
-        yield 'Spread for a variable' => [
+        yield 'Spread one item for a variable' => [
             <<<'PHP'
 <?php
 
@@ -82,7 +82,7 @@ PHP
             ,
         ];
 
-        yield 'Spread for a function call' => [
+        yield 'Spread one item for a function call' => [
             <<<'PHP'
 <?php
 
@@ -97,7 +97,7 @@ PHP
             ,
         ];
 
-        yield 'Spread for a method call' => [
+        yield 'Spread one item for a method call' => [
             <<<'PHP'
 <?php
 
@@ -112,7 +112,7 @@ PHP
             ,
         ];
 
-        yield 'Spread for a new iterator object' => [
+        yield 'Spread one item for a new iterator object' => [
             <<<'PHP'
 <?php
 
