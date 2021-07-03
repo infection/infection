@@ -43,9 +43,14 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 interface CommandLineArgumentsAndOptionsBuilder
 {
     /**
+     * @return string[]
+     */
+    public function buildForInitialTestsRun(string $configPath, string $extraOptions): array;
+
+    /**
      * @param TestLocation[] $tests
      *
      * @return string[]
      */
-    public function build(string $configPath, string $extraOptions, array $tests): array;
+    public function buildForMutant(string $configPath, string $extraOptions, array $tests): array;
 }

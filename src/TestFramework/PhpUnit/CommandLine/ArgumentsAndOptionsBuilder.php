@@ -51,8 +51,7 @@ use function ltrim;
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    // todo build & buildForMutant
-    public function build(string $configPath, string $extraOptions, array $tests): array
+    public function buildForInitialTestsRun(string $configPath, string $extraOptions): array
     {
         $options = [
             '--configuration',
@@ -67,6 +66,13 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
                 }, explode(' --', ltrim($extraOptions, '-')))
             );
         }
+
+        return $options;
+    }
+
+    public function buildForMutant(string $configPath, string $extraOptions, array $tests): array
+    {
+        $options = $this->buildForInitialTestsRun($configPath, $extraOptions);
 
 //                preg_replace('/\swith data set (.*)/', '', $test->getMethod())
 

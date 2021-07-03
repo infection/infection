@@ -129,7 +129,7 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->cliArgumentsBuilder
             ->expects($this->once())
-            ->method('build')
+            ->method('buildForInitialTestsRun')
             ->with('', '--group=default')
         ;
 
@@ -163,7 +163,7 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->cliArgumentsBuilder
             ->expects($this->once())
-            ->method('build')
+            ->method('buildForInitialTestsRun')
             ->with('', '--group=default --coverage-xml=/tmp/coverage-xml --log-junit=/tmp/infection/junit.xml')
             ->willReturn([
                 '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
@@ -215,7 +215,7 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->cliArgumentsBuilder
             ->expects($this->once())
-            ->method('build')
+            ->method('buildForInitialTestsRun')
             ->with('', '--group=default --coverage-xml=/tmp/coverage-xml --log-junit=/tmp/infection/junit.xml')
             ->willReturn([
                 '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',

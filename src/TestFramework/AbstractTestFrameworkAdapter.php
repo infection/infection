@@ -91,7 +91,10 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         array $phpExtraArgs,
         bool $skipCoverage
     ): array {
-        return $this->getCommandLine($this->buildInitialConfigFile(), $extraOptions, $phpExtraArgs, []);
+        return $this->getCommandLine(
+            $phpExtraArgs,
+            $this->argumentsAndOptionsBuilder->buildForInitialTestsRun($this->buildInitialConfigFile(), $extraOptions)
+        );
     }
 
     /**
@@ -109,15 +112,17 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         string $extraOptions
     ): array {
         return $this->getCommandLine(
-            $this->buildMutationConfigFile(
-                $tests,
-                $mutantFilePath,
-                $mutationHash,
-                $mutationOriginalFilePath
-            ),
-            $extraOptions,
             [],
-            $tests,
+            $this->argumentsAndOptionsBuilder->buildForMutant(
+                $this->buildMutationConfigFile(
+                    $tests,
+                    $mutantFilePath,
+                    $mutationHash,
+                    $mutationOriginalFilePath
+                ),
+                $extraOptions,
+                $tests
+            )
         );
     }
 
@@ -155,22 +160,18 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
     /**
      * @param string[] $phpExtraArgs
-     * @param TestLocation[] $tests
+     * @param string[] $testFrameworkArgs
      *
      * @return string[]
      */
     private function getCommandLine(
-        string $configPath,
-        string $extraOptions,
         array $phpExtraArgs,
-        array $tests
+        array $testFrameworkArgs
     ): array {
-        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions, $tests);
-
         return $this->commandLineBuilder->build(
             $this->testFrameworkExecutable,
             $phpExtraArgs,
-            $frameworkArgs
+            $testFrameworkArgs
         );
     }
 
