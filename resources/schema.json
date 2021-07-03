@@ -324,6 +324,7 @@
                 "This": { "$ref": "#/definitions/default-mutator-config" },
                 "Spaceship": { "$ref": "#/definitions/default-mutator-config" },
                 "Spread": { "$ref": "#/definitions/default-mutator-config" },
+                "SpreadRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "Foreach_": { "$ref": "#/definitions/default-mutator-config" },
                 "For_": { "$ref": "#/definitions/default-mutator-config" },
                 "DoWhile": { "$ref": "#/definitions/default-mutator-config" },

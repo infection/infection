@@ -159,6 +159,7 @@ final class ProfileList
         Mutator\Operator\NullSafeMethodCall::class,
         Mutator\Operator\NullSafePropertyCall::class,
         Mutator\Operator\Spread::class,
+        Mutator\Operator\SpreadRemoval::class,
         Mutator\Operator\Ternary::class,
         Mutator\Operator\Throw_::class,
     ];
@@ -362,6 +363,7 @@ final class ProfileList
         'NullSafeMethodCall' => Mutator\Operator\NullSafeMethodCall::class,
         'NullSafePropertyCall' => Mutator\Operator\NullSafePropertyCall::class,
         'Spread' => Mutator\Operator\Spread::class,
+        'SpreadRemoval' => Mutator\Operator\SpreadRemoval::class,
         'Ternary' => Mutator\Operator\Ternary::class,
         'Throw_' => Mutator\Operator\Throw_::class,
 
