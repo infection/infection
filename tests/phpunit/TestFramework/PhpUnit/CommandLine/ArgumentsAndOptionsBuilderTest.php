@@ -60,7 +60,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--configuration',
                 $configPath,
             ],
-            $this->builder->build($configPath, '', [])
+            $this->builder->buildForInitialTestsRun($configPath, '')
         );
     }
 
@@ -75,7 +75,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--verbose',
                 '--debug',
             ],
-            $this->builder->build($configPath, '--verbose --debug', [])
+            $this->builder->buildForInitialTestsRun($configPath, '--verbose --debug')
         );
     }
 
@@ -88,10 +88,24 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--configuration',
                 $configPath,
                 '--path=/a path/with spaces',
+            ],
+            $this->builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces')
+        );
+    }
+
+    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(): void
+    {
+        $configPath = '/the config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--path=/a path/with spaces',
                 '--filter',
                 'App\\\\Test::test_case1|App\\\\Test::test_case2',
             ],
-            $this->builder->build(
+            $this->builder->buildForMutant(
                 $configPath,
                 '--path=/a path/with spaces',
                 [
