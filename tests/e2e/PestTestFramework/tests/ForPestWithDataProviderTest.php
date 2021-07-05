@@ -10,7 +10,7 @@ test('tests division with inline dataset', function (float $a, float $b, float $
     [2.0, 4.0, 0.5]
 ]);
 
-test('tests division with shared dataset', function (float $a, float $b, float $expectedResult) {
+test('tests division with shared dataset, with special | char', function (float $a, float $b, float $expectedResult) {
     $sourceClass = new ForPestWithDataProvider();
 
     expect($sourceClass->div($a, $b))->toBe($expectedResult);
