@@ -45,6 +45,7 @@ use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function ltrim;
+use function Safe\sprintf;
 
 /**
  * @internal
@@ -74,8 +75,6 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
     {
         $options = $this->buildForInitialTestsRun($configPath, $extraOptions);
 
-//                preg_replace('/\swith data set (.*)/', '', $test->getMethod())
-
         if (count($tests) > 0) {
             $escapedTests = array_map(
                 static fn (TestLocation $testLocation): string => escapeshellcmd($testLocation->getMethod()),
@@ -83,7 +82,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
             );
 
             $options[] = '--filter';
-            $options[] = implode('|', array_unique($escapedTests));
+            $options[] = sprintf('/%s/', implode('|', array_unique($escapedTests)));
         }
 
         return $options;
