@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 
+use function array_map;
+use Generator;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use PHPUnit\Framework\TestCase;
@@ -93,7 +95,10 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
     }
 
-    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(): void
+    /**
+     * @dataProvider provideTestCases
+     */
+    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(array $testCases, string $expectedFilterOptionValue): void
     {
         $configPath = '/the config/path';
 
@@ -103,16 +108,50 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 $configPath,
                 '--path=/a path/with spaces',
                 '--filter',
-                'App\\\\Test::test_case1|App\\\\Test::test_case2',
+                $expectedFilterOptionValue,
             ],
             $this->builder->buildForMutant(
                 $configPath,
                 '--path=/a path/with spaces',
-                [
-                    TestLocation::forTestMethod('App\Test::test_case1'),
-                    TestLocation::forTestMethod('App\Test::test_case2'),
-                ]
+                array_map(
+                    static fn (string $testCase): TestLocation => TestLocation::forTestMethod($testCase),
+                    $testCases
+                )
             )
         );
+    }
+
+    public function provideTestCases(): Generator
+    {
+        yield '1 test case' => [
+            [
+                'App\Test::test_case1',
+            ],
+            '/App\\\\Test::test_case1/',
+        ];
+
+        yield '2 test cases' => [
+            [
+                'App\Test::test_case1',
+                'App\Test::test_case2',
+            ],
+            '/App\\\\Test::test_case1|App\\\\Test::test_case2/',
+        ];
+
+        yield '2 simple test cases, 1 with data set and special character >' => [
+            [
+                'App\Test::test_case1 with data set "With special character >"',
+                'App\Test::test_case2',
+            ],
+            '/App\\\\Test::test_case1 with data set "With special character \\>"|App\\\\Test::test_case2/',
+        ];
+
+        yield '2 simple test cases, 1 with data set and special character @' => [
+            [
+                'App\Test::test_case1 with data set "With special character @"',
+                'App\Test::test_case2',
+            ],
+            '/App\\\\Test::test_case1 with data set "With special character @"|App\\\\Test::test_case2/',
+        ];
     }
 }
