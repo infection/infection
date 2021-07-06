@@ -67,8 +67,6 @@ DIFF
     }
 
     /**
-     * @psalm-mutation-free
-     *
      * @return iterable<Node\Stmt\Return_>
      */
     public function mutate(Node $node): iterable
@@ -102,8 +100,6 @@ DIFF
     }
 
     /**
-     * @psalm-mutation-free
-     *
      * @param Node\Stmt\Return_ $node
      */
     private function getFloatValueOfNode(Node $node): float

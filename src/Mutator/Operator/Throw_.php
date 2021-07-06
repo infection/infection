@@ -78,8 +78,6 @@ DIFF
     }
 
     /**
-     * @psalm-mutation-free
-     *
      * Replaces "throw new Exception();" with "new Exception();"
      *
      * @return iterable<Node\Stmt\Expression>

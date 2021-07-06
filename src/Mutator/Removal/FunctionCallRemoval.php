@@ -77,8 +77,6 @@ DIFF
     }
 
     /**
-     * @psalm-mutation-free
-     *
      * Replaces "doSmth()" with ""
      *
      * @return iterable<Node\Stmt\Nop>

@@ -103,8 +103,6 @@ final class IgnoreMutator implements Mutator
     }
 
     /**
-     * @psalm-mutation-free
-     *
      * @return iterable<Node|Node[]>
      */
     public function mutate(Node $node): iterable

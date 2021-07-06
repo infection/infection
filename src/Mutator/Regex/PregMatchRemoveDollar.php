@@ -74,9 +74,6 @@ DIFF
         );
     }
 
-    /**
-     * @psalm-mutation-free
-     */
     protected function mutateRegex(string $regex): Generator
     {
         preg_match(self::ANALYSE_REGEX, $regex, $matches);

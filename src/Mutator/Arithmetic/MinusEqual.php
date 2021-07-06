@@ -67,8 +67,6 @@ DIFF
     }
 
     /**
-     * @psalm-mutation-free
-     *
      * @return iterable<Node\Expr\AssignOp\Plus>
      */
     public function mutate(Node $node): iterable

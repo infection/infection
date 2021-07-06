@@ -93,7 +93,6 @@ DIFF
     }
 
     /**
-     * @psalm-mutation-free
      * @psalm-suppress ImpureMethodCall
      *
      * @return iterable<Node\Expr>

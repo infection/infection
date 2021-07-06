@@ -76,9 +76,6 @@ DIFF
         );
     }
 
-    /**
-     * @psalm-mutation-free
-     */
     public function mutate(Node $node): iterable
     {
         if ($node->left instanceof Node\Expr\BinaryOp\Concat) {

@@ -154,8 +154,8 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, mixed[]>|bool $settings
-     * @param array<string, array<string, string>> $mutators
+     * @param array<string, mixed>|bool $settings
+     * @param array<string, array<array-key, string>> $mutators
      */
     private static function registerFromProfile(
         string $profile,
@@ -163,8 +163,6 @@ final class MutatorResolver
         array &$mutators
     ): void {
         foreach (ProfileList::ALL_PROFILES[$profile] as $mutatorOrProfile) {
-            /** @var string $mutatorOrProfile */
-
             // A profile may refer to another collection of profiles
             if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
                 self::registerFromProfile(

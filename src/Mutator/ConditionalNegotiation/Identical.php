@@ -67,8 +67,6 @@ DIFF
     }
 
     /**
-     * @psalm-mutation-free
-     *
      * @return iterable<Node\Expr\BinaryOp\NotIdentical>
      */
     public function mutate(Node $node): iterable

@@ -68,8 +68,6 @@ DIFF
     }
 
     /**
-     * @psalm-mutation-free
-     *
      * @return iterable<Node\Expr\PreInc|Node\Expr\PostInc>
      */
     public function mutate(Node $node): iterable

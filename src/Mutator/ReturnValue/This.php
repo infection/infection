@@ -68,8 +68,6 @@ DIFF
     /**
      * Replaces "return $this;" with "return null;"
      *
-     * @psalm-mutation-free
-     *
      * @return iterable<Node\Stmt\Return_>
      */
     public function mutate(Node $node): iterable

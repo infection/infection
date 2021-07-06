@@ -84,8 +84,6 @@ DIFF
     }
 
     /**
-     * @psalm-mutation-free
-     *
      * @return iterable<Node\Stmt\Foreach_>
      */
     public function mutate(Node $node): iterable

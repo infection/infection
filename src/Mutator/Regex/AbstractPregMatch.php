@@ -54,8 +54,6 @@ abstract class AbstractPregMatch implements Mutator
     /**
      * Replaces regex in "preg_match"
      *
-     * @psalm-mutation-free
-     *
      * @return iterable<Node\Expr\FuncCall>
      */
     public function mutate(Node $node): iterable
@@ -83,15 +81,10 @@ abstract class AbstractPregMatch implements Mutator
     abstract protected function isProperRegexToMutate(string $regex): bool;
 
     /**
-     * @psalm-mutation-free
-     *
      * @return Generator<string>
      */
     abstract protected function mutateRegex(string $regex): Generator;
 
-    /**
-     * @psalm-mutation-free
-     */
     private function pullOutRegex(Node\Arg $argument): string
     {
         /** @var Node\Scalar\String_ $stringNode */
@@ -100,9 +93,6 @@ abstract class AbstractPregMatch implements Mutator
         return $stringNode->value;
     }
 
-    /**
-     * @psalm-mutation-free
-     */
     private function getNewRegexArgument(string $regex, Node\Arg $argument): Node\Arg
     {
         return new Node\Arg(
