@@ -51,22 +51,22 @@ parameters:
 			path: ../src/Config/ValueProvider/SourceDirsProvider.php
 
 		-
-			message: "#^Only booleans are allowed in an if condition, string given\\.$#"
-			count: 1
-			path: ../src/Config/ValueProvider/TestFrameworkConfigPathProvider.php
-
-		-
 			message: "#^Only booleans are allowed in a negated boolean, string given\\.$#"
 			count: 1
 			path: ../src/Config/ValueProvider/TestFrameworkConfigPathProvider.php
 
 		-
-			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
+			message: "#^Only booleans are allowed in an if condition, string given\\.$#"
+			count: 1
+			path: ../src/Config/ValueProvider/TestFrameworkConfigPathProvider.php
+
+		-
+			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<string, Infection\\\\Mutator\\\\Mutator\\<PhpParser\\\\Node\\>\\> and 'Infection\\\\\\\\Mutator\\\\\\\\Mutator' will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/Configuration/Configuration.php
 
 		-
-			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<string, Infection\\\\Mutator\\\\Mutator\\<PhpParser\\\\Node\\>\\> and 'Infection\\\\\\\\Mutator\\\\\\\\Mutator' will always evaluate to true\\.$#"
+			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/Configuration/Configuration.php
 
@@ -96,12 +96,12 @@ parameters:
 			path: ../src/FileSystem/Finder/ComposerExecutableFinder.php
 
 		-
-			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
+			message: "#^Only booleans are allowed in a negated boolean, string\\|false given\\.$#"
 			count: 1
 			path: ../src/FileSystem/Finder/NonExecutableFinder.php
 
 		-
-			message: "#^Only booleans are allowed in a negated boolean, string\\|false given\\.$#"
+			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
 			count: 1
 			path: ../src/FileSystem/Finder/NonExecutableFinder.php
 
@@ -121,12 +121,12 @@ parameters:
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
-			message: "#^Only booleans are allowed in an if condition, string\\|null given\\.$#"
+			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
 			count: 1
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
-			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
+			message: "#^Only booleans are allowed in an if condition, string\\|null given\\.$#"
 			count: 1
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
@@ -161,6 +161,11 @@ parameters:
 			path: ../src/Logger/ConsoleLogger.php
 
 		-
+			message: "#^Method Infection\\\\Logger\\\\JsonLogger\\:\\:getResultsLine\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../src/Logger/JsonLogger.php
+
+		-
 			message: "#^Casting to int\\<0, max\\> something that's already int\\<0, max\\>\\.$#"
 			count: 1
 			path: ../src/Logger/PerMutatorLogger.php
@@ -181,6 +186,11 @@ parameters:
 			path: ../src/Metrics/MinMsiChecker.php
 
 		-
+			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:oneOf\\(\\) with string and array\\('Assignment', 'AssignmentEqual', 'BitwiseAnd', 'BitwiseNot', 'BitwiseOr', 'BitwiseXor', 'Decrement', 'DivEqual', \\.\\.\\.\\) will always evaluate to true\\.$#"
+			count: 1
+			path: ../src/Mutant/MutantExecutionResult.php
+
+		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<Infection\\\\Mutator\\\\Mutator\\<PhpParser\\\\Node\\>\\> and 'Infection\\\\\\\\Mutator\\\\\\\\Mutator' will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/Mutation/FileMutationGenerator.php
@@ -191,12 +201,22 @@ parameters:
 			path: ../src/Mutation/FileMutationGenerator.php
 
 		-
+			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:oneOf\\(\\) with string and array\\('Assignment', 'AssignmentEqual', 'BitwiseAnd', 'BitwiseNot', 'BitwiseOr', 'BitwiseXor', 'Decrement', 'DivEqual', \\.\\.\\.\\) will always evaluate to true\\.$#"
+			count: 1
+			path: ../src/Mutation/Mutation.php
+
+		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<Infection\\\\Mutator\\\\Mutator\\<PhpParser\\\\Node\\>\\> and 'Infection\\\\\\\\Mutator\\\\\\\\Mutator' will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/Mutation/MutationGenerator.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:boolean\\(\\) with bool and string will always evaluate to true\\.$#"
+			count: 1
+			path: ../src/Mutator/AllowedFunctionsConfig.php
+
+		-
+			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:oneOf\\(\\) with string and array\\<string\\> will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/Mutator/AllowedFunctionsConfig.php
 
@@ -214,6 +234,11 @@ parameters:
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:boolean\\(\\) with bool and string will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/Mutator/Boolean/TrueValueConfig.php
+
+		-
+			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:oneOf\\(\\) with string and array\\('Assignment', 'AssignmentEqual', 'BitwiseAnd', 'BitwiseNot', 'BitwiseOr', 'BitwiseXor', 'Decrement', 'DivEqual', \\.\\.\\.\\) will always evaluate to true\\.$#"
+			count: 1
+			path: ../src/Mutator/InvalidMutator.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:isArray\\(\\) with array and string will always evaluate to true\\.$#"
@@ -241,12 +266,12 @@ parameters:
 			path: ../src/Mutator/Removal/FunctionCallRemoval.php
 
 		-
-			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<PhpParser\\\\Node\\> and 'PhpParser\\\\\\\\Node' will always evaluate to true\\.$#"
+			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:isInstanceOf\\(\\) with PhpParser\\\\Node and 'PhpParser\\\\\\\\Node' will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/PhpParser/MutatedNode.php
 
 		-
-			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:isInstanceOf\\(\\) with PhpParser\\\\Node and 'PhpParser\\\\\\\\Node' will always evaluate to true\\.$#"
+			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<PhpParser\\\\Node\\> and 'PhpParser\\\\\\\\Node' will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/PhpParser/MutatedNode.php
 
@@ -269,6 +294,11 @@ parameters:
 			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
 			count: 3
 			path: ../src/Process/Runner/MutationTestingRunner.php
+
+		-
+			message: "#^If condition is always true\\.$#"
+			count: 1
+			path: ../src/Process/Runner/ParallelProcessRunner.php
 
 		-
 			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
@@ -336,18 +366,23 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
 
 		-
-			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
-			count: 2
-			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
-
-		-
 			message: "#^Only booleans are allowed in a negated boolean, DOMElement\\|null given\\.$#"
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
 		-
+			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
+			count: 2
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+
+		-
 			message: "#^Only booleans are allowed in &&, int given on the left side\\.$#"
 			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
+
+		-
+			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
+			count: 2
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-
@@ -358,11 +393,6 @@ parameters:
 		-
 			message: "#^Only booleans are allowed in an if condition, string\\|false given\\.$#"
 			count: 1
-			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
-
-		-
-			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
-			count: 2
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-

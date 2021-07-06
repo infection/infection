@@ -87,8 +87,8 @@ phpstan-baseline: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-src-baseline.neon || true
 	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-tests-baseline.neon || true
 
-.PHONY: psalm-update-baseline
-psalm-update-baseline: vendor
+.PHONY: psalm-baseline
+psalm-baseline: vendor
 	$(PSALM) --threads=4 --set-baseline=psalm-baseline.xml
 
 .PHONY: psalm

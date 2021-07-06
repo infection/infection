@@ -99,7 +99,7 @@ final class JsonLogger implements LineMutationTestingResultsLogger
     {
         $mutatorRows = [];
 
-        foreach ($executionResults as $index => $mutantProcess) {
+        foreach ($executionResults as $mutantProcess) {
             $mutatorRows[] = [
                 'mutator' => [
                     'mutatorName' => $mutantProcess->getMutatorName(),
