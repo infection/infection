@@ -63,7 +63,6 @@ $finder = Finder::create()
     ])
     ->ignoreDotFiles(false)
     ->name('*php')
-    ->name('.php_cs.dist')
     ->name('infection')
     ->name('infection-debug')
 ;
