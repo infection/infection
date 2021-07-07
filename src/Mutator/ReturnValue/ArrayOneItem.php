@@ -83,6 +83,8 @@ DIFF
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @return iterable<Node\Stmt\Return_>
      */
     public function mutate(Node $node): iterable

@@ -77,6 +77,9 @@ DIFF
         return 'array_map';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from range(1, count($node->args) - 1);

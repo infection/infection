@@ -98,6 +98,9 @@ DIFF
         return 'array_uintersect_uassoc';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_slice(

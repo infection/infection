@@ -77,6 +77,8 @@ DIFF
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @return iterable<Node\Expr\ArrayItem>
      */
     public function mutate(Node $node): iterable

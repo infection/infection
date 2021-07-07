@@ -64,6 +64,8 @@ DIFF
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * Replaces "and" with "or"
      *
      * @return iterable<Node\Expr\BinaryOp\LogicalOr>

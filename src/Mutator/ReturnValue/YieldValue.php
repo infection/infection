@@ -70,6 +70,8 @@ DIFF
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @return iterable<Node\Expr\Yield_>
      */
     public function mutate(Node $node): iterable

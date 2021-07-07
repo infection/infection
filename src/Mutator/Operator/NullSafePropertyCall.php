@@ -68,6 +68,8 @@ DIFF
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @return iterable<Node\Expr\PropertyFetch>
      */
     public function mutate(Node $node): iterable

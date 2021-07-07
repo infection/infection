@@ -90,6 +90,9 @@ DIFF
         return $node instanceof Node\Expr\BinaryOp\Concat;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function mutate(Node $node): iterable
     {
         if ($node->left instanceof Node\Expr\BinaryOp\Concat) {

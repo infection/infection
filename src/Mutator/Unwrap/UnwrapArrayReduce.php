@@ -87,6 +87,9 @@ DIFF
         return 'array_reduce';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield 2;

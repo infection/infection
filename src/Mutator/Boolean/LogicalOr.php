@@ -64,6 +64,8 @@ DIFF
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * Replaces "||" with "&&"
      *
      * @return iterable<Node\Expr\BinaryOp\BooleanAnd>
