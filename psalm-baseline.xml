@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="4.x-dev@">
+  <file src="src/Mutator/IgnoreMutator.php">
+    <InvalidArgument occurrences="1">
+      <code>$node</code>
+    </InvalidArgument>
+  </file>
+  <file src="src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php">
+    <InvalidReturnType occurrences="1">
+      <code>iterable&lt;string, string&gt;</code>
+    </InvalidReturnType>
+  </file>
+  <file src="src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php">
+    <InvalidArrayOffset occurrences="1">
+      <code>$buckets[$msTime]</code>
+    </InvalidArrayOffset>
+  </file>
+</files>
