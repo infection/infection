@@ -40,7 +40,6 @@ use Infection\Tests\Mutator\BaseMutatorTestCase;
 final class SpreadRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @requires PHP >= 7.4
      * @dataProvider mutationsProvider
      *
      * @param string|string[] $expected
