@@ -58,6 +58,14 @@ abstract class MutationConfigBuilder
         string $mutationOriginalFilePath
     ): string;
 
+    abstract public function buildExecutable(
+        array $tests,
+        string $mutantFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $originalExecutable
+    ): string;
+
     protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutantFilePath): string
     {
         $infectionPhar = '';
