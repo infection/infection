@@ -178,6 +178,7 @@
                 "PowEqual": { "$ref": "#/definitions/default-mutator-config" },
                 "ShiftLeft": { "$ref": "#/definitions/default-mutator-config" },
                 "ShiftRight": { "$ref": "#/definitions/default-mutator-config" },
+                "ExpressionRepeat": { "$ref": "#/definitions/default-mutator-config" },
                 "RoundingFamily": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItem": { "$ref": "#/definitions/default-mutator-config" },
                 "EqualIdentical": { "$ref": "#/definitions/default-mutator-config" },
