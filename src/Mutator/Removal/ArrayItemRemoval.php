@@ -117,12 +117,12 @@ DIFF
      *
      * @return iterable<Node\Expr\Array_>
      */
-    public function mutate(Node $arrayNode): iterable
+    public function mutate(Node $node): iterable
     {
-        Assert::allNotNull($arrayNode->items);
+        Assert::allNotNull($node->items);
 
-        foreach ($this->getItemsIndexes($arrayNode->items) as $indexToRemove) {
-            $newArrayNode = clone $arrayNode;
+        foreach ($this->getItemsIndexes($node->items) as $indexToRemove) {
+            $newArrayNode = clone $node;
             unset($newArrayNode->items[$indexToRemove]);
 
             yield $newArrayNode;

@@ -86,10 +86,18 @@ final class XmlConfigurationManipulator
     public function removeExistingLoggers(SafeDOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {
+            if ($node->parentNode === null) {
+                continue;
+            }
+
             $node->parentNode->removeChild($node);
         }
 
         foreach ($xPath->query('/phpunit/coverage/report') as $node) {
+            if ($node->parentNode === null) {
+                continue;
+            }
+
             $node->parentNode->removeChild($node);
         }
     }

@@ -50,7 +50,7 @@ interface Mutator
     public function canMutate(Node $node): bool;
 
     /**
-     * @psalm-mutation-free
+     * @psalm-mutation-free Two different mutators can mutate the same Node. Nodes must be immutable.
      *
      * @param TNode $node
      *

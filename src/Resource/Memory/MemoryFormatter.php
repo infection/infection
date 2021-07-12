@@ -66,7 +66,7 @@ final class MemoryFormatter
             'Expected a positive or null amount of bytes. Got: %s'
         );
 
-        $power = $bytes > 0 ? round(log($bytes, 1023)) : 0;
+        $power = $bytes > 0 ? (int) round(log($bytes, 1023)) : 0;
 
         return sprintf(
             '%s%s',
