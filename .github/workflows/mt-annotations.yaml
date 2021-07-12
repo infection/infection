@@ -12,7 +12,7 @@ jobs:
 
         strategy:
             matrix:
-                php-version: ['7.4']
+                php-version: ['8.0']
 
         name: Mutation Testing Code Review Annotations ${{ matrix.php-version }}
 
