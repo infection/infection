@@ -24,6 +24,7 @@ jobs:
           - { operating-system: 'windows-latest', php-version: '7.4', dependencies: '', coverage-driver: 'xdebug' }
           - { operating-system: 'ubuntu-latest', php-version: '7.4', dependencies: '--prefer-lowest', coverage-driver: 'pcov' }
           - { operating-system: 'ubuntu-latest', php-version: '8.0', dependencies: '--ignore-platform-req=php', coverage-driver: 'pcov' }
+          - { operating-system: 'ubuntu-latest', php-version: '7.4', dependencies: '', coverage-driver: 'xdebug2' }
 
     continue-on-error: ${{ matrix.php-version == '8.0' }}
     name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} ${{ matrix.dependencies }}

@@ -189,7 +189,7 @@ final class TestLocationBucketSorterTest extends TestCase
             $totalQuickSort += microtime(true) - $start;
         }
 
-        $this->assertGreaterThanOrEqual(0.01, abs($totalQuickSort - $totalBucketSort));
+        $this->assertGreaterThanOrEqual(0.001, abs($totalQuickSort - $totalBucketSort));
     }
 
     public static function locationsArrayProvider(): iterable

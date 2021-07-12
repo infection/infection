@@ -256,6 +256,11 @@ parameters:
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 
 		-
+			message: "#^Parameter \\#2 \\$env \\(array\\<bool\\|string\\>\\|null\\) of method Infection\\\\Process\\\\CoveredPhpProcess\\:\\:start\\(\\) should be contravariant with parameter \\$env \\(array\\) of method Symfony\\\\Component\\\\Process\\\\Process\\:\\:start\\(\\)$#"
+			count: 1
+			path: ../src/Process/CoveredPhpProcess.php
+
+		-
 			message: "#^Parameter \\#2 \\$env \\(array\\<bool\\|string\\>\\|null\\) of method Infection\\\\Process\\\\OriginalPhpProcess\\:\\:start\\(\\) should be contravariant with parameter \\$env \\(array\\) of method Symfony\\\\Component\\\\Process\\\\Process\\:\\:start\\(\\)$#"
 			count: 1
 			path: ../src/Process/OriginalPhpProcess.php
