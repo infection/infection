@@ -112,7 +112,7 @@ final class LogsTest extends TestCase
             'debug.log',
             'perMutator.log',
             true,
-            new Badge('master'),
+            new Badge('master', null),
         ];
     }
 }

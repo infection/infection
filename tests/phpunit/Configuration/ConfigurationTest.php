@@ -202,7 +202,7 @@ final class ConfigurationTest extends TestCase
                 'debug.log',
                 'mutator.log',
                 true,
-                new Badge('master')
+                new Badge('master', null)
             ),
             'default',
             'custom-dir',

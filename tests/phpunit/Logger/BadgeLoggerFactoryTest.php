@@ -121,7 +121,7 @@ final class BadgeLoggerFactoryTest extends TestCase
                 null,
                 null,
                 false,
-                new Badge('master')
+                new Badge('master', null)
             )
         );
 
@@ -167,7 +167,7 @@ final class BadgeLoggerFactoryTest extends TestCase
                 null,
                 null,
                 false,
-                new Badge('foo')
+                new Badge('foo', null)
             ),
             BadgeLogger::class,
         ];
@@ -180,7 +180,7 @@ final class BadgeLoggerFactoryTest extends TestCase
                 'debug',
                 'per_mutator',
                 true,
-                new Badge('branch')
+                new Badge('branch', null)
             ),
             BadgeLogger::class,
         ];

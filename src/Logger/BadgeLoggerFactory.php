@@ -66,7 +66,9 @@ class BadgeLoggerFactory
 
     public function createFromLogEntries(Logs $logConfig): ?MutationTestingResultsLogger
     {
-        if ($logConfig->getBadge() === null) {
+        $badge = $logConfig->getBadge();
+
+        if ($badge === null) {
             return null;
         }
 
@@ -78,7 +80,8 @@ class BadgeLoggerFactory
                 $this->logger
             ),
             $this->metricsCalculator,
-            $logConfig->getBadge()->getBranch(),
+            $badge->getExactBranchMatch(),
+            $badge->getBranchMatchRegEx(),
             $this->logger
         );
     }

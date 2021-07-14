@@ -43,6 +43,7 @@ use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Psr\Log\LoggerInterface;
+use function Safe\preg_match;
 use function Safe\sprintf;
 
 /**
@@ -54,7 +55,8 @@ final class BadgeLogger implements MutationTestingResultsLogger
     private StrykerApiKeyResolver $strykerApiKeyResolver;
     private StrykerDashboardClient $strykerDashboardClient;
     private MetricsCalculator $metricsCalculator;
-    private string $branch;
+    private ?string $exactBranchMatch;
+    private ?string $matchBranchRegex;
     private LoggerInterface $logger;
 
     public function __construct(
@@ -62,14 +64,16 @@ final class BadgeLogger implements MutationTestingResultsLogger
         StrykerApiKeyResolver $strykerApiKeyResolver,
         StrykerDashboardClient $strykerDashboardClient,
         MetricsCalculator $metricsCalculator,
-        string $branch,
+        ?string $exactBranchMatch,
+        ?string $matchBranchRegex,
         LoggerInterface $logger
     ) {
         $this->buildContextResolver = $buildContextResolver;
         $this->strykerApiKeyResolver = $strykerApiKeyResolver;
         $this->strykerDashboardClient = $strykerDashboardClient;
         $this->metricsCalculator = $metricsCalculator;
-        $this->branch = $branch;
+        $this->exactBranchMatch = $exactBranchMatch;
+        $this->matchBranchRegex = $matchBranchRegex;
         $this->logger = $logger;
     }
 
@@ -83,11 +87,23 @@ final class BadgeLogger implements MutationTestingResultsLogger
             return;
         }
 
-        if ($buildContext->branch() !== $this->branch) {
+        $branch = $buildContext->branch();
+
+        if ($this->exactBranchMatch !== null && $branch !== $this->exactBranchMatch) {
             $this->logReportWasNotSent(sprintf(
                 'Expected branch "%s", found "%s"',
-                $this->branch,
-                $buildContext->branch()
+                $this->exactBranchMatch,
+                $branch
+            ));
+
+            return;
+        }
+
+        if ($this->matchBranchRegex !== null && preg_match($this->matchBranchRegex, $branch) !== 1) {
+            $this->logReportWasNotSent(sprintf(
+                'Expected branch to match regex "%s", found "%s"',
+                $this->matchBranchRegex,
+                $branch
             ));
 
             return;
@@ -106,7 +122,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
         $this->strykerDashboardClient->sendReport(
             'github.com/' . $buildContext->repositorySlug(),
-            $buildContext->branch(),
+            $branch,
             $apiKey,
             $this->metricsCalculator->getMutationScoreIndicator()
         );

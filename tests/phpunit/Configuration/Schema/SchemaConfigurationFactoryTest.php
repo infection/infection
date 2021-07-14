@@ -363,7 +363,35 @@ JSON
                     null,
                     null,
                     false,
-                    new Badge('master')
+                    new Badge('master', null)
+                ),
+            ]),
+        ];
+
+        yield '[logs][badge] regex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "badge": {
+            "matchBranchRegex": "/^foo$/"
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    new Badge(null, '/^foo$/')
                 ),
             ]),
         ];
@@ -397,7 +425,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    new Badge('master')
+                    new Badge('master', null)
                 ),
             ]),
         ];
@@ -415,6 +443,30 @@ JSON
         "perMutator": "",
         "badge": {
             "branch": ""
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => Logs::createEmpty(),
+            ]),
+        ];
+
+        yield '[logs] empty branch match regex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "text": "",
+        "summary": "",
+        "debug": "",
+        "perMutator": "",
+        "badge": {
+            "matchBranchRegex": ""
         }
     }
 }
@@ -455,7 +507,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    new Badge('master')
+                    new Badge('master', null)
                 ),
             ]),
         ];
@@ -2325,7 +2377,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    new Badge('master')
+                    new Badge('master', null)
                 ),
                 'tmpDir' => 'custom-tmp',
                 'phpunit' => new PhpUnit(

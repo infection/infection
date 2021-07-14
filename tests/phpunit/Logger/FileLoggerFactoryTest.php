@@ -220,7 +220,7 @@ final class FileLoggerFactoryTest extends TestCase
                 'debug',
                 'per_mutator',
                 true,
-                new Badge('branch')
+                new Badge('branch', null)
             ),
             [
                 TextFileLogger::class,

@@ -732,7 +732,7 @@ final class ConfigurationFactoryTest extends TestCase
                     'debug.log',
                     'mutator.log',
                     true,
-                    new Badge('master')
+                    new Badge('master', null)
                 ),
                 'config/tmp',
                 new PhpUnit(
@@ -785,7 +785,7 @@ final class ConfigurationFactoryTest extends TestCase
                 'debug.log',
                 'mutator.log',
                 true,
-                new Badge('master')
+                new Badge('master', null)
             ),
             'none',
             '/path/to/config/tmp/infection',

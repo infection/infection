@@ -36,16 +36,37 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\Badge;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class BadgeTest extends TestCase
 {
-    use BadgeAssertions;
-
-    public function test_it_can_be_instantiated(): void
+    public function test_it_can_be_instantiated_with_an_exact_branch_match(): void
     {
-        $badge = new Badge('master');
+        $badge = new Badge('master', null);
 
-        $this->assertBadgeStateIs($badge, 'master');
+        $this->assertNull($badge->getBranchMatchRegEx());
+        $this->assertSame('master', $badge->getExactBranchMatch());
+    }
+
+    public function test_it_can_be_instantiated_with_a_regex_branch_match(): void
+    {
+        $badge = new Badge(null, '/^foo$/');
+
+        $this->assertNull($badge->getExactBranchMatch());
+        $this->assertSame('/^foo$/', $badge->getBranchMatchRegEx());
+    }
+
+    public function test_it_rejects_invalid_regex(): void
+    {
+        try {
+            new Badge(null, '/foo#');
+
+            $this->fail();
+        } catch (InvalidArgumentException $invalid) {
+            $this->assertSame('Provided branchMatchRegex "/foo#" is not a valid regex', $invalid->getMessage());
+            $this->assertSame(0, $invalid->getCode());
+            $this->assertNotNull($invalid->getPrevious());
+        }
     }
 }

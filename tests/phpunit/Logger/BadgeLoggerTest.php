@@ -92,6 +92,7 @@ final class BadgeLoggerTest extends TestCase
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,
             'master',
+            null,
             $this->logger
         );
     }
@@ -235,6 +236,44 @@ final class BadgeLoggerTest extends TestCase
         );
     }
 
+    public function test_it_skips_logging_when_it_is_branch_not_from_config_regex(): void
+    {
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => '1.x-mismatch',
+        ]);
+
+        $this->badgeApiClientMock
+            ->expects($this->never())
+            ->method('sendReport')
+        ;
+
+        $badgeLogger = new BadgeLogger(
+            new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
+            new StrykerApiKeyResolver(),
+            $this->badgeApiClientMock,
+            $this->metricsCalculatorMock,
+            null,
+            '/^\d+\\.x$/',
+            $this->logger
+        );
+
+        $badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Dashboard report has not been sent: Expected branch to match regex "/^\d+\\.x$/", found "1.x-mismatch"',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
+    }
+
     public function test_it_sends_report_missing_our_api_key(): void
     {
         $this->ciDetectorEnv->setVariables([
@@ -289,6 +328,52 @@ final class BadgeLoggerTest extends TestCase
         ;
 
         $this->badgeLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Sending dashboard report...',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
+    }
+
+    public function test_it_sends_report_when_everything_is_ok_with_stryker_key_and_matching_branch_regex(): void
+    {
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => '7.x',
+        ]);
+
+        putenv('STRYKER_DASHBOARD_API_KEY=abc');
+
+        $this->badgeApiClientMock
+            ->expects($this->once())
+            ->method('sendReport')
+            ->with('github.com/a/b', '7.x', 'abc', 33.3)
+        ;
+
+        $this->metricsCalculatorMock
+            ->method('getMutationScoreIndicator')
+            ->willReturn(33.3)
+        ;
+
+        $badgeLogger = new BadgeLogger(
+            new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
+            new StrykerApiKeyResolver(),
+            $this->badgeApiClientMock,
+            $this->metricsCalculatorMock,
+            null,
+            '/^\d+\\.x$/',
+            $this->logger
+        );
+
+        $badgeLogger->log();
 
         $this->assertSame(
             [
