@@ -35,17 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
+use function array_key_exists;
 use function array_map;
 use function array_merge;
-use function array_unique;
 use function count;
 use function escapeshellcmd;
 use function explode;
-use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function ltrim;
-use function Safe\sprintf;
+use function rtrim;
 
 /**
  * @internal
@@ -71,18 +70,33 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         return $options;
     }
 
+    /**
+     * @param TestLocation[] $tests
+     */
     public function buildForMutant(string $configPath, string $extraOptions, array $tests): array
     {
         $options = $this->buildForInitialTestsRun($configPath, $extraOptions);
 
         if (count($tests) > 0) {
-            $escapedTests = array_map(
-                static fn (TestLocation $testLocation): string => escapeshellcmd($testLocation->getMethod()),
-                $tests
-            );
+            $filterString = '/';
+            $usedTestCases = [];
+
+            foreach ($tests as $testLocation) {
+                $testCaseString = $testLocation->getMethod();
+
+                if (array_key_exists($testCaseString, $usedTestCases)) {
+                    continue;
+                }
+
+                $usedTestCases[$testCaseString] = true;
+
+                $filterString .= escapeshellcmd($testCaseString) . '|';
+            }
+
+            $filterString = rtrim($filterString, '|') . '/';
 
             $options[] = '--filter';
-            $options[] = sprintf('/%s/', implode('|', array_unique($escapedTests)));
+            $options[] = $filterString;
         }
 
         return $options;
