@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Configuration\Entry;
 
 use InvalidArgumentException;
+use function preg_quote;
 use Safe\Exceptions\PcreException;
 use function Safe\preg_match;
 use function Safe\sprintf;
@@ -45,35 +46,32 @@ use function Safe\sprintf;
  */
 final class Badge
 {
-    private ?string $exactBranchMatch;
-    private ?string $matchBranchRegex;
+    private string $branchMatch;
 
-    public function __construct(?string $exactBranchMatch, ?string $matchBranchRegex)
+    public function __construct(string $branch)
     {
-        if ($matchBranchRegex !== null) {
-            try {
-                // Yes, the `@` is intentional. For some reason, `thecodingmachine/safe` does not suppress the warnings here
-                @preg_match($matchBranchRegex, '');
-            } catch (PcreException $invalidRegex) {
-                throw new InvalidArgumentException(
-                    sprintf('Provided branchMatchRegex "%s" is not a valid regex', $matchBranchRegex),
-                    0,
-                    $invalidRegex
-                );
-            }
+        if (preg_match('#^/.+/$#', $branch) === 0) {
+            $this->branchMatch = '/^' . preg_quote($branch, '/') . '$/';
+
+            return;
         }
 
-        $this->exactBranchMatch = $exactBranchMatch;
-        $this->matchBranchRegex = $matchBranchRegex;
+        try {
+            // Yes, the `@` is intentional. For some reason, `thecodingmachine/safe` does not suppress the warnings here
+            @preg_match($branch, '');
+        } catch (PcreException $invalidRegex) {
+            throw new InvalidArgumentException(
+                sprintf('Provided branchMatchRegex "%s" is not a valid regex', $branch),
+                0,
+                $invalidRegex
+            );
+        }
+
+        $this->branchMatch = $branch;
     }
 
-    public function getExactBranchMatch(): ?string
+    public function applicableForBranch(string $branchName): bool
     {
-        return $this->exactBranchMatch;
-    }
-
-    public function getBranchMatchRegEx(): ?string
-    {
-        return $this->matchBranchRegex;
+        return preg_match($this->branchMatch, $branchName) === 1;
     }
 }

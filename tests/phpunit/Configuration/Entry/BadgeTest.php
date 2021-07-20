@@ -43,28 +43,36 @@ final class BadgeTest extends TestCase
 {
     public function test_it_can_be_instantiated_with_an_exact_branch_match(): void
     {
-        $badge = new Badge('master', null);
+        $badge = new Badge('master');
 
-        $this->assertNull($badge->getBranchMatchRegEx());
-        $this->assertSame('master', $badge->getExactBranchMatch());
+        $this->assertTrue($badge->applicableForBranch('master'));
+        $this->assertFalse($badge->applicableForBranch('mast'));
+        $this->assertFalse($badge->applicableForBranch('master '));
+        $this->assertFalse($badge->applicableForBranch(' master'));
+        $this->assertFalse($badge->applicableForBranch('master1'));
     }
 
     public function test_it_can_be_instantiated_with_a_regex_branch_match(): void
     {
-        $badge = new Badge(null, '/^foo$/');
+        $badge = new Badge('/^(foo|bar)$/');
 
-        $this->assertNull($badge->getExactBranchMatch());
-        $this->assertSame('/^foo$/', $badge->getBranchMatchRegEx());
+        $this->assertTrue($badge->applicableForBranch('foo'));
+        $this->assertTrue($badge->applicableForBranch('bar'));
+        $this->assertFalse($badge->applicableForBranch('fo'));
+        $this->assertFalse($badge->applicableForBranch('ba'));
+        $this->assertFalse($badge->applicableForBranch('foo '));
+        $this->assertFalse($badge->applicableForBranch(' foo'));
+        $this->assertFalse($badge->applicableForBranch('foo1'));
     }
 
     public function test_it_rejects_invalid_regex(): void
     {
         try {
-            new Badge(null, '/foo#');
+            new Badge('/[/');
 
             $this->fail();
         } catch (InvalidArgumentException $invalid) {
-            $this->assertSame('Provided branchMatchRegex "/foo#" is not a valid regex', $invalid->getMessage());
+            $this->assertSame('Provided branchMatchRegex "/[/" is not a valid regex', $invalid->getMessage());
             $this->assertSame(0, $invalid->getCode());
             $this->assertNotNull($invalid->getPrevious());
         }

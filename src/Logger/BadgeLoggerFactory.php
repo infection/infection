@@ -80,8 +80,7 @@ class BadgeLoggerFactory
                 $this->logger
             ),
             $this->metricsCalculator,
-            $badge->getExactBranchMatch(),
-            $badge->getBranchMatchRegEx(),
+            $badge,
             $this->logger
         );
     }

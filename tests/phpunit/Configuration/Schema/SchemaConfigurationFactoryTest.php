@@ -363,7 +363,7 @@ JSON
                     null,
                     null,
                     false,
-                    new Badge('master', null)
+                    new Badge('master')
                 ),
             ]),
         ];
@@ -376,7 +376,7 @@ JSON
     },
     "logs": {
         "badge": {
-            "matchBranchRegex": "/^foo$/"
+            "branch": "/^foo$/"
         }
     }
 }
@@ -391,7 +391,7 @@ JSON
                     null,
                     null,
                     false,
-                    new Badge(null, '/^foo$/')
+                    new Badge('/^foo$/')
                 ),
             ]),
         ];
@@ -425,7 +425,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    new Badge('master', null)
+                    new Badge('master')
                 ),
             ]),
         ];
@@ -466,7 +466,7 @@ JSON
         "debug": "",
         "perMutator": "",
         "badge": {
-            "matchBranchRegex": ""
+            "branch": ""
         }
     }
 }
@@ -507,7 +507,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    new Badge('master', null)
+                    new Badge('master')
                 ),
             ]),
         ];
@@ -2377,7 +2377,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    new Badge('master', null)
+                    new Badge('master')
                 ),
                 'tmpDir' => 'custom-tmp',
                 'phpunit' => new PhpUnit(

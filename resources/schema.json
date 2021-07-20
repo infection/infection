@@ -64,42 +64,25 @@
                     "description": "Markdown file which will give a break-down of the effectiveness of each mutator."
                 },
                 "badge": {
-                    "description": "Mutation score badge for your GitHub project.",
-                    "oneOf": [
-                        {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "required": ["branch"],
-                            "properties": {
-                                "branch": {
-                                    "type": "string",
-                                    "description": "Mutation score will be uploaded to upstream tracker only if your current branch matches this value.",
-                                    "examples": [
-                                        "main",
-                                        "master",
-                                        "develop",
-                                        "latest"
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "required": ["matchBranchRegex"],
-                            "properties": {
-                                "matchBranchRegex": {
-                                    "type": "string",
-                                    "description": "Mutation score will be uploaded to upstream tracker only if your current branch matches this regular expression.",
-                                    "examples": [
-                                        "/1\\.\\d+/",
-                                        "/release-.*/",
-                                        "/feature\\/.*/"
-                                    ]
-                                }
-                            }
+                    "type": "object",
+                    "description": "Mutation score badge for your GitHub project. If provided, infection will report results for maching branches to an upstream reporting dashboard/collector.",
+                    "additionalProperties": false,
+                    "required": ["branch"],
+                    "properties": {
+                        "branch": {
+                            "type": "string",
+                            "description": "Mutation score badge for your GitHub project. If this value starts and ends with \"/\", it will be considered a regular expression.",
+                            "exaples": [
+                                "main",
+                                "master",
+                                "develop",
+                                "latest",
+                                "/1\\.\\d+/",
+                                "/release-.*/",
+                                "/feature\\/.*/"
+                            ]
                         }
-                    ]
+                    }
                 },
                 "github": {
                     "type": "boolean",

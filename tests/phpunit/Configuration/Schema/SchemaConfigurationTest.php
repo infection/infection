@@ -126,7 +126,7 @@ final class SchemaConfigurationTest extends TestCase
                 'debug.log',
                 'mutator.log',
                 true,
-                new Badge('master', null)
+                new Badge('master')
             ),
             'path/to/tmp',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),

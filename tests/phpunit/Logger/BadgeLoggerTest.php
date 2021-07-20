@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Configuration\Entry\Badge;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Logger\BadgeLogger;
@@ -91,8 +92,7 @@ final class BadgeLoggerTest extends TestCase
             new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,
-            'master',
-            null,
+            new Badge('master'),
             $this->logger
         );
     }
@@ -228,7 +228,7 @@ final class BadgeLoggerTest extends TestCase
             [
                 [
                     LogLevel::WARNING,
-                    'Dashboard report has not been sent: Expected branch "master", found "foo"',
+                    'Dashboard report has not been sent: Branch "foo" does not match expected badge configuration',
                     [],
                 ],
             ],
@@ -255,8 +255,7 @@ final class BadgeLoggerTest extends TestCase
             new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,
-            null,
-            '/^\d+\\.x$/',
+            new Badge('/^\d+\\.x$/'),
             $this->logger
         );
 
@@ -266,7 +265,7 @@ final class BadgeLoggerTest extends TestCase
             [
                 [
                     LogLevel::WARNING,
-                    'Dashboard report has not been sent: Expected branch to match regex "/^\d+\\.x$/", found "1.x-mismatch"',
+                    'Dashboard report has not been sent: Branch "1.x-mismatch" does not match expected badge configuration',
                     [],
                 ],
             ],
@@ -368,8 +367,7 @@ final class BadgeLoggerTest extends TestCase
             new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,
-            null,
-            '/^\d+\\.x$/',
+            new Badge('/^\d+\\.x$/'),
             $this->logger
         );
 

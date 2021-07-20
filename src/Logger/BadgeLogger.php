@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function getenv;
+use Infection\Configuration\Entry\Badge;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
@@ -43,7 +44,6 @@ use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Psr\Log\LoggerInterface;
-use function Safe\preg_match;
 use function Safe\sprintf;
 
 /**
@@ -55,8 +55,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
     private StrykerApiKeyResolver $strykerApiKeyResolver;
     private StrykerDashboardClient $strykerDashboardClient;
     private MetricsCalculator $metricsCalculator;
-    private ?string $exactBranchMatch;
-    private ?string $matchBranchRegex;
+    private Badge $badge;
     private LoggerInterface $logger;
 
     public function __construct(
@@ -64,16 +63,14 @@ final class BadgeLogger implements MutationTestingResultsLogger
         StrykerApiKeyResolver $strykerApiKeyResolver,
         StrykerDashboardClient $strykerDashboardClient,
         MetricsCalculator $metricsCalculator,
-        ?string $exactBranchMatch,
-        ?string $matchBranchRegex,
+        Badge $badge,
         LoggerInterface $logger
     ) {
         $this->buildContextResolver = $buildContextResolver;
         $this->strykerApiKeyResolver = $strykerApiKeyResolver;
         $this->strykerDashboardClient = $strykerDashboardClient;
         $this->metricsCalculator = $metricsCalculator;
-        $this->exactBranchMatch = $exactBranchMatch;
-        $this->matchBranchRegex = $matchBranchRegex;
+        $this->badge = $badge;
         $this->logger = $logger;
     }
 
@@ -89,20 +86,9 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
         $branch = $buildContext->branch();
 
-        if ($this->exactBranchMatch !== null && $branch !== $this->exactBranchMatch) {
+        if (!$this->badge->applicableForBranch($branch)) {
             $this->logReportWasNotSent(sprintf(
-                'Expected branch "%s", found "%s"',
-                $this->exactBranchMatch,
-                $branch
-            ));
-
-            return;
-        }
-
-        if ($this->matchBranchRegex !== null && preg_match($this->matchBranchRegex, $branch) !== 1) {
-            $this->logReportWasNotSent(sprintf(
-                'Expected branch to match regex "%s", found "%s"',
-                $this->matchBranchRegex,
+                'Branch "%s" does not match expected badge configuration',
                 $branch
             ));
 

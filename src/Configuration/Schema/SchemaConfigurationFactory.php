@@ -93,12 +93,11 @@ class SchemaConfigurationFactory
 
     private static function createBadge(?stdClass $badge): ?Badge
     {
-        $exactBranchMatch = self::normalizeString($badge->branch ?? null);
-        $matchBranchRegex = self::normalizeString($badge->matchBranchRegex ?? null);
+        $branch = self::normalizeString($badge->branch ?? null);
 
-        return $exactBranchMatch === null && $matchBranchRegex === null
+        return $branch === null
             ? null
-            : new Badge($exactBranchMatch, $matchBranchRegex)
+            : new Badge($branch)
         ;
     }
 
