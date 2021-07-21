@@ -41,28 +41,37 @@ use PHPUnit\Framework\TestCase;
 
 final class BadgeTest extends TestCase
 {
-    public function test_it_can_be_instantiated_with_an_exact_branch_match(): void
+    /** @dataProvider branch_names_to_be_matched */
+    public function test_branch_match(string $branchName, string $branchMatch, bool $willMatch): void
     {
-        $badge = new Badge('master');
-
-        $this->assertTrue($badge->applicableForBranch('master'));
-        $this->assertFalse($badge->applicableForBranch('mast'));
-        $this->assertFalse($badge->applicableForBranch('master '));
-        $this->assertFalse($badge->applicableForBranch(' master'));
-        $this->assertFalse($badge->applicableForBranch('master1'));
+        $this->assertSame(
+            $willMatch,
+            (new Badge($branchMatch))
+                ->applicableForBranch($branchName)
+        );
     }
 
-    public function test_it_can_be_instantiated_with_a_regex_branch_match(): void
+    /** @return non-empty-list<array{string, non-empty-string, bool}> */
+    public function branch_names_to_be_matched(): array
     {
-        $badge = new Badge('/^(foo|bar)$/');
-
-        $this->assertTrue($badge->applicableForBranch('foo'));
-        $this->assertTrue($badge->applicableForBranch('bar'));
-        $this->assertFalse($badge->applicableForBranch('fo'));
-        $this->assertFalse($badge->applicableForBranch('ba'));
-        $this->assertFalse($badge->applicableForBranch('foo '));
-        $this->assertFalse($badge->applicableForBranch(' foo'));
-        $this->assertFalse($badge->applicableForBranch('foo1'));
+        return [
+            ['master', 'master', true],
+            ['main', 'main', true],
+            ['main', 'master', false],
+            ['mast', 'master', false],
+            ['master ', 'master', false],
+            [' master', 'master', false],
+            [' master ', 'master', false],
+            ['master1', 'master', false],
+            ['foo', '/^(foo|bar)$/', true],
+            ['bar', '/^(foo|bar)$/', true],
+            ['foobar', '/^(foo|bar)$/', false],
+            ['fo', '/^(foo|bar)$/', false],
+            ['ba', '/^(foo|bar)$/', false],
+            ['foo ', '/^(foo|bar)$/', false],
+            [' foo', '/^(foo|bar)$/', false],
+            ['foo1', '/^(foo|bar)$/', false],
+        ];
     }
 
     public function test_it_rejects_invalid_regex(): void
