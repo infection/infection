@@ -48,6 +48,9 @@ final class Badge
 {
     private string $branchMatch;
 
+    /**
+     * @throws InvalidArgumentException when the provided $branch looks like a regular expression, but is not a valid one
+     */
     public function __construct(string $branch)
     {
         if (preg_match('#^/.+/$#', $branch) === 0) {
