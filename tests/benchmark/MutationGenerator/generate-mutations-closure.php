@@ -65,7 +65,8 @@ $traces = array_map(
 );
 
 $mutators = $container->getMutatorFactory()->create(
-    $container->getMutatorResolver()->resolve(['@default' => true])
+    $container->getMutatorResolver()->resolve(['@default' => true]),
+    true
 );
 
 $fileMutationGenerator = $container->getFileMutationGenerator();

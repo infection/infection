@@ -368,6 +368,34 @@ JSON
             ]),
         ];
 
+        yield '[logs][badge] regex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "badge": {
+            "branch": "/^foo$/"
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    new Badge('/^foo$/')
+                ),
+            ]),
+        ];
+
         yield '[logs] nominal' => [
             <<<'JSON'
 {
@@ -403,6 +431,30 @@ JSON
         ];
 
         yield '[logs] empty strings' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "text": "",
+        "summary": "",
+        "debug": "",
+        "perMutator": "",
+        "badge": {
+            "branch": ""
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => Logs::createEmpty(),
+            ]),
+        ];
+
+        yield '[logs] empty branch match regex' => [
             <<<'JSON'
 {
     "source": {

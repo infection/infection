@@ -40,8 +40,6 @@ use Infection\Configuration\Entry\Logs;
 
 trait LogsAssertions
 {
-    use BadgeAssertions;
-
     private function assertLogsStateIs(
         Logs $logs,
         ?string $expectedTextLogFilePath,
@@ -65,7 +63,8 @@ trait LogsAssertions
             $this->assertNull($badge);
         } else {
             $this->assertNotNull($badge);
-            $this->assertBadgeStateIs($badge, $expectedBadge->getBranch());
+
+            self::assertEquals($expectedBadge, $badge);
         }
     }
 }

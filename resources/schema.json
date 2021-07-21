@@ -65,12 +65,22 @@
                 },
                 "badge": {
                     "type": "object",
+                    "description": "Mutation score badge for your GitHub project. If provided, infection will report results for maching branches to an upstream reporting dashboard/collector.",
                     "additionalProperties": false,
                     "required": ["branch"],
                     "properties": {
                         "branch": {
                             "type": "string",
-                            "description": "Mutation score badge for your GitHub project."
+                            "description": "Mutation score badge for your GitHub project. If this value starts and ends with \"/\", it will be considered a regular expression.",
+                            "exaples": [
+                                "main",
+                                "master",
+                                "develop",
+                                "latest",
+                                "/1\\.\\d+/",
+                                "/release-.*/",
+                                "/feature\\/.*/"
+                            ]
                         }
                     }
                 },

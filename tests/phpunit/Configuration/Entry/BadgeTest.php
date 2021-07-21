@@ -36,16 +36,54 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\Badge;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class BadgeTest extends TestCase
 {
-    use BadgeAssertions;
-
-    public function test_it_can_be_instantiated(): void
+    /** @dataProvider branch_names_to_be_matched */
+    public function test_branch_match(string $branchName, string $branchMatch, bool $willMatch): void
     {
-        $badge = new Badge('master');
+        $this->assertSame(
+            $willMatch,
+            (new Badge($branchMatch))
+                ->applicableForBranch($branchName)
+        );
+    }
 
-        $this->assertBadgeStateIs($badge, 'master');
+    /** @return non-empty-list<array{string, non-empty-string, bool}> */
+    public function branch_names_to_be_matched(): array
+    {
+        return [
+            ['master', 'master', true],
+            ['main', 'main', true],
+            ['main', 'master', false],
+            ['mast', 'master', false],
+            ['master ', 'master', false],
+            [' master', 'master', false],
+            [' master ', 'master', false],
+            ['master1', 'master', false],
+            ['foo', '/^(foo|bar)$/', true],
+            ['bar', '/^(foo|bar)$/', true],
+            ['foobar', '/^(foo|bar)$/', false],
+            ['fo', '/^(foo|bar)$/', false],
+            ['ba', '/^(foo|bar)$/', false],
+            ['foo ', '/^(foo|bar)$/', false],
+            [' foo', '/^(foo|bar)$/', false],
+            ['foo1', '/^(foo|bar)$/', false],
+        ];
+    }
+
+    public function test_it_rejects_invalid_regex(): void
+    {
+        try {
+            new Badge('/[/');
+
+            $this->fail();
+        } catch (InvalidArgumentException $invalid) {
+            $this->assertSame('Provided branchMatchRegex "/[/" is not a valid regex', $invalid->getMessage());
+            $this->assertSame(0, $invalid->getCode());
+            $this->assertNotNull($invalid->getPrevious());
+        }
     }
 }

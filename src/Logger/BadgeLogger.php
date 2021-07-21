@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function getenv;
+use Infection\Configuration\Entry\Badge;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
@@ -54,7 +55,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
     private StrykerApiKeyResolver $strykerApiKeyResolver;
     private StrykerDashboardClient $strykerDashboardClient;
     private MetricsCalculator $metricsCalculator;
-    private string $branch;
+    private Badge $badge;
     private LoggerInterface $logger;
 
     public function __construct(
@@ -62,14 +63,14 @@ final class BadgeLogger implements MutationTestingResultsLogger
         StrykerApiKeyResolver $strykerApiKeyResolver,
         StrykerDashboardClient $strykerDashboardClient,
         MetricsCalculator $metricsCalculator,
-        string $branch,
+        Badge $badge,
         LoggerInterface $logger
     ) {
         $this->buildContextResolver = $buildContextResolver;
         $this->strykerApiKeyResolver = $strykerApiKeyResolver;
         $this->strykerDashboardClient = $strykerDashboardClient;
         $this->metricsCalculator = $metricsCalculator;
-        $this->branch = $branch;
+        $this->badge = $badge;
         $this->logger = $logger;
     }
 
@@ -83,11 +84,12 @@ final class BadgeLogger implements MutationTestingResultsLogger
             return;
         }
 
-        if ($buildContext->branch() !== $this->branch) {
+        $branch = $buildContext->branch();
+
+        if (!$this->badge->applicableForBranch($branch)) {
             $this->logReportWasNotSent(sprintf(
-                'Expected branch "%s", found "%s"',
-                $this->branch,
-                $buildContext->branch()
+                'Branch "%s" does not match expected badge configuration',
+                $branch
             ));
 
             return;
@@ -106,7 +108,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
         $this->strykerDashboardClient->sendReport(
             'github.com/' . $buildContext->repositorySlug(),
-            $buildContext->branch(),
+            $branch,
             $apiKey,
             $this->metricsCalculator->getMutationScoreIndicator()
         );
