@@ -166,6 +166,7 @@ final class Container
     public const DEFAULT_GIT_DIFF_BASE = null;
     public const DEFAULT_USE_GITHUB_LOGGER = false;
     public const DEFAULT_USE_NOOP_MUTATORS = false;
+    public const DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
     public const DEFAULT_NO_PROGRESS = false;
     public const DEFAULT_FORCE_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
@@ -684,7 +685,8 @@ final class Container
             self::DEFAULT_GIT_DIFF_FILTER,
             self::DEFAULT_GIT_DIFF_BASE,
             self::DEFAULT_USE_GITHUB_LOGGER,
-            self::DEFAULT_USE_NOOP_MUTATORS
+            self::DEFAULT_USE_NOOP_MUTATORS,
+            self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES
         );
     }
 
@@ -715,7 +717,8 @@ final class Container
         ?string $gitDiffFilter,
         ?string $gitDiffBase,
         bool $useGitHubLogger,
-        bool $useNoopMutators
+        bool $useNoopMutators,
+        bool $executeOnlyCoveringTestCases
     ): self {
         $clone = clone $this;
 
@@ -790,7 +793,8 @@ final class Container
                 $gitDiffFilter,
                 $gitDiffBase,
                 $useGitHubLogger,
-                $useNoopMutators
+                $useNoopMutators,
+                $executeOnlyCoveringTestCases
             ): Configuration {
                 return $container->getConfigurationFactory()->create(
                     $container->getSchemaConfiguration(),
@@ -815,7 +819,8 @@ final class Container
                     $gitDiffFilter,
                     $gitDiffBase,
                     $useGitHubLogger,
-                    $useNoopMutators
+                    $useNoopMutators,
+                    $executeOnlyCoveringTestCases
                 );
             }
         );

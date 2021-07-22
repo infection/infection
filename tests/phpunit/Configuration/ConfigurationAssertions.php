@@ -83,7 +83,8 @@ trait ConfigurationAssertions
         int $expectedMsiPrecision,
         int $expectedThreadCount,
         bool $expectedDryRyn,
-        array $expectedIgnoreSourceCodeMutatorsMap
+        array $expectedIgnoreSourceCodeMutatorsMap,
+        bool $expectedExecuteOnlyCoveringTestCases
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
@@ -132,6 +133,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedThreadCount, $configuration->getThreadCount());
         $this->assertSame($expectedDryRyn, $configuration->isDryRun());
         $this->assertSame($expectedIgnoreSourceCodeMutatorsMap, $configuration->getIgnoreSourceCodeMutatorsMap());
+        $this->assertSame($expectedExecuteOnlyCoveringTestCases, $configuration->getExecuteOnlyCoveringTestCases());
     }
 
     /**

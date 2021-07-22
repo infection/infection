@@ -102,7 +102,8 @@ final class Factory
                 $this->jUnitFilePath,
                 $this->projectDir,
                 $this->infectionConfig->getSourceDirectories(),
-                $skipCoverage
+                $skipCoverage,
+                $this->infectionConfig->getExecuteOnlyCoveringTestCases()
             );
         }
 
@@ -120,7 +121,8 @@ final class Factory
                 $this->jUnitFilePath,
                 $this->projectDir,
                 $this->infectionConfig->getSourceDirectories(),
-                $skipCoverage
+                $skipCoverage,
+                $this->infectionConfig->getExecuteOnlyCoveringTestCases()
             );
         }
 
