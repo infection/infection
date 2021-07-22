@@ -39,11 +39,13 @@ use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function count;
+use function escapeshellarg;
 use function escapeshellcmd;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function ltrim;
+use function preg_quote;
 use function rtrim;
 
 /**
@@ -97,7 +99,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 
                 $usedTestCases[$testCaseString] = true;
 
-                $filterString .= escapeshellcmd($testCaseString) . '|';
+                $filterString .= preg_quote($testCaseString, '/') . '|';
             }
 
             $filterString = rtrim($filterString, '|') . '/';
