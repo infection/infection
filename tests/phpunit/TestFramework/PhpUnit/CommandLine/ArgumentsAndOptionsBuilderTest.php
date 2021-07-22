@@ -50,7 +50,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->builder = new ArgumentsAndOptionsBuilder();
+        $this->builder = new ArgumentsAndOptionsBuilder(false);
     }
 
     public function test_it_can_build_the_command_without_extra_options(): void
@@ -98,19 +98,26 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     /**
      * @dataProvider provideTestCases
      */
-    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(array $testCases, string $expectedFilterOptionValue): void
+    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(bool $executeOnlyCoveringTestCases, array $testCases, ?string $expectedFilterOptionValue = null): void
     {
         $configPath = '/the config/path';
 
+        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases);
+
+        $expectedArgumentsAndOptions = [
+            '--configuration',
+            $configPath,
+            '--path=/a path/with spaces',
+        ];
+
+        if ($executeOnlyCoveringTestCases) {
+            $expectedArgumentsAndOptions[] = '--filter';
+            $expectedArgumentsAndOptions[] = $expectedFilterOptionValue;
+        }
+
         $this->assertSame(
-            [
-                '--configuration',
-                $configPath,
-                '--path=/a path/with spaces',
-                '--filter',
-                $expectedFilterOptionValue,
-            ],
-            $this->builder->buildForMutant(
+            $expectedArgumentsAndOptions,
+            $builder->buildForMutant(
                 $configPath,
                 '--path=/a path/with spaces',
                 array_map(
@@ -123,7 +130,15 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function provideTestCases(): Generator
     {
+        yield '--only-covering-test-cases is disabled' => [
+            false,
+            [
+                'App\Test::test_case1',
+            ],
+        ];
+
         yield '1 test case' => [
+            true,
             [
                 'App\Test::test_case1',
             ],
@@ -131,6 +146,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         ];
 
         yield '2 test cases' => [
+            true,
             [
                 'App\Test::test_case1',
                 'App\Test::test_case2',
@@ -139,6 +155,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         ];
 
         yield '2 simple test cases, 1 with data set and special character >' => [
+            true,
             [
                 'App\Test::test_case1 with data set "With special character >"',
                 'App\Test::test_case2',
@@ -147,6 +164,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         ];
 
         yield '2 simple test cases, 1 with data set and special character @' => [
+            true,
             [
                 'App\Test::test_case1 with data set "With special character @"',
                 'App\Test::test_case2',

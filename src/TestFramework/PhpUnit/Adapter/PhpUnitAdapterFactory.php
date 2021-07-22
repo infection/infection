@@ -67,7 +67,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         string $jUnitFilePath,
         string $projectDir,
         array $sourceDirectories,
-        bool $skipCoverage
+        bool $skipCoverage,
+        bool $executeOnlyCoveringTestCases = false
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
 
@@ -100,7 +101,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $projectDir,
                 new JUnitTestCaseSorter()
             ),
-            new ArgumentsAndOptionsBuilder(),
+            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases),
             new VersionParser(),
             new CommandLineBuilder()
         );

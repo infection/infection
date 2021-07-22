@@ -51,6 +51,13 @@ use function rtrim;
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
+    private bool $executeOnlyCoveringTestCases;
+
+    public function __construct(bool $executeOnlyCoveringTestCases)
+    {
+        $this->executeOnlyCoveringTestCases = $executeOnlyCoveringTestCases;
+    }
+
     public function buildForInitialTestsRun(string $configPath, string $extraOptions): array
     {
         $options = [
@@ -77,7 +84,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
     {
         $options = $this->buildForInitialTestsRun($configPath, $extraOptions);
 
-        if (count($tests) > 0) {
+        if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
             $filterString = '/';
             $usedTestCases = [];
 
