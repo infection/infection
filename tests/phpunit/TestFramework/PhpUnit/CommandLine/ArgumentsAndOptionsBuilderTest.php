@@ -142,7 +142,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             [
                 'App\Test::test_case1',
             ],
-            '/App\\\\Test::test_case1/',
+            '/App\\\\Test\:\:test_case1/',
         ];
 
         yield '2 test cases' => [
@@ -151,7 +151,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 'App\Test::test_case1',
                 'App\Test::test_case2',
             ],
-            '/App\\\\Test::test_case1|App\\\\Test::test_case2/',
+            '/App\\\\Test\:\:test_case1|App\\\\Test\:\:test_case2/',
         ];
 
         yield '2 simple test cases, 1 with data set and special character >' => [
@@ -160,7 +160,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 'App\Test::test_case1 with data set "With special character >"',
                 'App\Test::test_case2',
             ],
-            '/App\\\\Test::test_case1 with data set "With special character \\>"|App\\\\Test::test_case2/',
+            '/App\\\\Test\:\:test_case1 with data set "With special character \\>"|App\\\\Test\:\:test_case2/',
         ];
 
         yield '2 simple test cases, 1 with data set and special character @' => [
@@ -169,7 +169,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 'App\Test::test_case1 with data set "With special character @"',
                 'App\Test::test_case2',
             ],
-            '/App\\\\Test::test_case1 with data set "With special character @"|App\\\\Test::test_case2/',
+            '/App\\\\Test\:\:test_case1 with data set "With special character @"|App\\\\Test\:\:test_case2/',
         ];
     }
 }
