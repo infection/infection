@@ -39,8 +39,6 @@ use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function count;
-use function escapeshellarg;
-use function escapeshellcmd;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
