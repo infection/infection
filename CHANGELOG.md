@@ -1,5 +1,20 @@
 # Change Log
 
+## [0.24.0](https://github.com/infection/infection/tree/0.24.0) (2021-07-25)
+[Full Changelog](https://github.com/infection/infection/compare/0.23.0...0.24.0)
+
+**Added:**
+
+- [Mutator] Add Mutator `SpreadAssignment` #1529
+- [Mutator] Add Mutator `SpreadRemoval` #1529
+
+**Changed**:
+
+- [Performance] Improve Infection performance executed against slow test suites #1539
+- Allow using MSI Badge for multiple branches #1538
+- Add Mutator information to GitHub annotation logger #1540
+- [BC BREAK] Rename `Spread` mutator to `SpreadOneItem` #1529
+
 ## [0.23.0](https://github.com/infection/infection/tree/0.23.0) (2021-05-13)
 [Full Changelog](https://github.com/infection/infection/compare/0.22.1...0.23.0)
 
