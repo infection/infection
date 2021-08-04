@@ -155,7 +155,7 @@ XML
 XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, ['src/', 'examples/'], null);
+                $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, ['src/', 'examples/'], []);
             },
             <<<'XML'
 <phpunit cacheTokens="true">
@@ -207,7 +207,7 @@ XML
 XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->addOrUpdateCoverageIncludeNodes($xPath, ['src/', 'examples/'], null);
+                $configManipulator->addOrUpdateCoverageIncludeNodes($xPath, ['src/', 'examples/'], []);
             },
             <<<'XML'
 <phpunit cacheTokens="true">

@@ -61,7 +61,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     /**
      * @param string[] $srcDirs
-     * @param array<string> $filteredSourceFilesToMutate
+     * @param list<string> $filteredSourceFilesToMutate
      */
     public function __construct(
         string $tmpDir,
