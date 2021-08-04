@@ -146,7 +146,7 @@ XML
         );
     }
 
-    public function test_it_adds_coverage_whitelist_to_pre_93_configuration(): void
+    public function test_it_adds_coverage_whitelist_directories_to_pre_93_configuration(): void
     {
         $this->assertItChangesXML(
             <<<'XML'
@@ -155,7 +155,7 @@ XML
 XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->addLegacyCoverageWhitelistNodesUnlessTheyExist($xPath, ['src/', 'examples/']);
+                $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, ['src/', 'examples/'], null);
             },
             <<<'XML'
 <phpunit cacheTokens="true">
@@ -165,6 +165,85 @@ XML
       <directory>examples/</directory>
     </whitelist>
   </filter>
+</phpunit>
+XML
+            );
+    }
+
+    public function test_it_adds_coverage_whitelist_files_to_pre_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes(
+                    $xPath,
+                    ['src/', 'examples/'],
+                    ['src/File1.php', 'example/File2.php']
+                );
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <filter>
+    <whitelist>
+      <file>src/File1.php</file>
+      <file>example/File2.php</file>
+    </whitelist>
+  </filter>
+</phpunit>
+XML
+            );
+    }
+
+    public function test_it_adds_coverage_whitelist_directories_to_post_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateCoverageIncludeNodes($xPath, ['src/', 'examples/'], null);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <coverage>
+    <include>
+      <directory>src/</directory>
+      <directory>examples/</directory>
+    </include>
+  </coverage>
+</phpunit>
+XML
+            );
+    }
+
+    public function test_it_adds_coverage_whitelist_files_to_post_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateCoverageIncludeNodes($xPath,
+                    ['src/', 'examples/'],
+                    ['src/File1.php', 'example/File2.php']
+                );
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <coverage>
+    <include>
+      <file>src/File1.php</file>
+      <file>example/File2.php</file>
+    </include>
+  </coverage>
 </phpunit>
 XML
             );

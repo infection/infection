@@ -56,6 +56,9 @@ use Webmozart\Assert\Assert;
  */
 final class PestAdapterFactory implements TestFrameworkAdapterFactory
 {
+    /**
+     * @param list<string>|null $filteredSourceFilesToMutate
+     */
     public static function create(
         string $testFrameworkExecutable,
         string $tmpDir,
@@ -65,7 +68,8 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
         string $projectDir,
         array $sourceDirectories,
         bool $skipCoverage,
-        bool $executeOnlyCoveringTestCases = false
+        bool $executeOnlyCoveringTestCases = false,
+        ?array $filteredSourceFilesToMutate = null
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
 
@@ -89,7 +93,8 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
-                $sourceDirectories
+                $sourceDirectories,
+                $filteredSourceFilesToMutate
             ),
             new MutationConfigBuilder(
                 $tmpDir,

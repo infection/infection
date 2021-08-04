@@ -56,16 +56,20 @@ class InitialConfigBuilder implements ConfigBuilder
     private XmlConfigurationVersionProvider $versionProvider;
     /** @var string[] */
     private array $srcDirs;
+    /** @var list<string>|null */
+    private ?array $filteredSourceFilesToMutate;
 
     /**
      * @param string[] $srcDirs
+     * @param array<string>|null $filteredSourceFilesToMutate
      */
     public function __construct(
         string $tmpDir,
         string $originalXmlConfigContent,
         XmlConfigurationManipulator $configManipulator,
         XmlConfigurationVersionProvider $versionProvider,
-        array $srcDirs
+        array $srcDirs,
+        ?array $filteredSourceFilesToMutate
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,
@@ -77,6 +81,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator = $configManipulator;
         $this->versionProvider = $versionProvider;
         $this->srcDirs = $srcDirs;
+        $this->filteredSourceFilesToMutate = $filteredSourceFilesToMutate;
     }
 
     public function build(string $version): string
@@ -118,25 +123,25 @@ class InitialConfigBuilder implements ConfigBuilder
     private function addCoverageNodes(string $version, SafeDOMXPath $xPath): void
     {
         if (version_compare($version, '10', '>=')) {
-            $this->configManipulator->addCoverageIncludeNodesUnlessTheyExist($xPath, $this->srcDirs);
+            $this->configManipulator->addOrUpdateCoverageIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
             return;
         }
 
         if (version_compare($version, '9.3', '<')) {
-            $this->configManipulator->addLegacyCoverageWhitelistNodesUnlessTheyExist($xPath, $this->srcDirs);
+            $this->configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
             return;
         }
 
         // For versions between 9.3 and 10.0, fallback to version provider
         if (version_compare($this->versionProvider->provide($xPath), '9.3', '>=')) {
-            $this->configManipulator->addCoverageIncludeNodesUnlessTheyExist($xPath, $this->srcDirs);
+            $this->configManipulator->addOrUpdateCoverageIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
             return;
         }
 
-        $this->configManipulator->addLegacyCoverageWhitelistNodesUnlessTheyExist($xPath, $this->srcDirs);
+        $this->configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
     }
 
     private function addRandomTestsOrderAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
