@@ -132,18 +132,18 @@ final class XmlConfigurationManipulator
 
     /**
      * @param string[] $srcDirs
-     * @param list<string>|null $filteredSourceFilesToMutate
+     * @param list<string> $filteredSourceFilesToMutate
      */
-    public function addOrUpdateLegacyCoverageWhitelistNodes(SafeDOMXPath $xPath, array $srcDirs, ?array $filteredSourceFilesToMutate): void
+    public function addOrUpdateLegacyCoverageWhitelistNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
     {
         $this->addOrUpdateCoverageNodes('filter', 'whitelist', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
 
     /**
      * @param string[] $srcDirs
-     * @param list<string>|null $filteredSourceFilesToMutate
+     * @param list<string> $filteredSourceFilesToMutate
      */
-    public function addOrUpdateCoverageIncludeNodes(SafeDOMXPath $xPath, array $srcDirs, ?array $filteredSourceFilesToMutate): void
+    public function addOrUpdateCoverageIncludeNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
     {
         $this->addOrUpdateCoverageNodes('coverage', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
@@ -184,14 +184,14 @@ final class XmlConfigurationManipulator
 
     /**
      * @param string[] $srcDirs
-     * @param list<string>|null $filteredSourceFilesToMutate
+     * @param list<string> $filteredSourceFilesToMutate
      */
-    private function addOrUpdateCoverageNodes(string $parentName, string $listName, SafeDOMXPath $xPath, array $srcDirs, ?array $filteredSourceFilesToMutate): void
+    private function addOrUpdateCoverageNodes(string $parentName, string $listName, SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
     {
         $coverageNodeExists = $this->nodeExists($xPath, "{$parentName}/{$listName}");
 
         if ($coverageNodeExists) {
-            if ($filteredSourceFilesToMutate === null) {
+            if ($filteredSourceFilesToMutate === []) {
                 // use original phpunit.xml's coverage setting since all files need to be mutated (no filter is set)
                 return;
             }
@@ -203,7 +203,7 @@ final class XmlConfigurationManipulator
 
         $listNode = $xPath->document->createElement($listName);
 
-        if ($filteredSourceFilesToMutate === null) {
+        if ($filteredSourceFilesToMutate === []) {
             foreach ($srcDirs as $srcDir) {
                 $directoryNode = $xPath->document->createElement(
                     'directory',

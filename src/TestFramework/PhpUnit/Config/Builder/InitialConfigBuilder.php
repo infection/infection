@@ -56,12 +56,12 @@ class InitialConfigBuilder implements ConfigBuilder
     private XmlConfigurationVersionProvider $versionProvider;
     /** @var string[] */
     private array $srcDirs;
-    /** @var list<string>|null */
-    private ?array $filteredSourceFilesToMutate;
+    /** @var list<string> */
+    private array $filteredSourceFilesToMutate;
 
     /**
      * @param string[] $srcDirs
-     * @param array<string>|null $filteredSourceFilesToMutate
+     * @param array<string> $filteredSourceFilesToMutate
      */
     public function __construct(
         string $tmpDir,
@@ -69,7 +69,7 @@ class InitialConfigBuilder implements ConfigBuilder
         XmlConfigurationManipulator $configManipulator,
         XmlConfigurationVersionProvider $versionProvider,
         array $srcDirs,
-        ?array $filteredSourceFilesToMutate
+        array $filteredSourceFilesToMutate
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,

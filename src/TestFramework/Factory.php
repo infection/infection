@@ -175,12 +175,12 @@ final class Factory
     /**
      * Get only those source files that will be mutated to use them in coverage whitelist
      *
-     * @return list<string>|null
+     * @return list<string>
      */
-    private function getFilteredSourceFilesToMutate(): ?array
+    private function getFilteredSourceFilesToMutate(): array
     {
         if ($this->sourceFileFilter->getFilters() === []) {
-            return null;
+            return [];
         }
 
         /** @var list<string> $filteredPaths */
@@ -190,10 +190,6 @@ final class Factory
             },
             iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()))
         ));
-
-        if ($filteredPaths === []) {
-            return null;
-        }
 
         return $filteredPaths;
     }

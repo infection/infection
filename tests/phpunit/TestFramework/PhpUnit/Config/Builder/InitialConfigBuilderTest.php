@@ -559,7 +559,7 @@ XML
 
     private function createConfigBuilder(
         ?string $originalPhpUnitXmlConfigPath = null,
-        ?iterable $filteredSourceFilesToMutate = null
+        array $filteredSourceFilesToMutate = []
     ): InitialConfigBuilder {
         $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
 
