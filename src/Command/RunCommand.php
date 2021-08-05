@@ -485,7 +485,7 @@ final class RunCommand extends BaseCommand
     ): void {
         $locator = $container->getRootsFileOrDirectoryLocator();
 
-        if ($customConfigPath = (string) $io->getInput()->getOption(self::OPTION_CONFIGURATION)) {
+        if (($customConfigPath = (string) $io->getInput()->getOption(self::OPTION_CONFIGURATION)) !== '') {
             $locator->locate($customConfigPath);
         } else {
             $this->runConfigurationCommand($locator, $io);
