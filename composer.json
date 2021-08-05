@@ -62,7 +62,7 @@
         "symfony/filesystem": "^3.4.29 || ^4.1.19 || ^5.0",
         "symfony/finder": "^3.4.29 || ^4.1.19 || ^5.0",
         "symfony/process": "^3.4.29 || ^4.1.19 || ^5.0",
-        "thecodingmachine/safe": "^1.0",
+        "thecodingmachine/safe": "^1.1.3",
         "webmozart/assert": "^1.3",
         "webmozart/path-util": "^2.3"
     },
