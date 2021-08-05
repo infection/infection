@@ -42,7 +42,9 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use function method_exists;
+use PackageVersions\Versions;
 use Symfony\Component\Process\Process;
+use function version_compare;
 
 /**
  * @internal
@@ -82,7 +84,7 @@ class MutantProcessFactory
 
         $process->setTimeout($this->timeout);
 
-        if (method_exists($process, 'inheritEnvironmentVariables')) {
+        if (method_exists($process, 'inheritEnvironmentVariables') && version_compare(Versions::getVersion('symfony/console'), 'v4.4', '<')) {
             // in version 4.4.0 this method is deprecated and removed in 5.0.0
             $process->inheritEnvironmentVariables();
         }
