@@ -269,6 +269,19 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(2, $whitelistedDirectories->length);
     }
 
+    public function test_it_replaces_coverage_filter_include_node_if_exists_but_filtered_source_files_provided(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_coverage_include_directories.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('9.3'));
+
+        $coverageIncludeFiles = $this->queryXpath($xml, '/phpunit/coverage/include/file');
+
+        $this->assertInstanceOf(DOMNodeList::class, $coverageIncludeFiles);
+
+        $this->assertSame(1, $coverageIncludeFiles->length);
+    }
+
     public function test_it_creates_coverage_include_node_if_does_not_exist_for_future_version_of_phpunit(): void
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
@@ -539,14 +552,14 @@ XML
         return (new DOMXPath($dom))->query($query);
     }
 
-    private function createConfigBuilderForPHPUnit93(
-        ?string $originalPhpUnitXmlConfigPath = null
-    ): InitialConfigBuilder {
+    private function createConfigBuilderForPHPUnit93(): InitialConfigBuilder
+    {
         return $this->createConfigBuilder(self::FIXTURES . '/phpunit_93.xml');
     }
 
     private function createConfigBuilder(
-        ?string $originalPhpUnitXmlConfigPath = null
+        ?string $originalPhpUnitXmlConfigPath = null,
+        array $filteredSourceFilesToMutate = []
     ): InitialConfigBuilder {
         $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
 
@@ -559,7 +572,8 @@ XML
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationManipulator($replacer, ''),
             new XmlConfigurationVersionProvider(),
-            $srcDirs
+            $srcDirs,
+            $filteredSourceFilesToMutate
         );
     }
 }

@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
@@ -58,7 +59,8 @@ final class FactoryTest extends TestCase
             $this->createMock(TestFrameworkFinder::class),
             '',
             $this->createMock(Configuration::class),
-            []
+            $this->createMock(SourceFileFilter::class),
+            [],
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -74,6 +76,7 @@ final class FactoryTest extends TestCase
             $this->createMock(TestFrameworkFinder::class),
             '',
             $this->createMock(Configuration::class),
+            $this->createMock(SourceFileFilter::class),
             [
                 'infection/codeception-adapter' => [
                         'install_path' => '/path/to/dummy/adapter/factory.php',

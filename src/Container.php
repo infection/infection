@@ -290,6 +290,7 @@ final class Container
                     $container->getTestFrameworkFinder(),
                     $container->getDefaultJUnitFilePath(),
                     $config,
+                    $container->getSourceFileFilter(),
                     GeneratedExtensionsConfig::EXTENSIONS
                 );
             },
