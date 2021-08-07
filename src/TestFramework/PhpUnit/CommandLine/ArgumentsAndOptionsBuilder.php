@@ -39,12 +39,14 @@ use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function count;
+use function end;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function ltrim;
 use function preg_quote;
 use function rtrim;
+use function Safe\sprintf;
 
 /**
  * @internal
@@ -90,6 +92,13 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 
             foreach ($tests as $testLocation) {
                 $testCaseString = $testLocation->getMethod();
+
+                $partsDelimitedByColons = explode('::', $testCaseString, 2);
+
+                if (count($partsDelimitedByColons) > 1) {
+                    $parts = explode('\\', $partsDelimitedByColons[0]);
+                    $testCaseString = sprintf('%s::%s', end($parts), $partsDelimitedByColons[1]);
+                }
 
                 if (array_key_exists($testCaseString, $usedTestCases)) {
                     continue;
