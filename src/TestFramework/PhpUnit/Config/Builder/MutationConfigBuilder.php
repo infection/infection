@@ -85,7 +85,8 @@ class MutationConfigBuilder extends ConfigBuilder
         array $tests,
         string $mutantFilePath,
         string $mutationHash,
-        string $mutationOriginalFilePath
+        string $mutationOriginalFilePath,
+        string $version
     ): string {
         $dom = $this->getDom();
         $xPath = new SafeDOMXPath($dom);
@@ -98,6 +99,9 @@ class MutationConfigBuilder extends ConfigBuilder
             $originalBootstrapFile = $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
         }
 
+        // if original phpunit.xml has order by random, we should replace it to use `default` order and our sorting
+        // by <file> tags (e.g. the fastest tests first)
+        $this->configManipulator->setDefaultTestsOrderAttribute($version, $xPath);
         $this->configManipulator->setStopOnFailure($xPath);
         $this->configManipulator->deactivateColours($xPath);
         $this->configManipulator->deactivateResultCaching($xPath);

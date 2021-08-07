@@ -570,6 +570,53 @@ XML
         );
     }
 
+    public function test_it_sets_execution_order_to_default_for_phpunit_7_2(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->setDefaultTestsOrderAttribute('7.2', $xPath);
+            },
+            <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    executionOrder="default"
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_does_not_set_execution_order_to_default_for_phpunit_7_1(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->setDefaultTestsOrderAttribute('7.1', $xPath);
+            },
+            <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+        );
+    }
+
     public function test_it_removes_existing_printers(): void
     {
         $this->assertItChangesXML(<<<'XML'

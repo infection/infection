@@ -154,7 +154,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
             $tests,
             $mutantFilePath,
             $mutationHash,
-            $mutationOriginalFilePath
+            $mutationOriginalFilePath,
+            $this->getVersion()
         );
     }
 
