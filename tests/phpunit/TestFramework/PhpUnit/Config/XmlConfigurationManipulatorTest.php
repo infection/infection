@@ -600,7 +600,7 @@ XML
         );
     }
 
-    public function test_it_sets_execution_order_to_default_for_phpunit_7_2(): void
+    public function test_it_activates_result_cache_and_execution_order_defects_for_phpunit_7_3(): void
     {
         $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -611,12 +611,14 @@ XML
 XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->setDefaultTestsOrderAttribute('7.2', $xPath);
+                $configManipulator->handleResultCacheAndExecutionOrder('7.3', $xPath, 'a1b2c3');
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
-    executionOrder="default"
+    executionOrder="defects"
+    cacheResult="true"
+    cacheResultFile=".phpunit.result.cache.a1b2c3"
     syntaxCheck="false"
 >
 </phpunit>
@@ -624,7 +626,7 @@ XML
         );
     }
 
-    public function test_it_does_not_set_execution_order_to_default_for_phpunit_7_1(): void
+    public function test_it_does_not_set_result_cache_for_phpunit_7_1(): void
     {
         $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -635,7 +637,7 @@ XML
 XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->setDefaultTestsOrderAttribute('7.1', $xPath);
+                $configManipulator->handleResultCacheAndExecutionOrder('7.1', $xPath, 'a1b2c3');
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>

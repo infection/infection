@@ -37,6 +37,7 @@ namespace Infection\Event\Subscriber;
 
 use Infection\Event\MutationTestingWasFinished;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 /**
  * @internal
@@ -54,6 +55,11 @@ final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscr
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        $this->filesystem->remove($this->tmpDir);
+        $finder = Finder::create()
+            ->in($this->tmpDir)
+            // leave PHPUnit's result cache files so that subsequent Infection runs are faster because of `executionOrder=defects`
+            ->notName('/\.phpunit\.result\.cache\.(.*)/');
+
+        $this->filesystem->remove($finder);
     }
 }

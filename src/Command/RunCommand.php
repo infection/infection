@@ -312,7 +312,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_DEBUG,
                 null,
                 InputOption::VALUE_NONE,
-                'Will not clean up Infection temporary folder'
+                'Will not clean up utility files from Infection temporary folder. Adds command lines to the logs and prints Initial Tests output to stdout.'
             )
             ->addOption(
                 self::OPTION_DRY_RUN,

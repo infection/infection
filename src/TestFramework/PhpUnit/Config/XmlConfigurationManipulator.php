@@ -100,13 +100,21 @@ final class XmlConfigurationManipulator
         $this->setAttributeValue($xPath, 'cacheResult', 'false');
     }
 
-    public function setDefaultTestsOrderAttribute(string $version, SafeDOMXPath $xPath): void
+    public function handleResultCacheAndExecutionOrder(string $version, SafeDOMXPath $xPath, string $mutationHash): void
     {
-        if (version_compare($version, '7.2', '<')) {
+        // starting from PHPUnit 7.3 we can set cache result and "defects" execution order https://github.com/sebastianbergmann/phpunit/blob/7.3.0/phpunit.xsd
+        if (version_compare($version, '7.3', '>=')) {
+            $this->setAttributeValue($xPath, 'cacheResult', 'true');
+            $this->setAttributeValue($xPath, 'cacheResultFile', sprintf('.phpunit.result.cache.%s', $mutationHash));
+            $this->setAttributeValue($xPath, 'executionOrder', 'defects');
+
             return;
         }
 
-        $this->setAttributeValue($xPath, 'executionOrder', 'default');
+        // from 7.2 to 7.3 we only can set "default" execution order and no cache result https://github.com/sebastianbergmann/phpunit/blob/7.2.0/phpunit.xsd
+        if (version_compare($version, '7.2', '>=')) {
+            $this->setAttributeValue($xPath, 'executionOrder', 'default');
+        }
     }
 
     public function deactivateStderrRedirection(SafeDOMXPath $xPath): void
