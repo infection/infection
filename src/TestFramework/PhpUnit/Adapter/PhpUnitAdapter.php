@@ -136,7 +136,10 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         // "Warnings!" - e.g. when deprecated functions are used, but tests pass
         $isWarning = preg_match('/warnings!/i', $output);
 
-        return $isOk || $isOkWithInfo || $isWarning;
+        // "No tests executed!" - e.g. when --filter option contains too large regular expression
+        $isNoTestsExecuted = preg_match('/No tests executed!/i', $output);
+
+        return $isOk || $isOkWithInfo || $isWarning | $isNoTestsExecuted;
     }
 
     public function getMemoryUsed(string $output): float

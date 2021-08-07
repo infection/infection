@@ -275,6 +275,8 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['FAILURES!', false];
 
         yield ['ERRORS!', false];
+
+        yield ['No tests executed!', true];
     }
 
     public function memoryReportProvider(): iterable
