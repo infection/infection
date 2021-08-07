@@ -50,6 +50,7 @@ use function libxml_use_internal_errors;
 use LibXMLError;
 use LogicException;
 use function Safe\sprintf;
+use function version_compare;
 use Webmozart\Assert\Assert;
 
 /**
@@ -97,6 +98,15 @@ final class XmlConfigurationManipulator
     public function deactivateResultCaching(SafeDOMXPath $xPath): void
     {
         $this->setAttributeValue($xPath, 'cacheResult', 'false');
+    }
+
+    public function setDefaultTestsOrderAttribute(string $version, SafeDOMXPath $xPath): void
+    {
+        if (version_compare($version, '7.2', '<')) {
+            return;
+        }
+
+        $this->setAttributeValue($xPath, 'executionOrder', 'default');
     }
 
     public function deactivateStderrRedirection(SafeDOMXPath $xPath): void

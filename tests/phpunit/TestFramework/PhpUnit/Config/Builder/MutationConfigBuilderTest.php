@@ -93,7 +93,8 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
-            self::ORIGINAL_FILE_PATH
+            self::ORIGINAL_FILE_PATH,
+            '7.1'
         );
 
         $this->assertSame(
@@ -119,7 +120,8 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
-            self::ORIGINAL_FILE_PATH
+            self::ORIGINAL_FILE_PATH,
+            '7.1'
         );
 
         $tmp = $this->tmp;
@@ -200,7 +202,8 @@ XML
                     ],
                     self::MUTATED_FILE_PATH,
                     'hash1',
-                    self::ORIGINAL_FILE_PATH
+                    self::ORIGINAL_FILE_PATH,
+                    '7.1'
                 )
             )
         );
@@ -269,7 +272,8 @@ XML
                     ],
                     self::MUTATED_FILE_PATH,
                     'hash2',
-                    self::ORIGINAL_FILE_PATH
+                    self::ORIGINAL_FILE_PATH,
+                    '7.1'
                 )
             )
         );
@@ -308,7 +312,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
     }
@@ -320,7 +325,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -348,7 +354,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -374,7 +381,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -390,7 +398,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -407,7 +416,8 @@ PHP
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
-            self::ORIGINAL_FILE_PATH
+            self::ORIGINAL_FILE_PATH,
+            '7.1'
         );
 
         $testSuite = $this->queryXpath(
@@ -426,7 +436,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -443,7 +454,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -451,6 +463,44 @@ PHP
 
         $this->assertInstanceOf(DOMNodeList::class, $printerClass);
         $this->assertSame(0, $printerClass->length);
+    }
+
+    public function test_it_sets_default_execution_order_when_attribute_is_absent(): void
+    {
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_coverage_whitelist.xml');
+
+        $xml = file_get_contents(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.2'
+            )
+        );
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
+
+        $this->assertSame('default', $executionOrder);
+    }
+
+    public function test_it_sets_default_execution_order_when_attribute_is_present(): void
+    {
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_set.xml');
+
+        $xml = file_get_contents(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.2'
+            )
+        );
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
+
+        $this->assertSame('default', $executionOrder);
     }
 
     /**
@@ -468,7 +518,8 @@ PHP
                 $tests,
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -492,7 +543,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -510,7 +562,8 @@ PHP
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
-            self::ORIGINAL_FILE_PATH
+            self::ORIGINAL_FILE_PATH,
+            '7.1'
         );
 
         $expectedCustomAutoloadFilePath = sprintf(
