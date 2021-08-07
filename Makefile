@@ -135,7 +135,7 @@ test-unit: $(PHPUNIT)
 	$(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-unit-parallel
-test-unit-parallel:	 	## Runs the unit tests in parallel
+test-unit-parallel:	## Runs the unit tests in parallel
 test-unit-parallel:
 	$(PARATEST)
 
