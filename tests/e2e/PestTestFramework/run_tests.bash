@@ -11,5 +11,4 @@ else
     php $INFECTION
 fi
 
-cat infection.log
 diff -w expected-output.txt infection.log
