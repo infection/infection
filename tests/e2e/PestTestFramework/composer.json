@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "pestphp/pest": "^1.2.0"
+        "pestphp/pest": "^1.15.0"
     },
     "autoload": {
         "psr-4": {
