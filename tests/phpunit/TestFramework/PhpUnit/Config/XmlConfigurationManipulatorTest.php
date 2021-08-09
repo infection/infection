@@ -110,6 +110,36 @@ XML
         );
     }
 
+    public function test_it_replaces_with_absolute_paths_xml_file_with_tabs(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+    <testsuites>
+		<testsuite name="All Tests">
+			<directory suffix="UnitTest.php">
+				./Tests
+			</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->replaceWithAbsolutePaths($xPath);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <testsuites>
+    <testsuite name="All Tests">
+      <directory suffix="UnitTest.php">/Tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
+XML
+        );
+    }
+
     public function test_it_removes_existing_loggers_from_pre_93_configuration(): void
     {
         $this->assertItChangesPrePHPUnit93Configuration(
