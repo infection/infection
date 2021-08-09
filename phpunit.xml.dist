@@ -23,7 +23,7 @@
         </testsuite>
     </testsuites>
 
-    <coverage>
+    <coverage cacheDirectory="./reports/.coverage-cache">
         <include>
             <directory>src</directory>
         </include>
