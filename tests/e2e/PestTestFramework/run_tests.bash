@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-readonly INFECTION="../../../bin/infection --test-framework=pest --debug"
+readonly INFECTION="../../../bin/infection --test-framework=pest --debug --log-verbosity=all"
 
 set -e pipefail
 
