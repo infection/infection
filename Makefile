@@ -137,7 +137,7 @@ test-unit: $(PHPUNIT)
 .PHONY: test-unit-parallel
 test-unit-parallel:	## Runs the unit tests in parallel
 test-unit-parallel:
-	$(PARATEST)
+	$(PARATEST) --group=default
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms

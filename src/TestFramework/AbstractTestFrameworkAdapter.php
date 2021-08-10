@@ -51,8 +51,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     private CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder;
     private InitialConfigBuilder $initialConfigBuilder;
     private MutationConfigBuilder $mutationConfigBuilder;
-    private VersionParser $versionParser;
-    private CommandLineBuilder $commandLineBuilder;
+    protected VersionParser $versionParser;
+    protected CommandLineBuilder $commandLineBuilder;
     private ?string $version;
 
     public function __construct(
@@ -176,7 +176,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         );
     }
 
-    private function retrieveVersion(): string
+    protected function retrieveVersion(): string
     {
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
             $this->testFrameworkExecutable,

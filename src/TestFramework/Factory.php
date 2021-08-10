@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Infection\TestFramework\PhpUnit\Adapter\ParatestAdapterFactory;
 use function array_filter;
 use function array_map;
 use function implode;
@@ -135,6 +136,30 @@ final class Factory
                 $skipCoverage,
                 $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
                 $filteredSourceFilesToMutate
+            );
+        }
+
+        if ($adapterName === TestFrameworkTypes::PARATEST) {
+            $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
+
+            return ParatestAdapterFactory::create(
+                $this->testFrameworkFinder->find(
+                    TestFrameworkTypes::PARATEST,
+                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
+                ),
+                $this->tmpDir,
+                $phpUnitConfigPath,
+                (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
+                $this->jUnitFilePath,
+                $this->projectDir,
+                $this->infectionConfig->getSourceDirectories(),
+                $skipCoverage,
+                $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
+                $filteredSourceFilesToMutate,
+                $this->testFrameworkFinder->find(
+                    TestFrameworkTypes::PHPUNIT,
+                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
+                )
             );
         }
 

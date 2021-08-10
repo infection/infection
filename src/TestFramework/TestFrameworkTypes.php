@@ -40,15 +40,17 @@ namespace Infection\TestFramework;
  */
 final class TestFrameworkTypes
 {
-    public const PHPUNIT = 'phpunit';
+    public const CODECEPTION = 'codeception';
+    public const PARATEST = 'paratest';
     public const PEST = 'pest';
     public const PHPSPEC = 'phpspec';
-    public const CODECEPTION = 'codeception';
+    public const PHPUNIT = 'phpunit';
 
     public const TYPES = [
-        self::PEST,
-        self::PHPUNIT,
-        self::PHPSPEC,
         self::CODECEPTION,
+        self::PARATEST,
+        self::PEST,
+        self::PHPSPEC,
+        self::PHPUNIT,
     ];
 }
