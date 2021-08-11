@@ -216,7 +216,7 @@ final class ConfigureCommand extends BaseCommand
         ];
 
         file_put_contents(
-            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
+            SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
             json_encode($configObject, JSON_PRETTY_PRINT)
         );
     }

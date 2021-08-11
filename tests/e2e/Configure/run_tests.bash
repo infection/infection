@@ -7,7 +7,7 @@ if test ! -f "$(which expect)"; then
 fi
 
 cd $(dirname $0)
-rm -f infection.json.dist
+rm -f infection.json
 
 set -e
 
@@ -25,5 +25,5 @@ unset GITHUB_ACTIONS
 
 ./do_configure.expect
 
-test -f infection.json.dist
-diff -u infection.json.test infection.json.dist
+test -f infection.json
+diff -u infection.json.test infection.json
