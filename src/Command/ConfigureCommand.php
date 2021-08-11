@@ -37,6 +37,7 @@ namespace Infection\Command;
 
 use function count;
 use function file_exists;
+use function strpos;
 use const GLOB_ONLYDIR;
 use function implode;
 use Infection\Config\ConsoleHelper;
@@ -245,7 +246,7 @@ final class ConfigureCommand extends BaseCommand
         try {
             $version = strstr(Versions::getVersion(Application::PACKAGE_NAME), '@', true);
 
-            if ($version === false || str_starts_with($version, 'dev-')) {
+            if ($version === false || strpos($version, 'dev-') === 0) {
                 $version = 'master';
             }
         } catch (OutOfBoundsException $e) {
