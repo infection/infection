@@ -12,7 +12,6 @@
 /build/
 /devTools/Docker*.json
 /infection-cache
-/infection.json
 /infection.log
 /phpunit.xml
 /tests/benchmark/*/coverage/
