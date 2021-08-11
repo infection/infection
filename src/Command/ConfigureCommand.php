@@ -47,11 +47,15 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
+use Infection\Console\Application;
 use Infection\Console\IO;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
 use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
+use OutOfBoundsException;
+use PackageVersions\Versions;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\file_put_contents;
@@ -60,6 +64,8 @@ use function Safe\json_decode;
 use function Safe\json_encode;
 use function Safe\sprintf;
 use stdClass;
+use function str_starts_with;
+use function strstr;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -178,6 +184,8 @@ final class ConfigureCommand extends BaseCommand
     ): void {
         $configObject = new stdClass();
 
+        $configObject->{'$schema'} = $this->getJsonSchemaPathOrUrl();
+
         $configObject->source = new stdClass();
 
         if ($sourceDirs) {
@@ -217,12 +225,33 @@ final class ConfigureCommand extends BaseCommand
 
         file_put_contents(
             SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
-            json_encode($configObject, JSON_PRETTY_PRINT)
+            json_encode($configObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
     }
 
     private function abort(): void
     {
         throw new RuntimeException('Configuration generation aborted');
+    }
+
+    private function getJsonSchemaPathOrUrl(): string
+    {
+        $fileName = 'vendor/infection/infection/resources/schema.json';
+
+        if (file_exists($fileName)) {
+            return $fileName;
+        }
+
+        try {
+            $version = strstr(Versions::getVersion(Application::PACKAGE_NAME), '@', true);
+
+            if ($version === false || str_starts_with($version, 'dev-')) {
+                $version = 'master';
+            }
+        } catch (OutOfBoundsException $e) {
+            $version = 'master';
+        }
+
+        return sprintf('https://raw.githubusercontent.com/infection/infection/%s/resources/schema.json', $version);
     }
 }
