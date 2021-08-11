@@ -55,9 +55,9 @@ use function trim;
  */
 final class Application extends BaseApplication
 {
-    private const NAME = 'Infection - PHP Mutation Testing Framework';
+    public const PACKAGE_NAME = 'infection/infection';
 
-    private const PACKAGE_NAME = 'infection/infection';
+    private const NAME = 'Infection - PHP Mutation Testing Framework';
 
     private const LOGO = '
     ____      ____          __  _

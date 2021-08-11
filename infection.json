@@ -1,4 +1,5 @@
 {
+    "$schema": "./resources/schema.json",
     "timeout": 25,
     "source": {
         "directories": [

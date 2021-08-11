@@ -6,6 +6,9 @@
         "source"
     ],
     "properties": {
+        "$schema": {
+            "type": "string"
+        },
         "timeout": {
             "type": "number",
             "description": "The allowed timeout in seconds.",
