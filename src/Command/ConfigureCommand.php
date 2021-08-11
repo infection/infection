@@ -37,7 +37,6 @@ namespace Infection\Command;
 
 use function count;
 use function file_exists;
-use function strpos;
 use const GLOB_ONLYDIR;
 use function implode;
 use Infection\Config\ConsoleHelper;
@@ -65,7 +64,7 @@ use function Safe\json_decode;
 use function Safe\json_encode;
 use function Safe\sprintf;
 use stdClass;
-use function str_starts_with;
+use function strpos;
 use function strstr;
 use Symfony\Component\Console\Input\InputOption;
 
