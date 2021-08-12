@@ -100,7 +100,7 @@ class MetricsCalculator implements Collector
 
     public function getErrorCount(): int
     {
-        return $this->countByStatus[DetectionStatus::ERROR];
+        return $this->countByStatus[DetectionStatus::ERROR] + $this->countByStatus[DetectionStatus::SYNTAX_ERROR];
     }
 
     public function getSkippedCount(): int

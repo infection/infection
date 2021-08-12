@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function escapeshellarg;
 use Infection\AbstractTestFramework\MemoryUsageAware;
+use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
@@ -54,7 +55,7 @@ use function version_compare;
  * @internal
  * @final
  */
-class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions
+class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
@@ -140,6 +141,16 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         $isNoTestsExecuted = preg_match('/No tests executed!/i', $output);
 
         return $isOk || $isOkWithInfo || $isWarning | $isNoTestsExecuted;
+    }
+
+    public function isSyntaxError(string $output): bool
+    {
+        return preg_match('/ParseError: syntax error/i', $output) === 1;
+    }
+
+    public function checkVersion(): void
+    {
+        // TODO will be implemented in https://github.com/infection/infection/pull/1227
     }
 
     public function getMemoryUsed(string $output): float

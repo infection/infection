@@ -9,5 +9,9 @@
     "logs": {
         "summary": "infection.log"
     },
-    "tmpDir": "."
+    "tmpDir": ".",
+    "mutators": {
+        "@default": false,
+        "SyntaxError": true
+    }
 }

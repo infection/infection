@@ -21,6 +21,11 @@ class FakeAwareAdapter extends AbstractTestFrameworkAdapter implements MemoryUsa
         return false;
     }
 
+    public function checkVersion(): void
+    {
+        // TODO will be implemented in https://github.com/infection/infection/pull/1227
+    }
+
     public function testsPass(string $output): bool
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);

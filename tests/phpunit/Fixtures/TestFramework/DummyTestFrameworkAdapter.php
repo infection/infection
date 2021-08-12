@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Fixtures\TestFramework;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\UnsupportedTestFrameworkVersion;
 
 final class DummyTestFrameworkAdapter implements TestFrameworkAdapter
 {
@@ -16,6 +17,11 @@ final class DummyTestFrameworkAdapter implements TestFrameworkAdapter
     public function testsPass(string $output): bool
     {
         return true;
+    }
+
+    public function checkVersion(): void
+    {
+        // TODO will be implemented in https://github.com/infection/infection/pull/1227
     }
 
     public function hasJUnitReport(): bool

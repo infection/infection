@@ -123,6 +123,8 @@ class TargetDetectionStatusesProvider
 
             yield DetectionStatus::ERROR;
 
+            yield DetectionStatus::SYNTAX_ERROR;
+
             yield DetectionStatus::TIMED_OUT;
 
             if (!$this->onlyCoveredMode) {
@@ -137,6 +139,8 @@ class TargetDetectionStatusesProvider
             yield DetectionStatus::TIMED_OUT;
 
             yield DetectionStatus::SKIPPED;
+
+            yield DetectionStatus::SYNTAX_ERROR;
 
             if ($this->logVerbosity === LogVerbosity::DEBUG) {
                 yield DetectionStatus::KILLED;

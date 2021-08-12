@@ -70,7 +70,7 @@ abstract class BaseMutatorTestCase extends TestCase
      * @var string|string[]
      * @var mixed[] $settings
      */
-    final public function doTest(string $inputCode, $expectedCode = [], array $settings = []): void
+    final public function doTest(string $inputCode, $expectedCode = [], array $settings = [], bool $allowInvalidCode = false): void
     {
         $expectedCodeSamples = (array) $expectedCode;
 
@@ -106,7 +106,10 @@ abstract class BaseMutatorTestCase extends TestCase
                 StringNormalizer::normalizeString($expectedCodeSample),
                 StringNormalizer::normalizeString($realMutatedCode)
             );
-            $this->assertSyntaxIsValid($realMutatedCode);
+
+            if (!$allowInvalidCode) {
+                $this->assertSyntaxIsValid($realMutatedCode);
+            }
         }
     }
 

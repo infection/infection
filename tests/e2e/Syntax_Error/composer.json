@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^9.5.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Syntax_Error\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Syntax_Error\\Test\\": "tests/"
+        }
+    }
+}

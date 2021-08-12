@@ -76,6 +76,11 @@ final class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptio
         return $isOk || $isOkRisked;
     }
 
+    public function checkVersion(): void
+    {
+        // TODO will be implemented in https://github.com/infection/infection/pull/1227
+    }
+
     public function hasJUnitReport(): bool
     {
         return $this->phpUnitAdapter->hasJUnitReport();

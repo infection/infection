@@ -33,30 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Console;
+namespace Infection\Tests\Mutator;
 
-use Infection\Console\OutputFormatterStyleConfigurator;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Formatter\OutputFormatterInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-final class OutputFormatterStyleConfiguratorTest extends TestCase
+final class SyntaxErrorTest extends BaseMutatorTestCase
 {
-    public function test_it_adds_styles(): void
+    /**
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
+     */
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $formatter = $this->createMock(OutputFormatterInterface::class);
-        $formatter
-            ->expects($this->exactly(13))
-            ->method('setStyle')
-        ;
+        $this->doTest($input, $expected, [], true);
+    }
 
-        $output = $this->createMock(OutputInterface::class);
-        $output
-            ->expects($this->once())
-            ->method('getFormatter')
-            ->willReturn($formatter)
-        ;
+    public function mutationsProvider(): iterable
+    {
+        yield 'It mutates method call to invalid syntax' => [
+            <<<'PHP'
+<?php
 
-        OutputFormatterStyleConfigurator::configure($output);
+$this->methodCall();
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$->methodCall();
+PHP
+        ];
     }
 }

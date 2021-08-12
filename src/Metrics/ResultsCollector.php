@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Metrics;
 
 use function array_key_exists;
+use function array_merge;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;
@@ -102,7 +103,10 @@ class ResultsCollector implements Collector
      */
     public function getErrorExecutionResults(): array
     {
-        return $this->getResultListForStatus(DetectionStatus::ERROR)->getSortedExecutionResults();
+        return array_merge(
+            $this->getResultListForStatus(DetectionStatus::ERROR)->getSortedExecutionResults(),
+            $this->getResultListForStatus(DetectionStatus::SYNTAX_ERROR)->getSortedExecutionResults(),
+        );
     }
 
     /**
