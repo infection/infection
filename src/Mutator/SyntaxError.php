@@ -33,30 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Console;
+namespace Infection\Mutator;
 
-use Infection\Console\OutputFormatterStyleConfigurator;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Formatter\OutputFormatterInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use PhpParser\Node;
 
-final class OutputFormatterStyleConfiguratorTest extends TestCase
+/**
+ * @internal
+ *
+ * @implements Mutator<Node\Expr\Variable>
+ */
+final class SyntaxError implements Mutator
 {
-    public function test_it_adds_styles(): void
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        $formatter = $this->createMock(OutputFormatterInterface::class);
-        $formatter
-            ->expects($this->exactly(13))
-            ->method('setStyle')
-        ;
+        return new Definition(
+            'Replaces a `$this` with `false` to produce a syntax error. Internal usage only.',
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null,
+            <<<'DIFF'
+class X {
+    function foo()
+    {
+-        $this->method();
++        $->method();
+    }
+}
+DIFF
+        );
+    }
 
-        $output = $this->createMock(OutputInterface::class);
-        $output
-            ->expects($this->once())
-            ->method('getFormatter')
-            ->willReturn($formatter)
-        ;
+    /**
+     * @psalm-mutation-free
+     *
+     * @return iterable<Node\Expr\ConstFetch>
+     */
+    public function mutate(Node $node): iterable
+    {
+        yield new Node\Expr\ConstFetch(new Node\Name('$'));
+    }
 
-        OutputFormatterStyleConfigurator::configure($output);
+    public function canMutate(Node $node): bool
+    {
+        return $node instanceof Node\Expr\Variable && $node->name === 'this';
     }
 }

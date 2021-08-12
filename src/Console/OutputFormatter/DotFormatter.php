@@ -66,6 +66,7 @@ final class DotFormatter extends AbstractOutputFormatter
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
+            . '<with-syntax-error>X</with-syntax-error>: syntax error, '
             . '<timeout>T</timeout>: timed out, '
             . '<skipped>S</skipped>: skipped',
             '',
@@ -99,6 +100,10 @@ final class DotFormatter extends AbstractOutputFormatter
                 break;
             case DetectionStatus::ERROR:
                 $this->output->write('<with-error>E</with-error>');
+
+                break;
+            case DetectionStatus::SYNTAX_ERROR:
+                $this->output->write('<with-syntax-error>X</with-syntax-error>');
 
                 break;
         }
