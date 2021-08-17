@@ -85,6 +85,11 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
             $separateSections
         );
         $logs[] = $this->getResultsLine(
+            $this->resultsCollector->getSyntaxErrorExecutionResults(),
+            'Syntax Errors',
+            $separateSections
+        );
+        $logs[] = $this->getResultsLine(
             $this->resultsCollector->getEscapedExecutionResults(),
             'Escaped',
             $separateSections

@@ -102,6 +102,12 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
                 'Errors',
                 $separateSections
             );
+
+            $logs[] = $this->getResultsLine(
+                $this->resultsCollector->getSyntaxErrorExecutionResults(),
+                'Syntax Errors',
+                $separateSections
+            );
         }
 
         if (!$this->onlyCoveredMode) {

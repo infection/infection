@@ -59,6 +59,7 @@ final class SummaryFileLogger implements LineMutationTestingResultsLogger
             '',
             'Killed: ' . $this->metricsCalculator->getKilledCount(),
             'Errored: ' . $this->metricsCalculator->getErrorCount(),
+            'Syntax Errors: ' . $this->metricsCalculator->getSyntaxErrorCount(),
             'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
             'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
             'Skipped: ' . $this->metricsCalculator->getSkippedCount(),

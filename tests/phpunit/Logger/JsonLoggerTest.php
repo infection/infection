@@ -82,6 +82,7 @@ final class JsonLoggerTest extends TestCase
                     'notCoveredCount' => 0,
                     'escapedCount' => 0,
                     'errorCount' => 0,
+                    'syntaxErrorCount' => 0,
                     'skippedCount' => 0,
                     'timeOutCount' => 0,
                     'msi' => 0,
@@ -92,6 +93,7 @@ final class JsonLoggerTest extends TestCase
                 'timeouted' => [],
                 'killed' => [],
                 'errored' => [],
+                'syntaxErrors' => [],
                 'uncovered' => [],
             ],
         ];
@@ -102,16 +104,17 @@ final class JsonLoggerTest extends TestCase
             $this->createCompleteResultsCollector(),
             [
                 'stats' => [
-                    'totalMutantsCount' => 12,
+                    'totalMutantsCount' => 14,
                     'killedCount' => 2,
                     'notCoveredCount' => 2,
                     'escapedCount' => 2,
                     'errorCount' => 2,
+                    'syntaxErrorCount' => 2,
                     'skippedCount' => 2,
                     'timeOutCount' => 2,
-                    'msi' => 60,
-                    'mutationCodeCoverage' => 80,
-                    'coveredCodeMsi' => 75,
+                    'msi' => 50,
+                    'mutationCodeCoverage' => 83.33,
+                    'coveredCodeMsi' => 60,
                 ],
                 'escaped' => [
                     [
@@ -209,6 +212,30 @@ final class JsonLoggerTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                 ],
+                'syntaxErrors' => [
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'PregQuote',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 9,
+                        ],
+                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'syntaxError#1';"),
+                        'processOutput' => 'process output',
+                    ],
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'For_',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 10,
+                        ],
+                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'syntaxError#0';"),
+                        'processOutput' => 'process output',
+                    ],
+                ],
                 'uncovered' => [],
             ],
         ];
@@ -224,6 +251,7 @@ final class JsonLoggerTest extends TestCase
                     'notCoveredCount' => 1,
                     'escapedCount' => 0,
                     'errorCount' => 0,
+                    'syntaxErrorCount' => 0,
                     'skippedCount' => 0,
                     'timeOutCount' => 0,
                     'msi' => 0,
@@ -234,6 +262,7 @@ final class JsonLoggerTest extends TestCase
                 'timeouted' => [],
                 'killed' => [],
                 'errored' => [],
+                'syntaxErrors' => [],
                 'uncovered' => [
                     [
                         'mutator' => [
@@ -261,6 +290,7 @@ final class JsonLoggerTest extends TestCase
                     'notCoveredCount' => 0,
                     'escapedCount' => 0,
                     'errorCount' => 0,
+                    'syntaxErrorCount' => 0,
                     'skippedCount' => 0,
                     'timeOutCount' => 0,
                     'msi' => 0,
@@ -271,6 +301,7 @@ final class JsonLoggerTest extends TestCase
                 'timeouted' => [],
                 'killed' => [],
                 'errored' => [],
+                'syntaxErrors' => [],
                 'uncovered' => [
                     [
                         'mutator' => [
