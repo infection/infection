@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\AbstractTestFramework\MemoryUsageAware;
+use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use function Safe\preg_match;
@@ -44,7 +45,7 @@ use function Safe\sprintf;
 /**
  * @internal
  */
-final class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, TestFrameworkAdapter
+final class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFrameworkAdapter
 {
     private const NAME = 'Pest';
 
@@ -74,6 +75,11 @@ final class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptio
         $isOkRisked = preg_match('/Tests:\s+(.*?)(\d+\srisked)/', $output) === 1;
 
         return $isOk || $isOkRisked;
+    }
+
+    public function isSyntaxError(string $output): bool
+    {
+        return preg_match('/ParseError\s*syntax error/i', $output) === 1;
     }
 
     public function hasJUnitReport(): bool

@@ -174,9 +174,9 @@ final class CalculatorTest extends TestCase
 
         yield 'nominal' => [
             $this->createCompleteMetricsCalculator(),
-            60.,
-            80.0,
-            75.0,
+            50.,  // 14 total mutations; 2 skipped; 6 of 12 are killed => 50%
+            83.33, // 14 total mutations; 2 skipped & 2 not covered; => 10 of 12 => 83.33%
+            60.0, // 14 total mutations; 2 skipped & 2 not covered; 6 of 10 are killed => 60%
         ];
     }
 }

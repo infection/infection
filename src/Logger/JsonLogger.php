@@ -74,6 +74,7 @@ final class JsonLogger implements LineMutationTestingResultsLogger
                 'notCoveredCount' => $this->metricsCalculator->getNotTestedCount(),
                 'escapedCount' => $this->metricsCalculator->getEscapedCount(),
                 'errorCount' => $this->metricsCalculator->getErrorCount(),
+                'syntaxErrorCount' => $this->metricsCalculator->getSyntaxErrorCount(),
                 'skippedCount' => $this->metricsCalculator->getSkippedCount(),
                 'timeOutCount' => $this->metricsCalculator->getTimedOutCount(),
                 'msi' => $this->metricsCalculator->getMutationScoreIndicator(),
@@ -84,6 +85,7 @@ final class JsonLogger implements LineMutationTestingResultsLogger
             'timeouted' => $this->getResultsLine($this->resultsCollector->getTimedOutExecutionResults()),
             'killed' => $this->getResultsLine($this->resultsCollector->getKilledExecutionResults()),
             'errored' => $this->getResultsLine($this->resultsCollector->getErrorExecutionResults()),
+            'syntaxErrors' => $this->getResultsLine($this->resultsCollector->getSyntaxErrorExecutionResults()),
             'uncovered' => $this->onlyCoveredMode ? [] : $this->getResultsLine($this->resultsCollector->getNotCoveredExecutionResults()),
         ];
 

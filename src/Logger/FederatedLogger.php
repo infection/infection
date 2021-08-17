@@ -43,7 +43,7 @@ final class FederatedLogger implements MutationTestingResultsLogger
     /**
      * @var MutationTestingResultsLogger[]
      */
-    private $loggers;
+    private array $loggers;
 
     public function __construct(MutationTestingResultsLogger ...$loggers)
     {

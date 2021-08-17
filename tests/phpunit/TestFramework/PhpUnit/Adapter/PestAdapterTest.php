@@ -91,13 +91,25 @@ final class PestAdapterTest extends TestCase
     }
 
     /**
-     * @dataProvider outputProvider
+     * @dataProvider passOutputProvider
      */
-    public function test_it_can_tell_the_outcome_of_the_tests_from_the_output(
+    public function test_it_can_tell_if_tests_pass_from_the_output(
         string $output,
         bool $expected
     ): void {
         $actual = $this->adapter->testsPass($output);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @dataProvider syntaxErrorOutputProvider
+     */
+    public function test_it_can_tell_if_there_is_a_syntax_error_from_the_output(
+        string $output,
+        bool $expected
+    ): void {
+        $actual = $this->adapter->isSyntaxError($output);
 
         $this->assertSame($expected, $actual);
     }
@@ -266,13 +278,28 @@ final class PestAdapterTest extends TestCase
         );
     }
 
-    public function outputProvider(): iterable
+    public function passOutputProvider(): iterable
     {
         yield ['Tests:  1 risked', true];
 
         yield ['Tests:  9 passed', true];
 
         yield ['Tests:  1 failed, 8 passed', false];
+    }
+
+    public function syntaxErrorOutputProvider(): iterable
+    {
+        yield ['Tests:  1 risked', false];
+
+        yield [
+            <<<TXT
+'ParseError
+
+syntax error, unexpected ">"'
+TXT
+            ,
+            true,
+        ];
     }
 
     public function memoryReportProvider(): iterable

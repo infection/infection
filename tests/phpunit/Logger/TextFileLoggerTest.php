@@ -124,6 +124,9 @@ Killed mutants:
 Errors mutants:
 ===============
 
+Syntax Errors mutants:
+======================
+
 Not Covered mutants:
 ====================
 
@@ -170,6 +173,9 @@ Killed mutants:
 Errors mutants:
 ===============
 
+Syntax Errors mutants:
+======================
+
 Not Covered mutants:
 ====================
 
@@ -213,6 +219,9 @@ Killed mutants:
 Errors mutants:
 ===============
 
+Syntax Errors mutants:
+======================
+
 TXT
         ];
 
@@ -252,6 +261,9 @@ Killed mutants:
 
 Errors mutants:
 ===============
+
+Syntax Errors mutants:
+======================
 
 TXT
         ];
@@ -498,6 +510,33 @@ Errors mutants:
   process output
 
 
+Syntax Errors mutants:
+======================
+
+1) foo/bar:9    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'syntaxError#1';
+
+  process output
+
+
+2) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'syntaxError#0';
+
+  process output
+
+
 Not Covered mutants:
 ====================
 
@@ -792,6 +831,35 @@ $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/Foo
   process output
 
 
+Syntax Errors mutants:
+======================
+
+1) foo/bar:9    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'syntaxError#1';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+  process output
+
+
+2) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'syntaxError#0';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+  process output
+
+
 Not Covered mutants:
 ====================
 
@@ -1038,6 +1106,33 @@ Errors mutants:
 
   process output
 
+
+Syntax Errors mutants:
+======================
+
+1) foo/bar:9    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'syntaxError#1';
+
+  process output
+
+
+2) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'syntaxError#0';
+
+  process output
+
 TXT
         ];
 
@@ -1274,6 +1369,35 @@ $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/Foo
 
 - echo 'original';
 + echo 'error#0';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+  process output
+
+
+Syntax Errors mutants:
+======================
+
+1) foo/bar:9    [M] PregQuote
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'syntaxError#1';
+
+$ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+  process output
+
+
+2) foo/bar:10    [M] For_
+
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'syntaxError#0';
 
 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
   process output

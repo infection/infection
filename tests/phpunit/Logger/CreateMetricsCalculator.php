@@ -96,6 +96,18 @@ trait CreateMetricsCalculator
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
+                DetectionStatus::SYNTAX_ERROR,
+                'syntaxError#0'
+            ),
+            $this->createMutantExecutionResult(
+                1,
+                PregQuote::class,
+                DetectionStatus::SYNTAX_ERROR,
+                'syntaxError#1'
+            ),
+            $this->createMutantExecutionResult(
+                0,
+                For_::class,
                 DetectionStatus::ESCAPED,
                 'escaped#0'
             ),

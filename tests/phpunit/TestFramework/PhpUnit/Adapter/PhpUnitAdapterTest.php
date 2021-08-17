@@ -91,13 +91,25 @@ final class PhpUnitAdapterTest extends TestCase
     }
 
     /**
-     * @dataProvider outputProvider
+     * @dataProvider passOutputProvider
      */
-    public function test_it_can_tell_the_outcome_of_the_tests_from_the_output(
+    public function test_it_can_tell_if_tests_pass_from_the_output(
         string $output,
         bool $expected
     ): void {
         $actual = $this->adapter->testsPass($output);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @dataProvider syntaxErrorOutputProvider
+     */
+    public function test_it_can_tell_if_there_is_a_syntax_error_from_the_output(
+        string $output,
+        bool $expected
+    ): void {
+        $actual = $this->adapter->isSyntaxError($output);
 
         $this->assertSame($expected, $actual);
     }
@@ -266,7 +278,7 @@ final class PhpUnitAdapterTest extends TestCase
         );
     }
 
-    public function outputProvider(): iterable
+    public function passOutputProvider(): iterable
     {
         yield ['OK, but incomplete, skipped, or risky tests!', true];
 
@@ -277,6 +289,13 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['ERRORS!', false];
 
         yield ['No tests executed!', true];
+    }
+
+    public function syntaxErrorOutputProvider(): iterable
+    {
+        yield ['OK, but incomplete, skipped, or risky tests!', false];
+
+        yield ['ParseError: syntax error, unexpected ">"', true];
     }
 
     public function memoryReportProvider(): iterable

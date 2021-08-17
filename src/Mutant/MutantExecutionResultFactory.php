@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
+use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
 use function Safe\sprintf;
@@ -103,8 +104,14 @@ class MutantExecutionResultFactory
             return DetectionStatus::ERROR;
         }
 
-        if ($this->testFrameworkAdapter->testsPass($this->retrieveProcessOutput($process))) {
+        $output = $this->retrieveProcessOutput($process);
+
+        if ($this->testFrameworkAdapter->testsPass($output)) {
             return DetectionStatus::ESCAPED;
+        }
+
+        if ($this->testFrameworkAdapter instanceof SyntaxErrorAware && $this->testFrameworkAdapter->isSyntaxError($output)) {
+            return DetectionStatus::SYNTAX_ERROR;
         }
 
         return DetectionStatus::KILLED;

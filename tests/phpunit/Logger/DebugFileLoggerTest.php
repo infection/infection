@@ -74,6 +74,9 @@ Killed mutants:
 Errors mutants:
 ===============
 
+Syntax Errors mutants:
+======================
+
 Escaped mutants:
 ================
 
@@ -94,7 +97,7 @@ TXT
             $this->createCompleteResultsCollector(),
             false,
             <<<'TXT'
-Total: 12
+Total: 14
 
 Killed mutants:
 ===============
@@ -108,6 +111,16 @@ Line 10
 
 Errors mutants:
 ===============
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+
+Syntax Errors mutants:
+======================
 
 Mutator: PregQuote
 Line 9
@@ -163,7 +176,7 @@ TXT
             $this->createCompleteResultsCollector(),
             true,
             <<<'TXT'
-Total: 12
+Total: 14
 
 Killed mutants:
 ===============
@@ -177,6 +190,16 @@ Line 10
 
 Errors mutants:
 ===============
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+
+Syntax Errors mutants:
+======================
 
 Mutator: PregQuote
 Line 9
