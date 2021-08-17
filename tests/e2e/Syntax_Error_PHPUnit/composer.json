@@ -4,12 +4,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Syntax_Error\\": "src/"
+            "Syntax_Error_PHPUnit\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Syntax_Error\\Test\\": "tests/"
+            "Syntax_Error_PHPUnit\\Test\\": "tests/"
         }
     }
 }

@@ -1,15 +1,15 @@
 <?php
 
-namespace Syntax_Error;
+namespace Syntax_Error_Pest;
 
-class SourceClass
+class ForPest
 {
     public function foo(): string
     {
         return 'hello';
     }
 
-    public function bar(): string
+    public function hello(): string
     {
         return $this->foo();
     }
