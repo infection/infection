@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a87f2b86b3b635db0cd25142a5d8abaf",
+    "content-hash": "d9cfb23acce60abd6aa6cc78193cd142",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -72,16 +72,16 @@
         },
         {
             "name": "infection/abstract-testframework-adapter",
-            "version": "dev-feature/syntax-error",
+            "version": "0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/abstract-testframework-adapter.git",
-                "reference": "677c0277763bbfe7e1b5eb5fe9d3bf0d7f4b0ca5"
+                "reference": "18925e20d15d1a5995bb85c9dc09e8751e1e069b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/abstract-testframework-adapter/zipball/677c0277763bbfe7e1b5eb5fe9d3bf0d7f4b0ca5",
-                "reference": "677c0277763bbfe7e1b5eb5fe9d3bf0d7f4b0ca5",
+                "url": "https://api.github.com/repos/infection/abstract-testframework-adapter/zipball/18925e20d15d1a5995bb85c9dc09e8751e1e069b",
+                "reference": "18925e20d15d1a5995bb85c9dc09e8751e1e069b",
                 "shasum": ""
             },
             "require": {
@@ -111,7 +111,7 @@
             "description": "Abstract Test Framework Adapter for Infection",
             "support": {
                 "issues": "https://github.com/infection/abstract-testframework-adapter/issues",
-                "source": "https://github.com/infection/abstract-testframework-adapter/tree/feature/syntax-error"
+                "source": "https://github.com/infection/abstract-testframework-adapter/tree/0.5.0"
             },
             "funding": [
                 {
@@ -123,7 +123,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2021-08-12T13:09:43+00:00"
+            "time": "2021-08-17T18:49:12+00:00"
         },
         {
             "name": "infection/extension-installer",
@@ -4673,9 +4673,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "infection/abstract-testframework-adapter": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
