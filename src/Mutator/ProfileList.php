@@ -465,7 +465,7 @@ final class ProfileList
         'BCMath' => Mutator\Extensions\BCMath::class,
         'MBString' => Mutator\Extensions\MBString::class,
 
-        // Internal only usage
+        // Internal usage only
         'SyntaxError' => Mutator\SyntaxError::class,
     ];
 
