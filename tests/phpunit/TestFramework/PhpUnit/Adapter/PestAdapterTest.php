@@ -292,12 +292,11 @@ final class PestAdapterTest extends TestCase
         yield ['Tests:  1 risked', false];
 
         yield [
-            <<<TXT
-'ParseError
+            <<<'TXT'
+            'ParseError
 
-syntax error, unexpected ">"'
-TXT
-            ,
+            syntax error, unexpected ">"'
+            TXT,
             true,
         ];
     }
