@@ -99,12 +99,10 @@ class MutationConfigBuilder extends ConfigBuilder
             $originalBootstrapFile = $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
         }
 
-        // if original phpunit.xml has order by random, we should replace it to use `default` order and our sorting
-        // by <file> tags (e.g. the fastest tests first)
-        $this->configManipulator->setDefaultTestsOrderAttribute($version, $xPath);
+        // activate PHPUnit's result cache and order tests by running defects first, then sorted by fastest first
+        $this->configManipulator->handleResultCacheAndExecutionOrder($version, $xPath, $mutationHash);
         $this->configManipulator->setStopOnFailure($xPath);
         $this->configManipulator->deactivateColours($xPath);
-        $this->configManipulator->deactivateResultCaching($xPath);
         $this->configManipulator->deactivateStderrRedirection($xPath);
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);

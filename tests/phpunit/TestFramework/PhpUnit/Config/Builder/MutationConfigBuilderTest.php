@@ -135,7 +135,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
   ~
   ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
   -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" cacheResult="false" stderr="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" stderr="false">
   <testsuites>
     <testsuite name="Infection testsuite with filtered tests"/>
   </testsuites>
@@ -171,7 +171,7 @@ XML
   ~
   ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
   -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" cacheResult="false" stderr="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" stderr="false">
   <testsuites>
     <testsuite name="Infection testsuite with filtered tests">
       <file>/path/to/FooTest.php</file>
@@ -241,7 +241,7 @@ PHP
   ~
   ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
   -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" cacheResult="false" stderr="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" stderr="false">
   <testsuites>
     <testsuite name="Infection testsuite with filtered tests">
       <file>/path/to/BarTest.php</file>
@@ -465,7 +465,26 @@ PHP
         $this->assertSame(0, $printerClass->length);
     }
 
-    public function test_it_sets_default_execution_order_when_attribute_is_absent(): void
+    public function test_it_does_not_set_default_execution_order_for_phpunit_7_1(): void
+    {
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_coverage_whitelist.xml');
+
+        $xml = file_get_contents(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
+            )
+        );
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
+
+        $this->assertSame(0, $executionOrder->length);
+    }
+
+    public function test_it_sets_default_execution_order_when_attribute_is_absent_for_phpunit_7_2(): void
     {
         $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_coverage_whitelist.xml');
 
@@ -484,7 +503,7 @@ PHP
         $this->assertSame('default', $executionOrder);
     }
 
-    public function test_it_sets_default_execution_order_when_attribute_is_present(): void
+    public function test_it_sets_default_execution_order_when_attribute_is_present_for_phpunit_7_2(): void
     {
         $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_set.xml');
 
@@ -501,6 +520,30 @@ PHP
         $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
 
         $this->assertSame('default', $executionOrder);
+    }
+
+    public function test_it_sets_defects_execution_order_and_cache_result_when_attribute_is_present_for_phpunit_7_3(): void
+    {
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_set.xml');
+
+        $xml = file_get_contents(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.3'
+            )
+        );
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
+        $this->assertSame('defects', $executionOrder);
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@cacheResult')[0]->nodeValue;
+        $this->assertSame('true', $executionOrder);
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@cacheResultFile')[0]->nodeValue;
+        $this->assertSame(sprintf('.phpunit.result.cache.%s', self::HASH), $executionOrder);
     }
 
     /**

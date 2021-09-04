@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d9cfb23acce60abd6aa6cc78193cd142",
+    "content-hash": "5905bdd842f6ae14114a96418dc3f578",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -183,16 +183,16 @@
         },
         {
             "name": "infection/include-interceptor",
-            "version": "0.2.4",
+            "version": "0.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/include-interceptor.git",
-                "reference": "e3cf9317a7fd554ab60a5587f028b16418cc4264"
+                "reference": "0cc76d95a79d9832d74e74492b0a30139904bdf7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/e3cf9317a7fd554ab60a5587f028b16418cc4264",
-                "reference": "e3cf9317a7fd554ab60a5587f028b16418cc4264",
+                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/0cc76d95a79d9832d74e74492b0a30139904bdf7",
+                "reference": "0cc76d95a79d9832d74e74492b0a30139904bdf7",
                 "shasum": ""
             },
             "require-dev": {
@@ -223,9 +223,19 @@
             "description": "Stream Wrapper: Include Interceptor. Allows to replace included (autoloaded) file with another one.",
             "support": {
                 "issues": "https://github.com/infection/include-interceptor/issues",
-                "source": "https://github.com/infection/include-interceptor/tree/0.2.4"
+                "source": "https://github.com/infection/include-interceptor/tree/0.2.5"
             },
-            "time": "2020-08-07T22:40:37+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/infection",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/infection",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2021-08-09T10:03:57+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
