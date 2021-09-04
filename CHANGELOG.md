@@ -1,5 +1,27 @@
 # Change Log
 
+## [0.25.0](https://github.com/infection/infection/tree/0.25.0) (2021-09-05)
+[Full Changelog](https://github.com/infection/infection/compare/0.24.0...0.25.0)
+
+**Added:**
+
+- Detect syntax errors during mutation analysis and differentiate them from all errors #1555 #262
+- Add `$schema` to generated `infection.json` config file for autocomplete #1553 #1432
+
+**Changed**:
+
+- [Performance] Add files to coverage whitelist instead of the whole directories when `--filter` or `--git-diff-filter` are used #1543
+- [Performance] Speed up Infection runs by remembering which test killed a mutant #1519 #1549
+- [internal] Allow Infection test suite to be executed in parallel using Paratest #1544
+- Generate `infection.json` (without `.dist` postfix) by default #1554
+- Do not mark Mutant as Killed when no tests were executed #1546
+
+**Fixed:**
+
+- Display time and consumed memory even in case of insufficient MSI #1562
+- Trim "\n" and "\t" characters when replacing relative paths with absolute ones during XML config creation #1550 #1542
+- For Mutant's `phpunit.xml`, set `executionOrder="default"` to prevent random ordering of the tests since we need them to be sorted (fastest - first) #1547
+
 ## [0.24.0](https://github.com/infection/infection/tree/0.24.0) (2021-07-25)
 [Full Changelog](https://github.com/infection/infection/compare/0.23.0...0.24.0)
 
