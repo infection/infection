@@ -142,7 +142,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             [
                 'App\Test::test_case1',
             ],
-            '/App\\\\Test\:\:test_case1/',
+            '/Test\:\:test_case1/',
         ];
 
         yield '2 test cases' => [
@@ -151,25 +151,50 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 'App\Test::test_case1',
                 'App\Test::test_case2',
             ],
-            '/App\\\\Test\:\:test_case1|App\\\\Test\:\:test_case2/',
+            '/Test\:\:test_case1|Test\:\:test_case2/',
         ];
 
-        yield '2 simple test cases, 1 with data set and special character >' => [
+        yield '1 simple test case, 1 with data set and special character >' => [
             true,
             [
                 'App\Test::test_case1 with data set "With special character >"',
                 'App\Test::test_case2',
             ],
-            '/App\\\\Test\:\:test_case1 with data set "With special character \\>"|App\\\\Test\:\:test_case2/',
+            '/Test\:\:test_case1 with data set "With special character \\>"|Test\:\:test_case2/',
         ];
 
-        yield '2 simple test cases, 1 with data set and special character @' => [
+        yield '1 simple test case, 1 with data set and special character @' => [
             true,
             [
                 'App\Test::test_case1 with data set "With special character @"',
                 'App\Test::test_case2',
             ],
-            '/App\\\\Test\:\:test_case1 with data set "With special character @"|App\\\\Test\:\:test_case2/',
+            '/Test\:\:test_case1 with data set "With special character @"|Test\:\:test_case2/',
+        ];
+
+        yield '2 data sets from data provider for the same test case' => [
+            true,
+            [
+                'App\Test::test_case1 with data set "#1"',
+                'App\Test::test_case1 with data set "#2"',
+            ],
+            '/Test\:\:test_case1 with data set "\#1"|Test\:\:test_case1 with data set "\#2"/',
+        ];
+
+        yield '1 data set from data provider "With special char \\"' => [
+            true,
+            [
+                'App\Test::test_case1 with data set "With special char \\"',
+            ],
+            '/Test\:\:test_case1 with data set "With special char \\\\"/',
+        ];
+
+        yield '1 data set from data provider "With special chars ::"' => [
+            true,
+            [
+                'App\Test::test_case1 with data set "With special chars ::"',
+            ],
+            '/Test\:\:test_case1 with data set "With special chars \:\:"/',
         ];
     }
 }
