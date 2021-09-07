@@ -59,7 +59,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
+          composer install --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
 
       - name: Run tests
         shell: bash
