@@ -112,9 +112,9 @@ final class JsonLoggerTest extends TestCase
                     'syntaxErrorCount' => 2,
                     'skippedCount' => 2,
                     'timeOutCount' => 2,
-                    'msi' => 50,
+                    'msi' => 66.67,
                     'mutationCodeCoverage' => 83.33,
-                    'coveredCodeMsi' => 60,
+                    'coveredCodeMsi' => 80,
                 ],
                 'escaped' => [
                     [
