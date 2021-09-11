@@ -59,6 +59,11 @@ use function Safe\usort;
  */
 final class TestLocationBucketSorterTest extends TestCase
 {
+    /**
+     * Used for floating point comparisons.
+     *
+     * @var float
+     */
     private const EPSILON = 0.001;
 
     public function test_it_sorts(): void
