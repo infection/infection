@@ -59,6 +59,8 @@ use function Safe\usort;
  */
 final class TestLocationBucketSorterTest extends TestCase
 {
+    private const EPSILON = 0.001;
+
     public function test_it_sorts(): void
     {
         $testLocation = new TestLocation('', '', 0.0);
@@ -189,7 +191,7 @@ final class TestLocationBucketSorterTest extends TestCase
             $totalQuickSort += microtime(true) - $start;
         }
 
-        $this->assertGreaterThanOrEqual(0.001, self::getRelativeError($totalQuickSort, $totalBucketSort));
+        $this->assertGreaterThanOrEqual(self::EPSILON, self::getRelativeError($totalQuickSort, $totalBucketSort));
     }
 
     public static function locationsArrayProvider(): iterable
@@ -216,8 +218,8 @@ final class TestLocationBucketSorterTest extends TestCase
     {
         // We do not expect A or B to be extremely small or large: these are edge cases,
         // and they will need special handling which we avoid simplicity sake.
-        self::assertGreaterThan(0.0001, abs($a));
-        self::assertGreaterThan(0.0001, abs($b));
+        self::assertGreaterThan(self::EPSILON, abs($a));
+        self::assertGreaterThan(self::EPSILON, abs($b));
 
         return abs($a - $b) / (abs($a) + abs($b));
     }
