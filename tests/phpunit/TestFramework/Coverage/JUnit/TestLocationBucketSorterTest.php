@@ -59,6 +59,13 @@ use function Safe\usort;
  */
 final class TestLocationBucketSorterTest extends TestCase
 {
+    /**
+     * Used for floating point comparisons.
+     *
+     * @var float
+     */
+    private const EPSILON = 0.001;
+
     public function test_it_sorts(): void
     {
         $testLocation = new TestLocation('', '', 0.0);
@@ -189,7 +196,7 @@ final class TestLocationBucketSorterTest extends TestCase
             $totalQuickSort += microtime(true) - $start;
         }
 
-        $this->assertGreaterThanOrEqual(0.01, abs($totalQuickSort - $totalBucketSort));
+        $this->assertGreaterThanOrEqual(self::EPSILON, self::getRelativeError($totalQuickSort, $totalBucketSort));
     }
 
     public static function locationsArrayProvider(): iterable
@@ -204,6 +211,22 @@ final class TestLocationBucketSorterTest extends TestCase
         yield 'Ten times the minimal amount of locations' => [new ArrayIterator(array_slice($locations, 0, JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * 10))];
 
         yield 'All locations' => [new ArrayIterator($locations)];
+    }
+
+    /**
+     * Finds relative error.
+     *
+     * @see https://floating-point-gui.de/errors/comparison/
+     * @see https://stackoverflow.com/questions/4915462/how-should-i-do-floating-point-comparison
+     */
+    private static function getRelativeError(float $a, float $b): float
+    {
+        // We do not expect A or B to be extremely small or large: these are edge cases,
+        // and they will need special handling which we avoid simplicity sake.
+        self::assertGreaterThan(self::EPSILON, abs($a));
+        self::assertGreaterThan(self::EPSILON, abs($b));
+
+        return abs($a - $b) / (abs($a) + abs($b));
     }
 
     private static function quicksort(&$uniqueTestLocations): void
