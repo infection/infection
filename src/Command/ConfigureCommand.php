@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Composer\InstalledVersions;
 use function count;
 use function file_exists;
 use const GLOB_ONLYDIR;
@@ -55,7 +56,6 @@ use Infection\TestFramework\TestFrameworkTypes;
 use const JSON_PRETTY_PRINT;
 use const JSON_UNESCAPED_SLASHES;
 use OutOfBoundsException;
-use PackageVersions\Versions;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\file_put_contents;
@@ -65,7 +65,6 @@ use function Safe\json_encode;
 use function Safe\sprintf;
 use stdClass;
 use function strpos;
-use function strstr;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -243,9 +242,9 @@ final class ConfigureCommand extends BaseCommand
         }
 
         try {
-            $version = strstr(Versions::getVersion(Application::PACKAGE_NAME), '@', true);
+            $version = InstalledVersions::getReference(Application::PACKAGE_NAME);
 
-            if ($version === false || strpos($version, 'dev-') === 0) {
+            if ($version === null || strpos($version, 'dev-') === 0) {
                 $version = 'master';
             }
         } catch (OutOfBoundsException $e) {
