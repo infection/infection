@@ -73,7 +73,7 @@ final class Application extends BaseApplication
     public function __construct(Container $container)
     {
         try {
-            $version = (string) InstalledVersions::getReference(self::PACKAGE_NAME);
+            $version = (string) InstalledVersions::getVersion(self::PACKAGE_NAME);
             // @codeCoverageIgnoreStart
         } catch (OutOfBoundsException $e) {
             if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#i', $e->getMessage()) === 0) {
