@@ -88,13 +88,15 @@ DIFF
             return false;
         }
 
-        if ($node->value === PHP_INT_MAX) {
+        $parentNode = ParentConnector::getParent($node);
+
+        if ($node->value === PHP_INT_MAX && !$parentNode instanceof Node\Expr\UnaryMinus) {
             return false;
         }
 
         if (
             $node->value === 0
-            && ($this->isPartOfComparison($node) || ParentConnector::getParent($node) instanceof Node\Expr\Assign)
+            && ($this->isPartOfComparison($node) || $parentNode instanceof Node\Expr\Assign)
         ) {
             return false;
         }
