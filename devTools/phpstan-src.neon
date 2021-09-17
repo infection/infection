@@ -9,6 +9,10 @@ parameters:
         - '#.* value type specified in iterable type Symfony\\Component\\Process\\Process#'
         - '#generic class ReflectionClass (but )?does not specify its types#'
         -
+            path: '../src/Mutator/Number/DecrementInteger.php'
+            message: '#Casting to int .* already int#'
+            count: 1
+        -
             path: '../src/PhpParser/FileParser.php'
             message: '#Method Infection\\PhpParser\\FileParser::parse\(\) should return array<PhpParser\\Node> but returns array<PhpParser\\Node\\Stmt>\|null\.#'
             count: 1
