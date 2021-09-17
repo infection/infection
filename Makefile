@@ -69,7 +69,7 @@ cs:	  	 	## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
 	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff
 	LC_ALL=C sort -u .gitignore -o .gitignore
-	$(MAKE) check_trailing_whitespaces || true
+	$(MAKE) check_trailing_whitespaces
 
 .PHONY: cs-check
 cs-check:		## Runs PHP-CS-Fixer in dry-run mode

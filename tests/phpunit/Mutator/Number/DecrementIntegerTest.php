@@ -525,14 +525,14 @@ PHP
         yield 'It will decrement min int plus one' => [
             <<<"PHP"
             <?php
-            
+
             if (1 === {$minIntPlus1}) {
                 echo 'bar';
             }
             PHP,
             <<<"PHP"
             <?php
-            
+
             if (1 === -({$minIntPlus1}-1)) {
                 echo 'bar';
             }
