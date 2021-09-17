@@ -266,7 +266,7 @@ PHP
         yield 'It increments min int plus one, -PHP_INT_MAX' => [
             <<<"PHP"
             <?php
-                        
+
             if (\$foo === {$minIntPlus1}) {
                 echo 'bar';
             }
@@ -274,7 +274,7 @@ PHP
             ,
             <<<"PHP"
             <?php
-                        
+
             if (\$foo === {$minIntPlus2}) {
                 echo 'bar';
             }
@@ -287,7 +287,7 @@ PHP
         yield 'It does not increment min int because of a parser bug (we get DNumber)' => [
             <<<"PHP"
             <?php
-            
+ 
             if (\$foo === {$minInt}) {
                 echo 'bar';
             }
