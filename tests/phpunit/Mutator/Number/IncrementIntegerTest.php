@@ -284,7 +284,7 @@ PHP
 
         $minInt = PHP_INT_MIN;
 
-        yield 'It does not increment min int because of a parser bug (we get DNumber)' => [
+        yield 'It does not increment min int because of a parser bug (we get DNumber instead of LNumber)' => [
             <<<"PHP"
             <?php
 

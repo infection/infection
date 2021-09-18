@@ -85,10 +85,15 @@ DIFF
 
         $value = $node->value - 1;
 
+        /*
+         * Parser gives us only positive numbers we have to check if parent node
+         * isn't a minus sign. If so, then means we have a negated positive number so
+         * we have to add to it instead of substracting.
+         */
         if ($parentNode instanceof Node\Expr\UnaryMinus) {
             // PHP Parser reads negative number as a pair of minus sign and a positive int,
             // but positive part of PHP_INT_MIN leads to an overflow into float. To work
-            // around this we have to cast the result value back to int.
+            // around this we have to cast the result value back to int after adding one.
             $value = (int) ($node->value + 1);
         }
 

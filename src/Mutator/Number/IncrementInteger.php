@@ -75,6 +75,11 @@ DIFF
 
         $value = $node->value + 1;
 
+        /*
+         * Parser gives us only positive numbers we have to check if parent node
+         * isn't a minus sign. If so, then means we have a negated positive number so
+         * we have to substract to it instead of adding.
+         */
         if ($parentNode instanceof Node\Expr\UnaryMinus) {
             $value = $node->value - 1;
         }
