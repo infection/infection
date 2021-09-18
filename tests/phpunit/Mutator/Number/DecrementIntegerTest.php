@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Number;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use const PHP_INT_MAX;
 use const PHP_INT_MIN;
 
 final class DecrementIntegerTest extends BaseMutatorTestCase
