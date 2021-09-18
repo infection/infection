@@ -520,13 +520,13 @@ if (1 === {$minInt}) {
 PHP
         ];
 
-        $minIntPlus1 = PHP_INT_MIN + 1;
+        $maxInt = PHP_INT_MAX;
 
-        yield 'It does not decrement min int plus one to avoid parser bugs' => [
+        yield 'It does not decrement max int negative to avoid parser bugs' => [
             <<<"PHP"
             <?php
 
-            if (1 === {$minIntPlus1}) {
+            if (1 === -{$maxInt}) {
                 echo 'bar';
             }
             PHP,
