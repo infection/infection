@@ -280,7 +280,7 @@ PHP
             ,
         ];
 
-        yield 'It increments a negative integer' => [
+        yield 'It decrements a negative integer' => [
             <<<'PHP'
 <?php
 
