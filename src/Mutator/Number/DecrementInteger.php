@@ -40,7 +40,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
-use const PHP_INT_MIN;
+use const PHP_INT_MAX;
 use PhpParser\Node;
 
 /**
@@ -106,13 +106,16 @@ DIFF
             return false;
         }
 
-        if ($node->value === PHP_INT_MIN) {
+        $parentNode = ParentConnector::getParent($node);
+
+        // We cannot increment PHP_INT_MAX as part of a negative number, leads to parser bugs.
+        if ($node->value === PHP_INT_MAX && $parentNode instanceof Node\Expr\UnaryMinus) {
             return false;
         }
 
         if (
             $node->value === 1
-            && ($this->isPartOfComparison($node) || ParentConnector::getParent($node) instanceof Node\Expr\Assign)
+            && ($this->isPartOfComparison($node) || $parentNode instanceof Node\Expr\Assign)
         ) {
             return false;
         }

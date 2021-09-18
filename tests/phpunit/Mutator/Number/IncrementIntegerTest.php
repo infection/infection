@@ -263,7 +263,7 @@ PHP
         $minIntPlus1 = PHP_INT_MIN + 1;
         $minIntPlus2 = $minIntPlus1 + 1;
 
-        yield 'It increments min int plus one, -PHP_INT_MAX' => [
+        yield 'It increments min int plus one, up to value of -PHP_INT_MAX' => [
             <<<"PHP"
             <?php
 
@@ -280,18 +280,6 @@ PHP
             }
             PHP
             ,
-        ];
-
-        $minInt = PHP_INT_MIN;
-
-        yield 'It does not increment min int because of a parser bug (we get DNumber instead of LNumber)' => [
-            <<<"PHP"
-            <?php
-
-            if (\$foo === {$minInt}) {
-                echo 'bar';
-            }
-            PHP,
         ];
     }
 }

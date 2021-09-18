@@ -95,6 +95,7 @@ DIFF
 
         $parentNode = ParentConnector::getParent($node);
 
+        // We cannot increment largest positive integer, but we can do that for a negative integer
         if ($node->value === PHP_INT_MAX && !$parentNode instanceof Node\Expr\UnaryMinus) {
             return false;
         }
