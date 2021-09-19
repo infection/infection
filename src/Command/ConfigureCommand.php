@@ -242,7 +242,7 @@ final class ConfigureCommand extends BaseCommand
         }
 
         try {
-            $version = InstalledVersions::getPrettyVersion(Application::PACKAGE_NAME);
+            $version = InstalledVersions::getReference(Application::PACKAGE_NAME);
 
             if ($version === null || strpos($version, 'dev-') === 0) {
                 $version = 'master';
