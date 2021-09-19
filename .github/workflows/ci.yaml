@@ -57,7 +57,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
+          composer install --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
 
       - name: Run tests
         shell: bash
@@ -85,7 +85,7 @@ jobs:
         shell: bash
         run: |
           ls tests/e2e/*/composer.json | xargs dirname |
-             xargs -I{} composer --working-dir={} update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
+             xargs -I{} composer --working-dir={} install --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
 
       - name: Run a subset of E2E tests
         if: runner.os == 'Windows'
