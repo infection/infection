@@ -20,13 +20,14 @@ jobs:
         php-version: ['7.4']
         dependencies: ['']
         coverage-driver: [pcov, xdebug]
+        e2e-runner: ['bin/infection']
         include:
           - { operating-system: 'windows-latest', php-version: '7.4', dependencies: '', coverage-driver: 'xdebug' }
-          - { operating-system: 'ubuntu-latest', php-version: '7.4', dependencies: '--prefer-lowest', coverage-driver: 'pcov' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', dependencies: '--ignore-platform-req=php', coverage-driver: 'pcov' }
+          - { operating-system: 'ubuntu-latest', php-version: '7.4', dependencies: '', coverage-driver: 'pcov' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.0', dependencies: '--ignore-platform-req=php', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
 
     continue-on-error: ${{ matrix.php-version == '8.0' }}
-    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} ${{ matrix.dependencies }}
+    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} ${{ matrix.dependencies }} with ${{ matrix.e2e-runner }}
 
     steps:
       - name: Checkout code
@@ -57,7 +58,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
+          composer install --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
 
       - name: Run tests
         shell: bash
@@ -85,7 +86,7 @@ jobs:
         shell: bash
         run: |
           ls tests/e2e/*/composer.json | xargs dirname |
-             xargs -I{} composer --working-dir={} update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
+             xargs -I{} composer --working-dir={} install --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
 
       - name: Run a subset of E2E tests
         if: runner.os == 'Windows'
@@ -99,8 +100,16 @@ jobs:
           sudo apt-get install -y --no-install-recommends expect
 
       - name: Run the whole set of E2E tests
-        if: runner.os != 'Windows'
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
         env:
           TERM: xterm-256color
         run: |
           make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection BENCHMARK_SOURCES=
+
+      - name: Run the whole set of E2E tests with prefixed PHAR
+        if: runner.os != 'Windows' && matrix.e2e-runner != 'bin/infection' && matrix.php-version == '8.0'
+        env:
+          TERM: xterm-256color
+        run: |
+          make compile
+          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=build/infection.phar BENCHMARK_SOURCES=
