@@ -113,3 +113,9 @@ jobs:
         run: |
           make compile
           make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=build/infection.phar BENCHMARK_SOURCES=
+
+      - name: Build PHAR and verify it works
+        if: runner.os != 'Windows'
+        run: |
+            make compile
+            ./build/infection.phar --version
