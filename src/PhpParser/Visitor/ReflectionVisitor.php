@@ -155,7 +155,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             return false;
         }
 
-        if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY)) {
+        if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY) !== null) {
             return true;
         }
 

@@ -66,12 +66,16 @@ final class InitialTestsFailed extends Exception
             ),
         ];
 
-        if ($stdOut = $initialTestSuiteProcess->getOutput()) {
+        $stdOut = $initialTestSuiteProcess->getOutput();
+
+        if ($stdOut !== '') {
             $lines[] = 'STDOUT:';
             $lines[] = $stdOut;
         }
 
-        if ($stdError = $initialTestSuiteProcess->getErrorOutput()) {
+        $stdError = $initialTestSuiteProcess->getErrorOutput();
+
+        if ($stdError !== '') {
             $lines[] = 'STDERR:';
             $lines[] = $stdError;
         }

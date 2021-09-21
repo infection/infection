@@ -180,7 +180,7 @@ final class XmlConfigurationManipulator
 
         $original = libxml_use_internal_errors(true);
 
-        if ($schema->length && !$xPath->document->schemaValidate($this->buildSchemaPath($schema[0]->nodeValue))) {
+        if ($schema->length > 0 && !$xPath->document->schemaValidate($this->buildSchemaPath($schema[0]->nodeValue))) {
             throw InvalidPhpUnitConfiguration::byXsdSchema(
                 $configPath,
                 $this->getXmlErrorsString()
@@ -269,7 +269,7 @@ final class XmlConfigurationManipulator
             $level = $this->getErrorLevelName($error);
             $errorsString .= sprintf('[%s] %s', $level, $error->message);
 
-            if ($error->file) {
+            if ($error->file !== '') {
                 $errorsString .= sprintf(' in %s (line %s, col %s)', $error->file, $error->line, $error->column);
             }
 
@@ -281,7 +281,7 @@ final class XmlConfigurationManipulator
 
     private function buildSchemaPath(string $nodeValue): string
     {
-        if (filter_var($nodeValue, FILTER_VALIDATE_URL)) {
+        if (filter_var($nodeValue, FILTER_VALIDATE_URL) !== false) {
             return $nodeValue;
         }
 

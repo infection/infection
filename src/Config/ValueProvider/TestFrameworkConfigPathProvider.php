@@ -91,7 +91,7 @@ final class TestFrameworkConfigPathProvider
             $phpUnitPathGuesser = new PhpUnitPathGuesser(json_decode($composerJsonText));
             $defaultValue = $phpUnitPathGuesser->guess();
 
-            if ($defaultValue) {
+            if ($defaultValue !== '') {
                 try {
                     $this->testFrameworkConfigLocator->locate($testFramework, $defaultValue);
 
@@ -110,7 +110,7 @@ final class TestFrameworkConfigPathProvider
         return function (string $answerDir) use ($testFramework): string {
             $answerDir = trim($answerDir);
 
-            if (!$answerDir) {
+            if ($answerDir === '') {
                 return $answerDir;
             }
 

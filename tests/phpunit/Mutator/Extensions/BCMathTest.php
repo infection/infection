@@ -207,6 +207,6 @@ final class BCMathTest extends BaseMutatorTestCase
     {
         return implode(', ', array_map(static function (string $argument) {
             return "'$argument'";
-        }, $numberOfArguments ? range(1, $numberOfArguments) : []));
+        }, $numberOfArguments > 0 ? range(1, $numberOfArguments) : []));
     }
 }
