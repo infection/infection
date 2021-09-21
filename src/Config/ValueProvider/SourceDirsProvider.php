@@ -80,7 +80,7 @@ final class SourceDirsProvider
 
         $choices = array_unique(array_merge(['.'], array_values($dirsInCurrentDir), $guessedSourceDirs));
 
-        $defaultValues = $guessedSourceDirs ? implode(',', $guessedSourceDirs) : null;
+        $defaultValues = $guessedSourceDirs !== [] ? implode(',', $guessedSourceDirs) : null;
 
         $questionText = $this->consoleHelper->getQuestion(
             'Which source directories do you want to include (comma separated)?',

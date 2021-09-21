@@ -169,7 +169,7 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
 
-        if (!$nodeList->length) {
+        if ($nodeList->length === 0) {
             $node = $xPath->query('/phpunit')[0];
             $node->setAttribute($attribute, $value);
 

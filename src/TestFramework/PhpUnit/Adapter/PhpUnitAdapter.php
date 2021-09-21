@@ -120,27 +120,27 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
 
     public function testsPass(string $output): bool
     {
-        if (preg_match('/failures!/i', $output)) {
+        if (preg_match('/failures!/i', $output) === 1) {
             return false;
         }
 
-        if (preg_match('/errors!/i', $output)) {
+        if (preg_match('/errors!/i', $output) === 1) {
             return false;
         }
 
         // OK (XX tests, YY assertions)
-        $isOk = preg_match('/OK\s\(/', $output);
+        $isOk = preg_match('/OK\s\(/', $output) === 1;
 
         // "OK, but incomplete, skipped, or risky tests!"
-        $isOkWithInfo = preg_match('/OK\s?,/', $output);
+        $isOkWithInfo = preg_match('/OK\s?,/', $output) === 1;
 
         // "Warnings!" - e.g. when deprecated functions are used, but tests pass
-        $isWarning = preg_match('/warnings!/i', $output);
+        $isWarning = preg_match('/warnings!/i', $output) === 1;
 
         // "No tests executed!" - e.g. when --filter option contains too large regular expression
-        $isNoTestsExecuted = preg_match('/No tests executed!/i', $output);
+        $isNoTestsExecuted = preg_match('/No tests executed!/i', $output) === 1;
 
-        return $isOk || $isOkWithInfo || $isWarning | $isNoTestsExecuted;
+        return $isOk || $isOkWithInfo || $isWarning || $isNoTestsExecuted;
     }
 
     public function isSyntaxError(string $output): bool
@@ -150,7 +150,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
 
     public function getMemoryUsed(string $output): float
     {
-        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match)) {
+        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
             return (float) $match[1];
         }
 

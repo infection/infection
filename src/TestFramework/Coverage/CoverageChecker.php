@@ -174,7 +174,7 @@ TXT
         return PHP_SAPI === 'phpdbg'
             || XdebugHandler::isXdebugActive()
             || extension_loaded('pcov')
-            || XdebugHandler::getSkippedVersion()
+            || XdebugHandler::getSkippedVersion() !== ''
             || $this->isXdebugIncludedInInitialTestPhpOptions()
             || $this->isPcovIncludedInInitialTestPhpOptions();
     }

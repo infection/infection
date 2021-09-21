@@ -47,7 +47,7 @@ final class SourceTestClassNameScheme
 
     public static function getSourceClassName(string $testCaseClassName): string
     {
-        if (preg_match('/(Infection\\\\Tests\\\\.*)Test$/', $testCaseClassName, $matches)) {
+        if (preg_match('/(Infection\\\\Tests\\\\.*)Test$/', $testCaseClassName, $matches) === 1) {
             return str_replace('Infection\\Tests\\', 'Infection\\', $matches[1]);
         }
 

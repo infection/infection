@@ -118,7 +118,7 @@ final class E2ETest extends TestCase
 
     protected function tearDown(): void
     {
-        if ($this->previousLoader) {
+        if ($this->previousLoader instanceof ClassLoader) {
             $this->previousLoader->unregister();
         }
 

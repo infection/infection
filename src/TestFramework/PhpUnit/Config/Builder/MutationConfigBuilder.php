@@ -186,7 +186,7 @@ PHP
     {
         $bootstrap = $xPath->query('/phpunit/@bootstrap');
 
-        if ($bootstrap->length) {
+        if ($bootstrap->length > 0) {
             $bootstrap[0]->nodeValue = $customAutoloadFilePath;
         } else {
             $node = $xPath->query('/phpunit')[0];
@@ -243,7 +243,7 @@ PHP
         $nodeToAppendTestSuite = $testSuites->item(0);
 
         // If there is no `testsuites` node, append to root
-        if (!$nodeToAppendTestSuite) {
+        if ($nodeToAppendTestSuite === null) {
             $nodeToAppendTestSuite = $xPath->query('/phpunit')->item(0);
         }
 
@@ -267,7 +267,7 @@ PHP
     {
         $bootstrap = $xPath->query('/phpunit/@bootstrap');
 
-        if ($bootstrap->length) {
+        if ($bootstrap->length > 0) {
             return $bootstrap[0]->nodeValue;
         }
 

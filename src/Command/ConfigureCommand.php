@@ -187,20 +187,20 @@ final class ConfigureCommand extends BaseCommand
 
         $configObject->source = new stdClass();
 
-        if ($sourceDirs) {
+        if ($sourceDirs !== []) {
             $configObject->source->directories = $sourceDirs;
         }
 
-        if ($excludedDirs) {
+        if ($excludedDirs !== []) {
             $configObject->source->excludes = $excludedDirs;
         }
 
-        if ($phpUnitConfigPath) {
+        if ($phpUnitConfigPath !== null) {
             $configObject->phpUnit = new stdClass();
             $configObject->phpUnit->configDir = $phpUnitConfigPath;
         }
 
-        if ($phpUnitCustomExecutablePath) {
+        if ($phpUnitCustomExecutablePath !== null) {
             if (!isset($configObject->phpUnit)) {
                 $configObject->phpUnit = new stdClass();
             }
@@ -208,7 +208,7 @@ final class ConfigureCommand extends BaseCommand
             $configObject->phpUnit->customPath = $phpUnitCustomExecutablePath;
         }
 
-        if ($textLogFilePath) {
+        if ($textLogFilePath !== null) {
             $configObject->logs = new stdClass();
             $configObject->logs->text = $textLogFilePath;
         }

@@ -176,7 +176,7 @@ final class ProjectCodeProvider
                     '%s\\%s%s%s',
                     'Infection',
                     str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
-                    $file->getRelativePath() ? '\\' : '',
+                    $file->getRelativePath() !== '' ? '\\' : '',
                     $file->getBasename('.' . $file->getExtension())
                 );
             },
