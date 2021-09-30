@@ -217,6 +217,10 @@ DIFF
     private static function makeBinaryOperatorMapper(string $operator): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($operator): iterable {
+            if ($node->args[0] instanceof Node\VariadicPlaceholder || $node->args[1] instanceof Node\VariadicPlaceholder) {
+                return [];
+            }
+
             yield new $operator($node->args[0]->value, $node->args[1]->value);
         };
     }
@@ -237,6 +241,10 @@ DIFF
     private static function makePowerModuloMapper(): Closure
     {
         return static function (Node\Expr\FuncCall $node): iterable {
+            if ($node->args[2] instanceof Node\VariadicPlaceholder) {
+                return [];
+            }
+
             yield new Node\Expr\BinaryOp\Mod(
                 new Node\Expr\FuncCall(
                     new Node\Name('\pow'),

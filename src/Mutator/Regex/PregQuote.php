@@ -84,6 +84,10 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
+        if ($node->args[0] instanceof Node\VariadicPlaceholder) {
+            return [];
+        }
+
         yield $node->args[0];
     }
 

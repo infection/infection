@@ -202,6 +202,10 @@ DIFF
             return null;
         }
 
+        if ($node->args[1] instanceof Node\VariadicPlaceholder) {
+            return null;
+        }
+
         $mode = $node->args[1]->value;
 
         if ($mode instanceof Node\Scalar\LNumber) {
@@ -244,7 +248,7 @@ DIFF
     }
 
     /**
-     * @param Node\Arg[] $args
+     * @param array<Node\Arg|Node\VariadicPlaceholder> $args
      */
     private static function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {
