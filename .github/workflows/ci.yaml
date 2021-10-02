@@ -114,4 +114,4 @@ jobs:
           make compile
           # test PHAR works from subfolder
           cd build && ./infection.phar -V && cd ..
-          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=infection.phar BENCHMARK_SOURCES=
+          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=build/infection.phar BENCHMARK_SOURCES=
