@@ -105,18 +105,6 @@ class MutationTestingRunner
                 return $this->mutantFactory->create($mutation);
             })
             ->filter(function (Mutant $mutant) {
-                // It's a proxy call to Mutation, can be done one stage up
-                if ($mutant->isCoveredByTest()) {
-                    return true;
-                }
-
-                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromNonCoveredMutant($mutant)
-                ));
-
-                return false;
-            })
-            ->filter(function (Mutant $mutant) {
                 $mutatorName = $mutant->getMutation()->getMutatorName();
 
                 if (!array_key_exists($mutatorName, $this->ignoreSourceCodeMutatorsMap)) {
@@ -130,6 +118,18 @@ class MutationTestingRunner
                 }
 
                 return true;
+            })
+            ->filter(function (Mutant $mutant) {
+                // It's a proxy call to Mutation, can be done one stage up
+                if ($mutant->isCoveredByTest()) {
+                    return true;
+                }
+
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromNonCoveredMutant($mutant)
+                ));
+
+                return false;
             })
             ->filter(function (Mutant $mutant) {
                 // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
