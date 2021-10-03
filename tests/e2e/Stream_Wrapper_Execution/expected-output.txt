@@ -1,7 +1,9 @@
 Total: 5
 
-Killed: 0
-Errored: 5
+Killed: 5
+Errored: 0
+Syntax Errors: 0
 Escaped: 0
 Timed Out: 0
+Skipped: 0
 Not Covered: 0
