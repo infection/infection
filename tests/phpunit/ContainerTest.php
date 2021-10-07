@@ -101,8 +101,6 @@ final class ContainerTest extends TestCase
 
         $traces = $newContainer->getUnionTraceProvider()->provideTraces();
 
-        $this->assertIsIterable($traces);
-
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage('Could not find any "index.xml" file in "/path/to/coverage"');
 

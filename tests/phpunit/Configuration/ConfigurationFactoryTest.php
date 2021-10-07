@@ -431,25 +431,25 @@ final class ConfigurationFactoryTest extends TestCase
             21.2
         );
 
-        yield 'minCoveredMsi not specified in schema and not specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi not specified in schema and not specified in input' => self::createValueForMinCoveredMsi(
             null,
             null,
             null
         );
 
-        yield 'minCoveredMsi specified in schema and not specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi specified in schema and not specified in input' => self::createValueForMinCoveredMsi(
             33.3,
             null,
             33.3
         );
 
-        yield 'minCoveredMsi not specified in schema and specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi not specified in schema and specified in input' => self::createValueForMinCoveredMsi(
             null,
             21.2,
             21.2
         );
 
-        yield 'minCoveredMsi specified in schema and specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi specified in schema and specified in input' => self::createValueForMinCoveredMsi(
             33.3,
             21.2,
             21.2
