@@ -63,7 +63,7 @@ final class IterableCounterTest extends TestCase
 
     public function test_it_counts_iterator(): void
     {
-        $generator = (static function () {
+        $generator = (static function (): iterable {
             yield from [1 => 1, 2, 3];
         })();
 

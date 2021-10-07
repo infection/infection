@@ -233,7 +233,7 @@ final class TestLocationBucketSorterTest extends TestCase
     {
         usort(
             $uniqueTestLocations,
-            static function (TestLocation $a, TestLocation $b) {
+            static function (TestLocation $a, TestLocation $b): int {
                 return $a->getExecutionTime() <=> $b->getExecutionTime();
             }
         );

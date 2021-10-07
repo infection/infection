@@ -75,7 +75,7 @@ final class MutatorVisitorTest extends BaseVisitorTest
 
     public function providesMutationCases(): iterable
     {
-        yield 'it mutates the correct node' => (function () {
+        yield 'it mutates the correct node' => (function (): iterable {
             return [
                 $nodes = $this->parseCode(<<<'PHP'
 <?php
@@ -126,7 +126,7 @@ PHP
             ];
         })();
 
-        yield 'it can mutate the node with multiple-ones' => (function () {
+        yield 'it can mutate the node with multiple-ones' => (function (): iterable {
             return [
                 $nodes = $this->parseCode(<<<'PHP'
 <?php
@@ -178,7 +178,7 @@ PHP
             ];
         })();
 
-        yield 'it does not mutate if only one of start or end position is correctly set' => (function () {
+        yield 'it does not mutate if only one of start or end position is correctly set' => (function (): iterable {
             return [
                 $nodes = $this->parseCode(<<<'PHP'
 <?php
@@ -232,7 +232,7 @@ PHP
             ];
         })();
 
-        yield 'it does not mutate if the parser does not contain startTokenPos' => (static function () {
+        yield 'it does not mutate if the parser does not contain startTokenPos' => (static function (): iterable {
             $badLexer = new Lexer\Emulative([
                 'usedAttributes' => [
                     'comments',

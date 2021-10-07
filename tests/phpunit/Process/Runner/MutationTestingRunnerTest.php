@@ -553,7 +553,7 @@ final class MutationTestingRunnerTest extends TestCase
 
     private function emptyIterable(): Callback
     {
-        return $this->someIterable(static function (iterable $subject) {
+        return $this->someIterable(static function (iterable $subject): bool {
             foreach ($subject as $value) {
                 return false;
             }
@@ -564,7 +564,7 @@ final class MutationTestingRunnerTest extends TestCase
 
     private function iterableContaining(array $expected): Callback
     {
-        return $this->someIterable(static function (iterable $subject) use ($expected) {
+        return $this->someIterable(static function (iterable $subject) use ($expected): bool {
             $actual = [];
 
             foreach ($subject as $value) {

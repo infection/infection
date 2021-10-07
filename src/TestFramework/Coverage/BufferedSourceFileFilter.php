@@ -85,7 +85,7 @@ class BufferedSourceFileFilter implements FileFilter
     public function filter(iterable $input): iterable
     {
         return take($this->filter->filter($input))
-            ->filter(function (Trace $trace) {
+            ->filter(function (Trace $trace): bool {
                 $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
 
                 Assert::string($traceRealPath);
