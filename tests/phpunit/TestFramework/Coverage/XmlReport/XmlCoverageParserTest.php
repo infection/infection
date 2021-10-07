@@ -38,21 +38,18 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
+use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @group integration
  */
 final class XmlCoverageParserTest extends TestCase
 {
-    /**
-     * @var XmlCoverageParser
-     */
-    private $parser;
+    private XmlCoverageParser $parser;
 
     protected function setUp(): void
     {
@@ -186,7 +183,7 @@ XML;
         $providerMock
             ->expects($this->once())
             ->method('provideFileInfo')
-            ->willReturn($this->createMock(SplFileInfo::class))
+            ->willReturn(new MockSplFileInfo(['file' => 'test.txt']))
         ;
 
         $providerMock

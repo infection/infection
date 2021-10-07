@@ -40,34 +40,31 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use function iterator_to_array;
 use function Later\now;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
 
 final class ProxyTraceTest extends TestCase
 {
     public function test_it_exposes_its_source_file_file_info(): void
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
         $actual = (new ProxyTrace($fileInfoMock))->getSourceFileInfo();
 
-        $this->assertSame(
-            $fileInfoMock,
-            $actual
-        );
+        $this->assertSame($fileInfoMock, $actual);
     }
 
     public function test_it_exposes_its_source_file_real_path(): void
     {
         $expected = 'Foo.php';
 
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
-        $fileInfoMock
-            ->method('getRealPath')
-            ->willReturn($expected)
-        ;
+        $fileInfoMock = new MockSplFileInfo([
+            'realPath' => $expected,
+        ]);
 
         $actual = (new ProxyTrace($fileInfoMock))->getRealPath();
 
@@ -76,12 +73,16 @@ final class ProxyTraceTest extends TestCase
 
     public function test_it_can_retrieve_the_test_locations(): void
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
+
         $tests = new TestLocations();
 
         $trace = new ProxyTrace($fileInfoMock, now($tests));
 
         $actual = $trace->getTests();
+
         $this->assertSame($tests, $actual);
 
         // From cache
@@ -91,7 +92,9 @@ final class ProxyTraceTest extends TestCase
 
     public function test_it_has_no_tests_if_no_covered(): void
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
         $trace = new ProxyTrace($fileInfoMock, now(new TestLocations()));
 
@@ -100,7 +103,9 @@ final class ProxyTraceTest extends TestCase
 
     public function test_it_returns_null_for_no_tests(): void
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
         $trace = new ProxyTrace($fileInfoMock, null);
 
@@ -111,7 +116,9 @@ final class ProxyTraceTest extends TestCase
 
     public function test_it_returns_empty_iterable_for_no_tests(): void
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
         $trace = new ProxyTrace($fileInfoMock, null);
 
@@ -120,7 +127,9 @@ final class ProxyTraceTest extends TestCase
 
     public function test_it_exposes_its_test_locations(): void
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
         $tests = new TestLocations(
             [

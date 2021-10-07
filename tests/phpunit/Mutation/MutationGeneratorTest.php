@@ -46,6 +46,7 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use function Later\now;
@@ -60,7 +61,9 @@ final class MutationGeneratorTest extends TestCase
 
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
-        $fileInfo = $this->createMock(SplFileInfo::class);
+        $fileInfo = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
         // Prophecy compares arguments on equality, therefore these have to be somewhat unique
         $proxyTraceA = new ProxyTrace($fileInfo, now(1));
