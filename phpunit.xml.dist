@@ -10,7 +10,7 @@
 >
 
     <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=1" />
         <env name="COLUMNS" value="100" force="true" />
     </php>
 
