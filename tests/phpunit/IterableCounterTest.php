@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use ArrayIterator;
 use Infection\IterableCounter;
 use Iterator;
 use PHPUnit\Framework\TestCase;
@@ -43,7 +44,7 @@ final class IterableCounterTest extends TestCase
 {
     public function test_it_does_not_count_when_not_asked(): void
     {
-        $iterator = $this->createMock(Iterator::class);
+        $iterator = new ArrayIterator();
 
         $count = IterableCounter::bufferAndCountIfNeeded($iterator, true);
 
