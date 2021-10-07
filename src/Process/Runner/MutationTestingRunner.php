@@ -104,7 +104,7 @@ class MutationTestingRunner
             ->cast(function (Mutation $mutation): Mutant {
                 return $this->mutantFactory->create($mutation);
             })
-            ->filter(function (Mutant $mutant) {
+            ->filter(function (Mutant $mutant): bool {
                 $mutatorName = $mutant->getMutation()->getMutatorName();
 
                 if (!array_key_exists($mutatorName, $this->ignoreSourceCodeMutatorsMap)) {
@@ -119,7 +119,7 @@ class MutationTestingRunner
 
                 return true;
             })
-            ->filter(function (Mutant $mutant) {
+            ->filter(function (Mutant $mutant): bool {
                 // It's a proxy call to Mutation, can be done one stage up
                 if ($mutant->isCoveredByTest()) {
                     return true;
@@ -131,7 +131,7 @@ class MutationTestingRunner
 
                 return false;
             })
-            ->filter(function (Mutant $mutant) {
+            ->filter(function (Mutant $mutant): bool {
                 // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
                 if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
                     return true;

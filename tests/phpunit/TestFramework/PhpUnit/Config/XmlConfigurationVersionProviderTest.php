@@ -56,7 +56,7 @@ final class XmlConfigurationVersionProviderTest extends TestCase
     public function configurationsProvider()
     {
         yield from take($this->legacyConfigurationsProvider())
-            ->map(static function (string $xml) {
+            ->map(static function (string $xml): iterable {
                 yield $xml => [
                     SafeDOMXPath::fromString($xml),
                     false,
@@ -64,7 +64,7 @@ final class XmlConfigurationVersionProviderTest extends TestCase
             });
 
         yield from take($this->mainlineConfigurationsProvider())
-            ->map(static function (string $xml) {
+            ->map(static function (string $xml): iterable {
                 yield $xml => [
                     SafeDOMXPath::fromString($xml),
                     true,

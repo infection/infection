@@ -26,11 +26,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"string\"\\.$#"
-			count: 2
-			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
-
-		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:resource\\(\\) with resource will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/Config/ValueProvider/BaseProviderTest.php
@@ -46,11 +41,6 @@ parameters:
 			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
-			count: 1
-			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationFileLoaderTest.php
-
-		-
 			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
 			count: 1
 			path: ../tests/phpunit/Console/E2ETest.php
@@ -59,11 +49,6 @@ parameters:
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertIsIterable\\(\\) with iterable\\<Infection\\\\TestFramework\\\\Coverage\\\\Trace\\> will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/ContainerTest.php
-
-		-
-			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
-			count: 2
-			path: ../tests/phpunit/EngineTest.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:notNull\\(\\) with Infection\\\\Tests\\\\EnvVariableManipulation\\\\EnvBackup and 'Attempted to…' will always evaluate to true\\.$#"
@@ -126,11 +111,6 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/Exception/FinderExceptionTest.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"Generator\"\\.$#"
-			count: 1
-			path: ../tests/phpunit/IterableCounterTest.php
-
-		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:string\\(\\) with string will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/Logger/DummyLogger.php
@@ -144,11 +124,6 @@ parameters:
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:string\\(\\) with string will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/Mutator/BaseMutatorTestCase.php
-
-		-
-			message: "#^Anonymous function should have native return typehint \"string\"\\.$#"
-			count: 1
-			path: ../tests/phpunit/Mutator/Extensions/BCMathTest.php
 
 		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Infection\\\\\\\\Mutator\\\\\\\\Mutator' and Infection\\\\Mutator\\\\Mutator will always evaluate to true\\.$#"
@@ -171,11 +146,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/FileParserTest.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"array\"\\.$#"
-			count: 4
-			path: ../tests/phpunit/PhpParser/Visitor/MutatorVisitorTest.php
-
-		-
 			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/ReflectionVisitorTest.php
@@ -186,34 +156,14 @@ parameters:
 			path: ../tests/phpunit/Process/Factory/MutantProcessFactoryTest.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"Generator\"\\.$#"
-			count: 1
-			path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
-
-		-
 			message: "#^Instanceof between Infection\\\\Event\\\\MutationTestingWasFinished\\|Infection\\\\Event\\\\MutationTestingWasStarted and class\\-string will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
-			count: 2
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
-			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
-			count: 1
-			path: ../tests/phpunit/Resource/Listener/PerformanceLoggerSubscriberTest.php
-
-		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Infection\\\\\\\\TestFramework\\\\\\\\Coverage\\\\\\\\JUnit\\\\\\\\TestFileNameNotFoundException' and Infection\\\\TestFramework\\\\Coverage\\\\JUnit\\\\TestFileNameNotFoundException will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestFileNameNotFoundExceptionTest.php
-
-		-
-			message: "#^Anonymous function should have native return typehint \"int\\<\\-1, 1\\>\"\\.$#"
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
 
 		-
 			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
@@ -224,11 +174,6 @@ parameters:
 			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
-
-		-
-			message: "#^Anonymous function should have native return typehint \"Generator\"\\.$#"
-			count: 2
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
 
 		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'DOMDocument' and DOMDocument will always evaluate to true\\.$#"

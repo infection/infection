@@ -97,7 +97,7 @@ final class JUnitTestCaseSorter
         if ($numberOfTestLocation < self::USE_BUCKET_SORT_AFTER) {
             usort(
                 $uniqueTestLocations,
-                static function (TestLocation $a, TestLocation $b) {
+                static function (TestLocation $a, TestLocation $b): int {
                     return $a->getExecutionTime() <=> $b->getExecutionTime();
                 }
             );

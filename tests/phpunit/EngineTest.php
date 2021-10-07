@@ -160,7 +160,7 @@ final class EngineTest extends TestCase
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->callback(static function (ApplicationExecutionWasFinished $event) {
+            ->with($this->callback(static function (ApplicationExecutionWasFinished $event): bool {
                 return true;
             }));
 
@@ -208,7 +208,7 @@ final class EngineTest extends TestCase
         $mutationTestingRunner
             ->expects($this->once())
             ->method('run')
-            ->with($this->callback(static function (iterable $input) {
+            ->with($this->callback(static function (iterable $input): bool {
                 return true;
             }))
         ;

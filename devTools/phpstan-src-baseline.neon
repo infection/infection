@@ -16,16 +16,6 @@ parameters:
 			path: ../src/Config/Guesser/SourceDirGuesser.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"string\"\\.$#"
-			count: 1
-			path: ../src/Config/ValueProvider/ExcludeDirsProvider.php
-
-		-
-			message: "#^Anonymous function should have native return typehint \"string\"\\.$#"
-			count: 1
-			path: ../src/Config/ValueProvider/PhpUnitCustomExecutablePathProvider.php
-
-		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/Configuration/Configuration.php
@@ -44,11 +34,6 @@ parameters:
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allString\\(\\) with array\\<string\\> will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/Configuration/Schema/InvalidSchema.php
-
-		-
-			message: "#^Anonymous function should have native return typehint \"string\"\\.$#"
-			count: 1
-			path: ../src/Differ/DiffColorizer.php
 
 		-
 			message: "#^Call to function is_string\\(\\) with string will always evaluate to true\\.$#"
@@ -186,24 +171,9 @@ parameters:
 			path: ../src/Process/OriginalPhpProcess.php
 
 		-
-			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
-			count: 3
-			path: ../src/Process/Runner/MutationTestingRunner.php
-
-		-
 			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
 			count: 1
 			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
-
-		-
-			message: "#^Anonymous function should have native return typehint \"bool\"\\.$#"
-			count: 1
-			path: ../src/TestFramework/Coverage/BufferedSourceFileFilter.php
-
-		-
-			message: "#^Anonymous function should have native return typehint \"int\\<\\-1, 1\\>\"\\.$#"
-			count: 1
-			path: ../src/TestFramework/Coverage/JUnit/JUnitTestCaseSorter.php
 
 		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Assert\\:\\:notNull\\(\\) with DOMNodeList\\<DOMElement\\> will always evaluate to true\\.$#"
