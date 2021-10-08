@@ -53,8 +53,8 @@ use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
 use function Safe\file_get_contents;
 use function Safe\realpath;
+use function Safe\simplexml_load_string;
 use function Safe\sprintf;
-use function simplexml_load_string;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

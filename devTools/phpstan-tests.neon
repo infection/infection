@@ -1,6 +1,3 @@
-includes:
-    - phpstan-tests-baseline.neon
-
 parameters:
     tmpDir: ../build/cache/phpstan-tests
     parallel:
@@ -16,16 +13,19 @@ parameters:
         - '#^Cannot call method (willReturn|shouldBeCalledTimes)\(\) on iterable<Infection\\Mutation\\Mutation>\.$#'
         - '#Offset .*\\.* does not exist on array<class-string<.*>.*#'
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'
-        - '#Call to method PHPUnit\\Framework\\Assert::.* with array.* and array.* will always evaluate to false#'
+        - '#^Call to method PHPUnit\\Framework\\Assert::.* with array.* and array.* will always evaluate to false\.$#'
+        - '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with SimpleXMLElement and ''Expected dumped…'' will always evaluate to true\.$#'
+        - '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with string will always evaluate to true\.$#'
+        - '#^Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with ''[a-zA-Z\\]+'' and [a-zA-Z\\]+ will always evaluate to (false|true)\.$#'
+        - '#^Call to method PHPUnit\\Framework\\Assert::assertTrue\(\) with true will always evaluate to true\.$#'
+        - '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
+        - '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
         -
-            path: '../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php'
-            message: '#Function simplexml_load_string is unsafe to use#'
+            message: "#^Variable method call on Infection\\\\Tests\\\\FileSystem\\\\Finder\\\\MockVendor\\.$#"
             count: 1
-        -
-            path: '../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php'
-            message: '#Function simplexml_load_string is unsafe to use#'
-            count: 1
+            path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
     level: 4
     paths:
         - ../tests/phpunit
+    treatPhpDocTypesAsCertain: false
