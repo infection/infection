@@ -22,7 +22,6 @@ jobs:
       matrix:
         operating-system: [ubuntu-latest, windows-latest]
         php-version: ['7.4']
-        dependencies: ['']
         coverage-driver: [pcov]
 
     name: Mutation testing on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }}
@@ -46,16 +45,15 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-${{ matrix.dependencies }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
             composer-${{ runner.os }}-${{ matrix.php-version }}-
             composer-${{ runner.os }}-
             composer-
 
       - name: Install dependencies
         run: |
-          composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
+          composer update --no-interaction --prefer-dist --no-progress
 
       - name: Collect coverage report
         run: |

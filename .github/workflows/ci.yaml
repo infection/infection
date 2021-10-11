@@ -18,16 +18,15 @@ jobs:
       matrix:
         operating-system: [ubuntu-latest]
         php-version: ['7.4']
-        dependencies: ['']
         coverage-driver: [pcov, xdebug]
         e2e-runner: ['bin/infection']
         include:
-          - { operating-system: 'windows-latest', php-version: '7.4', dependencies: '', coverage-driver: 'xdebug' }
-          - { operating-system: 'ubuntu-latest', php-version: '7.4', dependencies: '', coverage-driver: 'pcov' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', dependencies: '', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.1', dependencies: '', coverage-driver: 'pcov' }
+          - { operating-system: 'windows-latest', php-version: '7.4', coverage-driver: 'xdebug' }
+          - { operating-system: 'ubuntu-latest', php-version: '7.4', coverage-driver: 'pcov' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov' }
 
-    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} ${{ matrix.dependencies }} with ${{ matrix.e2e-runner }}
+    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
     steps:
       - name: Checkout code
@@ -49,7 +48,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-${{ matrix.dependencies }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
           restore-keys: |
             composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
             composer-${{ runner.os }}-${{ matrix.php-version }}-
@@ -58,7 +57,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer install --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
+          composer install --no-interaction --prefer-dist --no-progress
 
       - name: Run tests
         shell: bash
@@ -85,7 +84,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: tests/e2e/*/vendor
-          key: e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}-${{ matrix.dependencies }}
+          key: e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}
           restore-keys: |
             e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}-
             e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-
@@ -96,7 +95,7 @@ jobs:
         shell: bash
         run: |
           ls tests/e2e/*/composer.json | xargs dirname |
-             xargs -I{} composer --working-dir={} install --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
+             xargs -I{} composer --working-dir={} install --no-interaction --prefer-dist --no-progress
 
       - name: Run a subset of E2E tests
         if: runner.os == 'Windows'
