@@ -24,8 +24,8 @@ jobs:
         include:
           - { operating-system: 'windows-latest', php-version: '7.4', dependencies: '', coverage-driver: 'xdebug' }
           - { operating-system: 'ubuntu-latest', php-version: '7.4', dependencies: '', coverage-driver: 'pcov' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', dependencies: '--ignore-platform-req=php', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.1', dependencies: '--ignore-platform-req=php', coverage-driver: 'pcov' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.0', dependencies: '', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.1', dependencies: '', coverage-driver: 'pcov' }
 
     name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} ${{ matrix.dependencies }} with ${{ matrix.e2e-runner }}
 
