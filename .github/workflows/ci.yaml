@@ -68,13 +68,17 @@ jobs:
           # Implement __serialize() and __unserialize() instead (or in addition, if support for old PHP versions is necessary)" is not fixed
           if [[ "${{ matrix.php-version }}" == '8.1' ]]; then
             export SYMFONY_DEPRECATIONS_HELPER=max[direct]=1
-          else
-            make test-unit
           fi
+
+          make test-unit
 
       - name: Run integration tests
         shell: bash
         run: |
+          if [[ "${{ matrix.php-version }}" == '8.1' ]]; then
+            export SYMFONY_DEPRECATIONS_HELPER=max[direct]=1
+          fi
+
           make test-unit PHPUNIT_GROUP=integration
 
       - name: Cache E2E tests dependencies
