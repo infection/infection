@@ -78,7 +78,7 @@ final class TestLocationBucketSorter
             // This is a very hot path. Factoring here another method just to test this math may not be as good idea.
 
             // Quick drop off lower bits, reducing precision to 8th of a second
-            $msTime = ($location->getExecutionTime() ?? 0) * 1024 >> 7; // * 1024 / 128
+            $msTime = (int) (($location->getExecutionTime() ?? 0) * 1024) >> 7; // * 1024 / 128
 
             // For anything above 4 seconds reduce precision to 4 seconds
             if ($msTime > 32) {
