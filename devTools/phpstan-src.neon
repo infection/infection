@@ -1,6 +1,5 @@
 includes:
     - ../vendor/phpstan/phpstan/conf/bleedingEdge.neon
-    - phpstan-src-baseline.neon
 
 parameters:
     tmpDir: ../build/cache/phpstan-src
@@ -8,6 +7,10 @@ parameters:
     ignoreErrors:
         - '#.* value type specified in iterable type Symfony\\Component\\Process\\Process#'
         - '#generic class ReflectionClass (but )?does not specify its types#'
+        - '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
+        - '#^Parameter \#\d+ \$.+ \(.+\) of method .+ should be contravariant with parameter \$.+ \(.+\) of method .+$#'
+        - '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
+        - '#^Variable (method|property) (access|call) #'
         -
             path: '../src/Mutator/Number/DecrementInteger.php'
             message: '#Casting to int .* already int#'
@@ -29,6 +32,10 @@ parameters:
             message: '#Function realpath is unsafe to use\.#'
             count: 1
         -
+            path: ../src/TestFramework/Factory.php
+            message: "#^Parameter \\#1 \\$it of function iterator_to_array expects Traversable, iterable\\<Infection\\\\TestFramework\\\\Coverage\\\\Trace\\|SplFileInfo\\> given\\.$#"
+            count: 1
+        -
             path: '../src/Container.php'
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
             count: 1
@@ -38,3 +45,4 @@ parameters:
     level: max
     paths:
         - ../src
+    treatPhpDocTypesAsCertain: false

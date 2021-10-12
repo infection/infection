@@ -57,6 +57,7 @@ use Webmozart\Assert\Assert;
 final class PestAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
+     * @param string[] $sourceDirectories
      * @param list<string> $filteredSourceFilesToMutate
      */
     public static function create(

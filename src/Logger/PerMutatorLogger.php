@@ -146,7 +146,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
 
         foreach ($table as $row) {
             foreach ($row as $columnNumber => $cell) {
-                $sizes[$columnNumber] = (int) max($sizes[$columnNumber], strlen($cell));
+                $sizes[$columnNumber] = max($sizes[$columnNumber], strlen($cell));
             }
         }
 
@@ -179,11 +179,11 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
      */
     private function createMetricsPerMutators(): array
     {
-        $executionResults = $this->resultsCollector->getAllExecutionResults();
+        $allExecutionResults = $this->resultsCollector->getAllExecutionResults();
 
         $processPerMutator = [];
 
-        foreach ($executionResults as $executionResult) {
+        foreach ($allExecutionResults as $executionResult) {
             $mutatorName = $executionResult->getMutatorName();
             $processPerMutator[$mutatorName][] = $executionResult;
         }
