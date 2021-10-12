@@ -104,6 +104,6 @@ DIFF
             return true;
         }
 
-        return !in_array($name->toLowerString(), $this->doNotRemoveFunctions);
+        return !in_array($name->toLowerString(), $this->doNotRemoveFunctions, true);
     }
 }

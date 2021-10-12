@@ -363,7 +363,7 @@ final class JsonLoggerTest extends TestCase
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,
-                base64_decode('abc') // produces non UTF-8 character
+                base64_decode('abc', true) // produces non UTF-8 character
             ),
         );
 

@@ -151,11 +151,6 @@ parameters:
 			path: ../src/Mutator/Operator/Finally_.php
 
 		-
-			message: "#^Call to function in_array\\(\\) requires parameter \\#3 to be set\\.$#"
-			count: 1
-			path: ../src/Mutator/Removal/FunctionCallRemoval.php
-
-		-
 			message: "#^Call to static method Webmozart\\\\Assert\\\\Mixin\\:\\:allIsInstanceOf\\(\\) with array\\<PhpParser\\\\Node\\> and 'PhpParser\\\\\\\\Node' will always evaluate to true\\.$#"
 			count: 1
 			path: ../src/PhpParser/MutatedNode.php

@@ -63,9 +63,11 @@ $finder = Finder::create()
     ])
     ->ignoreDotFiles(false)
     ->name('*php')
-    ->name('.php_cs.dist')
-    ->name('infection')
-    ->name('infection-debug')
+    ->append([
+        __DIR__ . '/bin/infection',
+        __DIR__ . '/bin/infection-debug',
+        __FILE__,
+    ])
 ;
 
 return (new Config())
@@ -155,6 +157,7 @@ return (new Config())
         'single_line_throw' => false,
         'static_lambda' => true,
         'strict_comparison' => true,
+        'strict_param' => true,
         'yoda_style' => [
             'equal' => false,
             'identical' => false,
