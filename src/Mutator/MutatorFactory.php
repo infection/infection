@@ -100,7 +100,7 @@ final class MutatorFactory
     {
         $parts = explode('\\', $className);
 
-        return (string) end($parts);
+        return end($parts);
     }
 
     /**

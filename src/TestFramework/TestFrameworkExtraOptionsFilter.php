@@ -59,6 +59,6 @@ class TestFrameworkExtraOptionsFilter
             Assert::notNull($actualExtraOptions);
         }
 
-        return (string) preg_replace('/\s+/', ' ', trim($actualExtraOptions));
+        return preg_replace('/\s+/', ' ', trim($actualExtraOptions));
     }
 }

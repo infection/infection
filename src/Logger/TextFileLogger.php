@@ -72,6 +72,8 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     {
         $separateSections = false;
 
+        $logs = [];
+
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getEscapedExecutionResults(),
             'Escaped',
