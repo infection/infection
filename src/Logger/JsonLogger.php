@@ -95,7 +95,7 @@ final class JsonLogger implements LineMutationTestingResultsLogger
     /**
      * @param MutantExecutionResult[] $executionResults
      *
-     * @return array<int, array{mutator: array, diff: string, processOutput: string}>
+     * @return array<int, array{mutator: array<string, int|string>, diff: string, processOutput: string}>
      */
     private function getResultsLine(array $executionResults): array
     {

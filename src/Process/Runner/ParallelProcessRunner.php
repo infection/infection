@@ -172,10 +172,8 @@ final class ParallelProcessRunner implements ProcessRunner
 
         $start = microtime(true);
 
-        if ($input->valid()) {
-            $bucket[] = $input->current();
-            $input->next();
-        }
+        $bucket[] = $input->current();
+        $input->next();
 
         return (int) (microtime(true) - $start) * 1000000; // ns to ms
     }

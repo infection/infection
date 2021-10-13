@@ -49,7 +49,7 @@ final class JUnitTestCaseSorter
     /**
      * Expected average number of buckets. Exposed for testing purposes.
      *
-     * @var int[]
+     * @var int
      */
     public const BUCKETS_COUNT = 25;
 
