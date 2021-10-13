@@ -37,6 +37,7 @@ namespace Infection\FileSystem\Finder\Iterator;
 
 use const DIRECTORY_SEPARATOR;
 use function preg_quote;
+use ReturnTypeWillChange;
 use function str_replace;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
@@ -50,6 +51,7 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
+    #[ReturnTypeWillChange]
     public function accept()
     {
         $filename = $this->current()->getRealPath();

@@ -52,7 +52,7 @@
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.5",
         "justinrainbow/json-schema": "^5.2.10",
-        "nikic/php-parser": "^4.10.3",
+        "nikic/php-parser": "^4.13",
         "ondram/ci-detector": "^3.3.0",
         "sanmai/later": "^0.1.1",
         "sanmai/pipeline": "^5.1",
@@ -67,8 +67,7 @@
         "webmozart/path-util": "^2.3"
     },
     "conflict": {
-        "phpunit/php-code-coverage": ">9 <9.1.4",
-        "symfony/console": "=4.1.5"
+        "phpunit/php-code-coverage": ">9 <9.1.4"
     },
     "require-dev": {
         "ext-simplexml": "*",

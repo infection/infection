@@ -56,7 +56,6 @@ use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutator\MutatorName;
-use Iterator;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -372,11 +371,7 @@ final class MutationTestingRunnerTest extends TestCase
 
     public function test_it_passes_through_iterables_when_concurrent_execution_requested(): void
     {
-        $mutations = $this->createMock(Iterator::class);
-        $mutations
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        $mutations = new ArrayIterator();
 
         $this->mutantFactoryMock
             ->expects($this->never())
