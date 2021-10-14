@@ -218,7 +218,7 @@ DIFF
     {
         return static function (Node\Expr\FuncCall $node) use ($operator): iterable {
             if ($node->args[0] instanceof Node\VariadicPlaceholder || $node->args[1] instanceof Node\VariadicPlaceholder) {
-                return [];
+                return;
             }
 
             yield new $operator($node->args[0]->value, $node->args[1]->value);
@@ -242,7 +242,7 @@ DIFF
     {
         return static function (Node\Expr\FuncCall $node): iterable {
             if ($node->args[2] instanceof Node\VariadicPlaceholder) {
-                return [];
+                return;
             }
 
             yield new Node\Expr\BinaryOp\Mod(
