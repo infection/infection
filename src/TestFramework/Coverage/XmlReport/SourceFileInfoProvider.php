@@ -40,8 +40,9 @@ use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use function implode;
 use Infection\TestFramework\SafeDOMXPath;
-use function realpath as native_realpath;
+use Safe\Exceptions\FilesystemException;
 use function Safe\file_get_contents;
+use function Safe\realpath;
 use function Safe\sprintf;
 use function str_replace;
 use Symfony\Component\Finder\SplFileInfo;
@@ -130,9 +131,9 @@ class SourceFileInfoProvider
             ])
         );
 
-        $realPath = native_realpath($path);
-
-        if ($realPath === false) {
+        try {
+            $realPath = realpath($path);
+        } catch (FilesystemException $e) {
             $coverageFilePath = Path::canonicalize(
                 $this->coverageDir . DIRECTORY_SEPARATOR . $this->relativeCoverageFilePath
             );

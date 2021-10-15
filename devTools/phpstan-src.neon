@@ -17,26 +17,6 @@ parameters:
             message: '#^Strict comparison using !== between array<int, Infection\\Mutant\\MutantExecutionResult> and array\(\) will always evaluate to true\.$#'
             count: 1
         -
-            path: '../src/Mutator/Number/DecrementInteger.php'
-            message: '#Casting to int .* already int#'
-            count: 1
-        -
-            path: '../src/PhpParser/FileParser.php'
-            message: '#Method Infection\\PhpParser\\FileParser::parse\(\) should return array<PhpParser\\Node> but returns array<PhpParser\\Node\\Stmt>\|null\.#'
-            count: 1
-        -
-            path: '../src/Reflection/AnonymousClassReflection.php'
-            message: '#Parameter \#1 \$argument of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object\, string given\.#'
-            count: 1
-        -
-            path: '../src/Reflection/CoreClassReflection.php'
-            message: '#Parameter \#1 \$argument of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object\, string given\.#'
-            count: 1
-        -
-            path: '../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php'
-            message: '#Function realpath is unsafe to use\.#'
-            count: 1
-        -
             path: ../src/TestFramework/Factory.php
             message: '#^Parameter \#1 \$callback of function array_map expects callable\(Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\): mixed, Closure\(SplFileInfo\): string\|false given\.$#'
             count: 1
@@ -48,10 +28,11 @@ parameters:
             path: '../src/Container.php'
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
             count: 1
-        -
-            path: '../src/FileSystem/DummyFileSystem.php'
-            message: '#Infection\\FileSystem\\DummyFileSystem#'
     level: max
     paths:
         - ../src
+    excludes_analyse:
+        - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
+    stubFiles:
+        - phpstan.stub
     treatPhpDocTypesAsCertain: false
