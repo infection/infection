@@ -2,6 +2,7 @@ Total: 1
 
 Killed: 0
 Errored: 1
+Syntax Errors: 0
 Escaped: 0
 Timed Out: 0
 Skipped: 0

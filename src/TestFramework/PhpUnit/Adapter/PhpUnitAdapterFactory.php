@@ -58,6 +58,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
      * @param string[] $sourceDirectories
+     * @param list<string> $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -67,9 +68,11 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         string $jUnitFilePath,
         string $projectDir,
         array $sourceDirectories,
-        bool $skipCoverage
+        bool $skipCoverage,
+        bool $executeOnlyCoveringTestCases = false,
+        array $filteredSourceFilesToMutate = []
     ): TestFrameworkAdapter {
-        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the phpunit adapter');
+        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
@@ -91,7 +94,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
-                $sourceDirectories
+                $sourceDirectories,
+                $filteredSourceFilesToMutate
             ),
             new MutationConfigBuilder(
                 $tmpDir,
@@ -100,7 +104,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $projectDir,
                 new JUnitTestCaseSorter()
             ),
-            new ArgumentsAndOptionsBuilder(),
+            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases),
             new VersionParser(),
             new CommandLineBuilder()
         );

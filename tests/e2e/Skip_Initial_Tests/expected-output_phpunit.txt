@@ -28,6 +28,9 @@ Line 15
 Errors mutants:
 ===============
 
+Syntax Errors mutants:
+======================
+
 Escaped mutants:
 ================
 

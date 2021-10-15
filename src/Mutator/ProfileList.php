@@ -158,7 +158,9 @@ final class ProfileList
         Mutator\Operator\Finally_::class,
         Mutator\Operator\NullSafeMethodCall::class,
         Mutator\Operator\NullSafePropertyCall::class,
-        Mutator\Operator\Spread::class,
+        Mutator\Operator\SpreadAssignment::class,
+        Mutator\Operator\SpreadOneItem::class,
+        Mutator\Operator\SpreadRemoval::class,
         Mutator\Operator\Ternary::class,
         Mutator\Operator\Throw_::class,
     ];
@@ -361,7 +363,9 @@ final class ProfileList
         'Finally_' => Mutator\Operator\Finally_::class,
         'NullSafeMethodCall' => Mutator\Operator\NullSafeMethodCall::class,
         'NullSafePropertyCall' => Mutator\Operator\NullSafePropertyCall::class,
-        'Spread' => Mutator\Operator\Spread::class,
+        'SpreadAssignment' => Mutator\Operator\SpreadAssignment::class,
+        'SpreadOneItem' => Mutator\Operator\SpreadOneItem::class,
+        'SpreadRemoval' => Mutator\Operator\SpreadRemoval::class,
         'Ternary' => Mutator\Operator\Ternary::class,
         'Throw_' => Mutator\Operator\Throw_::class,
 
@@ -460,6 +464,9 @@ final class ProfileList
         // Extensions
         'BCMath' => Mutator\Extensions\BCMath::class,
         'MBString' => Mutator\Extensions\MBString::class,
+
+        // Internal usage only
+        'SyntaxError' => Mutator\SyntaxError::class,
     ];
 
     /** @var array<int, string>|null */

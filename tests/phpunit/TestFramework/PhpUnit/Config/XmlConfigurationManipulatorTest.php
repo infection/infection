@@ -110,6 +110,36 @@ XML
         );
     }
 
+    public function test_it_replaces_with_absolute_paths_xml_file_with_tabs(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+    <testsuites>
+		<testsuite name="All Tests">
+			<directory suffix="UnitTest.php">
+				./Tests
+			</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->replaceWithAbsolutePaths($xPath);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <testsuites>
+    <testsuite name="All Tests">
+      <directory suffix="UnitTest.php">/Tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
+XML
+        );
+    }
+
     public function test_it_removes_existing_loggers_from_pre_93_configuration(): void
     {
         $this->assertItChangesPrePHPUnit93Configuration(
@@ -146,7 +176,7 @@ XML
         );
     }
 
-    public function test_it_adds_coverage_whitelist_to_pre_93_configuration(): void
+    public function test_it_adds_coverage_whitelist_directories_to_pre_93_configuration(): void
     {
         $this->assertItChangesXML(
             <<<'XML'
@@ -155,7 +185,7 @@ XML
 XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->addLegacyCoverageWhitelistNodesUnlessTheyExist($xPath, ['src/', 'examples/']);
+                $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, ['src/', 'examples/'], []);
             },
             <<<'XML'
 <phpunit cacheTokens="true">
@@ -165,6 +195,85 @@ XML
       <directory>examples/</directory>
     </whitelist>
   </filter>
+</phpunit>
+XML
+            );
+    }
+
+    public function test_it_adds_coverage_whitelist_files_to_pre_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes(
+                    $xPath,
+                    ['src/', 'examples/'],
+                    ['src/File1.php', 'example/File2.php']
+                );
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <filter>
+    <whitelist>
+      <file>src/File1.php</file>
+      <file>example/File2.php</file>
+    </whitelist>
+  </filter>
+</phpunit>
+XML
+            );
+    }
+
+    public function test_it_adds_coverage_whitelist_directories_to_post_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateCoverageIncludeNodes($xPath, ['src/', 'examples/'], []);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <coverage>
+    <include>
+      <directory>src/</directory>
+      <directory>examples/</directory>
+    </include>
+  </coverage>
+</phpunit>
+XML
+            );
+    }
+
+    public function test_it_adds_coverage_whitelist_files_to_post_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateCoverageIncludeNodes($xPath,
+                    ['src/', 'examples/'],
+                    ['src/File1.php', 'example/File2.php']
+                );
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <coverage>
+    <include>
+      <file>src/File1.php</file>
+      <file>example/File2.php</file>
+    </include>
+  </coverage>
 </phpunit>
 XML
             );
@@ -484,6 +593,55 @@ XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     stderr="false"
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_activates_result_cache_and_execution_order_defects_for_phpunit_7_3(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->handleResultCacheAndExecutionOrder('7.3', $xPath, 'a1b2c3');
+            },
+            <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    executionOrder="defects"
+    cacheResult="true"
+    cacheResultFile=".phpunit.result.cache.a1b2c3"
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_does_not_set_result_cache_for_phpunit_7_1(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->handleResultCacheAndExecutionOrder('7.1', $xPath, 'a1b2c3');
+            },
+            <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
     syntaxCheck="false"
 >
 </phpunit>

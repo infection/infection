@@ -138,7 +138,8 @@ final class ConfigurationFactoryTest extends TestCase
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
         ?float $expectedMinCoveredMsi,
-        array $expectedIgnoreSourceCodeMutatorsMap
+        array $expectedIgnoreSourceCodeMutatorsMap,
+        bool $inputExecuteOnlyCoveringTestCases
     ): void {
         $config = $this
             ->createConfigurationFactory($ciDetected)
@@ -165,7 +166,8 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputGitDiffFilter,
                 $inputGitDiffBase,
                 $inputUseGitHubAnnotationsLogger,
-                $inputUseNoopMutators
+                $inputUseNoopMutators,
+                $inputExecuteOnlyCoveringTestCases
             )
         ;
 
@@ -198,7 +200,8 @@ final class ConfigurationFactoryTest extends TestCase
             $inputMsiPrecision,
             $inputThreadsCount,
             $inputDryRun,
-            $expectedIgnoreSourceCodeMutatorsMap
+            $expectedIgnoreSourceCodeMutatorsMap,
+            $inputExecuteOnlyCoveringTestCases
         );
     }
 
@@ -272,6 +275,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            true,
         ];
 
         yield 'null timeout' => self::createValueForTimeout(
@@ -427,25 +431,25 @@ final class ConfigurationFactoryTest extends TestCase
             21.2
         );
 
-        yield 'minCoveredMsi not specified in schema and not specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi not specified in schema and not specified in input' => self::createValueForMinCoveredMsi(
             null,
             null,
             null
         );
 
-        yield 'minCoveredMsi specified in schema and not specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi specified in schema and not specified in input' => self::createValueForMinCoveredMsi(
             33.3,
             null,
             33.3
         );
 
-        yield 'minCoveredMsi not specified in schema and specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi not specified in schema and specified in input' => self::createValueForMinCoveredMsi(
             null,
             21.2,
             21.2
         );
 
-        yield 'minCoveredMsi specified in schema and specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi specified in schema and specified in input' => self::createValueForMinCoveredMsi(
             33.3,
             21.2,
             21.2
@@ -717,6 +721,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
 
         yield 'complete' => [
@@ -813,6 +818,7 @@ final class ConfigurationFactoryTest extends TestCase
             true,
             81.5,
             [],
+            false,
         ];
     }
 
@@ -885,6 +891,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -957,6 +964,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1030,6 +1038,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1102,6 +1111,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1175,6 +1185,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1248,6 +1259,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1321,6 +1333,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1394,6 +1407,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             $expectedMinCoveredMsi,
             [],
+            false,
         ];
     }
 
@@ -1468,6 +1482,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1541,6 +1556,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1615,6 +1631,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1688,6 +1705,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1765,6 +1783,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             [],
+            false,
         ];
     }
 
@@ -1843,6 +1862,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             $expectedIgnoreSourceCodeMutatorsMap,
+            false,
         ];
     }
 

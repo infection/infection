@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Fixtures\TestFramework;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\UnsupportedTestFrameworkVersion;
 
 final class DummyTestFrameworkAdapter implements TestFrameworkAdapter
 {

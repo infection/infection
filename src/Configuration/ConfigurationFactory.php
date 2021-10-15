@@ -118,7 +118,8 @@ class ConfigurationFactory
         ?string $gitDiffFilter,
         ?string $gitDiffBase,
         bool $useGitHubLogger,
-        bool $useNoopMutators
+        bool $useNoopMutators,
+        bool $executeOnlyCoveringTestCases
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -170,7 +171,8 @@ class ConfigurationFactory
             $msiPrecision,
             $threadCount,
             $dryRun,
-            $ignoreSourceCodeMutatorsMap
+            $ignoreSourceCodeMutatorsMap,
+            $executeOnlyCoveringTestCases
         );
     }
 

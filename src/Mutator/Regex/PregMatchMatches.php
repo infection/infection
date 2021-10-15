@@ -89,6 +89,10 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
+        if ($node->args[2] instanceof Node\VariadicPlaceholder) {
+            return [];
+        }
+
         yield new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
     }
 

@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Process\Factory;
 
+use Composer\InstalledVersions;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\CoveredPhpProcess;
 use Infection\Process\OriginalPhpProcess;
 use function method_exists;
 use Symfony\Component\Process\Process;
+use function version_compare;
 
 /**
  * @internal
@@ -78,7 +80,7 @@ class InitialTestsRunProcessFactory
 
         $process->setTimeout(null); // Ignore the default timeout of 60 seconds
 
-        if (method_exists($process, 'inheritEnvironmentVariables')) {
+        if (method_exists($process, 'inheritEnvironmentVariables') && version_compare((string) InstalledVersions::getVersion('symfony/console'), 'v4.4', '<')) {
             // In version 4.4.0 this method is deprecated and removed in 5.0.0
             $process->inheritEnvironmentVariables();
         }

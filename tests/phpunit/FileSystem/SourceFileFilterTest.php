@@ -38,10 +38,10 @@ namespace Infection\Tests\FileSystem;
 use function array_values;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Coverage\Trace;
+use Infection\Tests\Fixtures\MockSplFileInfo;
 use IteratorIterator;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
-use SplFileInfo;
 use Traversable;
 
 final class SourceFileFilterTest extends TestCase
@@ -210,7 +210,7 @@ final class SourceFileFilterTest extends TestCase
 
         $actual = take($actual)
             ->map(static function ($traceOrFileInfo) {
-                /* @var Trace|SplFileInfo */
+                /* @var Trace|MockSplFileInfo */
                 return $traceOrFileInfo->getRealPath();
             })
             ->toArray();
@@ -221,19 +221,17 @@ final class SourceFileFilterTest extends TestCase
     /**
      * @param string[] $filePaths
      *
-     * @return Traversable<SplFileInfo>
+     * @return Traversable<MockSplFileInfo>
      */
     private function createSplFileInfosTraversable(array $filePaths): Traversable
     {
         return take($filePaths)
-            ->map(function (string $filename) {
-                $traceMock = $this->createMock(SplFileInfo::class);
-                $traceMock
-                    ->method('getRealPath')
-                    ->willReturn($filename)
-                ;
-
-                return $traceMock;
+            ->map(static function (string $realPath): MockSplFileInfo {
+                return new MockSplFileInfo([
+                    'realPath' => $realPath,
+                    'type' => 'file',
+                    'mode' => 'r+',
+                ]);
             })
         ;
     }
@@ -246,7 +244,7 @@ final class SourceFileFilterTest extends TestCase
     private function createTracesTraversable(array $filePaths): Traversable
     {
         return take($filePaths)
-            ->map(function (string $filename) {
+            ->map(function (string $filename): Trace {
                 $traceMock = $this->createMock(Trace::class);
                 $traceMock
                     ->method('getRealPath')

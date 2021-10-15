@@ -114,12 +114,12 @@ class MinMsiChecker
 
     private function isMsiInsufficient(float $msi): bool
     {
-        return $this->minMsi && ($msi < $this->minMsi);
+        return $this->minMsi > 0 && $msi < $this->minMsi;
     }
 
     private function isCoveredCodeMsiInsufficient(float $coveredCodeMsi): bool
     {
-        return $this->minCoveredCodeMsi && ($coveredCodeMsi < $this->minCoveredCodeMsi);
+        return $this->minCoveredCodeMsi > 0 && $coveredCodeMsi < $this->minCoveredCodeMsi;
     }
 
     private function canIncreaseMsi(float $msi): bool

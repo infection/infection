@@ -87,7 +87,7 @@ class TestFrameworkFinder
 
     private function shouldUseCustomPath(string $testFrameworkName, string $customPath): bool
     {
-        if (!$customPath) {
+        if ($customPath === '') {
             return false;
         }
 
@@ -120,7 +120,7 @@ class TestFrameworkFinder
         }
 
         if ($vendorPath !== null) {
-            $pathName = getenv('PATH') ? 'PATH' : 'Path';
+            $pathName = getenv('PATH') !== false ? 'PATH' : 'Path';
             putenv($pathName . '=' . $vendorPath . PATH_SEPARATOR . getenv($pathName));
         }
     }
@@ -159,7 +159,9 @@ class TestFrameworkFinder
         $extraDirs = [$cwd, $cwd . '/bin'];
 
         foreach ($candidates as $name) {
-            if ($path = $finder->find($name, null, $extraDirs)) {
+            $path = $finder->find($name, null, $extraDirs);
+
+            if ($path !== null) {
                 return $path;
             }
         }
@@ -183,7 +185,7 @@ class TestFrameworkFinder
          *   SET BIN_TARGET=%~dp0/../path
          *   php %~dp0/path %*
          */
-        if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match)) {
+        if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match) === 1) {
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
             $script = realpath(dirname($path) . '/' . $target);
 

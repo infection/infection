@@ -55,7 +55,9 @@ final class ComposerExecutableFinder
         $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
 
         foreach ($probable as $name) {
-            if ($path = $finder->find($name, null, $immediatePaths)) {
+            $path = $finder->find($name, null, $immediatePaths);
+
+            if ($path !== null) {
                 if (strpos($path, '.phar') === false) {
                     return $path;
                 }

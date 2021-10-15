@@ -87,7 +87,8 @@ final class ConfigurationTest extends TestCase
         int $msiPrecision,
         int $threadsCount,
         bool $dryRun,
-        array $ignoreSourceCodeMutatorsMap
+        array $ignoreSourceCodeMutatorsMap,
+        bool $executeOnlyCoveringTestCases
     ): void {
         $config = new Configuration(
             $timeout,
@@ -117,7 +118,8 @@ final class ConfigurationTest extends TestCase
             $msiPrecision,
             $threadsCount,
             $dryRun,
-            $ignoreSourceCodeMutatorsMap
+            $ignoreSourceCodeMutatorsMap,
+            $executeOnlyCoveringTestCases
         );
 
         $this->assertConfigurationStateIs(
@@ -149,7 +151,8 @@ final class ConfigurationTest extends TestCase
             $msiPrecision,
             $threadsCount,
             $dryRun,
-            $ignoreSourceCodeMutatorsMap
+            $ignoreSourceCodeMutatorsMap,
+            $executeOnlyCoveringTestCases
         );
     }
 
@@ -184,6 +187,7 @@ final class ConfigurationTest extends TestCase
             0,
             false,
             [],
+            false,
         ];
 
         yield 'nominal' => [
@@ -230,6 +234,7 @@ final class ConfigurationTest extends TestCase
             [
                 'For_' => ['.*someMethod.*'],
             ],
+            true,
         ];
     }
 }

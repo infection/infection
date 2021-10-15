@@ -41,6 +41,7 @@ use function ltrim;
 use function Safe\sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
+use function trim;
 
 /**
  * @internal
@@ -48,7 +49,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class PathReplacer
 {
     private Filesystem $filesystem;
-    private ?string $phpUnitConfigDir = null;
+    private ?string $phpUnitConfigDir;
 
     public function __construct(Filesystem $filesystem, ?string $phpUnitConfigDir = null)
     {
@@ -61,11 +62,13 @@ final class PathReplacer
      */
     public function replaceInNode(DOMNode $domElement): void
     {
-        if (!$this->filesystem->isAbsolutePath($domElement->nodeValue)) {
+        $path = trim($domElement->nodeValue);
+
+        if (!$this->filesystem->isAbsolutePath($path)) {
             $newPath = sprintf(
                 '%s/%s',
                 $this->phpUnitConfigDir,
-                ltrim($domElement->nodeValue, '\/')
+                ltrim($path, '\/')
             );
 
             // remove all occurrences of "/./". realpath can't be used because of glob patterns

@@ -55,7 +55,8 @@ abstract class MutationConfigBuilder
         array $tests,
         string $mutantFilePath,
         string $mutationHash,
-        string $mutationOriginalFilePath
+        string $mutationOriginalFilePath,
+        string $version
     ): string;
 
     protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutantFilePath): string

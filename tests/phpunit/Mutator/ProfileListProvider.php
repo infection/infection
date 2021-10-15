@@ -44,6 +44,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NoopMutator;
 use Infection\Mutator\ProfileList;
+use Infection\Mutator\SyntaxError;
 use ReflectionClass;
 use function Safe\ksort;
 use function Safe\realpath;
@@ -98,7 +99,7 @@ final class ProfileListProvider
             $shortClassName = substr($file->getFilename(), 0, -4);
             $className = self::getMutatorClassNameFromPath($file->getPathname());
 
-            if (in_array($className, [IgnoreMutator::class, NoopMutator::class], true)) {
+            if (in_array($className, [IgnoreMutator::class, NoopMutator::class, SyntaxError::class], true)) {
                 continue;
             }
 

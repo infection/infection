@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function array_merge;
+use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\DescribeCommand;
 use Infection\Command\RunCommand;
 use Infection\Container;
 use OutOfBoundsException;
-use PackageVersions\Versions;
 use function preg_quote;
 use function Safe\preg_match;
 use function Safe\sprintf;
@@ -55,9 +55,9 @@ use function trim;
  */
 final class Application extends BaseApplication
 {
-    private const NAME = 'Infection - PHP Mutation Testing Framework';
+    public const PACKAGE_NAME = 'infection/infection';
 
-    private const PACKAGE_NAME = 'infection/infection';
+    private const NAME = 'Infection - PHP Mutation Testing Framework';
 
     private const LOGO = '
     ____      ____          __  _
@@ -73,7 +73,7 @@ final class Application extends BaseApplication
     public function __construct(Container $container)
     {
         try {
-            $version = Versions::getVersion(self::PACKAGE_NAME);
+            $version = (string) InstalledVersions::getVersion(self::PACKAGE_NAME);
             // @codeCoverageIgnoreStart
         } catch (OutOfBoundsException $e) {
             if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#i', $e->getMessage()) === 0) {

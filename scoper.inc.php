@@ -42,7 +42,7 @@ $polyfillsBootstrap = Finder::create()
 
 return [
     'whitelist' => [
-        \Composer\Autoload\ClassLoader::class,
+        'Composer\*',
         'Safe\*',
         // PHP 8.0
         'T_NAME_QUALIFIED',
@@ -51,6 +51,11 @@ return [
         'T_MATCH',
         'T_NULLSAFE_OBJECT_OPERATOR',
         'T_ATTRIBUTE',
+        // PHP 8.1
+        'T_AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG',
+        'T_AMPERSAND_FOLLOWED_BY_VAR_OR_VARARG',
+        'T_ENUM',
+        'T_READONLY',
     ],
     'files-whitelist' => \array_map(
         static function ($file) {

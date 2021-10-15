@@ -33,16 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Mutator;
 
-use Infection\Configuration\Entry\Badge;
+use PhpParser\Node;
 
-trait BadgeAssertions
+/**
+ * @internal
+ *
+ * @implements Mutator<Node\Expr\Variable>
+ */
+final class SyntaxError implements Mutator
 {
-    private function assertBadgeStateIs(
-        Badge $badge,
-        string $expectedBranch
-    ): void {
-        $this->assertSame($expectedBranch, $badge->getBranch());
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Replaces a `$this` with `false` to produce a syntax error. Internal usage only.',
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null,
+            <<<'DIFF'
+class X {
+    function foo()
+    {
+-        $this->method();
++        $->method();
+    }
+}
+DIFF
+        );
+    }
+
+    /**
+     * @psalm-mutation-free
+     *
+     * @return iterable<Node\Expr\ConstFetch>
+     */
+    public function mutate(Node $node): iterable
+    {
+        yield new Node\Expr\ConstFetch(new Node\Name('$'));
+    }
+
+    public function canMutate(Node $node): bool
+    {
+        return $node instanceof Node\Expr\Variable && $node->name === 'this';
     }
 }

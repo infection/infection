@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Composer\InstalledVersions;
 use function count;
 use function file_exists;
 use const GLOB_ONLYDIR;
@@ -47,11 +48,14 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
+use Infection\Console\Application;
 use Infection\Console\IO;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
 use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
+use OutOfBoundsException;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\file_put_contents;
@@ -60,6 +64,7 @@ use function Safe\json_decode;
 use function Safe\json_encode;
 use function Safe\sprintf;
 use stdClass;
+use function strpos;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -178,22 +183,24 @@ final class ConfigureCommand extends BaseCommand
     ): void {
         $configObject = new stdClass();
 
+        $configObject->{'$schema'} = $this->getJsonSchemaPathOrUrl();
+
         $configObject->source = new stdClass();
 
-        if ($sourceDirs) {
+        if ($sourceDirs !== []) {
             $configObject->source->directories = $sourceDirs;
         }
 
-        if ($excludedDirs) {
+        if ($excludedDirs !== []) {
             $configObject->source->excludes = $excludedDirs;
         }
 
-        if ($phpUnitConfigPath) {
+        if ($phpUnitConfigPath !== null) {
             $configObject->phpUnit = new stdClass();
             $configObject->phpUnit->configDir = $phpUnitConfigPath;
         }
 
-        if ($phpUnitCustomExecutablePath) {
+        if ($phpUnitCustomExecutablePath !== null) {
             if (!isset($configObject->phpUnit)) {
                 $configObject->phpUnit = new stdClass();
             }
@@ -201,7 +208,7 @@ final class ConfigureCommand extends BaseCommand
             $configObject->phpUnit->customPath = $phpUnitCustomExecutablePath;
         }
 
-        if ($textLogFilePath) {
+        if ($textLogFilePath !== null) {
             $configObject->logs = new stdClass();
             $configObject->logs->text = $textLogFilePath;
         }
@@ -216,13 +223,34 @@ final class ConfigureCommand extends BaseCommand
         ];
 
         file_put_contents(
-            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
-            json_encode($configObject, JSON_PRETTY_PRINT)
+            SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
+            json_encode($configObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
     }
 
     private function abort(): void
     {
         throw new RuntimeException('Configuration generation aborted');
+    }
+
+    private function getJsonSchemaPathOrUrl(): string
+    {
+        $fileName = 'vendor/infection/infection/resources/schema.json';
+
+        if (file_exists($fileName)) {
+            return $fileName;
+        }
+
+        try {
+            $version = InstalledVersions::getPrettyVersion(Application::PACKAGE_NAME);
+
+            if ($version === null || strpos($version, 'dev-') === 0) {
+                $version = 'master';
+            }
+        } catch (OutOfBoundsException $e) {
+            $version = 'master';
+        }
+
+        return sprintf('https://raw.githubusercontent.com/infection/infection/%s/resources/schema.json', $version);
     }
 }

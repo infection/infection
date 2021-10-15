@@ -75,6 +75,11 @@ DIFF
 
         $value = $node->value + 1;
 
+        /*
+         * Parser gives us only positive numbers we have to check if parent node
+         * isn't a minus sign. If so, then means we have a negated positive number so
+         * we have to substract to it instead of adding.
+         */
         if ($parentNode instanceof Node\Expr\UnaryMinus) {
             $value = $node->value - 1;
         }
@@ -88,13 +93,16 @@ DIFF
             return false;
         }
 
-        if ($node->value === PHP_INT_MAX) {
+        $parentNode = ParentConnector::getParent($node);
+
+        // We cannot increment largest positive integer, but we can do that for a negative integer
+        if ($node->value === PHP_INT_MAX && !$parentNode instanceof Node\Expr\UnaryMinus) {
             return false;
         }
 
         if (
             $node->value === 0
-            && ($this->isPartOfComparison($node) || ParentConnector::getParent($node) instanceof Node\Expr\Assign)
+            && ($this->isPartOfComparison($node) || $parentNode instanceof Node\Expr\Assign)
         ) {
             return false;
         }

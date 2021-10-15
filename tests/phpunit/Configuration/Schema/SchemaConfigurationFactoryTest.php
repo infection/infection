@@ -368,6 +368,34 @@ JSON
             ]),
         ];
 
+        yield '[logs][badge] regex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "badge": {
+            "branch": "/^foo$/"
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    new Badge('/^foo$/')
+                ),
+            ]),
+        ];
+
         yield '[logs] nominal' => [
             <<<'JSON'
 {
@@ -403,6 +431,30 @@ JSON
         ];
 
         yield '[logs] empty strings' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "text": "",
+        "summary": "",
+        "debug": "",
+        "perMutator": "",
+        "badge": {
+            "branch": ""
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => Logs::createEmpty(),
+            ]),
+        ];
+
+        yield '[logs] empty branch match regex' => [
             <<<'JSON'
 {
     "source": {
@@ -1965,66 +2017,66 @@ JSON
                     ]),
                 ];
             })();
-        }
 
-        yield '[mutators][profile] ' . $profile . ' ignore' => (static function () use (
-            $profile
-        ): array {
-            return [
-                <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "$profile": {
-            "ignore": ["fileA", "fileB"]
+            yield '[mutators][profile] ' . $profile . ' ignore' => (static function () use (
+                $profile
+            ): array {
+                return [
+                    <<<JSON
+    {
+        "source": {
+            "directories": ["src"]
+        },
+        "mutators": {
+            "$profile": {
+                "ignore": ["fileA", "fileB"]
+            }
         }
     }
-}
-JSON
-                ,
-                self::createConfig([
-                    'source' => new Source(['src'], []),
-                    'mutators' => [
-                        $profile => (object) [
-                            'ignore' => ['fileA', 'fileB'],
-                        ],
-                    ],
-                ]),
-            ];
-        })();
-
-        yield '[mutators][profile] ' . $profile . ' ignore empty & untrimmed' => (static function () use (
-            $profile
-        ): array {
-            return [
-                <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "$profile": {
-            "ignore": [" file ", ""]
-        }
-    }
-}
-JSON
-                ,
-                self::createConfig([
-                    'source' => new Source(['src'], []),
-                    'mutators' => [
-                        $profile => (object) [
-                            'ignore' => [
-                                ' file ',
-                                '',
+    JSON
+                    ,
+                    self::createConfig([
+                        'source' => new Source(['src'], []),
+                        'mutators' => [
+                            $profile => (object) [
+                                'ignore' => ['fileA', 'fileB'],
                             ],
                         ],
-                    ],
-                ]),
-            ];
-        })();
+                    ]),
+                ];
+            })();
+
+            yield '[mutators][profile] ' . $profile . ' ignore empty & untrimmed' => (static function () use (
+                $profile
+            ): array {
+                return [
+                    <<<JSON
+    {
+        "source": {
+            "directories": ["src"]
+        },
+        "mutators": {
+            "$profile": {
+                "ignore": [" file ", ""]
+            }
+        }
+    }
+    JSON
+                    ,
+                    self::createConfig([
+                        'source' => new Source(['src'], []),
+                        'mutators' => [
+                            $profile => (object) [
+                                'ignore' => [
+                                    ' file ',
+                                    '',
+                                ],
+                            ],
+                        ],
+                    ]),
+                ];
+            })();
+        }
 
         yield '[mutators][profile] nominal' => [
             <<<JSON

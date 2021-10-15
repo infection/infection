@@ -95,12 +95,11 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_GIT_DIFF_FILTER,
             Container::DEFAULT_GIT_DIFF_BASE,
             Container::DEFAULT_USE_GITHUB_LOGGER,
-            Container::DEFAULT_USE_NOOP_MUTATORS
+            Container::DEFAULT_USE_NOOP_MUTATORS,
+            Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES
         );
 
         $traces = $newContainer->getUnionTraceProvider()->provideTraces();
-
-        $this->assertIsIterable($traces);
 
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage('Could not find any "index.xml" file in "/path/to/coverage"');
@@ -144,7 +143,8 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_GIT_DIFF_FILTER,
             Container::DEFAULT_GIT_DIFF_BASE,
             Container::DEFAULT_USE_GITHUB_LOGGER,
-            Container::DEFAULT_USE_NOOP_MUTATORS
+            Container::DEFAULT_USE_NOOP_MUTATORS,
+            Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
         );
     }
 }

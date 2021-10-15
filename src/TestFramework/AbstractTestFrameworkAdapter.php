@@ -91,7 +91,10 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         array $phpExtraArgs,
         bool $skipCoverage
     ): array {
-        return $this->getCommandLine($this->buildInitialConfigFile(), $extraOptions, $phpExtraArgs);
+        return $this->getCommandLine(
+            $phpExtraArgs,
+            $this->argumentsAndOptionsBuilder->buildForInitialTestsRun($this->buildInitialConfigFile(), $extraOptions)
+        );
     }
 
     /**
@@ -109,14 +112,17 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         string $extraOptions
     ): array {
         return $this->getCommandLine(
-            $this->buildMutationConfigFile(
-                $tests,
-                $mutantFilePath,
-                $mutationHash,
-                $mutationOriginalFilePath
-            ),
-            $extraOptions,
-            []
+            [],
+            $this->argumentsAndOptionsBuilder->buildForMutant(
+                $this->buildMutationConfigFile(
+                    $tests,
+                    $mutantFilePath,
+                    $mutationHash,
+                    $mutationOriginalFilePath
+                ),
+                $extraOptions,
+                $tests
+            )
         );
     }
 
@@ -148,26 +154,25 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
             $tests,
             $mutantFilePath,
             $mutationHash,
-            $mutationOriginalFilePath
+            $mutationOriginalFilePath,
+            $this->getVersion()
         );
     }
 
     /**
      * @param string[] $phpExtraArgs
+     * @param string[] $testFrameworkArgs
      *
      * @return string[]
      */
     private function getCommandLine(
-        string $configPath,
-        string $extraOptions,
-        array $phpExtraArgs
+        array $phpExtraArgs,
+        array $testFrameworkArgs
     ): array {
-        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
-
         return $this->commandLineBuilder->build(
             $this->testFrameworkExecutable,
             $phpExtraArgs,
-            $frameworkArgs
+            $testFrameworkArgs
         );
     }
 

@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use function array_map;
 use const DIRECTORY_SEPARATOR;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
@@ -93,13 +91,25 @@ final class PhpUnitAdapterTest extends TestCase
     }
 
     /**
-     * @dataProvider outputProvider
+     * @dataProvider passOutputProvider
      */
-    public function test_it_can_tell_the_outcome_of_the_tests_from_the_output(
+    public function test_it_can_tell_if_tests_pass_from_the_output(
         string $output,
         bool $expected
     ): void {
         $actual = $this->adapter->testsPass($output);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @dataProvider syntaxErrorOutputProvider
+     */
+    public function test_it_can_tell_if_there_is_a_syntax_error_from_the_output(
+        string $output,
+        bool $expected
+    ): void {
+        $actual = $this->adapter->isSyntaxError($output);
 
         $this->assertSame($expected, $actual);
     }
@@ -124,16 +134,6 @@ final class PhpUnitAdapterTest extends TestCase
         );
     }
 
-    public function test_it_provides_node_ignorers(): void
-    {
-        $nodeIgnorers = array_map('get_class', $this->adapter->getNodeIgnorers());
-
-        $this->assertSame(
-            [PhpUnitCodeCoverageAnnotationIgnorer::class],
-            $nodeIgnorers
-        );
-    }
-
     /**
      * @group integration
      */
@@ -141,7 +141,7 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->cliArgumentsBuilder
             ->expects($this->once())
-            ->method('build')
+            ->method('buildForInitialTestsRun')
             ->with('', '--group=default')
         ;
 
@@ -175,7 +175,7 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->cliArgumentsBuilder
             ->expects($this->once())
-            ->method('build')
+            ->method('buildForInitialTestsRun')
             ->with('', '--group=default --coverage-xml=/tmp/coverage-xml --log-junit=/tmp/infection/junit.xml')
             ->willReturn([
                 '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
@@ -227,7 +227,7 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->cliArgumentsBuilder
             ->expects($this->once())
-            ->method('build')
+            ->method('buildForInitialTestsRun')
             ->with('', '--group=default --coverage-xml=/tmp/coverage-xml --log-junit=/tmp/infection/junit.xml')
             ->willReturn([
                 '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
@@ -278,7 +278,7 @@ final class PhpUnitAdapterTest extends TestCase
         );
     }
 
-    public function outputProvider(): iterable
+    public function passOutputProvider(): iterable
     {
         yield ['OK, but incomplete, skipped, or risky tests!', true];
 
@@ -287,6 +287,15 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['FAILURES!', false];
 
         yield ['ERRORS!', false];
+
+        yield ['No tests executed!', true];
+    }
+
+    public function syntaxErrorOutputProvider(): iterable
+    {
+        yield ['OK, but incomplete, skipped, or risky tests!', false];
+
+        yield ['ParseError: syntax error, unexpected ">"', true];
     }
 
     public function memoryReportProvider(): iterable

@@ -35,18 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  *
- * @implements Mutator<Node\Expr\ArrayItem>
+ * @implements Mutator<Node\Expr\Array_>
  */
-final class Spread implements Mutator
+final class SpreadAssignment implements Mutator
 {
     use GetMutatorName;
 
@@ -54,24 +56,24 @@ final class Spread implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a spread operator in an array expression with its first element only. For example:
+Removes a spread operator in an array expression and turns it into an assignment. For example:
 
 ```php
-$x = [...$collection, 4, 5];
+$x = [...$collection];
 ```
 
 Will be mutated to:
 
 ```php
-$x = [[...$collection][0], 4, 5];
+$x = $collection;
 ```
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = [...$collection, 4, 5];
-+ $x = [[...$collection][0], 4, 5];
+- $x = [...$collection];
++ $x = $collection;
 DIFF
         );
     }
@@ -79,28 +81,27 @@ DIFF
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Expr\ArrayItem>
+     * @return iterable<Node\Expr>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\ArrayItem(
-            new Node\Expr\ArrayDimFetch(
-                new Node\Expr\Array_(
-                    [$node],
-                    $node->getAttributes() + ['kind' => Node\Expr\Array_::KIND_SHORT]
-                ),
-                new Node\Scalar\LNumber(0),
-                $node->value->getAttributes()
-            ),
-            null,
-            false,
-            $node->getAttributes(),
-            false
-        );
+        Assert::allNotNull($node->items);
+
+        yield $node->items[0]->value;
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\ArrayItem && $node->unpack;
+        if (!$node instanceof Node\Expr\Array_) {
+            return false;
+        }
+
+        if (count($node->items) !== 1) {
+            return false;
+        }
+
+        Assert::allNotNull($node->items);
+
+        return $node->items[0]->unpack;
     }
 }

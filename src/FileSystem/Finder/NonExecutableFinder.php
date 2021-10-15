@@ -55,7 +55,7 @@ final class NonExecutableFinder
     {
         $path = getenv('PATH') ?: getenv('Path');
 
-        if (!$path) {
+        if ($path === false || $path === '') {
             return null;
         }
 

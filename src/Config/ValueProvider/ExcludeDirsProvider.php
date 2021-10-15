@@ -108,7 +108,7 @@ final class ExcludeDirsProvider
             $globDirs = glob($sourceDirs[0] . '/*', GLOB_ONLYDIR);
 
             $autocompleteValues = array_map(
-                static function (string $dir) use ($sourceDirs) {
+                static function (string $dir) use ($sourceDirs): string {
                     return str_replace($sourceDirs[0] . '/', '', $dir);
                 },
                 $globDirs

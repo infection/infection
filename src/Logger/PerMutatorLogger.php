@@ -73,7 +73,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
         $calculatorPerMutator = $this->createMetricsPerMutators();
 
         $table = [
-            ['Mutator', 'Mutations', 'Killed', 'Escaped', 'Errors', 'Timed Out', 'Skipped', 'MSI (%s)', 'Covered MSI (%s)'],
+            ['Mutator', 'Mutations', 'Killed', 'Escaped', 'Errors', 'Syntax Errors', 'Timed Out', 'Skipped', 'MSI (%s)', 'Covered MSI (%s)'],
         ];
 
         foreach ($calculatorPerMutator as $mutatorName => $calculator) {
@@ -85,6 +85,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
                 (string) $calculator->getKilledCount(),
                 (string) $calculator->getEscapedCount(),
                 (string) $calculator->getErrorCount(),
+                (string) $calculator->getSyntaxErrorCount(),
                 (string) $calculator->getTimedOutCount(),
                 (string) $calculator->getSkippedCount(),
                 self::formatScore($calculator->getMutationScoreIndicator()),
@@ -145,7 +146,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
 
         foreach ($table as $row) {
             foreach ($row as $columnNumber => $cell) {
-                $sizes[$columnNumber] = (int) max($sizes[$columnNumber], strlen($cell));
+                $sizes[$columnNumber] = max($sizes[$columnNumber], strlen($cell));
             }
         }
 
@@ -159,8 +160,6 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
 
     /**
      * @param int[] $columnSizes
-     *
-     * @var int[]
      */
     private static function createSeparatorRow(array $columnSizes): string
     {
@@ -178,11 +177,11 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
      */
     private function createMetricsPerMutators(): array
     {
-        $executionResults = $this->resultsCollector->getAllExecutionResults();
+        $allExecutionResults = $this->resultsCollector->getAllExecutionResults();
 
         $processPerMutator = [];
 
-        foreach ($executionResults as $executionResult) {
+        foreach ($allExecutionResults as $executionResult) {
             $mutatorName = $executionResult->getMutatorName();
             $processPerMutator[$mutatorName][] = $executionResult;
         }

@@ -110,14 +110,16 @@ final class Engine
         $this->runInitialTestSuite();
         $this->runMutationAnalysis();
 
-        $this->minMsiChecker->checkMetrics(
-            $this->metricsCalculator->getTestedMutantsCount(),
-            $this->metricsCalculator->getMutationScoreIndicator(),
-            $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
-            $this->consoleOutput
-        );
-
-        $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
+        try {
+            $this->minMsiChecker->checkMetrics(
+                $this->metricsCalculator->getTestedMutantsCount(),
+                $this->metricsCalculator->getMutationScoreIndicator(),
+                $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
+                $this->consoleOutput
+            );
+        } finally {
+            $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
+        }
     }
 
     private function runInitialTestSuite(): void

@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use function getenv;
 use function Infection\Tests\make_tmp_dir;
 use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\TestCase;
 use function Safe\getcwd;
 use function Safe\realpath;
+use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
@@ -50,15 +52,9 @@ abstract class FileSystemTestCase extends TestCase
 {
     private const TMP_DIR_NAME = 'infection-test';
 
-    /**
-     * @var string
-     */
-    protected $cwd;
+    protected string $cwd = '';
 
-    /**
-     * @var string
-     */
-    protected $tmp;
+    protected string $tmp = '';
 
     public static function tearDownAfterClass(): void
     {
@@ -84,9 +80,16 @@ abstract class FileSystemTestCase extends TestCase
 
     final protected static function removeTmpDir(): void
     {
+        $testToken = getenv('TEST_TOKEN');
+
         (new Filesystem())->remove(
             normalizePath(
-                realpath(sys_get_temp_dir()) . '/' . self::TMP_DIR_NAME
+                sprintf(
+                    '%s/%s/%s',
+                    realpath(sys_get_temp_dir()),
+                    self::TMP_DIR_NAME,
+                    $testToken === false || $testToken === '' ? '1' : $testToken
+                )
             )
         );
     }

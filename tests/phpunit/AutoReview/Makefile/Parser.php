@@ -63,7 +63,7 @@ final class Parser
 
         foreach (explode(PHP_EOL, $makeFileContents) as $line) {
             if (strpos($line, "\t") === 0
-                || preg_match('/^\S+=.+$/u', $line)) {
+                || preg_match('/^\S+=.+$/u', $line) === 1) {
                 continue;
             }
 

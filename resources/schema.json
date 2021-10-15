@@ -6,6 +6,9 @@
         "source"
     ],
     "properties": {
+        "$schema": {
+            "type": "string"
+        },
         "timeout": {
             "type": "number",
             "description": "The allowed timeout in seconds.",
@@ -65,12 +68,22 @@
                 },
                 "badge": {
                     "type": "object",
+                    "description": "Mutation score badge for your GitHub project. If provided, infection will report results for maching branches to an upstream reporting dashboard/collector.",
                     "additionalProperties": false,
                     "required": ["branch"],
                     "properties": {
                         "branch": {
                             "type": "string",
-                            "description": "Mutation score badge for your GitHub project."
+                            "description": "Mutation score badge for your GitHub project. If this value starts and ends with \"/\", it will be considered a regular expression.",
+                            "exaples": [
+                                "main",
+                                "master",
+                                "develop",
+                                "latest",
+                                "/1\\.\\d+/",
+                                "/release-.*/",
+                                "/feature\\/.*/"
+                            ]
                         }
                     }
                 },
@@ -323,7 +336,10 @@
                 "NewObject": { "$ref": "#/definitions/default-mutator-config" },
                 "This": { "$ref": "#/definitions/default-mutator-config" },
                 "Spaceship": { "$ref": "#/definitions/default-mutator-config" },
-                "Spread": { "$ref": "#/definitions/default-mutator-config" },
+                "SpreadOneItem": { "$ref": "#/definitions/default-mutator-config" },
+                "SpreadAssignment": { "$ref": "#/definitions/default-mutator-config" },
+                "SpreadRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "SyntaxError": { "$ref": "#/definitions/default-mutator-config" },
                 "Foreach_": { "$ref": "#/definitions/default-mutator-config" },
                 "For_": { "$ref": "#/definitions/default-mutator-config" },
                 "DoWhile": { "$ref": "#/definitions/default-mutator-config" },

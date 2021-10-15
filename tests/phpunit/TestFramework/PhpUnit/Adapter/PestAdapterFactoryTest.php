@@ -33,27 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use PhpParser\Node;
-use PhpParser\Node\Stmt;
-use function strpos;
+use Infection\TestFramework\PhpUnit\Adapter\PestAdapterFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @internal
+ * @group integration
  */
-final class PhpUnitCodeCoverageAnnotationIgnorer implements NodeIgnorer
+final class PestAdapterFactoryTest extends TestCase
 {
-    public function ignores(Node $node): bool
+    public function test_it_can_create_an_adapter(): void
     {
-        if (!$node instanceof Stmt\ClassLike && !$node instanceof Stmt\ClassMethod) {
-            return false;
-        }
+        $adapter = PestAdapterFactory::create(
+            '/path/to/pest',
+            '/tmp',
+            __DIR__ . '/../../../Fixtures/Files/phpunit/phpunit.xml',
+            '/path/to/config-dir',
+            '/path/to/junit.xml',
+            '/path/to/project',
+            [],
+            true
+        );
 
-        $docComment = $node->getDocComment();
+        $this->assertSame('Pest', $adapter->getName());
+    }
 
-        return $docComment !== null
-            && strpos($docComment->getText(), '@codeCoverageIgnore') !== false
-        ;
+    public function test_it_has_a_name(): void
+    {
+        $this->assertSame('pest', PestAdapterFactory::getAdapterName());
+    }
+
+    public function test_it_has_an_executable(): void
+    {
+        $this->assertSame('pest', PestAdapterFactory::getExecutableName());
     }
 }

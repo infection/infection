@@ -35,18 +35,32 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
+use function array_key_exists;
 use function array_map;
 use function array_merge;
+use function count;
+use function end;
 use function explode;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function ltrim;
+use function preg_quote;
+use function rtrim;
+use function Safe\sprintf;
 
 /**
  * @internal
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    public function build(string $configPath, string $extraOptions): array
+    private bool $executeOnlyCoveringTestCases;
+
+    public function __construct(bool $executeOnlyCoveringTestCases)
+    {
+        $this->executeOnlyCoveringTestCases = $executeOnlyCoveringTestCases;
+    }
+
+    public function buildForInitialTestsRun(string $configPath, string $extraOptions): array
     {
         $options = [
             '--configuration',
@@ -60,6 +74,45 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
                     return '--' . $option;
                 }, explode(' --', ltrim($extraOptions, '-')))
             );
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param TestLocation[] $tests
+     */
+    public function buildForMutant(string $configPath, string $extraOptions, array $tests): array
+    {
+        $options = $this->buildForInitialTestsRun($configPath, $extraOptions);
+
+        if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
+            $filterString = '/';
+            $usedTestCases = [];
+
+            foreach ($tests as $testLocation) {
+                $testCaseString = $testLocation->getMethod();
+
+                $partsDelimitedByColons = explode('::', $testCaseString, 2);
+
+                if (count($partsDelimitedByColons) > 1) {
+                    $parts = explode('\\', $partsDelimitedByColons[0]);
+                    $testCaseString = sprintf('%s::%s', end($parts), $partsDelimitedByColons[1]);
+                }
+
+                if (array_key_exists($testCaseString, $usedTestCases)) {
+                    continue;
+                }
+
+                $usedTestCases[$testCaseString] = true;
+
+                $filterString .= preg_quote($testCaseString, '/') . '|';
+            }
+
+            $filterString = rtrim($filterString, '|') . '/';
+
+            $options[] = '--filter';
+            $options[] = $filterString;
         }
 
         return $options;

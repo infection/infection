@@ -87,6 +87,7 @@ class Configuration
     private bool $dryRun;
     /** @var array<string, array<int, string>> */
     private array $ignoreSourceCodeMutatorsMap;
+    private bool $executeOnlyCoveringTestCases;
 
     /**
      * @param string[] $sourceDirectories
@@ -123,7 +124,8 @@ class Configuration
         int $msiPrecision,
         int $threadCount,
         bool $dryRun,
-        array $ignoreSourceCodeMutatorsMap
+        array $ignoreSourceCodeMutatorsMap,
+        bool $executeOnlyCoveringTestCases
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
@@ -161,6 +163,7 @@ class Configuration
         $this->threadCount = $threadCount;
         $this->dryRun = $dryRun;
         $this->ignoreSourceCodeMutatorsMap = $ignoreSourceCodeMutatorsMap;
+        $this->executeOnlyCoveringTestCases = $executeOnlyCoveringTestCases;
     }
 
     public function getProcessTimeout(): float
@@ -316,5 +319,10 @@ class Configuration
     public function getIgnoreSourceCodeMutatorsMap(): array
     {
         return $this->ignoreSourceCodeMutatorsMap;
+    }
+
+    public function getExecuteOnlyCoveringTestCases(): bool
+    {
+        return $this->executeOnlyCoveringTestCases;
     }
 }

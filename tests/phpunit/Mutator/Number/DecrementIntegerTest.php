@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Number;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use const PHP_INT_MAX;
 use const PHP_INT_MIN;
 
 final class DecrementIntegerTest extends BaseMutatorTestCase
@@ -280,7 +281,7 @@ PHP
             ,
         ];
 
-        yield 'It increments a negative integer' => [
+        yield 'It decrements a negative integer' => [
             <<<'PHP'
 <?php
 
@@ -518,6 +519,18 @@ if (1 === {$minInt}) {
     echo 'bar';
 }
 PHP
+        ];
+
+        $maxInt = PHP_INT_MAX;
+
+        yield 'It does not decrement max int negative to avoid parser bugs' => [
+            <<<"PHP"
+            <?php
+
+            if (1 === -{$maxInt}) {
+                echo 'bar';
+            }
+            PHP,
         ];
     }
 }

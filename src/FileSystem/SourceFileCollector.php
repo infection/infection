@@ -56,7 +56,7 @@ class SourceFileCollector
         array $excludeDirectories
     ): iterable {
         if ($sourceDirectories === []) {
-            return;
+            return [];
         }
 
         $finder = Finder::create()
@@ -70,7 +70,6 @@ class SourceFileCollector
             $finder->notPath($excludeDirectory);
         }
 
-        // Generator here to make sure these files used only once
-        yield from $finder;
+        return $finder;
     }
 }

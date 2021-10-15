@@ -108,6 +108,14 @@ class ResultsCollector implements Collector
     /**
      * @return MutantExecutionResult[]
      */
+    public function getSyntaxErrorExecutionResults(): array
+    {
+        return $this->getResultListForStatus(DetectionStatus::SYNTAX_ERROR)->getSortedExecutionResults();
+    }
+
+    /**
+     * @return MutantExecutionResult[]
+     */
     public function getSkippedExecutionResults(): array
     {
         return $this->getResultListForStatus(DetectionStatus::SKIPPED)->getSortedExecutionResults();

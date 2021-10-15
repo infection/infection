@@ -58,6 +58,10 @@ abstract class AbstractUnwrapMutator implements Mutator
     final public function mutate(Node $node): iterable
     {
         foreach ($this->getParameterIndexes($node) as $index) {
+            if ($node->args[$index] instanceof Node\VariadicPlaceholder) {
+                continue;
+            }
+
             if ($node->args[$index]->unpack) {
                 continue;
             }

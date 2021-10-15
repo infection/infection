@@ -85,7 +85,8 @@ class MutationConfigBuilder extends ConfigBuilder
         array $tests,
         string $mutantFilePath,
         string $mutationHash,
-        string $mutationOriginalFilePath
+        string $mutationOriginalFilePath,
+        string $version
     ): string {
         $dom = $this->getDom();
         $xPath = new SafeDOMXPath($dom);
@@ -98,9 +99,10 @@ class MutationConfigBuilder extends ConfigBuilder
             $originalBootstrapFile = $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
         }
 
+        // activate PHPUnit's result cache and order tests by running defects first, then sorted by fastest first
+        $this->configManipulator->handleResultCacheAndExecutionOrder($version, $xPath, $mutationHash);
         $this->configManipulator->setStopOnFailure($xPath);
         $this->configManipulator->deactivateColours($xPath);
-        $this->configManipulator->deactivateResultCaching($xPath);
         $this->configManipulator->deactivateStderrRedirection($xPath);
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
@@ -184,7 +186,7 @@ PHP
     {
         $bootstrap = $xPath->query('/phpunit/@bootstrap');
 
-        if ($bootstrap->length) {
+        if ($bootstrap->length > 0) {
             $bootstrap[0]->nodeValue = $customAutoloadFilePath;
         } else {
             $node = $xPath->query('/phpunit')[0];
@@ -241,7 +243,7 @@ PHP
         $nodeToAppendTestSuite = $testSuites->item(0);
 
         // If there is no `testsuites` node, append to root
-        if (!$nodeToAppendTestSuite) {
+        if ($nodeToAppendTestSuite === null) {
             $nodeToAppendTestSuite = $xPath->query('/phpunit')->item(0);
         }
 
@@ -265,7 +267,7 @@ PHP
     {
         $bootstrap = $xPath->query('/phpunit/@bootstrap');
 
-        if ($bootstrap->length) {
+        if ($bootstrap->length > 0) {
             return $bootstrap[0]->nodeValue;
         }
 

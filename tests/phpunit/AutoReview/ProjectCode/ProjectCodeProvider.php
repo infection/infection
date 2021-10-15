@@ -171,12 +171,12 @@ final class ProjectCodeProvider
         ;
 
         $classes = array_map(
-            static function (SplFileInfo $file) {
+            static function (SplFileInfo $file): string {
                 return sprintf(
                     '%s\\%s%s%s',
                     'Infection',
                     str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
-                    $file->getRelativePath() ? '\\' : '',
+                    $file->getRelativePath() !== '' ? '\\' : '',
                     $file->getBasename('.' . $file->getExtension())
                 );
             },
@@ -274,7 +274,7 @@ final class ProjectCodeProvider
         ;
 
         $classes = array_map(
-            static function (SplFileInfo $file) {
+            static function (SplFileInfo $file): string {
                 $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
                 $fqcnPart = str_replace(DIRECTORY_SEPARATOR, '\\', $fqcnPart);
 

@@ -37,10 +37,9 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class SpreadTest extends BaseMutatorTestCase
+final class SpreadRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @requires PHP >= 7.4
      * @dataProvider mutationsProvider
      *
      * @param string|string[] $expected
@@ -52,7 +51,7 @@ final class SpreadTest extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield 'Spread for a raw array' => [
+        yield 'Spread removal for a raw array' => [
             <<<'PHP'
 <?php
 
@@ -62,12 +61,12 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [[...[1, 2, 3]][0], 4];
+$a = [[1, 2, 3], 4];
 PHP
             ,
         ];
 
-        yield 'Spread for a variable' => [
+        yield 'Spread removal for a variable' => [
             <<<'PHP'
 <?php
 
@@ -77,12 +76,12 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [[...$collection][0], 4];
+$a = [$collection, 4];
 PHP
             ,
         ];
 
-        yield 'Spread for a function call' => [
+        yield 'Spread removal for a function call' => [
             <<<'PHP'
 <?php
 
@@ -92,12 +91,12 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [[...getCollection()][0], 4];
+$a = [getCollection(), 4];
 PHP
             ,
         ];
 
-        yield 'Spread for a method call' => [
+        yield 'Spread removal for a method call' => [
             <<<'PHP'
 <?php
 
@@ -107,12 +106,12 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [[...$object->getCollection()][0], 4];
+$a = [$object->getCollection(), 4];
 PHP
             ,
         ];
 
-        yield 'Spread for a new iterator object' => [
+        yield 'Spread removal for a new iterator object' => [
             <<<'PHP'
 <?php
 
@@ -122,7 +121,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [[...new ArrayIterator(['a', 'b', 'c'])][0]];
+$a = [new ArrayIterator(['a', 'b', 'c'])];
 PHP
             ,
         ];

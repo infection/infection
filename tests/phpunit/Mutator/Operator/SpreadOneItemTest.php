@@ -33,129 +33,106 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\Mutator\Operator;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class PhpUnitCodeCoverageAnnotationIgnorerTest extends BaseNodeIgnorerTestCase
+final class SpreadOneItemTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider provideIgnoreCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_it_ignores_the_right_nodes(string $code, int $count): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $spy = $this->createSpy();
-
-        $this->parseAndTraverse($code, $spy);
-
-        $this->assertSame($count, $spy->nodeCounter);
+        $this->doTest($input, $expected);
     }
 
-    public function provideIgnoreCases(): iterable
+    public function mutationsProvider(): iterable
     {
-        yield 'classes with annotation are ignored' => [
+        yield 'Spread one item for a raw array' => [
             <<<'PHP'
 <?php
 
-/**
- * @codeCoverageIgnore
- */
-class IgnoredClass
-{
-    public function foo()
-    {
-        $ignored = true;
-    }
-}
+$a = [...[1, 2, 3], 4];
 PHP
             ,
-            0,
-        ];
-
-        yield 'method with annotations are ignored' => [
             <<<'PHP'
 <?php
 
-class IgnoredClass
-{
-    /**
-     * @codeCoverageIgnore
-     */
-    public function foo()
-    {
-        $ignored = true;
-    }
-
-    public function bar(): void
-    {
-        $counted = 1;
-    }
-
-}
+$a = [[...[1, 2, 3]][0], 4];
 PHP
             ,
-            1,
         ];
 
-        yield 'methods without comments are not ignored' => [
+        yield 'Spread one item for a variable' => [
             <<<'PHP'
 <?php
 
-class IgnoredClass
-{
-    public function foo($counted)
-    {
-        $counted = true;
-    }
-}
+$a = [...$collection, 4];
 PHP
             ,
-            2,
-        ];
-
-        yield 'classes without ignore annotation are not ignored' => [
             <<<'PHP'
 <?php
 
-/**
- * A comment, but not one that ignores
- */
-class Foo
-{
-    public function bar($counted)
-    {
-        $counted = 2;
-    }
-}
+$a = [[...$collection][0], 4];
 PHP
             ,
-            2,
         ];
 
-        yield 'methods without ignore annotation are not ignored' => [
+        yield 'Spread one item for a function call' => [
             <<<'PHP'
 <?php
 
-
-class Foo
-{
-    /**
-     * A comment, but not one that ignores
-     */
-    public function bar($counted)
-    {
-        $counted = 2;
-    }
-}
+$a = [...getCollection(), 4];
 PHP
             ,
-            2,
-        ];
-    }
+            <<<'PHP'
+<?php
 
-    protected function getIgnore(): NodeIgnorer
-    {
-        return new PhpUnitCodeCoverageAnnotationIgnorer();
+$a = [[...getCollection()][0], 4];
+PHP
+            ,
+        ];
+
+        yield 'Spread one item for a method call' => [
+            <<<'PHP'
+<?php
+
+$a = [...$object->getCollection(), 4];
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = [[...$object->getCollection()][0], 4];
+PHP
+            ,
+        ];
+
+        yield 'Spread one item for a new iterator object' => [
+            <<<'PHP'
+<?php
+
+$a = [...new ArrayIterator(['a', 'b', 'c'])];
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = [[...new ArrayIterator(['a', 'b', 'c'])][0]];
+PHP
+            ,
+        ];
+
+        yield 'It does not mutate argument unpacking' => [
+            <<<'PHP'
+<?php
+
+function foo(...$array) {}
+PHP
+            ,
+        ];
     }
 }

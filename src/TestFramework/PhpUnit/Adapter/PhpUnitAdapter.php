@@ -37,14 +37,13 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function escapeshellarg;
 use Infection\AbstractTestFramework\MemoryUsageAware;
+use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\VersionParser;
 use function Safe\preg_match;
@@ -56,7 +55,7 @@ use function version_compare;
  * @internal
  * @final
  */
-class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditionalNodes, MemoryUsageAware, ProvidesInitialRunOnlyOptions
+class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
@@ -121,29 +120,37 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
 
     public function testsPass(string $output): bool
     {
-        if (preg_match('/failures!/i', $output)) {
+        if (preg_match('/failures!/i', $output) === 1) {
             return false;
         }
 
-        if (preg_match('/errors!/i', $output)) {
+        if (preg_match('/errors!/i', $output) === 1) {
             return false;
         }
 
         // OK (XX tests, YY assertions)
-        $isOk = preg_match('/OK\s\(/', $output);
+        $isOk = preg_match('/OK\s\(/', $output) === 1;
 
         // "OK, but incomplete, skipped, or risky tests!"
-        $isOkWithInfo = preg_match('/OK\s?,/', $output);
+        $isOkWithInfo = preg_match('/OK\s?,/', $output) === 1;
 
         // "Warnings!" - e.g. when deprecated functions are used, but tests pass
-        $isWarning = preg_match('/warnings!/i', $output);
+        $isWarning = preg_match('/warnings!/i', $output) === 1;
 
-        return $isOk || $isOkWithInfo || $isWarning;
+        // "No tests executed!" - e.g. when --filter option contains too large regular expression
+        $isNoTestsExecuted = preg_match('/No tests executed!/i', $output) === 1;
+
+        return $isOk || $isOkWithInfo || $isWarning || $isNoTestsExecuted;
+    }
+
+    public function isSyntaxError(string $output): bool
+    {
+        return preg_match('/ParseError: syntax error/i', $output) === 1;
     }
 
     public function getMemoryUsed(string $output): float
     {
-        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match)) {
+        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
             return (float) $match[1];
         }
 
@@ -170,11 +177,6 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
         }
 
         return $recommendations;
-    }
-
-    public function getNodeIgnorers(): array
-    {
-        return [new PhpUnitCodeCoverageAnnotationIgnorer()];
     }
 
     /**

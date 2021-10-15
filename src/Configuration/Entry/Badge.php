@@ -35,20 +35,46 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Entry;
 
+use InvalidArgumentException;
+use function preg_quote;
+use Safe\Exceptions\PcreException;
+use function Safe\preg_match;
+use function Safe\sprintf;
+
 /**
  * @internal
  */
 final class Badge
 {
-    private string $branch;
+    private string $branchMatch;
 
+    /**
+     * @throws InvalidArgumentException when the provided $branch looks like a regular expression, but is not a valid one
+     */
     public function __construct(string $branch)
     {
-        $this->branch = $branch;
+        if (preg_match('#^/.+/$#', $branch) === 0) {
+            $this->branchMatch = '/^' . preg_quote($branch, '/') . '$/';
+
+            return;
+        }
+
+        try {
+            // Yes, the `@` is intentional. For some reason, `thecodingmachine/safe` does not suppress the warnings here
+            @preg_match($branch, '');
+        } catch (PcreException $invalidRegex) {
+            throw new InvalidArgumentException(
+                sprintf('Provided branchMatchRegex "%s" is not a valid regex', $branch),
+                0,
+                $invalidRegex
+            );
+        }
+
+        $this->branchMatch = $branch;
     }
 
-    public function getBranch(): string
+    public function applicableForBranch(string $branchName): bool
     {
-        return $this->branch;
+        return preg_match($this->branchMatch, $branchName) === 1;
     }
 }

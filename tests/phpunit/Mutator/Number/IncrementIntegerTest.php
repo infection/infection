@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\Number;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use const PHP_INT_MAX;
+use const PHP_INT_MIN;
 
 final class IncrementIntegerTest extends BaseMutatorTestCase
 {
@@ -257,6 +258,28 @@ PHP
 
 random_int(10000001, {$maxInt});
 PHP
+        ];
+
+        $minIntPlus1 = PHP_INT_MIN + 1;
+        $minIntPlus2 = $minIntPlus1 + 1;
+
+        yield 'It increments min int plus one, up to value of -PHP_INT_MAX' => [
+            <<<"PHP"
+            <?php
+
+            if (\$foo === {$minIntPlus1}) {
+                echo 'bar';
+            }
+            PHP
+            ,
+            <<<"PHP"
+            <?php
+
+            if (\$foo === {$minIntPlus2}) {
+                echo 'bar';
+            }
+            PHP
+            ,
         ];
     }
 }
