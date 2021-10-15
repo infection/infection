@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\CoveredPhpProcess;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\OriginalPhpProcess;
 use const PHP_OS_FAMILY;
@@ -87,7 +86,6 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
 
         $this->assertNull($process->getTimeout());
         $this->assertNotInstanceOf(OriginalPhpProcess::class, $process);
-        $this->assertInstanceOf(CoveredPhpProcess::class, $process);
     }
 
     public function test_it_creates_a_process_with_coverage(): void
