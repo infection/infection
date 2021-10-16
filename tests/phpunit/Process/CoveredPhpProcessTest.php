@@ -61,12 +61,14 @@ final class CoveredPhpProcessTest extends TestCase
     public function test_it_injects_xdebug_env_vars(): void
     {
         $process = new CoveredPhpProcess(['env']);
-        $process->run();
+        $process->run(null, ['TESTING' => 'test']);
 
         if (XdebugHandler::getSkippedVersion() !== '') {
             $this->assertStringContainsString('XDEBUG_MODE=coverage', $process->getOutput());
         } else {
             $this->assertStringNotContainsString('XDEBUG_MODE=coverage', $process->getOutput());
         }
+
+        $this->assertStringContainsString('TESTING=test', $process->getOutput());
     }
 }
