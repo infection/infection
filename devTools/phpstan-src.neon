@@ -52,7 +52,10 @@ parameters:
             path: '../src/FileSystem/DummyFileSystem.php'
             message: '#Infection\\FileSystem\\DummyFileSystem#'
         -
-            path: '../src/Process/CoveredPhpProcess.php'
+            path: '../src/Process/OriginalPhpProcess.php'
+            message: '#Function ini_get is unsafe to use#'
+        -
+            path: '../src/TestFramework/Coverage/CoverageChecker.php'
             message: '#Function ini_get is unsafe to use#'
     level: max
     paths:

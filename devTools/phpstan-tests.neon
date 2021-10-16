@@ -28,7 +28,7 @@ parameters:
             path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
         -
             message: '#Function ini_get is unsafe to use#'
-            path: ../tests/phpunit/Process/CoveredPhpProcessTest.php
+            path: ../tests/phpunit/Process/OriginalPhpProcessTest.php
     level: 4
     paths:
         - ../tests/phpunit
