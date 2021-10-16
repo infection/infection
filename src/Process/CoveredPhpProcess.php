@@ -33,58 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Factory;
+namespace Infection\Process;
 
-use Composer\InstalledVersions;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\CoveredPhpProcess;
-use Infection\Process\OriginalPhpProcess;
-use function method_exists;
+use function array_merge;
+use function extension_loaded;
 use Symfony\Component\Process\Process;
-use function version_compare;
 
 /**
  * @internal
- * @final
+ *
+ * Process which setups necessary environment variables to make coverage reporting happen
+ * without any extra user interaction.
+ *
+ * As of now we only cover Xdebug, adding XDEBUG_MODE environment variable to ensure it
+ * is properly activated. Since we can't know if Xdebug was offloaded, we add this env
+ * variable at most times, except when there's PCOV loaded: chances are Xdebug is not
+ * required when PCOV already used for coverage.
  */
-class InitialTestsRunProcessFactory
+final class CoveredPhpProcess extends Process
 {
-    private TestFrameworkAdapter $testFrameworkAdapter;
-
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
-    {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-    }
-
     /**
-     * Creates process with enabled debugger as test framework is going to use in the code coverage.
-     *
-     * @param string[] $phpExtraOptions
+     * @param array<string|bool>|null $env
      */
-    public function createProcess(
-        string $testFrameworkExtraOptions,
-        array $phpExtraOptions,
-        bool $skipCoverage
-    ): Process {
-        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processClass = $skipCoverage ? CoveredPhpProcess::class : OriginalPhpProcess::class;
-
-        /** @var Process $process */
-        $process = new $processClass(
-            $this->testFrameworkAdapter->getInitialTestRunCommandLine(
-                $testFrameworkExtraOptions,
-                $phpExtraOptions,
-                $skipCoverage
-            )
-        );
-
-        $process->setTimeout(null); // Ignore the default timeout of 60 seconds
-
-        if (method_exists($process, 'inheritEnvironmentVariables') && version_compare((string) InstalledVersions::getVersion('symfony/console'), 'v4.4', '<')) {
-            // In version 4.4.0 this method is deprecated and removed in 5.0.0
-            $process->inheritEnvironmentVariables();
+    public function start(?callable $callback = null, ?array $env = null): void
+    {
+        if (!extension_loaded('pcov')) {
+            $env = array_merge($env ?? [], [
+                'XDEBUG_MODE' => 'coverage',
+            ]);
         }
 
-        return $process;
+        parent::start($callback, $env ?? []);
     }
 }
