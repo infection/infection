@@ -39,7 +39,6 @@ use function array_merge;
 use function basename;
 use Composer\Autoload\ClassLoader;
 use const DIRECTORY_SEPARATOR;
-use ErrorException;
 use function extension_loaded;
 use function file_exists;
 use function function_exists;
@@ -332,12 +331,8 @@ final class E2ETest extends TestCase
             $this->markTestSkipped("Infection from within PHPUnit won't run without Xdebug or PHPDBG");
         }
 
-        try {
-            if (extension_loaded('xdebug') && ini_get('xdebug.mode') === '') {
-                $this->markTestSkipped("Infection from within PHPUnit won't run without exabled Xdebug");
-            }
-        } catch (ErrorException $e) {
-            // Xdebug 2
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test can be unstable on Windows');
         }
 
         /*
