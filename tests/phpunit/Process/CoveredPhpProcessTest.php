@@ -37,9 +37,9 @@ namespace Infection\Tests\Process;
 
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Process\CoveredPhpProcess;
+use function ini_get as ini_get_unsafe;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
-use function ini_get as ini_get_unsafe;
 
 final class CoveredPhpProcessTest extends TestCase
 {

@@ -58,7 +58,6 @@ final class CoveredPhpProcess extends Process
      */
     public function start(?callable $callback = null, ?array $env = null): void
     {
-
         if (
             XdebugHandler::getSkippedVersion() !== '' ||
             // Any other value but false means Xdebug 3 is loaded. Xdebug 2 didn't have
