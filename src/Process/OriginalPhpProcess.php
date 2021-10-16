@@ -70,6 +70,9 @@ final class OriginalPhpProcess extends Process
             // it too, but it has coverage enabled at all times.
             ini_get_unsafe('xdebug.mode') !== false
         ) {
+            // Why going through all the trouble above? We don't want to enable
+            // Xdebug when there are more compelling choices. In the end the user is
+            // still in control: they can provide XDEBUG_MODE=coverage on their own.
             $env = array_merge($env ?? [], [
                 'XDEBUG_MODE' => 'coverage',
             ]);
