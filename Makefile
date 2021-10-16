@@ -31,11 +31,10 @@ PARATEST=vendor/bin/paratest --runner=WrapperRunner
 
 INFECTION=./build/infection.phar
 
-DOCKER_RUN=docker run --tty --rm --volume "$$PWD":/opt/infection --workdir /opt/infection
-DOCKER_RUN_74=$(FLOCK) devTools/*php74*.json $(DOCKER_RUN) infection_php74
-DOCKER_RUN_74_IMAGE=devTools/Dockerfile-php74-xdebug.json
-DOCKER_RUN_80=$(FLOCK) devTools/*php80*.json $(DOCKER_RUN) infection_php80
-DOCKER_RUN_80_IMAGE=devTools/Dockerfile-php80-xdebug.json
+DOCKER_RUN=docker-compose run
+DOCKER_RUN_74=$(DOCKER_RUN) php74 $(FLOCK) Makefile
+DOCKER_RUN_80=$(DOCKER_RUN) php80 $(FLOCK) Makefile
+DOCKER_FILE_IMAGE=devTools/Dockerfile.json
 
 FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
@@ -57,7 +56,7 @@ compile: $(INFECTION)
 
 .PHONY: compile-docker
 compile-docker:	 	## Bundles Infection into a PHAR using docker
-compile-docker: $(DOCKER_RUN_74_IMAGE)
+compile-docker: $(DOCKER_FILE_IMAGE)
 	$(DOCKER_RUN_74) make compile
 
 .PHONY: check_trailing_whitespaces
@@ -144,11 +143,11 @@ test-unit-docker:	## Runs the unit tests on the different Docker platforms
 test-unit-docker: test-unit-74-docker test-unit-80-docker
 
 .PHONY: test-unit-74-docker
-test-unit-74-docker: $(DOCKER_RUN_74_IMAGE) $(PHPUNIT)
+test-unit-74-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_74) $(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-unit-80-docker
-test-unit-80-docker: $(DOCKER_RUN_80_IMAGE) $(PHPUNIT)
+test-unit-80-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_80) $(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-e2e
@@ -169,12 +168,12 @@ test-e2e-docker: test-e2e-phpdbg-docker test-e2e-xdebug-docker
 test-e2e-phpdbg-docker: test-e2e-phpdbg-74-docker test-e2e-phpdbg-80-docker
 
 .PHONY: test-e2e-phpdbg-74-docker
-test-e2e-phpdbg-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
+test-e2e-phpdbg-74-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_74) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 	$(DOCKER_RUN_74) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-phpdbg-80-docker
-test-e2e-phpdbg-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
+test-e2e-phpdbg-80-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_80) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 	$(DOCKER_RUN_80) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
@@ -182,12 +181,12 @@ test-e2e-phpdbg-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
 test-e2e-xdebug-docker: test-e2e-xdebug-74-docker test-e2e-xdebug-80-docker
 
 .PHONY: test-e2e-xdebug-74-docker
-test-e2e-xdebug-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
+test-e2e-xdebug-74-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_74) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 	$(DOCKER_RUN_74) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-xdebug-80-docker
-test-e2e-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
+test-e2e-xdebug-80-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_80) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 	$(DOCKER_RUN_80) ./tests/e2e_tests $(INFECTION)
 
@@ -204,22 +203,22 @@ test-infection-docker: test-infection-phpdbg-docker test-infection-xdebug-docker
 test-infection-phpdbg-docker: test-infection-phpdbg-74-docker test-infection-phpdbg-80-docker
 
 .PHONY: test-infection-phpdbg-74-docker
-test-infection-phpdbg-74-docker: $(DOCKER_RUN_74_IMAGE)
+test-infection-phpdbg-74-docker: $(DOCKER_FILE_IMAGE)
 	$(DOCKER_RUN_74) phpdbg -qrr bin/infection --threads=4
 
 .PHONY: test-infection-phpdbg-80-docker
-test-infection-phpdbg-80-docker: $(DOCKER_RUN_80_IMAGE)
+test-infection-phpdbg-80-docker: $(DOCKER_FILE_IMAGE)
 	$(DOCKER_RUN_80) phpdbg -qrr bin/infection --threads=4
 
 .PHONY: test-infection-xdebug-docker
 test-infection-xdebug-docker: test-infection-xdebug-74-docker test-infection-xdebug-80-docker
 
 .PHONY: test-infection-xdebug-74-docker
-test-infection-xdebug-74-docker: $(DOCKER_RUN_74_IMAGE)
+test-infection-xdebug-74-docker: $(DOCKER_FILE_IMAGE)
 	$(DOCKER_RUN_74) ./bin/infection --threads=4
 
 .PHONY: test-infection-xdebug-80-docker
-test-infection-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE)
+test-infection-xdebug-80-docker: $(DOCKER_FILE_IMAGE)
 	$(DOCKER_RUN_80) ./bin/infection --threads=4
 
 #
@@ -266,14 +265,8 @@ phpunit.xml.dist:
 	# Not updating phpunit.xml with:
 	# phpunit --migrate-configuration || true
 
-$(DOCKER_RUN_74_IMAGE): devTools/Dockerfile-php74-xdebug
-	docker build --tag infection_php74 --file devTools/Dockerfile-php74-xdebug .
-	docker image inspect infection_php74 > $(DOCKER_RUN_74_IMAGE)
-	touch $@
-
-$(DOCKER_RUN_80_IMAGE): devTools/Dockerfile-php80-xdebug
-	docker build --tag infection_php80 --file devTools/Dockerfile-php80-xdebug .
-	docker image inspect infection_php80 >> $(DOCKER_RUN_80_IMAGE)
+$(DOCKER_FILE_IMAGE): devTools/Dockerfile
+	docker-compose build
 	touch $@
 
 tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz

@@ -1,4 +1,6 @@
-FROM php:7.4-cli-alpine
+ARG PHP_VERSION
+
+FROM php:${PHP_VERSION}-cli-alpine
 
 ARG XDEBUG_VERSION=3.0.4
 
@@ -28,8 +30,10 @@ RUN apk add --no-cache \
         zip
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-COPY devTools/memory-limit.ini ${PHP_INI_DIR}/conf.d/
+COPY memory-limit.ini ${PHP_INI_DIR}/conf.d/
 
 RUN adduser -h /opt/infection -s /bin/bash -D infection
 
 USER infection
+
+WORKDIR /opt/infection

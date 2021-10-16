@@ -1,0 +1,16 @@
+version: '3'
+services:
+  php74:
+    build:
+      context: devTools
+      args:
+        PHP_VERSION: 7.4
+    volumes:
+      - .:/opt/infection
+  php80:
+    build:
+      context: devTools
+      args:
+        PHP_VERSION: 8.0
+    volumes:
+      - .:/opt/infection
