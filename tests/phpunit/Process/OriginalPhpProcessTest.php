@@ -36,23 +36,23 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\Process\CoveredPhpProcess;
+use Infection\Process\OriginalPhpProcess;
 use function ini_get as ini_get_unsafe;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-final class CoveredPhpProcessTest extends TestCase
+final class OriginalPhpProcessTest extends TestCase
 {
     public function test_it_extends_symfony_process(): void
     {
-        $process = new CoveredPhpProcess([]);
+        $process = new OriginalPhpProcess([]);
 
         $this->assertInstanceOf(Process::class, $process);
     }
 
     public function test_it_takes_command_line(): void
     {
-        $process = new CoveredPhpProcess(['foo']);
+        $process = new OriginalPhpProcess(['foo']);
         $this->assertStringContainsString('foo', $process->getCommandLine());
     }
 
@@ -61,7 +61,7 @@ final class CoveredPhpProcessTest extends TestCase
      */
     public function test_it_injects_xdebug_env_vars(): void
     {
-        $process = new CoveredPhpProcess(['env']);
+        $process = new OriginalPhpProcess(['env']);
         $process->run(null, ['TESTING' => 'test']);
 
         if (XdebugHandler::getSkippedVersion() !== '' || ini_get_unsafe('xdebug.mode') !== false) {

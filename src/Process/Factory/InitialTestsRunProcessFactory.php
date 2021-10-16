@@ -37,7 +37,6 @@ namespace Infection\Process\Factory;
 
 use Composer\InstalledVersions;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\CoveredPhpProcess;
 use Infection\Process\OriginalPhpProcess;
 use function method_exists;
 use Symfony\Component\Process\Process;
@@ -67,7 +66,7 @@ class InitialTestsRunProcessFactory
         bool $skipCoverage
     ): Process {
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processClass = $skipCoverage ? CoveredPhpProcess::class : OriginalPhpProcess::class;
+        $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
 
         /** @var Process $process */
         $process = new $processClass(

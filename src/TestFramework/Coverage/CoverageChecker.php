@@ -42,6 +42,7 @@ use function implode;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use function ini_get as ini_get_unsafe;
 use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\preg_match;
@@ -175,6 +176,7 @@ TXT
             || XdebugHandler::isXdebugActive()
             || extension_loaded('pcov')
             || XdebugHandler::getSkippedVersion() !== ''
+            || ini_get_unsafe('xdebug.mode') !== false
             || $this->isXdebugIncludedInInitialTestPhpOptions()
             || $this->isPcovIncludedInInitialTestPhpOptions();
     }

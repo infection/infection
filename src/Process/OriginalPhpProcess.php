@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use function array_merge;
 use Composer\XdebugHandler\PhpConfig;
+use Composer\XdebugHandler\XdebugHandler;
+use function ini_get as ini_get_unsafe;
 use Symfony\Component\Process\Process;
 
 /**
@@ -56,6 +59,17 @@ final class OriginalPhpProcess extends Process
     {
         $phpConfig = new PhpConfig();
         $phpConfig->useOriginal();
+
+        if (
+            XdebugHandler::getSkippedVersion() !== '' ||
+            // Any other value but false means Xdebug 3 is loaded. Xdebug 2 didn't have
+            // it too, but it has coverage enabled at all times.
+            ini_get_unsafe('xdebug.mode') !== false
+        ) {
+            $env = array_merge($env ?? [], [
+                'XDEBUG_MODE' => 'coverage',
+            ]);
+        }
 
         parent::start($callback, $env ?? []);
 
