@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use function extension_loaded;
+use Composer\XdebugHandler\XdebugHandler;
 use Infection\Process\CoveredPhpProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -63,7 +63,7 @@ final class CoveredPhpProcessTest extends TestCase
         $process = new CoveredPhpProcess(['env']);
         $process->run();
 
-        if (!extension_loaded('pcov')) {
+        if (XdebugHandler::getSkippedVersion() !== '') {
             $this->assertStringContainsString('XDEBUG_MODE=coverage', $process->getOutput());
         } else {
             $this->assertStringNotContainsString('XDEBUG_MODE=coverage', $process->getOutput());
