@@ -103,7 +103,7 @@ class CoverageChecker
 Coverage needs to be generated but no code coverage generator (pcov, phpdbg or xdebug) has been detected. Please either:
 - Enable pcov and run Infection again
 - Use phpdbg, e.g. `phpdbg -qrr infection`
-- Enable Xdebug and run Infection again
+- Enable Xdebug (in case of using Xdebug 3 check that `xdebug.mode` or environment variable XDEBUG_MODE set to `coverage`) and run Infection again
 - Use the "--coverage" option with path to the existing coverage report
 - Enable the code generator tool for the initial test run only, e.g. with `--initial-tests-php-options -d zend_extension=xdebug.so`
 TXT
