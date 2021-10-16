@@ -1,4 +1,6 @@
-FROM php:8.0-cli-alpine
+ARG PHP_VERSION
+
+FROM php:${PHP_VERSION}-cli-alpine
 
 ARG XDEBUG_VERSION=3.0.4
 
@@ -24,11 +26,14 @@ RUN apk add --no-cache \
         make \
         bash \
         expect \
+        git \
         zip
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-COPY devTools/memory-limit.ini devTools/xdebug-coverage.ini ${PHP_INI_DIR}/conf.d/
+COPY memory-limit.ini xdebug-coverage.ini ${PHP_INI_DIR}/conf.d/
 
 RUN adduser -h /opt/infection -s /bin/bash -D infection
 
 USER infection
+
+WORKDIR /opt/infection
