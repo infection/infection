@@ -35,6 +35,7 @@ if [ "$DRIVER" = "phpdbg" ]
 then
     PATH=$PATH:bin phpdbg -qrr vendor/bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml
 else
+    export XDEBUG_MODE=coverage
     PATH=$PATH:bin php vendor/bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml
 fi
 
