@@ -39,6 +39,7 @@ use Composer\XdebugHandler\XdebugHandler;
 use Infection\Process\CoveredPhpProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use function ini_get as ini_get_unsafe;
 
 final class CoveredPhpProcessTest extends TestCase
 {
@@ -63,7 +64,7 @@ final class CoveredPhpProcessTest extends TestCase
         $process = new CoveredPhpProcess(['env']);
         $process->run(null, ['TESTING' => 'test']);
 
-        if (XdebugHandler::getSkippedVersion() !== '') {
+        if (XdebugHandler::getSkippedVersion() !== '' || ini_get_unsafe('xdebug.mode') !== false) {
             $this->assertStringContainsString('XDEBUG_MODE=coverage', $process->getOutput());
         } else {
             $this->assertStringNotContainsString('XDEBUG_MODE=coverage', $process->getOutput());

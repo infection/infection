@@ -37,6 +37,7 @@ namespace Infection\Process;
 
 use function array_merge;
 use Composer\XdebugHandler\XdebugHandler;
+use function ini_get as ini_get_unsafe;
 use Symfony\Component\Process\Process;
 
 /**
@@ -46,7 +47,9 @@ use Symfony\Component\Process\Process;
  * without any extra user interaction.
  *
  * As of now we only cover Xdebug, adding XDEBUG_MODE environment variable to ensure it
- * is properly activated. We only add this variable if we know that Xdebug was offloaded.
+ * is properly activated. We add this variable if we know that Xdebug was offloaded, or
+ * if we know Xdebug is loaded since we can't know it coverage option is enabled (setting
+ * XDEBUG_MODE won't change xdebug.mode).
  */
 final class CoveredPhpProcess extends Process
 {
@@ -55,7 +58,13 @@ final class CoveredPhpProcess extends Process
      */
     public function start(?callable $callback = null, ?array $env = null): void
     {
-        if (XdebugHandler::getSkippedVersion() !== '') {
+
+        if (
+            XdebugHandler::getSkippedVersion() !== '' ||
+            // Any other value but false means Xdebug 3 is loaded. Xdebug 2 didn't have
+            // it too, but it has coverage enabled at all times.
+            ini_get_unsafe('xdebug.mode') !== false
+        ) {
             $env = array_merge($env ?? [], [
                 'XDEBUG_MODE' => 'coverage',
             ]);

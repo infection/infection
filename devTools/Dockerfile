@@ -30,7 +30,7 @@ RUN apk add --no-cache \
         zip
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-COPY memory-limit.ini ${PHP_INI_DIR}/conf.d/
+COPY memory-limit.ini xdebug-coverage.ini ${PHP_INI_DIR}/conf.d/
 
 RUN adduser -h /opt/infection -s /bin/bash -D infection
 
