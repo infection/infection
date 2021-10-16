@@ -38,7 +38,9 @@ namespace Infection\Process;
 use function array_merge;
 use Composer\XdebugHandler\PhpConfig;
 use Composer\XdebugHandler\XdebugHandler;
+use function extension_loaded;
 use function ini_get as ini_get_unsafe;
+use const PHP_SAPI;
 use Symfony\Component\Process\Process;
 
 /**
@@ -61,6 +63,8 @@ final class OriginalPhpProcess extends Process
         $phpConfig->useOriginal();
 
         if (
+            extension_loaded('pcov') ||
+            PHP_SAPI === 'phpdbg' ||
             XdebugHandler::getSkippedVersion() !== '' ||
             // Any other value but false means Xdebug 3 is loaded. Xdebug 2 didn't have
             // it too, but it has coverage enabled at all times.
