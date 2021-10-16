@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use function array_merge;
-use function extension_loaded;
+use Composer\XdebugHandler\XdebugHandler;
 use Symfony\Component\Process\Process;
 
 /**
@@ -46,9 +46,7 @@ use Symfony\Component\Process\Process;
  * without any extra user interaction.
  *
  * As of now we only cover Xdebug, adding XDEBUG_MODE environment variable to ensure it
- * is properly activated. Since we can't know if Xdebug was offloaded, we add this env
- * variable at most times, except when there's PCOV loaded: chances are Xdebug is not
- * required when PCOV already used for coverage.
+ * is properly activated. We only add this variable if we know that Xdebug was offloaded.
  */
 final class CoveredPhpProcess extends Process
 {
@@ -57,7 +55,7 @@ final class CoveredPhpProcess extends Process
      */
     public function start(?callable $callback = null, ?array $env = null): void
     {
-        if (!extension_loaded('pcov')) {
+        if (XdebugHandler::getSkippedVersion() !== '') {
             $env = array_merge($env ?? [], [
                 'XDEBUG_MODE' => 'coverage',
             ]);
