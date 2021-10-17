@@ -62,9 +62,14 @@ final class OriginalPhpProcess extends Process
         $phpConfig = new PhpConfig();
         $phpConfig->useOriginal();
 
+        // We don't want to add XDEBUG_MODE=coverage if:
+        // - PCOV is loaded
+        // - PHPDBG is in use
+        // - Xdebug wasn't ever there
+        // - or Xdebug isn't version 3+
         if (
-            extension_loaded('pcov') ||
-            PHP_SAPI === 'phpdbg' ||
+            !extension_loaded('pcov') ||
+            PHP_SAPI !== 'phpdbg' ||
             XdebugHandler::getSkippedVersion() !== '' ||
             // Any other value but false means Xdebug 3 is loaded. Xdebug 2 didn't have
             // it too, but it has coverage enabled at all times.
