@@ -70,15 +70,6 @@ jobs:
 
           make test-unit
 
-      - name: Run integration tests
-        shell: bash
-        run: |
-          if [[ "${{ matrix.php-version }}" == '8.1' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[direct]=1
-          fi
-
-          make test-unit PHPUNIT_GROUP=integration
-
       - name: Cache E2E tests dependencies
         if: runner.os == 'Windows'
         uses: actions/cache@v2
@@ -113,7 +104,7 @@ jobs:
         env:
           TERM: xterm-256color
         run: |
-          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection BENCHMARK_SOURCES=
+          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
       - name: Run the whole set of E2E tests with prefixed PHAR
         if: runner.os != 'Windows' && matrix.e2e-runner != 'bin/infection' && matrix.php-version == '8.0'
@@ -124,3 +115,12 @@ jobs:
           # test PHAR works from subfolder
           cd build && ./infection.phar -V && cd ..
           make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=build/infection.phar BENCHMARK_SOURCES=
+
+      - name: Run integration tests
+        shell: bash
+        run: |
+            if [[ "${{ matrix.php-version }}" == '8.1' ]]; then
+              export SYMFONY_DEPRECATIONS_HELPER=max[direct]=1
+            fi
+
+            make test-unit PHPUNIT_GROUP=integration
