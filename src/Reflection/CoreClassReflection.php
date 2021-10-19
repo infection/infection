@@ -50,6 +50,9 @@ final class CoreClassReflection implements ClassReflection
         $this->reflectionClass = $reflectionClass;
     }
 
+    /**
+     * @param class-string $className
+     */
     public static function fromClassName(string $className): self
     {
         return new self(new ReflectionClass($className));
