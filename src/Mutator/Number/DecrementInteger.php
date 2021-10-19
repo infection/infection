@@ -94,7 +94,7 @@ DIFF
             // PHP Parser reads negative number as a pair of minus sign and a positive int,
             // but positive part of PHP_INT_MIN leads to an overflow into float. To work
             // around this we have to cast the result value back to int after adding one.
-            $value = (int) ($node->value + 1);
+            $value = $node->value + 1;
         }
 
         yield new Node\Scalar\LNumber($value);
