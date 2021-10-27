@@ -1,5 +1,5 @@
 {
-    "timeout": 25,
+    "timeout": 11125,
     "source": {
         "directories": [
             "src"
@@ -9,5 +9,8 @@
         "summary": "infection.log",
         "text": "text.log"
     },
-    "tmpDir": "."
+    "tmpDir": ".",
+    "mutators": {
+        "@default": true
+    }
 }

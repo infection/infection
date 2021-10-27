@@ -1,7 +1,7 @@
 {
     "require-dev": {
         "phpunit/phpunit": "^9",
-        "dg/bypass-finals": "dev-master#7c08b98712099224a53bdeb36a58f66e5cf73e61"
+        "dg/bypass-finals": "dev-master#aa882485188494ae831da14d1139ed3bdd161e41"
     },
     "autoload": {
         "psr-4": {
