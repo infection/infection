@@ -37,7 +37,7 @@ namespace Infection\Logger\GitHub;
 
 use function escapeshellarg;
 use function Safe\sprintf;
-use function shell_exec;
+use Symfony\Component\Process\Process;
 
 /**
  * @final
@@ -50,12 +50,12 @@ class GitDiffFileProvider
 
     public function provide(string $gitDiffFilter, string $gitDiffBase): string
     {
-        return (string) shell_exec(
-            sprintf(
-                'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-                escapeshellarg($gitDiffBase),
-                escapeshellarg($gitDiffFilter)
-            )
-        );
+        $process = Process::fromShellCommandline(sprintf(
+            'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
+            escapeshellarg($gitDiffBase),
+            escapeshellarg($gitDiffFilter)
+        ))->mustRun();
+
+        return $process->getOutput();
     }
 }
