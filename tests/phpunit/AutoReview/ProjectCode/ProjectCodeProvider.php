@@ -58,7 +58,6 @@ use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
@@ -67,6 +66,7 @@ use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\OriginalPhpProcess;
 use Infection\Process\Runner\IndexedProcessBearer;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -114,7 +114,7 @@ final class ProjectCodeProvider
         XdebugHandler::class,
         NullSubscriber::class,
         FormatterName::class,
-        GitDiffFileProvider::class,
+        ShellCommandLineExecutor::class,
     ];
 
     /**

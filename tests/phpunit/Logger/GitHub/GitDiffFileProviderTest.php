@@ -33,40 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\GitHub;
+namespace Infection\Tests\Logger\GitHub;
 
-use function escapeshellarg;
+use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
-use function Safe\sprintf;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @final
- *
- * @internal
- */
-class GitDiffFileProvider
+final class GitDiffFileProviderTest extends TestCase
 {
-    public const DEFAULT_BASE = 'origin/master';
-
-    private ShellCommandLineExecutor $shellCommandLineExecutor;
-
-    public function __construct(ShellCommandLineExecutor $shellCommandLineExecutor)
+    public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void
     {
-        $this->shellCommandLineExecutor = $shellCommandLineExecutor;
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandLineExecutor->expects($this->once())
+            ->method('execute')
+            ->willReturn('');
+
+        $this->expectException(NoFilesInDiffToMutate::class);
+
+        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $diffProvider->provide('AM', 'master');
     }
 
-    public function provide(string $gitDiffFilter, string $gitDiffBase): string
+    public function test_it_executes_diff_and_returns_filter_as_a_string(): void
     {
-        $filter = $this->shellCommandLineExecutor->execute(sprintf(
-            'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-            escapeshellarg($gitDiffBase),
-            escapeshellarg($gitDiffFilter)
-        ));
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandLineExecutor->expects($this->once())
+            ->method('execute')
+            ->with('git diff \'master\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -')
+            ->willReturn('src/A.php,src/B.php');
 
-        if ($filter === '') {
-            throw NoFilesInDiffToMutate::create();
-        }
+        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $filter = $diffProvider->provide('AM', 'master');
 
-        return $filter;
+        $this->assertSame('src/A.php,src/B.php', $filter);
     }
 }
