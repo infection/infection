@@ -53,6 +53,7 @@ use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Logger\ConsoleLogger;
+use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -329,25 +330,29 @@ final class RunCommand extends BaseCommand
         $container = $this->createContainer($io, $logger);
         $consoleOutput = new ConsoleOutput($logger);
 
-        $this->startUp($container, $consoleOutput, $logger, $io);
-
-        $engine = new Engine(
-            $container->getConfiguration(),
-            $container->getTestFrameworkAdapter(),
-            $container->getCoverageChecker(),
-            $container->getEventDispatcher(),
-            $container->getInitialTestsRunner(),
-            $container->getMemoryLimiter(),
-            $container->getMutationGenerator(),
-            $container->getMutationTestingRunner(),
-            $container->getMinMsiChecker(),
-            $consoleOutput,
-            $container->getMetricsCalculator(),
-            $container->getTestFrameworkExtraOptionsFilter()
-        );
-
         try {
+            $this->startUp($container, $consoleOutput, $logger, $io);
+
+            $engine = new Engine(
+                $container->getConfiguration(),
+                $container->getTestFrameworkAdapter(),
+                $container->getCoverageChecker(),
+                $container->getEventDispatcher(),
+                $container->getInitialTestsRunner(),
+                $container->getMemoryLimiter(),
+                $container->getMutationGenerator(),
+                $container->getMutationTestingRunner(),
+                $container->getMinMsiChecker(),
+                $consoleOutput,
+                $container->getMetricsCalculator(),
+                $container->getTestFrameworkExtraOptionsFilter()
+            );
+
             $engine->execute();
+
+            return true;
+        } catch (NoFilesInDiffToMutate $e) {
+            $io->success($e->getMessage());
 
             return true;
         } catch (InitialTestsFailed | MinMsiCheckFailed $exception) {
