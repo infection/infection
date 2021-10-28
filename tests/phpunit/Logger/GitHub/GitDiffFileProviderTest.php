@@ -38,6 +38,7 @@ namespace Infection\Tests\Logger\GitHub;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
+use const PHP_OS_FAMILY;
 use PHPUnit\Framework\TestCase;
 
 final class GitDiffFileProviderTest extends TestCase
@@ -57,10 +58,16 @@ final class GitDiffFileProviderTest extends TestCase
 
     public function test_it_executes_diff_and_returns_filter_as_a_string(): void
     {
+        $expectedCommandLine = 'git diff \'master\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -';
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $expectedCommandLine = 'git diff "master" --diff-filter="AM" --name-only | grep src/ | paste -s -d "," -';
+        }
+
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
         $shellCommandLineExecutor->expects($this->once())
             ->method('execute')
-            ->with('git diff \'master\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -')
+            ->with($expectedCommandLine)
             ->willReturn('src/A.php,src/B.php');
 
         $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
