@@ -104,6 +104,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
@@ -654,8 +655,11 @@ final class Container
             DiffSourceCodeMatcher::class => static function (): DiffSourceCodeMatcher {
                 return new DiffSourceCodeMatcher();
             },
-            GitDiffFileProvider::class => static function (): GitDiffFileProvider {
-                return new GitDiffFileProvider();
+            ShellCommandLineExecutor::class => static function (): ShellCommandLineExecutor {
+                return new ShellCommandLineExecutor();
+            },
+            GitDiffFileProvider::class => static function (self $container): GitDiffFileProvider {
+                return new GitDiffFileProvider($container->getShellCommandLineExecutor());
             },
         ]);
 
@@ -1254,6 +1258,11 @@ final class Container
     public function getDiffSourceCodeMatcher(): DiffSourceCodeMatcher
     {
         return $this->get(DiffSourceCodeMatcher::class);
+    }
+
+    public function getShellCommandLineExecutor(): ShellCommandLineExecutor
+    {
+        return $this->get(ShellCommandLineExecutor::class);
     }
 
     public function getGitDiffFileProvider(): GitDiffFileProvider

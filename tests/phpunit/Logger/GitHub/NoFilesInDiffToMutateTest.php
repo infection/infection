@@ -33,40 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\GitHub;
+namespace Infection\Tests\Logger\GitHub;
 
-use function escapeshellarg;
-use Infection\Process\ShellCommandLineExecutor;
-use function Safe\sprintf;
+use Infection\Logger\GitHub\NoFilesInDiffToMutate;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @final
- *
- * @internal
- */
-class GitDiffFileProvider
+final class NoFilesInDiffToMutateTest extends TestCase
 {
-    public const DEFAULT_BASE = 'origin/master';
-
-    private ShellCommandLineExecutor $shellCommandLineExecutor;
-
-    public function __construct(ShellCommandLineExecutor $shellCommandLineExecutor)
+    public function test_composer_not_found_exception(): void
     {
-        $this->shellCommandLineExecutor = $shellCommandLineExecutor;
-    }
+        $exception = NoFilesInDiffToMutate::create();
 
-    public function provide(string $gitDiffFilter, string $gitDiffBase): string
-    {
-        $filter = $this->shellCommandLineExecutor->execute(sprintf(
-            'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-            escapeshellarg($gitDiffBase),
-            escapeshellarg($gitDiffFilter)
-        ));
-
-        if ($filter === '') {
-            throw NoFilesInDiffToMutate::create();
-        }
-
-        return $filter;
+        $this->assertInstanceOf(NoFilesInDiffToMutate::class, $exception);
+        $this->assertSame(
+            'No files in diff found, skipping mutation analysis.',
+            $exception->getMessage()
+        );
     }
 }

@@ -35,38 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Logger\GitHub;
 
-use function escapeshellarg;
-use Infection\Process\ShellCommandLineExecutor;
-use function Safe\sprintf;
+use Exception;
 
 /**
- * @final
- *
  * @internal
  */
-class GitDiffFileProvider
+final class NoFilesInDiffToMutate extends Exception
 {
-    public const DEFAULT_BASE = 'origin/master';
-
-    private ShellCommandLineExecutor $shellCommandLineExecutor;
-
-    public function __construct(ShellCommandLineExecutor $shellCommandLineExecutor)
+    public static function create(): self
     {
-        $this->shellCommandLineExecutor = $shellCommandLineExecutor;
-    }
-
-    public function provide(string $gitDiffFilter, string $gitDiffBase): string
-    {
-        $filter = $this->shellCommandLineExecutor->execute(sprintf(
-            'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-            escapeshellarg($gitDiffBase),
-            escapeshellarg($gitDiffFilter)
-        ));
-
-        if ($filter === '') {
-            throw NoFilesInDiffToMutate::create();
-        }
-
-        return $filter;
+        return new self('No files in diff found, skipping mutation analysis.');
     }
 }
