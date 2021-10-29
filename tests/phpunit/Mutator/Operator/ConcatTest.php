@@ -163,7 +163,7 @@ $a = 'foo';
 $a . $a;
 PHP
             ,
-            []
+            [],
         ];
 
         yield 'Does not flip the same variable - multiple concatenation' => [
@@ -174,7 +174,7 @@ $a = 'foo';
 $a . $a . $a;
 PHP
             ,
-            []
+            [],
         ];
 
         yield 'Does not flip the same value' => [
@@ -184,7 +184,7 @@ PHP
 'foo' . 'foo';
 PHP
             ,
-            []
+            [],
         ];
     }
 }
