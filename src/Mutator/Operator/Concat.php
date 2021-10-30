@@ -93,7 +93,7 @@ DIFF
 
         $newNode = new Node\Expr\BinaryOp\Concat($left, $right);
 
-        if ($printer->prettyPrint([$node]) !== $printer->prettyPrint([$newNode])) {
+        if ($printer->prettyPrint([clone $node]) !== $printer->prettyPrint([$newNode])) {
             yield $newNode;
         }
     }
