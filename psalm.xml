@@ -14,4 +14,12 @@
            <directory name="src/PhpParser" />
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <ImpureMethodCall>
+            <errorLevel type="suppress">
+                <file name="src/Mutator/Operator/Concat.php"/>
+            </errorLevel>
+        </ImpureMethodCall>
+    </issueHandlers>
 </psalm>
