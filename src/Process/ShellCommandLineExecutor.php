@@ -33,73 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+namespace Infection\Process;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use PhpParser\Node;
-use PhpParser\PrettyPrinter\Standard;
+use Symfony\Component\Process\Process;
+use function trim;
 
 /**
  * @internal
  *
- * @implements Mutator<Node\Expr\BinaryOp\Concat>
+ * @final
  */
-final class Concat implements Mutator
+class ShellCommandLineExecutor
 {
-    use GetMutatorName;
-
-    public static function getDefinition(): ?Definition
+    public function execute(string $commandLine): string
     {
-        return new Definition(
-            <<<'TXT'
-Flips the operands of the string concatenation operator `.`. For example:
-
-```php
-'foo' . 'bar';
-```
-
-Will be mutated to:
-
-```php
-'bar' . 'foo';
-```
-TXT
-            ,
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null,
-            <<<'DIFF'
-- 'foo' . 'bar';
-+ 'bar' . 'foo';
-DIFF
-        );
-    }
-
-    /**
-     * @psalm-mutation-free
-     */
-    public function mutate(Node $node): iterable
-    {
-        $printer = new Standard();
-
-        if ($node->left instanceof Node\Expr\BinaryOp\Concat) {
-            $left = new Node\Expr\BinaryOp\Concat($node->left->left, $node->right);
-            $right = $node->left->right;
-        } else {
-            [$left, $right] = [$node->right, $node->left];
-        }
-
-        $newNode = new Node\Expr\BinaryOp\Concat($left, $right);
-
-        if ($printer->prettyPrint([clone $node]) !== $printer->prettyPrint([$newNode])) {
-            yield $newNode;
-        }
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        return $node instanceof Node\Expr\BinaryOp\Concat;
+        return trim(Process::fromShellCommandline($commandLine)->mustRun()->getOutput());
     }
 }

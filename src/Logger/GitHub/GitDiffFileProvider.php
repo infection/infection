@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Logger\GitHub;
 
 use function escapeshellarg;
+use Infection\Process\ShellCommandLineExecutor;
 use function Safe\sprintf;
-use function shell_exec;
 
 /**
  * @final
@@ -48,14 +48,25 @@ class GitDiffFileProvider
 {
     public const DEFAULT_BASE = 'origin/master';
 
+    private ShellCommandLineExecutor $shellCommandLineExecutor;
+
+    public function __construct(ShellCommandLineExecutor $shellCommandLineExecutor)
+    {
+        $this->shellCommandLineExecutor = $shellCommandLineExecutor;
+    }
+
     public function provide(string $gitDiffFilter, string $gitDiffBase): string
     {
-        return (string) shell_exec(
-            sprintf(
-                'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-                escapeshellarg($gitDiffBase),
-                escapeshellarg($gitDiffFilter)
-            )
-        );
+        $filter = $this->shellCommandLineExecutor->execute(sprintf(
+            'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
+            escapeshellarg($gitDiffBase),
+            escapeshellarg($gitDiffFilter)
+        ));
+
+        if ($filter === '') {
+            throw NoFilesInDiffToMutate::create();
+        }
+
+        return $filter;
     }
 }

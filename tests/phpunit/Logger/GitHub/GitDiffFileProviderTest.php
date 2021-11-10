@@ -33,73 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+namespace Infection\Tests\Logger\GitHub;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use PhpParser\Node;
-use PhpParser\PrettyPrinter\Standard;
+use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Logger\GitHub\NoFilesInDiffToMutate;
+use Infection\Process\ShellCommandLineExecutor;
+use const PHP_OS_FAMILY;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * @implements Mutator<Node\Expr\BinaryOp\Concat>
- */
-final class Concat implements Mutator
+final class GitDiffFileProviderTest extends TestCase
 {
-    use GetMutatorName;
-
-    public static function getDefinition(): ?Definition
+    public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void
     {
-        return new Definition(
-            <<<'TXT'
-Flips the operands of the string concatenation operator `.`. For example:
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandLineExecutor->expects($this->once())
+            ->method('execute')
+            ->willReturn('');
 
-```php
-'foo' . 'bar';
-```
+        $this->expectException(NoFilesInDiffToMutate::class);
 
-Will be mutated to:
-
-```php
-'bar' . 'foo';
-```
-TXT
-            ,
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null,
-            <<<'DIFF'
-- 'foo' . 'bar';
-+ 'bar' . 'foo';
-DIFF
-        );
+        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $diffProvider->provide('AM', 'master');
     }
 
-    /**
-     * @psalm-mutation-free
-     */
-    public function mutate(Node $node): iterable
+    public function test_it_executes_diff_and_returns_filter_as_a_string(): void
     {
-        $printer = new Standard();
+        $expectedCommandLine = 'git diff \'master\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -';
 
-        if ($node->left instanceof Node\Expr\BinaryOp\Concat) {
-            $left = new Node\Expr\BinaryOp\Concat($node->left->left, $node->right);
-            $right = $node->left->right;
-        } else {
-            [$left, $right] = [$node->right, $node->left];
+        if (PHP_OS_FAMILY === 'Windows') {
+            $expectedCommandLine = 'git diff "master" --diff-filter="AM" --name-only | grep src/ | paste -s -d "," -';
         }
 
-        $newNode = new Node\Expr\BinaryOp\Concat($left, $right);
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandLineExecutor->expects($this->once())
+            ->method('execute')
+            ->with($expectedCommandLine)
+            ->willReturn('src/A.php,src/B.php');
 
-        if ($printer->prettyPrint([clone $node]) !== $printer->prettyPrint([$newNode])) {
-            yield $newNode;
-        }
-    }
+        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $filter = $diffProvider->provide('AM', 'master');
 
-    public function canMutate(Node $node): bool
-    {
-        return $node instanceof Node\Expr\BinaryOp\Concat;
+        $this->assertSame('src/A.php,src/B.php', $filter);
     }
 }

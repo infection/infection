@@ -154,5 +154,37 @@ PHP
                 ,
             ],
         ];
+
+        yield 'Does not flip the same variable' => [
+            <<<'PHP'
+<?php
+
+$a = 'foo';
+$a . $a;
+PHP
+            ,
+            [],
+        ];
+
+        yield 'Does not flip the same variable - multiple concatenation' => [
+            <<<'PHP'
+<?php
+
+$a = 'foo';
+$a . $a . $a;
+PHP
+            ,
+            [],
+        ];
+
+        yield 'Does not flip the same value' => [
+            <<<'PHP'
+<?php
+
+'foo' . 'foo';
+PHP
+            ,
+            [],
+        ];
     }
 }
