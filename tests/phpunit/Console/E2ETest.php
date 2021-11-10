@@ -145,7 +145,7 @@ final class E2ETest extends TestCase
         }
 
         $output = $this->runInfection(self::EXPECT_SUCCESS, [
-            '--test-framework-options="--exclude-group=' . self::EXCLUDED_GROUP . '"',
+            '--test-framework-options=--exclude-group=' . self::EXCLUDED_GROUP,
         ]);
 
         $this->assertMatchesRegularExpression('/\d+ mutations were generated/', $output);
@@ -329,6 +329,10 @@ final class E2ETest extends TestCase
     {
         if (!extension_loaded('xdebug') && PHP_SAPI !== 'phpdbg') {
             $this->markTestSkipped("Infection from within PHPUnit won't run without Xdebug or PHPDBG");
+        }
+
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test can be unstable on Windows');
         }
 
         /*

@@ -64,7 +64,6 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Process\OriginalPhpProcess;
 use Infection\Process\Runner\IndexedProcessBearer;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\AdapterInstaller;
@@ -100,7 +99,6 @@ final class ProjectCodeProvider
         RunCommand::class,
         Application::class,
         ProgressFormatter::class,
-        OriginalPhpProcess::class,
         ComposerExecutableFinder::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,

@@ -35,7 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use function array_merge;
 use Composer\XdebugHandler\PhpConfig;
+use Composer\XdebugHandler\XdebugHandler;
+use function extension_loaded;
+use function ini_get as ini_get_unsafe;
+use const PHP_SAPI;
 use Symfony\Component\Process\Process;
 
 /**
@@ -57,8 +62,37 @@ final class OriginalPhpProcess extends Process
         $phpConfig = new PhpConfig();
         $phpConfig->useOriginal();
 
+        if (self::shallExtendEnvironmentWithXdebugMode()) {
+            $env = array_merge($env ?? [], [
+                'XDEBUG_MODE' => 'coverage',
+            ]);
+        }
+
         parent::start($callback, $env ?? []);
 
         $phpConfig->usePersistent();
+    }
+
+    private static function shallExtendEnvironmentWithXdebugMode(): bool
+    {
+        // Most obvious cases when we don't want to add XDEBUG_MODE=coverage:
+        // - PCOV is loaded
+        // - PHPDBG is in use
+        if (extension_loaded('pcov') || PHP_SAPI === 'phpdbg') {
+            return false;
+        }
+
+        // We also do not need to add XDEBUG_MODE for Xdebug <=3:
+        // it had coverage enabled at all times and it didn't have `xdebug.mode`.
+        if (ini_get_unsafe('xdebug.mode') === false) {
+            return false;
+        }
+
+        // The last case: Xdebug 3+ running inactive.
+        return ini_get_unsafe('xdebug.mode') === '';
+
+        // Why going through all the trouble above? We don't want to enable
+        // Xdebug when there are more compelling choices. In the end the user is
+        // still in control: they can provide XDEBUG_MODE=coverage on their own.
     }
 }

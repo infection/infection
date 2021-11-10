@@ -9,6 +9,7 @@ if [ "$DRIVER" = "phpdbg" ]
 then
     phpdbg -qrr $PHPUNIT
 else
+    export XDEBUG_MODE=coverage
     php $PHPUNIT
 fi
 
