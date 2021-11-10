@@ -29,9 +29,6 @@ parameters:
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
             count: 1
         -
-            path: '../src/FileSystem/DummyFileSystem.php'
-            message: '#Infection\\FileSystem\\DummyFileSystem#'
-        -
             path: '../src/Process/OriginalPhpProcess.php'
             message: '#Function ini_get is unsafe to use#'
         -
