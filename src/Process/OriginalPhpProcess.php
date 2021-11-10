@@ -62,22 +62,7 @@ final class OriginalPhpProcess extends Process
         $phpConfig = new PhpConfig();
         $phpConfig->useOriginal();
 
-        // We don't want to add XDEBUG_MODE=coverage if:
-        // - PCOV is loaded
-        // - PHPDBG is in use
-        // - Xdebug wasn't ever there
-        // - or Xdebug isn't version 3+
-        if (
-            !extension_loaded('pcov') ||
-            PHP_SAPI !== 'phpdbg' ||
-            XdebugHandler::getSkippedVersion() !== '' ||
-            // Any other value but false means Xdebug 3 is loaded. Xdebug 2 didn't have
-            // it too, but it has coverage enabled at all times.
-            ini_get_unsafe('xdebug.mode') !== false
-        ) {
-            // Why going through all the trouble above? We don't want to enable
-            // Xdebug when there are more compelling choices. In the end the user is
-            // still in control: they can provide XDEBUG_MODE=coverage on their own.
+        if (self::shallExtendEnvironmentWithXdebugMode()) {
             $env = array_merge($env ?? [], [
                 'XDEBUG_MODE' => 'coverage',
             ]);
@@ -86,5 +71,31 @@ final class OriginalPhpProcess extends Process
         parent::start($callback, $env ?? []);
 
         $phpConfig->usePersistent();
+    }
+
+    private static function shallExtendEnvironmentWithXdebugMode(): bool
+    {
+        // Most obvious cases when we don't want to add XDEBUG_MODE=coverage:
+        // - PCOV is loaded
+        // - PHPDBG is in use
+        if (extension_loaded('pcov') || PHP_SAPI === 'phpdbg') {
+            return false;
+        }
+
+        // We also do not need to add XDEBUG_MODE for Xdebug <=3:
+        // it had coverage enabled at all times and it didn't have `xdebug.mode`.
+        if (ini_get_unsafe('xdebug.mode') === false) {
+            return false;
+        }
+
+        // We also don't need anything if Xdebug wasn't there to begin with
+        if (XdebugHandler::getSkippedVersion() === '') {
+            return false;
+        }
+
+        // Why going through all the trouble above? We don't want to enable
+        // Xdebug when there are more compelling choices. In the end the user is
+        // still in control: they can provide XDEBUG_MODE=coverage on their own.
+        return true;
     }
 }
