@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use Composer\XdebugHandler\XdebugHandler;
 use function extension_loaded;
 use Infection\Process\OriginalPhpProcess;
 use function ini_get as ini_get_unsafe;
@@ -67,10 +66,9 @@ final class OriginalPhpProcessTest extends TestCase
         $process->run(null, ['TESTING' => 'test']);
 
         if (
-            extension_loaded('pcov') ||
-            PHP_SAPI === 'phpdbg' ||
-            XdebugHandler::getSkippedVersion() !== '' ||
-            ini_get_unsafe('xdebug.mode') !== false
+            !extension_loaded('pcov') &&
+            PHP_SAPI !== 'phpdbg' &&
+            ini_get_unsafe('xdebug.mode') === false
         ) {
             $this->assertStringContainsString('XDEBUG_MODE=coverage', $process->getOutput());
         } else {
