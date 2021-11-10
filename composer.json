@@ -55,7 +55,7 @@
         "nikic/php-parser": "^4.13",
         "ondram/ci-detector": "^3.3.0",
         "sanmai/later": "^0.1.1",
-        "sanmai/pipeline": "^5.1",
+        "sanmai/pipeline": "^5.1 || ^6",
         "sebastian/diff": "^3.0.2 || ^4.0",
         "seld/jsonlint": "^1.7",
         "symfony/console": "^3.4.29 || ^4.1.19 || ^5.0",
