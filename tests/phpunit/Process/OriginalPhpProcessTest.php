@@ -68,7 +68,10 @@ final class OriginalPhpProcessTest extends TestCase
         if (
             !extension_loaded('pcov') &&
             PHP_SAPI !== 'phpdbg' &&
-            ini_get_unsafe('xdebug.mode') === false
+            (
+                ini_get_unsafe('xdebug.mode') === false ||
+                ini_get_unsafe('xdebug.mode') === ''
+            )
         ) {
             $this->assertStringContainsString('XDEBUG_MODE=coverage', $process->getOutput());
         } else {

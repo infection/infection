@@ -88,14 +88,11 @@ final class OriginalPhpProcess extends Process
             return false;
         }
 
-        // We also don't need anything if Xdebug wasn't there to begin with
-        if (XdebugHandler::getSkippedVersion() === '') {
-            return false;
-        }
+        // The last case: Xdebug 3+ running inactive.
+        return ini_get_unsafe('xdebug.mode') === '';
 
         // Why going through all the trouble above? We don't want to enable
         // Xdebug when there are more compelling choices. In the end the user is
         // still in control: they can provide XDEBUG_MODE=coverage on their own.
-        return true;
     }
 }
