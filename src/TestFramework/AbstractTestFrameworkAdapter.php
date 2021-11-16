@@ -100,13 +100,13 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     /**
      * Returns array of arguments to pass them into the Mutant Process
      *
-     * @param TestLocation[] $tests
+     * @param TestLocation[] $coverageTests
      *
      * @return string[]
      */
     public function getMutantCommandLine(
-        array $tests,
-        string $mutantFilePath,
+        array $coverageTests,
+        string $mutatedFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath,
         string $extraOptions
@@ -115,13 +115,13 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
             [],
             $this->argumentsAndOptionsBuilder->buildForMutant(
                 $this->buildMutationConfigFile(
-                    $tests,
-                    $mutantFilePath,
+                    $coverageTests,
+                    $mutatedFilePath,
                     $mutationHash,
                     $mutationOriginalFilePath
                 ),
                 $extraOptions,
-                $tests
+                $coverageTests
             )
         );
     }

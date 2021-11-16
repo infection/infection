@@ -469,7 +469,7 @@ final class ProfileList
         'SyntaxError' => Mutator\SyntaxError::class,
     ];
 
-    /** @var array<int, string>|null */
+    /** @var array<string, string>|null */
     private static ?array $defaultProfileMutators = null;
 
     /**
