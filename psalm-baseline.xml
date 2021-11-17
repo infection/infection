@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.1.1@16bfbd9224698bd738c665f33039fade2a1a3977">
-  <file src="src/Mutator/Regex/PregMatchRemoveCaret.php">
-    <ImpureFunctionCall occurrences="1">
-      <code>preg_match</code>
-    </ImpureFunctionCall>
+<files psalm-version="4.x-dev@">
+  <file src="src/Mutator/IgnoreMutator.php">
+    <InvalidArgument occurrences="1">
+      <code>$node</code>
+    </InvalidArgument>
   </file>
-  <file src="src/Mutator/Regex/PregMatchRemoveDollar.php">
-    <ImpureFunctionCall occurrences="1">
-      <code>preg_match</code>
-    </ImpureFunctionCall>
+  <file src="src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php">
+    <InvalidReturnType occurrences="1">
+      <code>iterable&lt;string, string&gt;</code>
+    </InvalidReturnType>
   </file>
-  <file src="src/Mutator/Regex/PregMatchRemoveFlags.php">
-    <ImpureFunctionCall occurrences="1">
-      <code>preg_match</code>
-    </ImpureFunctionCall>
+  <file src="src/TestFramework/Factory.php">
+    <InvalidArgument occurrences="1">
+      <code>$this-&gt;sourceFileFilter-&gt;filter($this-&gt;infectionConfig-&gt;getSourceFiles())</code>
+    </InvalidArgument>
+  </file>
+  <file src="src/TestFramework/TestFrameworkExtraOptionsFilter.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>preg_replace('/\s+/', ' ', trim($actualExtraOptions))</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
   </file>
 </files>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <psalm
-    errorLevel="8"
+    errorLevel="6"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
@@ -8,18 +8,24 @@
     errorBaseline="psalm-baseline.xml"
 >
     <projectFiles>
-        <directory name="src/Mutator" />
+        <directory name="src" />
         <ignoreFiles>
+            <directory name="src/PhpParser" />
             <directory name="vendor" />
-           <directory name="src/PhpParser" />
         </ignoreFiles>
     </projectFiles>
 
     <issueHandlers>
         <ImpureMethodCall>
             <errorLevel type="suppress">
-                <file name="src/Mutator/Operator/Concat.php"/>
+                <directory name="src/Mutator"/>
             </errorLevel>
         </ImpureMethodCall>
+
+        <ImpureFunctionCall>
+            <errorLevel type="suppress">
+                <directory name="src/Mutator/Regex"/>
+            </errorLevel>
+        </ImpureFunctionCall>
     </issueHandlers>
 </psalm>

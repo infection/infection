@@ -24,7 +24,7 @@ PHP_CS_FIXER_CACHE=.php_cs.cache
 PHPSTAN=./vendor/bin/phpstan
 
 PSALM=./.tools/psalm
-PSALM_URL="https://github.com/vimeo/psalm/releases/download/4.1.1/psalm.phar"
+PSALM_URL="https://github.com/vimeo/psalm/releases/download/4.12.0/psalm.phar"
 
 PHPUNIT=vendor/phpunit/phpunit/phpunit
 PARATEST=vendor/bin/paratest --runner=WrapperRunner
@@ -86,6 +86,10 @@ phpstan: vendor $(PHPSTAN)
 phpstan-baseline: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-src-baseline.neon || true
 	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-tests-baseline.neon || true
+
+.PHONY: psalm-baseline
+psalm-baseline: vendor
+	$(PSALM) --threads=4 --set-baseline=psalm-baseline.xml
 
 .PHONY: psalm
 psalm: vendor $(PSALM)
