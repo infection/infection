@@ -67,7 +67,8 @@
         "webmozart/path-util": "^2.3"
     },
     "conflict": {
-        "phpunit/php-code-coverage": ">9 <9.1.4"
+        "phpunit/php-code-coverage": ">9 <9.1.4",
+	    "dg/bypass-finals": "*"
     },
     "require-dev": {
         "ext-simplexml": "*",
