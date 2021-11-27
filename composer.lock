@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "119f7c2f2bf8fba0f60d0c8b738e3594",
+    "content-hash": "9c965a7ee872c12bda03105422e1b416",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -2026,6 +2026,7 @@
                 "issues": "https://github.com/webmozart/path-util/issues",
                 "source": "https://github.com/webmozart/path-util/tree/2.3.0"
             },
+            "abandoned": "symfony/filesystem",
             "time": "2015-12-17T08:42:14+00:00"
         }
     ],
