@@ -1,5 +1,21 @@
 # Change Log
 
+[Full Changelog](https://github.com/infection/infection/compare/0.25.3...0.25.4)
+
+## [0.25.4](https://github.com/infection/infection/tree/0.25.4) (2021-12-08)
+
+**Added:**
+
+* PHP 8.1 support https://github.com/infection/infection/pull/1535
+* Allow Symfony 6 https://github.com/infection/infection/pull/1606
+* Set `XDEBUG_MODE` for processes with coverage https://github.com/infection/infection/pull/1518
+* Add `dg/bypass-finals` to the conflict packages list https://github.com/infection/infection/pull/1605
+
+**Changed:**
+
+* Stop Infection execution with `0` exit code when git diff filter returns empty result https://github.com/infection/infection/pull/1600
+* feat: Concat does not generate mutant when both operands are the same https://github.com/infection/infection/pull/1602
+
 ## [0.25.0](https://github.com/infection/infection/tree/0.25.0) (2021-09-05)
 [Full Changelog](https://github.com/infection/infection/compare/0.24.0...0.25.0)
 
