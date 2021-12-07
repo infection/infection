@@ -101,7 +101,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends expect
 
       - name: Run the whole set of E2E tests
-        if: runner.os != 'Windows' && matrix.e2e-runner != 'build/infection.phar'
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
         env:
           TERM: xterm-256color
         run: |
