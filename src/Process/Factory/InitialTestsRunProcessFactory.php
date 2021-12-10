@@ -79,7 +79,7 @@ class InitialTestsRunProcessFactory
 
         $process->setTimeout(null); // Ignore the default timeout of 60 seconds
 
-        if (method_exists($process, 'inheritEnvironmentVariables') && version_compare((string) InstalledVersions::getVersion('symfony/console'), 'v4.4', '<')) {
+        if (method_exists($process, 'inheritEnvironmentVariables') && version_compare((string) InstalledVersions::getPrettyVersion('symfony/console'), 'v4.4', '<')) {
             // In version 4.4.0 this method is deprecated and removed in 5.0.0
             $process->inheritEnvironmentVariables();
         }
