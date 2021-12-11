@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        operating-system: [ubuntu-latest, windows-latest]
+        operating-system: [ubuntu-latest]
         php-version: ['7.4']
         coverage-driver: [pcov]
 
