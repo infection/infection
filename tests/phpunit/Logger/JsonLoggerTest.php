@@ -84,6 +84,7 @@ final class JsonLoggerTest extends TestCase
                     'errorCount' => 0,
                     'syntaxErrorCount' => 0,
                     'skippedCount' => 0,
+                    'ignoredCount' => 0,
                     'timeOutCount' => 0,
                     'msi' => 0,
                     'mutationCodeCoverage' => 0,
@@ -95,6 +96,7 @@ final class JsonLoggerTest extends TestCase
                 'errored' => [],
                 'syntaxErrors' => [],
                 'uncovered' => [],
+                'ignored' => [],
             ],
         ];
 
@@ -104,13 +106,14 @@ final class JsonLoggerTest extends TestCase
             $this->createCompleteResultsCollector(),
             [
                 'stats' => [
-                    'totalMutantsCount' => 14,
+                    'totalMutantsCount' => 16,
                     'killedCount' => 2,
                     'notCoveredCount' => 2,
                     'escapedCount' => 2,
                     'errorCount' => 2,
                     'syntaxErrorCount' => 2,
                     'skippedCount' => 2,
+                    'ignoredCount' => 2,
                     'timeOutCount' => 2,
                     'msi' => 66.67,
                     'mutationCodeCoverage' => 83.33,
@@ -237,6 +240,30 @@ final class JsonLoggerTest extends TestCase
                     ],
                 ],
                 'uncovered' => [],
+                'ignored' => [
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'PregQuote',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 9,
+                        ],
+                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#1';"),
+                        'processOutput' => 'process output',
+                    ],
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'For_',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 10,
+                        ],
+                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#0';"),
+                        'processOutput' => 'process output',
+                    ],
+                ],
             ],
         ];
 
@@ -253,6 +280,7 @@ final class JsonLoggerTest extends TestCase
                     'errorCount' => 0,
                     'syntaxErrorCount' => 0,
                     'skippedCount' => 0,
+                    'ignoredCount' => 0,
                     'timeOutCount' => 0,
                     'msi' => 0,
                     'mutationCodeCoverage' => 0,
@@ -276,6 +304,48 @@ final class JsonLoggerTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                 ],
+                'ignored' => [],
+            ],
+        ];
+
+        yield 'Ignored mutations' => [
+            true,
+            $this->createIgnoredMetricsCalculator(),
+            $this->createIgnoredResultsCollector(),
+            [
+                'stats' => [
+                    'totalMutantsCount' => 1,
+                    'killedCount' => 0,
+                    'notCoveredCount' => 0,
+                    'escapedCount' => 0,
+                    'errorCount' => 0,
+                    'syntaxErrorCount' => 0,
+                    'skippedCount' => 0,
+                    'ignoredCount' => 1,
+                    'timeOutCount' => 0,
+                    'msi' => 0,
+                    'mutationCodeCoverage' => 0,
+                    'coveredCodeMsi' => 0,
+                ],
+                'escaped' => [],
+                'timeouted' => [],
+                'killed' => [],
+                'errored' => [],
+                'syntaxErrors' => [],
+                'uncovered' => [],
+                'ignored' => [
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'For_',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 10,
+                        ],
+                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#0';"),
+                        'processOutput' => 'process output',
+                    ],
+                ],
             ],
         ];
 
@@ -292,6 +362,7 @@ final class JsonLoggerTest extends TestCase
                     'errorCount' => 0,
                     'syntaxErrorCount' => 0,
                     'skippedCount' => 0,
+                    'ignoredCount' => 0,
                     'timeOutCount' => 0,
                     'msi' => 0,
                     'mutationCodeCoverage' => 0,
@@ -315,6 +386,7 @@ final class JsonLoggerTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                 ],
+                'ignored' => [],
             ],
         ];
     }
@@ -350,6 +422,36 @@ final class JsonLoggerTest extends TestCase
                 For_::class,
                 DetectionStatus::NOT_COVERED,
                 'uncovered#0'
+            ),
+        );
+    }
+
+    private function createIgnoredMetricsCalculator(): MetricsCalculator
+    {
+        $collector = new MetricsCalculator(2);
+
+        $this->initIgnoredCollector($collector);
+
+        return $collector;
+    }
+
+    private function createIgnoredResultsCollector(): ResultsCollector
+    {
+        $collector = new ResultsCollector();
+
+        $this->initIgnoredCollector($collector);
+
+        return $collector;
+    }
+
+    private function initIgnoredCollector(Collector $collector): void
+    {
+        $collector->collect(
+            $this->createMutantExecutionResult(
+                0,
+                For_::class,
+                DetectionStatus::IGNORED,
+                'ignored#0'
             ),
         );
     }

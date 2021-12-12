@@ -76,6 +76,7 @@ final class JsonLogger implements LineMutationTestingResultsLogger
                 'errorCount' => $this->metricsCalculator->getErrorCount(),
                 'syntaxErrorCount' => $this->metricsCalculator->getSyntaxErrorCount(),
                 'skippedCount' => $this->metricsCalculator->getSkippedCount(),
+                'ignoredCount' => $this->metricsCalculator->getIgnoredCount(),
                 'timeOutCount' => $this->metricsCalculator->getTimedOutCount(),
                 'msi' => $this->metricsCalculator->getMutationScoreIndicator(),
                 'mutationCodeCoverage' => $this->metricsCalculator->getCoverageRate(),
@@ -87,6 +88,7 @@ final class JsonLogger implements LineMutationTestingResultsLogger
             'errored' => $this->getResultsLine($this->resultsCollector->getErrorExecutionResults()),
             'syntaxErrors' => $this->getResultsLine($this->resultsCollector->getSyntaxErrorExecutionResults()),
             'uncovered' => $this->onlyCoveredMode ? [] : $this->getResultsLine($this->resultsCollector->getNotCoveredExecutionResults()),
+            'ignored' => $this->getResultsLine($this->resultsCollector->getIgnoredExecutionResults()),
         ];
 
         return [json_encode($data, JSON_THROW_ON_ERROR)];
@@ -101,7 +103,7 @@ final class JsonLogger implements LineMutationTestingResultsLogger
     {
         $mutatorRows = [];
 
-        foreach ($executionResults as $index => $mutantProcess) {
+        foreach ($executionResults as $mutantProcess) {
             $mutatorRows[] = [
                 'mutator' => [
                     'mutatorName' => $mutantProcess->getMutatorName(),

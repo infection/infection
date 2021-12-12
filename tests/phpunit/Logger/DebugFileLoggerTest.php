@@ -86,6 +86,9 @@ Timed Out mutants:
 Skipped mutants:
 ================
 
+Ignored mutants:
+================
+
 Not Covered mutants:
 ====================
 
@@ -97,7 +100,7 @@ TXT
             $this->createCompleteResultsCollector(),
             false,
             <<<'TXT'
-Total: 14
+Total: 16
 
 Killed mutants:
 ===============
@@ -156,6 +159,16 @@ Mutator: For_
 Line 10
 
 Mutator: PregQuote
+Line 10
+
+
+Ignored mutants:
+================
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
 Line 10
 
 
@@ -176,7 +189,7 @@ TXT
             $this->createCompleteResultsCollector(),
             true,
             <<<'TXT'
-Total: 14
+Total: 16
 
 Killed mutants:
 ===============
@@ -235,6 +248,16 @@ Mutator: For_
 Line 10
 
 Mutator: PregQuote
+Line 10
+
+
+Ignored mutants:
+================
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
 Line 10
 
 TXT

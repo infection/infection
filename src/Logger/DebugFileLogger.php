@@ -104,6 +104,11 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
             'Skipped',
             $separateSections
         );
+        $logs[] = $this->getResultsLine(
+            $this->resultsCollector->getIgnoredExecutionResults(),
+            'Ignored',
+            $separateSections
+        );
 
         if (!$this->onlyCoveredMode) {
             $logs[] = $this->getResultsLine(

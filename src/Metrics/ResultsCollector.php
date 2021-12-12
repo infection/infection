@@ -73,7 +73,7 @@ class ResultsCollector implements Collector
             if (!array_key_exists($detectionStatus, $this->resultsByStatus)) {
                 throw new InvalidArgumentException(sprintf(
                     'Unknown execution result process result code "%s"',
-                    $executionResult->getDetectionStatus()
+                    $detectionStatus
                 ));
             }
 
@@ -143,6 +143,14 @@ class ResultsCollector implements Collector
     public function getNotCoveredExecutionResults(): array
     {
         return $this->getResultListForStatus(DetectionStatus::NOT_COVERED)->getSortedExecutionResults();
+    }
+
+    /**
+     * @return MutantExecutionResult[]
+     */
+    public function getIgnoredExecutionResults(): array
+    {
+        return $this->getResultListForStatus(DetectionStatus::IGNORED)->getSortedExecutionResults();
     }
 
     private function getResultListForStatus(string $detectionStatus): SortableMutantExecutionResults

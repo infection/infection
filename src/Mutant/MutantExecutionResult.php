@@ -108,6 +108,11 @@ class MutantExecutionResult
         return self::createFromMutant($mutant, DetectionStatus::SKIPPED);
     }
 
+    public static function createFromIgnoredMutant(Mutant $mutant): self
+    {
+        return self::createFromMutant($mutant, DetectionStatus::IGNORED);
+    }
+
     public function getProcessCommandLine(): string
     {
         return $this->processCommandLine;
