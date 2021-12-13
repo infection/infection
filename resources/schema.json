@@ -52,11 +52,15 @@
                 },
                 "summary": {
                     "type": "string",
-                    "definition": "Summary log file, which display the amount of mutants per category, (Killed, Errored, Escaped, Timed Out & Not Covered). More intended for internal purposes."
+                    "definition": "Summary log file, which displays the amount of mutants per category, (Killed, Errored, Escaped, Timed Out & Not Covered). More intended for internal purposes."
                 },
                 "json": {
                     "type": "string",
                     "definition": "JSON log file, which contains information about all mutants, as well as the source and mutated code and test framework output. Useful for using on CI servers to be able to programmatically analyze it."
+                },
+                "html": {
+                    "type": "string",
+                    "definition": "HTML report, which displays MSI values as well as mutated files with Killed and Escaped mutants with diffs for them. Human readable report, similar to PHPUnit HTML report."
                 },
                 "debug": {
                     "type": "string",

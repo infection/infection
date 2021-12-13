@@ -37,6 +37,8 @@ namespace Infection\Logger;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
+use Infection\Logger\Html\HtmlFileLogger;
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Psr\Log\LoggerInterface;
@@ -56,6 +58,7 @@ class FileLoggerFactory
     private bool $debugMode;
     private bool $onlyCoveredCode;
     private LoggerInterface $logger;
+    private StrykerHtmlReportBuilder $strykerHtmlReportBuilder;
 
     public function __construct(
         MetricsCalculator $metricsCalculator,
@@ -64,7 +67,8 @@ class FileLoggerFactory
         string $logVerbosity,
         bool $debugMode,
         bool $onlyCoveredCode,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        StrykerHtmlReportBuilder $strykerHtmlReportBuilder
     ) {
         $this->metricsCalculator = $metricsCalculator;
         $this->resultsCollector = $resultsCollector;
@@ -73,6 +77,7 @@ class FileLoggerFactory
         $this->debugMode = $debugMode;
         $this->onlyCoveredCode = $onlyCoveredCode;
         $this->logger = $logger;
+        $this->strykerHtmlReportBuilder = $strykerHtmlReportBuilder;
     }
 
     public function createFromLogEntries(Logs $logConfig): MutationTestingResultsLogger
@@ -100,6 +105,8 @@ class FileLoggerFactory
         }
 
         yield $logConfig->getTextLogFilePath() => $this->createTextLogger();
+
+        yield $logConfig->getHtmlLogFilePath() => $this->createHtmlLogger();
 
         yield $logConfig->getSummaryLogFilePath() => $this->createSummaryLogger();
 
@@ -131,6 +138,13 @@ class FileLoggerFactory
             $this->logVerbosity === LogVerbosity::DEBUG,
             $this->onlyCoveredCode,
             $this->debugMode
+        );
+    }
+
+    private function createHtmlLogger(): LineMutationTestingResultsLogger
+    {
+        return new HtmlFileLogger(
+            $this->strykerHtmlReportBuilder,
         );
     }
 

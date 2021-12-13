@@ -43,6 +43,7 @@ trait LogsAssertions
     private function assertLogsStateIs(
         Logs $logs,
         ?string $expectedTextLogFilePath,
+        ?string $expectedHtmlLogFilePath,
         ?string $expectedSummaryLogFilePath,
         ?string $expectedJsonLogFilePath,
         ?string $expectedDebugLogFilePath,
@@ -51,6 +52,7 @@ trait LogsAssertions
         ?Badge $expectedBadge
     ): void {
         $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
+        $this->assertSame($expectedHtmlLogFilePath, $logs->getHtmlLogFilePath());
         $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
         $this->assertSame($expectedJsonLogFilePath, $logs->getJsonLogFilePath());
         $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());

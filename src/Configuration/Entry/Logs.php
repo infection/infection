@@ -42,6 +42,7 @@ namespace Infection\Configuration\Entry;
 class Logs
 {
     private ?string $textLogFilePath;
+    private ?string $htmlLogFilePath;
     private ?string $summaryLogFilePath;
     private ?string $jsonLogFilePath;
     private ?string $debugLogFilePath;
@@ -51,6 +52,7 @@ class Logs
 
     public function __construct(
         ?string $textLogFilePath,
+        ?string $htmlLogFilePath,
         ?string $summaryLogFilePath,
         ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
@@ -59,6 +61,7 @@ class Logs
         ?Badge $badge
     ) {
         $this->textLogFilePath = $textLogFilePath;
+        $this->htmlLogFilePath = $htmlLogFilePath;
         $this->summaryLogFilePath = $summaryLogFilePath;
         $this->jsonLogFilePath = $jsonLogFilePath;
         $this->debugLogFilePath = $debugLogFilePath;
@@ -75,6 +78,7 @@ class Logs
             null,
             null,
             null,
+            null,
             false,
             null
         );
@@ -83,6 +87,11 @@ class Logs
     public function getTextLogFilePath(): ?string
     {
         return $this->textLogFilePath;
+    }
+
+    public function getHtmlLogFilePath(): ?string
+    {
+        return $this->htmlLogFilePath;
     }
 
     public function getSummaryLogFilePath(): ?string

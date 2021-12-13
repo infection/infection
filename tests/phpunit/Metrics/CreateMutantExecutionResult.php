@@ -88,11 +88,16 @@ trait CreateMutantExecutionResult
 
 DIFF
                 )),
+            'a1b2c3',
             MutatorName::getName(For_::class),
             'foo/bar',
             $id,
+            10 + $id,
+            $id,
+            10 + $id,
             now('<?php $a = 1;'),
-            now('<?php $a = 1;')
+            now('<?php $a = 1;'),
+            []
         );
     }
 }

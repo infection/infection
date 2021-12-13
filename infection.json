@@ -9,7 +9,8 @@
     "logs": {
         "badge": {
             "branch": "master"
-        }
+        },
+        "html": "infection.html"
     },
     "mutators": {
         "global-ignoreSourceCodeByRegex": [

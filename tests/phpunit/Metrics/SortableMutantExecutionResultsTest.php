@@ -193,11 +193,16 @@ final class SortableMutantExecutionResultsTest extends TestCase
             'Passed!',
             DetectionStatus::ESCAPED,
             now('#' . $id),
+            '#' . $id,
             MutatorName::getName(For_::class),
             $originalFilePath,
             $originalStartingLine,
+            $originalStartingLine + 10,
+            1,
+            5,
             now('<?php $a = 1;'),
-            now('<?php $a = 1;')
+            now('<?php $a = 1;'),
+            []
         );
     }
 }

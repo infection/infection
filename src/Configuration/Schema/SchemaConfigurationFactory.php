@@ -82,6 +82,7 @@ class SchemaConfigurationFactory
     {
         return new Logs(
             self::normalizeString($logs->text ?? null),
+            self::normalizeString($logs->html ?? null),
             self::normalizeString($logs->summary ?? null),
             self::normalizeString($logs->json ?? null),
             self::normalizeString($logs->debug ?? null),

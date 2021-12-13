@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -564,7 +565,8 @@ final class Container
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
                     $config->mutateOnlyCoveredCode(),
-                    $container->getLogger()
+                    $container->getLogger(),
+                    $container->getStrykerHtmlReportBuilder()
                 );
             },
             MutationTestingResultsLogger::class => static function (self $container): MutationTestingResultsLogger {
@@ -576,6 +578,9 @@ final class Container
                         $container->getConfiguration()->getLogs()
                     ),
                 ]));
+            },
+            StrykerHtmlReportBuilder::class => static function (self $container): StrykerHtmlReportBuilder {
+                return new StrykerHtmlReportBuilder($container->getMetricsCalculator(), $container->getResultsCollector());
             },
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
@@ -1296,6 +1301,11 @@ final class Container
     public function getGitDiffFileProvider(): GitDiffFileProvider
     {
         return $this->get(GitDiffFileProvider::class);
+    }
+
+    public function getStrykerHtmlReportBuilder(): StrykerHtmlReportBuilder
+    {
+        return $this->get(StrykerHtmlReportBuilder::class);
     }
 
     /**

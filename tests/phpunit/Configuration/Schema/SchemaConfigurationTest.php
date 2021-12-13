@@ -121,6 +121,7 @@ final class SchemaConfigurationTest extends TestCase
             new Source(['src', 'lib'], ['fixtures', 'tests']),
             new Logs(
                 'text.log',
+                'report.html',
                 'summary.log',
                 'json.log',
                 'debug.log',

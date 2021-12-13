@@ -189,11 +189,16 @@ trait CreateMetricsCalculator
 
 DIFF
             )),
+            'a1b2c3',
             MutatorName::getName($mutatorClassName),
             'foo/bar',
             10 - $i,
+            20 - $i,
+            10 - $i,
+            20 - $i,
             now('<?php $a = 1;'),
-            now('<?php $a = 2;')
+            now('<?php $a = 2;'),
+            []
         );
     }
 }

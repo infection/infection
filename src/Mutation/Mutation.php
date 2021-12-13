@@ -46,6 +46,8 @@ use function md5;
 use PhpParser\Node;
 use function Safe\array_flip;
 use Webmozart\Assert\Assert;
+use function strlen;
+use function strrpos;
 
 /**
  * @internal
@@ -130,6 +132,21 @@ class Mutation
     public function getOriginalStartingLine(): int
     {
         return (int) $this->attributes['startLine'];
+    }
+
+    public function getOriginalEndingLine(): int
+    {
+        return (int) $this->attributes['endLine'];
+    }
+
+    public function getOriginalStartFilePosition(): int
+    {
+        return (int) $this->attributes['startFilePos'];
+    }
+
+    public function getOriginalEndFilePosition(): int
+    {
+        return (int) $this->attributes['endFilePos'];
     }
 
     public function getMutatedNodeClass(): string

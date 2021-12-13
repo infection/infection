@@ -99,6 +99,7 @@ trait ConfigurationAssertions
         $this->assertLogsStateIs(
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),
+            $expectedLogs->getHtmlLogFilePath(),
             $expectedLogs->getSummaryLogFilePath(),
             $expectedLogs->getJsonLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),

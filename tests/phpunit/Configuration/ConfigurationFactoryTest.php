@@ -738,6 +738,7 @@ final class ConfigurationFactoryTest extends TestCase
                 new Source(['src/'], ['vendor/']),
                 new Logs(
                     'text.log',
+                    'report.html',
                     'summary.log',
                     'json.log',
                     'debug.log',
@@ -792,6 +793,7 @@ final class ConfigurationFactoryTest extends TestCase
             ['vendor/'],
             new Logs(
                 'text.log',
+                'report.html',
                 'summary.log',
                 'json.log',
                 'debug.log',

@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use function array_map;
-use function get_class;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
@@ -45,6 +43,8 @@ use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\GitHubAnnotationsLogger;
+use Infection\Logger\Html\HtmlFileLogger;
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\JsonLogger;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\PerMutatorLogger;
@@ -57,6 +57,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Filesystem\Filesystem;
+use function array_map;
+use function get_class;
 
 /**
  * @group integration
@@ -96,6 +98,7 @@ final class FileLoggerFactoryTest extends TestCase
 
         $logger = $factory->createFromLogEntries(
             new Logs(
+                '/a/file',
                 '/a/file',
                 '/a/file',
                 '/a/file',
@@ -141,14 +144,30 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 false,
                 null
             ),
             [TextFileLogger::class],
         ];
 
+        yield 'html logger' => [
+            new Logs(
+                null,
+                'html',
+                null,
+                null,
+                null,
+                null,
+                false,
+                null
+            ),
+            [HtmlFileLogger::class],
+        ];
+
         yield 'summary logger' => [
             new Logs(
+                null,
                 null,
                 'summary_file',
                 null,
@@ -165,6 +184,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 'debug_file',
                 null,
                 false,
@@ -175,6 +195,7 @@ final class FileLoggerFactoryTest extends TestCase
 
         yield 'json logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 'json_file',
@@ -188,6 +209,7 @@ final class FileLoggerFactoryTest extends TestCase
 
         yield 'per mutator logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -206,6 +228,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 true,
                 null
             ),
@@ -215,6 +238,7 @@ final class FileLoggerFactoryTest extends TestCase
         yield 'all loggers' => [
             new Logs(
                 'text',
+                'html',
                 'summary',
                 'json',
                 'debug',
@@ -224,6 +248,7 @@ final class FileLoggerFactoryTest extends TestCase
             ),
             [
                 TextFileLogger::class,
+                HtmlFileLogger::class,
                 SummaryFileLogger::class,
                 JsonLogger::class,
                 DebugFileLogger::class,
@@ -246,6 +271,7 @@ final class FileLoggerFactoryTest extends TestCase
             $debugMode,
             $onlyCoveredCode,
             new FakeLogger(),
+            new StrykerHtmlReportBuilder($this->metricsCalculator, $this->resultsCollector)
         );
     }
 

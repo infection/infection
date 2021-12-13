@@ -48,6 +48,7 @@ final class LogsTest extends TestCase
      */
     public function test_it_can_be_instantiated(
         ?string $textLogFilePath,
+        ?string $htmlLogFilePath,
         ?string $summaryLogFilePath,
         ?string $jsonLogFilePath,
         ?string $debugLogFilePath,
@@ -57,6 +58,7 @@ final class LogsTest extends TestCase
     ): void {
         $logs = new Logs(
             $textLogFilePath,
+            $htmlLogFilePath,
             $summaryLogFilePath,
             $jsonLogFilePath,
             $debugLogFilePath,
@@ -68,6 +70,7 @@ final class LogsTest extends TestCase
         $this->assertLogsStateIs(
             $logs,
             $textLogFilePath,
+            $htmlLogFilePath,
             $summaryLogFilePath,
             $jsonLogFilePath,
             $debugLogFilePath,
@@ -88,6 +91,7 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
             false,
             null
         );
@@ -101,12 +105,14 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
             false,
             null,
         ];
 
         yield 'complete' => [
             'text.log',
+            'report.html',
             'summary.log',
             'json.log',
             'debug.log',
