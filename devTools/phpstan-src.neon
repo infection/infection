@@ -34,10 +34,10 @@ parameters:
         -
             path: '../src/TestFramework/Coverage/CoverageChecker.php'
             message: '#Function ini_get is unsafe to use#'
-    level: max
+    level: 8
     paths:
         - ../src
-    excludes_analyse:
+    excludePaths:
         - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
     stubFiles:
         - phpstan.stub
