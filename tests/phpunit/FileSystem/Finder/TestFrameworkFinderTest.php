@@ -67,11 +67,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     private static $pathName;
 
     /**
-     * @var array
-     */
-    private static $names;
-
-    /**
      * @var Filesystem
      */
     private $fileSystem;
@@ -82,7 +77,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     public static function setUpBeforeClass(): void
     {
         self::$pathName = getenv('PATH') ? 'PATH' : 'Path';
-        self::$names = [self::$pathName, 'PATHEXT'];
     }
 
     protected function setUp(): void

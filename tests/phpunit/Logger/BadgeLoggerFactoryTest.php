@@ -39,56 +39,25 @@ use function array_map;
 use function get_class;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
-use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
 use Infection\Logger\BadgeLoggerFactory;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\FakeCiDetector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group integration
  */
 final class BadgeLoggerFactoryTest extends TestCase
 {
-    /**
-     * @var MetricsCalculator
-     */
-    private $metricsCalculator;
-
-    /**
-     * @var ResultsCollector
-     */
-    private $resultsCollector;
-
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
-
-    protected function setUp(): void
-    {
-        $this->metricsCalculator = new MetricsCalculator(2);
-        $this->resultsCollector = new ResultsCollector();
-
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
-    }
-
     public function test_it_does_not_create_any_logger_for_no_verbosity_level_and_no_badge(): void
     {
-        $factory = $this->createLoggerFactory(
-            LogVerbosity::NONE,
-            true,
-            true
-        );
+        $factory = $this->createLoggerFactory();
 
         $logger = $factory->createFromLogEntries(
             new Logs(
@@ -107,11 +76,7 @@ final class BadgeLoggerFactoryTest extends TestCase
 
     public function test_it_creates_a_badge_logger_on_no_verbosity(): void
     {
-        $factory = $this->createLoggerFactory(
-            LogVerbosity::NONE,
-            true,
-            true
-        );
+        $factory = $this->createLoggerFactory();
 
         $logger = $factory->createFromLogEntries(
             new Logs(
@@ -135,11 +100,7 @@ final class BadgeLoggerFactoryTest extends TestCase
         Logs $logs,
         ?string $expectedLogger
     ): void {
-        $factory = $this->createLoggerFactory(
-            LogVerbosity::NORMAL,
-            true,
-            true
-        );
+        $factory = $this->createLoggerFactory();
 
         $logger = $factory->createFromLogEntries($logs);
 
@@ -186,13 +147,10 @@ final class BadgeLoggerFactoryTest extends TestCase
         ];
     }
 
-    private function createLoggerFactory(
-        string $logVerbosity,
-        bool $debugMode,
-        bool $onlyCoveredCode
-    ): BadgeLoggerFactory {
+    private function createLoggerFactory(): BadgeLoggerFactory
+    {
         return new BadgeLoggerFactory(
-            $this->metricsCalculator,
+            new MetricsCalculator(2),
             new FakeCiDetector(),
             new FakeLogger(),
         );
