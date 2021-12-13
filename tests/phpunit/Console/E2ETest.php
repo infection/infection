@@ -275,6 +275,7 @@ final class E2ETest extends TestCase
 
         // $vendorDir is normally defined inside autoload_psr4.php, but PHPStan
         // can't see there, so have to both tell it so, and verify that too
+        // @phpstan-ignore-next-line
         $vendorDir = $vendorDir ?? null;
         $this->assertNotEmpty($vendorDir, 'Unexpected autoload_psr4.php found: please confirm that all dependencies are installed correctly for this fixture.');
 
