@@ -6,4 +6,5 @@ Syntax Errors: 0
 Escaped: 2
 Timed Out: 1
 Skipped: 0
+Ignored: 0
 Not Covered: 0

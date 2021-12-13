@@ -68,7 +68,8 @@ final class DotFormatter extends AbstractOutputFormatter
             . '<with-error>E</with-error>: fatal error, '
             . '<with-syntax-error>X</with-syntax-error>: syntax error, '
             . '<timeout>T</timeout>: timed out, '
-            . '<skipped>S</skipped>: skipped',
+            . '<skipped>S</skipped>: skipped, '
+            . '<ignored>I</ignored>: ignored',
             '',
         ]);
     }
@@ -104,6 +105,10 @@ final class DotFormatter extends AbstractOutputFormatter
                 break;
             case DetectionStatus::SYNTAX_ERROR:
                 $this->output->write('<with-syntax-error>X</with-syntax-error>');
+
+                break;
+            case DetectionStatus::IGNORED:
+                $this->output->write('<ignored>I</ignored>');
 
                 break;
         }

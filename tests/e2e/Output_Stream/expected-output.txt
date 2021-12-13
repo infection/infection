@@ -25,5 +25,8 @@ Timed Out mutants:
 Skipped mutants:
 ================
 
+Ignored mutants:
+================
+
 Not Covered mutants:
 ====================

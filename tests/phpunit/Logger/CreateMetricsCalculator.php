@@ -152,6 +152,18 @@ trait CreateMetricsCalculator
                 PregQuote::class,
                 DetectionStatus::NOT_COVERED,
                 'notCovered#1'
+            ),
+            $this->createMutantExecutionResult(
+                0,
+                For_::class,
+                DetectionStatus::IGNORED,
+                'ignored#0'
+            ),
+            $this->createMutantExecutionResult(
+                1,
+                PregQuote::class,
+                DetectionStatus::IGNORED,
+                'ignored#1'
             )
         );
     }

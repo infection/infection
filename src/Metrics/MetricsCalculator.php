@@ -113,6 +113,11 @@ class MetricsCalculator implements Collector
         return $this->countByStatus[DetectionStatus::SKIPPED];
     }
 
+    public function getIgnoredCount(): int
+    {
+        return $this->countByStatus[DetectionStatus::IGNORED];
+    }
+
     public function getEscapedCount(): int
     {
         return $this->countByStatus[DetectionStatus::ESCAPED];
@@ -135,7 +140,7 @@ class MetricsCalculator implements Collector
 
     public function getTestedMutantsCount(): int
     {
-        return $this->getTotalMutantsCount() - $this->getSkippedCount();
+        return $this->getTotalMutantsCount() - $this->getSkippedCount() - $this->getIgnoredCount();
     }
 
     /**

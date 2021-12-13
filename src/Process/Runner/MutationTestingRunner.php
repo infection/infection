@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use function array_key_exists;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
@@ -107,12 +106,12 @@ class MutationTestingRunner
             ->filter(function (Mutant $mutant): bool {
                 $mutatorName = $mutant->getMutation()->getMutatorName();
 
-                if (!array_key_exists($mutatorName, $this->ignoreSourceCodeMutatorsMap)) {
-                    return true;
-                }
-
-                foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] as $sourceCodeRegex) {
+                foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] ?? [] as $sourceCodeRegex) {
                     if ($this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {
+                        $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                            MutantExecutionResult::createFromIgnoredMutant($mutant)
+                        ));
+
                         return false;
                     }
                 }
@@ -146,9 +145,7 @@ class MutationTestingRunner
             ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
 
-                $process = $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
-
-                return $process;
+                return $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
             })
         ;
 

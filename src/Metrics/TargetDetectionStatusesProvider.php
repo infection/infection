@@ -130,6 +130,8 @@ class TargetDetectionStatusesProvider
             if (!$this->onlyCoveredMode) {
                 yield DetectionStatus::NOT_COVERED;
             }
+
+            yield DetectionStatus::IGNORED;
         }
 
         // Follows the logic in TextFileLogger
@@ -151,6 +153,8 @@ class TargetDetectionStatusesProvider
             if (!$this->onlyCoveredMode) {
                 yield DetectionStatus::NOT_COVERED;
             }
+
+            yield DetectionStatus::IGNORED;
         }
     }
 }

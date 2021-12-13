@@ -69,6 +69,7 @@ Syntax Errors: 0
 Escaped: 0
 Timed Out: 0
 Skipped: 0
+Ignored: 0
 Not Covered: 0
 
 TXT
@@ -77,7 +78,7 @@ TXT
         yield 'all mutations' => [
             $this->createCompleteMetricsCalculator(),
             <<<'TXT'
-Total: 14
+Total: 16
 
 Killed: 2
 Errored: 2
@@ -85,6 +86,7 @@ Syntax Errors: 2
 Escaped: 2
 Timed Out: 2
 Skipped: 2
+Ignored: 2
 Not Covered: 2
 
 TXT

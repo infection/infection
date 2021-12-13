@@ -45,6 +45,7 @@ use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
@@ -312,20 +313,20 @@ final class MutationTestingRunnerTest extends TestCase
 
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
+        $mutant = MutantBuilder::build(
+            '/path/to/mutant0',
+            $mutation0,
+            'mutated code 0',
+            '- Assert::integer(1)',
+            '<?php $a = 1;'
+        );
+
         $this->mutantFactoryMock
             ->method('create')
             ->withConsecutive(
                 [$mutation0],
             )
-            ->willReturnOnConsecutiveCalls(
-                MutantBuilder::build(
-                    '/path/to/mutant0',
-                    $mutation0,
-                    'mutated code 0',
-                    '- Assert::integer(1)',
-                    '<?php $a = 1;'
-                ),
-            )
+            ->willReturnOnConsecutiveCalls($mutant)
         ;
 
         $this->fileSystemMock
@@ -363,6 +364,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutationTestingWasStarted(0),
+                new MutantProcessWasFinished(MutantExecutionResult::createFromNonCoveredMutant($mutant)),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -458,18 +460,18 @@ final class MutationTestingRunnerTest extends TestCase
             $this->assertIsInstanceOfAny($expectedClasses, $expectedEvent);
             $this->assertArrayHasKey($index, $actualEvents, $assertionErrorMessage);
 
-            $exepectedEventClass = get_class($expectedEvent);
+            $expectedEventClass = get_class($expectedEvent);
 
             // Handle mocks
             foreach ($expectedClasses as $expectedClassName) {
                 if ($expectedEvent instanceof $expectedClassName) {
-                    $exepectedEventClass = $expectedClassName;
+                    $expectedEventClass = $expectedClassName;
                 }
             }
 
             $event = $actualEvents[$index];
             $this->assertInstanceOf(
-                $exepectedEventClass,
+                $expectedEventClass,
                 $event,
                 $assertionErrorMessage
             );

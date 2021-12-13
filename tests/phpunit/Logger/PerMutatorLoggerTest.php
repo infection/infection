@@ -66,8 +66,8 @@ final class PerMutatorLoggerTest extends TestCase
             <<<'TXT'
 # Effects per Mutator
 
-| Mutator | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | MSI (%s) | Covered MSI (%s) |
-| ------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | -------- | ---------------- |
+| Mutator | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+| ------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
 
 TXT
         ];
@@ -78,10 +78,10 @@ TXT
             <<<'TXT'
 # Effects per Mutator
 
-| Mutator   | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | MSI (%s) | Covered MSI (%s) |
-| --------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | -------- | ---------------- |
-| For_      |         7 |      1 |       1 |      1 |             1 |         1 |       1 |    66.67 |            80.00 |
-| PregQuote |         7 |      1 |       1 |      1 |             1 |         1 |       1 |    66.67 |            80.00 |
+| Mutator   | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+| --------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
+| For_      |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
+| PregQuote |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
 
 TXT
         ];

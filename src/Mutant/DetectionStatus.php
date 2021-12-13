@@ -51,6 +51,7 @@ final class DetectionStatus
     public const SKIPPED = 'skipped';
     public const SYNTAX_ERROR = 'syntax error';
     public const NOT_COVERED = 'not covered';
+    public const IGNORED = 'ignored';
 
     public const ALL = [
         self::KILLED,
@@ -60,5 +61,6 @@ final class DetectionStatus
         self::SKIPPED,
         self::SYNTAX_ERROR,
         self::NOT_COVERED,
+        self::IGNORED,
     ];
 }
