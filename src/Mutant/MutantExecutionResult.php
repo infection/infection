@@ -50,9 +50,6 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResult
 {
-    // todo private
-    public int $originalStartFilePosition;
-    public int $originalEndFilePosition;
     private string $processCommandLine;
     private string $processOutput;
     private string $detectionStatus;
@@ -66,15 +63,19 @@ class MutantExecutionResult
     private string $originalFilePath;
     private int $originalStartingLine;
     private int $originalEndingLine;
+    private int $originalStartFilePosition;
+    private int $originalEndFilePosition;
 
     /**
      * @var Deferred<string>
      */
     private Deferred $originalCode;
+
     /**
      * @var Deferred<string>
      */
     private Deferred $mutatedCode;
+
     /**
      * @var TestLocation[]
      */
@@ -209,19 +210,22 @@ class MutantExecutionResult
         return $this->tests;
     }
 
-    private function toColumn(string $code, int $pos): int
+    /**
+     * Adopted from https://github.com/nikic/PHP-Parser/blob/4abdcde5f16269959a834e4e58ea0ba0938ab133/lib/PhpParser/Error.php#L155
+     */
+    private function toColumn(string $code, int $position): int
     {
-        if ($pos > strlen($code)) {
+        if ($position > strlen($code)) {
             throw new RuntimeException('Invalid position information');
         }
 
-        $lineStartPos = strrpos($code, "\n", $pos - strlen($code));
+        $lineStartPos = strrpos($code, "\n", $position - strlen($code));
 
         if ($lineStartPos === false) {
             $lineStartPos = -1;
         }
 
-        return $pos - $lineStartPos;
+        return $position - $lineStartPos;
     }
 
     private static function createFromMutant(Mutant $mutant, string $detectionStatus): self

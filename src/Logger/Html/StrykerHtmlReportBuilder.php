@@ -44,10 +44,8 @@ use function array_reduce;
 use function array_slice;
 use function array_unique;
 use ArrayObject;
-use function count;
 use function current;
 use function explode;
-use function file_get_contents;
 use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -64,13 +62,18 @@ use Infection\Mutator\Removal\MethodCallRemoval;
 use function ltrim;
 use function md5;
 use const PHP_EOL;
-use function preg_match;
+use PhpParser\NodeAbstract;
+use function Safe\file_get_contents;
+use function Safe\preg_match;
+use function Safe\substr;
 use function strlen;
 use function strpos;
-use function substr;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
+/**
+ * @internal
+ */
 final class StrykerHtmlReportBuilder
 {
     private const DETECTION_STATUS_MAP = [
@@ -84,6 +87,7 @@ final class StrykerHtmlReportBuilder
     ];
 
     private const PLUS_LENGTH = 1;
+    private const DIFF_HEADERS_LINES_COUNT = 3;
 
     private MetricsCalculator $metricsCalculator;
     private ResultsCollector $resultsCollector;
@@ -106,7 +110,6 @@ final class StrykerHtmlReportBuilder
             ],
             'files' => $this->getFiles(),
             'testFiles' => $this->getTestFiles(),
-            // 'performance' => [], todo
             'framework' => [
                 'name' => 'Infection',
                 'branding' => [
@@ -131,7 +134,7 @@ final class StrykerHtmlReportBuilder
         $usedTests = [];
 
         $uniqueTests = array_reduce($allTests, static function (array $carry, TestLocation $testLocation) use (&$usedTests) {
-            $key = $testLocation->getFilePath() . $testLocation->getMethod();
+            $key = $testLocation->getMethod();
 
             if (!array_key_exists($key, $usedTests)) {
                 $carry[] = $testLocation;
@@ -162,6 +165,8 @@ final class StrykerHtmlReportBuilder
         if ($this->metricsCalculator->getTotalMutantsCount() !== 0) {
             $resultsByPath = $this->retrieveResultsByPath();
             $basePath = Path::getLongestCommonBasePath(array_keys($resultsByPath));
+
+            Assert::string($basePath, '$basePath must be a string');
 
             $files = $this->retrieveFiles($resultsByPath, $basePath);
         }
@@ -208,7 +213,6 @@ final class StrykerHtmlReportBuilder
         }
 
         return $results;
-//        return count($results) > 1 ? array_slice($results, 0, 1, true) : $results;
     }
 
     /**
@@ -236,22 +240,10 @@ final class StrykerHtmlReportBuilder
                     ? $result->getOriginalStartingLine()
                     : $result->getOriginalEndingLine();
 
-                // needed when remove method is on multiple lines
+                // needed when removed method is on multiple lines
                 if ($result->getMutatorName() === MutatorFactory::getMutatorNameForClassName(MethodCallRemoval::class)) {
                     $endingColumn = $result->getOriginalEndingColumn($originalCode) + 1;
                 }
-
-//                var_dump($result->getMutatorName());
-//                var_dump($result->getMutantDiff());
-//                var_dump($result->getOriginalStartingLine());
-//                var_dump($result->getOriginalEndingLine());
-//                var_dump($result->originalStartFilePosition);
-//                var_dump($result->originalEndFilePosition);
-//                var_dump($endingLine);
-//                var_dump($startingColumn);
-//                var_dump($endingColumn);
-//                var_dump($result->getOriginalStartingColumn($originalCode));
-//                var_dump($result->getOriginalEndingColumn($originalCode));
 
                 return [
                     'id' => $result->getMutantHash(),
@@ -264,7 +256,7 @@ final class StrykerHtmlReportBuilder
                     ],
                     'status' => self::DETECTION_STATUS_MAP[$result->getDetectionStatus()],
                     'statusReason' => $result->getProcessOutput(),
-                    'coveredBy' => array_unique(array_map( // todo unique? ask @sanmai
+                    'coveredBy' => array_unique(array_map(
                         fn (TestLocation $testLocation): string => $this->buildTestMethodId($testLocation->getMethod()),
                         $result->getTests()
                     )),
@@ -290,9 +282,9 @@ final class StrykerHtmlReportBuilder
             +++ New
             @@ @@
              */
-                array_slice($lines, 3),
+                array_slice($lines, self::DIFF_HEADERS_LINES_COUNT),
                 static function (string $line): bool {
-                    return isset($line[0]) && strpos($line, '+') === 0;
+                    return strpos($line, '+') === 0;
                 }
             )
         );
@@ -307,7 +299,7 @@ final class StrykerHtmlReportBuilder
     {
         $matches = [];
 
-        if (preg_match('/(?<name>\S+::\S+)(?:(?<dataname> with data set (?:#\d+|"[^"]+"))\s\()?/', $processOutput, $matches)) {
+        if (preg_match('/(?<name>\S+::\S+)(?<dataname> with data set (?:#\d+|"[^"]+"))?/', $processOutput, $matches) === 1) {
             return [$this->buildTestMethodId($matches['name'] . ($matches['dataname'] ?? ''))];
         }
 
@@ -318,8 +310,10 @@ final class StrykerHtmlReportBuilder
     {
         $matches = [];
 
-        if (preg_match('/Tests:\s(\d+),\sAssertions/', $processOutput, $matches)) {
-            return (int) ($matches[1] ?? 0);
+        if (preg_match('/Tests:\s(\d+),\sAssertions/', $processOutput, $matches) === 1) {
+            Assert::keyExists($matches, 1);
+
+            return (int) $matches[1];
         }
 
         return 0;
@@ -329,7 +323,7 @@ final class StrykerHtmlReportBuilder
     {
         Assert::keyExists(ProfileList::ALL_MUTATORS, $mutatorName);
 
-        /** @var Mutator $mutatorClass */
+        /** @var Mutator<NodeAbstract> $mutatorClass */
         $mutatorClass = ProfileList::ALL_MUTATORS[$mutatorName];
 
         $definition = $mutatorClass::getDefinition();
@@ -339,7 +333,10 @@ final class StrykerHtmlReportBuilder
         return $definition->getDescription();
     }
 
-    private function buildTest($testLocation): array
+    /**
+     * @return array{id: string, name: string}
+     */
+    private function buildTest(TestLocation $testLocation): array
     {
         return [
             'id' => $this->buildTestMethodId($testLocation->getMethod()),

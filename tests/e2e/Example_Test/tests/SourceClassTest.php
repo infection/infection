@@ -12,12 +12,4 @@ class SourceClassTest extends TestCase
         $sourceClass = new SourceClass();
         $this->assertSame('hello', $sourceClass->hello());
     }
-
-    public function test_this_test_case_kills_nothing(): void
-    {
-        $sourceClass = new SourceClass();
-        $sourceClass->hello();
-
-        $this->assertTrue(true);
-    }
 }

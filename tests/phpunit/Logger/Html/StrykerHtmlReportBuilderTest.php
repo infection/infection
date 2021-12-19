@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\Html;
 
 use function array_map;
-use function file_get_contents;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
@@ -54,11 +53,15 @@ use JsonSchema\Validator;
 use function Later\now;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
-use function realpath;
+use function Safe\file_get_contents;
 use function Safe\json_decode;
 use function Safe\json_encode;
+use function Safe\realpath;
 use function Safe\sprintf;
 
+/**
+ * @group integration
+ */
 final class StrykerHtmlReportBuilderTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/mutation-testing-report-schema.json';
@@ -100,9 +103,10 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             ],
         ];
 
-        $realPath = realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php');
+        $realPathForHtmlReport = realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php');
+        $realPathForHtmlReport2 = realpath(__DIR__ . '/../../Fixtures/ForHtmlReport2.php');
 
-        yield 'one mutation' => [
+        yield 'different mutations' => [
             $this->createFullHtmlReportMetricsCalculator(),
             $this->createFullHtmlReportResultsCollector(),
             [
@@ -112,9 +116,9 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                     'low' => 50,
                 ],
                 'files' => [
-                    $realPath => [
+                    'ForHtmlReport.php' => [
                         'language' => 'php',
-                        'source' => file_get_contents($realPath),
+                        'source' => file_get_contents($realPathForHtmlReport),
                         'mutants' => [
                             [
                                 'id' => '32f68ca331c9262cc97322271d88d06d',
@@ -135,9 +139,9 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                                 'description' => 'Removes the method call.',
                                 'location' => ['start' => ['line' => 15, 'column' => 9], 'end' => ['line' => 15, 'column' => 27]],
                                 'status' => 'Survived',
-                                'statusReason' => 'PHPUnit output. Tests: 1, Assertions: 3',
+                                'statusReason' => 'PHPUnit output. Tests: 1, Assertions: 3. Failure: 1) TestClass::test_method1 Failed',
                                 'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e'],
-                                'killedBy' => [],
+                                'killedBy' => ['06a6c58caae5aa33e9b787f064618f5e'],
                                 'testsCompleted' => 1,
                             ],
                             [
@@ -147,9 +151,9 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                                 'description' => 'Removes the method call.',
                                 'location' => ['start' => ['line' => 17, 'column' => 9], 'end' => ['line' => 19, 'column' => 11]],
                                 'status' => 'Survived',
-                                'statusReason' => 'PHPUnit output. Tests: 1, Assertions: 3',
-                                'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e'],
-                                'killedBy' => [],
+                                'statusReason' => 'PHPUnit output. Tests: 1, Assertions: 3. Failure: 1) TestClass::test_method1 with data set #1',
+                                'coveredBy' => ['2b67abde50b026f4057311ea32409632'],
+                                'killedBy' => ['2b67abde50b026f4057311ea32409632'],
                                 'testsCompleted' => 1,
                             ],
                             [
@@ -159,10 +163,28 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                                 'description' => "Removes an element of an array literal. For example:\n\n```php\n\$x = [0, 1, 2];\n```\n\nWill be mutated to:\n\n```php\n\$x = [1, 2];\n```\n\nAnd:\n\n```php\n\$x = [0, 2];\n```\n\nAnd:\n\n```php\n\$x = [0, 1];\n```\n\nWhich elements it removes or how many elements it will attempt to remove will depend on its\nconfiguration.\n",
                                 'location' => ['start' => ['line' => 28, 'column' => 9], 'end' => ['line' => 28, 'column' => 65]],
                                 'status' => 'Survived',
-                                'statusReason' => 'PHPUnit output. Tests: 1, Assertions: 3',
+                                'statusReason' => 'PHPUnit output. Tests: 3, Assertions: 3',
                                 'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e', '949bee6dd4ac608462995babbe81ee12', '2733f8c97b5ba92b1aacb77d46837b0e'],
                                 'killedBy' => [],
-                                'testsCompleted' => 1,
+                                'testsCompleted' => 3,
+                            ],
+                        ],
+                    ],
+                    'ForHtmlReport2.php' => [
+                        'language' => 'php',
+                        'source' => file_get_contents($realPathForHtmlReport2),
+                        'mutants' => [
+                            [
+                                'id' => '12f68ca331c9262cc97322271d88d06d',
+                                'mutatorName' => 'PublicVisibility',
+                                'replacement' => 'protected function add(int $a, int $b) : int',
+                                'description' => 'Replaces the `public` method visibility keyword with `protected`.',
+                                'location' => ['start' => ['line' => 13, 'column' => 5], 'end' => ['line' => 13, 'column' => 6]],
+                                'status' => 'Killed',
+                                'statusReason' => 'Output without ability to detect the number of executed tests',
+                                'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e'],
+                                'killedBy' => [],
+                                'testsCompleted' => 0,
                             ],
                         ],
                     ],
@@ -173,6 +195,10 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                             [
                                 'id' => '06a6c58caae5aa33e9b787f064618f5e',
                                 'name' => 'TestClass::test_method1',
+                            ],
+                            [
+                                'id' => '2b67abde50b026f4057311ea32409632',
+                                'name' => 'TestClass::test_method1 with data set #1',
                             ],
                         ],
                     ],
@@ -301,7 +327,8 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 196,
                 [
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
-                ]
+                ],
+                'PHPUnit output. Tests: 1, Assertions: 3. Failure: 1) TestClass::test_method1 Failed'
             ),
             // this tests diff on the multi-line (in original source code) method call removal
             $this->createMutantExecutionResult(
@@ -327,8 +354,9 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 207,
                 246,
                 [
-                    new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
-                ]
+                    new TestLocation('TestClass::test_method1 with data set #1', '/infection/path/to/TestClass.php', 0.123),
+                ],
+                'PHPUnit output. Tests: 1, Assertions: 3. Failure: 1) TestClass::test_method1 with data set #1'
             ),
             // this tests diff on the one-line diff with array item removal
             $this->createMutantExecutionResult(
@@ -357,7 +385,35 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
                     new TestLocation('TestClass2::test_method2', '/infection/path/to/TestClass2.php', 0.456),
                     new TestLocation('TestClass2::test_method3', '/infection/path/to/TestClass2.php', 0.789),
-                ]
+                ],
+                'PHPUnit output. Tests: 3, Assertions: 3'
+            ),
+            // add one test for the second file
+            $this->createMutantExecutionResult(
+                DetectionStatus::KILLED,
+                <<<'DIFF'
+                --- Original
+                +++ New
+                @@ @@
+                 use function array_fill_keys;
+                 final class ForHtmlReport2
+                 {
+                -    public function add(int $a, int $b) : int
+                +    protected function add(int $a, int $b) : int
+                     {
+                         return 0;
+                DIFF,
+                '12f68ca331c9262cc97322271d88d06d',
+                PublicVisibility::class,
+                realpath(__DIR__ . '/../../Fixtures/ForHtmlReport2.php'),
+                13,
+                35,
+                124,
+                547,
+                [
+                    new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
+                ],
+                'Output without ability to detect the number of executed tests'
             ),
         );
     }
@@ -375,11 +431,12 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         int $originalEndingLine,
         int $originalStartFilePosition,
         int $originalEndFilePosition,
-        array $testLocations
+        array $testLocations,
+        ?string $processOutput = 'PHPUnit output. Tests: 1, Assertions: 3'
     ): MutantExecutionResult {
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            'PHPUnit output. Tests: 1, Assertions: 3',
+            $processOutput,
             $detectionStatus,
             now(normalize_trailing_spaces($diff)),
             $mutantHash,

@@ -33,28 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\Html;
+namespace Infection\Tests\Logger\Html;
 
-use Infection\Logger\LineMutationTestingResultsLogger;
-use function Safe\json_encode;
+use Infection\Logger\Html\HtmlFileLogger;
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class HtmlFileLogger implements LineMutationTestingResultsLogger
+final class HtmlFileLoggerTest extends TestCase
 {
-    private StrykerHtmlReportBuilder $strykerHtmlReportBuilder;
-
-    public function __construct(
-        StrykerHtmlReportBuilder $strykerHtmlReportBuilder
-    ) {
-        $this->strykerHtmlReportBuilder = $strykerHtmlReportBuilder;
-    }
-
-    public function getLogLines(): array
+    public function test_it_builds_html(): void
     {
-        return [
-            <<<"HTML"
+        $htmlLogger = new HtmlFileLogger(new StrykerHtmlReportBuilder(new MetricsCalculator(2), new ResultsCollector()));
+
+        $logLines = $htmlLogger->getLogLines();
+
+        $this->assertSame(
+            <<<'HTML'
             <!DOCTYPE html>
             <html>
                 <body>
@@ -69,17 +65,13 @@ final class HtmlFileLogger implements LineMutationTestingResultsLogger
                         app.addEventListener('theme-changed', updateTheme);
                         updateTheme();
 
-                        document.getElementsByTagName('mutation-test-report-app').item(0).report = {$this->getMutationTestingReport()}
+                        document.getElementsByTagName('mutation-test-report-app').item(0).report = {"schemaVersion":"1","thresholds":{"high":90,"low":50},"files":{},"testFiles":{},"framework":{"name":"Infection","branding":{"homepageUrl":"https:\/\/infection.github.io\/","imageUrl":"https:\/\/infection.github.io\/images\/logo.png"}}}
                         ;
                     </script>
                 </body>
             </html>
-            HTML
-        ];
-    }
-
-    private function getMutationTestingReport(): string
-    {
-        return json_encode($this->strykerHtmlReportBuilder->build());
+            HTML,
+            $logLines[0]
+        );
     }
 }
