@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use function array_map;
+use function get_class;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
@@ -57,8 +59,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Filesystem\Filesystem;
-use function array_map;
-use function get_class;
 
 /**
  * @group integration

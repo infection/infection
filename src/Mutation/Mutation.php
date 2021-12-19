@@ -46,8 +46,6 @@ use function md5;
 use PhpParser\Node;
 use function Safe\array_flip;
 use Webmozart\Assert\Assert;
-use function strlen;
-use function strrpos;
 
 /**
  * @internal

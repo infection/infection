@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
 use function array_keys;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\ProfileList;
 use Later\Interfaces\Deferred;
-use Webmozart\Assert\Assert;
+use RuntimeException;
 use function strlen;
 use function strrpos;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -49,6 +50,9 @@ use function strrpos;
  */
 class MutantExecutionResult
 {
+    // todo private
+    public int $originalStartFilePosition;
+    public int $originalEndFilePosition;
     private string $processCommandLine;
     private string $processOutput;
     private string $detectionStatus;
@@ -75,8 +79,6 @@ class MutantExecutionResult
      * @var TestLocation[]
      */
     private array $tests;
-    private int $originalStartFilePosition;
-    private int $originalEndFilePosition;
 
     /**
      * @param Deferred<string> $mutantDiff
@@ -189,19 +191,6 @@ class MutantExecutionResult
         return $this->toColumn($originalCode, $this->originalEndFilePosition);
     }
 
-    private function toColumn(string $code, int $pos) : int {
-        if ($pos > strlen($code)) {
-            throw new \RuntimeException('Invalid position information');
-        }
-
-        $lineStartPos = strrpos($code, "\n", $pos - strlen($code));
-        if (false === $lineStartPos) {
-            $lineStartPos = -1;
-        }
-
-        return $pos - $lineStartPos;
-    }
-
     public function getOriginalCode(): string
     {
         return $this->originalCode->get();
@@ -218,6 +207,21 @@ class MutantExecutionResult
     public function getTests(): array
     {
         return $this->tests;
+    }
+
+    private function toColumn(string $code, int $pos): int
+    {
+        if ($pos > strlen($code)) {
+            throw new RuntimeException('Invalid position information');
+        }
+
+        $lineStartPos = strrpos($code, "\n", $pos - strlen($code));
+
+        if ($lineStartPos === false) {
+            $lineStartPos = -1;
+        }
+
+        return $pos - $lineStartPos;
     }
 
     private static function createFromMutant(Mutant $mutant, string $detectionStatus): self

@@ -1,26 +1,60 @@
 <?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 declare(strict_types=1);
 
-
 namespace Infection\Tests\Logger\Html;
 
-
+use function array_map;
+use function file_get_contents;
+use function implode;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
-use Infection\Logger\JsonLogger;
 use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutator\Loop\For_;
+use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\Removal\ArrayItemRemoval;
+use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Tests\Mutator\MutatorName;
-use JsonSchema\Validator;
-use PHPUnit\Framework\TestCase;
-use function array_map;
-use function implode;
 use function Infection\Tests\normalize_trailing_spaces;
+use JsonSchema\Validator;
 use function Later\now;
+use const PHP_EOL;
+use PHPUnit\Framework\TestCase;
+use function realpath;
 use function Safe\json_decode;
 use function Safe\json_encode;
 use function Safe\sprintf;
@@ -36,9 +70,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,
         array $expectedReport
-    ): void
-    {
-        $this->markTestSkipped();
+    ): void {
         $report = (new StrykerHtmlReportBuilder($metricsCalculator, $resultsCollector))->build();
 
         $this->assertSame($expectedReport, json_decode(json_encode($report), true));
@@ -62,48 +94,126 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                     'name' => 'Infection',
                     'branding' => [
                         'homepageUrl' => 'https://infection.github.io/',
-                        'imageUrl' => 'https://infection.github.io/images/logo.png'
-                    ]
-                ]
+                        'imageUrl' => 'https://infection.github.io/images/logo.png',
+                    ],
+                ],
             ],
         ];
 
+        $realPath = realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php');
+
         yield 'one mutation' => [
-            $this->createIgnoredMetricsCalculator(),
-            $this->createIgnoredResultsCollector(),
+            $this->createFullHtmlReportMetricsCalculator(),
+            $this->createFullHtmlReportResultsCollector(),
             [
                 'schemaVersion' => '1',
                 'thresholds' => [
                     'high' => 90,
                     'low' => 50,
                 ],
-                'files' => [],
-                'testFiles' => [],
+                'files' => [
+                    $realPath => [
+                        'language' => 'php',
+                        'source' => file_get_contents($realPath),
+                        'mutants' => [
+                            [
+                                'id' => '32f68ca331c9262cc97322271d88d06d',
+                                'mutatorName' => 'PublicVisibility',
+                                'replacement' => 'protected function add(int $a, int $b) : int',
+                                'description' => 'Replaces the `public` method visibility keyword with `protected`.',
+                                'location' => ['start' => ['line' => 13, 'column' => 5], 'end' => ['line' => 13, 'column' => 45]],
+                                'status' => 'Killed',
+                                'statusReason' => 'PHPUnit output. Tests: 1, Assertions: 3',
+                                'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e'],
+                                'killedBy' => [],
+                                'testsCompleted' => 1,
+                            ],
+                            [
+                                'id' => 'fd66aff56e903645c21271264b062b4f',
+                                'mutatorName' => 'MethodCallRemoval',
+                                'replacement' => '',
+                                'description' => 'Removes the method call.',
+                                'location' => ['start' => ['line' => 15, 'column' => 9], 'end' => ['line' => 15, 'column' => 27]],
+                                'status' => 'Survived',
+                                'statusReason' => 'PHPUnit output. Tests: 1, Assertions: 3',
+                                'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e'],
+                                'killedBy' => [],
+                                'testsCompleted' => 1,
+                            ],
+                            [
+                                'id' => '746519c01522ddc7da799a9b7927e4c2',
+                                'mutatorName' => 'MethodCallRemoval',
+                                'replacement' => '',
+                                'description' => 'Removes the method call.',
+                                'location' => ['start' => ['line' => 17, 'column' => 9], 'end' => ['line' => 19, 'column' => 11]],
+                                'status' => 'Survived',
+                                'statusReason' => 'PHPUnit output. Tests: 1, Assertions: 3',
+                                'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e'],
+                                'killedBy' => [],
+                                'testsCompleted' => 1,
+                            ],
+                            [
+                                'id' => '633b144fb6d55bbc60430df68a952388',
+                                'mutatorName' => 'ArrayItemRemoval',
+                                'replacement' => '$this->innerArray(array_keys([\'b\' => \'2\']));',
+                                'description' => "Removes an element of an array literal. For example:\n\n```php\n\$x = [0, 1, 2];\n```\n\nWill be mutated to:\n\n```php\n\$x = [1, 2];\n```\n\nAnd:\n\n```php\n\$x = [0, 2];\n```\n\nAnd:\n\n```php\n\$x = [0, 1];\n```\n\nWhich elements it removes or how many elements it will attempt to remove will depend on its\nconfiguration.\n",
+                                'location' => ['start' => ['line' => 28, 'column' => 9], 'end' => ['line' => 28, 'column' => 65]],
+                                'status' => 'Survived',
+                                'statusReason' => 'PHPUnit output. Tests: 1, Assertions: 3',
+                                'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e', '949bee6dd4ac608462995babbe81ee12', '2733f8c97b5ba92b1aacb77d46837b0e'],
+                                'killedBy' => [],
+                                'testsCompleted' => 1,
+                            ],
+                        ],
+                    ],
+                ],
+                'testFiles' => [
+                    '/infection/path/to/TestClass.php' => [
+                        'tests' => [
+                            [
+                                'id' => '06a6c58caae5aa33e9b787f064618f5e',
+                                'name' => 'TestClass::test_method1',
+                            ],
+                        ],
+                    ],
+                    '/infection/path/to/TestClass2.php' => [
+                        'tests' => [
+                            [
+                                'id' => '949bee6dd4ac608462995babbe81ee12',
+                                'name' => 'TestClass2::test_method2',
+                            ],
+                            [
+                                'id' => '2733f8c97b5ba92b1aacb77d46837b0e',
+                                'name' => 'TestClass2::test_method3',
+                            ],
+                        ],
+                    ],
+                ],
                 'framework' => [
                     'name' => 'Infection',
                     'branding' => [
                         'homepageUrl' => 'https://infection.github.io/',
-                        'imageUrl' => 'https://infection.github.io/images/logo.png'
-                    ]
-                ]
+                        'imageUrl' => 'https://infection.github.io/images/logo.png',
+                    ],
+                ],
             ],
         ];
     }
 
-    private function createIgnoredMetricsCalculator(): MetricsCalculator
+    private function createFullHtmlReportMetricsCalculator(): MetricsCalculator
     {
         $collector = new MetricsCalculator(2);
 
-        $this->initIgnoredCollector($collector);
+        $this->initHtmlReportCollector($collector);
 
         return $collector;
     }
 
-    private function createIgnoredResultsCollector(): ResultsCollector
+    private function createFullHtmlReportResultsCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
-        $this->initIgnoredCollector($collector);
+        $this->initHtmlReportCollector($collector);
 
         return $collector;
     }
@@ -114,7 +224,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
 
         $validator = new Validator();
 
-        $validator->validate($resultReport, (object)['$ref' => self::SCHEMA_FILE]);
+        $validator->validate($resultReport, (object) ['$ref' => self::SCHEMA_FILE]);
 
         $normalizedErrors = array_map(
             static function (array $error): string {
@@ -134,58 +244,154 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         );
     }
 
-    private function createCollectorWithOneMutant(): ResultsCollector
-    {
-        $collector = new ResultsCollector();
-
-        $this->initIgnoredCollector($collector);
-
-        return $collector;
-    }
-
-    private function initIgnoredCollector(Collector $collector): void
+    private function initHtmlReportCollector(Collector $collector): void
     {
         $collector->collect(
+            // this tests diffs on the method signature line
             $this->createMutantExecutionResult(
-                0,
-                For_::class,
-                DetectionStatus::IGNORED,
-                'ignored#0'
+                DetectionStatus::KILLED,
+                <<<'DIFF'
+                --- Original
+                +++ New
+                @@ @@
+                 use function array_fill_keys;
+                 final class ForHtmlReport
+                 {
+                -    public function add(int $a, int $b) : int
+                +    protected function add(int $a, int $b) : int
+                     {
+                         $this->inner('3');
+                         $this->inner('3');
+                DIFF,
+                '32f68ca331c9262cc97322271d88d06d',
+                PublicVisibility::class,
+                realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
+                13,
+                35,
+                124,
+                547,
+                [
+                    new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
+                    // check that duplicate values are moved in the report
+                    new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
+                ]
+            ),
+            // this tests diff on the one-line method call removal
+            $this->createMutantExecutionResult(
+                DetectionStatus::ESCAPED,
+                <<<'DIFF'
+                --- Original
+                +++ New
+                @@ @@
+                 {
+                     public function add(int $a, int $b) : int
+                     {
+                -        $this->inner('3');
+                +
+                         $this->inner('3');
+                         switch (true) {
+                             case 1 !== 1:
+                DIFF,
+                'fd66aff56e903645c21271264b062b4f',
+                MethodCallRemoval::class,
+                realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
+                15,
+                15,
+                179,
+                196,
+                [
+                    new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
+                ]
+            ),
+            // this tests diff on the multi-line (in original source code) method call removal
+            $this->createMutantExecutionResult(
+                DetectionStatus::ESCAPED,
+                <<<'DIFF'
+                --- Original
+                +++ New
+                @@ @@
+                     public function add(int $a, int $b) : int
+                     {
+                         $this->inner('3');
+                -        $this->inner('3');
+                +
+                         switch (true) {
+                             case 0 !== 1:
+                                 break;
+                DIFF,
+                '746519c01522ddc7da799a9b7927e4c2',
+                MethodCallRemoval::class,
+                realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
+                17,
+                19,
+                207,
+                246,
+                [
+                    new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
+                ]
+            ),
+            // this tests diff on the one-line diff with array item removal
+            $this->createMutantExecutionResult(
+                DetectionStatus::ESCAPED,
+                <<<'DIFF'
+                --- Original
+                +++ New
+                @@ @@
+                             default:
+                                 break;
+                         }
+                -        $this->innerArray(array_keys(['a' => '1', 'b' => '2']));
+                +        $this->innerArray(array_keys(['b' => '2']));
+                         if ($this instanceof ForHtmlReport) {
+                             // ...
+                         }
+                DIFF,
+                '633b144fb6d55bbc60430df68a952388',
+                ArrayItemRemoval::class,
+                realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
+                28,
+                28,
+                414,
+                437,
+                [
+                    new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
+                    new TestLocation('TestClass2::test_method2', '/infection/path/to/TestClass2.php', 0.456),
+                    new TestLocation('TestClass2::test_method3', '/infection/path/to/TestClass2.php', 0.789),
+                ]
             ),
         );
     }
 
+    /**
+     * @param array<int, TestLocation> $testLocations
+     */
     private function createMutantExecutionResult(
-        int $i,
-        string $mutatorClassName,
         string $detectionStatus,
-        string $echoMutatedMessage
+        string $diff,
+        string $mutantHash,
+        string $mutatorClassName,
+        string $originalFileRealPath,
+        int $originalStartingLine,
+        int $originalEndingLine,
+        int $originalStartFilePosition,
+        int $originalEndFilePosition,
+        array $testLocations
     ): MutantExecutionResult {
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            'process output',
+            'PHPUnit output. Tests: 1, Assertions: 3',
             $detectionStatus,
-            now(normalize_trailing_spaces(
-                <<<DIFF
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo '$echoMutatedMessage';
-
-DIFF
-            )),
-            'a1b2c3',
+            now(normalize_trailing_spaces($diff)),
+            $mutantHash,
             MutatorName::getName($mutatorClassName),
-            realpath(__DIR__ . '/../../Fixtures/EmptyClass.php'),
-            10 - $i,
-            20 - $i,
-            1,
-            1 + $i,
+            $originalFileRealPath,
+            $originalStartingLine,
+            $originalEndingLine,
+            $originalStartFilePosition,
+            $originalEndFilePosition,
             now('<?php $a = 1;'),
             now('<?php $a = 2;'),
-            []
+            $testLocations
         );
     }
 }

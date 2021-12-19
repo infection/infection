@@ -1,11 +1,55 @@
 <?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 declare(strict_types=1);
 
-
 namespace Infection\Logger\Html;
 
-
+use function array_filter;
+use function array_key_exists;
+use function array_keys;
+use function array_map;
+use function array_merge;
+use function array_reduce;
+use function array_slice;
+use function array_unique;
+use ArrayObject;
+use function count;
+use function current;
+use function explode;
+use function file_get_contents;
+use function implode;
+use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
@@ -17,28 +61,15 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
 use Infection\Mutator\Removal\MethodCallRemoval;
-use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
-use function array_filter;
-use function array_key_exists;
-use function array_keys;
-use function array_map;
-use function array_merge;
-use function array_reduce;
-use function array_slice;
-use function array_unique;
-use function current;
-use function explode;
-use function file_get_contents;
-use function implode;
-use function in_array;
-use function json_encode;
 use function ltrim;
 use function md5;
+use const PHP_EOL;
 use function preg_match;
 use function strlen;
 use function strpos;
 use function substr;
+use Webmozart\Assert\Assert;
+use Webmozart\PathUtil\Path;
 
 final class StrykerHtmlReportBuilder
 {
@@ -60,12 +91,10 @@ final class StrykerHtmlReportBuilder
     public function __construct(
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector
-    )
-    {
+    ) {
         $this->metricsCalculator = $metricsCalculator;
         $this->resultsCollector = $resultsCollector;
     }
-
 
     public function build(): array
     {
@@ -76,22 +105,21 @@ final class StrykerHtmlReportBuilder
                 'low' => 50,
             ],
             'files' => $this->getFiles(),
-//            'testFiles' => $this->getTestFiles(),
+            'testFiles' => $this->getTestFiles(),
             // 'performance' => [], todo
             'framework' => [
                 'name' => 'Infection',
                 'branding' => [
                     'homepageUrl' => 'https://infection.github.io/',
-                    'imageUrl' => 'https://infection.github.io/images/logo.png'
-                ]
-            ]
+                    'imageUrl' => 'https://infection.github.io/images/logo.png',
+                ],
+            ],
         ];
     }
 
-    private function getTestFiles(): \ArrayObject
+    private function getTestFiles(): ArrayObject
     {
         $testFiles = [];
-
         $allTests = [];
 
         foreach ($this->resultsCollector->getAllExecutionResults() as $result) {
@@ -116,28 +144,20 @@ final class StrykerHtmlReportBuilder
 
         foreach ($uniqueTests as $testLocation) {
             if (!array_key_exists($testLocation->getFilePath(), $testFiles)) {
-                $testFiles[$testLocation->getFilePath()]= [
-                    'tests' => [
-                        [
-                            'id' => md5($testLocation->getMethod()),
-                            'name' => $testLocation->getMethod()
-                        ]
-                    ]
+                $testFiles[$testLocation->getFilePath()] = [
+                    'tests' => [$this->buildTest($testLocation)],
                 ];
             } else {
-                $testFiles[$testLocation->getFilePath()]['tests'][] = [
-                    'id' => md5($testLocation->getMethod()),
-                    'name' => $testLocation->getMethod()
-                ];
+                $testFiles[$testLocation->getFilePath()]['tests'][] = $this->buildTest($testLocation);
             }
         }
 
-        return new \ArrayObject($testFiles);
+        return new ArrayObject($testFiles);
     }
 
-    private function getFiles(): \ArrayObject
+    private function getFiles(): ArrayObject
     {
-        $files = new \ArrayObject();
+        $files = new ArrayObject();
 
         if ($this->metricsCalculator->getTotalMutantsCount() !== 0) {
             $resultsByPath = $this->retrieveResultsByPath();
@@ -149,13 +169,12 @@ final class StrykerHtmlReportBuilder
         return $files;
     }
 
-
     /**
      * @param array<string, MutantExecutionResult[]> $resultsByPath
      */
-    private function retrieveFiles(array $resultsByPath, string $basePath): \ArrayObject
+    private function retrieveFiles(array $resultsByPath, string $basePath): ArrayObject
     {
-        $files = new \ArrayObject();
+        $files = new ArrayObject();
 
         foreach ($resultsByPath as $path => $results) {
             $relativePath = $path === $basePath ? $path : Path::makeRelative($path, $basePath);
@@ -170,7 +189,7 @@ final class StrykerHtmlReportBuilder
             $files[$relativePath] = [
                 'language' => 'php',
                 'source' => file_get_contents($path),
-                'mutants' => $this->retrieveMutants($results, $originalCode)
+                'mutants' => $this->retrieveMutants($results, $originalCode),
             ];
         }
 
@@ -189,6 +208,7 @@ final class StrykerHtmlReportBuilder
         }
 
         return $results;
+//        return count($results) > 1 ? array_slice($results, 0, 1, true) : $results;
     }
 
     /**
@@ -222,8 +242,11 @@ final class StrykerHtmlReportBuilder
                 }
 
 //                var_dump($result->getMutatorName());
-//                var_dump($replacement);
+//                var_dump($result->getMutantDiff());
 //                var_dump($result->getOriginalStartingLine());
+//                var_dump($result->getOriginalEndingLine());
+//                var_dump($result->originalStartFilePosition);
+//                var_dump($result->originalEndFilePosition);
 //                var_dump($endingLine);
 //                var_dump($startingColumn);
 //                var_dump($endingColumn);
@@ -236,19 +259,13 @@ final class StrykerHtmlReportBuilder
                     'replacement' => ltrim($replacement),
                     'description' => $this->getMutatorDescription($result->getMutatorName()),
                     'location' => [
-                        'start' => [
-                            'line' => $result->getOriginalStartingLine(),
-                            'column' => $startingColumn,
-                        ],
-                        'end' => [
-                            'line' => $endingLine,
-                            'column' => $endingColumn,
-                        ],
+                        'start' => ['line' => $result->getOriginalStartingLine(), 'column' => $startingColumn],
+                        'end' => ['line' => $endingLine, 'column' => $endingColumn],
                     ],
                     'status' => self::DETECTION_STATUS_MAP[$result->getDetectionStatus()],
                     'statusReason' => $result->getProcessOutput(),
                     'coveredBy' => array_unique(array_map( // todo unique? ask @sanmai
-                        static fn (TestLocation $testLocation): string => md5($testLocation->getMethod()),
+                        fn (TestLocation $testLocation): string => $this->buildTestMethodId($testLocation->getMethod()),
                         $result->getTests()
                     )),
                     'killedBy' => $this->getKilledBy($result->getProcessOutput()),
@@ -268,7 +285,7 @@ final class StrykerHtmlReportBuilder
                 return isset($line[0]) ? substr($line, self::PLUS_LENGTH) : $line;
             },
             array_filter(
-            /**
+            /*
             --- Original
             +++ New
             @@ @@
@@ -291,7 +308,7 @@ final class StrykerHtmlReportBuilder
         $matches = [];
 
         if (preg_match('/(?<name>\S+::\S+)(?:(?<dataname> with data set (?:#\d+|"[^"]+"))\s\()?/', $processOutput, $matches)) {
-            return [md5($matches['name'] . ($matches['dataname'] ?? ''))];
+            return [$this->buildTestMethodId($matches['name'] . ($matches['dataname'] ?? ''))];
         }
 
         return [];
@@ -320,5 +337,18 @@ final class StrykerHtmlReportBuilder
         Assert::notNull($definition);
 
         return $definition->getDescription();
+    }
+
+    private function buildTest($testLocation): array
+    {
+        return [
+            'id' => $this->buildTestMethodId($testLocation->getMethod()),
+            'name' => $testLocation->getMethod(),
+        ];
+    }
+
+    private function buildTestMethodId(string $testMethod): string
+    {
+        return md5($testMethod);
     }
 }
