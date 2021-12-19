@@ -12,6 +12,9 @@
         }
     },
     "mutators": {
+        "global-ignoreSourceCodeByRegex": [
+            "Assert::.*"
+        ],
         "@default": true
     }
 }
