@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
@@ -136,6 +137,21 @@ PHP
             ,
             [6],
         ];
+
+        yield 'function signature' => [
+            <<<'PHP'
+<?php
+
+class Test {
+    public function findMe() // line 4
+    {
+        // ...
+    }
+}
+PHP
+            ,
+            [4],
+        ];
     }
 
     private function createSpyTraverser()
@@ -144,10 +160,17 @@ PHP
             /**
              * @var int[]
              */
-            public $range = [];
+            public array $range = [];
 
             public function leaveNode(Node $node)
             {
+                if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === 'findMe') {
+                    $node->setAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, true);
+
+                    $lineRange = new LineRangeCalculator();
+                    $this->range = $lineRange->calculateRange($node)->range;
+                }
+
                 if ($node instanceof Node\Expr\Variable && $node->name === 'findMe') {
                     $lineRange = new LineRangeCalculator();
                     $this->range = $lineRange->calculateRange($node)->range;

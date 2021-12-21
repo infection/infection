@@ -40,6 +40,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -85,9 +86,9 @@ class TestLocator
      */
     private function getTestsForFunctionSignature(NodeLineRangeData $lineRange): iterable
     {
-        foreach ($lineRange->range as $line) {
-            yield from $this->getTestsForExecutedMethodOnLine($line);
-        }
+        Assert::count($lineRange->range, 1); // 1-line range
+
+        yield from $this->getTestsForExecutedMethodOnLine($lineRange->range[0]);
     }
 
     /**
