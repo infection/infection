@@ -178,7 +178,7 @@ final class ProxyTraceTest extends TestCase
         $this->assertCount(
             1,
             iterator_to_array($trace->getAllTestsForMutation(
-                new NodeLineRangeData(19, 22),
+                new NodeLineRangeData(19, 19),
                 true
             ))
         );
