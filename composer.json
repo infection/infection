@@ -89,7 +89,11 @@
         "platform": {
             "php": "7.4.7"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true,
+            "infection/extension-installer": true
+        }
     },
     "autoload": {
         "psr-4": {
