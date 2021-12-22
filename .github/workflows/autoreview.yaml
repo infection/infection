@@ -28,7 +28,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: composer:v2
+          tools: composer:v2.1
 
       - name: Get composer cache directory
         id: composer-cache
