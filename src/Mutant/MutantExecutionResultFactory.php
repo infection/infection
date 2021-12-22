@@ -106,7 +106,7 @@ class MutantExecutionResultFactory
 
         $output = $this->retrieveProcessOutput($process);
 
-        if ($this->testFrameworkAdapter->testsPass($output)) {
+        if ($process->getExitCode() === 0 && $this->testFrameworkAdapter->testsPass($output)) {
             return DetectionStatus::ESCAPED;
         }
 
