@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_key_exists;
+use function array_values;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
@@ -96,11 +97,19 @@ class TestLocator
      */
     private function getTestsForLineRange(NodeLineRangeData $lineRange): iterable
     {
+        // same test can cover more than 1 line. To avoid many duplications, we need to return unique tests after
+        // accumulating them by each line from the range
+        $uniqueTestLocations = [];
+
         foreach ($lineRange->range as $line) {
             if (array_key_exists($line, $this->testLocations->getTestsLocationsBySourceLine())) {
-                yield from $this->testLocations->getTestsLocationsBySourceLine()[$line];
+                foreach ($this->testLocations->getTestsLocationsBySourceLine()[$line] as $testLocation) {
+                    $uniqueTestLocations[$testLocation->getMethod()] = $testLocation;
+                }
             }
         }
+
+        yield from array_values($uniqueTestLocations);
     }
 
     /**
