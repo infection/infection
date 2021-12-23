@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use function array_key_exists;
 use function array_values;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -102,10 +101,8 @@ class TestLocator
         $uniqueTestLocations = [];
 
         foreach ($lineRange->range as $line) {
-            if (array_key_exists($line, $this->testLocations->getTestsLocationsBySourceLine())) {
-                foreach ($this->testLocations->getTestsLocationsBySourceLine()[$line] as $testLocation) {
-                    $uniqueTestLocations[$testLocation->getMethod()] = $testLocation;
-                }
+            foreach ($this->testLocations->getTestsLocationsBySourceLine()[$line] ?? [] as $testLocation) {
+                $uniqueTestLocations[$testLocation->getMethod()] = $testLocation;
             }
         }
 
