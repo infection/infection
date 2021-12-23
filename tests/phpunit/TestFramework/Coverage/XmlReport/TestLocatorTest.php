@@ -126,26 +126,6 @@ final class TestLocatorTest extends TestCase
                     'testFilePath' => '/path/to/acme/FooTest.php',
                     'testExecutionTime' => 0.456,
                 ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'testExecutionTime' => 0.123,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'testExecutionTime' => 0.456,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'testExecutionTime' => 0.456,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'testExecutionTime' => 0.123,
-                ],
             ],
         ];
 
