@@ -65,6 +65,7 @@ use const PHP_EOL;
 use PhpParser\NodeAbstract;
 use function Safe\file_get_contents;
 use function Safe\preg_match;
+use function Safe\preg_split;
 use function Safe\substr;
 use function strlen;
 use function strpos;
@@ -222,7 +223,7 @@ final class StrykerHtmlReportBuilder
     {
         return array_map(
             function (MutantExecutionResult $result) use ($originalCode): array {
-                $fileAsArrayOfLines = explode(PHP_EOL, $originalCode);
+                $fileAsArrayOfLines = preg_split('/\n|\r\n?/', $originalCode);
                 $replacement = $this->retrieveReplacementFromDiff($result->getMutantDiff());
 
                 $originalCodeLine = $fileAsArrayOfLines[$result->getOriginalStartingLine() - 1];
