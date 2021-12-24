@@ -45,7 +45,6 @@ use function array_slice;
 use function array_unique;
 use ArrayObject;
 use function current;
-use function explode;
 use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
