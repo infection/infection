@@ -271,7 +271,7 @@ final class StrykerHtmlReportBuilder
 
     private function retrieveReplacementFromDiff(string $diff): string
     {
-        $lines = explode(PHP_EOL, $diff);
+        $lines = preg_split('/\n|\r\n?/', $diff);
 
         $lines = array_map(
             static function (string $line): string {
