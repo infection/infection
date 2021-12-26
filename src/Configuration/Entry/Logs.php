@@ -94,6 +94,11 @@ class Logs
         return $this->htmlLogFilePath;
     }
 
+    public function setHtmlLogFilePath(string $htmlLogFilePath): void
+    {
+        $this->htmlLogFilePath = $htmlLogFilePath;
+    }
+
     public function getSummaryLogFilePath(): ?string
     {
         return $this->summaryLogFilePath;

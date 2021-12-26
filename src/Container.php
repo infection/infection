@@ -170,6 +170,7 @@ final class Container
     public const DEFAULT_GIT_DIFF_LINES = false;
     public const DEFAULT_GIT_DIFF_BASE = null;
     public const DEFAULT_USE_GITHUB_LOGGER = false;
+    public const DEFAULT_HTML_LOGGER_PATH = null;
     public const DEFAULT_USE_NOOP_MUTATORS = false;
     public const DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
     public const DEFAULT_NO_PROGRESS = false;
@@ -710,6 +711,7 @@ final class Container
             self::DEFAULT_GIT_DIFF_LINES,
             self::DEFAULT_GIT_DIFF_BASE,
             self::DEFAULT_USE_GITHUB_LOGGER,
+            self::DEFAULT_HTML_LOGGER_PATH,
             self::DEFAULT_USE_NOOP_MUTATORS,
             self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES
         );
@@ -743,6 +745,7 @@ final class Container
         bool $isForGitDiffLines,
         ?string $gitDiffBase,
         bool $useGitHubLogger,
+        ?string $htmlLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases
     ): self {
@@ -820,6 +823,7 @@ final class Container
                 $isForGitDiffLines,
                 $gitDiffBase,
                 $useGitHubLogger,
+                $htmlLogFilePath,
                 $useNoopMutators,
                 $executeOnlyCoveringTestCases
             ): Configuration {
@@ -847,6 +851,7 @@ final class Container
                     $isForGitDiffLines,
                     $gitDiffBase,
                     $useGitHubLogger,
+                    $htmlLogFilePath,
                     $useNoopMutators,
                     $executeOnlyCoveringTestCases
                 );

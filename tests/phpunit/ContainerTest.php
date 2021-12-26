@@ -96,6 +96,7 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_GIT_DIFF_LINES,
             Container::DEFAULT_GIT_DIFF_BASE,
             Container::DEFAULT_USE_GITHUB_LOGGER,
+            Container::DEFAULT_HTML_LOGGER_PATH,
             Container::DEFAULT_USE_NOOP_MUTATORS,
             Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES
         );
@@ -145,6 +146,7 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_GIT_DIFF_LINES,
             Container::DEFAULT_GIT_DIFF_BASE,
             Container::DEFAULT_USE_GITHUB_LOGGER,
+            Container::DEFAULT_HTML_LOGGER_PATH,
             Container::DEFAULT_USE_NOOP_MUTATORS,
             Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
         );
