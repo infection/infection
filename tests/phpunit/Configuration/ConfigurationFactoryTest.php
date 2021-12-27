@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Infection\Configuration\ConfigurationFactory;
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
@@ -772,7 +772,7 @@ final class ConfigurationFactoryTest extends TestCase
                     'debug.log',
                     'mutator.log',
                     true,
-                    new Badge('master')
+                    StrykerConfig::forFullReport('master')
                 ),
                 'config/tmp',
                 new PhpUnit(
@@ -828,7 +828,7 @@ final class ConfigurationFactoryTest extends TestCase
                 'debug.log',
                 'mutator.log',
                 true,
-                new Badge('master')
+                StrykerConfig::forFullReport('master')
             ),
             'none',
             '/path/to/config/tmp/infection',

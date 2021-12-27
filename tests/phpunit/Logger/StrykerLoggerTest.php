@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Infection\Configuration\Entry\Badge;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
-use Infection\Logger\BadgeLogger;
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\Http\StrykerDashboardClient;
+use Infection\Logger\StrykerLogger;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Tests\CI\ConfigurableEnv;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use OndraM\CiDetector\CiDetector;
@@ -49,14 +51,14 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use function Safe\putenv;
 
-final class BadgeLoggerTest extends TestCase
+final class StrykerLoggerTest extends TestCase
 {
     use BacksUpEnvironmentVariables;
 
     /**
      * @var StrykerDashboardClient|MockObject
      */
-    private $badgeApiClientMock;
+    private $strykerDashboardClient;
 
     /**
      * @var MetricsCalculator|MockObject
@@ -74,27 +76,30 @@ final class BadgeLoggerTest extends TestCase
     private $logger;
 
     /**
-     * @var BadgeLogger
+     * @var StrykerLogger
      */
-    private $badgeLogger;
+    private $strykerLogger;
 
     protected function setUp(): void
     {
         $this->backupEnvironmentVariables();
 
-        $this->badgeApiClientMock = $this->createMock(StrykerDashboardClient::class);
+        $this->strykerDashboardClient = $this->createMock(StrykerDashboardClient::class);
         $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
         $this->ciDetectorEnv = new ConfigurableEnv();
         $this->logger = new DummyLogger();
 
-        $this->badgeLogger = new BadgeLogger(
+        $this->strykerLogger = new StrykerLogger(
             new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
             new StrykerApiKeyResolver(),
-            $this->badgeApiClientMock,
+            $this->strykerDashboardClient,
             $this->metricsCalculatorMock,
-            new Badge('master'),
+            new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
+            StrykerConfig::forBadge('master'),
             $this->logger
         );
+
+        // todo add forFullReport cases
     }
 
     protected function tearDown(): void
@@ -108,12 +113,12 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS' => false,
         ]);
 
-        $this->badgeApiClientMock
+        $this->strykerDashboardClient
             ->expects($this->never())
             ->method('sendReport')
         ;
 
-        $this->badgeLogger->log();
+        $this->strykerLogger->log();
 
         $this->assertSame(
             [
@@ -134,12 +139,12 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_PULL_REQUEST' => '123',
         ]);
 
-        $this->badgeApiClientMock
+        $this->strykerDashboardClient
             ->expects($this->never())
             ->method('sendReport')
         ;
 
-        $this->badgeLogger->log();
+        $this->strykerLogger->log();
 
         $this->assertSame(
             [
@@ -162,11 +167,11 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_BRANCH' => false,
         ]);
 
-        $this->badgeApiClientMock
+        $this->strykerDashboardClient
             ->expects($this->never())
             ->method('sendReport');
 
-        $this->badgeLogger->log();
+        $this->strykerLogger->log();
 
         $this->assertSame(
             [
@@ -189,12 +194,12 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_BRANCH' => 'foo',
         ]);
 
-        $this->badgeApiClientMock
+        $this->strykerDashboardClient
             ->expects($this->never())
             ->method('sendReport')
         ;
 
-        $this->badgeLogger->log();
+        $this->strykerLogger->log();
 
         $this->assertSame(
             [
@@ -217,18 +222,18 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_BRANCH' => 'foo',
         ]);
 
-        $this->badgeApiClientMock
+        $this->strykerDashboardClient
             ->expects($this->never())
             ->method('sendReport')
         ;
 
-        $this->badgeLogger->log();
+        $this->strykerLogger->log();
 
         $this->assertSame(
             [
                 [
                     LogLevel::WARNING,
-                    'Dashboard report has not been sent: Branch "foo" does not match expected badge configuration',
+                    'Dashboard report has not been sent: Branch "foo" does not match expected Stryker configuration',
                     [],
                 ],
             ],
@@ -245,27 +250,28 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_BRANCH' => '1.x-mismatch',
         ]);
 
-        $this->badgeApiClientMock
+        $this->strykerDashboardClient
             ->expects($this->never())
             ->method('sendReport')
         ;
 
-        $badgeLogger = new BadgeLogger(
+        $strykerLogger = new StrykerLogger(
             new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
             new StrykerApiKeyResolver(),
-            $this->badgeApiClientMock,
+            $this->strykerDashboardClient,
             $this->metricsCalculatorMock,
-            new Badge('/^\d+\\.x$/'),
+            new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
+            StrykerConfig::forBadge('/^\d+\\.x$/'),
             $this->logger
         );
 
-        $badgeLogger->log();
+        $strykerLogger->log();
 
         $this->assertSame(
             [
                 [
                     LogLevel::WARNING,
-                    'Dashboard report has not been sent: Branch "1.x-mismatch" does not match expected badge configuration',
+                    'Dashboard report has not been sent: Branch "1.x-mismatch" does not match expected Stryker configuration',
                     [],
                 ],
             ],
@@ -282,21 +288,21 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_BRANCH' => 'master',
         ]);
 
-        putenv('INFECTION_BADGE_API_KEY');
+        putenv('INFECTION_DASHBOARD_API_KEY');
         putenv('STRYKER_DASHBOARD_API_KEY');
 
-        $this->badgeApiClientMock
+        $this->strykerDashboardClient
             ->expects($this->never())
             ->method('sendReport')
         ;
 
-        $this->badgeLogger->log();
+        $this->strykerLogger->log();
 
         $this->assertSame(
             [
                 [
                     LogLevel::WARNING,
-                    'Dashboard report has not been sent: The Stryker API key needs to be configured using one of the environment variables "INFECTION_BADGE_API_KEY" or "STRYKER_DASHBOARD_API_KEY", but could not find any of these.',
+                    'Dashboard report has not been sent: The Stryker API key needs to be configured using one of the environment variables "INFECTION_DASHBOARD_API_KEY" or "STRYKER_DASHBOARD_API_KEY", but could not find any of these.',
                     [],
                 ],
             ],
@@ -315,10 +321,10 @@ final class BadgeLoggerTest extends TestCase
 
         putenv('STRYKER_DASHBOARD_API_KEY=abc');
 
-        $this->badgeApiClientMock
+        $this->strykerDashboardClient
             ->expects($this->once())
             ->method('sendReport')
-            ->with('github.com/a/b', 'master', 'abc', 33.3)
+            ->with('github.com/a/b', 'master', 'abc', '{"mutationScore":33.3}')
         ;
 
         $this->metricsCalculatorMock
@@ -326,7 +332,7 @@ final class BadgeLoggerTest extends TestCase
             ->willReturn(33.3)
         ;
 
-        $this->badgeLogger->log();
+        $this->strykerLogger->log();
 
         $this->assertSame(
             [
@@ -351,10 +357,10 @@ final class BadgeLoggerTest extends TestCase
 
         putenv('STRYKER_DASHBOARD_API_KEY=abc');
 
-        $this->badgeApiClientMock
+        $this->strykerDashboardClient
             ->expects($this->once())
             ->method('sendReport')
-            ->with('github.com/a/b', '7.x', 'abc', 33.3)
+            ->with('github.com/a/b', '7.x', 'abc', '{"mutationScore":33.3}')
         ;
 
         $this->metricsCalculatorMock
@@ -362,16 +368,17 @@ final class BadgeLoggerTest extends TestCase
             ->willReturn(33.3)
         ;
 
-        $badgeLogger = new BadgeLogger(
+        $strykerLogger = new StrykerLogger(
             new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
             new StrykerApiKeyResolver(),
-            $this->badgeApiClientMock,
+            $this->strykerDashboardClient,
             $this->metricsCalculatorMock,
-            new Badge('/^\d+\\.x$/'),
+            new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
+            StrykerConfig::forBadge('/^\d+\\.x$/'),
             $this->logger
         );
 
-        $badgeLogger->log();
+        $strykerLogger->log();
 
         $this->assertSame(
             [
@@ -394,12 +401,12 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_BRANCH' => 'master',
         ]);
 
-        putenv('INFECTION_BADGE_API_KEY=abc');
+        putenv('INFECTION_DASHBOARD_API_KEY=abc');
 
-        $this->badgeApiClientMock
+        $this->strykerDashboardClient
             ->expects($this->once())
             ->method('sendReport')
-            ->with('github.com/a/b', 'master', 'abc', 33.3)
+            ->with('github.com/a/b', 'master', 'abc', '{"mutationScore":33.3}')
         ;
 
         $this->metricsCalculatorMock
@@ -407,7 +414,7 @@ final class BadgeLoggerTest extends TestCase
             ->willReturn(33.3)
         ;
 
-        $this->badgeLogger->log();
+        $this->strykerLogger->log();
 
         $this->assertSame(
             [

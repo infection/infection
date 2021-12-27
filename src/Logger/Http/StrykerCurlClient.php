@@ -55,8 +55,8 @@ use function Safe\sprintf;
  * @internal
  * @final
  *
- * @see https://github.com/stryker-mutator/stryker-handbook/blob/master/dashboard.md#send-a-report-via-curl
- * @see https://github.com/stryker-mutator/mutation-testing-elements/tree/master/packages/mutation-testing-report-schema
+ * @see https://stryker-mutator.io/docs/General/dashboard
+ * @see https://github.com/stryker-mutator/mutation-testing-elements/blob/master/packages/report-schema/src/mutation-testing-report-schema.json
  */
 class StrykerCurlClient
 {

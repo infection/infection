@@ -42,10 +42,10 @@ use function array_map;
 use function array_merge;
 use function array_values;
 use function implode;
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Mutator\ProfileList;
@@ -59,10 +59,10 @@ use stdClass;
 use function var_export;
 
 /**
- * @covers \Infection\Configuration\Entry\Badge
  * @covers \Infection\Configuration\Entry\Logs
  * @covers \Infection\Configuration\Entry\PhpUnit
  * @covers \Infection\Configuration\Entry\Source
+ * @covers \Infection\Configuration\Entry\StrykerConfig
  * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
  */
 final class SchemaConfigurationFactoryTest extends TestCase
@@ -372,15 +372,15 @@ JSON
             ]),
         ];
 
-        yield '[logs][badge] nominal' => [
+        yield '[logs][stryker] badge' => [
             <<<'JSON'
 {
     "source": {
         "directories": ["src"]
     },
     "logs": {
-        "badge": {
-            "branch": "master"
+        "stryker": {
+            "badge": "master"
         }
     }
 }
@@ -396,20 +396,20 @@ JSON
                     null,
                     null,
                     false,
-                    new Badge('master')
+                    StrykerConfig::forBadge('master')
                 ),
             ]),
         ];
 
-        yield '[logs][badge] regex' => [
+        yield '[logs][stryker] report' => [
             <<<'JSON'
 {
     "source": {
         "directories": ["src"]
     },
     "logs": {
-        "badge": {
-            "branch": "/^foo$/"
+        "stryker": {
+            "report": "master"
         }
     }
 }
@@ -425,7 +425,65 @@ JSON
                     null,
                     null,
                     false,
-                    new Badge('/^foo$/')
+                    StrykerConfig::forFullReport('master')
+                ),
+            ]),
+        ];
+
+        yield '[logs][stryker] badge regex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "stryker": {
+            "badge": "/^foo$/"
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    StrykerConfig::forBadge('/^foo$/')
+                ),
+            ]),
+        ];
+
+        yield '[logs][stryker] report regex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "stryker": {
+            "report": "/^foo$/"
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    StrykerConfig::forFullReport('/^foo$/')
                 ),
             ]),
         ];
@@ -444,8 +502,8 @@ JSON
         "debug": "debug.log",
         "perMutator": "perMutator.log",
         "github": true,
-        "badge": {
-            "branch": "master"
+        "stryker": {
+            "badge": "master"
         }
     }
 }
@@ -461,7 +519,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    new Badge('master')
+                    StrykerConfig::forBadge('master')
                 ),
             ]),
         ];
@@ -477,8 +535,8 @@ JSON
         "summary": "",
         "debug": "",
         "perMutator": "",
-        "badge": {
-            "branch": ""
+        "stryker": {
+            "report": ""
         }
     }
 }
@@ -501,8 +559,8 @@ JSON
         "summary": "",
         "debug": "",
         "perMutator": "",
-        "badge": {
-            "branch": ""
+        "stryker": {
+            "badge": ""
         }
     }
 }
@@ -528,8 +586,8 @@ JSON
         "debug": " debug.log ",
         "perMutator": " perMutator.log ",
         "github": true ,
-        "badge": {
-            "branch": " master "
+        "stryker": {
+            "badge": " master "
         }
     }
 }
@@ -545,7 +603,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    new Badge('master')
+                    StrykerConfig::forBadge('master')
                 ),
             ]),
         ];
@@ -2178,8 +2236,8 @@ JSON
         "debug": "debug.log",
         "perMutator": "perMutator.log",
         "github": true,
-        "badge": {
-            "branch": "master"
+        "stryker": {
+            "badge": "master"
         }
     },
     "tmpDir": "custom-tmp",
@@ -2417,7 +2475,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    new Badge('master')
+                    StrykerConfig::forBadge('master')
                 ),
                 'tmpDir' => 'custom-tmp',
                 'phpunit' => new PhpUnit(

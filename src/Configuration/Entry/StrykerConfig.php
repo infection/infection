@@ -33,52 +33,70 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\Http;
+namespace Infection\Configuration\Entry;
 
-use function in_array;
-use Psr\Log\LoggerInterface;
+use InvalidArgumentException;
+use function preg_quote;
+use Safe\Exceptions\PcreException;
+use function Safe\preg_match;
 use function Safe\sprintf;
 
 /**
  * @internal
  */
-class StrykerDashboardClient
+final class StrykerConfig
 {
-    private StrykerCurlClient $client;
-    private LoggerInterface $logger;
+    private string $branchMatch;
+    private bool $isForFullReport;
 
-    public function __construct(StrykerCurlClient $client, LoggerInterface $logger)
+    /**
+     * Stryker has 2 ways for integration (https://stryker-mutator.io/docs/General/dashboard):
+     *  - badge only
+     *  - full report
+     *
+     * @throws InvalidArgumentException when the provided $branch looks like a regular expression, but is not a valid one
+     */
+    private function __construct(string $branch, bool $isForFullReport)
     {
-        $this->client = $client;
-        $this->logger = $logger;
-    }
+        $this->isForFullReport = $isForFullReport;
 
-    public function sendReport(
-        string $repositorySlug,
-        string $branch,
-        string $apiKey,
-        string $reportJson
-    ): void {
-        $response = $this->client->request(
-            $repositorySlug,
-            $branch,
-            $apiKey,
-            $reportJson
-        );
+        if (preg_match('#^/.+/$#', $branch) === 0) {
+            $this->branchMatch = '/^' . preg_quote($branch, '/') . '$/';
 
-        $statusCode = $response->getStatusCode();
+            return;
+        }
 
-        if (!in_array($statusCode, [Response::HTTP_OK, Response::HTTP_CREATED], true)) {
-            $this->logger->warning(sprintf(
-                'Stryker dashboard returned an unexpected response code: %s',
-                $statusCode)
+        try {
+            // Yes, the `@` is intentional. For some reason, `thecodingmachine/safe` does not suppress the warnings here
+            @preg_match($branch, '');
+        } catch (PcreException $invalidRegex) {
+            throw new InvalidArgumentException(
+                sprintf('Provided branchMatchRegex "%s" is not a valid regex', $branch),
+                0,
+                $invalidRegex
             );
         }
 
-        $this->logger->notice(sprintf(
-            'Dashboard response:%s%s',
-            "\r\n",
-            $response->getBody()
-        ));
+        $this->branchMatch = $branch;
+    }
+
+    public static function forBadge(string $branch): self
+    {
+        return new self($branch, false);
+    }
+
+    public static function forFullReport(string $branch): self
+    {
+        return new self($branch, true);
+    }
+
+    public function isForFullReport(): bool
+    {
+        return $this->isForFullReport;
+    }
+
+    public function applicableForBranch(string $branchName): bool
+    {
+        return preg_match($this->branchMatch, $branchName) === 1;
     }
 }

@@ -33,48 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Entry;
+namespace Infection\Logger;
 
-use InvalidArgumentException;
-use function preg_quote;
-use Safe\Exceptions\PcreException;
-use function Safe\preg_match;
-use function Safe\sprintf;
+use Infection\Configuration\Entry\Logs;
+use Infection\Environment\BuildContextResolver;
+use Infection\Environment\StrykerApiKeyResolver;
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
+use Infection\Logger\Http\StrykerCurlClient;
+use Infection\Logger\Http\StrykerDashboardClient;
+use Infection\Metrics\MetricsCalculator;
+use OndraM\CiDetector\CiDetector;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
+ * @final
  */
-final class Badge
+class StrykerLoggerFactory
 {
-    private string $branchMatch;
+    private MetricsCalculator $metricsCalculator;
+    private StrykerHtmlReportBuilder $strykerHtmlReportBuilder;
+    private CiDetector $ciDetector;
+    private LoggerInterface $logger;
 
-    /**
-     * @throws InvalidArgumentException when the provided $branch looks like a regular expression, but is not a valid one
-     */
-    public function __construct(string $branch)
-    {
-        if (preg_match('#^/.+/$#', $branch) === 0) {
-            $this->branchMatch = '/^' . preg_quote($branch, '/') . '$/';
-
-            return;
-        }
-
-        try {
-            // Yes, the `@` is intentional. For some reason, `thecodingmachine/safe` does not suppress the warnings here
-            @preg_match($branch, '');
-        } catch (PcreException $invalidRegex) {
-            throw new InvalidArgumentException(
-                sprintf('Provided branchMatchRegex "%s" is not a valid regex', $branch),
-                0,
-                $invalidRegex
-            );
-        }
-
-        $this->branchMatch = $branch;
+    public function __construct(
+        MetricsCalculator $metricsCalculator,
+        StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
+        CiDetector $ciDetector,
+        LoggerInterface $logger
+    ) {
+        $this->metricsCalculator = $metricsCalculator;
+        $this->ciDetector = $ciDetector;
+        $this->logger = $logger;
+        $this->strykerHtmlReportBuilder = $strykerHtmlReportBuilder;
     }
 
-    public function applicableForBranch(string $branchName): bool
+    public function createFromLogEntries(Logs $logConfig): ?MutationTestingResultsLogger
     {
-        return preg_match($this->branchMatch, $branchName) === 1;
+        $strykerConfig = $logConfig->getStrykerConfig();
+
+        if ($strykerConfig === null) {
+            return null;
+        }
+
+        return new StrykerLogger(
+            new BuildContextResolver($this->ciDetector),
+            new StrykerApiKeyResolver(),
+            new StrykerDashboardClient(
+                new StrykerCurlClient(),
+                $this->logger
+            ),
+            $this->metricsCalculator,
+            $this->strykerHtmlReportBuilder,
+            $strykerConfig,
+            $this->logger
+        );
     }
 }

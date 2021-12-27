@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Environment;
 
 use function array_key_exists;
+use function array_slice;
 use function is_string;
 
 /**
@@ -53,7 +54,8 @@ final class StrykerApiKeyResolver
     public function resolve(array $environment): string
     {
         $names = [
-            'INFECTION_BADGE_API_KEY',
+            'INFECTION_BADGE_API_KEY', // deprecated
+            'INFECTION_DASHBOARD_API_KEY',
             'STRYKER_DASHBOARD_API_KEY',
         ];
 
@@ -65,6 +67,6 @@ final class StrykerApiKeyResolver
             return $environment[$name];
         }
 
-        throw CouldNotResolveStrykerApiKey::from(...$names);
+        throw CouldNotResolveStrykerApiKey::from(...array_slice($names, 1));
     }
 }

@@ -44,8 +44,6 @@ use function Infection\Tests\normalizeLineReturn;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
-use function Safe\json_decode;
-use function Safe\json_encode;
 
 final class StrykerDashboardClientTest extends TestCase
 {
@@ -89,12 +87,7 @@ final class StrykerDashboardClientTest extends TestCase
                 'infection/infection',
                 'master',
                 self::API_KEY,
-                json_encode(json_decode(<<<'JSON'
-{
-    "mutationScore": 80.31
-}
-JSON
-                ))
+                '{"mutationScore": 80.31}'
             )
             ->willReturn(new Response(201, 'Report received!'))
         ;
@@ -103,7 +96,7 @@ JSON
             'infection/infection',
             'master',
             self::API_KEY,
-            80.31
+            '{"mutationScore": 80.31}'
         );
 
         $this->assertSame(
@@ -138,12 +131,7 @@ EOF
                 'infection/infection',
                 'master',
                 self::API_KEY,
-                json_encode(json_decode(<<<'JSON'
-{
-    "mutationScore": 80.31
-}
-JSON
-                ))
+                '{"mutationScore": 80.31}'
             )
             ->willReturn(new Response(400, 'Report invalid!'))
         ;
@@ -152,7 +140,7 @@ JSON
             'infection/infection',
             'master',
             self::API_KEY,
-            80.31
+            '{"mutationScore": 80.31}'
         );
 
         $this->assertSame(
