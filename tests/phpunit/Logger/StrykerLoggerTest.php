@@ -98,8 +98,6 @@ final class StrykerLoggerTest extends TestCase
             StrykerConfig::forBadge('master'),
             $this->logger
         );
-
-        // todo add forFullReport cases
     }
 
     protected function tearDown(): void
@@ -407,6 +405,52 @@ final class StrykerLoggerTest extends TestCase
             ->expects($this->once())
             ->method('sendReport')
             ->with('github.com/a/b', 'master', 'abc', '{"mutationScore":33.3}')
+        ;
+
+        $this->metricsCalculatorMock
+            ->method('getMutationScoreIndicator')
+            ->willReturn(33.3)
+        ;
+
+        $this->strykerLogger->log();
+
+        $this->assertSame(
+            [
+                [
+                    LogLevel::WARNING,
+                    'Sending dashboard report...',
+                    [],
+                ],
+            ],
+            $this->logger->getLogs()
+        );
+    }
+
+    public function test_it_sends_report_when_everything_is_ok_with_our_key_for_full_report(): void
+    {
+        $this->strykerLogger = new StrykerLogger(
+            new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
+            new StrykerApiKeyResolver(),
+            $this->strykerDashboardClient,
+            $this->metricsCalculatorMock,
+            new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
+            StrykerConfig::forFullReport('master'),
+            $this->logger
+        );
+
+        $this->ciDetectorEnv->setVariables([
+            'TRAVIS' => 'true',
+            'TRAVIS_PULL_REQUEST' => 'false',
+            'TRAVIS_REPO_SLUG' => 'a/b',
+            'TRAVIS_BRANCH' => 'master',
+        ]);
+
+        putenv('INFECTION_DASHBOARD_API_KEY=abc');
+
+        $this->strykerDashboardClient
+            ->expects($this->once())
+            ->method('sendReport')
+            ->with('github.com/a/b', 'master', 'abc', '{"schemaVersion":"1","thresholds":{"high":90,"low":50},"files":{},"testFiles":{},"framework":{"name":"Infection","branding":{"homepageUrl":"https:\/\/infection.github.io\/","imageUrl":"https:\/\/infection.github.io\/images\/logo.png"}}}')
         ;
 
         $this->metricsCalculatorMock

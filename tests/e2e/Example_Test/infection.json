@@ -7,10 +7,7 @@
         ]
     },
     "logs": {
-        "summary": "infection.log",
-        "stryker": {
-            "badge": "feature/stryker-setting"
-        }
+        "summary": "infection.log"
     },
     "tmpDir": "."
 }
