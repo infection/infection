@@ -53,6 +53,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\NotMatchedIgnoreSourceCodeRegexFound;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -358,6 +359,75 @@ final class MutationTestingRunnerTest extends TestCase
                 'For_' => ['Assert::.*'],
             ]
         );
+
+        $this->runner->run($mutations, $testFrameworkExtraOptions);
+
+        $this->assertAreSameEvents(
+            [
+                new MutationTestingWasStarted(0),
+                new MutantProcessWasFinished(MutantExecutionResult::createFromNonCoveredMutant($mutant)),
+                new MutationTestingWasFinished(),
+            ],
+            $this->eventDispatcher->getEvents()
+        );
+    }
+
+    public function test_fails_with_error_when_not_all_ignore_source_code_regexes_are_used(): void
+    {
+        $mutations = [
+            $mutation0 = $this->createMutation(0),
+        ];
+
+        $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
+
+        $mutant = MutantBuilder::build(
+            '/path/to/mutant0',
+            $mutation0,
+            'mutated code 0',
+            '- Non matching source code line',
+            '<?php $a = 1;'
+        );
+
+        $this->mutantFactoryMock
+            ->method('create')
+            ->withConsecutive(
+                [$mutation0],
+            )
+            ->willReturnOnConsecutiveCalls($mutant)
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $this->processFactoryMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $this->processRunnerMock
+            ->expects($this->never())
+            ->method('run')
+            ->with($this->emptyIterable())
+        ;
+
+        $this->runner = new MutationTestingRunner(
+            $this->processFactoryMock,
+            $this->mutantFactoryMock,
+            $this->processRunnerMock,
+            $this->eventDispatcher,
+            $this->fileSystemMock,
+            new DiffSourceCodeMatcher(),
+            true,
+            100.0,
+            [
+                'For_' => ['Assert::.*'],
+            ]
+        );
+
+        $this->expectException(NotMatchedIgnoreSourceCodeRegexFound::class);
+        $this->expectExceptionMessage('The following ignore source code regexes were not matched, consider removing them from `infection.json`: Assert::.*');
 
         $this->runner->run($mutations, $testFrameworkExtraOptions);
 

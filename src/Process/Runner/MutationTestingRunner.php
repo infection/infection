@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use function array_keys;
+use function array_merge;
+use function array_unique;
+use function array_values;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
@@ -47,6 +51,7 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Factory\MutantProcessFactory;
 use function Pipeline\take;
+use function Safe\array_flip;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -99,21 +104,32 @@ class MutationTestingRunner
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
+        $notMatchedSourceCodeRegexes = array_flip(array_unique(array_merge(...array_values($this->ignoreSourceCodeMutatorsMap))));
+
         $processes = take($mutations)
             ->cast(function (Mutation $mutation): Mutant {
                 return $this->mutantFactory->create($mutation);
             })
-            ->filter(function (Mutant $mutant): bool {
+            ->filter(function (Mutant $mutant) use (&$notMatchedSourceCodeRegexes): bool {
                 $mutatorName = $mutant->getMutation()->getMutatorName();
 
                 foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] ?? [] as $sourceCodeRegex) {
                     if ($this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {
+                        unset($notMatchedSourceCodeRegexes[$sourceCodeRegex]);
+
                         $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
                             MutantExecutionResult::createFromIgnoredMutant($mutant)
                         ));
 
                         return false;
                     }
+                }
+
+                return true;
+            })
+            ->filter(static function (Mutant $mutant) use ($notMatchedSourceCodeRegexes): bool {
+                if ($notMatchedSourceCodeRegexes !== []) {
+                    throw NotMatchedIgnoreSourceCodeRegexFound::forRegexes(array_keys($notMatchedSourceCodeRegexes));
                 }
 
                 return true;
