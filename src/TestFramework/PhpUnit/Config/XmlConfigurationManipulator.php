@@ -200,6 +200,16 @@ final class XmlConfigurationManipulator
         );
     }
 
+    public function addFailOnAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
+    {
+        if (version_compare($version, '5.2', '<')) {
+            return;
+        }
+
+        $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
+        $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
+    }
+
     /**
      * @param string[] $srcDirs
      * @param list<string> $filteredSourceFilesToMutate
@@ -358,5 +368,19 @@ final class XmlConfigurationManipulator
         }
 
         return $this->createNode($dom, $nodeName);
+    }
+
+    private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
+    {
+        $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
+
+        if ($nodeList->length === 0) {
+            $node = $xPath->query('/phpunit')[0];
+            $node->setAttribute($attribute, $value);
+
+            return true;
+        }
+
+        return false;
     }
 }

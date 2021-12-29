@@ -407,7 +407,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
 
         $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
-        $this->assertSame('true', $failOnRisky[0]->value);
+        $this->assertSame('false', $failOnRisky[0]->value);
     }
 
     public function test_it_does_not_update_fail_on_warning_attributes_if_it_is_already_set(): void
@@ -421,7 +421,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnWarning'));
 
         $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
-        $this->assertSame('true', $failOnRisky[0]->value);
+        $this->assertSame('false', $failOnRisky[0]->value);
     }
 
     public function test_it_creates_a_configuration(): void

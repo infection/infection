@@ -24,7 +24,7 @@ PHP_CS_FIXER_CACHE=.php_cs.cache
 PHPSTAN=./vendor/bin/phpstan
 
 PSALM=./.tools/psalm
-PSALM_URL="https://github.com/vimeo/psalm/releases/download/4.12.0/psalm.phar"
+PSALM_URL="https://github.com/vimeo/psalm/releases/download/v4.15.0/psalm.phar"
 
 PHPUNIT=vendor/phpunit/phpunit/phpunit
 PARATEST=vendor/bin/paratest --runner=WrapperRunner

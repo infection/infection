@@ -135,7 +135,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
   ~
   ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
   -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" stderr="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
   <testsuites>
     <testsuite name="Infection testsuite with filtered tests"/>
   </testsuites>
@@ -171,7 +171,7 @@ XML
   ~
   ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
   -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" stderr="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
   <testsuites>
     <testsuite name="Infection testsuite with filtered tests">
       <file>/path/to/FooTest.php</file>
@@ -241,7 +241,7 @@ PHP
   ~
   ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
   -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" stderr="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
   <testsuites>
     <testsuite name="Infection testsuite with filtered tests">
       <file>/path/to/BarTest.php</file>
@@ -620,6 +620,108 @@ PHP
             'IncludeInterceptor.php',
             file_get_contents($expectedCustomAutoloadFilePath)
         );
+    }
+
+    /**
+     * @dataProvider failOnProvider
+     */
+    public function test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions(
+        string $version,
+        string $attributeName,
+        int $expectedNodeCount
+    ): void {
+        $xml = file_get_contents($this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH,
+            $version
+        ));
+
+        $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
+
+        $this->assertInstanceOf(DOMNodeList::class, $nodes);
+
+        $this->assertSame($expectedNodeCount, $nodes->length);
+    }
+
+    public function test_it_does_not_update_fail_on_risky_attributes_if_it_is_already_set(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_fail_on_risky_set.xml';
+
+        $builder = $this->createConfigBuilder($phpunitXmlPath);
+
+        $xml = file_get_contents($builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH,
+             '5.2'
+        ));
+
+        $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
+
+        $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
+        $this->assertSame('false', $failOnRisky[0]->value);
+    }
+
+    public function test_it_does_not_update_fail_on_warning_attributes_if_it_is_already_set(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_fail_on_warning_set.xml';
+
+        $builder = $this->createConfigBuilder($phpunitXmlPath);
+
+        $xml = file_get_contents($builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH,
+            '5.2'
+        ));
+
+        $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnWarning'));
+
+        $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
+        $this->assertSame('false', $failOnRisky[0]->value);
+    }
+
+    public function failOnProvider(): iterable
+    {
+        yield 'PHPUnit 5.1.99 runs without failOnRisky' => [
+            '5.1.99',
+            'failOnRisky',
+            0,
+        ];
+
+        yield 'PHPUnit 5.2 runs with failOnRisky' => [
+            '5.2',
+            'failOnRisky',
+            1,
+        ];
+
+        yield 'PHPUnit 5.3.1 runs with failOnRisky' => [
+            '5.3.1',
+            'failOnRisky',
+            1,
+        ];
+
+        yield 'PHPUnit 5.1.99 runs without resolveDependencies' => [
+            '5.1.99',
+            'failOnWarning',
+            0,
+        ];
+
+        yield 'PHPUnit 5.2 runs with resolveDependencies' => [
+            '5.2',
+            'failOnWarning',
+            1,
+        ];
+
+        yield 'PHPUnit 5.3.1 runs resolveDependencies' => [
+            '5.3.1',
+            'failOnWarning',
+            1,
+        ];
     }
 
     public function locationsProvider(): iterable
