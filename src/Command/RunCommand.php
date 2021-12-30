@@ -416,7 +416,7 @@ final class RunCommand extends BaseCommand
             throw new InvalidArgumentException(sprintf('Cannot pass both "--%s" and "--%s" options: use none or only one of them', self::OPTION_GIT_DIFF_LINES, self::OPTION_GIT_DIFF_FILTER));
         }
 
-        if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER) {
+        if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER && $isForGitDiffLines === Container::DEFAULT_GIT_DIFF_LINES) {
             throw new InvalidArgumentException(sprintf('Cannot pass "--%s" without "--%s"', self::OPTION_GIT_DIFF_BASE, self::OPTION_GIT_DIFF_FILTER));
         }
 
