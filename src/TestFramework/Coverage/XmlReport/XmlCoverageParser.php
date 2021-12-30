@@ -156,6 +156,10 @@ class XmlCoverageParser
         $methodsCoverage = [];
 
         foreach ($methodsCoverageNodes as $methodsCoverageNode) {
+            if ((int) $methodsCoverageNode->getAttribute('coverage') === 0) {
+                continue;
+            }
+
             $methodName = $methodsCoverageNode->getAttribute('name');
 
             $start = $methodsCoverageNode->getAttribute('start');
