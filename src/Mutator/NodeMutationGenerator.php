@@ -38,6 +38,8 @@ namespace Infection\Mutator;
 use function count;
 use function get_class;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Differ\FilesDiffChangedLines;
+use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
@@ -69,6 +71,9 @@ class NodeMutationGenerator
     private ?array $testsMemoized = null;
     private ?bool $isOnFunctionSignatureMemoized = null;
     private ?bool $isInsideFunctionMemoized = null;
+    private FilesDiffChangedLines $filesDiffChangedLines;
+    private bool $isForGitDiffLines;
+    private ?string $gitDiffBase;
 
     /**
      * @param Mutator<Node>[] $mutators
@@ -80,7 +85,10 @@ class NodeMutationGenerator
         array $fileNodes,
         Trace $trace,
         bool $onlyCovered,
-        LineRangeCalculator $lineRangeCalculator
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase,
+        LineRangeCalculator $lineRangeCalculator,
+        FilesDiffChangedLines $filesDiffChangedLines
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -89,7 +97,10 @@ class NodeMutationGenerator
         $this->fileNodes = $fileNodes;
         $this->trace = $trace;
         $this->onlyCovered = $onlyCovered;
+        $this->isForGitDiffLines = $isForGitDiffLines;
+        $this->gitDiffBase = $gitDiffBase;
         $this->lineRangeCalculator = $lineRangeCalculator;
+        $this->filesDiffChangedLines = $filesDiffChangedLines;
     }
 
     /**
@@ -105,6 +116,10 @@ class NodeMutationGenerator
         if (!$this->isOnFunctionSignature()
             && !$this->isInsideFunction()
         ) {
+            return;
+        }
+
+        if ($this->isForGitDiffLines && !$this->filesDiffChangedLines->contains($this->filePath, $node->getStartLine(), $node->getEndLine(), $this->gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE)) {
             return;
         }
 

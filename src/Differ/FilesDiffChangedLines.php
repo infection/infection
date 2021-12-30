@@ -33,48 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\GitHub;
+namespace Infection\Differ;
 
-use function escapeshellarg;
-use Infection\Process\ShellCommandLineExecutor;
-use function Safe\sprintf;
+use Infection\Logger\GitHub\GitDiffFileProvider;
 
 /**
- * @final
- *
  * @internal
+ * @final
  */
-class GitDiffFileProvider
+class FilesDiffChangedLines
 {
-    public const DEFAULT_BASE = 'origin/master';
+    private DiffChangedLinesParser $diffChangedLinesParser;
+    private GitDiffFileProvider $diffFileProvider;
+    /** @var array<string, ChangedLinesRange[]> */
+    private ?array $memoizedFilesChangedLinesMap;
 
-    private ShellCommandLineExecutor $shellCommandLineExecutor;
-
-    public function __construct(ShellCommandLineExecutor $shellCommandLineExecutor)
+    public function __construct(DiffChangedLinesParser $diffChangedLinesParser, GitDiffFileProvider $diffFileProvider)
     {
-        $this->shellCommandLineExecutor = $shellCommandLineExecutor;
+        $this->diffChangedLinesParser = $diffChangedLinesParser;
+        $this->diffFileProvider = $diffFileProvider;
     }
 
-    public function provide(string $gitDiffFilter, string $gitDiffBase): string
+    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, ?string $gitDiffBase): bool
     {
-        $filter = $this->shellCommandLineExecutor->execute(sprintf(
-            'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-            escapeshellarg($gitDiffBase),
-            escapeshellarg($gitDiffFilter)
-        ));
+        $map = $this->memoizedFilesChangedLinesMap
+            ?? $this->memoizedFilesChangedLinesMap = $this->diffChangedLinesParser->parse(
+                $this->diffFileProvider->provideWithLines($gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE)
+            );
 
-        if ($filter === '') {
-            throw NoFilesInDiffToMutate::create();
+        foreach ($map[$fileRealPath] ?? [] as $changedLinesRange) {
+            if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {
+                return true;
+            }
         }
 
-        return $filter;
-    }
-
-    public function provideWithLines(string $gitDiffBase): string
-    {
-        return $this->shellCommandLineExecutor->execute(sprintf(
-            "git diff %s --unified=0 --diff-filter=AM | grep -v -e '^[+-]' -e '^index'",
-            escapeshellarg($gitDiffBase)
-        ));
+        return false;
     }
 }

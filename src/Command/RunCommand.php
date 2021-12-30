@@ -110,6 +110,9 @@ final class RunCommand extends BaseCommand
     private const OPTION_GIT_DIFF_FILTER = 'git-diff-filter';
 
     /** @var string */
+    private const OPTION_GIT_DIFF_LINES = 'git-diff-lines';
+
+    /** @var string */
     private const OPTION_GIT_DIFF_BASE = 'git-diff-base';
 
     /** @var string */
@@ -214,7 +217,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_MUTATORS,
                 null,
                 InputOption::VALUE_REQUIRED,
-                sprintf('Specify particular mutators, e.g. "--%s=Plus,PublicVisibility"', self::OPTION_MUTATORS),
+                sprintf('Specify particular mutators, e.g. <comment>"--%s=Plus,PublicVisibility"</comment>', self::OPTION_MUTATORS),
                 Container::DEFAULT_MUTATORS_INPUT
             )
             ->addOption(
@@ -238,14 +241,21 @@ final class RunCommand extends BaseCommand
                 self::OPTION_GIT_DIFF_FILTER,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Filter files to mutate git `--diff-filter` options. A - only for added files, AM - for added and modified.',
+                'Filter files to mutate by git <comment>"--diff-filter"</comment> option. <comment>A</comment> - only for added files, <comment>AM</comment> - for added and modified.',
+                Container::DEFAULT_GIT_DIFF_FILTER
+            )
+            ->addOption(
+                self::OPTION_GIT_DIFF_LINES,
+                null,
+                InputOption::VALUE_NONE,
+                'Mutates only added and modified <comment>lines</comment> in files.',
                 Container::DEFAULT_GIT_DIFF_FILTER
             )
             ->addOption(
                 self::OPTION_GIT_DIFF_BASE,
                 null,
                 InputOption::VALUE_REQUIRED,
-                sprintf('Base branch for `--%1$s` option. Must be used only together with `--%1$s`.', self::OPTION_GIT_DIFF_FILTER),
+                sprintf('Base branch for <comment>"--%1$s"</comment> option. Must be used only together with <comment>"--%1$s"</comment>.', self::OPTION_GIT_DIFF_FILTER),
                 Container::DEFAULT_GIT_DIFF_BASE
             )
             ->addOption(
@@ -264,7 +274,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES,
                 null,
                 InputOption::VALUE_NONE,
-                'Execute only those test cases that cover mutated line, not the whole file with covering test cases. Can dramatically speed up Mutation Testing for slow test suites. For PHPUnit / Pest it uses `--filter` option',
+                'Execute only those test cases that cover mutated line, not the whole file with covering test cases. Can dramatically speed up Mutation Testing for slow test suites. For PHPUnit / Pest it uses <comment>"--filter"</comment> option',
             )
             ->addOption(
                 self::OPTION_MIN_MSI,
@@ -292,7 +302,7 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 sprintf(
-                    'PHP options passed to the PHP executable when executing the initial tests. Will be ignored if "--%s" option presented',
+                    'PHP options passed to the PHP executable when executing the initial tests. Will be ignored if <comment>"--%s"</comment> option presented',
                     self::OPTION_COVERAGE
                 ),
                 Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS
@@ -301,7 +311,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_SKIP_INITIAL_TESTS,
                 null,
                 InputOption::VALUE_NONE,
-                sprintf('Skips the initial test runs. Requires the coverage to be provided via the "--%s" option', self::OPTION_COVERAGE)
+                sprintf('Skips the initial test runs. Requires the coverage to be provided via the <comment>"--%s"</comment> option', self::OPTION_COVERAGE)
             )
             ->addOption(
                 self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS,
@@ -399,7 +409,12 @@ final class RunCommand extends BaseCommand
         }
 
         $gitDiffFilter = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
+        $isForGitDiffLines = (bool) $input->getOption(self::OPTION_GIT_DIFF_LINES);
         $gitDiffBase = $input->getOption(self::OPTION_GIT_DIFF_BASE);
+
+        if ($isForGitDiffLines && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER) {
+            throw new InvalidArgumentException(sprintf('Cannot pass both "--%s" and "--%s" options: use none or only one of them', self::OPTION_GIT_DIFF_LINES, self::OPTION_GIT_DIFF_FILTER));
+        }
 
         if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER) {
             throw new InvalidArgumentException(sprintf('Cannot pass "--%s" without "--%s"', self::OPTION_GIT_DIFF_BASE, self::OPTION_GIT_DIFF_FILTER));
@@ -409,7 +424,7 @@ final class RunCommand extends BaseCommand
 
         if ($filter !== '' && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_BASE) {
             throw new InvalidArgumentException(
-                sprintf('Cannot pass both "--%s" and "--%s" option: use none or only one of them', self::OPTION_FILTER, self::OPTION_GIT_DIFF_FILTER)
+                sprintf('Cannot pass both "--%s" and "--%s" options: use none or only one of them', self::OPTION_FILTER, self::OPTION_GIT_DIFF_FILTER)
             );
         }
 
@@ -455,6 +470,7 @@ final class RunCommand extends BaseCommand
             // To keep in sync with Container::DEFAULT_DRY_RUN
             (bool) $input->getOption(self::OPTION_DRY_RUN),
             $gitDiffFilter,
+            $isForGitDiffLines,
             $gitDiffBase,
             (bool) $input->getOption(self::OPTION_LOGGER_GITHUB),
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),

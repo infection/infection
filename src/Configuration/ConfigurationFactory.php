@@ -116,6 +116,7 @@ class ConfigurationFactory
         int $threadCount,
         bool $dryRun,
         ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
         ?string $gitDiffBase,
         bool $useGitHubLogger,
         bool $useNoopMutators,
@@ -147,7 +148,7 @@ class ConfigurationFactory
                 $schema->getSource()->getDirectories(),
                 $schema->getSource()->getExcludes()
             ),
-            $this->retrieveFilter($filter, $gitDiffFilter, $gitDiffBase),
+            $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase),
             $schema->getSource()->getExcludes(),
             $this->retrieveLogs($schema->getLogs(), $useGitHubLogger),
             $logVerbosity,
@@ -172,7 +173,9 @@ class ConfigurationFactory
             $threadCount,
             $dryRun,
             $ignoreSourceCodeMutatorsMap,
-            $executeOnlyCoveringTestCases
+            $executeOnlyCoveringTestCases,
+            $isForGitDiffLines,
+            $gitDiffBase
         );
     }
 
@@ -297,13 +300,19 @@ class ConfigurationFactory
         return $map;
     }
 
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, ?string $gitDiffBase): string
+    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase): string
     {
-        if ($gitDiffFilter === null) {
+        if ($gitDiffFilter === null && !$isForGitDiffLines) {
             return $filter;
         }
 
-        return $this->gitDiffFileProvider->provide($gitDiffFilter, $gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE);
+        $baseBranch = $gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE;
+
+        if ($isForGitDiffLines) {
+            return $this->gitDiffFileProvider->provide('AM', $baseBranch);
+        }
+
+        return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch);
     }
 
     private function retrieveLogs(Logs $logs, bool $useGitHubLogger): Logs

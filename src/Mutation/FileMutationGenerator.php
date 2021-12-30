@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -55,15 +56,24 @@ class FileMutationGenerator
     private FileParser $parser;
     private NodeTraverserFactory $traverserFactory;
     private LineRangeCalculator $lineRangeCalculator;
+    private FilesDiffChangedLines $filesDiffChangedLines;
+    private bool $isForGitDiffLines;
+    private ?string $gitDiffBase;
 
     public function __construct(
         FileParser $parser,
         NodeTraverserFactory $traverserFactory,
-        LineRangeCalculator $lineRangeCalculator
+        LineRangeCalculator $lineRangeCalculator,
+        FilesDiffChangedLines $filesDiffChangedLines,
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase
     ) {
         $this->parser = $parser;
         $this->traverserFactory = $traverserFactory;
         $this->lineRangeCalculator = $lineRangeCalculator;
+        $this->filesDiffChangedLines = $filesDiffChangedLines;
+        $this->isForGitDiffLines = $isForGitDiffLines;
+        $this->gitDiffBase = $gitDiffBase;
     }
 
     /**
@@ -98,7 +108,10 @@ class FileMutationGenerator
                 $initialStatements,
                 $trace,
                 $onlyCovered,
-                $this->lineRangeCalculator
+                $this->isForGitDiffLines,
+                $this->gitDiffBase,
+                $this->lineRangeCalculator,
+                $this->filesDiffChangedLines
             )
         );
 

@@ -33,48 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\GitHub;
-
-use function escapeshellarg;
-use Infection\Process\ShellCommandLineExecutor;
-use function Safe\sprintf;
+namespace Infection\Differ;
 
 /**
- * @final
- *
  * @internal
  */
-class GitDiffFileProvider
+final class ChangedLinesRange
 {
-    public const DEFAULT_BASE = 'origin/master';
+    private int $startLine;
+    private int $endLine;
 
-    private ShellCommandLineExecutor $shellCommandLineExecutor;
-
-    public function __construct(ShellCommandLineExecutor $shellCommandLineExecutor)
+    public function __construct(int $startLine, int $endLine)
     {
-        $this->shellCommandLineExecutor = $shellCommandLineExecutor;
+        $this->startLine = $startLine;
+        $this->endLine = $endLine;
     }
 
-    public function provide(string $gitDiffFilter, string $gitDiffBase): string
+    public function getStartLine(): int
     {
-        $filter = $this->shellCommandLineExecutor->execute(sprintf(
-            'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-            escapeshellarg($gitDiffBase),
-            escapeshellarg($gitDiffFilter)
-        ));
-
-        if ($filter === '') {
-            throw NoFilesInDiffToMutate::create();
-        }
-
-        return $filter;
+        return $this->startLine;
     }
 
-    public function provideWithLines(string $gitDiffBase): string
+    public function getEndLine(): int
     {
-        return $this->shellCommandLineExecutor->execute(sprintf(
-            "git diff %s --unified=0 --diff-filter=AM | grep -v -e '^[+-]' -e '^index'",
-            escapeshellarg($gitDiffBase)
-        ));
+        return $this->endLine;
     }
 }

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use function current;
+use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -62,12 +63,12 @@ final class FileMutationGeneratorTest extends TestCase
     private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Files';
 
     /**
-     * @var FileParser|MockObject
+     * @var FileParser&MockObject
      */
     private $fileParserMock;
 
     /**
-     * @var NodeTraverserFactory|MockObject
+     * @var NodeTraverserFactory&MockObject
      */
     private $traverserFactoryMock;
 
@@ -76,15 +77,24 @@ final class FileMutationGeneratorTest extends TestCase
      */
     private $mutationGenerator;
 
+    /**
+     * @var FilesDiffChangedLines&MockObject
+     */
+    private $filesDiffChangedLines;
+
     protected function setUp(): void
     {
         $this->fileParserMock = $this->createMock(FileParser::class);
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
+        $this->filesDiffChangedLines = $this->createMock(FilesDiffChangedLines::class);
 
         $this->mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
             $this->traverserFactoryMock,
-            new LineRangeCalculator()
+            new LineRangeCalculator(),
+            $this->filesDiffChangedLines,
+            false,
+            'master'
         );
     }
 
@@ -197,7 +207,10 @@ final class FileMutationGeneratorTest extends TestCase
         $mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
             $this->traverserFactoryMock,
-            new LineRangeCalculator()
+            new LineRangeCalculator(),
+            $this->filesDiffChangedLines,
+            false,
+            'master'
         );
 
         $mutations = $mutationGenerator->generate(

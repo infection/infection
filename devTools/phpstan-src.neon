@@ -34,6 +34,9 @@ parameters:
         -
             path: '../src/TestFramework/Coverage/CoverageChecker.php'
             message: '#Function ini_get is unsafe to use#'
+        -
+            path: '../src/Differ/DiffChangedLinesParser.php'
+            message: '#Method Infection\\Differ\\DiffChangedLinesParser::parse\(\) should return array\<string, array\<int, Infection\\Differ\\ChangedLinesRange\>\>#'
     level: 8
     paths:
         - ../src

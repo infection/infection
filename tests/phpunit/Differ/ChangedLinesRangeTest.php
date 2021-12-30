@@ -33,48 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\GitHub;
+namespace Infection\Tests\Differ;
 
-use function escapeshellarg;
-use Infection\Process\ShellCommandLineExecutor;
-use function Safe\sprintf;
+use Infection\Differ\ChangedLinesRange;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @final
- *
- * @internal
- */
-class GitDiffFileProvider
+final class ChangedLinesRangeTest extends TestCase
 {
-    public const DEFAULT_BASE = 'origin/master';
-
-    private ShellCommandLineExecutor $shellCommandLineExecutor;
-
-    public function __construct(ShellCommandLineExecutor $shellCommandLineExecutor)
+    public function test_it_returns_lines(): void
     {
-        $this->shellCommandLineExecutor = $shellCommandLineExecutor;
-    }
+        $range = new ChangedLinesRange(3, 6);
 
-    public function provide(string $gitDiffFilter, string $gitDiffBase): string
-    {
-        $filter = $this->shellCommandLineExecutor->execute(sprintf(
-            'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-            escapeshellarg($gitDiffBase),
-            escapeshellarg($gitDiffFilter)
-        ));
-
-        if ($filter === '') {
-            throw NoFilesInDiffToMutate::create();
-        }
-
-        return $filter;
-    }
-
-    public function provideWithLines(string $gitDiffBase): string
-    {
-        return $this->shellCommandLineExecutor->execute(sprintf(
-            "git diff %s --unified=0 --diff-filter=AM | grep -v -e '^[+-]' -e '^index'",
-            escapeshellarg($gitDiffBase)
-        ));
+        $this->assertSame(3, $range->getStartLine());
+        $this->assertSame(6, $range->getEndLine());
     }
 }

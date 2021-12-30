@@ -88,6 +88,8 @@ class Configuration
     /** @var array<string, array<int, string>> */
     private array $ignoreSourceCodeMutatorsMap;
     private bool $executeOnlyCoveringTestCases;
+    private bool $isForGitDiffLines;
+    private ?string $gitDiffBase;
 
     /**
      * @param string[] $sourceDirectories
@@ -125,7 +127,9 @@ class Configuration
         int $threadCount,
         bool $dryRun,
         array $ignoreSourceCodeMutatorsMap,
-        bool $executeOnlyCoveringTestCases
+        bool $executeOnlyCoveringTestCases,
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
@@ -164,6 +168,8 @@ class Configuration
         $this->dryRun = $dryRun;
         $this->ignoreSourceCodeMutatorsMap = $ignoreSourceCodeMutatorsMap;
         $this->executeOnlyCoveringTestCases = $executeOnlyCoveringTestCases;
+        $this->isForGitDiffLines = $isForGitDiffLines;
+        $this->gitDiffBase = $gitDiffBase;
     }
 
     public function getProcessTimeout(): float
@@ -324,5 +330,15 @@ class Configuration
     public function getExecuteOnlyCoveringTestCases(): bool
     {
         return $this->executeOnlyCoveringTestCases;
+    }
+
+    public function isForGitDiffLines(): bool
+    {
+        return $this->isForGitDiffLines;
+    }
+
+    public function getGitDiffBase(): ?string
+    {
+        return $this->gitDiffBase;
     }
 }

@@ -88,7 +88,9 @@ final class ConfigurationTest extends TestCase
         int $threadsCount,
         bool $dryRun,
         array $ignoreSourceCodeMutatorsMap,
-        bool $executeOnlyCoveringTestCases
+        bool $executeOnlyCoveringTestCases,
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase
     ): void {
         $config = new Configuration(
             $timeout,
@@ -119,7 +121,9 @@ final class ConfigurationTest extends TestCase
             $threadsCount,
             $dryRun,
             $ignoreSourceCodeMutatorsMap,
-            $executeOnlyCoveringTestCases
+            $executeOnlyCoveringTestCases,
+            $isForGitDiffLines,
+            $gitDiffBase
         );
 
         $this->assertConfigurationStateIs(
@@ -152,7 +156,9 @@ final class ConfigurationTest extends TestCase
             $threadsCount,
             $dryRun,
             $ignoreSourceCodeMutatorsMap,
-            $executeOnlyCoveringTestCases
+            $executeOnlyCoveringTestCases,
+            $isForGitDiffLines,
+            $gitDiffBase
         );
     }
 
@@ -188,6 +194,8 @@ final class ConfigurationTest extends TestCase
             false,
             [],
             false,
+            false,
+            'master',
         ];
 
         yield 'nominal' => [
@@ -235,6 +243,8 @@ final class ConfigurationTest extends TestCase
                 'For_' => ['.*someMethod.*'],
             ],
             true,
+            false,
+            'master',
         ];
     }
 }
