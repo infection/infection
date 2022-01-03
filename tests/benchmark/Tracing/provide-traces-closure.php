@@ -68,6 +68,7 @@ $container = Container::create()->withValues(
     Container::DEFAULT_THREAD_COUNT,
     Container::DEFAULT_DRY_RUN,
     Container::DEFAULT_GIT_DIFF_FILTER,
+    Container::DEFAULT_GIT_DIFF_LINES,
     Container::DEFAULT_GIT_DIFF_BASE,
     Container::DEFAULT_USE_GITHUB_LOGGER,
     true,

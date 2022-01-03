@@ -84,7 +84,9 @@ trait ConfigurationAssertions
         int $expectedThreadCount,
         bool $expectedDryRyn,
         array $expectedIgnoreSourceCodeMutatorsMap,
-        bool $expectedExecuteOnlyCoveringTestCases
+        bool $expectedExecuteOnlyCoveringTestCases,
+        bool $expectedIsForGitDiffLines,
+        ?string $expectedGitDiffBase
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
@@ -134,6 +136,8 @@ trait ConfigurationAssertions
         $this->assertSame($expectedDryRyn, $configuration->isDryRun());
         $this->assertSame($expectedIgnoreSourceCodeMutatorsMap, $configuration->getIgnoreSourceCodeMutatorsMap());
         $this->assertSame($expectedExecuteOnlyCoveringTestCases, $configuration->getExecuteOnlyCoveringTestCases());
+        $this->assertSame($expectedIsForGitDiffLines, $configuration->isForGitDiffLines());
+        $this->assertSame($expectedGitDiffBase, $configuration->getGitDiffBase());
     }
 
     /**

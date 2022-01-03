@@ -53,9 +53,11 @@ use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\FormatterFactory;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
+use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
+use Infection\Differ\FilesDiffChangedLines;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -164,6 +166,7 @@ final class Container
     public const DEFAULT_ONLY_COVERED = false;
     public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
     public const DEFAULT_GIT_DIFF_FILTER = null;
+    public const DEFAULT_GIT_DIFF_LINES = false;
     public const DEFAULT_GIT_DIFF_BASE = null;
     public const DEFAULT_USE_GITHUB_LOGGER = false;
     public const DEFAULT_USE_NOOP_MUTATORS = false;
@@ -527,11 +530,22 @@ final class Container
                 return new NodeTraverserFactory();
             },
             FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
+                $configuration = $container->getConfiguration();
+
                 return new FileMutationGenerator(
                     $container->getFileParser(),
                     $container->getNodeTraverserFactory(),
-                    $container->getLineRangeCalculator()
+                    $container->getLineRangeCalculator(),
+                    $container->getFilesDiffChangedLines(),
+                    $configuration->isForGitDiffLines(),
+                    $configuration->getGitDiffBase()
                 );
+            },
+            DiffChangedLinesParser::class => static function (self $container): DiffChangedLinesParser {
+                return new DiffChangedLinesParser();
+            },
+            FilesDiffChangedLines::class => static function (self $container): FilesDiffChangedLines {
+                return new FilesDiffChangedLines($container->getDiffChangedLinesParser(), $container->getGitDiffFileProvider());
             },
             BadgeLoggerFactory::class => static function (self $container): BadgeLoggerFactory {
                 return new BadgeLoggerFactory(
@@ -688,6 +702,7 @@ final class Container
             self::DEFAULT_THREAD_COUNT,
             self::DEFAULT_DRY_RUN,
             self::DEFAULT_GIT_DIFF_FILTER,
+            self::DEFAULT_GIT_DIFF_LINES,
             self::DEFAULT_GIT_DIFF_BASE,
             self::DEFAULT_USE_GITHUB_LOGGER,
             self::DEFAULT_USE_NOOP_MUTATORS,
@@ -720,6 +735,7 @@ final class Container
         int $threadCount,
         bool $dryRun,
         ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
         ?string $gitDiffBase,
         bool $useGitHubLogger,
         bool $useNoopMutators,
@@ -796,6 +812,7 @@ final class Container
                 $threadCount,
                 $dryRun,
                 $gitDiffFilter,
+                $isForGitDiffLines,
                 $gitDiffBase,
                 $useGitHubLogger,
                 $useNoopMutators,
@@ -822,6 +839,7 @@ final class Container
                     $threadCount,
                     $dryRun,
                     $gitDiffFilter,
+                    $isForGitDiffLines,
                     $gitDiffBase,
                     $useGitHubLogger,
                     $useNoopMutators,
@@ -1203,6 +1221,16 @@ final class Container
     public function getLineRangeCalculator(): LineRangeCalculator
     {
         return $this->get(LineRangeCalculator::class);
+    }
+
+    public function getFilesDiffChangedLines(): FilesDiffChangedLines
+    {
+        return $this->get(FilesDiffChangedLines::class);
+    }
+
+    public function getDiffChangedLinesParser(): DiffChangedLinesParser
+    {
+        return $this->get(DiffChangedLinesParser::class);
     }
 
     public function getTestFrameworkFinder(): TestFrameworkFinder
