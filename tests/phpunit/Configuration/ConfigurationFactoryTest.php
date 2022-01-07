@@ -1990,6 +1990,7 @@ final class ConfigurationFactoryTest extends TestCase
             0,
             false,
             'AM',
+            false,
             'master',
             true,
             $htmlFileLogPathFromCliOption,
