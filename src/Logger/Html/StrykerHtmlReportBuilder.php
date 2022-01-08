@@ -84,6 +84,7 @@ final class StrykerHtmlReportBuilder
         DetectionStatus::NOT_COVERED => 'NoCoverage',
         DetectionStatus::SYNTAX_ERROR => 'CompileError',
         DetectionStatus::IGNORED => 'Ignored',
+        DetectionStatus::SKIPPED => 'Ignored',
     ];
 
     private const PLUS_LENGTH = 1;
