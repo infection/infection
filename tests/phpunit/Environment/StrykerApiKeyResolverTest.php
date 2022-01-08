@@ -70,7 +70,7 @@ final class StrykerApiKeyResolverTest extends TestCase
     {
         $environment = [
             'API_KEY' => 'foo',
-            'INFECTION_BADGE_API_KEY' => 9000,
+            'INFECTION_DASHBOARD_API_KEY' => 9000,
             'STRYKER_DASHBOARD_API_KEY' => new stdClass(),
         ];
 
@@ -85,7 +85,7 @@ final class StrykerApiKeyResolverTest extends TestCase
     {
         $environment = [
             'API_KEY' => 'foo',
-            'INFECTION_BADGE_API_KEY' => 'bar',
+            'INFECTION_DASHBOARD_API_KEY' => 'bar',
             'STRYKER_DASHBOARD_API_KEY' => 'baz',
         ];
 

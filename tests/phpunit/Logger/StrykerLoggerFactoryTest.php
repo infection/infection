@@ -37,14 +37,16 @@ namespace Infection\Tests\Logger;
 
 use function array_map;
 use function get_class;
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
-use Infection\Logger\BadgeLogger;
-use Infection\Logger\BadgeLoggerFactory;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\MutationTestingResultsLogger;
+use Infection\Logger\StrykerLogger;
+use Infection\Logger\StrykerLoggerFactory;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\FakeCiDetector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use PHPUnit\Framework\TestCase;
@@ -53,7 +55,7 @@ use ReflectionClass;
 /**
  * @group integration
  */
-final class BadgeLoggerFactoryTest extends TestCase
+final class StrykerLoggerFactoryTest extends TestCase
 {
     public function test_it_does_not_create_any_logger_for_no_verbosity_level_and_no_badge(): void
     {
@@ -75,7 +77,7 @@ final class BadgeLoggerFactoryTest extends TestCase
         $this->assertNull($logger);
     }
 
-    public function test_it_creates_a_badge_logger_on_no_verbosity(): void
+    public function test_it_creates_a_stryker_logger_on_no_verbosity(): void
     {
         $factory = $this->createLoggerFactory();
 
@@ -88,11 +90,11 @@ final class BadgeLoggerFactoryTest extends TestCase
                 null,
                 null,
                 false,
-                new Badge('master')
+                StrykerConfig::forBadge('master')
             )
         );
 
-        $this->assertInstanceOf(BadgeLogger::class, $logger);
+        $this->assertInstanceOf(StrykerLogger::class, $logger);
     }
 
     /**
@@ -122,7 +124,7 @@ final class BadgeLoggerFactoryTest extends TestCase
             null,
         ];
 
-        yield 'badge logger' => [
+        yield 'stryker for badge logger' => [
             new Logs(
                 null,
                 null,
@@ -131,9 +133,23 @@ final class BadgeLoggerFactoryTest extends TestCase
                 null,
                 null,
                 false,
-                new Badge('foo')
+                StrykerConfig::forBadge('foo')
             ),
-            BadgeLogger::class,
+            StrykerLogger::class,
+        ];
+
+        yield 'stryker for report logger' => [
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
+                StrykerConfig::forFullReport('foo')
+            ),
+            StrykerLogger::class,
         ];
 
         yield 'all loggers' => [
@@ -145,16 +161,19 @@ final class BadgeLoggerFactoryTest extends TestCase
                 'debug',
                 'per_mutator',
                 true,
-                new Badge('branch')
+                StrykerConfig::forBadge('branch')
             ),
-            BadgeLogger::class,
+            StrykerLogger::class,
         ];
     }
 
-    private function createLoggerFactory(): BadgeLoggerFactory
+    private function createLoggerFactory(): StrykerLoggerFactory
     {
-        return new BadgeLoggerFactory(
+        $metricsCalculator = new MetricsCalculator(2);
+
+        return new StrykerLoggerFactory(
             new MetricsCalculator(2),
+            new StrykerHtmlReportBuilder($metricsCalculator, new ResultsCollector()),
             new FakeCiDetector(),
             new FakeLogger(),
         );

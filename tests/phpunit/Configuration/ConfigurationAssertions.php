@@ -105,7 +105,7 @@ trait ConfigurationAssertions
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
             $expectedLogs->getUseGitHubAnnotationsLogger(),
-            $expectedLogs->getBadge()
+            $expectedLogs->getStrykerConfig()
         );
         $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity());
         $this->assertSame($expectedTmpDir, $configuration->getTmpDir());

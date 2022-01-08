@@ -78,12 +78,12 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
-use Infection\Logger\BadgeLoggerFactory;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\MutationTestingResultsLogger;
+use Infection\Logger\StrykerLoggerFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
@@ -549,9 +549,10 @@ final class Container
             FilesDiffChangedLines::class => static function (self $container): FilesDiffChangedLines {
                 return new FilesDiffChangedLines($container->getDiffChangedLinesParser(), $container->getGitDiffFileProvider());
             },
-            BadgeLoggerFactory::class => static function (self $container): BadgeLoggerFactory {
-                return new BadgeLoggerFactory(
+            StrykerLoggerFactory::class => static function (self $container): StrykerLoggerFactory {
+                return new StrykerLoggerFactory(
                     $container->getMetricsCalculator(),
+                    $container->getStrykerHtmlReportBuilder(),
                     $container->getCiDetector(),
                     $container->getLogger()
                 );
@@ -575,7 +576,7 @@ final class Container
                     $container->getFileLoggerFactory()->createFromLogEntries(
                         $container->getConfiguration()->getLogs()
                     ),
-                    $container->getBadgeLoggerFactory()->createFromLogEntries(
+                    $container->getStrykerLoggerFactory()->createFromLogEntries(
                         $container->getConfiguration()->getLogs()
                     ),
                 ]));
@@ -1168,9 +1169,9 @@ final class Container
         return $this->get(FileLoggerFactory::class);
     }
 
-    public function getBadgeLoggerFactory(): BadgeLoggerFactory
+    public function getStrykerLoggerFactory(): StrykerLoggerFactory
     {
-        return $this->get(BadgeLoggerFactory::class);
+        return $this->get(StrykerLoggerFactory::class);
     }
 
     public function getMutationTestingResultsLogger(): MutationTestingResultsLogger

@@ -7,8 +7,8 @@
         ]
     },
     "logs": {
-        "badge": {
-            "branch": "master"
+        "stryker": {
+            "badge": "master"
         }
     },
     "mutators": {

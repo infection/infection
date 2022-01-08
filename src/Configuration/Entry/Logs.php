@@ -48,7 +48,7 @@ class Logs
     private ?string $debugLogFilePath;
     private ?string $perMutatorFilePath;
     private bool $useGitHubAnnotationsLogger;
-    private ?Badge $badge;
+    private ?StrykerConfig $strykerConfig;
 
     public function __construct(
         ?string $textLogFilePath,
@@ -58,7 +58,7 @@ class Logs
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
         bool $useGitHubAnnotationsLogger,
-        ?Badge $badge
+        ?StrykerConfig $strykerConfig
     ) {
         $this->textLogFilePath = $textLogFilePath;
         $this->htmlLogFilePath = $htmlLogFilePath;
@@ -67,7 +67,7 @@ class Logs
         $this->debugLogFilePath = $debugLogFilePath;
         $this->perMutatorFilePath = $perMutatorFilePath;
         $this->useGitHubAnnotationsLogger = $useGitHubAnnotationsLogger;
-        $this->badge = $badge;
+        $this->strykerConfig = $strykerConfig;
     }
 
     public static function createEmpty(): self
@@ -129,8 +129,8 @@ class Logs
         return $this->useGitHubAnnotationsLogger;
     }
 
-    public function getBadge(): ?Badge
+    public function getStrykerConfig(): ?StrykerConfig
     {
-        return $this->badge;
+        return $this->strykerConfig;
     }
 }

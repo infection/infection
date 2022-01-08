@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Infection\Configuration\Configuration;
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
@@ -215,7 +215,7 @@ final class ConfigurationTest extends TestCase
                 'debug.log',
                 'mutator.log',
                 true,
-                new Badge('master')
+                StrykerConfig::forBadge('master')
             ),
             'default',
             'custom-dir',

@@ -36,41 +36,46 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function getenv;
-use Infection\Configuration\Entry\Badge;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
 use Infection\Environment\StrykerApiKeyResolver;
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Psr\Log\LoggerInterface;
+use function Safe\json_encode;
 use function Safe\sprintf;
 
 /**
  * @internal
  */
-final class BadgeLogger implements MutationTestingResultsLogger
+final class StrykerLogger implements MutationTestingResultsLogger
 {
     private BuildContextResolver $buildContextResolver;
     private StrykerApiKeyResolver $strykerApiKeyResolver;
     private StrykerDashboardClient $strykerDashboardClient;
     private MetricsCalculator $metricsCalculator;
-    private Badge $badge;
+    private StrykerConfig $strykerConfig;
     private LoggerInterface $logger;
+    private StrykerHtmlReportBuilder $strykerHtmlReportBuilder;
 
     public function __construct(
         BuildContextResolver $buildContextResolver,
         StrykerApiKeyResolver $strykerApiKeyResolver,
         StrykerDashboardClient $strykerDashboardClient,
         MetricsCalculator $metricsCalculator,
-        Badge $badge,
+        StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
+        StrykerConfig $strykerConfig,
         LoggerInterface $logger
     ) {
         $this->buildContextResolver = $buildContextResolver;
         $this->strykerApiKeyResolver = $strykerApiKeyResolver;
         $this->strykerDashboardClient = $strykerDashboardClient;
         $this->metricsCalculator = $metricsCalculator;
-        $this->badge = $badge;
+        $this->strykerHtmlReportBuilder = $strykerHtmlReportBuilder;
+        $this->strykerConfig = $strykerConfig;
         $this->logger = $logger;
     }
 
@@ -86,9 +91,9 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
         $branch = $buildContext->branch();
 
-        if (!$this->badge->applicableForBranch($branch)) {
+        if (!$this->strykerConfig->applicableForBranch($branch)) {
             $this->logReportWasNotSent(sprintf(
-                'Branch "%s" does not match expected badge configuration',
+                'Branch "%s" does not match expected Stryker configuration',
                 $branch
             ));
 
@@ -106,11 +111,16 @@ final class BadgeLogger implements MutationTestingResultsLogger
         // All clear!
         $this->logger->warning('Sending dashboard report...');
 
+        // note: full html report updates Badge value as well
+        $report = $this->strykerConfig->isForFullReport()
+            ? $this->strykerHtmlReportBuilder->build()
+            : ['mutationScore' => $this->metricsCalculator->getMutationScoreIndicator()];
+
         $this->strykerDashboardClient->sendReport(
             'github.com/' . $buildContext->repositorySlug(),
             $branch,
             $apiKey,
-            $this->metricsCalculator->getMutationScoreIndicator()
+            json_encode($report)
         );
     }
 

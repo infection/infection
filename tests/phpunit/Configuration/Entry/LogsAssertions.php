@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Entry;
 
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\StrykerConfig;
 
 trait LogsAssertions
 {
@@ -49,7 +49,7 @@ trait LogsAssertions
         ?string $expectedDebugLogFilePath,
         ?string $expectedPerMutatorFilePath,
         bool $expectedUseGitHubAnnotationsLogger,
-        ?Badge $expectedBadge
+        ?StrykerConfig $expectedStrykerConfig
     ): void {
         $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
         $this->assertSame($expectedHtmlLogFilePath, $logs->getHtmlLogFilePath());
@@ -59,14 +59,14 @@ trait LogsAssertions
         $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
         $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger());
 
-        $badge = $logs->getBadge();
+        $strykerConfig = $logs->getStrykerConfig();
 
-        if ($expectedBadge === null) {
-            $this->assertNull($badge);
+        if ($expectedStrykerConfig === null) {
+            $this->assertNull($strykerConfig);
         } else {
-            $this->assertNotNull($badge);
+            $this->assertNotNull($strykerConfig);
 
-            self::assertEquals($expectedBadge, $badge);
+            self::assertEquals($expectedStrykerConfig, $strykerConfig);
         }
     }
 }

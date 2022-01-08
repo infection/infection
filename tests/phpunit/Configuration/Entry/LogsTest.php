@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Entry;
 
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\StrykerConfig;
 use PHPUnit\Framework\TestCase;
 
 final class LogsTest extends TestCase
@@ -54,7 +54,7 @@ final class LogsTest extends TestCase
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
         bool $useGitHubAnnotationsLogger,
-        ?Badge $badge
+        ?StrykerConfig $strykerConfig
     ): void {
         $logs = new Logs(
             $textLogFilePath,
@@ -64,7 +64,7 @@ final class LogsTest extends TestCase
             $debugLogFilePath,
             $perMutatorFilePath,
             $useGitHubAnnotationsLogger,
-            $badge
+            $strykerConfig
         );
 
         $this->assertLogsStateIs(
@@ -76,7 +76,7 @@ final class LogsTest extends TestCase
             $debugLogFilePath,
             $perMutatorFilePath,
             $useGitHubAnnotationsLogger,
-            $badge
+            $strykerConfig
         );
     }
 
@@ -118,7 +118,7 @@ final class LogsTest extends TestCase
             'debug.log',
             'perMutator.log',
             true,
-            new Badge('master'),
+            StrykerConfig::forBadge('master'),
         ];
     }
 }
