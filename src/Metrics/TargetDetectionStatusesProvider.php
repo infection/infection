@@ -111,6 +111,13 @@ class TargetDetectionStatusesProvider
             return;
         }
 
+        // HTML logger needs all mutation results to make a summary.
+        if ($this->logConfig->getHtmlLogFilePath() !== null) {
+            yield from DetectionStatus::ALL;
+
+            return;
+        }
+
         if ($this->logConfig->getUseGitHubAnnotationsLogger()) {
             yield DetectionStatus::ESCAPED;
         }

@@ -113,6 +113,7 @@ final class ConfigurationFactoryTest extends TestCase
         bool $inputIsForGitDiffLines,
         string $inputGitDiffBase,
         bool $inputUseGitHubAnnotationsLogger,
+        ?string $inputHtmlLogFilePath,
         bool $inputUseNoopMutators,
         int $inputMsiPrecision,
         int $expectedTimeout,
@@ -168,6 +169,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputIsForGitDiffLines,
                 $inputGitDiffBase,
                 $inputUseGitHubAnnotationsLogger,
+                $inputHtmlLogFilePath,
                 $inputUseNoopMutators,
                 $inputExecuteOnlyCoveringTestCases
             )
@@ -253,6 +255,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             true,
+            null,
             false,
             2,
             10,
@@ -282,6 +285,30 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             true,
         ];
+
+        yield 'null html file log path with existing path from config file' => self::createValueForHtmlLogFilePath(
+            'from-config.html',
+            null,
+            'from-config.html'
+        );
+
+        yield 'override html file log path from CLI option with existing path from config file' => self::createValueForHtmlLogFilePath(
+            'from-config.html',
+            'from-cli.html',
+            'from-cli.html'
+        );
+
+        yield 'set html file log path from CLI option when config file has no setting' => self::createValueForHtmlLogFilePath(
+            null,
+            'from-cli.html',
+            'from-cli.html'
+        );
+
+        yield 'null html file log path in config and CLI' => self::createValueForHtmlLogFilePath(
+            null,
+            null,
+            null
+        );
 
         yield 'null timeout' => self::createValueForTimeout(
             null,
@@ -697,6 +724,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -738,6 +766,7 @@ final class ConfigurationFactoryTest extends TestCase
                 new Source(['src/'], ['vendor/']),
                 new Logs(
                     'text.log',
+                    'report.html',
                     'summary.log',
                     'json.log',
                     'debug.log',
@@ -780,6 +809,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -792,6 +822,7 @@ final class ConfigurationFactoryTest extends TestCase
             ['vendor/'],
             new Logs(
                 'text.log',
+                'report.html',
                 'summary.log',
                 'json.log',
                 'debug.log',
@@ -872,6 +903,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             $expectedTimeOut,
@@ -946,6 +978,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1021,6 +1054,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1095,6 +1129,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1170,6 +1205,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1245,6 +1281,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1320,6 +1357,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1395,6 +1433,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1471,6 +1510,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1546,6 +1586,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1622,6 +1663,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1697,6 +1739,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1776,6 +1819,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             $useNoopMutatos,
             2,
             10,
@@ -1854,6 +1898,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             false,
             2,
             10,
@@ -1884,6 +1929,99 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             $expectedIgnoreSourceCodeMutatorsMap,
             false,
+        ];
+    }
+
+    private static function createValueForHtmlLogFilePath(?string $htmlFileLogPathInConfig, ?string $htmlFileLogPathFromCliOption, ?string $expectedHtmlFileLogPath): array
+    {
+        $expectedLogs = new Logs(
+            null,
+            $expectedHtmlFileLogPath,
+            null,
+            null,
+            null,
+            null,
+            true,
+            null,
+        );
+
+        return [
+            false,
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    null,
+                    $htmlFileLogPathInConfig,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    null,
+                ),
+                '',
+                new PhpUnit(null, null),
+                null,
+                null,
+                null,
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            false,
+            'none',
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            0,
+            false,
+            'AM',
+            false,
+            'master',
+            true,
+            $htmlFileLogPathFromCliOption,
+            false,
+            2,
+            10,
+            [],
+            [],
+            'src/a.php,src/b.php',
+            [],
+            $expectedLogs,
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            'phpunit',
+            null,
+            null,
+            false,
+            '',
+            sys_get_temp_dir() . '/infection',
+            false,
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            [],
+            true,
         ];
     }
 

@@ -66,6 +66,7 @@ final class BadgeLoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 '/a/file',
+                '/a/file',
                 true,
                 null
             )
@@ -80,6 +81,7 @@ final class BadgeLoggerFactoryTest extends TestCase
 
         $logger = $factory->createFromLogEntries(
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -127,6 +129,7 @@ final class BadgeLoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 false,
                 new Badge('foo')
             ),
@@ -136,6 +139,7 @@ final class BadgeLoggerFactoryTest extends TestCase
         yield 'all loggers' => [
             new Logs(
                 'text',
+                'html',
                 'summary',
                 'json',
                 'debug',

@@ -33,40 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Logger\Html;
 
-use Infection\Configuration\Entry\Badge;
-use Infection\Configuration\Entry\Logs;
+use Infection\Logger\LineMutationTestingResultsLogger;
+use function Safe\json_encode;
 
-trait LogsAssertions
+/**
+ * @internal
+ */
+final class HtmlFileLogger implements LineMutationTestingResultsLogger
 {
-    private function assertLogsStateIs(
-        Logs $logs,
-        ?string $expectedTextLogFilePath,
-        ?string $expectedHtmlLogFilePath,
-        ?string $expectedSummaryLogFilePath,
-        ?string $expectedJsonLogFilePath,
-        ?string $expectedDebugLogFilePath,
-        ?string $expectedPerMutatorFilePath,
-        bool $expectedUseGitHubAnnotationsLogger,
-        ?Badge $expectedBadge
-    ): void {
-        $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
-        $this->assertSame($expectedHtmlLogFilePath, $logs->getHtmlLogFilePath());
-        $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
-        $this->assertSame($expectedJsonLogFilePath, $logs->getJsonLogFilePath());
-        $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
-        $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
-        $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger());
+    private StrykerHtmlReportBuilder $strykerHtmlReportBuilder;
 
-        $badge = $logs->getBadge();
+    public function __construct(
+        StrykerHtmlReportBuilder $strykerHtmlReportBuilder
+    ) {
+        $this->strykerHtmlReportBuilder = $strykerHtmlReportBuilder;
+    }
 
-        if ($expectedBadge === null) {
-            $this->assertNull($badge);
-        } else {
-            $this->assertNotNull($badge);
+    public function getLogLines(): array
+    {
+        return [
+            <<<"HTML"
+            <!DOCTYPE html>
+            <html>
+                <body>
+                    <a href="/">Back</a>
+                    <mutation-test-report-app title-postfix="Infection"></mutation-test-report-app>
+                    <script defer src="https://www.unpkg.com/mutation-testing-elements"></script>
+                    <script>
+                        const app = document.getElementsByTagName('mutation-test-report-app').item(0);
+                        function updateTheme() {
+                            document.body.style.backgroundColor = app.themeBackgroundColor;
+                        }
+                        app.addEventListener('theme-changed', updateTheme);
+                        updateTheme();
 
-            self::assertEquals($expectedBadge, $badge);
-        }
+                        document.getElementsByTagName('mutation-test-report-app').item(0).report = {$this->getMutationTestingReport()}
+                        ;
+                    </script>
+                </body>
+            </html>
+            HTML
+        ];
+    }
+
+    private function getMutationTestingReport(): string
+    {
+        return json_encode($this->strykerHtmlReportBuilder->build());
     }
 }

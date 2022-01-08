@@ -66,11 +66,16 @@ class MutantExecutionResultFactory
             $this->retrieveProcessOutput($process),
             $this->retrieveDetectionStatus($mutantProcess),
             $mutant->getDiff(),
+            $mutation->getHash(),
             $mutation->getMutatorName(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalStartingLine(),
+            $mutation->getOriginalEndingLine(),
+            $mutation->getOriginalStartFilePosition(),
+            $mutation->getOriginalEndFilePosition(),
             $mutant->getPrettyPrintedOriginalCode(),
-            $mutant->getMutatedCode()
+            $mutant->getMutatedCode(),
+            $mutant->getTests()
         );
     }
 

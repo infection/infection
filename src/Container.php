@@ -82,6 +82,7 @@ use Infection\Logger\BadgeLoggerFactory;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MetricsCalculator;
@@ -169,6 +170,7 @@ final class Container
     public const DEFAULT_GIT_DIFF_LINES = false;
     public const DEFAULT_GIT_DIFF_BASE = null;
     public const DEFAULT_USE_GITHUB_LOGGER = false;
+    public const DEFAULT_HTML_LOGGER_PATH = null;
     public const DEFAULT_USE_NOOP_MUTATORS = false;
     public const DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
     public const DEFAULT_NO_PROGRESS = false;
@@ -564,7 +566,8 @@ final class Container
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
                     $config->mutateOnlyCoveredCode(),
-                    $container->getLogger()
+                    $container->getLogger(),
+                    $container->getStrykerHtmlReportBuilder()
                 );
             },
             MutationTestingResultsLogger::class => static function (self $container): MutationTestingResultsLogger {
@@ -576,6 +579,9 @@ final class Container
                         $container->getConfiguration()->getLogs()
                     ),
                 ]));
+            },
+            StrykerHtmlReportBuilder::class => static function (self $container): StrykerHtmlReportBuilder {
+                return new StrykerHtmlReportBuilder($container->getMetricsCalculator(), $container->getResultsCollector());
             },
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
@@ -705,6 +711,7 @@ final class Container
             self::DEFAULT_GIT_DIFF_LINES,
             self::DEFAULT_GIT_DIFF_BASE,
             self::DEFAULT_USE_GITHUB_LOGGER,
+            self::DEFAULT_HTML_LOGGER_PATH,
             self::DEFAULT_USE_NOOP_MUTATORS,
             self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES
         );
@@ -738,6 +745,7 @@ final class Container
         bool $isForGitDiffLines,
         ?string $gitDiffBase,
         bool $useGitHubLogger,
+        ?string $htmlLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases
     ): self {
@@ -815,6 +823,7 @@ final class Container
                 $isForGitDiffLines,
                 $gitDiffBase,
                 $useGitHubLogger,
+                $htmlLogFilePath,
                 $useNoopMutators,
                 $executeOnlyCoveringTestCases
             ): Configuration {
@@ -842,6 +851,7 @@ final class Container
                     $isForGitDiffLines,
                     $gitDiffBase,
                     $useGitHubLogger,
+                    $htmlLogFilePath,
                     $useNoopMutators,
                     $executeOnlyCoveringTestCases
                 );
@@ -1296,6 +1306,11 @@ final class Container
     public function getGitDiffFileProvider(): GitDiffFileProvider
     {
         return $this->get(GitDiffFileProvider::class);
+    }
+
+    public function getStrykerHtmlReportBuilder(): StrykerHtmlReportBuilder
+    {
+        return $this->get(StrykerHtmlReportBuilder::class);
     }
 
     /**

@@ -132,6 +132,21 @@ class Mutation
         return (int) $this->attributes['startLine'];
     }
 
+    public function getOriginalEndingLine(): int
+    {
+        return (int) $this->attributes['endLine'];
+    }
+
+    public function getOriginalStartFilePosition(): int
+    {
+        return (int) $this->attributes['startFilePos'];
+    }
+
+    public function getOriginalEndFilePosition(): int
+    {
+        return (int) $this->attributes['endFilePos'];
+    }
+
     public function getMutatedNodeClass(): string
     {
         return $this->mutatedNodeClass;

@@ -118,6 +118,8 @@ final class RunCommand extends BaseCommand
     /** @var string */
     private const OPTION_LOGGER_GITHUB = 'logger-github';
 
+    private const OPTION_LOGGER_HTML = 'logger-html';
+
     private const OPTION_USE_NOOP_MUTATORS = 'noop';
 
     private const OPTION_EXECUTE_ONLY_COVERING_TEST_CASES = 'only-covering-test-cases';
@@ -265,6 +267,12 @@ final class RunCommand extends BaseCommand
                 'Log escaped Mutants as GitHub Annotations.',
             )
             ->addOption(
+                self::OPTION_LOGGER_HTML,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to HTML report file, similar to PHPUnit HTML report.',
+            )
+            ->addOption(
                 self::OPTION_USE_NOOP_MUTATORS,
                 null,
                 InputOption::VALUE_NONE,
@@ -388,6 +396,7 @@ final class RunCommand extends BaseCommand
         $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
         $testFrameworkExtraOptions = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK_OPTIONS));
         $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
+        $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
 
         /** @var string|null $minMsi */
         $minMsi = $input->getOption(self::OPTION_MIN_MSI);
@@ -473,6 +482,7 @@ final class RunCommand extends BaseCommand
             $isForGitDiffLines,
             $gitDiffBase,
             (bool) $input->getOption(self::OPTION_LOGGER_GITHUB),
+            $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES)
         );

@@ -37,6 +37,12 @@ parameters:
         -
             path: '../src/Differ/DiffChangedLinesParser.php'
             message: '#Method Infection\\Differ\\DiffChangedLinesParser::parse\(\) should return array\<string, array\<int, Infection\\Differ\\ChangedLinesRange\>\>#'
+        -
+            path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
+            message: '#return type has no value type specified in iterable type array#'
+        -
+            path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
+            message: '#return type with generic class ArrayObject does not specify its types\: TKey, TValue#'
     level: 8
     paths:
         - ../src

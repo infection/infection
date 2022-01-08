@@ -230,6 +230,34 @@ JSON
                     null,
                     null,
                     null,
+                    null,
+                    false,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][html] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "html": "report.html"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    'report.html',
+                    null,
+                    null,
+                    null,
+                    null,
                     false,
                     null
                 ),
@@ -251,6 +279,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     'summary.log',
                     null,
@@ -277,6 +306,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     null,
                     'json.log',
@@ -306,6 +336,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     'debug.log',
                     null,
                     false,
@@ -329,6 +360,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     null,
                     null,
@@ -362,6 +394,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     false,
                     new Badge('master')
                 ),
@@ -390,6 +423,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     false,
                     new Badge('/^foo$/')
                 ),
@@ -404,6 +438,7 @@ JSON
     },
     "logs": {
         "text": "text.log",
+        "html": "report.html",
         "summary": "summary.log",
         "json": "json.log",
         "debug": "debug.log",
@@ -420,6 +455,7 @@ JSON
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
                     'text.log',
+                    'report.html',
                     'summary.log',
                     'json.log',
                     'debug.log',
@@ -486,6 +522,7 @@ JSON
     },
     "logs": {
         "text": " text.log ",
+        "html": " report.html ",
         "summary": " summary.log ",
         "json": " json.log ",
         "debug": " debug.log ",
@@ -502,6 +539,7 @@ JSON
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
                     'text.log',
+                    'report.html',
                     'summary.log',
                     'json.log',
                     'debug.log',
@@ -2134,6 +2172,7 @@ JSON
     },
     "logs": {
         "text": "text.log",
+        "html": "report.html",
         "summary": "summary.log",
         "json": "json.log",
         "debug": "debug.log",
@@ -2372,6 +2411,7 @@ JSON
                 ),
                 'logs' => new Logs(
                     'text.log',
+                    'report.html',
                     'summary.log',
                     'json.log',
                     'debug.log',

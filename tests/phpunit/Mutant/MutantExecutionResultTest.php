@@ -65,9 +65,13 @@ final class MutantExecutionResultTest extends TestCase
 
 DIFF;
 
+        $mutantHash = 'a1b2c3';
         $mutatorName = MutatorName::getName(For_::class);
         $originalFilePath = 'path/to/Foo.php';
         $originalStartingLine = 10;
+        $originalEndingLine = 20;
+        $originalStartFilePosition = 1;
+        $originalEndingFilePosition = 5;
         $originalCode = '<php $a = 1;';
         $mutatedCode = '<php $a = 2;';
 
@@ -76,11 +80,16 @@ DIFF;
             $processOutput,
             $processResultCode,
             now($mutantDiff),
+            $mutantHash,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine,
+            $originalEndingLine,
+            $originalStartFilePosition,
+            $originalEndingFilePosition,
             now($originalCode),
-            now($mutatedCode)
+            now($mutatedCode),
+            []
         );
 
         $this->assertResultStateIs(

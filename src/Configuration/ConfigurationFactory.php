@@ -119,6 +119,7 @@ class ConfigurationFactory
         bool $isForGitDiffLines,
         ?string $gitDiffBase,
         bool $useGitHubLogger,
+        ?string $htmlLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases
     ): Configuration {
@@ -150,7 +151,7 @@ class ConfigurationFactory
             ),
             $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase),
             $schema->getSource()->getExcludes(),
-            $this->retrieveLogs($schema->getLogs(), $useGitHubLogger),
+            $this->retrieveLogs($schema->getLogs(), $useGitHubLogger, $htmlLogFilePath),
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
@@ -315,10 +316,14 @@ class ConfigurationFactory
         return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch);
     }
 
-    private function retrieveLogs(Logs $logs, bool $useGitHubLogger): Logs
+    private function retrieveLogs(Logs $logs, bool $useGitHubLogger, ?string $htmlLogFilePath): Logs
     {
         if ($useGitHubLogger) {
             $logs->setUseGitHubAnnotationsLogger($useGitHubLogger);
+        }
+
+        if ($htmlLogFilePath !== null) {
+            $logs->setHtmlLogFilePath($htmlLogFilePath);
         }
 
         return $logs;
