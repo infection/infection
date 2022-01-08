@@ -8,7 +8,7 @@
     },
     "logs": {
         "stryker": {
-            "badge": "master"
+            "report": "master"
         }
     },
     "mutators": {
