@@ -92,6 +92,16 @@ class TargetDetectionStatusesProvider
             yield DetectionStatus::ESCAPED;
         }
 
+        $strykerConfig = $this->logConfig->getStrykerConfig();
+        $isStrykerFullReportEnabled = $strykerConfig !== null && $strykerConfig->isForFullReport();
+
+        // Stryker HTML report needs all mutation results.
+        if ($isStrykerFullReportEnabled) {
+            yield from DetectionStatus::ALL;
+
+            return;
+        }
+
         // This one stops all file logging.
         if ($this->logVerbosity === LogVerbosity::NONE) {
             return;
@@ -112,9 +122,7 @@ class TargetDetectionStatusesProvider
         }
 
         // HTML logger needs all mutation results to make a summary.
-        $strykerConfig = $this->logConfig->getStrykerConfig();
-
-        if ($this->logConfig->getHtmlLogFilePath() !== null || ($strykerConfig !== null && $strykerConfig->isForFullReport())) {
+        if ($this->logConfig->getHtmlLogFilePath() !== null) {
             yield from DetectionStatus::ALL;
 
             return;

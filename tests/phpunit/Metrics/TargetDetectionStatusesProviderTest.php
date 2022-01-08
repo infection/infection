@@ -215,7 +215,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
     {
         $logs = $this->createMock(Logs::class);
         $logs
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('getHtmlLogFilePath')
             ->willReturn(null)
         ;
@@ -226,6 +226,25 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+
+        $this->assertProvidesExcluding([], $provider->get());
+    }
+
+    public function test_it_provides_all_statuses_for_full_stryker_report_with_verbosity_none(): void
+    {
+        $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->never())
+            ->method('getHtmlLogFilePath')
+            ->willReturn(null)
+        ;
+        $logs
+            ->expects($this->once())
+            ->method('getStrykerConfig')
+            ->willReturn(StrykerConfig::forFullReport('master'))
+        ;
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, false);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
