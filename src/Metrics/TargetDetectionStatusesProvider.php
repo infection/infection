@@ -112,7 +112,9 @@ class TargetDetectionStatusesProvider
         }
 
         // HTML logger needs all mutation results to make a summary.
-        if ($this->logConfig->getHtmlLogFilePath() !== null) {
+        $strykerConfig = $this->logConfig->getStrykerConfig();
+
+        if ($this->logConfig->getHtmlLogFilePath() !== null || ($strykerConfig !== null && $strykerConfig->isForFullReport())) {
             yield from DetectionStatus::ALL;
 
             return;

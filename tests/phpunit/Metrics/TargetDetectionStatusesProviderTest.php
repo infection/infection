@@ -37,6 +37,7 @@ namespace Infection\Tests\Metrics;
 
 use function array_keys;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
@@ -194,6 +195,58 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $this->assertProvidesExcluding([
             DetectionStatus::SKIPPED,
         ], $provider->get());
+    }
+
+    public function test_it_provides_all_statuses_for_html_logger(): void
+    {
+        $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getHtmlLogFilePath')
+            ->willReturn('infection.html')
+        ;
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+
+        $this->assertProvidesExcluding([], $provider->get());
+    }
+
+    public function test_it_provides_all_statuses_for_full_stryker_report(): void
+    {
+        $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getHtmlLogFilePath')
+            ->willReturn(null)
+        ;
+        $logs
+            ->expects($this->once())
+            ->method('getStrykerConfig')
+            ->willReturn(StrykerConfig::forFullReport('master'))
+        ;
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+
+        $this->assertProvidesExcluding([], $provider->get());
+    }
+
+    public function test_it_provides_nothing_for_stryker_badge_report(): void
+    {
+        $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getHtmlLogFilePath')
+            ->willReturn(null)
+        ;
+        $logs
+            ->expects($this->once())
+            ->method('getStrykerConfig')
+            ->willReturn(StrykerConfig::forBadge('master'))
+        ;
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+
+        $this->assertSame([], $provider->get());
     }
 
     private function assertProvides(array $expected, array $actual): void
