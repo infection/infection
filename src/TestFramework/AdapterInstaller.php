@@ -50,6 +50,7 @@ final class AdapterInstaller
         TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
     ];
 
+    // 2 minutes
     private const TIMEOUT = 120.0;
 
     public function __construct(private ComposerExecutableFinder $composerExecutableFinder)
