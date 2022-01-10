@@ -84,7 +84,7 @@
                         {
                             "type": "object",
                             "required": ["report"],
-                            "description": "Mutation score badge for your GitHub project. If provided, Infection will report results for matching branches to an upstream reporting dashboard.",
+                            "description": "Mutation testing HTML report for your GitHub project. If provided, Infection will report results for matching branches to an upstream reporting dashboard.",
                             "additionalProperties": false,
                             "properties": {
                                 "report": { "$ref": "#/definitions/stryker-branch" }
