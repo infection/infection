@@ -9,5 +9,14 @@
     "logs": {
         "summary": "infection.log"
     },
-    "tmpDir": "."
+    "tmpDir": ".",
+    "mutators": {
+        "@default": false,
+        "ProtectedVisibility": true,
+        "Plus": true,
+        "global-ignoreSourceCodeByRegex": [
+            "public(.*)"
+        ],
+        "PublicVisibility": true
+    }
 }

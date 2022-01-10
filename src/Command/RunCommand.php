@@ -56,6 +56,7 @@ use Infection\Logger\ConsoleLogger;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Process\Runner\NotMatchedIgnoreSourceCodeRegexFound;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use const PHP_SAPI;
@@ -373,7 +374,7 @@ final class RunCommand extends BaseCommand
             $io->success($e->getMessage());
 
             return true;
-        } catch (InitialTestsFailed | MinMsiCheckFailed $exception) {
+        } catch (InitialTestsFailed | MinMsiCheckFailed | NotMatchedIgnoreSourceCodeRegexFound $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
             $io->error($exception->getMessage());
