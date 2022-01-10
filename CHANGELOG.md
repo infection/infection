@@ -1,8 +1,26 @@
 # Change Log
 
-[Full Changelog](https://github.com/infection/infection/compare/0.25.3...0.25.4)
+## [0.25.4](https://github.com/infection/infection/tree/0.25.4) (2022-01-10)
 
-## [0.25.4](https://github.com/infection/infection/tree/0.25.4) (2021-12-08)
+[Full Changelog](https://github.com/infection/infection/compare/0.26.0...0.25.4)
+
+**Added:**
+
+* Implement the Stryker HTML report  https://github.com/infection/infection/pull/1625
+* Add new `--git-diff-lines` option to generate Mutants only for the changed *lines* https://github.com/infection/infection/pull/1632
+* Show ignored mutants on progress and summary https://github.com/infection/infection/pull/1612
+
+**Changed:**
+
+* Replace `badge` logger with more advanced `stryker` logger https://github.com/infection/infection/pull/1629
+* Mark Mutant as killed if Test Framework returns non-zero exit code https://github.com/infection/infection/pull/1621
+* Set `failOnRisky`, `failOnWarning` to `true` if parameters are not already set for mutants https://github.com/infection/infection/pull/1630
+* Automatically set `XDEBUG_MODE=coverage` if needed https://github.com/infection/infection/pull/1518
+* Add `dg/bypass-finals` to the conflict packages list https://github.com/infection/infection/pull/1605
+
+## [0.26.0](https://github.com/infection/infection/tree/0.25.4) (2021-12-08)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.25.3...0.25.4)
 
 **Added:**
 
