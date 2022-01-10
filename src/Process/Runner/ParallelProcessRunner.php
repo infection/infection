@@ -61,16 +61,11 @@ final class ParallelProcessRunner implements ProcessRunner
      */
     private array $availableThreadIndexes = [];
 
-    private int $threadCount;
-    private int $poll;
-
     /**
      * @param int $poll Delay (in milliseconds) to wait in-between two polls
      */
-    public function __construct(int $threadCount, int $poll = 1000)
+    public function __construct(private int $threadCount, private int $poll = 1000)
     {
-        $this->threadCount = $threadCount;
-        $this->poll = $poll;
     }
 
     public function run(iterable $processes): void
@@ -131,7 +126,7 @@ final class ParallelProcessRunner implements ProcessRunner
 
             try {
                 $process->checkTimeout();
-            } catch (ProcessTimedOutException $exception) {
+            } catch (ProcessTimedOutException) {
                 $processBearer->markAsTimedOut();
             }
 
@@ -175,7 +170,7 @@ final class ParallelProcessRunner implements ProcessRunner
         $bucket[] = $input->current();
         $input->next();
 
-        return (int) (microtime(true) - $start) * 1000000; // ns to ms
+        return (int) (microtime(true) - $start) * 1_000_000; // ns to ms
     }
 
     /**

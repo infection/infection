@@ -50,36 +50,8 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResult
 {
-    private string $processCommandLine;
-    private string $processOutput;
     private string $detectionStatus;
-
-    /**
-     * @var Deferred<string>
-     */
-    private Deferred $mutantDiff;
-    private string $mutantHash;
     private string $mutatorName;
-    private string $originalFilePath;
-    private int $originalStartingLine;
-    private int $originalEndingLine;
-    private int $originalStartFilePosition;
-    private int $originalEndFilePosition;
-
-    /**
-     * @var Deferred<string>
-     */
-    private Deferred $originalCode;
-
-    /**
-     * @var Deferred<string>
-     */
-    private Deferred $mutatedCode;
-
-    /**
-     * @var TestLocation[]
-     */
-    private array $tests;
 
     /**
      * @param Deferred<string> $mutantDiff
@@ -88,38 +60,25 @@ class MutantExecutionResult
      * @param TestLocation[] $tests
      */
     public function __construct(
-        string $processCommandLine,
-        string $processOutput,
+        private string $processCommandLine,
+        private string $processOutput,
         string $detectionStatus,
-        Deferred $mutantDiff,
-        string $mutantHash,
+        private Deferred $mutantDiff,
+        private string $mutantHash,
         string $mutatorName,
-        string $originalFilePath,
-        int $originalStartingLine,
-        int $originalEndingLine,
-        int $originalStartFilePosition,
-        int $originalEndFilePosition,
-        Deferred $originalCode,
-        Deferred $mutatedCode,
-        array $tests
+        private string $originalFilePath,
+        private int $originalStartingLine,
+        private int $originalEndingLine,
+        private int $originalStartFilePosition,
+        private int $originalEndFilePosition,
+        private Deferred $originalCode,
+        private Deferred $mutatedCode,
+        private array $tests
     ) {
         Assert::oneOf($detectionStatus, DetectionStatus::ALL);
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
-
-        $this->processCommandLine = $processCommandLine;
-        $this->processOutput = $processOutput;
         $this->detectionStatus = $detectionStatus;
-        $this->mutantDiff = $mutantDiff;
-        $this->mutantHash = $mutantHash;
         $this->mutatorName = $mutatorName;
-        $this->originalFilePath = $originalFilePath;
-        $this->originalStartingLine = $originalStartingLine;
-        $this->originalEndingLine = $originalEndingLine;
-        $this->originalCode = $originalCode;
-        $this->mutatedCode = $mutatedCode;
-        $this->tests = $tests;
-        $this->originalStartFilePosition = $originalStartFilePosition;
-        $this->originalEndFilePosition = $originalEndFilePosition;
     }
 
     public static function createFromNonCoveredMutant(Mutant $mutant): self

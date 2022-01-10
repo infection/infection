@@ -52,11 +52,8 @@ final class AdapterInstallationDecider
         TestFrameworkTypes::PHPSPEC => 'Infection\TestFramework\PhpSpec\PhpSpecAdapter',
     ];
 
-    private QuestionHelper $questionHelper;
-
-    public function __construct(QuestionHelper $questionHelper)
+    public function __construct(private QuestionHelper $questionHelper)
     {
-        $this->questionHelper = $questionHelper;
     }
 
     public function shouldBeInstalled(string $adapterName, IO $io): bool

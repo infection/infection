@@ -43,11 +43,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
 {
-    private MutationTestingResultsLogger $logger;
-
-    public function __construct(MutationTestingResultsLogger $logger)
+    public function __construct(private MutationTestingResultsLogger $logger)
     {
-        $this->logger = $logger;
     }
 
     public function create(OutputInterface $output): EventSubscriber

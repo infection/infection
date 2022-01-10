@@ -40,13 +40,7 @@ namespace Infection\Process\Runner;
  */
 final class IndexedProcessBearer
 {
-    public int $threadIndex;
-
-    public ProcessBearer $processBearer;
-
-    public function __construct(int $threadIndex, ProcessBearer $processBearer)
+    public function __construct(public int $threadIndex, public ProcessBearer $processBearer)
     {
-        $this->threadIndex = $threadIndex;
-        $this->processBearer = $processBearer;
     }
 }

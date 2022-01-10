@@ -41,7 +41,7 @@ use const PHP_EOL;
 use Psr\Log\LoggerInterface;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
-use function strpos;
+use function str_starts_with;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -50,21 +50,8 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class FileLogger implements MutationTestingResultsLogger
 {
-    private string $filePath;
-    private Filesystem $fileSystem;
-    private LineMutationTestingResultsLogger $lineLogger;
-    private LoggerInterface $logger;
-
-    public function __construct(
-        string $filePath,
-        Filesystem $fileSystem,
-        LineMutationTestingResultsLogger $lineLogger,
-        LoggerInterface $logger
-    ) {
-        $this->filePath = $filePath;
-        $this->fileSystem = $fileSystem;
-        $this->lineLogger = $lineLogger;
-        $this->logger = $logger;
+    public function __construct(private string $filePath, private Filesystem $fileSystem, private LineMutationTestingResultsLogger $lineLogger, private LoggerInterface $logger)
+    {
     }
 
     public function log(): void
@@ -72,7 +59,7 @@ final class FileLogger implements MutationTestingResultsLogger
         $content = implode(PHP_EOL, $this->lineLogger->getLogLines());
 
         // If the output should be written to a stream then just write it directly
-        if (strpos($this->filePath, 'php://') === 0) {
+        if (str_starts_with($this->filePath, 'php://')) {
             if (in_array($this->filePath, ['php://stdout', 'php://stderr'], true)) {
                 file_put_contents($this->filePath, $content);
             } else {

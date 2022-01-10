@@ -63,7 +63,7 @@ final class MutatedNode
     /**
      * @param Node|Node[] $value
      */
-    public static function wrap($value): self
+    public static function wrap(array | \PhpParser\Node $value): self
     {
         return new self($value);
     }
@@ -71,7 +71,7 @@ final class MutatedNode
     /**
      * @return Node|Node[]
      */
-    public function unwrap()
+    public function unwrap(): array | \PhpParser\Node
     {
         return $this->value;
     }

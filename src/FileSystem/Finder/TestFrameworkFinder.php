@@ -111,7 +111,7 @@ class TestFrameworkFinder
 
             $process->mustRun();
             $vendorPath = trim($process->getOutput());
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             $candidate = getcwd() . '/vendor/bin';
 
             if (file_exists($candidate)) {

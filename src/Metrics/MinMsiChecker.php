@@ -45,18 +45,8 @@ class MinMsiChecker
 {
     private const VALUE_OVER_REQUIRED_TOLERANCE = 2;
 
-    private bool $ignoreMsiWithNoMutations;
-    private float $minMsi;
-    private float $minCoveredCodeMsi;
-
-    public function __construct(
-        bool $ignoreMsiWithNoMutations,
-        float $minMsi,
-        float $minCoveredMsi
-    ) {
-        $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
-        $this->minMsi = $minMsi;
-        $this->minCoveredCodeMsi = $minCoveredMsi;
+    public function __construct(private bool $ignoreMsiWithNoMutations, private float $minMsi, private float $minCoveredCodeMsi)
+    {
     }
 
     /**

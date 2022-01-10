@@ -46,20 +46,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
 {
-    private OutputInterface $output;
-    private TestFrameworkAdapter $testFrameworkAdapter;
-
-    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(private OutputInterface $output, private TestFrameworkAdapter $testFrameworkAdapter)
     {
-        $this->output = $output;
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $version = 'unknown';
         }
 

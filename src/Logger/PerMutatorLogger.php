@@ -57,15 +57,8 @@ use function strlen;
  */
 final class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
+    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector)
+    {
     }
 
     public function getLogLines(): array

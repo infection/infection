@@ -46,20 +46,16 @@ use function Safe\array_flip;
  */
 class IgnoreConfig
 {
-    /** @var string[] */
-    private array $patterns;
     /** @var array<string, int> */
     private array $hashtable = [];
 
     /**
-     * @param string[] $ignored
+     * @param string[] $patterns
      */
-    public function __construct(array $ignored)
+    public function __construct(private array $patterns)
     {
-        $this->patterns = $ignored;
-
-        if ($ignored !== []) {
-            $this->hashtable = array_flip($ignored);
+        if ($patterns !== []) {
+            $this->hashtable = array_flip($patterns);
         }
     }
 

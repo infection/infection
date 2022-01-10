@@ -42,7 +42,7 @@ use function Safe\preg_match;
 use function Safe\preg_split;
 use function Safe\realpath;
 use function Safe\sprintf;
-use function strpos;
+use function str_starts_with;
 use Webmozart\Assert\Assert;
 
 /**
@@ -73,7 +73,7 @@ class DiffChangedLinesParser
         $resultMap = [];
 
         foreach ($lines as $line) {
-            if (strpos($line, 'diff ') === 0) {
+            if (str_starts_with($line, 'diff ')) {
                 preg_match('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
 
                 Assert::keyExists(
@@ -83,7 +83,7 @@ class DiffChangedLinesParser
                 );
 
                 $filePath = realpath($matches[self::MATCH_INDEX]);
-            } elseif (strpos($line, '@@ ') === 0) {
+            } elseif (str_starts_with($line, '@@ ')) {
                 Assert::string($filePath, sprintf('Real path for file from diff can not be calculated. Diff: %s', $unifiedGreppedDiff));
 
                 preg_match('/\s\+(.*)\s@/', $line, $matches);

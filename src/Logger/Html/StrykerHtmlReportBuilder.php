@@ -66,8 +66,8 @@ use function Safe\file_get_contents;
 use function Safe\preg_match;
 use function Safe\preg_split;
 use function Safe\substr;
+use function str_starts_with;
 use function strlen;
-use function strpos;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
@@ -90,15 +90,8 @@ final class StrykerHtmlReportBuilder
     private const PLUS_LENGTH = 1;
     private const DIFF_HEADERS_LINES_COUNT = 3;
 
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
+    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector)
+    {
     }
 
     public function build(): array
@@ -274,9 +267,7 @@ final class StrykerHtmlReportBuilder
         $lines = preg_split('/\n|\r\n?/', $diff);
 
         $lines = array_map(
-            static function (string $line): string {
-                return isset($line[0]) ? substr($line, self::PLUS_LENGTH) : $line;
-            },
+            static fn (string $line): string => isset($line[0]) ? substr($line, self::PLUS_LENGTH) : $line,
             array_filter(
             /*
             --- Original
@@ -284,9 +275,7 @@ final class StrykerHtmlReportBuilder
             @@ @@
              */
                 array_slice($lines, self::DIFF_HEADERS_LINES_COUNT),
-                static function (string $line): bool {
-                    return strpos($line, '+') === 0;
-                }
+                static fn (string $line): bool => str_starts_with($line, '+')
             )
         );
 

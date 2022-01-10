@@ -51,21 +51,8 @@ use Psr\Log\LoggerInterface;
  */
 class StrykerLoggerFactory
 {
-    private MetricsCalculator $metricsCalculator;
-    private StrykerHtmlReportBuilder $strykerHtmlReportBuilder;
-    private CiDetector $ciDetector;
-    private LoggerInterface $logger;
-
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
-        CiDetector $ciDetector,
-        LoggerInterface $logger
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->ciDetector = $ciDetector;
-        $this->logger = $logger;
-        $this->strykerHtmlReportBuilder = $strykerHtmlReportBuilder;
+    public function __construct(private MetricsCalculator $metricsCalculator, private StrykerHtmlReportBuilder $strykerHtmlReportBuilder, private CiDetector $ciDetector, private LoggerInterface $logger)
+    {
     }
 
     public function createFromLogEntries(Logs $logConfig): ?MutationTestingResultsLogger

@@ -43,33 +43,14 @@ use function round;
  */
 final class Calculator
 {
-    private int $roundingPrecision;
-    private int $killedCount;
-    private int $errorCount;
-    private int $timedOutCount;
-    private int $notTestedCount;
-    private int $totalCount;
-
     private ?float $mutationScoreIndicator = null;
 
     private ?float $coverageRate = null;
 
     private ?float $coveredMutationScoreIndicator = null;
 
-    public function __construct(
-        int $roundingPrecision,
-        int $killedCount,
-        int $errorCount,
-        int $timedOutCount,
-        int $notTestedCount,
-        int $totalCount
-    ) {
-        $this->roundingPrecision = $roundingPrecision;
-        $this->killedCount = $killedCount;
-        $this->errorCount = $errorCount;
-        $this->timedOutCount = $timedOutCount;
-        $this->notTestedCount = $notTestedCount;
-        $this->totalCount = $totalCount;
+    public function __construct(private int $roundingPrecision, private int $killedCount, private int $errorCount, private int $timedOutCount, private int $notTestedCount, private int $totalCount)
+    {
     }
 
     public static function fromMetrics(MetricsCalculator $calculator): self

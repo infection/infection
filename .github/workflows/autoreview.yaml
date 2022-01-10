@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ['7.4']
+        php-version: ['8.0']
 
     name: Autoreview on PHP ${{ matrix.php-version }}
 

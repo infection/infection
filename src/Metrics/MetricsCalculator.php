@@ -46,8 +46,6 @@ use function Safe\sprintf;
  */
 class MetricsCalculator implements Collector
 {
-    private int $roundingPrecision;
-
     /**
      * @var array<string, int>
      */
@@ -57,10 +55,8 @@ class MetricsCalculator implements Collector
 
     private ?Calculator $calculator = null;
 
-    public function __construct(int $roundingPrecision)
+    public function __construct(private int $roundingPrecision)
     {
-        $this->roundingPrecision = $roundingPrecision;
-
         foreach (DetectionStatus::ALL as $status) {
             $this->countByStatus[$status] = 0;
         }

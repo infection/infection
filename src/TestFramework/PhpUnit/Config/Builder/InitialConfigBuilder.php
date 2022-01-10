@@ -50,38 +50,25 @@ use Webmozart\Assert\Assert;
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
-    private string $tmpDir;
     private string $originalXmlConfigContent;
-    private XmlConfigurationManipulator $configManipulator;
-    private XmlConfigurationVersionProvider $versionProvider;
-    /** @var string[] */
-    private array $srcDirs;
-    /** @var list<string> */
-    private array $filteredSourceFilesToMutate;
 
     /**
      * @param string[] $srcDirs
      * @param list<string> $filteredSourceFilesToMutate
      */
     public function __construct(
-        string $tmpDir,
+        private string $tmpDir,
         string $originalXmlConfigContent,
-        XmlConfigurationManipulator $configManipulator,
-        XmlConfigurationVersionProvider $versionProvider,
-        array $srcDirs,
-        array $filteredSourceFilesToMutate
+        private XmlConfigurationManipulator $configManipulator,
+        private XmlConfigurationVersionProvider $versionProvider,
+        private array $srcDirs,
+        private array $filteredSourceFilesToMutate
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,
             'The original XML config content cannot be an empty string'
         );
-
-        $this->tmpDir = $tmpDir;
         $this->originalXmlConfigContent = $originalXmlConfigContent;
-        $this->configManipulator = $configManipulator;
-        $this->versionProvider = $versionProvider;
-        $this->srcDirs = $srcDirs;
-        $this->filteredSourceFilesToMutate = $filteredSourceFilesToMutate;
     }
 
     public function build(string $version): string

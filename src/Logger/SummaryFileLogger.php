@@ -45,11 +45,8 @@ use Infection\Metrics\MetricsCalculator;
  */
 final class SummaryFileLogger implements LineMutationTestingResultsLogger
 {
-    private MetricsCalculator $metricsCalculator;
-
-    public function __construct(MetricsCalculator $metricsCalculator)
+    public function __construct(private MetricsCalculator $metricsCalculator)
     {
-        $this->metricsCalculator = $metricsCalculator;
     }
 
     public function getLogLines(): array

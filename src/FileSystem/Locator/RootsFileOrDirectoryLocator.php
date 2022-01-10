@@ -50,17 +50,15 @@ final class RootsFileOrDirectoryLocator implements Locator
 {
     /** @var string[] */
     private array $roots;
-    private Filesystem $filesystem;
 
     /**
      * @param string[] $roots
      */
-    public function __construct(array $roots, Filesystem $filesystem)
+    public function __construct(array $roots, private Filesystem $filesystem)
     {
         Assert::allString($roots);
 
         $this->roots = $roots;
-        $this->filesystem = $filesystem;
     }
 
     public function locate(string $fileName): string
@@ -108,7 +106,7 @@ final class RootsFileOrDirectoryLocator implements Locator
 
         try {
             return $this->locate(current($fileNames));
-        } catch (FileOrDirectoryNotFound $exception) {
+        } catch (FileOrDirectoryNotFound) {
             array_shift($fileNames);
 
             return $this->innerLocateOneOf($fileNames);

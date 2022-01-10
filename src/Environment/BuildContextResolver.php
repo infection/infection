@@ -44,18 +44,15 @@ use function trim;
  */
 final class BuildContextResolver
 {
-    private CiDetector $ciDetector;
-
-    public function __construct(CiDetector $ciDetector)
+    public function __construct(private CiDetector $ciDetector)
     {
-        $this->ciDetector = $ciDetector;
     }
 
     public function resolve(): BuildContext
     {
         try {
             $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException $exception) {
+        } catch (CiNotDetectedException) {
             throw new CouldNotResolveBuildContext('The current process is not executed in a CI build');
         }
 

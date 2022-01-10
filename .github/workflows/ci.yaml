@@ -17,12 +17,12 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
-        php-version: ['7.4']
+        php-version: ['8.0']
         coverage-driver: [pcov, xdebug]
         e2e-runner: ['bin/infection']
         include:
-          - { operating-system: 'windows-latest', php-version: '7.4', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '7.4', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }

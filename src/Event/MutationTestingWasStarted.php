@@ -40,11 +40,8 @@ namespace Infection\Event;
  */
 final class MutationTestingWasStarted
 {
-    private int $mutationCount;
-
-    public function __construct(int $mutationCount)
+    public function __construct(private int $mutationCount)
     {
-        $this->mutationCount = $mutationCount;
     }
 
     public function getMutationCount(): int

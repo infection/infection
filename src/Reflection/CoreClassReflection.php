@@ -43,11 +43,8 @@ use ReflectionException;
  */
 final class CoreClassReflection implements ClassReflection
 {
-    private ReflectionClass $reflectionClass;
-
-    private function __construct(ReflectionClass $reflectionClass)
+    private function __construct(private ReflectionClass $reflectionClass)
     {
-        $this->reflectionClass = $reflectionClass;
     }
 
     /**
@@ -62,7 +59,7 @@ final class CoreClassReflection implements ClassReflection
     {
         try {
             $method = $this->reflectionClass->getMethod($methodName)->getPrototype();
-        } catch (ReflectionException $e) {
+        } catch (ReflectionException) {
             return false;
         }
 

@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\PhpParser\Visitor;
 
 use function array_key_exists;
-use function get_class;
 use Infection\Mutation\Mutation;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -46,11 +45,8 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class MutatorVisitor extends NodeVisitorAbstract
 {
-    private Mutation $mutation;
-
-    public function __construct(Mutation $mutation)
+    public function __construct(private Mutation $mutation)
     {
-        $this->mutation = $mutation;
     }
 
     public function leaveNode(Node $node)
@@ -66,7 +62,7 @@ final class MutatorVisitor extends NodeVisitorAbstract
         $samePosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos']
             && $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
 
-        if ($samePosition && $this->mutation->getMutatedNodeClass() === get_class($node)) {
+        if ($samePosition && $this->mutation->getMutatedNodeClass() === $node::class) {
             return $this->mutation->getMutatedNode()->unwrap();
             // TODO STOP TRAVERSING
             // TODO check all built-in visitors, in particular FirstFindingVisitor

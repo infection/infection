@@ -55,40 +55,11 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MutationTestingRunner
 {
-    private MutantProcessFactory $processFactory;
-    private MutantFactory $mutantFactory;
-    private ProcessRunner $processRunner;
-    private EventDispatcher $eventDispatcher;
-    private Filesystem $fileSystem;
-    private DiffSourceCodeMatcher $diffSourceCodeMatcher;
-    private bool $runConcurrently;
-    private float $timeout;
-    /** @var array<string, array<int, string>> */
-    private array $ignoreSourceCodeMutatorsMap;
-
     /**
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
-    public function __construct(
-        MutantProcessFactory $processFactory,
-        MutantFactory $mutantFactory,
-        ProcessRunner $processRunner,
-        EventDispatcher $eventDispatcher,
-        Filesystem $fileSystem,
-        DiffSourceCodeMatcher $diffSourceCodeMatcher,
-        bool $runConcurrently,
-        float $timeout,
-        array $ignoreSourceCodeMutatorsMap
-    ) {
-        $this->processFactory = $processFactory;
-        $this->mutantFactory = $mutantFactory;
-        $this->processRunner = $processRunner;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->fileSystem = $fileSystem;
-        $this->diffSourceCodeMatcher = $diffSourceCodeMatcher;
-        $this->runConcurrently = $runConcurrently;
-        $this->timeout = $timeout;
-        $this->ignoreSourceCodeMutatorsMap = $ignoreSourceCodeMutatorsMap;
+    public function __construct(private MutantProcessFactory $processFactory, private MutantFactory $mutantFactory, private ProcessRunner $processRunner, private EventDispatcher $eventDispatcher, private Filesystem $fileSystem, private DiffSourceCodeMatcher $diffSourceCodeMatcher, private bool $runConcurrently, private float $timeout, private array $ignoreSourceCodeMutatorsMap)
+    {
     }
 
     /**
@@ -100,9 +71,7 @@ class MutationTestingRunner
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
         $processes = take($mutations)
-            ->cast(function (Mutation $mutation): Mutant {
-                return $this->mutantFactory->create($mutation);
-            })
+            ->cast(fn (Mutation $mutation): Mutant => $this->mutantFactory->create($mutation))
             ->filter(function (Mutant $mutant): bool {
                 $mutatorName = $mutant->getMutation()->getMutatorName();
 

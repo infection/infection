@@ -50,17 +50,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
 {
-    private OutputInterface $output;
     private ProgressBar $progressBar;
-    private TestFrameworkAdapter $testFrameworkAdapter;
-    private bool $debug;
 
-    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter, bool $debug)
+    public function __construct(private OutputInterface $output, private TestFrameworkAdapter $testFrameworkAdapter, private bool $debug)
     {
-        $this->output = $output;
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-        $this->debug = $debug;
-
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('verbose');
     }
@@ -69,7 +62,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $version = 'unknown';
         }
 

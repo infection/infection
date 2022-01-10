@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Logger\Http;
 
-use function curl_close;
 use const CURLINFO_HTTP_CODE;
 use const CURLOPT_CUSTOMREQUEST;
 use const CURLOPT_HEADER;
@@ -83,19 +82,15 @@ class StrykerCurlClient
 
         $handle = curl_init();
 
-        try {
-            curl_setopt($handle, CURLOPT_URL, $url);
-            curl_setopt($handle, CURLOPT_CUSTOMREQUEST, 'PUT');
-            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($handle, CURLOPT_POSTFIELDS, $reportJson);
-            curl_setopt($handle, CURLOPT_HEADER, true);
+        curl_setopt($handle, CURLOPT_URL, $url);
+        curl_setopt($handle, CURLOPT_CUSTOMREQUEST, 'PUT');
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($handle, CURLOPT_POSTFIELDS, $reportJson);
+        curl_setopt($handle, CURLOPT_HEADER, true);
 
-            $body = (string) curl_exec($handle);
-            $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        } finally {
-            curl_close($handle);
-        }
+        $body = (string) curl_exec($handle);
+        $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
         return new Response($statusCode, $body);
     }

@@ -37,7 +37,6 @@ namespace Infection\Logger;
 
 use DateTime;
 use DateTimeInterface;
-use function get_class;
 use function gettype;
 use Infection\Console\IO;
 use function is_object;
@@ -46,7 +45,7 @@ use function method_exists;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 use function Safe\sprintf;
-use function strpos;
+use function str_contains;
 use function strtr;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
@@ -87,11 +86,8 @@ final class ConsoleLogger extends AbstractLogger
         LogLevel::NOTICE => 'note',
     ];
 
-    private IO $io;
-
-    public function __construct(IO $io)
+    public function __construct(private IO $io)
     {
-        $this->io = $io;
     }
 
     /**
@@ -150,7 +146,7 @@ final class ConsoleLogger extends AbstractLogger
      */
     private function interpolate(string $message, array $context): string
     {
-        if (strpos($message, '{') === false) {
+        if (!str_contains($message, '{')) {
             return $message;
         }
 
@@ -165,7 +161,7 @@ final class ConsoleLogger extends AbstractLogger
             } elseif ($val instanceof DateTimeInterface) {
                 $replacements["{{$key}}"] = $val->format(DateTime::RFC3339);
             } elseif (is_object($val)) {
-                $replacements["{{$key}}"] = '[object ' . get_class($val) . ']';
+                $replacements["{{$key}}"] = '[object ' . $val::class . ']';
             } else {
                 $replacements["{{$key}}"] = '[' . gettype($val) . ']';
             }

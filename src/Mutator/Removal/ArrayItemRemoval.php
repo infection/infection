@@ -58,11 +58,8 @@ final class ArrayItemRemoval implements ConfigurableMutator
     use GetConfigClassName;
     use GetMutatorName;
 
-    private ArrayItemRemovalConfig $config;
-
-    public function __construct(ArrayItemRemovalConfig $config)
+    public function __construct(private ArrayItemRemovalConfig $config)
     {
-        $this->config = $config;
     }
 
     public static function getDefinition(): ?Definition
@@ -158,19 +155,14 @@ DIFF
      */
     private function getItemsIndexes(array $items): array
     {
-        switch ($this->config->getRemove()) {
-            case 'first':
-                return [0];
-
-            case 'last':
-                return [count($items) - 1];
-
-            default:
-                return range(
-                    0,
-                    min(count($items),
-                        $this->config->getLimit()) - 1
-                );
-        }
+        return match ($this->config->getRemove()) {
+            'first' => [0],
+            'last' => [count($items) - 1],
+            default => range(
+                0,
+                min(count($items),
+                    $this->config->getLimit()) - 1
+            ),
+        };
     }
 }

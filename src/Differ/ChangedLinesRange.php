@@ -40,13 +40,8 @@ namespace Infection\Differ;
  */
 final class ChangedLinesRange
 {
-    private int $startLine;
-    private int $endLine;
-
-    public function __construct(int $startLine, int $endLine)
+    public function __construct(private int $startLine, private int $endLine)
     {
-        $this->startLine = $startLine;
-        $this->endLine = $endLine;
     }
 
     public function getStartLine(): int

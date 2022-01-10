@@ -58,29 +58,10 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 {
     private const PAD_LENGTH = 8;
 
-    private OutputInterface $output;
-    private OutputFormatter $outputFormatter;
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-    private bool $showMutations;
-    private DiffColorizer $diffColorizer;
-
     private int $mutationCount = 0;
 
-    public function __construct(
-        OutputInterface $output,
-        OutputFormatter $outputFormatter,
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector,
-        DiffColorizer $diffColorizer,
-        bool $showMutations
-    ) {
-        $this->output = $output;
-        $this->outputFormatter = $outputFormatter;
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
-        $this->showMutations = $showMutations;
-        $this->diffColorizer = $diffColorizer;
+    public function __construct(private OutputInterface $output, private OutputFormatter $outputFormatter, private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector, private DiffColorizer $diffColorizer, private bool $showMutations)
+    {
     }
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
@@ -181,10 +162,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
     }
 
-    /**
-     * @param int|string $subject
-     */
-    private function getPadded($subject, int $padLength = self::PAD_LENGTH): string
+    private function getPadded(int | string $subject, int $padLength = self::PAD_LENGTH): string
     {
         return str_pad((string) $subject, $padLength, ' ', STR_PAD_LEFT);
     }

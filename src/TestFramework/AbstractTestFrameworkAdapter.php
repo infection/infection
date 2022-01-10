@@ -47,30 +47,8 @@ use Symfony\Component\Process\Process;
  */
 abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 {
-    private string $testFrameworkExecutable;
-    private CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder;
-    private InitialConfigBuilder $initialConfigBuilder;
-    private MutationConfigBuilder $mutationConfigBuilder;
-    private VersionParser $versionParser;
-    private CommandLineBuilder $commandLineBuilder;
-    private ?string $version;
-
-    public function __construct(
-        string $testFrameworkExecutable,
-        InitialConfigBuilder $initialConfigBuilder,
-        MutationConfigBuilder $mutationConfigBuilder,
-        CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
-        VersionParser $versionParser,
-        CommandLineBuilder $commandLineBuilder,
-        ?string $version = null
-    ) {
-        $this->testFrameworkExecutable = $testFrameworkExecutable;
-        $this->initialConfigBuilder = $initialConfigBuilder;
-        $this->mutationConfigBuilder = $mutationConfigBuilder;
-        $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
-        $this->versionParser = $versionParser;
-        $this->commandLineBuilder = $commandLineBuilder;
-        $this->version = $version;
+    public function __construct(private string $testFrameworkExecutable, private InitialConfigBuilder $initialConfigBuilder, private MutationConfigBuilder $mutationConfigBuilder, private CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder, private VersionParser $versionParser, private CommandLineBuilder $commandLineBuilder, private ?string $version = null)
+    {
     }
 
     abstract public function testsPass(string $output): bool;

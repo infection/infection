@@ -43,15 +43,11 @@ use Infection\Logger\GitHub\GitDiffFileProvider;
  */
 class FilesDiffChangedLines
 {
-    private DiffChangedLinesParser $diffChangedLinesParser;
-    private GitDiffFileProvider $diffFileProvider;
     /** @var array<string, ChangedLinesRange[]> */
-    private ?array $memoizedFilesChangedLinesMap;
+    private ?array $memoizedFilesChangedLinesMap = null;
 
-    public function __construct(DiffChangedLinesParser $diffChangedLinesParser, GitDiffFileProvider $diffFileProvider)
+    public function __construct(private DiffChangedLinesParser $diffChangedLinesParser, private GitDiffFileProvider $diffFileProvider)
     {
-        $this->diffChangedLinesParser = $diffChangedLinesParser;
-        $this->diffFileProvider = $diffFileProvider;
     }
 
     public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, ?string $gitDiffBase): bool
