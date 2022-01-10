@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.25.4](https://github.com/infection/infection/tree/0.25.4) (2022-01-10)
+## [0.26.0](https://github.com/infection/infection/tree/0.26.0) (2022-01-10)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.26.0...0.25.4)
 
@@ -18,7 +18,7 @@
 * Automatically set `XDEBUG_MODE=coverage` if needed https://github.com/infection/infection/pull/1518
 * Add `dg/bypass-finals` to the conflict packages list https://github.com/infection/infection/pull/1605
 
-## [0.26.0](https://github.com/infection/infection/tree/0.25.4) (2021-12-08)
+## [0.25.4](https://github.com/infection/infection/tree/0.25.4) (2021-12-08)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.25.3...0.25.4)
 
