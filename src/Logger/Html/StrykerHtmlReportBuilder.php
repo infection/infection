@@ -58,6 +58,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\Str;
 use function ltrim;
 use function md5;
 use const PHP_EOL;
@@ -249,14 +250,14 @@ final class StrykerHtmlReportBuilder
                 return [
                     'id' => $result->getMutantHash(),
                     'mutatorName' => $result->getMutatorName(),
-                    'replacement' => ltrim($replacement),
+                    'replacement' => Str::convertToUtf8(Str::trimLineReturns(ltrim($replacement))),
                     'description' => $this->getMutatorDescription($result->getMutatorName()),
                     'location' => [
                         'start' => ['line' => $result->getOriginalStartingLine(), 'column' => $startingColumn],
                         'end' => ['line' => $endingLine, 'column' => $endingColumn],
                     ],
                     'status' => self::DETECTION_STATUS_MAP[$result->getDetectionStatus()],
-                    'statusReason' => $result->getProcessOutput(),
+                    'statusReason' => Str::convertToUtf8(Str::trimLineReturns($result->getProcessOutput())),
                     'coveredBy' => array_unique(array_map(
                         fn (TestLocation $testLocation): string => $this->buildTestMethodId($testLocation->getMethod()),
                         $result->getTests()

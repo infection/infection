@@ -39,6 +39,7 @@ use function array_values;
 use function count;
 use function explode;
 use function implode;
+use function mb_convert_encoding;
 use const PHP_EOL;
 use function str_replace;
 use function trim;
@@ -88,5 +89,10 @@ final class Str
         }
 
         return implode(PHP_EOL, $lines);
+    }
+
+    public static function convertToUtf8(string $string): string
+    {
+        return mb_convert_encoding($string, 'UTF-8', 'UTF-8');
     }
 }

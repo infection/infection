@@ -53,6 +53,7 @@ use JsonSchema\Validator;
 use function Later\now;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
+use function Safe\base64_decode;
 use function Safe\file_get_contents;
 use function Safe\json_decode;
 use function Safe\json_encode;
@@ -182,6 +183,18 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                                 'location' => ['start' => ['line' => 13, 'column' => 5], 'end' => ['line' => 13, 'column' => 6]],
                                 'status' => 'Killed',
                                 'statusReason' => 'Output without ability to detect the number of executed tests',
+                                'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e'],
+                                'killedBy' => [],
+                                'testsCompleted' => 0,
+                            ],
+                            [
+                                'id' => '22f68ca331c9262cc97322271d88d06d',
+                                'mutatorName' => 'PublicVisibility',
+                                'replacement' => 'protected function add(int $a, int $b) : int',
+                                'description' => 'Replaces the `public` method visibility keyword with `protected`.',
+                                'location' => ['start' => ['line' => 13, 'column' => 5], 'end' => ['line' => 13, 'column' => 6]],
+                                'status' => 'Killed',
+                                'statusReason' => 'Output without ability to detect the number of executed testsi?',
                                 'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e'],
                                 'killedBy' => [],
                                 'testsCompleted' => 0,
@@ -414,6 +427,34 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
                 ],
                 'Output without ability to detect the number of executed tests'
+            ),
+            //
+            // with non UTF-8 character
+            $this->createMutantExecutionResult(
+                DetectionStatus::KILLED,
+                <<<'DIFF'
+                --- Original
+                +++ New
+                @@ @@
+                 use function array_fill_keys;
+                 final class ForHtmlReport2
+                 {
+                -    public function add(int $a, int $b) : int
+                +    protected function add(int $a, int $b) : int
+                     {
+                         return 0;
+                DIFF,
+                '22f68ca331c9262cc97322271d88d06d',
+                PublicVisibility::class,
+                realpath(__DIR__ . '/../../Fixtures/ForHtmlReport2.php'),
+                13,
+                35,
+                124,
+                547,
+                [
+                    new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
+                ],
+                'Output without ability to detect the number of executed tests' . base64_decode('abc', true) // produces non UTF-8 character
             ),
         );
     }
