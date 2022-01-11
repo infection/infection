@@ -41,7 +41,6 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Str;
 use function json_encode;
 use const JSON_THROW_ON_ERROR;
-use function mb_convert_encoding;
 
 /**
  * @internal
@@ -112,16 +111,11 @@ final class JsonLogger implements LineMutationTestingResultsLogger
                     'originalFilePath' => $mutantProcess->getOriginalFilePath(),
                     'originalStartLine' => $mutantProcess->getOriginalStartingLine(),
                 ],
-                'diff' => $this->convertToUtf8(Str::trimLineReturns($mutantProcess->getMutantDiff())),
-                'processOutput' => $this->convertToUtf8(Str::trimLineReturns($mutantProcess->getProcessOutput())),
+                'diff' => Str::convertToUtf8(Str::trimLineReturns($mutantProcess->getMutantDiff())),
+                'processOutput' => Str::convertToUtf8(Str::trimLineReturns($mutantProcess->getProcessOutput())),
             ];
         }
 
         return $mutatorRows;
-    }
-
-    private function convertToUtf8(string $string): string
-    {
-        return mb_convert_encoding($string, 'UTF-8', 'UTF-8');
     }
 }
