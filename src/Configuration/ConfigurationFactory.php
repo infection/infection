@@ -52,6 +52,7 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\TestFramework\TestFrameworkTypes;
+use OndraM\CiDetector\Exception\CiNotDetectedException;
 use OndraM\CiDetector\CiDetectorInterface;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
@@ -318,6 +319,10 @@ class ConfigurationFactory
 
     private function retrieveLogs(Logs $logs, bool $useGitHubLogger, ?string $htmlLogFilePath): Logs
     {
+        if ($useGitHubLogger === false) {
+            $useGitHubLogger = $this->detectCiGithubActions();
+        }
+
         if ($useGitHubLogger) {
             $logs->setUseGitHubAnnotationsLogger($useGitHubLogger);
         }
@@ -327,5 +332,20 @@ class ConfigurationFactory
         }
 
         return $logs;
+    }
+
+    private function detectCiGithubActions(): bool
+    {
+        try {
+            $ci = $this->ciDetector->detect();
+
+            if ($ci->getCiName() === CiDetector::CI_GITHUB_ACTIONS) {
+                return true;
+            }
+        } catch (CiNotDetectedException $e) {
+            // deliberately empty
+        }
+
+        return false;
     }
 }
