@@ -265,7 +265,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_LOGGER_GITHUB,
                 null,
                 InputOption::VALUE_NONE,
-                'Log escaped Mutants as GitHub Annotations.',
+                'Log escaped Mutants as GitHub Annotations (automatically detected on Github Actions itself).',
             )
             ->addOption(
                 self::OPTION_LOGGER_HTML,
