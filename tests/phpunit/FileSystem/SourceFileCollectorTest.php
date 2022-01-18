@@ -40,10 +40,10 @@ use function array_map;
 use function array_values;
 use function count;
 use Infection\FileSystem\SourceFileCollector;
+use function natcasesort;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use function range;
-use function Safe\natcasesort;
 use Webmozart\PathUtil\Path;
 
 final class SourceFileCollectorTest extends TestCase

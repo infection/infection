@@ -47,6 +47,10 @@ parameters:
         -
             path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
             message: '#return type with generic class ArrayObject does not specify its types\: TKey, TValue#'
+        -
+            message: '#^Function shell_exec is unsafe to use#'
+            path: '../src/TestFramework/CommandLineBuilder.php'
+
     level: 8
     paths:
         - ../src

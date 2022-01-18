@@ -38,7 +38,6 @@ namespace Infection\Tests\Mutator;
 use function array_shift;
 use function count;
 use function escapeshellarg;
-use function exec;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
@@ -50,6 +49,7 @@ use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
+use function Safe\exec;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
