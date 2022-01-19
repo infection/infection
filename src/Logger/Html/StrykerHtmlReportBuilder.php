@@ -166,6 +166,9 @@ final class StrykerHtmlReportBuilder
 
         if ($this->metricsCalculator->getTotalMutantsCount() !== 0) {
             $resultsByPath = $this->retrieveResultsByPath();
+
+            Assert::minCount($resultsByPath, 1, 'There must be at least one result to build HTML report.');
+
             $basePath = Path::getLongestCommonBasePath(array_keys($resultsByPath));
 
             Assert::string($basePath, '$basePath must be a string');
