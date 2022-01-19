@@ -53,29 +53,12 @@ use Webmozart\Assert\Assert;
  */
 class MutationConfigBuilder extends ConfigBuilder
 {
-    private string $tmpDir;
-    private string $projectDir;
-    private string $originalXmlConfigContent;
-    private XmlConfigurationManipulator $configManipulator;
-    private JUnitTestCaseSorter $jUnitTestCaseSorter;
-
     private ?string $originalBootstrapFile = null;
 
     private ?DOMDocument $dom = null;
 
-    public function __construct(
-        string $tmpDir,
-        string $originalXmlConfigContent,
-        XmlConfigurationManipulator $configManipulator,
-        string $projectDir,
-        JUnitTestCaseSorter $jUnitTestCaseSorter
-    ) {
-        $this->tmpDir = $tmpDir;
-        $this->projectDir = $projectDir;
-
-        $this->originalXmlConfigContent = $originalXmlConfigContent;
-        $this->configManipulator = $configManipulator;
-        $this->jUnitTestCaseSorter = $jUnitTestCaseSorter;
+    public function __construct(private string $tmpDir, private string $originalXmlConfigContent, private XmlConfigurationManipulator $configManipulator, private string $projectDir, private JUnitTestCaseSorter $jUnitTestCaseSorter)
+    {
     }
 
     /**

@@ -45,32 +45,13 @@ use Later\Interfaces\Deferred;
  */
 class Mutant
 {
-    private string $mutantFilePath;
-    private Mutation $mutation;
-    /** @var Deferred<string> */
-    private Deferred $mutatedCode;
-    /** @var Deferred<string> */
-    private Deferred $diff;
-    /** @var Deferred<string> */
-    private Deferred $prettyPrintedOriginalCode;
-
     /**
      * @param Deferred<string> $mutatedCode
      * @param Deferred<string> $diff
      * @param Deferred<string> $prettyPrintedOriginalCode
      */
-    public function __construct(
-        string $mutantFilePath,
-        Mutation $mutation,
-        Deferred $mutatedCode,
-        Deferred $diff,
-        Deferred $prettyPrintedOriginalCode
-    ) {
-        $this->mutantFilePath = $mutantFilePath;
-        $this->mutation = $mutation;
-        $this->mutatedCode = $mutatedCode;
-        $this->diff = $diff;
-        $this->prettyPrintedOriginalCode = $prettyPrintedOriginalCode;
+    public function __construct(private string $mutantFilePath, private Mutation $mutation, private Deferred $mutatedCode, private Deferred $diff, private Deferred $prettyPrintedOriginalCode)
+    {
     }
 
     public function getFilePath(): string

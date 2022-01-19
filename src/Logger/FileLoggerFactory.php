@@ -50,34 +50,8 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class FileLoggerFactory
 {
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-
-    private Filesystem $filesystem;
-    private string $logVerbosity;
-    private bool $debugMode;
-    private bool $onlyCoveredCode;
-    private LoggerInterface $logger;
-    private StrykerHtmlReportBuilder $strykerHtmlReportBuilder;
-
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector,
-        Filesystem $filesystem,
-        string $logVerbosity,
-        bool $debugMode,
-        bool $onlyCoveredCode,
-        LoggerInterface $logger,
-        StrykerHtmlReportBuilder $strykerHtmlReportBuilder
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
-        $this->filesystem = $filesystem;
-        $this->logVerbosity = $logVerbosity;
-        $this->debugMode = $debugMode;
-        $this->onlyCoveredCode = $onlyCoveredCode;
-        $this->logger = $logger;
-        $this->strykerHtmlReportBuilder = $strykerHtmlReportBuilder;
+    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector, private Filesystem $filesystem, private string $logVerbosity, private bool $debugMode, private bool $onlyCoveredCode, private LoggerInterface $logger, private StrykerHtmlReportBuilder $strykerHtmlReportBuilder)
+    {
     }
 
     public function createFromLogEntries(Logs $logConfig): MutationTestingResultsLogger

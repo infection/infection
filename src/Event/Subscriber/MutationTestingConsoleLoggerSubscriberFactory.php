@@ -46,24 +46,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-    private DiffColorizer $diffColorizer;
-    private bool $showMutations;
-    private OutputFormatter $formatter;
-
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector,
-        DiffColorizer $diffColorizer,
-        bool $showMutations,
-        OutputFormatter $formatter
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
-        $this->diffColorizer = $diffColorizer;
-        $this->showMutations = $showMutations;
-        $this->formatter = $formatter;
+    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector, private DiffColorizer $diffColorizer, private bool $showMutations, private OutputFormatter $formatter)
+    {
     }
 
     public function create(OutputInterface $output): EventSubscriber

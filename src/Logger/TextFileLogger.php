@@ -51,21 +51,8 @@ use function strlen;
  */
 final class TextFileLogger implements LineMutationTestingResultsLogger
 {
-    private ResultsCollector $resultsCollector;
-    private bool $debugVerbosity;
-    private bool $onlyCoveredMode;
-    private bool $debugMode;
-
-    public function __construct(
-        ResultsCollector $resultsCollector,
-        bool $debugVerbosity,
-        bool $onlyCoveredMode,
-        bool $debugMode
-    ) {
-        $this->resultsCollector = $resultsCollector;
-        $this->debugVerbosity = $debugVerbosity;
-        $this->onlyCoveredMode = $onlyCoveredMode;
-        $this->debugMode = $debugMode;
+    public function __construct(private ResultsCollector $resultsCollector, private bool $debugVerbosity, private bool $onlyCoveredMode, private bool $debugMode)
+    {
     }
 
     public function getLogLines(): array
@@ -205,9 +192,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
         return implode(
             PHP_EOL,
             array_map(
-                static function (string $line): string {
-                    return '  ' . $line;
-                },
+                static fn (string $line): string => '  ' . $line,
                 explode(PHP_EOL, Str::trimLineReturns($value))
             )
         );

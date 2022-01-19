@@ -49,21 +49,8 @@ use function Safe\array_flip;
  */
 class TargetDetectionStatusesProvider
 {
-    private Logs $logConfig;
-    private string $logVerbosity;
-    private bool $onlyCoveredMode;
-    private bool $showMutations;
-
-    public function __construct(
-        Logs $logConfig,
-        string $logVerbosity,
-        bool $onlyCoveredMode,
-        bool $showMutations
-    ) {
-        $this->logConfig = $logConfig;
-        $this->logVerbosity = $logVerbosity;
-        $this->onlyCoveredMode = $onlyCoveredMode;
-        $this->showMutations = $showMutations;
+    public function __construct(private Logs $logConfig, private string $logVerbosity, private bool $onlyCoveredMode, private bool $showMutations)
+    {
     }
 
     /**

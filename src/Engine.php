@@ -60,45 +60,8 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
  */
 final class Engine
 {
-    private Configuration $config;
-    private TestFrameworkAdapter $adapter;
-    private CoverageChecker $coverageChecker;
-    private EventDispatcher $eventDispatcher;
-    private InitialTestsRunner $initialTestsRunner;
-    private MemoryLimiter $memoryLimiter;
-    private MutationGenerator $mutationGenerator;
-    private MutationTestingRunner $mutationTestingRunner;
-    private MinMsiChecker $minMsiChecker;
-    private ConsoleOutput $consoleOutput;
-    private MetricsCalculator $metricsCalculator;
-    private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter;
-
-    public function __construct(
-        Configuration $config,
-        TestFrameworkAdapter $adapter,
-        CoverageChecker $coverageChecker,
-        EventDispatcher $eventDispatcher,
-        InitialTestsRunner $initialTestsRunner,
-        MemoryLimiter $memoryLimiter,
-        MutationGenerator $mutationGenerator,
-        MutationTestingRunner $mutationTestingRunner,
-        MinMsiChecker $minMsiChecker,
-        ConsoleOutput $consoleOutput,
-        MetricsCalculator $metricsCalculator,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter
-    ) {
-        $this->config = $config;
-        $this->adapter = $adapter;
-        $this->coverageChecker = $coverageChecker;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->initialTestsRunner = $initialTestsRunner;
-        $this->memoryLimiter = $memoryLimiter;
-        $this->mutationGenerator = $mutationGenerator;
-        $this->mutationTestingRunner = $mutationTestingRunner;
-        $this->minMsiChecker = $minMsiChecker;
-        $this->consoleOutput = $consoleOutput;
-        $this->metricsCalculator = $metricsCalculator;
-        $this->testFrameworkExtraOptionsFilter = $testFrameworkExtraOptionsFilter;
+    public function __construct(private Configuration $config, private TestFrameworkAdapter $adapter, private CoverageChecker $coverageChecker, private EventDispatcher $eventDispatcher, private InitialTestsRunner $initialTestsRunner, private MemoryLimiter $memoryLimiter, private MutationGenerator $mutationGenerator, private MutationTestingRunner $mutationTestingRunner, private MinMsiChecker $minMsiChecker, private ConsoleOutput $consoleOutput, private MetricsCalculator $metricsCalculator, private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter)
+    {
     }
 
     /**

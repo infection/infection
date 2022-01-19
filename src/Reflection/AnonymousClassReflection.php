@@ -42,11 +42,8 @@ use ReflectionClass;
  */
 final class AnonymousClassReflection implements ClassReflection
 {
-    private ReflectionClass $reflectionClass;
-
-    private function __construct(ReflectionClass $reflectionClass)
+    private function __construct(private ReflectionClass $reflectionClass)
     {
-        $this->reflectionClass = $reflectionClass;
     }
 
     /**

@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use function count;
-use function get_class;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\FilesDiffChangedLines;
 use Infection\Logger\GitHub\GitDiffFileProvider;
@@ -59,21 +58,12 @@ class NodeMutationGenerator
 {
     /** @var Mutator<Node>[] */
     private array $mutators;
-    private string $filePath;
-    /** @var Node[] */
-    private array $fileNodes;
-    private Trace $trace;
-    private bool $onlyCovered;
-    private LineRangeCalculator $lineRangeCalculator;
 
     private Node $currentNode;
     /** @var TestLocation[]|null */
     private ?array $testsMemoized = null;
     private ?bool $isOnFunctionSignatureMemoized = null;
     private ?bool $isInsideFunctionMemoized = null;
-    private FilesDiffChangedLines $filesDiffChangedLines;
-    private bool $isForGitDiffLines;
-    private ?string $gitDiffBase;
 
     /**
      * @param Mutator<Node>[] $mutators
@@ -81,26 +71,18 @@ class NodeMutationGenerator
      */
     public function __construct(
         array $mutators,
-        string $filePath,
-        array $fileNodes,
-        Trace $trace,
-        bool $onlyCovered,
-        bool $isForGitDiffLines,
-        ?string $gitDiffBase,
-        LineRangeCalculator $lineRangeCalculator,
-        FilesDiffChangedLines $filesDiffChangedLines
+        private string $filePath,
+        private array $fileNodes,
+        private Trace $trace,
+        private bool $onlyCovered,
+        private bool $isForGitDiffLines,
+        private ?string $gitDiffBase,
+        private LineRangeCalculator $lineRangeCalculator,
+        private FilesDiffChangedLines $filesDiffChangedLines
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
         $this->mutators = $mutators;
-        $this->filePath = $filePath;
-        $this->fileNodes = $fileNodes;
-        $this->trace = $trace;
-        $this->onlyCovered = $onlyCovered;
-        $this->isForGitDiffLines = $isForGitDiffLines;
-        $this->gitDiffBase = $gitDiffBase;
-        $this->lineRangeCalculator = $lineRangeCalculator;
-        $this->filesDiffChangedLines = $filesDiffChangedLines;
     }
 
     /**
@@ -161,7 +143,7 @@ class NodeMutationGenerator
                 $this->fileNodes,
                 $mutator->getName(),
                 $node->getAttributes(),
-                get_class($node),
+                $node::class,
                 MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
                 $tests

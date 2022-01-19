@@ -49,26 +49,13 @@ use function Safe\sprintf;
  */
 class MutantFactory
 {
-    private string $tmpDir;
-    private Differ $differ;
-    private PrettyPrinterAbstract $printer;
-
     /**
      * @var string[]
      */
     private array $printedFileCache = [];
-    private MutantCodeFactory $mutantCodeFactory;
 
-    public function __construct(
-        string $tmpDir,
-        Differ $differ,
-        PrettyPrinterAbstract $printer,
-        MutantCodeFactory $mutantCodeFactory
-    ) {
-        $this->tmpDir = $tmpDir;
-        $this->differ = $differ;
-        $this->printer = $printer;
-        $this->mutantCodeFactory = $mutantCodeFactory;
+    public function __construct(private string $tmpDir, private Differ $differ, private PrettyPrinterAbstract $printer, private MutantCodeFactory $mutantCodeFactory)
+    {
     }
 
     public function create(Mutation $mutation): Mutant

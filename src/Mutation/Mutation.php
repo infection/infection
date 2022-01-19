@@ -53,17 +53,9 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
-    private string $originalFilePath;
     private string $mutatorName;
-    private string $mutatedNodeClass;
-    private MutatedNode $mutatedNode;
-    private int $mutationByMutatorIndex;
     /** @var array<string|int|float> */
     private array $attributes;
-    /** @var Node[] */
-    private array $originalFileAst;
-    /** @var TestLocation[] */
-    private array $tests;
     private bool $coveredByTests;
     private ?float $nominalTimeToTest = null;
 
@@ -75,29 +67,22 @@ class Mutation
      * @param TestLocation[] $tests
      */
     public function __construct(
-        string $originalFilePath,
-        array $originalFileAst,
+        private string $originalFilePath,
+        private array $originalFileAst,
         string $mutatorName,
         array $attributes,
-        string $mutatedNodeClass,
-        MutatedNode $mutatedNode,
-        int $mutationByMutatorIndex,
-        array $tests
+        private string $mutatedNodeClass,
+        private MutatedNode $mutatedNode,
+        private int $mutationByMutatorIndex,
+        private array $tests
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
         foreach (MutationAttributeKeys::ALL as $key) {
             Assert::keyExists($attributes, $key);
         }
-
-        $this->originalFilePath = $originalFilePath;
-        $this->originalFileAst = $originalFileAst;
         $this->mutatorName = $mutatorName;
         $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
-        $this->mutatedNodeClass = $mutatedNodeClass;
-        $this->mutatedNode = $mutatedNode;
-        $this->mutationByMutatorIndex = $mutationByMutatorIndex;
-        $this->tests = $tests;
         $this->coveredByTests = $tests !== [];
     }
 

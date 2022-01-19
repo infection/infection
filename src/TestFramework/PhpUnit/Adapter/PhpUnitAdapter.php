@@ -59,17 +59,11 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
-    private string $tmpDir;
-
-    private string $jUnitFilePath;
-
-    private PCOVDirectoryProvider $pcovDirectoryProvider;
-
     public function __construct(
         string $testFrameworkExecutable,
-        string $tmpDir,
-        string $jUnitFilePath,
-        PCOVDirectoryProvider $pcovDirectoryProvider,
+        private string $tmpDir,
+        private string $jUnitFilePath,
+        private PCOVDirectoryProvider $pcovDirectoryProvider,
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
@@ -78,10 +72,6 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         ?string $version = null
     ) {
         parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser, $commandLineBuilder, $version);
-
-        $this->tmpDir = $tmpDir;
-        $this->jUnitFilePath = $jUnitFilePath;
-        $this->pcovDirectoryProvider = $pcovDirectoryProvider;
     }
 
     public function hasJUnitReport(): bool

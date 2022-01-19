@@ -43,12 +43,8 @@ use function Safe\json_encode;
  */
 final class HtmlFileLogger implements LineMutationTestingResultsLogger
 {
-    private StrykerHtmlReportBuilder $strykerHtmlReportBuilder;
-
-    public function __construct(
-        StrykerHtmlReportBuilder $strykerHtmlReportBuilder
-    ) {
-        $this->strykerHtmlReportBuilder = $strykerHtmlReportBuilder;
+    public function __construct(private StrykerHtmlReportBuilder $strykerHtmlReportBuilder)
+    {
     }
 
     public function getLogLines(): array

@@ -111,8 +111,7 @@ class XmlCoverageParser
     }
 
     /**
-     * @param DOMNodeList|DOMElement[] $coveredLineNodes
-     * @phpstan-param DOMNodeList<DOMElement> $coveredLineNodes
+     * @param DOMNodeList<DOMElement> $coveredLineNodes
      *
      * @return array<int, array<int, TestLocation>>
      */
@@ -145,9 +144,7 @@ class XmlCoverageParser
     }
 
     /**
-     * @param DOMNodeList|DOMElement[] $methodsCoverageNodes
-     *
-     * @phpstan-param DOMNodeList<DOMElement> $methodsCoverageNodes
+     * @param DOMNodeList<DOMElement> $methodsCoverageNodes
      *
      * @return SourceMethodLineRange[]
      */

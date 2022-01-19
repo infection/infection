@@ -46,16 +46,10 @@ use PhpParser\NodeVisitorAbstract;
 final class NonMutableNodesIgnorerVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var NodeIgnorer[]
-     */
-    private array $nodeIgnorers;
-
-    /**
      * @param NodeIgnorer[] $nodeIgnorers
      */
-    public function __construct(array $nodeIgnorers)
+    public function __construct(private array $nodeIgnorers)
     {
-        $this->nodeIgnorers = $nodeIgnorers;
     }
 
     public function enterNode(Node $node)

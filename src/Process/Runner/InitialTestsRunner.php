@@ -48,15 +48,8 @@ use Symfony\Component\Process\Process;
  */
 class InitialTestsRunner
 {
-    private InitialTestsRunProcessFactory $processBuilder;
-    private EventDispatcher $eventDispatcher;
-
-    public function __construct(
-        InitialTestsRunProcessFactory $processFactory,
-        EventDispatcher $eventDispatcher
-    ) {
-        $this->processBuilder = $processFactory;
-        $this->eventDispatcher = $eventDispatcher;
+    public function __construct(private InitialTestsRunProcessFactory $processBuilder, private EventDispatcher $eventDispatcher)
+    {
     }
 
     /**

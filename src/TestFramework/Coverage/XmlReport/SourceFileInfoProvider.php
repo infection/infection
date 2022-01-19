@@ -56,23 +56,10 @@ use Webmozart\PathUtil\Path;
  */
 class SourceFileInfoProvider
 {
-    private string $coverageIndexPath;
-    private string $coverageDir;
-    private string $relativeCoverageFilePath;
-    private string $projectSource;
-
     private ?SafeDOMXPath $xPath = null;
 
-    public function __construct(
-        string $coverageIndexPath,
-        string $coverageDir,
-        string $relativeCoverageFilePath,
-        string $projectSource
-    ) {
-        $this->coverageIndexPath = $coverageIndexPath;
-        $this->coverageDir = $coverageDir;
-        $this->relativeCoverageFilePath = $relativeCoverageFilePath;
-        $this->projectSource = $projectSource;
+    public function __construct(private string $coverageIndexPath, private string $coverageDir, private string $relativeCoverageFilePath, private string $projectSource)
+    {
     }
 
     /**
@@ -133,7 +120,7 @@ class SourceFileInfoProvider
 
         try {
             $realPath = realpath($path);
-        } catch (FilesystemException $e) {
+        } catch (FilesystemException) {
             $coverageFilePath = Path::canonicalize(
                 $this->coverageDir . DIRECTORY_SEPARATOR . $this->relativeCoverageFilePath
             );

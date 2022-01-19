@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Event\EventDispatcher;
 
-use function get_class;
 use Infection\Event\Subscriber\EventSubscriber;
 use ReflectionClass;
 use ReflectionMethod;
@@ -54,7 +53,7 @@ final class SyncEventDispatcher implements EventDispatcher
 
     public function dispatch(object $event): void
     {
-        $name = get_class($event);
+        $name = $event::class;
 
         foreach ($this->getListeners($name) as $listener) {
             $listener($event);

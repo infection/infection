@@ -53,14 +53,12 @@ use Webmozart\PathUtil\Path;
  */
 class IndexXmlCoverageLocator
 {
-    private string $coveragePath;
     private string $defaultIndexPath;
 
     private ?string $indexPath = null;
 
-    public function __construct(string $coveragePath)
+    public function __construct(private string $coveragePath)
     {
-        $this->coveragePath = $coveragePath;
         $this->defaultIndexPath = Path::canonicalize($coveragePath . '/coverage-xml/index.xml');
     }
 
@@ -103,9 +101,7 @@ class IndexXmlCoverageLocator
                 implode(
                     '", "',
                     array_map(
-                        static function (SplFileInfo $fileInfo): string {
-                            return Path::canonicalize($fileInfo->getPathname());
-                        },
+                        static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
                         $files
                     )
                 )

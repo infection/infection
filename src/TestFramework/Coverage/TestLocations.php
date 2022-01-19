@@ -42,21 +42,12 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
  */
 final class TestLocations
 {
-    /** @var array<int, array<int, TestLocation>> */
-    private array $byLine;
-    /** @var array<string, SourceMethodLineRange> */
-    private array $byMethod;
-
     /**
-     * @param array<int, array<int, TestLocation>> $testLocationsBySourceLine
-     * @param array<string, SourceMethodLineRange> $sourceMethodLineRangeByMethod
+     * @param array<int, array<int, TestLocation>> $byLine
+     * @param array<string, SourceMethodLineRange> $byMethod
      */
-    public function __construct(
-        array $testLocationsBySourceLine = [],
-        array $sourceMethodLineRangeByMethod = []
-    ) {
-        $this->byLine = $testLocationsBySourceLine;
-        $this->byMethod = $sourceMethodLineRangeByMethod;
+    public function __construct(private array $byLine = [], private array $byMethod = [])
+    {
     }
 
     /**

@@ -48,11 +48,8 @@ use function version_compare;
  */
 class InitialTestsRunProcessFactory
 {
-    private TestFrameworkAdapter $testFrameworkAdapter;
-
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(private TestFrameworkAdapter $testFrameworkAdapter)
     {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
     /**

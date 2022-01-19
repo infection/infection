@@ -52,22 +52,9 @@ use function version_compare;
  */
 class MutantProcessFactory
 {
-    private TestFrameworkAdapter $testFrameworkAdapter;
-    private float $timeout;
-    private EventDispatcher $eventDispatcher;
-    private MutantExecutionResultFactory $resultFactory;
-
     // TODO: is it necessary for the timeout to be an int?
-    public function __construct(
-        TestFrameworkAdapter $testFrameworkAdapter,
-        float $timeout,
-        EventDispatcher $eventDispatcher,
-        MutantExecutionResultFactory $resultFactory
-    ) {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-        $this->timeout = $timeout;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->resultFactory = $resultFactory;
+    public function __construct(private TestFrameworkAdapter $testFrameworkAdapter, private float $timeout, private EventDispatcher $eventDispatcher, private MutantExecutionResultFactory $resultFactory)
+    {
     }
 
     public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess

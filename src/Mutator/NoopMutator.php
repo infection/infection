@@ -47,15 +47,11 @@ use function Safe\sprintf;
  */
 final class NoopMutator implements Mutator
 {
-    /** @var Mutator<TNode> */
-    private Mutator $mutator;
-
     /**
      * @param Mutator<TNode> $mutator
      */
-    public function __construct(Mutator $mutator)
+    public function __construct(private Mutator $mutator)
     {
-        $this->mutator = $mutator;
     }
 
     public static function getDefinition(): ?Definition

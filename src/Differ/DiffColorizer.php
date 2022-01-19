@@ -39,7 +39,7 @@ use function array_map;
 use function explode;
 use function implode;
 use function Safe\sprintf;
-use function strpos;
+use function str_starts_with;
 
 /**
  * @internal
@@ -51,11 +51,11 @@ class DiffColorizer
     {
         $lines = array_map(
             static function (string $line): string {
-                if (strpos($line, '-') === 0) {
+                if (str_starts_with($line, '-')) {
                     return sprintf('<diff-del>%s</diff-del>', $line);
                 }
 
-                if (strpos($line, '+') === 0) {
+                if (str_starts_with($line, '+')) {
                     return sprintf('<diff-add>%s</diff-add>', $line);
                 }
 

@@ -48,11 +48,8 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResultFactory
 {
-    private TestFrameworkAdapter $testFrameworkAdapter;
-
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(private TestFrameworkAdapter $testFrameworkAdapter)
     {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
     public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult

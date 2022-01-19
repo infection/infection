@@ -53,27 +53,8 @@ use Webmozart\Assert\Assert;
  */
 class FileMutationGenerator
 {
-    private FileParser $parser;
-    private NodeTraverserFactory $traverserFactory;
-    private LineRangeCalculator $lineRangeCalculator;
-    private FilesDiffChangedLines $filesDiffChangedLines;
-    private bool $isForGitDiffLines;
-    private ?string $gitDiffBase;
-
-    public function __construct(
-        FileParser $parser,
-        NodeTraverserFactory $traverserFactory,
-        LineRangeCalculator $lineRangeCalculator,
-        FilesDiffChangedLines $filesDiffChangedLines,
-        bool $isForGitDiffLines,
-        ?string $gitDiffBase
-    ) {
-        $this->parser = $parser;
-        $this->traverserFactory = $traverserFactory;
-        $this->lineRangeCalculator = $lineRangeCalculator;
-        $this->filesDiffChangedLines = $filesDiffChangedLines;
-        $this->isForGitDiffLines = $isForGitDiffLines;
-        $this->gitDiffBase = $gitDiffBase;
+    public function __construct(private FileParser $parser, private NodeTraverserFactory $traverserFactory, private LineRangeCalculator $lineRangeCalculator, private FilesDiffChangedLines $filesDiffChangedLines, private bool $isForGitDiffLines, private ?string $gitDiffBase)
+    {
     }
 
     /**

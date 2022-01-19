@@ -49,11 +49,8 @@ final class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptio
 {
     private const NAME = 'Pest';
 
-    private PhpUnitAdapter $phpUnitAdapter;
-
-    public function __construct(PhpUnitAdapter $phpUnitAdapter)
+    public function __construct(private PhpUnitAdapter $phpUnitAdapter)
     {
-        $this->phpUnitAdapter = $phpUnitAdapter;
     }
 
     public function getName(): string

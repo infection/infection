@@ -47,16 +47,10 @@ use function strpos;
 final class JUnitTestCaseTimeAdder
 {
     /**
-     * @var TestLocation[]
-     */
-    private array $tests;
-
-    /**
      * @param TestLocation[] $tests
      */
-    public function __construct(array $tests)
+    public function __construct(private array $tests)
     {
-        $this->tests = $tests;
     }
 
     public function getTotalTestTime(): float

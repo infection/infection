@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Console\OutputFormatter;
 
 use function implode;
-use LogicException;
 use function Safe\sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -47,11 +46,8 @@ use Webmozart\Assert\Assert;
  */
 final class FormatterFactory
 {
-    private OutputInterface $output;
-
-    public function __construct(OutputInterface $output)
+    public function __construct(private OutputInterface $output)
     {
-        $this->output = $output;
     }
 
     public function create(string $formatterName): OutputFormatter
@@ -65,14 +61,9 @@ final class FormatterFactory
             )
         );
 
-        switch ($formatterName) {
-            case FormatterName::PROGRESS:
-                return new ProgressFormatter(new ProgressBar($this->output));
-
-            case FormatterName::DOT:
-                return new DotFormatter($this->output);
-        }
-
-        throw new LogicException('Unreachable statement');
+        return match ($formatterName) {
+            FormatterName::PROGRESS => new ProgressFormatter(new ProgressBar($this->output)),
+            FormatterName::DOT => new DotFormatter($this->output),
+        };
     }
 }

@@ -14,7 +14,11 @@ parameters:
         - '#^Variable (method|property) (access|call) #'
         -
             path: '../src/Metrics/MetricsCalculator.php'
-            message: '#^Strict comparison using !== between array<int, Infection\\Mutant\\MutantExecutionResult> and array{} will always evaluate to true\.$#'
+            message: '#^Strict comparison using !== between array<int|string, Infection\\Mutant\\MutantExecutionResult> and array{} will always evaluate to true\.$#'
+            count: 1
+        -
+            path: '../src/Mutator/MutatorResolver.php'
+            message: '#^Method Infection\\Mutator\\MutatorResolver::resolveSettings\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
             count: 1
         -
             path: ../src/TestFramework/Factory.php

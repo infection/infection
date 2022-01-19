@@ -53,11 +53,8 @@ use function Safe\sprintf;
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    private bool $executeOnlyCoveringTestCases;
-
-    public function __construct(bool $executeOnlyCoveringTestCases)
+    public function __construct(private bool $executeOnlyCoveringTestCases)
     {
-        $this->executeOnlyCoveringTestCases = $executeOnlyCoveringTestCases;
     }
 
     public function buildForInitialTestsRun(string $configPath, string $extraOptions): array
@@ -70,9 +67,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         if ($extraOptions !== '') {
             $options = array_merge(
                 $options,
-                array_map(static function ($option): string {
-                    return '--' . $option;
-                }, explode(' --', ltrim($extraOptions, '-')))
+                array_map(static fn ($option): string => '--' . $option, explode(' --', ltrim($extraOptions, '-')))
             );
         }
 

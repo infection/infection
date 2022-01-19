@@ -45,26 +45,18 @@ use Infection\Mutant\MutantExecutionResult;
  */
 class FilteringResultsCollector implements Collector
 {
-    private Collector $targetCollector;
-    /** @var array<string, mixed> */
-    private array $targetDetectionStatuses;
-
     /**
      * @param array<string, mixed> $targetDetectionStatuses
      */
-    public function __construct(Collector $targetCollector, array $targetDetectionStatuses)
+    public function __construct(private Collector $targetCollector, private array $targetDetectionStatuses)
     {
-        $this->targetCollector = $targetCollector;
-        $this->targetDetectionStatuses = $targetDetectionStatuses;
     }
 
     public function collect(MutantExecutionResult ...$executionResults): void
     {
         $executionResults = array_filter(
             $executionResults,
-            function (MutantExecutionResult $executionResults): bool {
-                return array_key_exists($executionResults->getDetectionStatus(), $this->targetDetectionStatuses);
-            }
+            fn (MutantExecutionResult $executionResults): bool => array_key_exists($executionResults->getDetectionStatus(), $this->targetDetectionStatuses)
         );
 
         if ($executionResults !== []) {

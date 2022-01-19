@@ -58,40 +58,11 @@ use Webmozart\Assert\Assert;
  */
 final class Factory
 {
-    private string $tmpDir;
-    private string $projectDir;
-    private TestFrameworkConfigLocatorInterface $configLocator;
-    private TestFrameworkFinder $testFrameworkFinder;
-    private string $jUnitFilePath;
-    private Configuration $infectionConfig;
-    private SourceFileFilter $sourceFileFilter;
-
-    /**
-     * @var array<string, array<string, mixed>>
-     */
-    private array $installedExtensions;
-
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
      */
-    public function __construct(
-        string $tmpDir,
-        string $projectDir,
-        TestFrameworkConfigLocatorInterface $configLocator,
-        TestFrameworkFinder $testFrameworkFinder,
-        string $jUnitFilePath,
-        Configuration $infectionConfig,
-        SourceFileFilter $sourceFileFilter,
-        array $installedExtensions
-    ) {
-        $this->tmpDir = $tmpDir;
-        $this->configLocator = $configLocator;
-        $this->projectDir = $projectDir;
-        $this->jUnitFilePath = $jUnitFilePath;
-        $this->infectionConfig = $infectionConfig;
-        $this->testFrameworkFinder = $testFrameworkFinder;
-        $this->sourceFileFilter = $sourceFileFilter;
-        $this->installedExtensions = $installedExtensions;
+    public function __construct(private string $tmpDir, private string $projectDir, private TestFrameworkConfigLocatorInterface $configLocator, private TestFrameworkFinder $testFrameworkFinder, private string $jUnitFilePath, private Configuration $infectionConfig, private SourceFileFilter $sourceFileFilter, private array $installedExtensions)
+    {
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
@@ -185,9 +156,7 @@ final class Factory
 
         /** @var list<string> $filteredPaths */
         $filteredPaths = array_filter(array_map(
-            static function (SplFileInfo $file) {
-                return $file->getRealPath();
-            },
+            static fn (SplFileInfo $file) => $file->getRealPath(),
             iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()))
         ));
 

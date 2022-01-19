@@ -48,11 +48,8 @@ class GitDiffFileProvider
 {
     public const DEFAULT_BASE = 'origin/master';
 
-    private ShellCommandLineExecutor $shellCommandLineExecutor;
-
-    public function __construct(ShellCommandLineExecutor $shellCommandLineExecutor)
+    public function __construct(private ShellCommandLineExecutor $shellCommandLineExecutor)
     {
-        $this->shellCommandLineExecutor = $shellCommandLineExecutor;
     }
 
     public function provide(string $gitDiffFilter, string $gitDiffBase): string

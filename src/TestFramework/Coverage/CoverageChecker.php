@@ -57,34 +57,19 @@ class CoverageChecker
 {
     private const PHPUNIT = 'phpunit';
     private const CODECEPTION = 'codeception';
-
-    private bool $skipCoverage;
-    private bool $skipInitialTests;
-    private string $initialTestPhpOptions;
-    private string $coveragePath;
-    private bool $jUnitReport;
-    private JUnitReportLocator $jUnitReportLocator;
     private string $frameworkAdapterName;
-    private IndexXmlCoverageLocator $indexXmlCoverageLocator;
 
     public function __construct(
-        bool $skipCoverage,
-        bool $skipInitialTests,
-        string $initialTestPhpOptions,
-        string $coveragePath,
-        bool $junitReport,
-        JUnitReportLocator $jUnitReportLocator,
+        private bool $skipCoverage,
+        private bool $skipInitialTests,
+        private string $initialTestPhpOptions,
+        private string $coveragePath,
+        private bool $jUnitReport,
+        private JUnitReportLocator $jUnitReportLocator,
         string $testFrameworkAdapterName,
-        IndexXmlCoverageLocator $indexXmlCoverageLocator
+        private IndexXmlCoverageLocator $indexXmlCoverageLocator
     ) {
-        $this->skipCoverage = $skipCoverage;
-        $this->skipInitialTests = $skipInitialTests;
-        $this->initialTestPhpOptions = $initialTestPhpOptions;
-        $this->coveragePath = $coveragePath;
-        $this->jUnitReport = $junitReport;
-        $this->jUnitReportLocator = $jUnitReportLocator;
         $this->frameworkAdapterName = strtolower($testFrameworkAdapterName);
-        $this->indexXmlCoverageLocator = $indexXmlCoverageLocator;
     }
 
     public function checkCoverageRequirements(): void

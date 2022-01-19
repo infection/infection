@@ -58,17 +58,11 @@ use function Safe\sprintf;
  */
 final class IgnoreMutator implements Mutator
 {
-    private IgnoreConfig $config;
-    /** @var Mutator<TNode> */
-    private Mutator $mutator;
-
     /**
      * @param Mutator<TNode> $mutator
      */
-    public function __construct(IgnoreConfig $config, Mutator $mutator)
+    public function __construct(private IgnoreConfig $config, private Mutator $mutator)
     {
-        $this->config = $config;
-        $this->mutator = $mutator;
     }
 
     public static function getDefinition(): ?Definition

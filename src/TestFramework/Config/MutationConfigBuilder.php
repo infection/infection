@@ -39,7 +39,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Phar;
 use function Safe\sprintf;
 use function str_replace;
-use function strpos;
+use function str_starts_with;
 use function strstr;
 use Webmozart\Assert\Assert;
 
@@ -63,7 +63,7 @@ abstract class MutationConfigBuilder
     {
         $infectionPhar = '';
 
-        if (strpos(__FILE__, 'phar:') === 0) {
+        if (str_starts_with(__FILE__, 'phar:')) {
             $infectionPhar = sprintf(
                 '\Phar::loadPhar("%s", "%s");',
                 str_replace('phar://', '', Phar::running(true)),
