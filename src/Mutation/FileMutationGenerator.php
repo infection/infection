@@ -78,14 +78,12 @@ class FileMutationGenerator
             return;
         }
 
-        $fileInfo = $trace->getSourceFileInfo();
-
-        $initialStatements = $this->parser->parse($fileInfo);
+        $initialStatements = $this->parser->parse($trace->getSourceFileInfo());
 
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 $mutators,
-                $fileInfo->getPathname(),
+                $trace->getRealPath(),
                 $initialStatements,
                 $trace,
                 $onlyCovered,
