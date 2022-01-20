@@ -114,6 +114,11 @@ final class FileMutationGeneratorTest extends TestCase
             ->method('getAllTestsForMutation')
             ->willReturn([])
         ;
+        $traceMock
+            ->expects($this->once())
+            ->method('getRealPath')
+            ->willReturn(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php')
+        ;
 
         $mutationGenerator = SingletonContainer::getContainer()->getFileMutationGenerator();
 
