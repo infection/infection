@@ -58,10 +58,10 @@ final class GitDiffFileProviderTest extends TestCase
 
     public function test_it_executes_diff_and_returns_filter_as_a_string(): void
     {
-        $expectedCommandLine = 'git diff \'master\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -';
+        $expectedCommandLine = 'git diff \'master...HEAD\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -';
 
         if (PHP_OS_FAMILY === 'Windows') {
-            $expectedCommandLine = 'git diff "master" --diff-filter="AM" --name-only | grep src/ | paste -s -d "," -';
+            $expectedCommandLine = 'git diff "master...HEAD" --diff-filter="AM" --name-only | grep src/ | paste -s -d "," -';
         }
 
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
@@ -74,5 +74,25 @@ final class GitDiffFileProviderTest extends TestCase
         $filter = $diffProvider->provide('AM', 'master');
 
         $this->assertSame('src/A.php,src/B.php', $filter);
+    }
+
+    public function test_it_provides_lines_filter_as_a_string(): void
+    {
+        $expectedCommandLine = 'git diff \'master...HEAD\' --unified=0 --diff-filter=AM | grep -v -e \'^[+-]\' -e \'^index\'';
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $expectedCommandLine = 'git diff "master...HEAD" --unified=0 --diff-filter=AM | grep -v -e \'^[+-]\' -e \'^index\'';
+        }
+
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandLineExecutor->expects($this->once())
+            ->method('execute')
+            ->with($expectedCommandLine)
+            ->willReturn('<LINE BY LINE GIT DIFF>');
+
+        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $filter = $diffProvider->provideWithLines('master');
+
+        $this->assertSame('<LINE BY LINE GIT DIFF>', $filter);
     }
 }

@@ -56,7 +56,7 @@ class GitDiffFileProvider
     {
         $filter = $this->shellCommandLineExecutor->execute(sprintf(
             'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-            escapeshellarg($gitDiffBase),
+            escapeshellarg($gitDiffBase . '...HEAD'),
             escapeshellarg($gitDiffFilter)
         ));
 
@@ -71,7 +71,7 @@ class GitDiffFileProvider
     {
         return $this->shellCommandLineExecutor->execute(sprintf(
             "git diff %s --unified=0 --diff-filter=AM | grep -v -e '^[+-]' -e '^index'",
-            escapeshellarg($gitDiffBase)
+            escapeshellarg($gitDiffBase . '...HEAD')
         ));
     }
 }
