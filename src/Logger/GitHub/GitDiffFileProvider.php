@@ -38,6 +38,8 @@ namespace Infection\Logger\GitHub;
 use function escapeshellarg;
 use Infection\Process\ShellCommandLineExecutor;
 use function Safe\sprintf;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use function trim;
 
 /**
  * @final
@@ -54,13 +56,13 @@ class GitDiffFileProvider
 
     public function provide(string $gitDiffFilter, string $gitDiffBase): string
     {
+        $referenceCommit = $this->findReferenceCommit($gitDiffBase);
+
         $filter = $this->shellCommandLineExecutor->execute(sprintf(
             'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-            escapeshellarg($gitDiffBase . '...HEAD'),
+            escapeshellarg($referenceCommit),
             escapeshellarg($gitDiffFilter)
         ));
-
-        var_dump(compact('filter'));
 
         if ($filter === '') {
             throw NoFilesInDiffToMutate::create();
@@ -71,9 +73,30 @@ class GitDiffFileProvider
 
     public function provideWithLines(string $gitDiffBase): string
     {
+        $referenceCommit = $this->findReferenceCommit($gitDiffBase);
+
         return $this->shellCommandLineExecutor->execute(sprintf(
             "git diff %s --unified=0 --diff-filter=AM | grep -v -e '^[+-]' -e '^index'",
-            escapeshellarg($gitDiffBase . '...HEAD')
+            escapeshellarg($referenceCommit)
         ));
+    }
+
+    private function findReferenceCommit(string $gitDiffBase): string
+    {
+        try {
+            $comparisonCommit = trim($this->shellCommandLineExecutor->execute(sprintf(
+                    'git merge-base %s HEAD',
+                    escapeshellarg($gitDiffBase))
+                )
+            );
+        } catch (ProcessFailedException) {
+            /**
+             * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
+             * Fall back to direct diff
+             */
+            $comparisonCommit = $gitDiffBase;
+        }
+
+        return $comparisonCommit;
     }
 }
