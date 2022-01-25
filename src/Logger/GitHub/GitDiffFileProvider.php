@@ -60,6 +60,8 @@ class GitDiffFileProvider
             escapeshellarg($gitDiffFilter)
         ));
 
+        var_dump(compact('filter'));
+
         if ($filter === '') {
             throw NoFilesInDiffToMutate::create();
         }
