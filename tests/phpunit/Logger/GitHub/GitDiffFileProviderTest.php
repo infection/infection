@@ -73,7 +73,7 @@ final class GitDiffFileProviderTest extends TestCase
             ->willReturnCallback(function (string $command) use ($expectedDiffCommandLine, $expectedMergeBaseCommandLine): string {
                 switch ($command) {
                     case $expectedMergeBaseCommandLine:
-                        return '0ABCMERGE_BASE_342';
+                        return "0ABCMERGE_BASE_342\n";
                     case $expectedDiffCommandLine:
                         return 'src/A.php,src/B.php';
                     default:
