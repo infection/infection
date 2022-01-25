@@ -54,11 +54,15 @@ class GitDiffFileProvider
 
     public function provide(string $gitDiffFilter, string $gitDiffBase): string
     {
-        $filter = $this->shellCommandLineExecutor->execute(sprintf(
+        $commandLine = sprintf(
             'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
             escapeshellarg($gitDiffBase . '...HEAD'),
             escapeshellarg($gitDiffFilter)
-        ));
+        );
+
+        var_dump(compact('commandLine'));
+
+        $filter = $this->shellCommandLineExecutor->execute($commandLine);
 
         if ($filter === '') {
             throw NoFilesInDiffToMutate::create();
@@ -69,9 +73,13 @@ class GitDiffFileProvider
 
     public function provideWithLines(string $gitDiffBase): string
     {
-        return $this->shellCommandLineExecutor->execute(sprintf(
+        $commandLine = sprintf(
             "git diff %s --unified=0 --diff-filter=AM | grep -v -e '^[+-]' -e '^index'",
             escapeshellarg($gitDiffBase . '...HEAD')
-        ));
+        );
+
+        var_dump(compact('commandLine'));
+
+        return $this->shellCommandLineExecutor->execute($commandLine);
     }
 }
