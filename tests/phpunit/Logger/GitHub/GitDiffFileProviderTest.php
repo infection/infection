@@ -40,6 +40,7 @@ use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 final class GitDiffFileProviderTest extends TestCase
 {
@@ -74,6 +75,31 @@ final class GitDiffFileProviderTest extends TestCase
                 switch ($command) {
                     case $expectedMergeBaseCommandLine:
                         return "0ABCMERGE_BASE_342\n";
+                    case $expectedDiffCommandLine:
+                        return 'src/A.php,src/B.php';
+                    default:
+                        $this->fail("Unexpected shell command: $command");
+                }
+            });
+
+        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $filter = $diffProvider->provide('AM', 'master');
+
+        $this->assertSame('src/A.php,src/B.php', $filter);
+    }
+
+    public function test_it_falls_back_to_direct_diff_if_merge_base_is_not_availabe(): void
+    {
+        $expectedMergeBaseCommandLine = 'git merge-base \'master\' HEAD';
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $expectedDiffCommandLine = 'git diff \'master\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -';
+
+        $shellCommandLineExecutor->expects($this->any())
+            ->method('execute')
+            ->willReturnCallback(function (string $command) use ($expectedDiffCommandLine, $expectedMergeBaseCommandLine): string {
+                switch ($command) {
+                    case $expectedMergeBaseCommandLine:
+                        throw $this->createStub(ProcessFailedException::class);
                     case $expectedDiffCommandLine:
                         return 'src/A.php,src/B.php';
                     default:
