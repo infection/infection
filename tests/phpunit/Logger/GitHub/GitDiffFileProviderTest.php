@@ -46,7 +46,7 @@ final class GitDiffFileProviderTest extends TestCase
     public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void
     {
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor->expects($this->once())
+        $shellCommandLineExecutor
             ->method('execute')
             ->willReturn('');
 
@@ -58,21 +58,63 @@ final class GitDiffFileProviderTest extends TestCase
 
     public function test_it_executes_diff_and_returns_filter_as_a_string(): void
     {
-        $expectedCommandLine = 'git diff \'master\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -';
+        $expectedMergeBaseCommandLine = 'git merge-base \'master\' HEAD';
+        $expectedDiffCommandLine = 'git diff \'0ABCMERGE_BASE_342\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -';
 
         if (PHP_OS_FAMILY === 'Windows') {
-            $expectedCommandLine = 'git diff "master" --diff-filter="AM" --name-only | grep src/ | paste -s -d "," -';
+            $expectedMergeBaseCommandLine = 'git merge-base "master" HEAD';
+            $expectedDiffCommandLine = 'git diff "0ABCMERGE_BASE_342" --diff-filter="AM" --name-only | grep src/ | paste -s -d "," -';
         }
 
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor->expects($this->once())
+
+        $shellCommandLineExecutor->expects($this->any())
             ->method('execute')
-            ->with($expectedCommandLine)
-            ->willReturn('src/A.php,src/B.php');
+            ->willReturnCallback(function (string $command) use ($expectedDiffCommandLine, $expectedMergeBaseCommandLine): string {
+                switch ($command) {
+                    case $expectedMergeBaseCommandLine:
+                        return "0ABCMERGE_BASE_342\n";
+                    case $expectedDiffCommandLine:
+                        return 'src/A.php,src/B.php';
+                    default:
+                        $this->fail("Unexpected shell command: $command");
+                }
+            });
 
         $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
         $filter = $diffProvider->provide('AM', 'master');
 
         $this->assertSame('src/A.php,src/B.php', $filter);
+    }
+
+    public function test_it_provides_lines_filter_as_a_string(): void
+    {
+        $expectedMergeBaseCommandLine = 'git merge-base \'master\' HEAD';
+        $expectedDiffCommandLine = 'git diff \'0ABCMERGE_BASE_342\' --unified=0 --diff-filter=AM | grep -v -e \'^[+-]\' -e \'^index\'';
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $expectedMergeBaseCommandLine = 'git merge-base "master" HEAD';
+            $expectedDiffCommandLine = 'git diff "0ABCMERGE_BASE_342" --unified=0 --diff-filter=AM | grep -v -e \'^[+-]\' -e \'^index\'';
+        }
+
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+
+        $shellCommandLineExecutor->expects($this->any())
+            ->method('execute')
+            ->willReturnCallback(function (string $command) use ($expectedDiffCommandLine, $expectedMergeBaseCommandLine): string {
+                switch ($command) {
+                    case $expectedMergeBaseCommandLine:
+                        return '0ABCMERGE_BASE_342';
+                    case $expectedDiffCommandLine:
+                        return '<LINE BY LINE GIT DIFF>';
+                    default:
+                        $this->fail("Unexpected shell command: $command");
+                }
+            });
+
+        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $filter = $diffProvider->provideWithLines('master');
+
+        $this->assertSame('<LINE BY LINE GIT DIFF>', $filter);
     }
 }
