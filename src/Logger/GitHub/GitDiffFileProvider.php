@@ -92,7 +92,7 @@ class GitDiffFileProvider
                     escapeshellarg($gitDiffBase))
                 )
             );
-        } catch (ProcessFailedException) {
+        } catch (ProcessFailedException $_e) {
             /**
              * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
              * Fall back to direct diff
