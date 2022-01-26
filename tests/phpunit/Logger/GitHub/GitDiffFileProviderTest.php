@@ -90,6 +90,10 @@ final class GitDiffFileProviderTest extends TestCase
 
     public function test_it_falls_back_to_direct_diff_if_merge_base_is_not_availabe(): void
     {
+        if (PHP_OS_FAMILY === 'Windows') {
+            $this->markTestSkipped('Not testing this on Windows');
+        }
+
         $expectedMergeBaseCommandLine = 'git merge-base \'master\' HEAD';
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
         $expectedDiffCommandLine = 'git diff \'master\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -';
