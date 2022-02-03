@@ -44,10 +44,11 @@ use function current;
 use function implode;
 use PHPUnit\Framework\TestCase;
 use function Safe\array_replace;
+use Safe\Exceptions\ExecException;
 use function Safe\file_get_contents;
+use function Safe\shell_exec;
 use function Safe\sprintf;
 use function Safe\substr;
-use function shell_exec;
 use function strpos;
 use function substr_count;
 
@@ -62,9 +63,15 @@ final class MakefileTest extends TestCase
 
     public function test_the_default_goal_is_the_help_command(): void
     {
+        try {
+            shell_exec('command -v timeout');
+            $timeout = 'timeout 2s';
+        } catch (ExecException) {
+            $timeout = '';
+        }
         $output = shell_exec(sprintf(
             '%s make --silent --file %s 2>&1',
-            shell_exec('command -v timeout') !== null ? 'timeout 2s' : '',
+             $timeout,
             self::MAKEFILE_PATH
         ));
 

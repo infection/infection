@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use Infection\Metrics\ResultsCollector;
-use function shell_exec;
+use function Safe\shell_exec;
 use function str_replace;
 use function trim;
 use Webmozart\PathUtil\Path;
@@ -55,7 +55,7 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
     public function getLogLines(): array
     {
         $lines = [];
-        $projectRootDirectory = trim((string) shell_exec('git rev-parse --show-toplevel'));
+        $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
 
         foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
             $error = [

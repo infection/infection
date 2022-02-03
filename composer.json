@@ -62,7 +62,7 @@
         "symfony/filesystem": "^3.4.29 || ^4.1.19 || ^5.0 || ^6.0",
         "symfony/finder": "^3.4.29 || ^4.1.19 || ^5.0 || ^6.0",
         "symfony/process": "^3.4.29 || ^4.1.19 || ^5.0 || ^6.0",
-        "thecodingmachine/safe": "^1.1.3",
+        "thecodingmachine/safe": "^2.1.2",
         "webmozart/assert": "^1.3",
         "webmozart/path-util": "^2.3"
     },
@@ -83,7 +83,7 @@
         "phpunit/phpunit": "^9.3.11",
         "symfony/phpunit-bridge": "^4.4.18 || ^5.1.10",
         "symfony/yaml": "^5.0",
-        "thecodingmachine/phpstan-safe-rule": "^1.1.0"
+        "thecodingmachine/phpstan-safe-rule": "^1.2.0"
     },
     "config": {
         "platform": {
