@@ -52,7 +52,7 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\TestFramework\TestFrameworkTypes;
-use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\CiDetectorInterface;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -74,7 +74,7 @@ class ConfigurationFactory
     private MutatorFactory $mutatorFactory;
     private MutatorParser $mutatorParser;
     private SourceFileCollector $sourceFileCollector;
-    private CiDetector $ciDetector;
+    private CiDetectorInterface $ciDetector;
     private GitDiffFileProvider $gitDiffFileProvider;
 
     public function __construct(
@@ -83,7 +83,7 @@ class ConfigurationFactory
         MutatorFactory $mutatorFactory,
         MutatorParser $mutatorParser,
         SourceFileCollector $sourceFileCollector,
-        CiDetector $ciDetector,
+        CiDetectorInterface $ciDetector,
         GitDiffFileProvider $gitDiffFileProvider
     ) {
         $this->tmpDirProvider = $tmpDirProvider;
