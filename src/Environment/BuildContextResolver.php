@@ -68,13 +68,13 @@ final class BuildContextResolver
             throw new CouldNotResolveBuildContext('The repository name could not be determined for the current process');
         }
 
-        if (trim($ci->getGitBranch()) === '') {
+        if (trim($ci->getBranch()) === '') {
             throw new CouldNotResolveBuildContext('The branch name could not be determined for the current process');
         }
 
         return new BuildContext(
             $ci->getRepositoryName(),
-            $ci->getGitBranch()
+            $ci->getBranch()
         );
     }
 }

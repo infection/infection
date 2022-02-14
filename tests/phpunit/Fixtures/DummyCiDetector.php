@@ -7,11 +7,12 @@ namespace Infection\Tests\Fixtures;
 use Infection\Tests\UnsupportedMethod;
 use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Env;
 
-final class DummyCiDetector extends CiDetector
+final class DummyCiDetector implements CiDetectorInterface
 {
-    private $ciDetected;
+    private bool $ciDetected;
 
     public function __construct(bool $ciDetected)
     {
