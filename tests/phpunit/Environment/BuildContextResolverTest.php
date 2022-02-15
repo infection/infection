@@ -123,7 +123,7 @@ final class BuildContextResolverTest extends TestCase
             ->willReturn($repositoryName);
 
         $ci
-            ->method('getGitBranch')
+            ->method('getBranch')
             ->willReturn($gitBranch);
 
         $ciDetector = $this->createMock(CiDetector::class);
@@ -158,7 +158,7 @@ final class BuildContextResolverTest extends TestCase
             ->willReturn($repositoryName);
 
         $ci
-            ->method('getGitBranch')
+            ->method('getBranch')
             ->willReturn($gitBranch);
 
         $ciDetector = $this->createMock(CiDetector::class);
@@ -198,7 +198,7 @@ final class BuildContextResolverTest extends TestCase
             ->willReturn($repositoryName);
 
         $ci
-            ->method('getGitBranch')
+            ->method('getBranch')
             ->willReturn($gitBranch);
 
         $ciDetector = $this->createMock(CiDetector::class);
