@@ -66,6 +66,8 @@ final class Application extends BaseApplication
  _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
 /___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
 
+<fg=blue>#StandWith</><fg=yellow>Ukraine</>
+
 ';
 
     private Container $container;
