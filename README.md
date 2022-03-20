@@ -6,6 +6,7 @@
 [![Infection MSI](https://img.shields.io/endpoint?url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Finfection%2Finfection%2Fmaster)](https://infection.github.io)
 [![codecov](https://codecov.io/gh/infection/infection/branch/master/graph/badge.svg)](https://codecov.io/gh/infection/infection)
 [![Slack channel: #infection on the Symfony slack](https://img.shields.io/badge/slack-%23infection-green.svg?style=flat-square)](https://symfony.com/slack-invite)
+[![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/)
 
 
 # Infection - Mutation Testing framework
