@@ -163,7 +163,7 @@ final class ConfigureCommand extends BaseCommand
         $io->newLine();
         $io->writeln(sprintf(
             'Configuration file "<comment>%s</comment>" was created.',
-            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE
+            SchemaConfigurationLoader::DEFAULT_CONFIG_FILE
         ));
         $io->newLine();
 
