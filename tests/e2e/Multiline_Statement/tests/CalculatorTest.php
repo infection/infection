@@ -19,7 +19,7 @@ class CalculatorTest extends TestCase
     {
         $result = $this->calculator->calculateInMultipleLines(110);
 
-        $this->assertSame(110., $result);
+        $this->assertGreaterThanOrEqual(110., $result);
     }
 
     public function testCalculateInMultipleLinesCustom()
@@ -33,7 +33,7 @@ class CalculatorTest extends TestCase
     {
         $result = $this->calculator->calculateInSingleLine(110);
 
-        $this->assertSame(110., $result);
+        $this->assertGreaterThanOrEqual(110., $result);
     }
 
     public function testCalculateInMultipleLinesFloat()
