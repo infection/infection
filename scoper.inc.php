@@ -43,7 +43,6 @@ $polyfillsBootstrap = Finder::create()
 return [
     'whitelist' => [
         'Composer\*',
-        'Safe\*',
         // PHP 8.0
         'T_NAME_QUALIFIED',
         'T_NAME_FULLY_QUALIFIED',
