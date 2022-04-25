@@ -44,7 +44,7 @@ use Infection\Event\MutationTestingWasStarted;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
-use function Safe\sprintf;
+use function sprintf;
 use function str_pad;
 use const STR_PAD_LEFT;
 use function str_repeat;
@@ -98,6 +98,10 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
      */
     private function showMutations(array $executionResults, string $headlinePrefix): void
     {
+        if ($executionResults === []) {
+            return;
+        }
+
         $headline = sprintf('%s mutants:', $headlinePrefix);
 
         $this->output->writeln([

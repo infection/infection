@@ -150,6 +150,92 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingWasFinished());
     }
 
+    public function test_it_outputs_escaped_mutants_when_mutation_testing_is_finished(): void
+    {
+        $this->output
+            ->expects($this->atLeastOnce())
+            ->method('writeln')
+            ->withConsecutive(
+                [
+                    [
+                        '',
+                        'Escaped mutants:',
+                        '================',
+                        '',
+                    ],
+                ],
+                [
+                    [
+                        '',
+                        '1) /original/filePath:10    [M] Plus',
+                    ],
+                ]
+            );
+
+        $executionResult = $this->createMock(MutantExecutionResult::class);
+        $executionResult->expects($this->once())
+            ->method('getOriginalFilePath')
+            ->willReturn('/original/filePath');
+
+        $executionResult->expects($this->once())
+            ->method('getOriginalStartingLine')
+            ->willReturn(10);
+
+        $executionResult->expects($this->once())
+            ->method('getMutatorName')
+            ->willReturn('Plus');
+
+        $this->resultsCollector->expects($this->once())
+            ->method('getEscapedExecutionResults')
+            ->willReturn([$executionResult]);
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $this->output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            true
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+    }
+
+    public function test_it_does_not_output_escaped_mutants_when_mutation_testing_is_finished_with_no_escaped_mutants(): void
+    {
+        $this->output
+            ->expects($this->atLeastOnce())
+            ->method('writeln')
+            ->withConsecutive(
+                [
+                    [
+                        '',
+                        '',
+                    ],
+                ],
+                [
+                    '<options=bold>0</options=bold> mutations were generated:',
+                ]
+            );
+
+        $this->resultsCollector->expects($this->once())
+            ->method('getEscapedExecutionResults')
+            ->willReturn([]);
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $this->output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            true
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+    }
+
     public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
     {
         $this->output->expects($this->once())
