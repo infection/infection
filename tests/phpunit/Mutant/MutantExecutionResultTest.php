@@ -68,6 +68,7 @@ final class MutantExecutionResultTest extends TestCase
             DIFF;
 
         $mutantHash = 'a1b2c3';
+        $mutatorClass = For_::class;
         $mutatorName = MutatorName::getName(For_::class);
         $originalFilePath = 'path/to/Foo.php';
         $originalStartingLine = 10;
@@ -83,6 +84,7 @@ final class MutantExecutionResultTest extends TestCase
             $processResultCode,
             now($mutantDiff),
             $mutantHash,
+            $mutatorClass,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine,
@@ -100,6 +102,7 @@ final class MutantExecutionResultTest extends TestCase
             $processOutput,
             $processResultCode,
             $mutantDiff,
+            $mutatorClass,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine,
@@ -118,6 +121,7 @@ final class MutantExecutionResultTest extends TestCase
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
+                $mutatorClass = For_::class,
                 $mutatorName = MutatorName::getName(For_::class),
                 [
                     'startLine' => $originalStartingLine = 10,
@@ -157,6 +161,7 @@ final class MutantExecutionResultTest extends TestCase
             '',
             DetectionStatus::NOT_COVERED,
             $mutantDiff,
+            $mutatorClass,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine,
@@ -171,6 +176,7 @@ final class MutantExecutionResultTest extends TestCase
         string $expectedProcessOutput,
         string $expectedDetectionStatus,
         string $expectedMutantDiff,
+        string $expectedMutatorClass,
         string $expectedMutatorName,
         string $expectedOriginalFilePath,
         int $expectedOriginalStartingLine,
@@ -181,6 +187,7 @@ final class MutantExecutionResultTest extends TestCase
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
         $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
         $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
+        $this->assertSame($expectedMutatorClass, $result->getMutatorClass());
         $this->assertSame($expectedMutatorName, $result->getMutatorName());
         $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
         $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());

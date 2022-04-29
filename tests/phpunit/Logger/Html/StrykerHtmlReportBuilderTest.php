@@ -479,6 +479,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             $detectionStatus,
             now(normalize_trailing_spaces($diff)),
             $mutantHash,
+            $mutatorClassName,
             MutatorName::getName($mutatorClassName),
             $originalFileRealPath,
             $originalStartingLine,

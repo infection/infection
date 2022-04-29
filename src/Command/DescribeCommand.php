@@ -40,6 +40,7 @@ use function array_keys;
 use Infection\Console\IO;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\ProfileList;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
@@ -71,7 +72,9 @@ final class DescribeCommand extends BaseCommand
             );
         }
 
-        if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)) {
+        if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)
+            && !MutatorResolver::isValidMutator($mutator)
+        ) {
             $io->error(sprintf(
                 '"The %s mutator does not exist"',
                 $mutator,
@@ -80,7 +83,7 @@ final class DescribeCommand extends BaseCommand
             return false;
         }
 
-        $mutatorClass = ProfileList::ALL_MUTATORS[$mutator];
+        $mutatorClass = ProfileList::ALL_MUTATORS[$mutator] ?? $mutator;
 
         Assert::subclassOf($mutatorClass, Mutator::class);
 

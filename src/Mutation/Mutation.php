@@ -37,10 +37,9 @@ namespace Infection\Mutation;
 
 use function array_flip;
 use function array_intersect_key;
-use function array_keys;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutator\ProfileList;
+use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
@@ -53,6 +52,7 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
+    private string $mutatorClass;
     private readonly string $mutatorName;
     /** @var array<string|int|float> */
     private readonly array $attributes;
@@ -69,6 +69,7 @@ class Mutation
     public function __construct(
         private readonly string $originalFilePath,
         private readonly array $originalFileAst,
+        string $mutatorClass,
         string $mutatorName,
         array $attributes,
         private readonly string $mutatedNodeClass,
@@ -76,11 +77,12 @@ class Mutation
         private readonly int $mutationByMutatorIndex,
         private readonly array $tests,
     ) {
-        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
+        Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
         foreach (MutationAttributeKeys::ALL as $key) {
             Assert::keyExists($attributes, $key);
         }
+        $this->mutatorClass = $mutatorClass;
         $this->mutatorName = $mutatorName;
         $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
         $this->coveredByTests = $tests !== [];
@@ -102,6 +104,11 @@ class Mutation
     public function getMutatorName(): string
     {
         return $this->mutatorName;
+    }
+
+    public function getMutatorClass(): string
+    {
+        return $this->mutatorClass;
     }
 
     /**

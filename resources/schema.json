@@ -143,7 +143,10 @@
         },
         "mutators": {
             "type": "object",
-            "additionalProperties": false,
+            "additionalProperties": {
+                "type": ["object", "boolean"],
+                "default": {}
+            },
             "description": "Contains the settings for different mutations and profiles",
             "properties": {
                 "global-ignore": {

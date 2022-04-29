@@ -63,6 +63,7 @@ final class MutantProcessFactoryTest extends TestCase
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
+                For_::class,
                 MutatorName::getName(For_::class),
                 [
                     'startLine' => $originalStartingLine = 10,

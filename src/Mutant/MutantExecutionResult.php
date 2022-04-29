@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use function array_keys;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutator\ProfileList;
+use Infection\Mutator\MutatorResolver;
 use Later\Interfaces\Deferred;
 use RuntimeException;
+use function Safe\sprintf;
 use function strlen;
 use function strrpos;
 use Webmozart\Assert\Assert;
@@ -51,6 +51,7 @@ use Webmozart\Assert\Assert;
 class MutantExecutionResult
 {
     private readonly string $detectionStatus;
+    private readonly string $mutatorClass;
     private readonly string $mutatorName;
 
     /**
@@ -65,6 +66,7 @@ class MutantExecutionResult
         string $detectionStatus,
         private readonly Deferred $mutantDiff,
         private readonly string $mutantHash,
+        string $mutatorClass,
         string $mutatorName,
         private readonly string $originalFilePath,
         private readonly int $originalStartingLine,
@@ -76,8 +78,10 @@ class MutantExecutionResult
         private readonly array $tests,
     ) {
         Assert::oneOf($detectionStatus, DetectionStatus::ALL);
-        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
+        Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
+
         $this->detectionStatus = $detectionStatus;
+        $this->mutatorClass = $mutatorClass;
         $this->mutatorName = $mutatorName;
     }
 
@@ -119,6 +123,11 @@ class MutantExecutionResult
     public function getMutantHash(): string
     {
         return $this->mutantHash;
+    }
+
+    public function getMutatorClass(): string
+    {
+        return $this->mutatorClass;
     }
 
     public function getMutatorName(): string
@@ -197,6 +206,7 @@ class MutantExecutionResult
             $detectionStatus,
             $mutant->getDiff(),
             $mutant->getMutation()->getHash(),
+            $mutant->getMutation()->getMutatorClass(),
             $mutant->getMutation()->getMutatorName(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalStartingLine(),

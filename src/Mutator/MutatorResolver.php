@@ -112,6 +112,16 @@ final class MutatorResolver
                 continue;
             }
 
+            if (self::isValidMutator($mutatorOrProfile)) {
+                self::registerFromClass(
+                    $mutatorOrProfile,
+                    $resolvedSettings,
+                    $mutators
+                );
+
+                continue;
+            }
+
             throw new InvalidArgumentException(sprintf(
                 'The profile or mutator "%s" was not recognized.',
                 $mutatorOrProfile,
@@ -119,6 +129,11 @@ final class MutatorResolver
         }
 
         return $mutators;
+    }
+
+    public static function isValidMutator(string $mutatorClass): bool
+    {
+        return class_exists($mutatorClass, true) && is_subclass_of($mutatorClass, Mutator::class);
     }
 
     /**
@@ -217,7 +232,7 @@ final class MutatorResolver
 
     /**
      * @param array<string, string[]>|bool $settings
-     * @param array<string, string[]> $mutators
+     * @param array<string, array<string, string>> $mutators
      */
     private static function registerFromClass(
         string $mutatorClassName,
