@@ -109,6 +109,7 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
+                    PublicVisibility::class,
                     MutatorName::getName(PublicVisibility::class),
                     [
                         'startTokenPos' => 29,
@@ -161,6 +162,7 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
+                    PublicVisibility::class,
                     MutatorName::getName(PublicVisibility::class),
                     [
                         'startTokenPos' => 29,
@@ -215,6 +217,7 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
+                    PublicVisibility::class,
                     MutatorName::getName(PublicVisibility::class),
                     [
                         'startTokenPos' => 29,
@@ -283,6 +286,7 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
+                    PublicVisibility::class,
                     MutatorName::getName(PublicVisibility::class),
                     [
                         'startTokenPos' => 29,

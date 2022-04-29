@@ -38,7 +38,6 @@ namespace Infection\Mutator;
 use function end;
 use function explode;
 use function is_a;
-use function Safe\array_flip;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
@@ -56,12 +55,9 @@ final class MutatorFactory
     {
         $mutators = [];
 
-        $knownMutatorClassNames = array_flip(ProfileList::ALL_MUTATORS);
-
         foreach ($resolvedMutators as $mutatorClassName => $config) {
-            Assert::keyExists(
-                $knownMutatorClassNames,
-                $mutatorClassName,
+            Assert::true(
+                MutatorResolver::isValidMutator($mutatorClassName),
                 sprintf('Unknown mutator "%s"', $mutatorClassName)
             );
             Assert::isArray(

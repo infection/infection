@@ -64,6 +64,7 @@ class MutantExecutionResultFactory
             $this->retrieveDetectionStatus($mutantProcess),
             $mutant->getDiff(),
             $mutation->getHash(),
+            $mutation->getMutatorClass(),
             $mutation->getMutatorName(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalStartingLine(),

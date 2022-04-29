@@ -190,6 +190,7 @@ trait CreateMetricsCalculator
 DIFF
             )),
             'a1b2c3',
+            $mutatorClassName,
             MutatorName::getName($mutatorClassName),
             'foo/bar',
             10 - $i,
