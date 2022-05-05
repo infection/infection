@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 use function array_diff;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
@@ -68,7 +69,7 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->parser = new IndexXmlCoverageParser();
+        $this->parser = new IndexXmlCoverageParser(false);
     }
 
     /**
@@ -163,6 +164,20 @@ XML;
         $this->expectException(NoLineExecuted::class);
 
         $this->parser->parse(
+            '/path/to/index.xml',
+            $xml,
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR
+        );
+    }
+
+    /**
+     * @dataProvider noCoveredLineReportProviders
+     */
+    public function test_it_errors_for_git_diff_lines_mode_when_no_lines_were_executed(string $xml): void
+    {
+        $this->expectException(NoLineExecutedInDiffLinesMode::class);
+
+        (new IndexXmlCoverageParser(true))->parse(
             '/path/to/index.xml',
             $xml,
             XmlCoverageFixtures::FIXTURES_COVERAGE_DIR

@@ -44,6 +44,13 @@ use Infection\TestFramework\SafeDOMXPath;
  */
 class IndexXmlCoverageParser
 {
+    private bool $isForGitDiffLines;
+
+    public function __construct(bool $isForGitDiffLines)
+    {
+        $this->isForGitDiffLines = $isForGitDiffLines;
+    }
+
     /**
      * Parses the given PHPUnit XML coverage index report (index.xml) to collect the information
      * needed to parse general coverage data. Note that this data is likely incomplete an will
@@ -60,7 +67,7 @@ class IndexXmlCoverageParser
     ): iterable {
         $xPath = XPathFactory::createXPath($xmlIndexCoverageContent);
 
-        self::assertHasExecutedLines($xPath);
+        self::assertHasExecutedLines($xPath, $this->isForGitDiffLines);
 
         return $this->parseNodes($coverageIndexPath, $coverageBasePath, $xPath);
     }
@@ -90,7 +97,7 @@ class IndexXmlCoverageParser
     /**
      * @throws NoLineExecuted
      */
-    private static function assertHasExecutedLines(SafeDOMXPath $xPath): void
+    private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
     {
         $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
 
@@ -99,7 +106,9 @@ class IndexXmlCoverageParser
             || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
             || $coverageCount === ''
         ) {
-            throw NoLineExecuted::create();
+            throw $isForGitDiffLines
+                ? NoLineExecutedInDiffLinesMode::create()
+                : NoLineExecuted::create();
         }
     }
 

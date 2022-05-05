@@ -220,7 +220,9 @@ final class Container
         $container = new self([
             Filesystem::class => static fn (): Filesystem => new Filesystem(),
             TmpDirProvider::class => static fn (): TmpDirProvider => new TmpDirProvider(),
-            IndexXmlCoverageParser::class => static fn (): IndexXmlCoverageParser => new IndexXmlCoverageParser(),
+            IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
+                $container->getConfiguration()->isForGitDiffLines()
+            ),
             XmlCoverageParser::class => static fn (): XmlCoverageParser => new XmlCoverageParser(),
             CoveredTraceProvider::class => static fn (self $container): CoveredTraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),

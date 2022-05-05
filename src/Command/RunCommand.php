@@ -56,6 +56,7 @@ use Infection\Logger\ConsoleLogger;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use const PHP_SAPI;
@@ -369,7 +370,7 @@ final class RunCommand extends BaseCommand
             $engine->execute();
 
             return true;
-        } catch (NoFilesInDiffToMutate $e) {
+        } catch (NoFilesInDiffToMutate | NoLineExecutedInDiffLinesMode $e) {
             $io->success($e->getMessage());
 
             return true;
