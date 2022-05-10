@@ -25,6 +25,7 @@ jobs:
           - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
 
     name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
