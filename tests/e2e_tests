@@ -21,6 +21,8 @@ do
         composer install > /dev/null 2>&1
     fi
 
+    putenv('INFECTION_E2E_TESTS_ENV=1');
+
     if [ -f "run_tests.bash" ]
     then
         output="$(bash run_tests.bash)"

@@ -40,7 +40,6 @@ use function array_key_exists;
 use function array_unique;
 use function array_values;
 use function dirname;
-use Exception;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -55,6 +54,7 @@ use Infection\Mutator\MutatorResolver;
 use Infection\TestFramework\TestFrameworkTypes;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
+use OndraM\CiDetector\Exception\CiNotDetectedException;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -339,7 +339,7 @@ class ConfigurationFactory
     {
         try {
             $ci = $this->ciDetector->detect();
-        } catch (Exception $e) {
+        } catch (CiNotDetectedException $e) {
             return false;
         }
 
