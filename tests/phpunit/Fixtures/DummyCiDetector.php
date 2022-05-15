@@ -22,7 +22,7 @@ final class DummyCiDetector implements CiDetectorInterface
         $this->githubActionsDetected = $githubActionsDetected;
     }
 
-    public static function fromEnvironment(Env $environment): CiDetector
+    public static function fromEnvironment(Env $environment): CiDetectorInterface
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }

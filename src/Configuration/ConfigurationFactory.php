@@ -343,6 +343,6 @@ class ConfigurationFactory
             return false;
         }
 
-        return $ci->getCiName() !== CiDetector::CI_GITHUB_ACTIONS;
+        return $ci->getCiName() === CiDetector::CI_GITHUB_ACTIONS;
     }
 }
