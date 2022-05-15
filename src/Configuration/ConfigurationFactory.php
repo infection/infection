@@ -52,7 +52,9 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\TestFramework\TestFrameworkTypes;
+use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
+use OndraM\CiDetector\Exception\CiNotDetectedException;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -118,7 +120,7 @@ class ConfigurationFactory
         ?string $gitDiffFilter,
         bool $isForGitDiffLines,
         ?string $gitDiffBase,
-        bool $useGitHubLogger,
+        ?bool $useGitHubLogger,
         ?string $htmlLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases
@@ -316,8 +318,12 @@ class ConfigurationFactory
         return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch);
     }
 
-    private function retrieveLogs(Logs $logs, bool $useGitHubLogger, ?string $htmlLogFilePath): Logs
+    private function retrieveLogs(Logs $logs, ?bool $useGitHubLogger, ?string $htmlLogFilePath): Logs
     {
+        if ($useGitHubLogger === null) {
+            $useGitHubLogger = $this->detectCiGithubActions();
+        }
+
         if ($useGitHubLogger) {
             $logs->setUseGitHubAnnotationsLogger($useGitHubLogger);
         }
@@ -327,5 +333,16 @@ class ConfigurationFactory
         }
 
         return $logs;
+    }
+
+    private function detectCiGithubActions(): bool
+    {
+        try {
+            $ci = $this->ciDetector->detect();
+        } catch (CiNotDetectedException $e) {
+            return false;
+        }
+
+        return $ci->getCiName() === CiDetector::CI_GITHUB_ACTIONS;
     }
 }

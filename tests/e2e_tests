@@ -23,9 +23,9 @@ do
 
     if [ -f "run_tests.bash" ]
     then
-        output="$(bash run_tests.bash)"
+        output="$(INFECTION_E2E_TESTS_ENV=1 bash run_tests.bash)"
     else
-        output="$(bash ../standard_script.bash ${1:-bin/infection})"
+        output="$(INFECTION_E2E_TESTS_ENV=1 bash ../standard_script.bash ${1:-bin/infection})"
     fi
 
     if [ $? != 0 ]

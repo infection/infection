@@ -37,6 +37,7 @@ namespace Infection\Command;
 
 use function extension_loaded;
 use function file_exists;
+use function getenv;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -61,8 +62,9 @@ use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
 
@@ -264,8 +266,9 @@ final class RunCommand extends BaseCommand
             ->addOption(
                 self::OPTION_LOGGER_GITHUB,
                 null,
-                InputOption::VALUE_NONE,
-                'Log escaped Mutants as GitHub Annotations.',
+                InputOption::VALUE_OPTIONAL,
+                'Log escaped Mutants as GitHub Annotations (automatically detected on Github Actions itself, use <comment>true</comment> to force-enable or <comment>false</comment> to force-disable it).',
+                false
             )
             ->addOption(
                 self::OPTION_LOGGER_HTML,
@@ -482,7 +485,7 @@ final class RunCommand extends BaseCommand
             $gitDiffFilter,
             $isForGitDiffLines,
             $gitDiffBase,
-            (bool) $input->getOption(self::OPTION_LOGGER_GITHUB),
+            $this->getUseGitHubLogger($input),
             $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES)
@@ -605,5 +608,39 @@ final class RunCommand extends BaseCommand
         } elseif (extension_loaded('pcov')) {
             $consoleOutput->logRunningWithDebugger('PCOV');
         }
+    }
+
+    private function getUseGitHubLogger(InputInterface $input): ?bool
+    {
+        // on e2e environment, we don't need github logger
+        if (getenv('INFECTION_E2E_TESTS_ENV') !== false) {
+            return false;
+        }
+
+        $useGitHubLogger = $input->getOption(self::OPTION_LOGGER_GITHUB);
+        // `false` means the option was not provided at all -> user does not care and it will be auto-detected
+        // `null` means the option was provided without any argument -> user wants to enable it
+        // any string: the argument provided, but only `'true'` and `'false` are supported
+        if ($useGitHubLogger === false) {
+            return null;
+        }
+
+        if ($useGitHubLogger === null) {
+            return true;
+        }
+
+        if ($useGitHubLogger === 'true') {
+            return true;
+        }
+
+        if ($useGitHubLogger === 'false') {
+            return false;
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'Cannot pass "%s" to "--%s": only "true", "false" or no argument is supported',
+            $useGitHubLogger,
+            self::OPTION_LOGGER_GITHUB
+        ));
     }
 }
