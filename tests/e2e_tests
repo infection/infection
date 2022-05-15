@@ -10,6 +10,7 @@ then
 fi
 
 touch error.log
+INFECTION_E2E_TESTS_ENV=1
 
 for dir in  */
 do
@@ -20,8 +21,6 @@ do
     then
         composer install > /dev/null 2>&1
     fi
-
-    putenv('INFECTION_E2E_TESTS_ENV=1');
 
     if [ -f "run_tests.bash" ]
     then
