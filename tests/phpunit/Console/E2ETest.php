@@ -349,6 +349,7 @@ final class E2ETest extends TestCase
             'run',
             '--verbose',
             '--no-interaction',
+            '--logger-github=false',
         ], $argvExtra));
 
         $output = new BufferedOutput();
