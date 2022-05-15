@@ -61,7 +61,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
@@ -452,9 +452,11 @@ final class RunCommand extends BaseCommand
         } elseif ($useGitHubLogger === 'false') {
             $useGitHubLogger = false;
         } else {
-            throw new InvalidArgumentException(
-                sprintf('Cannot pass "%s" to "--%s": only "true", "false" or no argument is supported', $useGitHubLogger, self::OPTION_LOGGER_GITHUB)
-            );
+            throw new InvalidArgumentException(sprintf(
+                'Cannot pass "%s" to "--%s": only "true", "false" or no argument is supported',
+                $useGitHubLogger,
+                self::OPTION_LOGGER_GITHUB
+            ));
         }
 
         return $this->getApplication()->getContainer()->withValues(
