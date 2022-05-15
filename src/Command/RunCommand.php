@@ -60,7 +60,6 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
-use function var_export;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
