@@ -113,7 +113,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $inputGitDiffFilter,
         bool $inputIsForGitDiffLines,
         string $inputGitDiffBase,
-        bool $inputUseGitHubAnnotationsLogger,
+        ?bool $inputUseGitHubAnnotationsLogger,
         ?string $inputHtmlLogFilePath,
         bool $inputUseNoopMutators,
         int $inputMsiPrecision,
@@ -399,34 +399,40 @@ final class ConfigurationFactoryTest extends TestCase
             true
         );
 
-        yield 'no Github Actions annotation logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
+        yield 'Github Actions annotation disabled, not logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
             false,
             false,
             false
         );
 
-        yield 'no Github Actions annotation logged in Github Actions environment' => self::createValueForGithubActionsDetected(
+        yield 'Github Actions annotation disabled, not logged in Github Actions environment' => self::createValueForGithubActionsDetected(
             false,
             true,
-            true
-        );
-
-        yield 'Github Actions annotation logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
-            true,
-            false,
-            true
-        );
-
-        yield 'Github Actions annotation logged in Github Actions environment' => self::createValueForGithubActionsDetected(
-            true,
-            true,
-            true
-        );
-
-        yield 'ignoreMsiWithNoMutations not specified in schema and not specified in input' => self::createValueForIgnoreMsiWithNoMutations(
-            null,
-            null,
             false
+        );
+
+        yield 'Github Actions annotation not provided, not logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
+            null,
+            false,
+            false
+        );
+
+        yield 'Github Actions annotation not provided, logged in Github Actions environment' => self::createValueForGithubActionsDetected(
+            null,
+            true,
+            true
+        );
+
+        yield 'Github Actions annotation enabled, logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
+            true,
+            false,
+            true
+        );
+
+        yield 'Github Actions annotation enabled, logged in Github Actions environment' => self::createValueForGithubActionsDetected(
+            true,
+            true,
+            true
         );
 
         yield 'ignoreMsiWithNoMutations not specified in schema and true in input' => self::createValueForIgnoreMsiWithNoMutations(
@@ -1271,7 +1277,7 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     private static function createValueForGithubActionsDetected(
-        bool $inputUseGitHubAnnotationsLogger,
+        ?bool $inputUseGitHubAnnotationsLogger,
         bool $githubActionsDetected,
         bool $useGitHubAnnotationsLogger
     ): array {

@@ -169,7 +169,7 @@ final class Container
     public const DEFAULT_GIT_DIFF_FILTER = null;
     public const DEFAULT_GIT_DIFF_LINES = false;
     public const DEFAULT_GIT_DIFF_BASE = null;
-    public const DEFAULT_USE_GITHUB_LOGGER = false;
+    public const DEFAULT_USE_GITHUB_LOGGER = null;
     public const DEFAULT_HTML_LOGGER_PATH = null;
     public const DEFAULT_USE_NOOP_MUTATORS = false;
     public const DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
@@ -610,7 +610,7 @@ final class Container
         ?string $gitDiffFilter,
         bool $isForGitDiffLines,
         ?string $gitDiffBase,
-        bool $useGitHubLogger,
+        ?bool $useGitHubLogger,
         ?string $htmlLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases
