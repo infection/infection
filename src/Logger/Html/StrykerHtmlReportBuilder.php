@@ -69,8 +69,8 @@ use function Safe\preg_split;
 use function Safe\substr;
 use function str_starts_with;
 use function strlen;
+use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -162,7 +162,7 @@ final class StrykerHtmlReportBuilder
 
             Assert::minCount($resultsByPath, 1, 'There must be at least one result to build HTML report.');
 
-            $basePath = Path::getLongestCommonBasePath(array_keys($resultsByPath));
+            $basePath = Path::getLongestCommonBasePath(...array_keys($resultsByPath));
 
             Assert::string($basePath, '$basePath must be a string');
 

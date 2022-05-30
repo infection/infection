@@ -49,8 +49,8 @@ use function Safe\preg_replace;
 use function Safe\realpath;
 use function Safe\sprintf;
 use function str_replace;
+use Symfony\Component\Filesystem\Path;
 use Traversable;
-use Webmozart\PathUtil\Path;
 
 /**
  * @group integration

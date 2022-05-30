@@ -44,7 +44,7 @@ use function natcasesort;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use function range;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 final class SourceFileCollectorTest extends TestCase
 {

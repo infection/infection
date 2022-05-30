@@ -44,8 +44,8 @@ use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\sprintf;
 use function Safe\substr;
+use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
 
 final class MutatorFixturesProvider
 {

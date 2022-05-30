@@ -56,9 +56,9 @@ use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use function Safe\sprintf;
+use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
