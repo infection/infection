@@ -59,7 +59,7 @@
         "sebastian/diff": "^3.0.2 || ^4.0",
         "seld/jsonlint": "^1.7",
         "symfony/console": "^3.4.29 || ^4.1.19 || ^5.0 || ^6.0",
-        "symfony/filesystem": "^3.4.29 || ^4.1.19 || ^5.0 || ^6.0",
+        "symfony/filesystem": "^5.4 || ^6.0",
         "symfony/finder": "^3.4.29 || ^4.1.19 || ^5.0 || ^6.0",
         "symfony/process": "^3.4.29 || ^4.1.19 || ^5.0 || ^6.0",
         "thecodingmachine/safe": "^2.1.2",
