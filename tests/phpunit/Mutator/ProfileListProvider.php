@@ -52,9 +52,9 @@ use function Safe\sprintf;
 use function Safe\substr;
 use const SORT_STRING;
 use function str_replace;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\PathUtil\Path;
 
 final class ProfileListProvider
 {

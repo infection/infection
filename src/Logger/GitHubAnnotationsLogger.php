@@ -38,8 +38,8 @@ namespace Infection\Logger;
 use Infection\Metrics\ResultsCollector;
 use function Safe\shell_exec;
 use function str_replace;
+use Symfony\Component\Filesystem\Path;
 use function trim;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal

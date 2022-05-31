@@ -51,7 +51,7 @@ use function Safe\sprintf;
 use function set_error_handler;
 use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @group integration

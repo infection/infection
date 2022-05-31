@@ -43,7 +43,7 @@ use ReflectionClass;
 use function Safe\file_get_contents;
 use function Safe\sprintf;
 use function strpos;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 final class ContainerTest extends TestCase
 {
