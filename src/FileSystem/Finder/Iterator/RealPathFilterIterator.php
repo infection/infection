@@ -43,6 +43,11 @@ use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
 /**
  * @internal
+ *
+ * @template-covariant TKey
+ * @template-covariant TValue
+ *
+ * @extends MultiplePcreFilterIterator<TKey, TValue>
  */
 final class RealPathFilterIterator extends MultiplePcreFilterIterator
 {
