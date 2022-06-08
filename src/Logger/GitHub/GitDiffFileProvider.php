@@ -66,7 +66,7 @@ class GitDiffFileProvider
             escapeshellarg($referenceCommit),
             escapeshellarg($gitDiffFilter),
             implode(' ', array_map(static function (string $directory): string {
-                return '-e '.escapeshellarg($directory);
+                return '-e ' . escapeshellarg($directory);
             }, $sourceDirectories))
         ));
 
