@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Logger\GitHub;
 
+use function array_map;
 use function escapeshellarg;
+use function implode;
 use Infection\Process\ShellCommandLineExecutor;
 use function Safe\sprintf;
 use Symfony\Component\Process\Exception\ProcessFailedException;
