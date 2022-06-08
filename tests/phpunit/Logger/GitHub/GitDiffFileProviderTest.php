@@ -53,17 +53,17 @@ final class GitDiffFileProviderTest extends TestCase
         $this->expectException(NoFilesInDiffToMutate::class);
 
         $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
-        $diffProvider->provide('AM', 'master');
+        $diffProvider->provide('AM', 'master', ['src/']);
     }
 
     public function test_it_executes_diff_and_returns_filter_as_a_string(): void
     {
         $expectedMergeBaseCommandLine = 'git merge-base \'master\' HEAD';
-        $expectedDiffCommandLine = 'git diff \'0ABCMERGE_BASE_342\' --diff-filter=\'AM\' --name-only | grep src/ | paste -s -d "," -';
+        $expectedDiffCommandLine = 'git diff \'0ABCMERGE_BASE_342\' --diff-filter=\'AM\' --name-only | grep -e \'app/\' -e \'my lib/\' | paste -s -d "," -';
 
         if (PHP_OS_FAMILY === 'Windows') {
             $expectedMergeBaseCommandLine = 'git merge-base "master" HEAD';
-            $expectedDiffCommandLine = 'git diff "0ABCMERGE_BASE_342" --diff-filter="AM" --name-only | grep src/ | paste -s -d "," -';
+            $expectedDiffCommandLine = 'git diff "0ABCMERGE_BASE_342" --diff-filter="AM" --name-only | grep -e "app/" -e "my lib/" | paste -s -d "," -';
         }
 
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
@@ -75,16 +75,16 @@ final class GitDiffFileProviderTest extends TestCase
                     case $expectedMergeBaseCommandLine:
                         return "0ABCMERGE_BASE_342\n";
                     case $expectedDiffCommandLine:
-                        return 'src/A.php,src/B.php';
+                        return 'app/A.php,my lib/B.php';
                     default:
                         $this->fail("Unexpected shell command: $command");
                 }
             });
 
         $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
-        $filter = $diffProvider->provide('AM', 'master');
+        $filter = $diffProvider->provide('AM', 'master', ['app/', 'my lib/']);
 
-        $this->assertSame('src/A.php,src/B.php', $filter);
+        $this->assertSame('app/A.php,my lib/B.php', $filter);
     }
 
     public function test_it_provides_lines_filter_as_a_string(): void
