@@ -11,7 +11,7 @@ on:
       - master
 
 env:
-  MIN_MSI: 71.39
+  MIN_MSI: 71.35
   MIN_COVERED_MSI: 86.78
 
 jobs:

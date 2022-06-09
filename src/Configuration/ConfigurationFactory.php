@@ -151,7 +151,7 @@ class ConfigurationFactory
                 $schema->getSource()->getDirectories(),
                 $schema->getSource()->getExcludes()
             ),
-            $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase),
+            $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
             $schema->getSource()->getExcludes(),
             $this->retrieveLogs($schema->getLogs(), $useGitHubLogger, $htmlLogFilePath),
             $logVerbosity,
@@ -303,7 +303,10 @@ class ConfigurationFactory
         return $map;
     }
 
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase): string
+    /**
+     * @param string[] $sourceDirectories
+     */
+    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase, array $sourceDirectories): string
     {
         if ($gitDiffFilter === null && !$isForGitDiffLines) {
             return $filter;
@@ -312,10 +315,10 @@ class ConfigurationFactory
         $baseBranch = $gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE;
 
         if ($isForGitDiffLines) {
-            return $this->gitDiffFileProvider->provide('AM', $baseBranch);
+            return $this->gitDiffFileProvider->provide('AM', $baseBranch, $sourceDirectories);
         }
 
-        return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch);
+        return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
     }
 
     private function retrieveLogs(Logs $logs, ?bool $useGitHubLogger, ?string $htmlLogFilePath): Logs
