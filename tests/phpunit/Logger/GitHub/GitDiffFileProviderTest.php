@@ -59,11 +59,11 @@ final class GitDiffFileProviderTest extends TestCase
     public function test_it_executes_diff_and_returns_filter_as_a_string(): void
     {
         $expectedMergeBaseCommandLine = 'git merge-base \'master\' HEAD';
-        $expectedDiffCommandLine = 'git diff \'0ABCMERGE_BASE_342\' --diff-filter=\'AM\' --name-only | grep -e \'app/\' -e \'my lib/\' | paste -s -d "," -';
+        $expectedDiffCommandLine = 'git diff \'0ABCMERGE_BASE_342\' --diff-filter=\'AM\' --name-only -- \'app/\' \'my lib/\' | paste -s -d "," -';
 
         if (PHP_OS_FAMILY === 'Windows') {
             $expectedMergeBaseCommandLine = 'git merge-base "master" HEAD';
-            $expectedDiffCommandLine = 'git diff "0ABCMERGE_BASE_342" --diff-filter="AM" --name-only | grep -e "app/" -e "my lib/" | paste -s -d "," -';
+            $expectedDiffCommandLine = 'git diff "0ABCMERGE_BASE_342" --diff-filter="AM" --name-only -- "app/" "my lib/" | paste -s -d "," -';
         }
 
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);

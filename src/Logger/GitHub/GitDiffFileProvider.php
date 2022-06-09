@@ -64,12 +64,10 @@ class GitDiffFileProvider
         $referenceCommit = $this->findReferenceCommit($gitDiffBase);
 
         $filter = $this->shellCommandLineExecutor->execute(sprintf(
-            'git diff %s --diff-filter=%s --name-only | grep %s | paste -s -d "," -',
+            'git diff %s --diff-filter=%s --name-only -- %s | paste -s -d "," -',
             escapeshellarg($referenceCommit),
             escapeshellarg($gitDiffFilter),
-            implode(' ', array_map(static function (string $directory): string {
-                return '-e ' . escapeshellarg($directory);
-            }, $sourceDirectories))
+            implode(' ', array_map('\\escapeshellarg', $sourceDirectories))
         ));
 
         if ($filter === '') {
