@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Logger\GitHub;
 
+use function array_map;
 use function escapeshellarg;
+use function implode;
 use Infection\Process\ShellCommandLineExecutor;
 use function Safe\sprintf;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -54,14 +56,18 @@ class GitDiffFileProvider
     {
     }
 
-    public function provide(string $gitDiffFilter, string $gitDiffBase): string
+    /**
+     * @param string[] $sourceDirectories
+     */
+    public function provide(string $gitDiffFilter, string $gitDiffBase, array $sourceDirectories): string
     {
         $referenceCommit = $this->findReferenceCommit($gitDiffBase);
 
         $filter = $this->shellCommandLineExecutor->execute(sprintf(
-            'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
+            'git diff %s --diff-filter=%s --name-only -- %s | paste -s -d "," -',
             escapeshellarg($referenceCommit),
-            escapeshellarg($gitDiffFilter)
+            escapeshellarg($gitDiffFilter),
+            implode(' ', array_map('\\escapeshellarg', $sourceDirectories))
         ));
 
         if ($filter === '') {
