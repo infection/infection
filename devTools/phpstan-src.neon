@@ -5,7 +5,6 @@ parameters:
     tmpDir: ../build/cache/phpstan-src
     inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
-        - '#.* value type specified in iterable type Symfony\\Component\\Process\\Process#'
         - '#generic class ReflectionClass (but )?does not specify its types#'
         - '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
         - '#^Parameter \#\d+ \$.+ \(.+\) of method .+ should be contravariant with parameter \$.+ \(.+\) of method .+$#'
