@@ -89,7 +89,7 @@ final class OriginalPhpProcess extends Process
         }
 
         // The last case: Xdebug 3+ running inactive.
-        return ini_get_unsafe('xdebug.mode') === '';
+        return ini_get_unsafe('xdebug.mode') !== 'coverage';
 
         // Why going through all the trouble above? We don't want to enable
         // Xdebug when there are more compelling choices. In the end the user is
