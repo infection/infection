@@ -70,7 +70,7 @@ final class OriginalPhpProcessTest extends TestCase
             PHP_SAPI !== 'phpdbg' &&
             (
                 ini_get_unsafe('xdebug.mode') === false ||
-                ini_get_unsafe('xdebug.mode') === ''
+                ini_get_unsafe('xdebug.mode') !== 'coverage'
             )
         ) {
             $this->assertStringContainsString('XDEBUG_MODE=coverage', $process->getOutput());
