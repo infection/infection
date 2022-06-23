@@ -32,9 +32,6 @@ parameters:
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
             count: 1
         -
-            path: '../src/Process/OriginalPhpProcess.php'
-            message: '#Function ini_get is unsafe to use#'
-        -
             path: '../src/TestFramework/Coverage/CoverageChecker.php'
             message: '#Function ini_get is unsafe to use#'
         -

@@ -39,7 +39,6 @@ use function array_merge;
 use Composer\XdebugHandler\PhpConfig;
 use Composer\XdebugHandler\XdebugHandler;
 use function extension_loaded;
-use function ini_get as ini_get_unsafe;
 use const PHP_SAPI;
 use Symfony\Component\Process\Process;
 
@@ -82,14 +81,8 @@ final class OriginalPhpProcess extends Process
             return false;
         }
 
-        // We also do not need to add XDEBUG_MODE for Xdebug <=3:
-        // it had coverage enabled at all times and it didn't have `xdebug.mode`.
-        if (ini_get_unsafe('xdebug.mode') === false) {
-            return false;
-        }
-
         // The last case: Xdebug 3+ running inactive.
-        return ini_get_unsafe('xdebug.mode') !== 'coverage';
+        return true;
 
         // Why going through all the trouble above? We don't want to enable
         // Xdebug when there are more compelling choices. In the end the user is
