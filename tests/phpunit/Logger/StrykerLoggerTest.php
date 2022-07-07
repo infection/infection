@@ -56,29 +56,20 @@ final class StrykerLoggerTest extends TestCase
     use BacksUpEnvironmentVariables;
 
     /**
-     * @var StrykerDashboardClient|MockObject
+     * @var StrykerDashboardClient&MockObject
      */
     private $strykerDashboardClient;
 
     /**
-     * @var MetricsCalculator|MockObject
+     * @var MetricsCalculator&MockObject
      */
     private $metricsCalculatorMock;
 
-    /**
-     * @var ConfigurableEnv
-     */
-    private $ciDetectorEnv;
+    private ConfigurableEnv $ciDetectorEnv;
 
-    /**
-     * @var DummyLogger
-     */
-    private $logger;
+    private DummyLogger $logger;
 
-    /**
-     * @var StrykerLogger
-     */
-    private $strykerLogger;
+    private StrykerLogger $strykerLogger;
 
     protected function setUp(): void
     {

@@ -10,6 +10,8 @@ use ReturnTypeWillChange;
 
 final class MockSplFileInfo extends SplFileInfo
 {
+    private string|false $realPath;
+
     public function __construct($param)
     {
         if (\is_string($param)) {

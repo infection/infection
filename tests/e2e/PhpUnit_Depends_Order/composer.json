@@ -9,9 +9,7 @@
             "PhpUnit_Depends_Order\\Test\\": "tests/"
         }
     },
-    "require": {
-    },
     "require-dev": {
-        "phpunit/phpunit": "^9.3.11"
+        "phpunit/phpunit": "^9.5.5"
     }
 }

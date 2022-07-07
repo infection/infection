@@ -48,15 +48,9 @@ use function Safe\ini_set;
  */
 final class MemoryLimiterEnvironmentTest extends TestCase
 {
-    /**
-     * @var string|null
-     */
-    private $originalMemoryLimit;
+    private ?string $originalMemoryLimit;
 
-    /**
-     * @var MemoryLimiterEnvironment
-     */
-    private $environment;
+    private MemoryLimiterEnvironment $environment;
 
     protected function setUp(): void
     {
@@ -75,7 +69,7 @@ final class MemoryLimiterEnvironmentTest extends TestCase
      */
     public function test_it_can_detect_if_a_memory_limit_is_set(string $memoryLimit, bool $expected): void
     {
-        ini_set('memory_limit', $memoryLimit);
+        @ini_set('memory_limit', $memoryLimit);
 
         $this->assertSame($expected, $this->environment->hasMemoryLimitSet());
     }
