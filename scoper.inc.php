@@ -50,4 +50,5 @@ return [
     ],
     'prefix' => 'Infected',
     'exclude-classes' => [\Composer\InstalledVersions::class],
+    'exclude-files' => ['vendor/composer/InstalledVersions.php'],
 ];
