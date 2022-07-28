@@ -16,22 +16,28 @@ jobs:
 
     strategy:
       matrix:
-        operating-system: [ubuntu-latest]
-        php-version: ['8.0']
-        coverage-driver: [pcov, xdebug]
-        e2e-runner: ['bin/infection']
+        operating-system: [ ubuntu-latest ]
+        php-version: [ '8.0' ]
+        coverage-driver: [ pcov, xdebug ]
+        e2e-runner: [ 'bin/infection' ]
         include:
           - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.2', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
 
     name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Configure for PHP >= 8.2
+        if: "matrix.php-version >= '8.2'"
+        run: |
+          composer config platform.php 8.1.99
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -63,10 +69,8 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          # Required as long as "PHPUnit\Runner\DefaultTestResultCache implements the Serializable interface, which is deprecated.
-          # Implement __serialize() and __unserialize() instead (or in addition, if support for old PHP versions is necessary)" is not fixed
-          if [[ "${{ matrix.php-version }}" == '8.1' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[direct]=1
+          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
+            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
           fi
 
           make test-unit
@@ -86,8 +90,13 @@ jobs:
       - name: Install Composer dependencies for E2E tests
         shell: bash
         run: |
-          ls tests/e2e/*/composer.json | xargs dirname |
-             xargs -I{} composer --working-dir={} install --no-interaction --prefer-dist --no-progress
+          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
+            ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} composer --working-dir={} config platform.php 8.1.99
+            ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} composer --working-dir={} install --no-interaction --prefer-dist --no-progress
+          else
+            ls tests/e2e/*/composer.json | xargs dirname |
+               xargs -I{} composer --working-dir={} install --no-interaction --prefer-dist --no-progress
+          fi
 
       - name: Run a subset of E2E tests
         if: runner.os == 'Windows'
@@ -105,9 +114,10 @@ jobs:
         env:
           TERM: xterm-256color
         run: |
-          if [[ "${{ matrix.php-version }}" == '8.1' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[direct]=1
+          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
+            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
           fi
+
           make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
       - name: Run the whole set of E2E tests with prefixed PHAR
@@ -123,8 +133,8 @@ jobs:
       - name: Run integration tests
         shell: bash
         run: |
-            if [[ "${{ matrix.php-version }}" == '8.1' ]]; then
-              export SYMFONY_DEPRECATIONS_HELPER=max[direct]=1
-            fi
+          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
+            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
+          fi
 
-            make test-unit PHPUNIT_GROUP=integration
+          make test-unit PHPUNIT_GROUP=integration
