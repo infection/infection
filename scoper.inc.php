@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 return [
     'whitelist' => [
-        'Composer\*',
         // PHP 8.0
         'T_NAME_QUALIFIED',
         'T_NAME_FULLY_QUALIFIED',
@@ -49,4 +48,6 @@ return [
         'T_ENUM',
         'T_READONLY',
     ],
+    'prefix' => 'Infected',
+    'exclude-classes' => [\Composer\InstalledVersions::class],
 ];
