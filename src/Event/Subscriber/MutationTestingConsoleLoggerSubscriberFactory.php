@@ -37,6 +37,7 @@ namespace Infection\Event\Subscriber;
 
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
+use Infection\Logger\FederatedLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -46,7 +47,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
-    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector, private DiffColorizer $diffColorizer, private bool $showMutations, private OutputFormatter $formatter)
+    public function __construct(
+        private MetricsCalculator $metricsCalculator,
+        private ResultsCollector $resultsCollector,
+        private DiffColorizer $diffColorizer,
+        private FederatedLogger $mutationTestingResultsLogger,
+        private bool $showMutations,
+        private OutputFormatter $formatter)
     {
     }
 
@@ -58,6 +65,7 @@ final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberF
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
+            $this->mutationTestingResultsLogger,
             $this->showMutations
         );
     }

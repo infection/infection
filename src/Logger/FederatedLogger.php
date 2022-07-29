@@ -56,4 +56,12 @@ final class FederatedLogger implements MutationTestingResultsLogger
             $logger->log();
         }
     }
+
+    /**
+     * @return MutationTestingResultsLogger[]
+     */
+    public function getLoggers(): array
+    {
+        return $this->loggers;
+    }
 }
