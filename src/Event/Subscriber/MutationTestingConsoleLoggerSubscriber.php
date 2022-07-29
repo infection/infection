@@ -166,7 +166,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
     }
 
-    private function getPadded(int | string $subject, int $padLength = self::PAD_LENGTH): string
+    private function getPadded(int|string $subject, int $padLength = self::PAD_LENGTH): string
     {
         return str_pad((string) $subject, $padLength, ' ', STR_PAD_LEFT);
     }

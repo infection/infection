@@ -71,7 +71,7 @@ final class MakefileTest extends TestCase
         }
         $output = shell_exec(sprintf(
             '%s make --silent --file %s 2>&1',
-             $timeout,
+            $timeout,
             self::MAKEFILE_PATH
         ));
 

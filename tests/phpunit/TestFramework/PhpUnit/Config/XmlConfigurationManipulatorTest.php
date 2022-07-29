@@ -197,7 +197,7 @@ XML
   </filter>
 </phpunit>
 XML
-            );
+        );
     }
 
     public function test_it_adds_coverage_whitelist_files_to_pre_93_configuration(): void
@@ -225,7 +225,7 @@ XML
   </filter>
 </phpunit>
 XML
-            );
+        );
     }
 
     public function test_it_adds_coverage_whitelist_directories_to_post_93_configuration(): void
@@ -249,7 +249,7 @@ XML
   </coverage>
 </phpunit>
 XML
-            );
+        );
     }
 
     public function test_it_adds_coverage_whitelist_files_to_post_93_configuration(): void
@@ -276,7 +276,7 @@ XML
   </coverage>
 </phpunit>
 XML
-            );
+        );
     }
 
     public function test_it_removes_existing_loggers_from_post_93_configuration(): void
@@ -741,7 +741,7 @@ XML
             $this->configManipulator->validate('/path/to/phpunit.xml', $xPath);
 
             $this->fail('Expected exception to be thrown');
-        } catch (InvalidArgumentException | InvalidPhpUnitConfiguration $exception) {
+        } catch (InvalidArgumentException|InvalidPhpUnitConfiguration $exception) {
             $this->assertSame(
                 $errorMessage,
                 normalizeLineReturn($exception->getMessage())
@@ -1000,7 +1000,7 @@ XML
     </logging>
 </phpunit>
 XML
-        ,
+            ,
             $changeXml,
             $expectedXml
         );

@@ -148,7 +148,7 @@ final class SchemaConfigurationFileTest extends TestCase
             self::FIXTURES_DIR,
             new InvalidFile(sprintf(
                 'The file "%s" could not be found or is not a file.',
-            self::FIXTURES_DIR
+                self::FIXTURES_DIR
             )),
         ];
 
@@ -163,7 +163,7 @@ Could not parse the JSON file "%s": Parse error on line 1:
 Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
 ERROR
                     ,
-                self::FIXTURES_DIR . '/invalid-json'
+                    self::FIXTURES_DIR . '/invalid-json'
                 ),
                 0,
                 new ParsingException(

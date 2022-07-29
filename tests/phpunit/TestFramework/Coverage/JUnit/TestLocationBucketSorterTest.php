@@ -107,7 +107,7 @@ final class TestLocationBucketSorterTest extends TestCase
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort([$testLocation2, $testLocation1]),
             false
-            );
+        );
 
         $this->assertSame([$testLocation1, $testLocation2], $sortedTestLocations);
     }

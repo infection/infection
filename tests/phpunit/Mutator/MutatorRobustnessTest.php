@@ -73,10 +73,10 @@ final class MutatorRobustnessTest extends TestCase
             $this->addToAssertionCount(1);
         } catch (Throwable $throwable) {
             $this->fail(sprintf(
-               'The mutator "%s" could not parse the file "%s": %s.',
-               $mutator->getName(),
-               $fileName,
-               $throwable->getMessage()
+                'The mutator "%s" could not parse the file "%s": %s.',
+                $mutator->getName(),
+                $fileName,
+                $throwable->getMessage()
             ));
         }
     }

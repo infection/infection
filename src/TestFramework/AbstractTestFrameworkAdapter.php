@@ -123,10 +123,10 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
      * @param TestLocation[] $tests
      */
     protected function buildMutationConfigFile(
-       array $tests,
-       string $mutantFilePath,
-       string $mutationHash,
-       string $mutationOriginalFilePath
+        array $tests,
+        string $mutantFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath
     ): string {
         return $this->mutationConfigBuilder->build(
             $tests,

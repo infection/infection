@@ -273,11 +273,11 @@ final class StrykerHtmlReportBuilder
         $lines = array_map(
             static fn (string $line): string => isset($line[0]) ? substr($line, self::PLUS_LENGTH) : $line,
             array_filter(
-            /*
-            --- Original
-            +++ New
-            @@ @@
-             */
+                /*
+                --- Original
+                +++ New
+                @@ @@
+                 */
                 array_slice($lines, self::DIFF_HEADERS_LINES_COUNT),
                 static fn (string $line): bool => str_starts_with($line, '+')
             )

@@ -87,7 +87,7 @@ trait CreateMutantExecutionResult
 + echo 'mutated';
 
 DIFF
-                )),
+            )),
             'a1b2c3',
             MutatorName::getName(For_::class),
             'foo/bar',

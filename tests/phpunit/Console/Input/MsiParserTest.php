@@ -44,7 +44,7 @@ final class MsiParserTest extends TestCase
     /**
      * @dataProvider precisionProvider
      *
-     * @param array<string | null> $values
+     * @param array<string|null> $values
      */
     public function test_it_can_detect_the_precision_of_the_given_values(
         array $values,

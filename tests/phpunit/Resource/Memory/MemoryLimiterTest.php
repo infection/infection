@@ -125,7 +125,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
             ->with(
                 $filename,
                 PHP_EOL . sprintf('memory_limit = %dM', $expectedLimit)
-        );
+            );
 
         $this->configureEnvironmentToBeCalledOnce();
 

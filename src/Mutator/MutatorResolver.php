@@ -126,7 +126,7 @@ final class MutatorResolver
      *
      * @return array<string, mixed[]>|bool
      */
-    private static function resolveSettings(bool | stdClass | array $settings, array $globalSettings): array | bool
+    private static function resolveSettings(bool|stdClass|array $settings, array $globalSettings): array|bool
     {
         if ($settings === false) {
             return false;
@@ -158,7 +158,7 @@ final class MutatorResolver
      */
     private static function registerFromProfile(
         string $profile,
-        array | bool $settings,
+        array|bool $settings,
         array &$mutators
     ): void {
         foreach (ProfileList::ALL_PROFILES[$profile] as $mutatorOrProfile) {
@@ -198,7 +198,7 @@ final class MutatorResolver
      */
     private static function registerFromName(
         string $mutator,
-        array | bool $settings,
+        array|bool $settings,
         array &$mutators
     ): void {
         if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)) {
@@ -221,7 +221,7 @@ final class MutatorResolver
      */
     private static function registerFromClass(
         string $mutatorClassName,
-        array | bool $settings,
+        array|bool $settings,
         array &$mutators
     ): void {
         if ($settings === false) {
