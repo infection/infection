@@ -258,7 +258,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_outputs_generated_file_log_paths_if_enabled(): void
     {
-        $output = new StreamOutput(fopen('php://memory', 'w', false));
+        $output = new StreamOutput(fopen('php://memory', 'w'));
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
@@ -290,6 +290,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
 
+        $output = $this->getDisplay($output);
         $this->assertStringContainsString(
             <<<TEXT
             Generated Reports:
@@ -297,7 +298,58 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                      - /absolute/path.html
             TEXT
             ,
-            $this->getDisplay($output));
+            $output
+        );
+        $this->assertStringNotContainsString(
+            'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
+            $output
+        );
+    }
+
+    public function test_it_displays_a_tip_to_enable_file_loggers_or_show_mutations_option(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            new FederatedLogger(/* no file loggers */),
+            false
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $this->assertStringContainsString(
+            'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
+            $this->getDisplay($output)
+        );
+    }
+
+    public function test_tip_is_not_displayed_when_show_mutations_option_is_used(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            new FederatedLogger(/* no file loggers */),
+            true
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $this->assertStringNotContainsString(
+            'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
+            $this->getDisplay($output)
+        );
     }
 
     public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void

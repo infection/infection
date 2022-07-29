@@ -193,6 +193,13 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
                     $this->addIndentation(sprintf('- %s', $fileLogger->getFilePath()))
                 );
             }
+
+            return;
+        }
+
+        // for the case when no file loggers are configured and `--show-mutations` is not used
+        if (!$this->showMutations) {
+            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.']);
         }
     }
 
