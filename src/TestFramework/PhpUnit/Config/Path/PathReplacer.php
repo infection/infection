@@ -52,10 +52,7 @@ final class PathReplacer
     {
     }
 
-    /**
-     * @param DOMNode|DOMElement $domElement
-     */
-    public function replaceInNode(DOMElement | DOMNode $domElement): void
+    public function replaceInNode(DOMElement|DOMNode $domElement): void
     {
         $path = trim($domElement->nodeValue);
 

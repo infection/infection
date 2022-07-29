@@ -279,7 +279,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->iterableContaining([$process0, $process1]), )
+            ->with($this->iterableContaining([$process0, $process1]))
         ;
 
         $this->runner = new MutationTestingRunner(

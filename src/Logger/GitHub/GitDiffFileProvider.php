@@ -91,10 +91,9 @@ class GitDiffFileProvider
     {
         try {
             $comparisonCommit = trim($this->shellCommandLineExecutor->execute(sprintf(
-                    'git merge-base %s HEAD',
-                    escapeshellarg($gitDiffBase))
-                )
-            );
+                'git merge-base %s HEAD',
+                escapeshellarg($gitDiffBase))
+            ));
         } catch (ProcessFailedException) {
             /**
              * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.

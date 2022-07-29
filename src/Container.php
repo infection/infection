@@ -405,12 +405,12 @@ final class Container
                 $container->getConfiguration()->noProgress()
             ),
             MutationTestingResultsCollectorSubscriberFactory::class => static fn (self $container): MutationTestingResultsCollectorSubscriberFactory => new MutationTestingResultsCollectorSubscriberFactory(
-               ...array_filter([
-                   $container->getMetricsCalculator(),
-                   $container->getFilteringResultsCollectorFactory()->create(
-                       $container->getResultsCollector()
-                   ),
-               ])
+                ...array_filter([
+                    $container->getMetricsCalculator(),
+                    $container->getFilteringResultsCollectorFactory()->create(
+                        $container->getResultsCollector()
+                    ),
+                ])
             ),
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();

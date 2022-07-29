@@ -373,11 +373,11 @@ final class RunCommand extends BaseCommand
             $engine->execute();
 
             return true;
-        } catch (NoFilesInDiffToMutate | NoLineExecutedInDiffLinesMode $e) {
+        } catch (NoFilesInDiffToMutate|NoLineExecutedInDiffLinesMode $e) {
             $io->success($e->getMessage());
 
             return true;
-        } catch (InitialTestsFailed | MinMsiCheckFailed $exception) {
+        } catch (InitialTestsFailed|MinMsiCheckFailed $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
             $io->error($exception->getMessage());
@@ -569,7 +569,7 @@ final class RunCommand extends BaseCommand
                 SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
                 SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
             ]);
-        } catch (FileNotFound | FileOrDirectoryNotFound $exception) {
+        } catch (FileNotFound|FileOrDirectoryNotFound $exception) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [

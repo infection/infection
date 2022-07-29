@@ -100,6 +100,7 @@ return (new Config())
                 'yield',
             ],
         ],
+        'blank_line_between_import_groups' => false,
         'compact_nullable_typehint' => true,
         'concat_space' => ['spacing' => 'one'],
         'fully_qualified_strict_types' => true,

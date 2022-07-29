@@ -81,7 +81,7 @@ final class SchemaValidatorTest extends TestCase
         yield 'empty JSON' => [
             self::createConfigWithContents(
                 $path,
-               '{}'
+                '{}'
             ),
             <<<'ERROR'
 "/path/to/config" does not match the expected JSON schema:

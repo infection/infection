@@ -656,7 +656,7 @@ PHP
             self::MUTATED_FILE_PATH,
             self::HASH,
             self::ORIGINAL_FILE_PATH,
-             '5.2'
+            '5.2'
         ));
 
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
