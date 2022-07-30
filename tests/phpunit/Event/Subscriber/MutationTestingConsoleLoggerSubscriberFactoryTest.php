@@ -38,6 +38,7 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
+use Infection\Logger\FederatedLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\Console\FakeOutputFormatter;
@@ -92,6 +93,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             $this->metricsCalculatorMock,
             $this->resultsCollectorMock,
             $this->diffColorizerMock,
+            new FederatedLogger(),
             $showMutations,
             new FakeOutputFormatter()
         );

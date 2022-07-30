@@ -414,11 +414,14 @@ final class Container
             ),
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
+                /** @var FederatedLogger $federatedMutationTestingResultsLogger */
+                $federatedMutationTestingResultsLogger = $container->getMutationTestingResultsLogger();
 
                 return new MutationTestingConsoleLoggerSubscriberFactory(
                     $container->getMetricsCalculator(),
                     $container->getResultsCollector(),
                     $container->getDiffColorizer(),
+                    $federatedMutationTestingResultsLogger,
                     $config->showMutations(),
                     $container->getOutputFormatter()
                 );

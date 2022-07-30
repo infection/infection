@@ -84,4 +84,9 @@ final class FileLogger implements MutationTestingResultsLogger
             ));
         }
     }
+
+    public function getFilePath(): string
+    {
+        return $this->filePath;
+    }
 }
