@@ -10,7 +10,6 @@
         "KevinGH\\Box\\Compactor\\PhpScoper"
     ],
     "files": [
-        "resources/schema.json",
-        "vendor/composer/installed.php"
+        "resources/schema.json"
     ]
 }
