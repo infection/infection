@@ -2,7 +2,7 @@ ARG PHP_VERSION
 
 FROM php:${PHP_VERSION}-cli-alpine
 
-ARG XDEBUG_VERSION=3.0.4
+ARG XDEBUG_VERSION
 
 RUN set -eux; \
     apk add --no-cache --virtual .build-deps \
@@ -29,7 +29,7 @@ RUN apk add --no-cache \
         git \
         zip
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.1 /usr/bin/composer /usr/bin/composer
 COPY memory-limit.ini xdebug.ini ${PHP_INI_DIR}/conf.d/
 
 RUN adduser -h /opt/infection -s /bin/bash -D infection

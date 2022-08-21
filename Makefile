@@ -33,6 +33,7 @@ INFECTION=./build/infection.phar
 
 DOCKER_RUN=docker-compose run
 DOCKER_RUN_80=$(DOCKER_RUN) php80 $(FLOCK) Makefile
+DOCKER_RUN_81=$(DOCKER_RUN) php81 $(FLOCK) Makefile
 DOCKER_FILE_IMAGE=devTools/Dockerfile.json
 
 FLOCK=./devTools/flock
@@ -56,7 +57,7 @@ compile: $(INFECTION)
 .PHONY: compile-docker
 compile-docker:	 	## Bundles Infection into a PHAR using docker
 compile-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_80) make compile
+	$(DOCKER_RUN_81) make compile
 
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:
