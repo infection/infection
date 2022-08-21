@@ -4,6 +4,15 @@ services:
     build:
       context: devTools
       args:
-        PHP_VERSION: 8.0
+        PHP_VERSION: '8.0'
+        XDEBUG_VERSION: '3.0.4'
+    volumes:
+      - .:/opt/infection
+  php81:
+    build:
+      context: devTools
+      args:
+        PHP_VERSION: '8.1'
+        XDEBUG_VERSION: '3.1.5'
     volumes:
       - .:/opt/infection
