@@ -35,13 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Logger\GitHub;
 
-use function array_map;
-use function escapeshellarg;
 use function implode;
 use Infection\Process\ShellCommandLineExecutor;
-use function Safe\sprintf;
+use function Safe\preg_match;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use function trim;
 
 /**
  * @final
@@ -63,38 +60,54 @@ class GitDiffFileProvider
     {
         $referenceCommit = $this->findReferenceCommit($gitDiffBase);
 
-        $filter = $this->shellCommandLineExecutor->execute(sprintf(
-            'git diff %s --diff-filter=%s --name-only -- %s | paste -s -d "," -',
-            escapeshellarg($referenceCommit),
-            escapeshellarg($gitDiffFilter),
-            implode(' ', array_map('\\escapeshellarg', $sourceDirectories))
+        $filter = $this->shellCommandLineExecutor->execute(array_merge(
+            [
+                'git',
+                'diff',
+                $referenceCommit,
+                '--diff-filter',
+                $gitDiffFilter,
+                '--name-only',
+                '--',
+            ],
+            $sourceDirectories
         ));
 
         if ($filter === '') {
             throw NoFilesInDiffToMutate::create();
         }
 
-        return $filter;
+        return implode(',', explode(PHP_EOL, $filter));
     }
 
     public function provideWithLines(string $gitDiffBase): string
     {
         $referenceCommit = $this->findReferenceCommit($gitDiffBase);
 
-        return $this->shellCommandLineExecutor->execute(sprintf(
-            "git diff %s --unified=0 --diff-filter=AM | grep -v -e '^[+-]' -e '^index'",
-            escapeshellarg($referenceCommit)
-        ));
+        $filter = $this->shellCommandLineExecutor->execute([
+            'git',
+            'diff',
+            $referenceCommit,
+            '--unified=0',
+            '--diff-filter=AM',
+        ]);
+        $lines = explode(PHP_EOL, $filter);
+        $lines = array_filter($lines, static function ($line): bool {
+            return 0 === preg_match('/^(\\+|-|index)/', $line);
+        });
+
+        return implode(PHP_EOL, $lines);
     }
 
     private function findReferenceCommit(string $gitDiffBase): string
     {
         try {
-            $comparisonCommit = trim($this->shellCommandLineExecutor->execute(sprintf(
-                    'git merge-base %s HEAD',
-                    escapeshellarg($gitDiffBase))
-                )
-            );
+            $comparisonCommit = $this->shellCommandLineExecutor->execute([
+                'git',
+                'merge-base',
+                $gitDiffBase,
+                'HEAD',
+            ]);
         } catch (ProcessFailedException) {
             /**
              * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
