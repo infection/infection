@@ -110,6 +110,7 @@ index f97971a..1ef35a5 100644
 +        $strrev = \strrev($encryptedMessage);
 
 EOF;
+        $gitUnifiedOutput = str_replace("\n", PHP_EOL, $gitUnifiedOutput);
 
         $expectedUnifiedReturn = <<<'EOF'
 diff --git a/tests/FooTest.php b/tests/FooTest.php
@@ -119,7 +120,7 @@ diff --git a/Bar.php b/Bar.php
 @@ -21 +31,4 @@ final class Bar
 
 EOF;
-
+        $expectedUnifiedReturn = str_replace("\n", PHP_EOL, $expectedUnifiedReturn);
 
         $shellCommandLineExecutor->expects($this->any())
             ->method('execute')
