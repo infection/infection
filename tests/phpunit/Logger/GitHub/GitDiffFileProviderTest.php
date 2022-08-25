@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\GitHub;
 
+use function implode;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
-use const PHP_OS_FAMILY;
+use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
+use function str_replace;
 
 final class GitDiffFileProviderTest extends TestCase
 {
@@ -68,9 +70,9 @@ final class GitDiffFileProviderTest extends TestCase
             ->willReturnCallback(function (array $command) use ($expectedDiffCommandLine, $expectedMergeBaseCommandLine): string {
                 switch ($command) {
                     case $expectedMergeBaseCommandLine:
-                        return "0ABCMERGE_BASE_342";
+                        return '0ABCMERGE_BASE_342';
                     case $expectedDiffCommandLine:
-                        return 'app/A.php'.PHP_EOL.'my lib/B.php';
+                        return 'app/A.php' . PHP_EOL . 'my lib/B.php';
                     default:
                         $this->fail('Unexpected shell command: ' . implode(' ', $command));
                 }

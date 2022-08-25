@@ -35,8 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Logger\GitHub;
 
+use function array_filter;
+use function array_merge;
+use function explode;
 use function implode;
 use Infection\Process\ShellCommandLineExecutor;
+use const PHP_EOL;
 use function Safe\preg_match;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
@@ -93,7 +97,7 @@ class GitDiffFileProvider
         ]);
         $lines = explode(PHP_EOL, $filter);
         $lines = array_filter($lines, static function ($line): bool {
-            return 0 === preg_match('/^(\\+|-|index)/', $line);
+            return preg_match('/^(\\+|-|index)/', $line) === 0;
         });
 
         return implode(PHP_EOL, $lines);
