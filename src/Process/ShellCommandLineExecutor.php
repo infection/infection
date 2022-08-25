@@ -45,8 +45,11 @@ use function trim;
  */
 class ShellCommandLineExecutor
 {
-    public function execute(string $commandLine): string
+    /**
+     * @param string[] $command
+     */
+    public function execute(array $command): string
     {
-        return trim(Process::fromShellCommandline($commandLine)->mustRun()->getOutput());
+        return trim((new Process($command))->mustRun()->getOutput());
     }
 }
