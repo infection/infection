@@ -107,10 +107,10 @@ class GitDiffFileProvider
     {
         try {
             $comparisonCommit = $this->shellCommandLineExecutor->execute([
-                'git ',
+                'git',
                 'merge-base',
                 $gitDiffBase,
-            'HEAD',
+                'HEAD',
             ]);
         } catch (ProcessFailedException) {
             /**
