@@ -76,7 +76,7 @@ final class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptio
 
     public function isSyntaxError(string $output): bool
     {
-        return preg_match('/ParseError\s*syntax error/i', $output) === 1;
+        return preg_match('/(ParseError\s*syntax error|Syntax Error for Pest)/i', $output) === 1;
     }
 
     public function hasJUnitReport(): bool
