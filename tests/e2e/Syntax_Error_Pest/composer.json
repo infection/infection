@@ -11,10 +11,5 @@
         "psr-4": {
             "Syntax_Error_Pest\\Test\\": "tests/"
         }
-    },
-    "config": {
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        }
     }
 }
