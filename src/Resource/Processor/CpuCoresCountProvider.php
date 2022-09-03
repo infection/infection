@@ -42,15 +42,10 @@ use function filter_var;
 use function function_exists;
 use function is_int;
 use function is_readable;
-use LogicException;
-use const PHP_OS;
-use const PHP_VERSION;
 use function Safe\file_get_contents;
-use function Safe\ini_get;
 use function Safe\shell_exec;
 use function substr_count;
 use function trim;
-use function version_compare;
 
 /**
  * @internal
@@ -66,18 +61,11 @@ final class CpuCoresCountProvider
             return 1;
         }
 
-        if (ini_get('pcre.jit') === '1'
-            && PHP_OS === 'Darwin'
-            && version_compare(PHP_VERSION, '7.3.0') >= 0
-            && version_compare(PHP_VERSION, '7.4.0') < 0
-        ) {
-            return 1;
-        }
-
         if (!extension_loaded('pcntl') || !function_exists('shell_exec')) {
             return 1;
         }
 
+        // for Linux
         $hasNproc = trim(@shell_exec('command -v nproc'));
 
         if ($hasNproc !== '') {
@@ -89,6 +77,7 @@ final class CpuCoresCountProvider
             }
         }
 
+        // for MacOS
         $ncpu = trim(shell_exec('sysctl -n hw.ncpu'));
         $cpuCount = filter_var($ncpu, FILTER_VALIDATE_INT);
 
@@ -97,14 +86,14 @@ final class CpuCoresCountProvider
         }
 
         if (is_readable('/proc/cpuinfo')) {
-            $cpuinfo = file_get_contents('/proc/cpuinfo');
-            $cpuCount = substr_count($cpuinfo, 'processor');
+            $cpuInfo = file_get_contents('/proc/cpuinfo');
+            $cpuCount = substr_count($cpuInfo, 'processor');
 
             if ($cpuCount > 0) {
                 return $cpuCount;
             }
         }
 
-        throw new LogicException('Failed to detect number of CPUs!');
+        return 1;
     }
 }
