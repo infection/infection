@@ -41,7 +41,6 @@ use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
-use Infection\Command\RunCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
@@ -66,6 +65,7 @@ use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Runner\IndexedProcessBearer;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -96,7 +96,6 @@ final class ProjectCodeProvider
      */
     public const NON_TESTED_CONCRETE_CLASSES = [
         ConfigureCommand::class,
-        RunCommand::class,
         Application::class,
         ProgressFormatter::class,
         ComposerExecutableFinder::class,
@@ -113,6 +112,7 @@ final class ProjectCodeProvider
         NullSubscriber::class,
         FormatterName::class,
         ShellCommandLineExecutor::class,
+        CpuCoresCountProvider::class,
     ];
 
     /**

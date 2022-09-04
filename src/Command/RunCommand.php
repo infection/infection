@@ -57,9 +57,12 @@ use Infection\Logger\ConsoleLogger;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
+use function is_numeric;
+use function max;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
@@ -67,6 +70,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -177,7 +181,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_THREADS,
                 'j',
                 InputOption::VALUE_REQUIRED,
-                'Number of threads to use by the runner when executing the mutations',
+                'Number of threads to use by the runner when executing the mutations. Use "max" to auto calculate it.',
                 Container::DEFAULT_THREAD_COUNT
             )
             ->addOption(
@@ -478,8 +482,7 @@ final class RunCommand extends BaseCommand
                 ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
                 : $testFrameworkExtraOptions,
             $filter,
-            // TODO: more validation here?
-            (int) $input->getOption(self::OPTION_THREADS),
+            $this->getThreadCount($input),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             (bool) $input->getOption(self::OPTION_DRY_RUN),
             $gitDiffFilter,
@@ -642,5 +645,19 @@ final class RunCommand extends BaseCommand
             $useGitHubLogger,
             self::OPTION_LOGGER_GITHUB
         ));
+    }
+
+    private function getThreadCount(InputInterface $input): int
+    {
+        $threads = $input->getOption(self::OPTION_THREADS);
+
+        if (is_numeric($threads)) {
+            return (int) $threads;
+        }
+
+        Assert::same($threads, 'max', sprintf('The value of option `--threads` must be of type integer or string "max". String "%s" provided.', $threads));
+
+        // we subtract 1 here to not use all the available cores by Infection
+        return max(1, CpuCoresCountProvider::provide() - 1);
     }
 }
