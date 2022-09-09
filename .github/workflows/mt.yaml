@@ -12,7 +12,7 @@ on:
 
 env:
   MIN_MSI: 71.35
-  MIN_COVERED_MSI: 86.78
+  MIN_COVERED_MSI: 86.54
 
 jobs:
   tests:
