@@ -92,6 +92,7 @@ DIFF
     {
         return $node instanceof Node\Expr\BinaryOp\Coalesce
             && !$node->left instanceof Node\Expr\ConstFetch
-            && !$node->left instanceof Node\Expr\ClassConstFetch;
+            && !$node->left instanceof Node\Expr\ClassConstFetch
+            && !($node->right instanceof Node\Expr\ConstFetch && $node->right->name->toLowerString() === 'null');
     }
 }
