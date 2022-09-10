@@ -163,7 +163,7 @@ final class ConfigureCommand extends BaseCommand
         $io->newLine();
         $io->writeln(sprintf(
             'Configuration file "<comment>%s</comment>" was created.',
-            SchemaConfigurationLoader::DEFAULT_CONFIG_FILE
+            SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE
         ));
         $io->newLine();
 
@@ -223,7 +223,7 @@ final class ConfigureCommand extends BaseCommand
         ];
 
         file_put_contents(
-            SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
+            SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE,
             json_encode($configObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
     }

@@ -640,9 +640,8 @@ final class Container
                 array_filter(
                     [
                         $configFile,
-                        SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
-                        SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
-                    ]
+                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES,
+                    ],
                 )
             )
         );

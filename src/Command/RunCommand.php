@@ -568,10 +568,7 @@ final class RunCommand extends BaseCommand
     private function runConfigurationCommand(Locator $locator, IO $io): void
     {
         try {
-            $locator->locateOneOf([
-                SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
-                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
-            ]);
+            $locator->locateOneOf(SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES);
         } catch (FileNotFound|FileOrDirectoryNotFound $exception) {
             $configureCommand = $this->getApplication()->find('configure');
 

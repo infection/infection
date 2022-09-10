@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
+use ColinODell\Json5\SyntaxError;
 use Exception;
 use function get_class;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\sprintf;
-use Seld\JsonLint\ParsingException;
+use function sprintf;
 
 /**
  * @group integration
@@ -156,26 +156,11 @@ final class SchemaConfigurationFileTest extends TestCase
             self::FIXTURES_DIR . '/invalid-json',
             new InvalidFile(
                 sprintf(
-                    <<<'ERROR'
-Could not parse the JSON file "%s": Parse error on line 1:
-
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-ERROR
-                    ,
+                    'Could not parse the JSON file "%s": Unexpected EOF at line 1 column 1 of the JSON5 data',
                     self::FIXTURES_DIR . '/invalid-json'
                 ),
                 0,
-                new ParsingException(
-                    <<<'ERROR'
-Parse error on line 1:
-
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-ERROR
-                    ,
-                    []
-                )
+                new SyntaxError('Unexpected EOF', 1, 1),
             ),
         ];
     }
