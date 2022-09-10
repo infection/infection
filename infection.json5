@@ -11,7 +11,7 @@
             "report": "master"
         }
     },
-    mutators: {
+    "mutators": {
         "global-ignoreSourceCodeByRegex": [
             "Assert::.*"
         ],
