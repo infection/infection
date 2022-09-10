@@ -48,12 +48,11 @@ final class SchemaConfigurationLoader
         self::DEFAULT_DIST_JSON5_CONFIG_FILE,
         self::DEFAULT_DIST_JSON_CONFIG_FILE,
     ];
-
-    public const DEFAULT_DIST_JSON5_CONFIG_FILE = 'infection.json5.dist';
     public const DEFAULT_JSON5_CONFIG_FILE = 'infection.json5';
 
-    public const DEFAULT_DIST_JSON_CONFIG_FILE = 'infection.json.dist';
-    public const DEFAULT_JSON_CONFIG_FILE = 'infection.json';
+    private const DEFAULT_DIST_JSON5_CONFIG_FILE = 'infection.json5.dist';
+    private const DEFAULT_DIST_JSON_CONFIG_FILE = 'infection.json.dist';
+    private const DEFAULT_JSON_CONFIG_FILE = 'infection.json';
 
     private Locator $locator;
     private SchemaConfigurationFileLoader $fileLoader;
