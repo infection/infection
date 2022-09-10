@@ -7,7 +7,7 @@ if test ! -f "$(which expect)"; then
 fi
 
 cd $(dirname $0)
-rm -v -f infection.json infection.log
+rm -v -f infection.json5 infection.log
 
 set -e
 
@@ -27,4 +27,4 @@ unset GITHUB_ACTIONS
 
 trap 'echo Final check failed: $(tail -n+$LINENO $0 | head -n1)' ERR
 
-test -f infection.json
+test -f infection.json5
