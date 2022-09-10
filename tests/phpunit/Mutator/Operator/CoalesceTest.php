@@ -163,5 +163,33 @@ new class {
 };
 PHP
         ];
+
+        yield 'It does not mutate when null is used with one coalesce' => [
+            <<<'PHP'
+<?php
+
+$foo = 'foo';
+$foo ?? null;
+PHP
+            ,
+        ];
+
+        yield 'It does not move null from the last position with 2 coalesce' => [
+            <<<'PHP'
+<?php
+
+$foo = 'foo';
+$bar = 'bar';
+$foo ?? $bar ?? null;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$foo = 'foo';
+$bar = 'bar';
+$bar ?? $foo ?? null;
+PHP
+        ];
     }
 }
