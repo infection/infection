@@ -149,16 +149,6 @@ if (function_exists('proc_nice')) {
 }
 %s
 require_once '%s';
-//DG\BypassFinals::enable();
-
-
-//if (class_exists('DG\BypassFinals', true)) {
-//    throw new \Exception('BypassFinal exists');
-//}
-//
-//if (class_exists('Infection\StreamWrapper\IncludeInterceptor', false)) {
-//    throw new \Exception('IncludeInterceptor exists');
-//}
 
 PHP
             ,
