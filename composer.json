@@ -68,7 +68,7 @@
     },
     "conflict": {
         "phpunit/php-code-coverage": ">9 <9.1.4",
-        "dg/bypass-finals": "*"
+        "dg/bypass-finals": "<1.4.1"
     },
     "require-dev": {
         "ext-simplexml": "*",
