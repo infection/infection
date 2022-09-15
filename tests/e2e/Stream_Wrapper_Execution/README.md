@@ -5,6 +5,6 @@
 
 ## Summary
 
-`dg/bypass-finals` before version 0.14.1 overridden Infection's Stream Wrapper and Infection did not create any Mutants.
+`dg/bypass-finals` before version 1.4.1 overridden Infection's Stream Wrapper and Infection did not create any Mutants.
 
-This tests ensures that starting from 0.14.1 `dg/bypass-finals` works good and do not "disables" Infection's Stream Wrapper.
+This tests ensures that starting from 1.4.1 `dg/bypass-finals` works good and do not "disables" Infection's Stream Wrapper.
