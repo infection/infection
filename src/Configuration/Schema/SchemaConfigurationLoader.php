@@ -42,8 +42,17 @@ use Infection\FileSystem\Locator\Locator;
  */
 final class SchemaConfigurationLoader
 {
-    public const DEFAULT_DIST_CONFIG_FILE = 'infection.json.dist';
-    public const DEFAULT_CONFIG_FILE = 'infection.json';
+    public const POSSIBLE_DEFAULT_CONFIG_FILES = [
+        self::DEFAULT_JSON5_CONFIG_FILE,
+        self::DEFAULT_JSON_CONFIG_FILE,
+        self::DEFAULT_DIST_JSON5_CONFIG_FILE,
+        self::DEFAULT_DIST_JSON_CONFIG_FILE,
+    ];
+    public const DEFAULT_JSON5_CONFIG_FILE = 'infection.json5';
+
+    private const DEFAULT_DIST_JSON5_CONFIG_FILE = 'infection.json5.dist';
+    private const DEFAULT_DIST_JSON_CONFIG_FILE = 'infection.json.dist';
+    private const DEFAULT_JSON_CONFIG_FILE = 'infection.json';
 
     private Locator $locator;
     private SchemaConfigurationFileLoader $fileLoader;
