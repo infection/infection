@@ -42,6 +42,7 @@ use function filter_var;
 use function function_exists;
 use function is_int;
 use function is_readable;
+use Safe\Exceptions\ExecException;
 use function Safe\file_get_contents;
 use function Safe\shell_exec;
 use function substr_count;
@@ -65,24 +66,30 @@ final class CpuCoresCountProvider
             return 1;
         }
 
-        // for Linux
-        $hasNproc = trim(@shell_exec('command -v nproc'));
+        try {
+            // for Linux
+            $hasNproc = trim(@shell_exec('command -v nproc'));
 
-        if ($hasNproc !== '') {
-            $nproc = trim(shell_exec('nproc'));
-            $cpuCount = filter_var($nproc, FILTER_VALIDATE_INT);
+            if ($hasNproc !== '') {
+                $nproc = trim(shell_exec('nproc'));
+                $cpuCount = filter_var($nproc, FILTER_VALIDATE_INT);
+
+                if (is_int($cpuCount)) {
+                    return $cpuCount;
+                }
+            }
+        } catch (ExecException) {
+        }
+
+        try {
+            // for MacOS
+            $ncpu = trim(shell_exec('sysctl -n hw.ncpu'));
+            $cpuCount = filter_var($ncpu, FILTER_VALIDATE_INT);
 
             if (is_int($cpuCount)) {
                 return $cpuCount;
             }
-        }
-
-        // for MacOS
-        $ncpu = trim(shell_exec('sysctl -n hw.ncpu'));
-        $cpuCount = filter_var($ncpu, FILTER_VALIDATE_INT);
-
-        if (is_int($cpuCount)) {
-            return $cpuCount;
+        } catch (ExecException) {
         }
 
         if (is_readable('/proc/cpuinfo')) {
