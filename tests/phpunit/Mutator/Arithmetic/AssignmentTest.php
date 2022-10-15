@@ -218,5 +218,14 @@ PHP
 $a = $b;
 PHP
         ];
+
+        yield 'It does not mutate Coalesce operator' => [
+            <<<'PHP'
+<?php
+
+$a ??= $b;
+PHP
+            ,
+        ];
     }
 }
