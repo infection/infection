@@ -175,6 +175,7 @@ final class ProfileList
 
     public const REMOVAL_PROFILE = [
         Mutator\Removal\ArrayItemRemoval::class,
+        Mutator\Removal\CatchBlockRemoval::class,
         Mutator\Removal\CloneRemoval::class,
         Mutator\Removal\ConcatOperandRemoval::class,
         Mutator\Removal\FunctionCallRemoval::class,
@@ -378,6 +379,7 @@ final class ProfileList
 
         // Removal
         'ArrayItemRemoval' => Mutator\Removal\ArrayItemRemoval::class,
+        'CatchBlockRemoval' => Mutator\Removal\CatchBlockRemoval::class,
         'CloneRemoval' => Mutator\Removal\CloneRemoval::class,
         'ConcatOperandRemoval' => Mutator\Removal\ConcatOperandRemoval::class,
         'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
