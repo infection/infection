@@ -248,6 +248,7 @@ final class ProfileList
         Mutator\Unwrap\UnwrapArrayUintersectUassoc::class,
         Mutator\Unwrap\UnwrapArrayUnique::class,
         Mutator\Unwrap\UnwrapArrayValues::class,
+        Mutator\Unwrap\UnwrapFinally::class,
         Mutator\Unwrap\UnwrapLcFirst::class,
         Mutator\Unwrap\UnwrapLtrim::class,
         Mutator\Unwrap\UnwrapRtrim::class,
@@ -460,6 +461,7 @@ final class ProfileList
         'UnwrapTrim' => Mutator\Unwrap\UnwrapTrim::class,
         'UnwrapUcFirst' => Mutator\Unwrap\UnwrapUcFirst::class,
         'UnwrapUcWords' => Mutator\Unwrap\UnwrapUcWords::class,
+        'UnwrapFinally' => Unwrap\UnwrapFinally::class,
 
         // Extensions
         'BCMath' => Mutator\Extensions\BCMath::class,

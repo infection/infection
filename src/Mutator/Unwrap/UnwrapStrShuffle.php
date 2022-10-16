@@ -41,7 +41,7 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapStrShuffle extends AbstractUnwrapMutator
+final class UnwrapStrShuffle extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {

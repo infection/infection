@@ -33,67 +33,73 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Unwrap;
+namespace Infection\Tests\Mutator\Unwrap;
 
-use function array_key_exists;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use PhpParser\Node;
-use function strtolower;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-/**
- * @internal
- *
- * @implements Mutator<Node\Expr\FuncCall>
- */
-abstract class AbstractUnwrapMutator implements Mutator
+final class UnwrapFinallyTest extends BaseMutatorTestCase
 {
-    use GetMutatorName;
-
     /**
-     * @psalm-mutation-free
+     * @dataProvider mutationsProvider
      *
-     * @return iterable<Node\Arg>
+     * @param string|string[] $expected
+     * @param mixed[] $settings
      */
-    final public function mutate(Node $node): iterable
+    public function test_it_can_mutate(string $input, array|string $expected = [], array $settings = []): void
     {
-        foreach ($this->getParameterIndexes($node) as $index) {
-            if ($node->args[$index] instanceof Node\VariadicPlaceholder) {
-                continue;
-            }
-
-            if ($node->args[$index]->unpack) {
-                continue;
-            }
-
-            yield $node->args[$index];
-        }
+        $this->doTest($input, $expected, $settings);
     }
 
-    final public function canMutate(Node $node): bool
+    public function mutationsProvider(): iterable
     {
-        if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
-            return false;
-        }
+        yield 'Can unwrap try-finally block without catches' => [
+            '<?php
 
-        foreach ($this->getParameterIndexes($node) as $index) {
-            if (!array_key_exists($index, $node->args)) {
-                return false;
-            }
-        }
-
-        return $node->name->toLowerString() === strtolower($this->getFunctionName());
+function withoutChecks(callable $fn): void
+{
+    $this->useChecks = false;
+    try {
+        $fn();
+    } finally {
+        $this->useChecks = true;
     }
+}',
+            '<?php
 
-    abstract protected function getFunctionName(): string;
+function withoutChecks(callable $fn) : void
+{
+    $this->useChecks = false;
+    $fn();
+    $this->useChecks = true;
+}',
+        ];
 
-    /**
-     * @psalm-mutation-free
-     *
-     * @return iterable<int>
-     */
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
-    {
-        yield 0;
+        yield 'Can unwrap finally statements and leave try-catch' => [
+            '<?php
+
+function withoutChecks(callable $fn): void
+{
+    $this->useChecks = false;
+    try {
+        $fn();
+    } catch (\Throwable $e) {
+        throw $e;
+    } finally {
+        $this->useChecks = true;
+    }
+}',
+            '<?php
+
+function withoutChecks(callable $fn) : void
+{
+    $this->useChecks = false;
+    try {
+        $fn();
+    } catch (\Throwable $e) {
+        throw $e;
+    }
+    $this->useChecks = true;
+}',
+        ];
     }
 }

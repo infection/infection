@@ -45,7 +45,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapArrayIntersectUkey extends AbstractUnwrapMutator
+final class UnwrapArrayIntersectUkey extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
