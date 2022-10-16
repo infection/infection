@@ -178,6 +178,7 @@ final class ProfileList
         Mutator\Removal\CloneRemoval::class,
         Mutator\Removal\ConcatOperandRemoval::class,
         Mutator\Removal\FunctionCallRemoval::class,
+        Mutator\Removal\MatchArmRemoval::class,
         Mutator\Removal\MethodCallRemoval::class,
         Mutator\Removal\SharedCaseRemoval::class,
     ];
@@ -381,6 +382,7 @@ final class ProfileList
         'CloneRemoval' => Mutator\Removal\CloneRemoval::class,
         'ConcatOperandRemoval' => Mutator\Removal\ConcatOperandRemoval::class,
         'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
+        'MatchArmRemoval' => Mutator\Removal\MatchArmRemoval::class,
         'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
         'SharedCaseRemoval' => Mutator\Removal\SharedCaseRemoval::class,
 
