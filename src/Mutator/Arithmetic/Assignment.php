@@ -79,6 +79,6 @@ DIFF
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\AssignOp;
+        return $node instanceof Node\Expr\AssignOp && !$node instanceof Node\Expr\AssignOp\Coalesce;
     }
 }
