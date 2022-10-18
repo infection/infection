@@ -9,7 +9,7 @@
         "PublicVisibility": true
     },
     "logs": {
-        "perMutator": "infection.log"
+        "summary": "infection.log"
     },
     "tmpDir": "."
 }
