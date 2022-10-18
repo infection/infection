@@ -318,7 +318,7 @@ class Child extends SameAbstract
 PHP
         ];
 
-        yield 'It does mutates anonymous classes' => [
+        yield 'It does mutate anonymous classes' => [
             <<<'PHP'
             <?php
 
