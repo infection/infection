@@ -152,6 +152,7 @@ final class ProfileList
     public const OPERATOR_PROFILE = [
         Mutator\Operator\AssignCoalesce::class,
         Mutator\Operator\Break_::class,
+        Mutator\Operator\Catch_::class,
         Mutator\Operator\Coalesce::class,
         Mutator\Operator\Concat::class,
         Mutator\Operator\Continue_::class,
@@ -369,6 +370,7 @@ final class ProfileList
         'SpreadRemoval' => Mutator\Operator\SpreadRemoval::class,
         'Ternary' => Mutator\Operator\Ternary::class,
         'Throw_' => Mutator\Operator\Throw_::class,
+        'Catch_' => Mutator\Operator\Catch_::class,
 
         // Regex
         'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
