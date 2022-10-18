@@ -332,6 +332,7 @@
                 },
                 "CatchBlockRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "FunctionCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "MatchArmRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "MethodCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "CloneRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ConcatOperandRemoval": { "$ref": "#/definitions/default-mutator-config" },
