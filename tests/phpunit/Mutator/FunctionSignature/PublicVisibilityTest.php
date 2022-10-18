@@ -317,5 +317,31 @@ class Child extends SameAbstract
 }
 PHP
         ];
+
+        yield 'It does mutates anonymous classes' => [
+            <<<'PHP'
+            <?php
+
+            $var = [
+                'class' => new class() {
+                    public function foo(): bool
+                    {
+                        return true;
+                    }
+                },
+            ];
+            PHP,
+            <<<'PHP'
+            <?php
+
+            $var = ['class' => new class
+            {
+                protected function foo() : bool
+                {
+                    return true;
+                }
+            }];
+            PHP,
+        ];
     }
 }
