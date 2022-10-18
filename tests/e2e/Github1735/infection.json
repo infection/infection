@@ -1,0 +1,15 @@
+{
+    "timeout": 3,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "mutators": {
+        "PublicVisibility": true
+    },
+    "logs": {
+        "perMutator": "infection.log"
+    },
+    "tmpDir": "."
+}
