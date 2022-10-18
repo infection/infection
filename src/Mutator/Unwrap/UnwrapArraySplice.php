@@ -41,7 +41,7 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapArraySplice extends AbstractUnwrapMutator
+final class UnwrapArraySplice extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {

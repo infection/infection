@@ -390,6 +390,7 @@
                 "UnwrapArrayUintersectUassoc": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapArrayUnique": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapArrayValues": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapFinally": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapLcFirst": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapLtrim": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapRtrim": { "$ref": "#/definitions/default-mutator-config" },

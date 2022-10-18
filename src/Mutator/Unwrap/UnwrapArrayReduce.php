@@ -42,7 +42,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapArrayReduce extends AbstractUnwrapMutator
+final class UnwrapArrayReduce extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {

@@ -44,7 +44,7 @@ use function range;
 /**
  * @internal
  */
-final class UnwrapArrayMap extends AbstractUnwrapMutator
+final class UnwrapArrayMap extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {

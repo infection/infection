@@ -35,52 +35,66 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use function array_keys;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\TryCatch>
  */
-final class UnwrapArrayReplaceRecursive extends AbstractFunctionUnwrapMutator
+final class UnwrapFinally implements Mutator
 {
+    use GetMutatorName;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            <<<'TXT'
-Replaces an `array_replace_recursive` function call with its first operand. For example:
-
-```php
-$x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
-```
-
-Will be mutated to:
-
-```php
-$x = ['foo', 'bar', 'baz'];
-```
-TXT
-            ,
+            'Replaces `try-catch-finally` block with try-catch or try-finally with simple statements.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
-+ $x = ['foo', 'bar', 'baz'];
+$check = true;
+- try {
+-     $callback();
+- }
+- } finally {
+-     $check = false;
+- }
++ $callback();
++ $check = false
 DIFF
         );
     }
 
-    protected function getFunctionName(): string
+    public function canMutate(Node $node): bool
     {
-        return 'array_replace_recursive';
+        return $node instanceof Node\Stmt\TryCatch
+            && $node->finally !== null;
     }
 
     /**
      * @psalm-mutation-free
+     *
+     * @return iterable<list<Node\Stmt>>
      */
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
+    public function mutate(Node $node): iterable
     {
-        yield from array_keys($node->args);
+        if ($node->catches === []) {
+            yield [
+                ...$node->stmts,
+                ...($node->finally->stmts ?? []),
+            ];
+
+            return;
+        }
+
+        yield [
+            new Node\Stmt\TryCatch($node->stmts, $node->catches, null, $node->getAttributes()),
+            ...($node->finally->stmts ?? []),
+        ];
     }
 }

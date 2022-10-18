@@ -41,7 +41,7 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapLtrim extends AbstractUnwrapMutator
+final class UnwrapLtrim extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {

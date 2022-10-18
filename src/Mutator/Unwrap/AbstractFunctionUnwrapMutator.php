@@ -35,52 +35,65 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use function array_keys;
-use Infection\Mutator\Definition;
-use Infection\Mutator\MutatorCategory;
+use function array_key_exists;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
+use function strtolower;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\FuncCall>
  */
-final class UnwrapArrayReplaceRecursive extends AbstractFunctionUnwrapMutator
+abstract class AbstractFunctionUnwrapMutator implements Mutator
 {
-    public static function getDefinition(): ?Definition
-    {
-        return new Definition(
-            <<<'TXT'
-Replaces an `array_replace_recursive` function call with its first operand. For example:
-
-```php
-$x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
-```
-
-Will be mutated to:
-
-```php
-$x = ['foo', 'bar', 'baz'];
-```
-TXT
-            ,
-            MutatorCategory::SEMANTIC_REDUCTION,
-            null,
-            <<<'DIFF'
-- $x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
-+ $x = ['foo', 'bar', 'baz'];
-DIFF
-        );
-    }
-
-    protected function getFunctionName(): string
-    {
-        return 'array_replace_recursive';
-    }
+    use GetMutatorName;
 
     /**
      * @psalm-mutation-free
+     *
+     * @return iterable<Node\Arg>
+     */
+    final public function mutate(Node $node): iterable
+    {
+        foreach ($this->getParameterIndexes($node) as $index) {
+            if ($node->args[$index] instanceof Node\VariadicPlaceholder) {
+                continue;
+            }
+
+            if ($node->args[$index]->unpack) {
+                continue;
+            }
+
+            yield $node->args[$index];
+        }
+    }
+
+    final public function canMutate(Node $node): bool
+    {
+        if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
+            return false;
+        }
+
+        foreach ($this->getParameterIndexes($node) as $index) {
+            if (!array_key_exists($index, $node->args)) {
+                return false;
+            }
+        }
+
+        return $node->name->toLowerString() === strtolower($this->getFunctionName());
+    }
+
+    abstract protected function getFunctionName(): string;
+
+    /**
+     * @psalm-mutation-free
+     *
+     * @return iterable<int>
      */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
-        yield from array_keys($node->args);
+        yield 0;
     }
 }

@@ -43,7 +43,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapArrayMergeRecursive extends AbstractUnwrapMutator
+final class UnwrapArrayMergeRecursive extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
