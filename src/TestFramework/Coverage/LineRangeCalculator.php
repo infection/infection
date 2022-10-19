@@ -44,15 +44,17 @@ use PhpParser\Node;
  */
 final class LineRangeCalculator
 {
-    public function calculateRange(Node $node): NodeLineRangeData
+    public function calculateRange(Node $originalNode): NodeLineRangeData
     {
-        $node = $this->getOuterMostArrayNode($node);
+        if ($originalNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false) === true) {
+            $startLine = $originalNode->getStartLine();
+            // function signature node should always be 1-line range: (start, start)
+            return new NodeLineRangeData($startLine, $startLine);
+        }
 
-        $endLine = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false) === true
-            ? $node->getStartLine() // function signature node should always be 1-line range: (start, start)
-            : $node->getEndLine();
+        $outerMostArrayNode = $this->getOuterMostArrayNode($originalNode);
 
-        return new NodeLineRangeData($node->getStartLine(), $endLine);
+        return new NodeLineRangeData($outerMostArrayNode->getStartLine(), $outerMostArrayNode->getEndLine());
     }
 
     /**
