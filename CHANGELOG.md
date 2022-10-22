@@ -1,5 +1,25 @@
 # Change Log
 
+## [0.26.16](https://github.com/infection/infection/tree/0.26.16) (2022-10-22)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.26.15...0.25.16)
+
+**Added:**
+
+* Add new `MatchArmRemoval` mutator https://github.com/infection/infection/pull/1744
+* Add new `CatchBlockRemoval` mutator https://github.com/infection/infection/pull/1742
+* Add new `Catch`_ mutator https://github.com/infection/infection/pull/1741
+* Add new `UnwrapFinally` mutator https://github.com/infection/infection/pull/1740
+
+**Fixed:**
+
+* Fix the issue with anonymous classes inside arrays https://github.com/infection/infection/pull/1745
+
+**Changed:**
+
+* Do not mutate coalesce operator in the Assignment mutator mutator https://github.com/infection/infection/pull/1739
+* Make CPU cores count more tolerant towards system command errors  https://github.com/infection/infection/pull/1733
+
 ## [0.26.0](https://github.com/infection/infection/tree/0.26.0) (2022-01-10)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.26.0...0.25.4)
