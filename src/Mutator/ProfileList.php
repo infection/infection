@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use function array_values;
 use Infection\CannotBeInstantiated;
 use Infection\Mutator;
 
@@ -100,6 +99,9 @@ final class ProfileList
         // IdenticalEqual disabled from the default boolean profile
         Mutator\Boolean\InstanceOf_::class,
         Mutator\Boolean\LogicalAnd::class,
+        Mutator\Boolean\LogicalAndNegateAllSubExpressions::class,
+        Mutator\Boolean\LogicalAndNegateSingleSubExpression::class,
+        Mutator\Boolean\LogicalAndNegation::class,
         Mutator\Boolean\LogicalLowerAnd::class,
         Mutator\Boolean\LogicalLowerOr::class,
         Mutator\Boolean\LogicalNot::class,
@@ -156,7 +158,9 @@ final class ProfileList
         Mutator\Operator\Coalesce::class,
         Mutator\Operator\Concat::class,
         Mutator\Operator\Continue_::class,
+        Mutator\Operator\ElseifNegation::class,
         Mutator\Operator\Finally_::class,
+        Mutator\Operator\IfNegation::class,
         Mutator\Operator\NullSafeMethodCall::class,
         Mutator\Operator\NullSafePropertyCall::class,
         Mutator\Operator\SpreadAssignment::class,
@@ -324,10 +328,16 @@ final class ProfileList
         'IdenticalEqual' => Mutator\Boolean\IdenticalEqual::class,
         'InstanceOf_' => Mutator\Boolean\InstanceOf_::class,
         'LogicalAnd' => Mutator\Boolean\LogicalAnd::class,
+        'LogicalAndNegateAllSubExpressions' => Mutator\Boolean\LogicalAndNegateAllSubExpressions::class,
+        'LogicalAndNegateSingleSubExpression' => Mutator\Boolean\LogicalAndNegateSingleSubExpression::class,
+        'LogicalAndNegation' => Mutator\Boolean\LogicalAndNegation::class,
         'LogicalLowerAnd' => Mutator\Boolean\LogicalLowerAnd::class,
         'LogicalLowerOr' => Mutator\Boolean\LogicalLowerOr::class,
         'LogicalNot' => Mutator\Boolean\LogicalNot::class,
         'LogicalOr' => Mutator\Boolean\LogicalOr::class,
+        'LogicalOrNegateAllSubExpressions' => Mutator\Boolean\LogicalOrNegateAllSubExpressions::class,
+        'LogicalOrNegateSingleSubExpression' => Mutator\Boolean\LogicalOrNegateSingleSubExpression::class,
+        'LogicalOrNegation' => Mutator\Boolean\LogicalOrNegation::class,
         'NotEqualNotIdentical' => Mutator\Boolean\NotEqualNotIdentical::class,
         'NotIdenticalNotEqual' => Mutator\Boolean\NotIdenticalNotEqual::class,
         'TrueValue' => Mutator\Boolean\TrueValue::class,
@@ -364,7 +374,9 @@ final class ProfileList
         'Coalesce' => Mutator\Operator\Coalesce::class,
         'Concat' => Mutator\Operator\Concat::class,
         'Continue_' => Mutator\Operator\Continue_::class,
+        'ElseifNegation' => Mutator\Operator\ElseifNegation::class,
         'Finally_' => Mutator\Operator\Finally_::class,
+        'IfNegation' => Mutator\Operator\IfNegation::class,
         'NullSafeMethodCall' => Mutator\Operator\NullSafeMethodCall::class,
         'NullSafePropertyCall' => Mutator\Operator\NullSafePropertyCall::class,
         'SpreadAssignment' => Mutator\Operator\SpreadAssignment::class,
