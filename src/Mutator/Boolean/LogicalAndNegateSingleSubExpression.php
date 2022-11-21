@@ -43,7 +43,7 @@ use Infection\Mutator\Util\NegateExpression;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
-class LogicalAndNegateSingleSubExpression extends AbstractLogicalOperatorNegationOnSubExpressionsMutator
+final class LogicalAndNegateSingleSubExpression extends AbstractLogicalOperatorNegationOnSubExpressionsMutator
 {
     use NegateExpression;
     use BooleanAndNegateSubExpressions;
