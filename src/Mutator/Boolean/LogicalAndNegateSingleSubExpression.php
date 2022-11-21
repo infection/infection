@@ -37,16 +37,16 @@ namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\BooleanAndNegateSubExpressions;
-use Infection\Mutator\Util\NegateExpression;
+use Infection\Mutator\Util\Visitor;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 
-final class LogicalAndNegateSingleSubExpression extends AbstractLogicalOperatorNegationOnSubExpressionsMutator
+final class LogicalAndNegateSingleSubExpression implements Mutator
 {
-    use NegateExpression;
-    use BooleanAndNegateSubExpressions;
+    use GetMutatorName;
 
     public static function getDefinition(): ?Definition
     {
@@ -73,17 +73,17 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        $subExpressions = $this->explodeExpressions($node);
+        $counter = new Visitor\LogicalAnd\CountSubExpressionsToNegateVisitor;
 
-        foreach ($subExpressions as $index => $expression) {
-            if (!$this->isComparisonOrNegation($expression)) {
-                $newExpressions = array_replace(
-                    $subExpressions,
-                    [$index => new Node\Expr\BooleanNot($expression)]
-                );
+        $traverser = new NodeTraverser;
+        $traverser->addVisitor($counter);
+        $traverser->traverse([$node]);
 
-                yield $this->implode($newExpressions, $node->getAttributes());
-            }
+        for ($i = 0; $i < $counter->getCount(); $i++) {
+            $traverser = new NodeTraverser();
+            $traverser->addVisitor(new Visitor\LogicalAnd\NegateOnlySingleSubExpressionVisitor($i));
+
+            yield from $traverser->traverse([clone $node]);
         }
     }
 

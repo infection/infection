@@ -37,16 +37,17 @@ namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\BooleanAndNegateSubExpressions;
 use Infection\Mutator\Util\NegateExpression;
+use Infection\Mutator\Util\Visitor;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 
-final class LogicalAndNegateAllSubExpressions extends AbstractLogicalOperatorNegationOnSubExpressionsMutator
+final class LogicalAndNegateAllSubExpressions implements Mutator
 {
-    use NegateExpression;
-    use BooleanAndNegateSubExpressions;
+    use GetMutatorName;
 
     public static function getDefinition(): ?Definition
     {
@@ -72,17 +73,10 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        $subExpressions = $this->explodeExpressions($node);
+        $traverser = new NodeTraverser;
+        $traverser->addVisitor(new Visitor\LogicalAnd\NegateAllSubExpressionsVisitor);
 
-        $allNegatedExpressions = array_map(
-            fn (Node\Expr $expr) => $this->negateExpression($expr),
-            $subExpressions
-        );
-
-        yield $this->implode(
-            $allNegatedExpressions,
-            $node->getAttributes()
-        );
+        yield from $traverser->traverse([clone $node]);
     }
 
     public function canMutate(Node $node): bool
