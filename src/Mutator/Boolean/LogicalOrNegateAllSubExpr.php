@@ -50,7 +50,7 @@ final class LogicalOrNegateAllSubExpr implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Negates all sub-expressions at once in OR (`||`). No matter how many sub-expressions, but all should be connected with OR (`||`) operator.
+Negates all sub-expressions at once in OR (`||`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

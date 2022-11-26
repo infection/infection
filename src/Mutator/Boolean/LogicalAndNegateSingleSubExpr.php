@@ -39,7 +39,6 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractNegateSingleSubExpr;
-use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 final class LogicalAndNegateSingleSubExpr extends AbstractNegateSingleSubExpr
@@ -50,7 +49,7 @@ final class LogicalAndNegateSingleSubExpr extends AbstractNegateSingleSubExpr
     {
         return new Definition(
             <<<'TXT'
-Negates all sub-expressions separately in AND (`&&`). No matter how many sub-expressions, but all should be connected with AND (`&&`) operator.
+Negates all sub-expressions separately in AND (`&&`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
@@ -65,20 +64,9 @@ DIFF
         );
     }
 
-    public function canMutate(Node $node): bool
+    public function instanceOf(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\BinaryOp\BooleanAnd) {
-            return false;
-        }
-
-        $parent = ParentConnector::findParent($node);
-
-        return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanAnd; // only grandparent
-    }
-
-    public function instanceOf(Node\Expr $expr): bool
-    {
-        return $expr instanceof Node\Expr\BinaryOp\BooleanAnd;
+        return $node instanceof Node\Expr\BinaryOp\BooleanAnd;
     }
 
     public function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr

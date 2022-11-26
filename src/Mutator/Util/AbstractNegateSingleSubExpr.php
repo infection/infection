@@ -37,6 +37,7 @@ namespace Infection\Mutator\Util;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\SimpleExpression;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 abstract class AbstractNegateSingleSubExpr implements Mutator
@@ -56,7 +57,18 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
         }
     }
 
-    abstract public function instanceOf(Node\Expr $expr): bool;
+    public function canMutate(Node $node): bool
+    {
+        if (!$this->instanceOf($node)) {
+            return false;
+        }
+
+        $parent = ParentConnector::findParent($node);
+
+        return $parent !== null && !$this->instanceOf($parent); // only grandparent
+    }
+
+    abstract public function instanceOf(Node $node): bool;
 
     abstract public function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr;
 
