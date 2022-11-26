@@ -79,7 +79,7 @@ DIFF
 
         $parent = ParentConnector::findParent($node);
 
-        if ($parent instanceof  Node\Expr\BinaryOp\BooleanOr) {
+        if ($parent instanceof Node\Expr\BinaryOp\BooleanOr) {
             return false;
         }
 

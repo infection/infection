@@ -33,19 +33,61 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator\Boolean;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\Negation\Driver\BooleanOrDriver;
+use Infection\PhpParser\Visitor\Negation\NegateOnlySingleSubExpressionVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 
-trait BooleanOrNegateSubExpressions
+final class LogicalOrNegateSingleSubExpr implements Mutator
 {
-    protected function createNewInstance(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Expr\BinaryOp\BooleanOr($left, $right, $attributes);
+        return new Definition(
+            <<<'TXT'
+Negates all sub-expressions separately in OR (`||`). No matter how many sub-expressions, but all should be connected with OR (`||`) operator.
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null,
+            <<<'DIFF'
+- $a = $b || $c;
+# Mutation 1
++ $a = !$b || $c;
+# Mutation 2
++ $a = $b || !$c;
+DIFF
+        );
     }
 
-    protected function instanceof(Node $node): bool
+    /**
+     * @param Node\Expr\BinaryOp\BooleanAnd $node
+     * @return iterable
+     */
+    public function mutate(Node $node): iterable
     {
-        return $node instanceof Node\Expr\BinaryOp\BooleanOr;
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NegateOnlySingleSubExpressionVisitor(new BooleanOrDriver()));
+
+        yield from $traverser->traverse([$node]);
+    }
+
+    public function canMutate(Node $node): bool
+    {
+        if (!$node instanceof Node\Expr\BinaryOp\BooleanOr) {
+            return false;
+        }
+
+        $parent = ParentConnector::findParent($node);
+
+        return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanOr; // only grandparent
     }
 }

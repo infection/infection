@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-class LogicalOrNegateSingleSubExpressionTest extends BaseMutatorTestCase
+class LogicalOrNegateAllSubExprTest extends BaseMutatorTestCase
 {
     /**
      * @group manhunto
@@ -53,7 +53,7 @@ class LogicalOrNegateSingleSubExpressionTest extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield 'It mutates or with two expressions' => [
+        yield 'It mutates oe with two expressions' => [
             <<<'PHP'
 <?php
 
@@ -64,17 +64,13 @@ PHP
                 <<<'PHP'
 <?php
 
-$var = !a() || b();
-PHP,
-                <<<'PHP'
-<?php
-
-$var = a() || !b();
+$var = !a() || !b();
 PHP
+                ,
             ]
         ];
 
-        yield 'It mutates or with more expressions' => [
+        yield 'It mutates oe with more expressions' => [
             <<<'PHP'
 <?php
 
@@ -85,30 +81,13 @@ PHP
                 <<<'PHP'
 <?php
 
-$var = !a() || b() || c() || d();
+$var = !a() || !b() || !c() || !d();
 PHP
                 ,
-                <<<'PHP'
-<?php
-
-$var = a() || !b() || c() || d();
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-$var = a() || b() || !c() || d();
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-$var = a() || b() || c() || !d();
-PHP
             ]
         ];
 
-        yield 'It does not mutate equal expressions' => [
+        yield 'It mutates equal' => [
             <<<'PHP'
 <?php
 
@@ -119,13 +98,13 @@ PHP
                 <<<'PHP'
 <?php
 
-$var = !a() || b() == 1;
+$var = !a() || !(b() == 1);
 PHP
                 ,
             ]
         ];
 
-        yield 'It does not mutate not equal expressions' => [
+        yield 'It mutates not equal' => [
             <<<'PHP'
 <?php
 
@@ -136,13 +115,13 @@ PHP
                 <<<'PHP'
 <?php
 
-$var = !a() || b() != 1;
+$var = !a() || !(b() != 1);
 PHP
                 ,
             ]
         ];
 
-        yield 'It does not mutate identical expressions' => [
+        yield 'It mutates identical' => [
             <<<'PHP'
 <?php
 
@@ -153,13 +132,13 @@ PHP
                 <<<'PHP'
 <?php
 
-$var = !a() || b() === 1;
+$var = !a() || !(b() === 1);
 PHP
                 ,
             ]
         ];
 
-        yield 'It does not mutate not identical expressions' => [
+        yield 'It mutates not identical' => [
             <<<'PHP'
 <?php
 
@@ -170,13 +149,13 @@ PHP
                 <<<'PHP'
 <?php
 
-$var = !a() || b() !== 1;
+$var = !a() || !(b() !== 1);
 PHP
                 ,
             ]
         ];
 
-        yield 'It does not mutate already negated expressions' => [
+        yield 'It mutates already negated expressions' => [
             <<<'PHP'
 <?php
 
@@ -187,7 +166,7 @@ PHP
                 <<<'PHP'
 <?php
 
-$var = !(!a() || !b());
+$var = !(!a() || b());
 PHP
                 ,
             ]

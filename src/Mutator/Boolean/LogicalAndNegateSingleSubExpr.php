@@ -36,32 +36,35 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\BooleanOrNegateSubExpressions;
-use Infection\Mutator\Util\NegateExpression;
+use Infection\PhpParser\Visitor\Negation\Driver\BooleanAndDriver;
+use Infection\PhpParser\Visitor\Negation\NegateOnlySingleSubExpressionVisitor;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use PhpParser\NodeDumper;
+use PhpParser\NodeTraverser;
 
-final class LogicalOrNegateSingleSubExpression extends AbstractLogicalOperatorNegationOnSubExpressionsMutator
+final class LogicalAndNegateSingleSubExpr implements Mutator
 {
-    use NegateExpression;
-    use BooleanOrNegateSubExpressions;
+    use GetMutatorName;
 
     public static function getDefinition(): ?Definition
     {
         return new Definition(
             <<<'TXT'
-Negates all sub-expressions separately in OR (`||`). No matter how many sub-expressions, but all should be connected with OR (`||`) operator.
+Negates all sub-expressions separately in AND (`&&`). No matter how many sub-expressions, but all should be connected with AND (`&&`) operator.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b || $c;
+- $a = $b && $c;
 # Mutation 1
-+ $a = !$b || $c;
++ $a = !$b && $c;
 # Mutation 2
-+ $a = $b || !$c;
++ $a = $b && !$c;
 DIFF
         );
     }
@@ -72,28 +75,20 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        $subExpressions = $this->explodeExpressions($node);
+        $traverser = new NodeTraverser;
+        $traverser->addVisitor(new NegateOnlySingleSubExpressionVisitor(new BooleanAndDriver));
 
-        foreach ($subExpressions as $index => $expression) {
-            if (!$this->isComparisonOrNegation($expression)) {
-                $newExpressions = array_replace(
-                    $subExpressions,
-                    [$index => new Node\Expr\BooleanNot($expression)]
-                );
-
-                yield $this->implode($newExpressions, $node->getAttributes());
-            }
-        }
+        yield from $traverser->traverse([$node]);
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\BinaryOp\BooleanOr) {
+        if (!$node instanceof Node\Expr\BinaryOp\BooleanAnd) {
             return false;
         }
 
         $parent = ParentConnector::findParent($node);
 
-        return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanOr; // only grandparent
+        return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanAnd; // only grandparent
     }
 }

@@ -77,7 +77,6 @@ if (!$this->fooBar()) {
     return 3;
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate already negated expression' => [
@@ -87,7 +86,6 @@ PHP
 if (!$this->fooBar()) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate equal comparison' => [
@@ -97,7 +95,6 @@ PHP
 if ($this->fooBar() == 1) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate not equal comparison' => [
@@ -107,7 +104,6 @@ PHP
 if ($this->fooBar() != 1) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate identical comparison' => [
@@ -117,7 +113,6 @@ PHP
 if ($this->fooBar() === true) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate not identical comparison' => [
@@ -127,7 +122,6 @@ PHP
 if ($this->fooBar() !== true) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate and condition' => [
@@ -137,7 +131,6 @@ PHP
 if (a() && b()) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate or condition' => [
@@ -147,7 +140,6 @@ PHP
 if (a() || b()) {
 }
 PHP
-            ,
         ];
     }
 }

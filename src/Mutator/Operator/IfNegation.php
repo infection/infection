@@ -39,13 +39,11 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\NegateExpression;
 use PhpParser\Node;
 
 final class IfNegation implements Mutator
 {
     use GetMutatorName;
-    use NegateExpression;
 
     public static function getDefinition(): ?Definition
     {
@@ -82,8 +80,15 @@ DIFF
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\If_
-            && !$this->isLogicalOperator($node->cond)
-            && !$this->isComparisonOrNegation($node->cond);
+        if (!$node instanceof Node\Stmt\If_) {
+            return false;
+        }
+
+        return $node->cond instanceof Node\Expr\FuncCall
+            || $node->cond instanceof Node\Expr\MethodCall
+            || $node->cond instanceof Node\Expr\StaticCall
+            || $node->cond instanceof Node\Expr\Variable
+            || $node->cond instanceof Node\Expr\ArrayDimFetch
+            || $node->cond instanceof Node\Expr\ClassConstFetch;
     }
 }

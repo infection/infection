@@ -36,34 +36,34 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\BooleanOrNegateSubExpressions;
-use Infection\Mutator\Util\NegateExpression;
+use Infection\PhpParser\Visitor\Negation\Driver\BooleanAndDriver;
+use Infection\PhpParser\Visitor\Negation\NegateAllSubExpressionsVisitor;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 
-final class LogicalOrNegateAllSubExpressions extends AbstractLogicalOperatorNegationOnSubExpressionsMutator
+final class LogicalAndNegateAllSubExpr implements Mutator
 {
-    use NegateExpression;
-    use BooleanOrNegateSubExpressions;
+    use GetMutatorName;
 
     public static function getDefinition(): ?Definition
     {
         return new Definition(
             <<<'TXT'
-Negates all sub-expressions at once in OR (`||`). No matter how many sub-expressions, but all should be connected with OR (`||`) operator.
+Negates all sub-expressions at once in AND (`&&`). No matter how many sub-expressions, but all should be connected with AND (`&&`) operator.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b || $c;
-+ $a = !$b || !$c;
+- $a = $b && $c;
++ $a = !$b && !$c;
 DIFF
         );
     }
-
-    use NegateExpression;
 
     /**
      * @param Node\Expr $node
@@ -71,27 +71,20 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        $subExpressions = $this->explodeExpressions($node);
+        $traverser = new NodeTraverser;
+        $traverser->addVisitor(new NegateAllSubExpressionsVisitor(new BooleanAndDriver));
 
-        $allNegatedExpressions = array_map(
-            fn (Node\Expr $expr) => $this->negateExpression($expr),
-            $subExpressions
-        );
-
-        yield $this->implode(
-            $allNegatedExpressions,
-            $node->getAttributes()
-        );
+        yield from $traverser->traverse([$node]);
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\BinaryOp\BooleanOr) {
+        if (!$node instanceof Node\Expr\BinaryOp\BooleanAnd) {
             return false;
         }
 
         $parent = ParentConnector::findParent($node);
 
-        return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanOr; // only grandparent
+        return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanAnd; // only grandparent
     }
 }

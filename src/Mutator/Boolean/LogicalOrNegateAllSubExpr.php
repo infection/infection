@@ -33,33 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator\Boolean;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\Negation\Driver\BooleanOrDriver;
+use Infection\PhpParser\Visitor\Negation\NegateAllSubExpressionsVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 
-trait NegateExpression
+final class LogicalOrNegateAllSubExpr implements Mutator
 {
-    private function negateExpression(Node\Expr $expr): Node\Expr
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        if ($expr instanceof Node\Expr\BooleanNot) {
-            return $expr->expr;
+        return new Definition(
+            <<<'TXT'
+Negates all sub-expressions at once in OR (`||`). No matter how many sub-expressions, but all should be connected with OR (`||`) operator.
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null,
+            <<<'DIFF'
+- $a = $b || $c;
++ $a = !$b || !$c;
+DIFF
+        );
+    }
+
+    /**
+     * @param Node\Expr $node
+     * @return iterable
+     */
+    public function mutate(Node $node): iterable
+    {
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NegateAllSubExpressionsVisitor(new BooleanOrDriver()));
+
+        yield from $traverser->traverse([$node]);
+    }
+
+    public function canMutate(Node $node): bool
+    {
+        if (!$node instanceof Node\Expr\BinaryOp\BooleanOr) {
+            return false;
         }
 
-        return new Node\Expr\BooleanNot($expr);
-    }
+        $parent = ParentConnector::findParent($node);
 
-    private function isLogicalOperator(Node\Expr $expr): bool
-    {
-        return $expr instanceof Node\Expr\BinaryOp\BooleanAnd
-            || $expr instanceof Node\Expr\BinaryOp\BooleanOr;
-    }
-
-    private function isComparisonOrNegation(Node\Expr $expr): bool
-    {
-        return $expr instanceof Node\Expr\BinaryOp\Equal
-            || $expr instanceof Node\Expr\BinaryOp\NotEqual
-            || $expr instanceof Node\Expr\BinaryOp\Identical
-            || $expr instanceof Node\Expr\BinaryOp\NotIdentical
-            || $expr instanceof Node\Expr\BooleanNot;
+        return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanOr; // only grandparent
     }
 }
