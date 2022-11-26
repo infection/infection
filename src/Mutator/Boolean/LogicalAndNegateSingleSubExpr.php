@@ -75,8 +75,8 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        $traverser = new NodeTraverser;
-        $traverser->addVisitor(new NegateOnlySingleSubExpressionVisitor(new BooleanAndDriver));
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NegateOnlySingleSubExpressionVisitor(new BooleanAndDriver()));
 
         yield from $traverser->traverse([$node]);
     }

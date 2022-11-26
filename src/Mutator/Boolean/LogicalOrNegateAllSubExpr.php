@@ -39,11 +39,8 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\Negation\Driver\BooleanOrDriver;
-use Infection\PhpParser\Visitor\Negation\NegateAllSubExpressionsVisitor;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
 
 final class LogicalOrNegateAllSubExpr implements Mutator
 {
@@ -66,15 +63,12 @@ DIFF
     }
 
     /**
-     * @param Node\Expr $node
-     * @return iterable
+     * @param Node\Expr\BinaryOp\BooleanOr $node
+     * @return Node\Expr\BinaryOp\BooleanOr[]
      */
     public function mutate(Node $node): iterable
     {
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NegateAllSubExpressionsVisitor(new BooleanOrDriver()));
-
-        yield from $traverser->traverse([$node]);
+        yield $this->negateEverySubExpression($node);
     }
 
     public function canMutate(Node $node): bool
@@ -86,5 +80,18 @@ DIFF
         $parent = ParentConnector::findParent($node);
 
         return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanOr; // only grandparent
+    }
+
+    private function negateEverySubExpression(Node\Expr $node, array $attributes = []): Node\Expr
+    {
+        if ($node instanceof Node\Expr\BinaryOp\BooleanOr) {
+            return new Node\Expr\BinaryOp\BooleanOr(
+                $this->negateEverySubExpression($node->left),
+                $this->negateEverySubExpression($node->right),
+                $attributes
+            );
+        }
+
+        return $node instanceof Node\Expr\BooleanNot ? $node->expr : new Node\Expr\BooleanNot($node);
     }
 }
