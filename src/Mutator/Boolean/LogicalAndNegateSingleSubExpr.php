@@ -37,16 +37,12 @@ namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\Negation\Driver\BooleanAndDriver;
-use Infection\PhpParser\Visitor\Negation\NegateOnlySingleSubExpressionVisitor;
+use Infection\Mutator\Util\AbstractNegateSingleSubExpr;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
-use PhpParser\NodeDumper;
-use PhpParser\NodeTraverser;
 
-final class LogicalAndNegateSingleSubExpr implements Mutator
+final class LogicalAndNegateSingleSubExpr extends AbstractNegateSingleSubExpr
 {
     use GetMutatorName;
 
@@ -69,18 +65,6 @@ DIFF
         );
     }
 
-    /**
-     * @param Node\Expr\BinaryOp\BooleanAnd $node
-     * @return iterable
-     */
-    public function mutate(Node $node): iterable
-    {
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NegateOnlySingleSubExpressionVisitor(new BooleanAndDriver()));
-
-        yield from $traverser->traverse([$node]);
-    }
-
     public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Expr\BinaryOp\BooleanAnd) {
@@ -90,5 +74,15 @@ DIFF
         $parent = ParentConnector::findParent($node);
 
         return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanAnd; // only grandparent
+    }
+
+    public function instanceOf(Node\Expr $expr): bool
+    {
+        return $expr instanceof Node\Expr\BinaryOp\BooleanAnd;
+    }
+
+    public function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr
+    {
+        return new Node\Expr\BinaryOp\BooleanAnd($left, $right, $attributes);
     }
 }
