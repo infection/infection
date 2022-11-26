@@ -39,11 +39,13 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\SimpleExpression;
 use PhpParser\Node;
 
 final class ElseifNegation implements Mutator
 {
     use GetMutatorName;
+    use SimpleExpression;
 
     public static function getDefinition(): ?Definition
     {
@@ -79,11 +81,6 @@ DIFF
             return false;
         }
 
-        return $node->cond instanceof Node\Expr\FuncCall
-            || $node->cond instanceof Node\Expr\MethodCall
-            || $node->cond instanceof Node\Expr\StaticCall
-            || $node->cond instanceof Node\Expr\Variable
-            || $node->cond instanceof Node\Expr\ArrayDimFetch
-            || $node->cond instanceof Node\Expr\ClassConstFetch;
+        return $this->isSimpleExpression($node->cond);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor\Negation;
 
+use Infection\Mutator\SimpleExpression;
 use Infection\PhpParser\Visitor\Negation\Driver\DriverInterface;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -11,6 +12,8 @@ use PhpParser\NodeVisitorAbstract;
 
 final class NegateOnlySingleSubExpressionVisitor extends NodeVisitorAbstract
 {
+    use SimpleExpression;
+
     private int $replaceExpressionAtIndex = 0;
 
     public function __construct(
@@ -64,7 +67,7 @@ final class NegateOnlySingleSubExpressionVisitor extends NodeVisitorAbstract
         if ($this->driver->instanceOf($node)) {
             $this->countSubExpressionsToNegate($node->left, $count);
             $this->countSubExpressionsToNegate($node->right, $count);
-        } elseif ($this->canBeNegated($node)) {
+        } elseif ($this->isSimpleExpression($node)) {
             $count++;
         }
 
@@ -81,7 +84,7 @@ final class NegateOnlySingleSubExpressionVisitor extends NodeVisitorAbstract
             );
         }
 
-        if ($this->canBeNegated($node)) {
+        if ($this->isSimpleExpression($node)) {
             if ($currentExpressionIndex === $this->replaceExpressionAtIndex) {
                 $currentExpressionIndex++;
 
@@ -92,15 +95,5 @@ final class NegateOnlySingleSubExpressionVisitor extends NodeVisitorAbstract
         }
 
         return $node;
-    }
-
-    private function canBeNegated(Node\Expr $expr): bool
-    {
-        return $expr instanceof Node\Expr\FuncCall
-            || $expr instanceof Node\Expr\MethodCall
-            || $expr instanceof Node\Expr\StaticCall
-            || $expr instanceof Node\Expr\Variable
-            || $expr instanceof Node\Expr\ArrayDimFetch
-            || $expr instanceof Node\Expr\ClassConstFetch;
     }
 }
