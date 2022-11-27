@@ -64,7 +64,7 @@ PHP
 
 $var = !a() && !b();
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates and with more expressions' => [
@@ -80,7 +80,7 @@ PHP
 
 $var = !a() && !b() && !c() && !d();
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates already negated expressions' => [
@@ -96,7 +96,7 @@ PHP
 
 $var = !(!a() && b());
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates more complex expressions' => [
@@ -113,7 +113,7 @@ PHP
 $var = !($A > 1) && !($this->foo() === false) && !(self::bar() >= 10);
 PHP
                 ,
-            ]
+            ],
         ];
     }
 }

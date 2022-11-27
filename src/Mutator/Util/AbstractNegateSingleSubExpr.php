@@ -53,13 +53,12 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
      * @psalm-mutation-free
      *
      * @param Node\Expr $node
-     * @return iterable
      */
     public function mutate(Node $node): iterable
     {
         $subExpressionsToNegateCount = $this->countSubExpressionsToNegate($node);
 
-        for ($expressionIndex = 0; $expressionIndex < $subExpressionsToNegateCount ; $expressionIndex++) {
+        for ($expressionIndex = 0; $expressionIndex < $subExpressionsToNegateCount; ++$expressionIndex) {
             yield $this->negateSubExpression($node, $expressionIndex);
         }
     }
@@ -85,7 +84,7 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
             $this->countSubExpressionsToNegate($node->left, $count);
             $this->countSubExpressionsToNegate($node->right, $count);
         } elseif ($this->isSimpleExpression($node)) {
-            $count++;
+            ++$count;
         }
 
         return $count;
@@ -103,12 +102,12 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
 
         if ($this->isSimpleExpression($node)) {
             if ($currentExpressionIndex === $negateExpressionAtIndex) {
-                $currentExpressionIndex++;
+                ++$currentExpressionIndex;
 
                 return new Node\Expr\BooleanNot($node);
             }
 
-            $currentExpressionIndex++;
+            ++$currentExpressionIndex;
         }
 
         return $node;

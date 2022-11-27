@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class ElseifNegationTest  extends BaseMutatorTestCase
+final class ElseifNegationTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -94,7 +94,7 @@ if (true) {
 } elseif (!$array[0]) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates variable' => [
@@ -114,7 +114,7 @@ if (true) {
 } elseif (!$foo) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates method call' => [
@@ -134,7 +134,7 @@ if (true) {
 } elseif (!$this->foo()) {
 }
 PHP,
-            ]
+            ],
         ];
 
         yield 'It mutates static calls' => [
@@ -154,7 +154,7 @@ if (true) {
 } elseif (!self::foo()) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates constant calls' => [
@@ -174,7 +174,7 @@ if (true) {
 } elseif (!self::FOO) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates closure calls' => [
@@ -194,7 +194,7 @@ if (true) {
 } elseif (!$foo()) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates invoke calls' => [
@@ -214,7 +214,7 @@ if (true) {
 } elseif (!($this->foo)()) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates function calls' => [
@@ -234,9 +234,8 @@ if (true) {
 } elseif (!a()) {
 }
 PHP
-            ]
+            ],
         ];
-
 
         yield 'It does not mutate already negated expression' => [
             <<<'PHP'

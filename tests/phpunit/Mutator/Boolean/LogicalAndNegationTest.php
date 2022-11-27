@@ -64,7 +64,7 @@ PHP
 
 $var = !(a() && b());
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates and with more expressions' => [
@@ -80,7 +80,7 @@ PHP
 
 $var = !(a() && b() && c() && d());
 PHP
-            ]
+            ],
         ];
 
         yield 'It does not mutate already negated expressions' => [

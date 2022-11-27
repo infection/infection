@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function array_values;
 use Infection\CannotBeInstantiated;
 use Infection\Mutator;
 

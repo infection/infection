@@ -70,6 +70,7 @@ DIFF
      * @psalm-mutation-free
      *
      * @param Node\Stmt\If_ $node
+     *
      * @return iterable<Node\Stmt\If_>
      */
     public function mutate(Node $node): iterable

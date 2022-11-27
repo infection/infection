@@ -92,7 +92,7 @@ PHP
 if (!$array[0]) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates variable' => [
@@ -110,7 +110,7 @@ PHP
 if (!$foo) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates method call' => [
@@ -128,7 +128,7 @@ PHP
 if (!$this->foo()) {
 }
 PHP,
-            ]
+            ],
         ];
 
         yield 'It mutates static calls' => [
@@ -146,7 +146,7 @@ PHP
 if (!self::foo()) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates constant calls' => [
@@ -164,7 +164,7 @@ PHP
 if (!self::FOO) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates closure calls' => [
@@ -182,7 +182,7 @@ PHP
 if (!$foo()) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates invoke calls' => [
@@ -200,7 +200,7 @@ PHP
 if (!($this->foo)()) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates function calls' => [
@@ -218,7 +218,7 @@ PHP
 if (!a()) {
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It does not mutate already negated expression' => [
@@ -285,4 +285,3 @@ PHP
         ];
     }
 }
-

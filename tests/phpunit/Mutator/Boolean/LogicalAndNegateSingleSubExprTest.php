@@ -69,7 +69,7 @@ PHP,
 
 $var = $array[0] && !$array[1];
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates variable' => [
@@ -90,7 +90,7 @@ PHP,
 
 $var = $foo && !$bar;
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates method call' => [
@@ -111,7 +111,7 @@ PHP,
 
 $var = $this->foo() && !$bar->baz();
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates static calls' => [
@@ -139,7 +139,7 @@ PHP
 
 $var = self::foo() && static::bar() && !Test::baz();
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates constant calls' => [
@@ -161,7 +161,7 @@ PHP
 
 $var = self::FOO && !self::BAR;
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates closure calls' => [
@@ -183,7 +183,7 @@ PHP
 
 $var = $foo() && !$bar();
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates invoke calls' => [
@@ -205,7 +205,7 @@ PHP
 
 $var = ($this->foo)() && !($this->bar)();
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates function calls' => [
@@ -226,7 +226,7 @@ PHP,
 
 $var = a() && !b();
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates and with more expressions' => [
@@ -260,7 +260,7 @@ PHP
 
 $var = a() && b() && c() && !d();
 PHP
-            ]
+            ],
         ];
 
         yield 'It does not mutate equal\'s expressions' => [
@@ -293,7 +293,7 @@ PHP
 $var = !(!a() && !b());
 PHP
                 ,
-            ]
+            ],
         ];
 
         yield 'It mutates expressions with logical or' => [
@@ -309,7 +309,7 @@ PHP
 
 $var = !a() && (b() || c());
 PHP
-            ]
+            ],
         ];
     }
 }

@@ -69,11 +69,12 @@ DIFF
      * @psalm-mutation-free
      *
      * @param Node\Stmt\ElseIf_ $node
+     *
      * @return iterable<Node\Stmt\ElseIf_>
      */
     public function mutate(Node $node): iterable
     {
-       yield new Node\Stmt\ElseIf_(
+        yield new Node\Stmt\ElseIf_(
             new Node\Expr\BooleanNot($node->cond),
             $node->stmts,
             $node->getAttributes()

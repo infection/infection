@@ -71,6 +71,7 @@ DIFF
      * @psalm-mutation-free
      *
      * @param Node\Expr\BinaryOp\BooleanOr $node
+     *
      * @return iterable<Node\Expr\BooleanNot>
      */
     public function mutate(Node $node): iterable
