@@ -71,6 +71,8 @@ DIFF
     /**
      * @psalm-mutation-free
      *
+     * @param Node\Expr|Node\Expr\BinaryOp\BooleanOr $node
+     *
      * @return iterable<Node>
      */
     public function mutate(Node $node): iterable
@@ -92,7 +94,7 @@ DIFF
     /**
      * @param array<string, mixed> $attributes
      */
-    private function negateEverySubExpression(Node $node, array $attributes = []): Node\Expr
+    private function negateEverySubExpression(Node\Expr|Node\Expr\BinaryOp\BooleanOr $node, array $attributes = []): Node\Expr
     {
         if ($node instanceof Node\Expr\BinaryOp\BooleanAnd) {
             return new Node\Expr\BinaryOp\BooleanAnd(
@@ -102,14 +104,6 @@ DIFF
             );
         }
 
-        if ($node instanceof Node\Expr\BooleanNot) {
-            return $node->expr;
-        }
-
-        if ($node instanceof Node\Expr) {
-            return new Node\Expr\BooleanNot($node);
-        }
-
-        throw new LogicException('Unexpected value type ' . $node->getType());
+        return $node instanceof Node\Expr\BooleanNot ? $node->expr : new Node\Expr\BooleanNot($node);
     }
 }
