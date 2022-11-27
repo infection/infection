@@ -76,13 +76,19 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
 
     abstract protected function isInstanceOf(Node $node): bool;
 
+    /**
+     * @param array<string, mixed> $attributes
+     */
     abstract protected function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr;
 
     private function countSubExpressionsToNegate(Node\Expr $node, int &$count = 0): int
     {
         if ($this->isInstanceOf($node)) {
-            $this->countSubExpressionsToNegate($node->left, $count);
-            $this->countSubExpressionsToNegate($node->right, $count);
+            $left = isset($node->left) ? $node->left : throw new \LogicException('Node should contains left attribute');
+            $right = isset($node->right) ? $node->right : throw new \LogicException('Node should contains right attribute');
+
+            $this->countSubExpressionsToNegate($left, $count);
+            $this->countSubExpressionsToNegate($right, $count);
         } elseif ($this->isSimpleExpression($node)) {
             ++$count;
         }
@@ -93,9 +99,12 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
     private function negateSubExpression(Node\Expr $node, int $negateExpressionAtIndex, int &$currentExpressionIndex = 0): Node\Expr
     {
         if ($this->isInstanceOf($node)) {
+            $left = isset($node->left) ? $node->left : throw new \LogicException('Node should contains left attribute');
+            $right = isset($node->right) ? $node->right : throw new \LogicException('Node should contains right attribute');
+
             return $this->create(
-                $this->negateSubExpression($node->left, $negateExpressionAtIndex, $currentExpressionIndex),
-                $this->negateSubExpression($node->right, $negateExpressionAtIndex, $currentExpressionIndex),
+                $this->negateSubExpression($left, $negateExpressionAtIndex, $currentExpressionIndex),
+                $this->negateSubExpression($right, $negateExpressionAtIndex, $currentExpressionIndex),
                 $node->getAttributes(),
             );
         }

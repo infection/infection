@@ -37,6 +37,9 @@ namespace Infection\Mutator;
 
 use PhpParser\Node;
 
+/**
+ * @internal 
+ */
 trait SimpleExpression
 {
     private function isSimpleExpression(Node\Expr $expr): bool
