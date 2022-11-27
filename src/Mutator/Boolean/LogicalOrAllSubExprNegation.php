@@ -47,7 +47,7 @@ use PhpParser\Node;
  *
  * @implements Mutator<Node\Expr\BinaryOp\BooleanOr>
  */
-final class LogicalOrNegateAllSubExpr implements Mutator
+final class LogicalOrAllSubExprNegation implements Mutator
 {
     use GetMutatorName;
 

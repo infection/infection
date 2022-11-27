@@ -37,17 +37,16 @@ namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\Mutator\Util\AbstractSingleSubExprNegation;
 use PhpParser\Node;
 
 /**
  * @internal
  *
- * @implements Mutator<Node\Expr\BinaryOp\BooleanAnd>
+ * @extends AbstractSingleSubExprNegation<Node\Expr\BinaryOp\BooleanOr>
  */
-final class LogicalAndNegateAllSubExpr implements Mutator
+final class LogicalOrSingleSubExprNegation extends AbstractSingleSubExprNegation
 {
     use GetMutatorName;
 
@@ -55,54 +54,28 @@ final class LogicalAndNegateAllSubExpr implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Negates all sub-expressions at once in AND (`&&`).
+Negates all sub-expressions separately in OR (`||`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b && $c;
-+ $a = !$b && !$c;
+- $a = $b || $c;
+# Mutation 1
++ $a = !$b || $c;
+# Mutation 2
++ $a = $b || !$c;
 DIFF
         );
     }
 
-    /**
-     * @psalm-mutation-free
-     *
-     * @param Node\Expr|Node\Expr\BinaryOp\BooleanOr $node
-     *
-     * @return iterable<Node>
-     */
-    public function mutate(Node $node): iterable
+    protected function isInstanceOf(Node $node): bool
     {
-        yield $this->negateEverySubExpression($node);
+        return $node instanceof Node\Expr\BinaryOp\BooleanOr;
     }
 
-    public function canMutate(Node $node): bool
+    protected function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr
     {
-        if (!$node instanceof Node\Expr\BinaryOp\BooleanAnd) {
-            return false;
-        }
-
-        $parent = ParentConnector::findParent($node);
-
-        return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanAnd; // only grandparent
-    }
-
-    /**
-     * @param array<string, mixed> $attributes
-     */
-    private function negateEverySubExpression(Node\Expr|Node\Expr\BinaryOp\BooleanOr $node, array $attributes = []): Node\Expr
-    {
-        if ($node instanceof Node\Expr\BinaryOp\BooleanAnd) {
-            return new Node\Expr\BinaryOp\BooleanAnd(
-                $this->negateEverySubExpression($node->left),
-                $this->negateEverySubExpression($node->right),
-                $attributes
-            );
-        }
-
-        return $node instanceof Node\Expr\BooleanNot ? $node->expr : new Node\Expr\BooleanNot($node);
+        return new Node\Expr\BinaryOp\BooleanOr($left, $right, $attributes);
     }
 }

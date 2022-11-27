@@ -33,49 +33,87 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Boolean;
+namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\AbstractNegateSingleSubExpr;
-use PhpParser\Node;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-/**
- * @internal
- *
- * @extends AbstractNegateSingleSubExpr<Node\Expr\BinaryOp\BooleanAnd>
- */
-final class LogicalAndNegateSingleSubExpr extends AbstractNegateSingleSubExpr
+final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
 {
-    use GetMutatorName;
-
-    public static function getDefinition(): ?Definition
+    /**
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
+     */
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
-        return new Definition(
-            <<<'TXT'
-Negates all sub-expressions separately in AND (`&&`).
-TXT
+        $this->doTest($input, $expected);
+    }
+
+    public function mutationsProvider(): iterable
+    {
+        yield 'It mutates and with two expressions' => [
+            <<<'PHP'
+<?php
+
+$var = a() && b();
+PHP
             ,
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null,
-            <<<'DIFF'
-- $a = $b && $c;
-# Mutation 1
-+ $a = !$b && $c;
-# Mutation 2
-+ $a = $b && !$c;
-DIFF
-        );
-    }
+            [
+                <<<'PHP'
+<?php
 
-    protected function isInstanceOf(Node $node): bool
-    {
-        return $node instanceof Node\Expr\BinaryOp\BooleanAnd;
-    }
+$var = !a() && !b();
+PHP
+            ],
+        ];
 
-    protected function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr
-    {
-        return new Node\Expr\BinaryOp\BooleanAnd($left, $right, $attributes);
+        yield 'It mutates and with more expressions' => [
+            <<<'PHP'
+<?php
+
+$var = a() && b() && c() && d();
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$var = !a() && !b() && !c() && !d();
+PHP
+            ],
+        ];
+
+        yield 'It mutates already negated expressions' => [
+            <<<'PHP'
+<?php
+
+$var = !(a() && !b());
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$var = !(!a() && b());
+PHP
+            ],
+        ];
+
+        yield 'It mutates more complex expressions' => [
+            <<<'PHP'
+<?php
+
+$var = $A > 1 && $this->foo() === false && self::bar() >= 10;
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$var = !($A > 1) && !($this->foo() === false) && !(self::bar() >= 10);
+PHP
+                ,
+            ],
+        ];
     }
 }

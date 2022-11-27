@@ -38,15 +38,15 @@ namespace Infection\Mutator\Boolean;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\AbstractNegateSingleSubExpr;
+use Infection\Mutator\Util\AbstractSingleSubExprNegation;
 use PhpParser\Node;
 
 /**
  * @internal
  *
- * @extends AbstractNegateSingleSubExpr<Node\Expr\BinaryOp\BooleanOr>
+ * @extends AbstractSingleSubExprNegation<Node\Expr\BinaryOp\BooleanAnd>
  */
-final class LogicalOrNegateSingleSubExpr extends AbstractNegateSingleSubExpr
+final class LogicalAndSingleSubExprNegation extends AbstractSingleSubExprNegation
 {
     use GetMutatorName;
 
@@ -54,28 +54,28 @@ final class LogicalOrNegateSingleSubExpr extends AbstractNegateSingleSubExpr
     {
         return new Definition(
             <<<'TXT'
-Negates all sub-expressions separately in OR (`||`).
+Negates all sub-expressions separately in AND (`&&`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b || $c;
+- $a = $b && $c;
 # Mutation 1
-+ $a = !$b || $c;
++ $a = !$b && $c;
 # Mutation 2
-+ $a = $b || !$c;
++ $a = $b && !$c;
 DIFF
         );
     }
 
     protected function isInstanceOf(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\BooleanOr;
+        return $node instanceof Node\Expr\BinaryOp\BooleanAnd;
     }
 
     protected function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr
     {
-        return new Node\Expr\BinaryOp\BooleanOr($left, $right, $attributes);
+        return new Node\Expr\BinaryOp\BooleanAnd($left, $right, $attributes);
     }
 }

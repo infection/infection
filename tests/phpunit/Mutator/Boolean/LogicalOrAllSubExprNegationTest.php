@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class LogicalAndNegateAllSubExprTest extends BaseMutatorTestCase
+final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
@@ -51,34 +51,34 @@ final class LogicalAndNegateAllSubExprTest extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield 'It mutates and with two expressions' => [
+        yield 'It mutates or with two expressions' => [
             <<<'PHP'
 <?php
 
-$var = a() && b();
+$var = a() || b();
 PHP
             ,
             [
                 <<<'PHP'
 <?php
 
-$var = !a() && !b();
+$var = !a() || !b();
 PHP
             ],
         ];
 
-        yield 'It mutates and with more expressions' => [
+        yield 'It mutates or with more expressions' => [
             <<<'PHP'
 <?php
 
-$var = a() && b() && c() && d();
+$var = a() || b() || c() || d();
 PHP
             ,
             [
                 <<<'PHP'
 <?php
 
-$var = !a() && !b() && !c() && !d();
+$var = !a() || !b() || !c() || !d();
 PHP
             ],
         ];
@@ -87,15 +87,16 @@ PHP
             <<<'PHP'
 <?php
 
-$var = !(a() && !b());
+$var = !(a() || !b());
 PHP
             ,
             [
                 <<<'PHP'
 <?php
 
-$var = !(!a() && b());
+$var = !(!a() || b());
 PHP
+                ,
             ],
         ];
 
@@ -103,14 +104,14 @@ PHP
             <<<'PHP'
 <?php
 
-$var = $A > 1 && $this->foo() === false && self::bar() >= 10;
+$var = $A > 1 || $this->foo() === false || self::bar() >= 10;
 PHP
             ,
             [
                 <<<'PHP'
 <?php
 
-$var = !($A > 1) && !($this->foo() === false) && !(self::bar() >= 10);
+$var = !($A > 1) || !($this->foo() === false) || !(self::bar() >= 10);
 PHP
                 ,
             ],
