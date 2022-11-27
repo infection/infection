@@ -77,8 +77,168 @@ if ($this->fooBar()) {
     return 3;
 }
 PHP
-            ,
         ];
+
+        yield 'It mutates array item fetch' => [
+            <<<'PHP'
+<?php
+
+if (true) {
+} elseif ($array[0]) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (true) {
+} elseif (!$array[0]) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates variable' => [
+            <<<'PHP'
+<?php
+
+if (true) {
+} elseif ($foo) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (true) {
+} elseif (!$foo) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates method call' => [
+            <<<'PHP'
+<?php
+
+if (true) {
+} elseif ($this->foo()) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (true) {
+} elseif (!$this->foo()) {
+}
+PHP,
+            ]
+        ];
+
+        yield 'It mutates static calls' => [
+            <<<'PHP'
+<?php
+
+if (true) {
+} elseif (self::foo()) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (true) {
+} elseif (!self::foo()) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates constant calls' => [
+            <<<'PHP'
+<?php
+
+if (true) {
+} elseif (self::FOO) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (true) {
+} elseif (!self::FOO) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates closure calls' => [
+            <<<'PHP'
+<?php
+
+if (true) {
+} elseif ($foo()) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (true) {
+} elseif (!$foo()) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates invoke calls' => [
+            <<<'PHP'
+<?php
+
+if (true) {
+} elseif (($this->foo)()) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (true) {
+} elseif (!($this->foo)()) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates function calls' => [
+            <<<'PHP'
+<?php
+
+if (true) {
+} elseif (a()) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (true) {
+} elseif (!a()) {
+}
+PHP
+            ]
+        ];
+
 
         yield 'It does not mutate already negated expression' => [
             <<<'PHP'
@@ -88,7 +248,6 @@ if ($this->barFoo()) {
 } elseif (!$this->fooBar()) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate equal comparison' => [
@@ -99,7 +258,6 @@ if ($this->barFoo()) {
 } elseif ($this->fooBar() == 1) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate not equal comparison' => [
@@ -110,7 +268,6 @@ if ($this->barFoo()) {
 } elseif ($this->fooBar() != 1) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate identical comparison' => [
@@ -121,7 +278,6 @@ if ($this->barFoo()) {
 } elseif ($this->fooBar() === true) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate not identical comparison' => [
@@ -132,7 +288,6 @@ if ($this->barFoo()) {
 } elseif ($this->fooBar() !== true) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate and condition' => [
@@ -143,7 +298,6 @@ if (c()) {
 } elseif (a() && b()) {
 }
 PHP
-            ,
         ];
 
         yield 'It does not mutate or condition' => [
@@ -154,7 +308,6 @@ if (c()) {
 } elseif (a() || b()) {
 }
 PHP
-            ,
         ];
     }
 }

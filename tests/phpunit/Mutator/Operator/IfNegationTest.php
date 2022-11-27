@@ -40,6 +40,7 @@ use Infection\Tests\Mutator\BaseMutatorTestCase;
 class IfNegationTest extends BaseMutatorTestCase
 {
     /**
+     * GOOD
      * @group manhunto
      *
      * @dataProvider mutationsProvider
@@ -77,6 +78,150 @@ if (!$this->fooBar()) {
     return 3;
 }
 PHP
+        ];
+
+        yield 'It mutates array item fetch' => [
+            <<<'PHP'
+<?php
+
+if ($array[0]) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (!$array[0]) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates variable' => [
+            <<<'PHP'
+<?php
+
+if ($foo) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (!$foo) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates method call' => [
+            <<<'PHP'
+<?php
+
+if ($this->foo()) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (!$this->foo()) {
+}
+PHP,
+            ]
+        ];
+
+        yield 'It mutates static calls' => [
+            <<<'PHP'
+<?php
+
+if (self::foo()) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (!self::foo()) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates constant calls' => [
+            <<<'PHP'
+<?php
+
+if (self::FOO) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (!self::FOO) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates closure calls' => [
+            <<<'PHP'
+<?php
+
+if ($foo()) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (!$foo()) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates invoke calls' => [
+            <<<'PHP'
+<?php
+
+if (($this->foo)()) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (!($this->foo)()) {
+}
+PHP
+            ]
+        ];
+
+        yield 'It mutates function calls' => [
+            <<<'PHP'
+<?php
+
+if (a()) {
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+if (!a()) {
+}
+PHP
+            ]
         ];
 
         yield 'It does not mutate already negated expression' => [

@@ -40,6 +40,7 @@ use Infection\Tests\Mutator\BaseMutatorTestCase;
 class LogicalOrNegationTest extends BaseMutatorTestCase
 {
     /**
+     * GOOD
      * @group manhunto
      *
      * @dataProvider mutationsProvider

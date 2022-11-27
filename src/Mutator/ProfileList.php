@@ -106,6 +106,9 @@ final class ProfileList
         Mutator\Boolean\LogicalLowerOr::class,
         Mutator\Boolean\LogicalNot::class,
         Mutator\Boolean\LogicalOr::class,
+        Mutator\Boolean\LogicalOrNegateAllSubExpr::class,
+        Mutator\Boolean\LogicalOrNegateSingleSubExpr::class,
+        Mutator\Boolean\LogicalOrNegation::class,
         // NotEqualNotIdentical disabled from the default boolean profile
         // NotIdenticalNotEqual disabled from the default boolean profile
         Mutator\Boolean\TrueValue::class,

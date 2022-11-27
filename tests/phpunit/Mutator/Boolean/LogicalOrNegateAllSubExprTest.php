@@ -40,6 +40,7 @@ use Infection\Tests\Mutator\BaseMutatorTestCase;
 class LogicalOrNegateAllSubExprTest extends BaseMutatorTestCase
 {
     /**
+     * GOOD
      * @group manhunto
      *
      * @dataProvider mutationsProvider
@@ -53,7 +54,7 @@ class LogicalOrNegateAllSubExprTest extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield 'It mutates oe with two expressions' => [
+        yield 'It mutates or with two expressions' => [
             <<<'PHP'
 <?php
 
@@ -66,11 +67,10 @@ PHP
 
 $var = !a() || !b();
 PHP
-                ,
             ]
         ];
 
-        yield 'It mutates oe with more expressions' => [
+        yield 'It mutates or with more expressions' => [
             <<<'PHP'
 <?php
 
@@ -83,75 +83,6 @@ PHP
 
 $var = !a() || !b() || !c() || !d();
 PHP
-                ,
-            ]
-        ];
-
-        yield 'It mutates equal' => [
-            <<<'PHP'
-<?php
-
-$var = a() || b() == 1;
-PHP
-            ,
-            [
-                <<<'PHP'
-<?php
-
-$var = !a() || !(b() == 1);
-PHP
-                ,
-            ]
-        ];
-
-        yield 'It mutates not equal' => [
-            <<<'PHP'
-<?php
-
-$var = a() || b() != 1;
-PHP
-            ,
-            [
-                <<<'PHP'
-<?php
-
-$var = !a() || !(b() != 1);
-PHP
-                ,
-            ]
-        ];
-
-        yield 'It mutates identical' => [
-            <<<'PHP'
-<?php
-
-$var = a() || b() === 1;
-PHP
-            ,
-            [
-                <<<'PHP'
-<?php
-
-$var = !a() || !(b() === 1);
-PHP
-                ,
-            ]
-        ];
-
-        yield 'It mutates not identical' => [
-            <<<'PHP'
-<?php
-
-$var = a() || b() !== 1;
-PHP
-            ,
-            [
-                <<<'PHP'
-<?php
-
-$var = !a() || !(b() !== 1);
-PHP
-                ,
             ]
         ];
 
@@ -167,6 +98,23 @@ PHP
 <?php
 
 $var = !(!a() || b());
+PHP
+                ,
+            ]
+        ];
+
+        yield 'It mutates more complex expressions' => [
+            <<<'PHP'
+<?php
+
+$var = $A > 1 || $this->foo() === false || self::bar() >= 10;
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$var = !($A > 1) || !($this->foo() === false) || !(self::bar() >= 10);
 PHP
                 ,
             ]
