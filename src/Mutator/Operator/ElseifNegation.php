@@ -59,8 +59,10 @@ final class ElseifNegation implements Mutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- elseif ($this->fooBar());
-+ elseif (!$this->fooBar());
+if ($this->foo()) {
+- } elseif ($this->bar()) {
++ } elseif (!$this->bar()) {
+}
 DIFF
         );
     }
