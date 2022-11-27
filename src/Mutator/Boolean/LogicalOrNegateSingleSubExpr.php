@@ -70,12 +70,12 @@ DIFF
         );
     }
 
-    public function instanceOf(Node $node): bool
+    protected function isInstanceOf(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\BooleanOr;
     }
 
-    public function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr
+    protected function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr
     {
         return new Node\Expr\BinaryOp\BooleanOr($left, $right, $attributes);
     }

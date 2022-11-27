@@ -61,22 +61,22 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        if (!$this->instanceOf($node)) {
+        if (!$this->isInstanceOf($node)) {
             return false;
         }
 
         $parent = ParentConnector::findParent($node);
 
-        return $parent !== null && !$this->instanceOf($parent); // only grandparent
+        return $parent !== null && !$this->isInstanceOf($parent); // only grandparent
     }
 
-    abstract public function instanceOf(Node $node): bool;
+    abstract protected function isInstanceOf(Node $node): bool;
 
-    abstract public function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr;
+    abstract protected function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr;
 
     private function countSubExpressionsToNegate(Node\Expr $node, int &$count = 0): int
     {
-        if ($this->instanceOf($node)) {
+        if ($this->isInstanceOf($node)) {
             $this->countSubExpressionsToNegate($node->left, $count);
             $this->countSubExpressionsToNegate($node->right, $count);
         } elseif ($this->isSimpleExpression($node)) {
@@ -88,7 +88,7 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
 
     private function negateSubExpression(Node\Expr $node, int $negateExpressionAtIndex, int &$currentExpressionIndex = 0): Node\Expr
     {
-        if ($this->instanceOf($node)) {
+        if ($this->isInstanceOf($node)) {
             return $this->create(
                 $this->negateSubExpression($node->left, $negateExpressionAtIndex, $currentExpressionIndex),
                 $this->negateSubExpression($node->right, $negateExpressionAtIndex, $currentExpressionIndex),
