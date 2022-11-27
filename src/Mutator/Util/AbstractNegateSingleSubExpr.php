@@ -44,7 +44,8 @@ use PhpParser\Node;
 /**
  * @internal
  *
- * @implements Mutator<Node>
+ * @template TNode of Node
+ * @implements Mutator<TNode>
  */
 abstract class AbstractNegateSingleSubExpr implements Mutator
 {

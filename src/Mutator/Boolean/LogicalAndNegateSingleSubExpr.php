@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractNegateSingleSubExpr<Node\Expr\BinaryOp\BooleanAnd>
  */
 final class LogicalAndNegateSingleSubExpr extends AbstractNegateSingleSubExpr
 {
