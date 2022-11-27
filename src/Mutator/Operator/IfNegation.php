@@ -42,6 +42,11 @@ use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\SimpleExpression;
 use PhpParser\Node;
 
+/**
+ * @internal
+ *
+ * @implements Mutator<Node\Stmt\If_>
+ */
 final class IfNegation implements Mutator
 {
     use GetMutatorName;

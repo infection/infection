@@ -40,9 +40,6 @@ use Infection\Tests\Mutator\BaseMutatorTestCase;
 class IfNegationTest extends BaseMutatorTestCase
 {
     /**
-     * GOOD
-     * @group manhunto
-     *
      * @dataProvider mutationsProvider
      *
      * @param string|string[] $expected

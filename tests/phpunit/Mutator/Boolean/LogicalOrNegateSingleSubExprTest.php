@@ -40,9 +40,6 @@ use Infection\Tests\Mutator\BaseMutatorTestCase;
 class LogicalOrNegateSingleSubExprTest extends BaseMutatorTestCase
 {
     /**
-     * TODO
-     * @group manhunto
-     *
      * @dataProvider mutationsProvider
      *
      * @param string|string[] $expected

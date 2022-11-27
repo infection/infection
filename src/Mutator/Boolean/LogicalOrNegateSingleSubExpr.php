@@ -37,10 +37,16 @@ namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractNegateSingleSubExpr;
 use PhpParser\Node;
 
+/**
+ * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\BooleanOr>
+ */
 final class LogicalOrNegateSingleSubExpr extends AbstractNegateSingleSubExpr
 {
     use GetMutatorName;

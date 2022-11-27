@@ -40,8 +40,6 @@ use Infection\Tests\Mutator\BaseMutatorTestCase;
 class ElseifNegationTest  extends BaseMutatorTestCase
 {
     /**
-     * @group manhunto
-     *
      * @dataProvider mutationsProvider
      *
      * @param string|string[] $expected

@@ -45,6 +45,8 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
     use SimpleExpression;
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr $node
      * @return iterable
      */

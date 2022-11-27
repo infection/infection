@@ -42,6 +42,11 @@ use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
+/**
+ * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\BooleanOr>
+ */
 final class LogicalOrNegateAllSubExpr implements Mutator
 {
     use GetMutatorName;
@@ -63,8 +68,10 @@ DIFF
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Expr\BinaryOp\BooleanOr $node
-     * @return Node\Expr\BinaryOp\BooleanOr[]
+     * @return iterable<Node\Expr\BinaryOp\BooleanOr>
      */
     public function mutate(Node $node): iterable
     {
