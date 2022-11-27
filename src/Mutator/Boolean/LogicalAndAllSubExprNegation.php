@@ -90,16 +90,13 @@ DIFF
         return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanAnd; // only grandparent
     }
 
-    /**
-     * @param array<string, mixed> $attributes
-     */
-    private function negateEverySubExpression(Node\Expr|Node\Expr\BinaryOp\BooleanOr $node, array $attributes = []): Node\Expr
+    private function negateEverySubExpression(Node\Expr|Node\Expr\BinaryOp\BooleanOr $node): Node\Expr
     {
         if ($node instanceof Node\Expr\BinaryOp\BooleanAnd) {
             return new Node\Expr\BinaryOp\BooleanAnd(
                 $this->negateEverySubExpression($node->left),
                 $this->negateEverySubExpression($node->right),
-                $attributes
+                $node->getAttributes()
             );
         }
 
