@@ -40,6 +40,7 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
+use LogicException;
 use PhpParser\Node;
 
 /**
@@ -69,8 +70,6 @@ DIFF
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node $node
      *
      * @return iterable<Node>
      */
@@ -111,6 +110,6 @@ DIFF
             return new Node\Expr\BooleanNot($node);
         }
 
-        throw new \LogicException('Unexpected value type ' . $node->getType());
+        throw new LogicException('Unexpected value type ' . $node->getType());
     }
 }

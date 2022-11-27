@@ -38,6 +38,7 @@ namespace Infection\Mutator\Util;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\SimpleExpression;
 use Infection\PhpParser\Visitor\ParentConnector;
+use LogicException;
 use PhpParser\Node;
 
 /**
@@ -84,8 +85,8 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
     private function countSubExpressionsToNegate(Node\Expr $node, int &$count = 0): int
     {
         if ($this->isInstanceOf($node)) {
-            $left = isset($node->left) ? $node->left : throw new \LogicException('Node should contains left attribute');
-            $right = isset($node->right) ? $node->right : throw new \LogicException('Node should contains right attribute');
+            $left = $node->left ?? throw new LogicException('Node should contains left attribute');
+            $right = $node->right ?? throw new LogicException('Node should contains right attribute');
 
             $this->countSubExpressionsToNegate($left, $count);
             $this->countSubExpressionsToNegate($right, $count);
@@ -99,8 +100,8 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
     private function negateSubExpression(Node\Expr $node, int $negateExpressionAtIndex, int &$currentExpressionIndex = 0): Node\Expr
     {
         if ($this->isInstanceOf($node)) {
-            $left = isset($node->left) ? $node->left : throw new \LogicException('Node should contains left attribute');
-            $right = isset($node->right) ? $node->right : throw new \LogicException('Node should contains right attribute');
+            $left = $node->left ?? throw new LogicException('Node should contains left attribute');
+            $right = $node->right ?? throw new LogicException('Node should contains right attribute');
 
             return $this->create(
                 $this->negateSubExpression($left, $negateExpressionAtIndex, $currentExpressionIndex),

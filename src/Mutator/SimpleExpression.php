@@ -38,7 +38,7 @@ namespace Infection\Mutator;
 use PhpParser\Node;
 
 /**
- * @internal 
+ * @internal
  */
 trait SimpleExpression
 {
