@@ -45,7 +45,7 @@ use PhpParser\Node;
 /**
  * @internal
  *
- * @implements Mutator<Node\Expr\BooleanNot>
+ * @implements Mutator<Node\Expr\BinaryOp\BooleanOr>
  */
 final class LogicalOrNegation implements Mutator
 {

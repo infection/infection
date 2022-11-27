@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-class ElseifNegationTest  extends BaseMutatorTestCase
+final class ElseifNegationTest  extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider

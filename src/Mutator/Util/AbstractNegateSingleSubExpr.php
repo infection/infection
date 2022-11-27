@@ -40,6 +40,11 @@ use Infection\Mutator\SimpleExpression;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
+/**
+ * @internal
+ *
+ * @implements Mutator<Node>
+ */
 abstract class AbstractNegateSingleSubExpr implements Mutator
 {
     use SimpleExpression;

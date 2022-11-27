@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-class LogicalOrNegateSingleSubExprTest extends BaseMutatorTestCase
+final class LogicalOrNegateSingleSubExprTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
