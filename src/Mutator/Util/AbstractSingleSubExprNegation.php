@@ -87,7 +87,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
     {
         if ($this->isInstanceOf($node)) {
             if (!isset($node->left, $node->right)) {
-                throw new LogicException('Node does not have left or right attribute. Give type ' . $node->getType());
+                throw new LogicException('Node does not have left or right attribute. Given type ' . $node->getType());
             }
 
             $this->countSubExpressionsToNegate($node->left, $count);
@@ -103,7 +103,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
     {
         if ($this->isInstanceOf($node)) {
             if (!isset($node->left, $node->right)) {
-                throw new LogicException('Node does not have left or right attribute. Give type ' . $node->getType());
+                throw new LogicException('Node does not have left or right attribute. Given type ' . $node->getType());
             }
 
             return $this->create(
