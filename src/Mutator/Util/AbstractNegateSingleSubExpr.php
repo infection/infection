@@ -85,11 +85,12 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
     private function countSubExpressionsToNegate(Node\Expr $node, int &$count = 0): int
     {
         if ($this->isInstanceOf($node)) {
-            $left = $node->left ?? throw new LogicException('Node should contains left attribute');
-            $right = $node->right ?? throw new LogicException('Node should contains right attribute');
+            if (!isset($node->left, $node->right)) {
+                throw new LogicException('Node does not have left or right attribute. Give type ' . $node->getType());
+            }
 
-            $this->countSubExpressionsToNegate($left, $count);
-            $this->countSubExpressionsToNegate($right, $count);
+            $this->countSubExpressionsToNegate($node->left, $count);
+            $this->countSubExpressionsToNegate($node->right, $count);
         } elseif ($this->isSimpleExpression($node)) {
             ++$count;
         }
@@ -100,12 +101,13 @@ abstract class AbstractNegateSingleSubExpr implements Mutator
     private function negateSubExpression(Node\Expr $node, int $negateExpressionAtIndex, int &$currentExpressionIndex = 0): Node\Expr
     {
         if ($this->isInstanceOf($node)) {
-            $left = $node->left ?? throw new LogicException('Node should contains left attribute');
-            $right = $node->right ?? throw new LogicException('Node should contains right attribute');
+            if (!isset($node->left, $node->right)) {
+                throw new LogicException('Node does not have left or right attribute. Give type ' . $node->getType());
+            }
 
             return $this->create(
-                $this->negateSubExpression($left, $negateExpressionAtIndex, $currentExpressionIndex),
-                $this->negateSubExpression($right, $negateExpressionAtIndex, $currentExpressionIndex),
+                $this->negateSubExpression($node->left, $negateExpressionAtIndex, $currentExpressionIndex),
+                $this->negateSubExpression($node->right, $negateExpressionAtIndex, $currentExpressionIndex),
                 $node->getAttributes(),
             );
         }
