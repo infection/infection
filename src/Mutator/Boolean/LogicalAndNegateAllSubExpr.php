@@ -40,7 +40,6 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
-use LogicException;
 use PhpParser\Node;
 
 /**

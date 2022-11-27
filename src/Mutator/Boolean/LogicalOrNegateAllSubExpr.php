@@ -104,6 +104,5 @@ DIFF
         }
 
         return $node instanceof Node\Expr\BooleanNot ? $node->expr : new Node\Expr\BooleanNot($node);
-
     }
 }
