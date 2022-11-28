@@ -40,7 +40,11 @@ use function array_filter;
 use function array_key_exists;
 use function array_shift;
 use function array_unshift;
+use function array_values;
+use function count;
 use function current;
+use function error_clear_last;
+use function function_exists;
 use function implode;
 use PHPUnit\Framework\TestCase;
 use function Safe\array_replace;
@@ -49,6 +53,8 @@ use function Safe\file_get_contents;
 use function Safe\shell_exec;
 use function Safe\sprintf;
 use function Safe\substr;
+use function shell_exec as unsafe_shell_exec;
+use function str_starts_with;
 use function strpos;
 use function substr_count;
 
@@ -61,21 +67,9 @@ final class MakefileTest extends TestCase
 {
     private const MAKEFILE_PATH = __DIR__ . '/../../../../Makefile';
 
-    public function test_the_default_goal_is_the_help_command(): void
+    public function test_it_has_a_help_command(): void
     {
-        try {
-            shell_exec('command -v timeout');
-            $timeout = 'timeout 2s';
-        } catch (ExecException) {
-            $timeout = '';
-        }
-        $output = shell_exec(sprintf(
-            '%s make --silent --file %s 2>&1',
-            $timeout,
-            self::MAKEFILE_PATH
-        ));
-
-        $expectedOutput = <<<'EOF'
+        $expected = <<<'EOF'
 [33mUsage:[0m
   make TARGET
 
@@ -102,7 +96,17 @@ final class MakefileTest extends TestCase
 
 EOF;
 
-        $this->assertSame($expectedOutput, $output);
+        $actual = self::executeMakeCommand('help');
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_the_default_goal_is_the_help_command(): void
+    {
+        $expected = self::executeMakeCommand('help');
+        $actual = self::executeMakeCommand('');
+
+        $this->assertSame($expected, $actual);
     }
 
     public function test_the_makefile_can_be_parsed(): void
@@ -235,38 +239,10 @@ EOF;
 
     public function test_all_docker_test_targets_are_properly_declared(): void
     {
-        $testRules = array_filter(
-            Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
-            static function (array $rule): bool {
-                [$target, $prerequisites] = $rule;
-
-                return strpos($target, 'test-') === 0
-                    && substr($target, -7) === '-docker'
-                    && ($prerequisites === []
-                        || strpos($prerequisites[0], '## ') !== 0
-                    )
-                ;
-            }
-        );
+        $testRules = self::getTestRules(true);
 
         foreach ($testRules as [$target, $prerequisites]) {
-            $dashCount = substr_count($target, '-') - 1;
-
-            $subTestTargets = array_column(
-                array_filter(
-                    $testRules,
-                    static function (array $rule) use ($target, $dashCount): bool {
-                        $targetWithoutSuffix = substr($target, 0, -7);
-
-                        $subTarget = substr($rule[0], 0, -7);
-
-                        return strpos($subTarget, $targetWithoutSuffix . '-') === 0
-                            && substr_count($subTarget, '-') === $dashCount + 1
-                        ;
-                    }
-                ),
-                0
-            );
+            $subTestTargets = self::getSubTestRules($target, $testRules);
 
             if ($subTestTargets === []) {
                 continue;
@@ -291,71 +267,136 @@ EOF;
 
     public function test_the_test_target_runs_all_the_tests(): void
     {
-        $testTargets = array_filter(
-            Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
-            static function (array $rule): bool {
-                [$target, $prerequisites] = $rule;
-
-                return strpos($target, 'test') === 0
-                    && strpos($target, 'tests/') !== 0
-                    && substr($target, -7) !== '-docker'
-                    && ($prerequisites === []
-                        || strpos($prerequisites[0], '## ') !== 0
-                    )
-                ;
-            }
-        );
+        $testRules = self::getTestRules(false);
 
         // Exclude itself
-        $testPrerequisites = array_shift($testTargets)[1];
+        $testPrerequisites = array_shift($testRules)[1];
 
-        $rootTestTargets = array_column(
-            array_filter(
-                $testTargets,
-                static function (array $rule): bool {
-                    return strpos($rule[0], 'test-') === 0
-                        && substr_count($rule[0], '-') === 1;
-                }
-            ),
-            0
-        );
-
+        $rootTestTargets = self::getRootTestTargets($testRules, 1);
         $rootTestTargets = array_replace($rootTestTargets, ['test-autoreview'], ['autoreview']);
 
-        $this->assertSame($rootTestTargets, $testPrerequisites);
+        $this->assertEqualsCanonicalizing($rootTestTargets, $testPrerequisites);
     }
 
     public function test_the_docker_test_target_runs_all_the_tests(): void
     {
-        $testTargets = array_filter(
-            Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
-            static function (array $rule): bool {
-                [$target, $prerequisites] = $rule;
+        $testRules = self::getTestRules(true);
 
-                return strpos($target, 'test') === 0
-                    && substr($target, -7) === '-docker'
-                    && ($prerequisites === []
-                        || strpos($prerequisites[0], '## ') !== 0
-                    )
-                ;
+        $testPrerequisites = array_shift($testRules)[1];
+
+        $rootTestTargets = self::getRootTestTargets($testRules, 2);
+        array_unshift($rootTestTargets, 'autoreview');
+
+        $this->assertEqualsCanonicalizing($rootTestTargets, $testPrerequisites);
+    }
+
+    private static function executeMakeCommand(string $commandName): string
+    {
+        $timeout = self::getTimeout();
+
+        return self::executeCommand(
+            sprintf(
+                '%s make %s help --silent --file %s 2>&1',
+                $timeout,
+                $commandName,
+                self::MAKEFILE_PATH,
+            ),
+        );
+    }
+
+    // TODO: remove this as we remove support for PHP 7.4 and Safe v1
+    private static function executeCommand(string $command): string
+    {
+        if (function_exists('Safe\shell_exec')) {
+            return shell_exec($command);
+        }
+
+        error_clear_last();
+
+        $safeResult = unsafe_shell_exec($command);
+
+        if ($safeResult === null || $safeResult === false) {
+            throw ExecException::createFromPhpError();
+        }
+
+        return $safeResult;
+    }
+
+    private static function getTimeout(): string
+    {
+        try {
+            self::executeCommand('command -v timeout');
+
+            return 'timeout 2s';
+        } catch (ExecException $execException) {
+            return '';
+        }
+    }
+
+    /**
+     * @return list<array{string, list<string>}>
+     */
+    private static function getTestRules(bool $dockerTargets): array
+    {
+        $filterDockerTarget = $dockerTargets
+            ? static fn (string $target) => substr($target, -7) === '-docker'
+            : static fn (string $target) => substr($target, -7) !== '-docker';
+
+        return array_values(
+            array_filter(
+                Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
+                static function (array $rule) use ($filterDockerTarget): bool {
+                    [$target, $prerequisites] = $rule;
+
+                    $isCommentRule = count($prerequisites) !== 0 && str_starts_with($prerequisites[0], '## ');
+
+                    return str_starts_with($target, 'test')
+                        && !str_starts_with($target, 'tests/')
+                        && $filterDockerTarget($target)
+                        && !$isCommentRule;
+                }
+            ),
+        );
+    }
+
+    /**
+     * @param list<array{string, list<string>}> $testRules
+     *
+     * @return list<string>
+     */
+    private static function getSubTestRules(string $target, array $testRules): array
+    {
+        $dashCount = substr_count($target, '-') - 1;
+
+        $subTestRules = array_filter(
+            $testRules,
+            static function (array $rule) use ($target, $dashCount): bool {
+                $targetWithoutSuffix = substr($target, 0, -7);
+                $subTarget = substr($rule[0], 0, -7);
+
+                return str_starts_with($subTarget, $targetWithoutSuffix . '-')
+                    && substr_count($subTarget, '-') === $dashCount + 1;
             }
         );
 
-        $testPrerequisites = array_shift($testTargets)[1];
+        return array_column($subTestRules, 0);
+    }
 
-        $rootTestTargets = array_column(
+    /**
+     * @param list<array{string, list<string>}> $testRules
+     *
+     * @return list<string>
+     */
+    private static function getRootTestTargets(array $testRules, int $dashCount): array
+    {
+        $testTargets = array_column($testRules, 0);
+
+        return array_values(
             array_filter(
                 $testTargets,
-                static function (array $rule): bool {
-                    return strpos($rule[0], 'test-') === 0
-                        && substr_count($rule[0], '-') === 2;
-                }
+                static fn (string $target): bool => str_starts_with($target, 'test-')
+                    && substr_count($target, '-') === $dashCount,
             ),
-            0
         );
-
-        array_unshift($rootTestTargets, 'autoreview');
-
-        $this->assertSame($rootTestTargets, $testPrerequisites);
     }
 }
