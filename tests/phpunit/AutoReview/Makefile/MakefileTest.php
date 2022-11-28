@@ -114,25 +114,25 @@ EOF;
 
     public function test_phony_targets_are_correctly_declared(): void
     {
-        $targets = Parser::parse(file_get_contents(self::MAKEFILE_PATH));
+        $rules = Parser::parse(file_get_contents(self::MAKEFILE_PATH));
 
         $phony = null;
         $targetComment = false;
         $matchedPhony = true;
 
-        foreach ($targets as [$target, $dependencies]) {
+        foreach ($rules as [$target, $prerequisites]) {
             if ($target === '.PHONY') {
                 $this->assertCount(
                     1,
-                    $dependencies,
+                    $prerequisites,
                     sprintf(
                         'Expected one target to be declared as .PHONY. Found: "%s"',
-                        implode('", "', $dependencies)
+                        implode('", "', $prerequisites)
                     )
                 );
 
                 $previousPhony = $phony;
-                $phony = current($dependencies);
+                $phony = current($prerequisites);
 
                 $this->assertTrue(
                     $matchedPhony,
@@ -149,10 +149,10 @@ EOF;
                 continue;
             }
 
-            if ($dependencies !== [] && strpos($dependencies[0], '#') === 0) {
+            if ($prerequisites !== [] && strpos($prerequisites[0], '#') === 0) {
                 $this->assertStringStartsWith(
                     '## ',
-                    $dependencies[0],
+                    $prerequisites[0],
                     'Expected the target comment to be a documented comment'
                 );
 
@@ -204,16 +204,16 @@ EOF;
 
     public function test_no_target_is_being_declared_twice(): void
     {
-        $targets = Parser::parse(file_get_contents(self::MAKEFILE_PATH));
+        $rules = Parser::parse(file_get_contents(self::MAKEFILE_PATH));
 
         $targetCounts = [];
 
-        foreach ($targets as [$target, $dependencies]) {
+        foreach ($rules as [$target, $prerequisites]) {
             if ($target === '.PHONY') {
                 continue;
             }
 
-            if ($dependencies !== [] && strpos($dependencies[0], '## ') === 0) {
+            if ($prerequisites !== [] && strpos($prerequisites[0], '## ') === 0) {
                 continue;
             }
 
@@ -235,30 +235,30 @@ EOF;
 
     public function test_all_docker_test_targets_are_properly_declared(): void
     {
-        $testTargets = array_filter(
+        $testRules = array_filter(
             Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
             static function (array $targetSet): bool {
-                [$target, $dependencies] = $targetSet;
+                [$target, $prerequisites] = $targetSet;
 
                 return strpos($target, 'test-') === 0
                     && substr($target, -7) === '-docker'
-                    && ($dependencies === []
-                        || strpos($dependencies[0], '## ') !== 0
+                    && ($prerequisites === []
+                        || strpos($prerequisites[0], '## ') !== 0
                     )
                 ;
             }
         );
 
-        foreach ($testTargets as [$target, $dependencies]) {
+        foreach ($testRules as [$target, $prerequisites]) {
             $dashCount = substr_count($target, '-') - 1;
 
             $subTestTargets = array_column(
                 array_filter(
-                    $testTargets,
-                    static function (array $targetSet) use ($target, $dashCount): bool {
+                    $testRules,
+                    static function (array $rule) use ($target, $dashCount): bool {
                         $targetWithoutSuffix = substr($target, 0, -7);
 
-                        $subTarget = substr($targetSet[0], 0, -7);
+                        $subTarget = substr($rule[0], 0, -7);
 
                         return strpos($subTarget, $targetWithoutSuffix . '-') === 0
                             && substr_count($subTarget, '-') === $dashCount + 1
@@ -278,12 +278,12 @@ EOF;
 
             $this->assertSame(
                 $subTestTargets,
-                $dependencies,
+                $prerequisites,
                 sprintf(
-                    'Expected the dependencies of the "%s" target to be "%s". Found "%s" instead',
+                    'Expected the pre-requisite of the "%s" target to be "%s". Found "%s" instead',
                     $target,
                     implode(' ', $subTestTargets),
-                    implode(' ', $dependencies)
+                    implode(' ', $prerequisites)
                 )
             );
         }
@@ -293,28 +293,28 @@ EOF;
     {
         $testTargets = array_filter(
             Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
-            static function (array $targetSet): bool {
-                [$target, $dependencies] = $targetSet;
+            static function (array $rule): bool {
+                [$target, $prerequisites] = $rule;
 
                 return strpos($target, 'test') === 0
                     && strpos($target, 'tests/') !== 0
                     && substr($target, -7) !== '-docker'
-                    && ($dependencies === []
-                        || strpos($dependencies[0], '## ') !== 0
+                    && ($prerequisites === []
+                        || strpos($prerequisites[0], '## ') !== 0
                     )
                 ;
             }
         );
 
         // Exclude itself
-        $testDependencies = array_shift($testTargets)[1];
+        $testPrerequisites = array_shift($testTargets)[1];
 
         $rootTestTargets = array_column(
             array_filter(
                 $testTargets,
-                static function (array $targetSet): bool {
-                    return strpos($targetSet[0], 'test-') === 0
-                        && substr_count($targetSet[0], '-') === 1;
+                static function (array $rule): bool {
+                    return strpos($rule[0], 'test-') === 0
+                        && substr_count($rule[0], '-') === 1;
                 }
             ),
             0
@@ -322,33 +322,33 @@ EOF;
 
         $rootTestTargets = array_replace($rootTestTargets, ['test-autoreview'], ['autoreview']);
 
-        $this->assertSame($rootTestTargets, $testDependencies);
+        $this->assertSame($rootTestTargets, $testPrerequisites);
     }
 
     public function test_the_docker_test_target_runs_all_the_tests(): void
     {
         $testTargets = array_filter(
             Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
-            static function (array $targetSet): bool {
-                [$target, $dependencies] = $targetSet;
+            static function (array $rule): bool {
+                [$target, $prerequisites] = $rule;
 
                 return strpos($target, 'test') === 0
                     && substr($target, -7) === '-docker'
-                    && ($dependencies === []
-                        || strpos($dependencies[0], '## ') !== 0
+                    && ($prerequisites === []
+                        || strpos($prerequisites[0], '## ') !== 0
                     )
                 ;
             }
         );
 
-        $testDependencies = array_shift($testTargets)[1];
+        $testPrerequisites = array_shift($testTargets)[1];
 
         $rootTestTargets = array_column(
             array_filter(
                 $testTargets,
-                static function (array $targetSet): bool {
-                    return strpos($targetSet[0], 'test-') === 0
-                        && substr_count($targetSet[0], '-') === 2;
+                static function (array $rule): bool {
+                    return strpos($rule[0], 'test-') === 0
+                        && substr_count($rule[0], '-') === 2;
                 }
             ),
             0
@@ -356,6 +356,6 @@ EOF;
 
         array_unshift($rootTestTargets, 'autoreview');
 
-        $this->assertSame($rootTestTargets, $testDependencies);
+        $this->assertSame($rootTestTargets, $testPrerequisites);
     }
 }
