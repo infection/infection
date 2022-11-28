@@ -237,8 +237,8 @@ EOF;
     {
         $testRules = array_filter(
             Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
-            static function (array $targetSet): bool {
-                [$target, $prerequisites] = $targetSet;
+            static function (array $rule): bool {
+                [$target, $prerequisites] = $rule;
 
                 return strpos($target, 'test-') === 0
                     && substr($target, -7) === '-docker'
