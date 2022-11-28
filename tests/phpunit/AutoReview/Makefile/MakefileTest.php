@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Makefile;
 
+use Fidry\Makefile\Rule;
+use Fidry\Makefile\Test\BaseMakefileTestCase;
 use function array_column;
 use function array_filter;
 use function array_key_exists;
+use function array_map;
 use function array_shift;
 use function array_unshift;
 use function array_values;
@@ -63,13 +66,18 @@ use function substr_count;
  *
  * @group integration
  */
-final class MakefileTest extends TestCase
+final class MakefileTest extends BaseMakefileTestCase
 {
     private const MAKEFILE_PATH = __DIR__ . '/../../../../Makefile';
 
-    public function test_it_has_a_help_command(): void
+    protected static function getMakefilePath(): string
     {
-        $expected = <<<'EOF'
+        return self::MAKEFILE_PATH;
+    }
+
+    protected function getExpectedHelpOutput(): string
+    {
+        return <<<'EOF'
 [33mUsage:[0m
   make TARGET
 
@@ -95,10 +103,6 @@ final class MakefileTest extends TestCase
 [33mtest-infection-docker:[0m	 Runs Infection against itself on the different Docker platforms
 
 EOF;
-
-        $actual = self::executeMakeCommand('help');
-
-        $this->assertSame($expected, $actual);
     }
 
     public function test_the_default_goal_is_the_help_command(): void
@@ -109,139 +113,14 @@ EOF;
         $this->assertSame($expected, $actual);
     }
 
-    public function test_the_makefile_can_be_parsed(): void
-    {
-        Parser::parse(file_get_contents(self::MAKEFILE_PATH));
-
-        $this->assertTrue(true);
-    }
-
-    public function test_phony_targets_are_correctly_declared(): void
-    {
-        $rules = Parser::parse(file_get_contents(self::MAKEFILE_PATH));
-
-        $phony = null;
-        $targetComment = false;
-        $matchedPhony = true;
-
-        foreach ($rules as [$target, $prerequisites]) {
-            if ($target === '.PHONY') {
-                $this->assertCount(
-                    1,
-                    $prerequisites,
-                    sprintf(
-                        'Expected one target to be declared as .PHONY. Found: "%s"',
-                        implode('", "', $prerequisites)
-                    )
-                );
-
-                $previousPhony = $phony;
-                $phony = current($prerequisites);
-
-                $this->assertTrue(
-                    $matchedPhony,
-                    sprintf(
-                        '"%s" has been declared as a .PHONY target but no such target could '
-                        . 'be found',
-                        $previousPhony
-                    )
-                );
-
-                $targetComment = false;
-                $matchedPhony = false;
-
-                continue;
-            }
-
-            if ($prerequisites !== [] && strpos($prerequisites[0], '#') === 0) {
-                $this->assertStringStartsWith(
-                    '## ',
-                    $prerequisites[0],
-                    'Expected the target comment to be a documented comment'
-                );
-
-                $this->assertSame(
-                    $phony,
-                    $target,
-                    'Expected the declared target to match the previous declared .PHONY'
-                );
-
-                $this->assertFalse(
-                    $targetComment,
-                    sprintf(
-                        'Did not expect to find twice the target comment line for "%s"',
-                        $target
-                    )
-                );
-
-                $this->assertFalse(
-                    $matchedPhony,
-                    sprintf(
-                        'Did not expect to find the target comment line before its target '
-                        . 'definition for "%s"',
-                        $target
-                    )
-                );
-
-                $targetComment = true;
-
-                continue;
-            }
-
-            if ($phony !== null && $matchedPhony === false) {
-                $matchedPhony = true;
-
-                $this->assertSame(
-                    $phony,
-                    $target,
-                    'Expected the declared target to match the previous declared .PHONY'
-                );
-
-                continue;
-            }
-
-            $phony = null;
-            $targetComment = false;
-            $matchedPhony = false;
-        }
-    }
-
-    public function test_no_target_is_being_declared_twice(): void
-    {
-        $rules = Parser::parse(file_get_contents(self::MAKEFILE_PATH));
-
-        $targetCounts = [];
-
-        foreach ($rules as [$target, $prerequisites]) {
-            if ($target === '.PHONY') {
-                continue;
-            }
-
-            if ($prerequisites !== [] && strpos($prerequisites[0], '## ') === 0) {
-                continue;
-            }
-
-            if (array_key_exists($target, $targetCounts)) {
-                ++$targetCounts[$target];
-            } else {
-                $targetCounts[$target] = 1;
-            }
-        }
-
-        foreach ($targetCounts as $target => $count) {
-            $this->assertSame(
-                1,
-                $count,
-                sprintf('Expected to find only one declaration for the target "%s"', $target)
-            );
-        }
-    }
-
     public function test_all_docker_test_targets_are_properly_declared(): void
     {
         $testRules = self::getTestRules(true);
 
-        foreach ($testRules as [$target, $prerequisites]) {
+        foreach ($testRules as $rule) {
+            $target = $rule->getTarget();
+            $prerequisites = $rule->getPrerequisites();
+
             $subTestTargets = self::getSubTestRules($target, $testRules);
 
             if ($subTestTargets === []) {
@@ -270,7 +149,7 @@ EOF;
         $testRules = self::getTestRules(false);
 
         // Exclude itself
-        $testPrerequisites = array_shift($testRules)[1];
+        $testPrerequisites = array_shift($testRules)->getPrerequisites();
 
         $rootTestTargets = self::getRootTestTargets($testRules, 1);
         $rootTestTargets = array_replace($rootTestTargets, ['test-autoreview'], ['autoreview']);
@@ -282,7 +161,7 @@ EOF;
     {
         $testRules = self::getTestRules(true);
 
-        $testPrerequisites = array_shift($testRules)[1];
+        $testPrerequisites = array_shift($testRules)->getPrerequisites();
 
         $rootTestTargets = self::getRootTestTargets($testRules, 2);
         array_unshift($rootTestTargets, 'autoreview');
@@ -290,51 +169,8 @@ EOF;
         $this->assertEqualsCanonicalizing($rootTestTargets, $testPrerequisites);
     }
 
-    private static function executeMakeCommand(string $commandName): string
-    {
-        $timeout = self::getTimeout();
-
-        return self::executeCommand(
-            sprintf(
-                '%s make %s help --silent --file %s 2>&1',
-                $timeout,
-                $commandName,
-                self::MAKEFILE_PATH,
-            ),
-        );
-    }
-
-    // TODO: remove this as we remove support for PHP 7.4 and Safe v1
-    private static function executeCommand(string $command): string
-    {
-        if (function_exists('Safe\shell_exec')) {
-            return shell_exec($command);
-        }
-
-        error_clear_last();
-
-        $safeResult = unsafe_shell_exec($command);
-
-        if ($safeResult === null || $safeResult === false) {
-            throw ExecException::createFromPhpError();
-        }
-
-        return $safeResult;
-    }
-
-    private static function getTimeout(): string
-    {
-        try {
-            self::executeCommand('command -v timeout');
-
-            return 'timeout 2s';
-        } catch (ExecException $execException) {
-            return '';
-        }
-    }
-
     /**
-     * @return list<array{string, list<string>}>
+     * @return list<Rule>
      */
     private static function getTestRules(bool $dockerTargets): array
     {
@@ -344,23 +180,21 @@ EOF;
 
         return array_values(
             array_filter(
-                Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
-                static function (array $rule) use ($filterDockerTarget): bool {
-                    [$target, $prerequisites] = $rule;
-
-                    $isCommentRule = count($prerequisites) !== 0 && str_starts_with($prerequisites[0], '## ');
+                self::getParsedRules(),
+                static function (Rule $rule) use ($filterDockerTarget): bool {
+                    $target = $rule->getTarget();
 
                     return str_starts_with($target, 'test')
                         && !str_starts_with($target, 'tests/')
                         && $filterDockerTarget($target)
-                        && !$isCommentRule;
+                        && !$rule->isComment();
                 }
             ),
         );
     }
 
     /**
-     * @param list<array{string, list<string>}> $testRules
+     * @param list<Rule> $testRules
      *
      * @return list<string>
      */
@@ -370,9 +204,9 @@ EOF;
 
         $subTestRules = array_filter(
             $testRules,
-            static function (array $rule) use ($target, $dashCount): bool {
+            static function (Rule $rule) use ($target, $dashCount): bool {
                 $targetWithoutSuffix = substr($target, 0, -7);
-                $subTarget = substr($rule[0], 0, -7);
+                $subTarget = substr($rule->getTarget(), 0, -7);
 
                 return str_starts_with($subTarget, $targetWithoutSuffix . '-')
                     && substr_count($subTarget, '-') === $dashCount + 1;
@@ -383,13 +217,16 @@ EOF;
     }
 
     /**
-     * @param list<array{string, list<string>}> $testRules
+     * @param list<Rule> $testRules
      *
      * @return list<string>
      */
     private static function getRootTestTargets(array $testRules, int $dashCount): array
     {
-        $testTargets = array_column($testRules, 0);
+        $testTargets = array_map(
+            static fn (Rule $rule) => $rule->getTarget(),
+            $testRules,
+        );
 
         return array_values(
             array_filter(
