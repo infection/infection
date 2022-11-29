@@ -73,7 +73,7 @@
     "require-dev": {
         "ext-simplexml": "*",
         "brianium/paratest": "^6.3",
-        "fidry/makefile": "^0.1.3",
+        "fidry/makefile": "^0.2.0",
         "helmich/phpunit-json-assert": "^3.0",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/extension-installer": "^1.1.0",
