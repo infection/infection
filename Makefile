@@ -218,6 +218,7 @@ $(PHP_CS_FIXER): Makefile
 	touch -c $@
 
 $(PHPSTAN): vendor
+	touch -c $@
 
 $(PSALM): Makefile
 	wget -q $(PSALM_URL) --output-document=$(PSALM)
@@ -246,6 +247,7 @@ $(PHPUNIT): vendor phpunit.xml.dist
 phpunit.xml.dist:
 	# Not updating phpunit.xml with:
 	# phpunit --migrate-configuration || true
+	touch -c $@
 
 $(DOCKER_FILE_IMAGE): devTools/Dockerfile
 	docker-compose build
