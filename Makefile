@@ -52,7 +52,9 @@ PHPUNIT_GROUP=default
 
 .PHONY: compile
 compile:	 	## Bundles Infection into a PHAR
-compile: $(INFECTION)
+compile:
+	rm $(INFECTION) || true
+	make $(INFECTION)
 
 .PHONY: compile-docker
 compile-docker:	 	## Bundles Infection into a PHAR using docker
