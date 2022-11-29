@@ -27,7 +27,7 @@ PSALM=./.tools/psalm
 PSALM_URL="https://github.com/vimeo/psalm/releases/download/v4.15.0/psalm.phar"
 
 PHPUNIT=vendor/phpunit/phpunit/phpunit
-PARATEST=vendor/bin/paratest --runner=WrapperRunner
+PARATEST=vendor/bin/paratest
 
 INFECTION=./build/infection.phar
 
@@ -129,18 +129,18 @@ test-docker:		## Runs all the tests on the different Docker platforms
 test-docker: autoreview test-unit-docker test-e2e-docker test-infection-docker
 
 .PHONY: test-autoreview
-test-autoreview:
+test-autoreview: $(PHPUNIT) vendor
 	$(PHPUNIT) --configuration=phpunit_autoreview.xml
 
 .PHONY: test-unit
 test-unit:	 	## Runs the unit tests
-test-unit: $(PHPUNIT)
+test-unit: $(PHPUNIT) vendor
 	$(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-unit-parallel
 test-unit-parallel:	## Runs the unit tests in parallel
-test-unit-parallel:
-	$(PARATEST)
+test-unit-parallel: $(PARATEST) vendor
+	$(PARATEST) --runner=WrapperRunner
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
@@ -157,7 +157,7 @@ test-e2e: test-e2e-phpunit
 
 .PHONY: test-e2e-phpunit
 test-e2e-phpunit:	## Runs PHPUnit-enabled subset of end-to-end tests
-test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES)
+test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES) vendor
 	$(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 
 .PHONY: test-e2e-docker
@@ -182,7 +182,7 @@ test-e2e-xdebug-80-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
 
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself
-test-infection:
+test-infection: $(INFECTION) vendor
 	$(INFECTION) --threads=4
 
 .PHONY: test-infection-docker
