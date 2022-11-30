@@ -1,0 +1,34 @@
+<?php
+
+namespace _HumbugBoxb47773b41c19\Safe;
+
+use _HumbugBoxb47773b41c19\Safe\Exceptions\FunchandException;
+function create_function(string $args, string $code) : string
+{
+    \error_clear_last();
+    $safeResult = \create_function($args, $code);
+    if ($safeResult === \false) {
+        throw FunchandException::createFromPhpError();
+    }
+    return $safeResult;
+}
+/**
+ *
+ *
+ * @param callable(): void $callback The function to register.
+ * @param mixed $args
+ * @throws FunchandException
+ *
+ */
+function register_tick_function(callable $callback, ...$args) : void
+{
+    \error_clear_last();
+    if ($args !== []) {
+        $safeResult = \register_tick_function($callback, ...$args);
+    } else {
+        $safeResult = \register_tick_function($callback);
+    }
+    if ($safeResult === \false) {
+        throw FunchandException::createFromPhpError();
+    }
+}

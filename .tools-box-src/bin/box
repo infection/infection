@@ -1,0 +1,46 @@
+<?php
+
+declare (strict_types=1);
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+namespace _HumbugBoxb47773b41c19\KevinGH\Box;
+
+use _HumbugBoxb47773b41c19\Fidry\Console\Application\ApplicationRunner;
+use _HumbugBoxb47773b41c19\Fidry\Console\Input\IO;
+use function file_exists;
+use function in_array;
+use _HumbugBoxb47773b41c19\KevinGH\Box\Console\Application;
+use _HumbugBoxb47773b41c19\KevinGH\Box\Console\OutputFormatterConfigurator;
+use const PHP_EOL;
+use const PHP_SAPI;
+use RuntimeException;
+if (\false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], \true)) {
+    echo PHP_EOL . 'Box may only be invoked from a command line, got "' . PHP_SAPI . '"' . PHP_EOL;
+    exit(1);
+}
+(static function () : void {
+    if (file_exists($autoload = __DIR__ . '/../../../autoload.php')) {
+        // Is installed via Composer
+        include_once $autoload;
+        return;
+    }
+    if (file_exists($autoload = __DIR__ . '/../vendor/autoload.php')) {
+        // Is installed locally
+        include_once $autoload;
+        return;
+    }
+    throw new RuntimeException('Unable to find the Composer autoloader.');
+})();
+register_aliases();
+register_error_handler();
+$io = IO::createDefault();
+OutputFormatterConfigurator::configure($io);
+$runner = new ApplicationRunner(new Application());
+$runner->run($io);

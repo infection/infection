@@ -1,0 +1,71 @@
+<?php
+
+namespace _HumbugBox9658796bb9f0;
+
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
+use _HumbugBox9658796bb9f0\Infection\Console\Application;
+use _HumbugBox9658796bb9f0\Infection\Container;
+use function _HumbugBox9658796bb9f0\Safe\getcwd;
+if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], \true) === \false) {
+    echo \PHP_EOL . 'Infection may only be invoked from a command line, got "' . \PHP_SAPI . '"' . \PHP_EOL;
+    exit(1);
+}
+// Infection autoloading
+(static function () : void {
+    if (\file_exists($autoload = __DIR__ . '/../../../autoload.php')) {
+        // Is installed via Composer
+        include_once $autoload;
+        return;
+    }
+    if (\file_exists($autoload = __DIR__ . '/../vendor/autoload.php')) {
+        // Is installed locally
+        include_once $autoload;
+        return;
+    }
+    \fwrite(\STDERR, <<<'ERROR'
+You need to set up the project dependencies using Composer:
+    $ composer install
+You can learn all about Composer on https://getcomposer.org/.
+
+ERROR
+);
+    throw new \RuntimeException('Unable to find the Composer autoloader.');
+})();
+// Project (third-party) autoloading
+(static function () : void {
+    if (\file_exists($autoload = getcwd() . '/vendor/autoload.php')) {
+        include_once $autoload;
+    }
+})();
+(new Application(Container::create()))->run();

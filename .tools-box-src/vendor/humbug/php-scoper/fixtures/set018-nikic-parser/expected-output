@@ -1,0 +1,64 @@
+array(
+    0: Stmt_Namespace(
+        name: Name(
+            parts: array(
+                0: _Prefixed
+            )
+        )
+        stmts: array(
+            0: Stmt_Function(
+                attrGroups: array(
+                )
+                byRef: false
+                name: Identifier(
+                    name: test
+                )
+                params: array(
+                    0: Param(
+                        attrGroups: array(
+                        )
+                        flags: 0
+                        type: UnionType(
+                            types: array(
+                                0: Identifier(
+                                    name: int
+                                )
+                                1: Identifier(
+                                    name: float
+                                )
+                            )
+                        )
+                        byRef: false
+                        variadic: false
+                        var: Expr_Variable(
+                            name: foo
+                        )
+                        default: null
+                    )
+                )
+                returnType: null
+                stmts: array(
+                    0: Stmt_Expression(
+                        expr: Expr_FuncCall(
+                            name: Name_FullyQualified(
+                                parts: array(
+                                    0: var_dump
+                                )
+                            )
+                            args: array(
+                                0: Arg(
+                                    name: null
+                                    value: Expr_Variable(
+                                        name: foo
+                                    )
+                                    byRef: false
+                                    unpack: false
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    )
+)

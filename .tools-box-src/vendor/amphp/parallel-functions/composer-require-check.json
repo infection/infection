@@ -1,0 +1,1 @@
+{"symbol-whitelist":["null","true","false","static","self","parent","array","string","int","float","bool","iterable","callable","mixed","void","object","parallel"],"php-core-extensions":["Core","date","pcre","Phar","Reflection","SPL","standard","hash"]}

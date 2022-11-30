@@ -34,21 +34,8 @@
 declare(strict_types=1);
 
 return [
-    'whitelist' => [
-        // PHP 8.0
-        'T_NAME_QUALIFIED',
-        'T_NAME_FULLY_QUALIFIED',
-        'T_NAME_RELATIVE',
-        'T_MATCH',
-        'T_NULLSAFE_OBJECT_OPERATOR',
-        'T_ATTRIBUTE',
-        // PHP 8.1
-        'T_AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG',
-        'T_AMPERSAND_FOLLOWED_BY_VAR_OR_VARARG',
-        'T_ENUM',
-        'T_READONLY',
+    'exclude-constants' => [
+        // Symfony global constants
+        '/^SYMFONY\_[\p{L}_]+$/',
     ],
-    'prefix' => 'Infected',
-    'exclude-classes' => [\Composer\InstalledVersions::class],
-    'exclude-files' => ['vendor/composer/InstalledVersions.php'],
 ];
