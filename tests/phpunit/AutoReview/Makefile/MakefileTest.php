@@ -67,6 +67,127 @@ final class MakefileTest extends BaseMakefileTestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function test_it_declares_test_rules(): void
+    {
+        $testRuleTargets = array_column(
+            self::getTestRules(false),
+            0,
+        );
+
+        $this->assertArrayContains(
+            $testRuleTargets,
+            ['test', 'test-autoreview', 'test-unit', 'test-e2e']
+        );
+        $this->assertDoesNotArrayContain(
+            $testRuleTargets,
+            ['test-docker', 'test-unit-docker', 'test-e2e-docker']
+        );
+    }
+
+    public function test_it_declares_docker_test_rules(): void
+    {
+        $testRuleTargets = array_column(
+            self::getTestRules(true),
+            0,
+        );
+
+        $this->assertArrayContains(
+            $testRuleTargets,
+            ['test-docker', 'test-unit-docker', 'test-e2e-docker']
+        );
+        $this->assertDoesNotArrayContain(
+            $testRuleTargets,
+            ['test', 'test-autoreview', 'test-unit', 'test-e2e']
+        );
+    }
+
+    /**
+     * @dataProvider subTargetProvider
+     *
+     * @param list<string> $expected
+     * @param list<string> $notExpected
+     */
+    public function test_it_can_get_a_docker_test_target_sub_test_targets(
+        string $target,
+        array $expected,
+        array $notExpected
+    ): void {
+        $subTestTargets = self::getDockerSubTestTargets(
+            $target,
+            self::getTestRules(true),
+        );
+
+        $this->assertArrayContains(
+            $subTestTargets,
+            $expected,
+        );
+        $this->assertDoesNotArrayContain(
+            $subTestTargets,
+            $notExpected,
+        );
+    }
+
+    public static function subTargetProvider(): iterable
+    {
+        yield [
+            'test-docker',
+            ['test-unit-docker', 'test-e2e-docker'],
+            ['test-docker', 'test-unit', 'test-e2e'],
+        ];
+
+        yield [
+            'test-unit-docker',
+            ['test-unit-80-docker'],
+            ['test-unit-docker', 'test-unit-80', 'test-unit'],
+        ];
+    }
+
+    /**
+     * @dataProvider rootTestTargetProvider
+     *
+     * @param list<string> $expected
+     * @param list<string> $notExpected
+     */
+    public function test_it_can_get_all_the_root_test_targets(
+        bool $docker,
+        array $expected,
+        array $notExpected
+    ): void {
+        $dashCount = $docker ? 2 : 1;
+
+        $rootTestRules = self::getTestRules($docker);
+        array_shift($rootTestRules);
+
+        $rootTestTargets = self::getRootTestTargets(
+            $rootTestRules,
+            $dashCount,
+        );
+
+        $this->assertArrayContains(
+            $rootTestTargets,
+            $expected,
+        );
+        $this->assertDoesNotArrayContain(
+            $rootTestTargets,
+            $notExpected,
+        );
+    }
+
+    public static function rootTestTargetProvider(): iterable
+    {
+        yield [
+            true,
+            ['test-unit-docker', 'test-e2e-docker'],
+            ['test-docker', 'test-unit', 'test-e2e'],
+        ];
+
+        yield [
+            false,
+            ['test-unit', 'test-e2e'],
+            ['test', 'test-unit-docker', 'test-e2e-docker'],
+        ];
+    }
+
     public function test_all_docker_test_targets_are_properly_declared(): void
     {
         $testRules = self::getTestRules(true);
@@ -75,7 +196,7 @@ final class MakefileTest extends BaseMakefileTestCase
             $target = $rule->getTarget();
             $prerequisites = $rule->getPrerequisites();
 
-            $subTestTargets = self::getSubTestRules($target, $testRules);
+            $subTestTargets = self::getDockerSubTestTargets($target, $testRules);
 
             if ($subTestTargets === []) {
                 continue;
@@ -115,6 +236,7 @@ final class MakefileTest extends BaseMakefileTestCase
     {
         $testRules = self::getTestRules(true);
 
+        // Exclude itself
         $testPrerequisites = array_shift($testRules)->getPrerequisites();
 
         $rootTestTargets = self::getRootTestTargets($testRules, 2);
@@ -187,7 +309,7 @@ EOF;
      *
      * @return list<string>
      */
-    private static function getSubTestRules(string $target, array $testRules): array
+    private static function getDockerSubTestTargets(string $target, array $testRules): array
     {
         $dashCount = substr_count($target, '-') - 1;
 
@@ -224,5 +346,47 @@ EOF;
                     && substr_count($target, '-') === $dashCount,
             ),
         );
+    }
+
+    /**
+     * @template T
+     *
+     * @param T[] $array
+     * @param T[] $items
+     */
+    private function assertArrayContains(
+        array $array,
+        array $items
+    ): void {
+        if (count($items) === 0) {
+            $this->addToAssertionCount(1);
+
+            return;
+        }
+
+        foreach ($items as $item) {
+            $this->assertContains($item, $array);
+        }
+    }
+
+    /**
+     * @template T
+     *
+     * @param T[] $array
+     * @param T[] $items
+     */
+    private function assertDoesNotArrayContain(
+        array $array,
+        array $items
+    ): void {
+        if (count($items) === 0) {
+            $this->addToAssertionCount(1);
+
+            return;
+        }
+
+        foreach ($items as $item) {
+            $this->assertNotContains($item, $array);
+        }
     }
 }
