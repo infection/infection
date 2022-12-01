@@ -89,11 +89,11 @@ phpstan-baseline: vendor $(PHPSTAN)
 
 .PHONY: psalm-baseline
 psalm-baseline: vendor
-	$(PSALM) --threads=4 --set-baseline=psalm-baseline.xml
+	$(PSALM) --threads=max --set-baseline=psalm-baseline.xml
 
 .PHONY: psalm
 psalm: vendor $(PSALM)
-	$(PSALM) --threads=4
+	$(PSALM) --threads=max
 
 .PHONY: validate
 validate:
@@ -183,7 +183,7 @@ test-e2e-xdebug-80-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself
 test-infection:
-	$(INFECTION) --threads=4
+	$(INFECTION) --threads=max
 
 .PHONY: test-infection-docker
 test-infection-docker:	## Runs Infection against itself on the different Docker platforms
@@ -194,14 +194,14 @@ test-infection-phpdbg-docker: test-infection-phpdbg-80-docker
 
 .PHONY: test-infection-phpdbg-80-docker
 test-infection-phpdbg-80-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_80) phpdbg -qrr bin/infection --threads=4
+	$(DOCKER_RUN_80) phpdbg -qrr bin/infection --threads=max
 
 .PHONY: test-infection-xdebug-docker
 test-infection-xdebug-docker: test-infection-xdebug-80-docker
 
 .PHONY: test-infection-xdebug-80-docker
 test-infection-xdebug-80-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_80) ./bin/infection --threads=4
+	$(DOCKER_RUN_80) ./bin/infection --threads=max
 
 #
 # Rules from files (non-phony targets)
