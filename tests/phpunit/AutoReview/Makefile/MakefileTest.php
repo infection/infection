@@ -35,30 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Makefile;
 
-use Fidry\Makefile\Rule;
-use Fidry\Makefile\Test\BaseMakefileTestCase;
 use function array_column;
 use function array_filter;
-use function array_key_exists;
 use function array_map;
 use function array_shift;
 use function array_unshift;
 use function array_values;
-use function count;
-use function current;
-use function error_clear_last;
-use function function_exists;
+use Fidry\Makefile\Rule;
+use Fidry\Makefile\Test\BaseMakefileTestCase;
 use function implode;
-use PHPUnit\Framework\TestCase;
 use function Safe\array_replace;
-use Safe\Exceptions\ExecException;
-use function Safe\file_get_contents;
-use function Safe\shell_exec;
 use function Safe\sprintf;
 use function Safe\substr;
-use function shell_exec as unsafe_shell_exec;
 use function str_starts_with;
-use function strpos;
 use function substr_count;
 
 /**
@@ -69,41 +58,6 @@ use function substr_count;
 final class MakefileTest extends BaseMakefileTestCase
 {
     private const MAKEFILE_PATH = __DIR__ . '/../../../../Makefile';
-
-    protected static function getMakefilePath(): string
-    {
-        return self::MAKEFILE_PATH;
-    }
-
-    protected function getExpectedHelpOutput(): string
-    {
-        return <<<'EOF'
-[33mUsage:[0m
-  make TARGET
-
-[32m#
-# Commands
-#---------------------------------------------------------------------------[0m
-
-[33mcompile:[0m	 	 Bundles Infection into a PHAR
-[33mcompile-docker:[0m	 	 Bundles Infection into a PHAR using docker
-[33mcs:[0m	  	 	 Runs PHP-CS-Fixer
-[33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
-[33mprofile:[0m 	 	 Runs Blackfire
-[33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)
-[33mtest:[0m		 	 Runs all the tests
-[33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
-[33mtest-unit:[0m	 	 Runs the unit tests
-[33mtest-unit-parallel:[0m	 Runs the unit tests in parallel
-[33mtest-unit-docker:[0m	 Runs the unit tests on the different Docker platforms
-[33mtest-e2e:[0m 	 	 Runs the end-to-end tests
-[33mtest-e2e-phpunit:[0m	 Runs PHPUnit-enabled subset of end-to-end tests
-[33mtest-e2e-docker:[0m 	 Runs the end-to-end tests on the different Docker platforms
-[33mtest-infection:[0m		 Runs Infection against itself
-[33mtest-infection-docker:[0m	 Runs Infection against itself on the different Docker platforms
-
-EOF;
-    }
 
     public function test_the_default_goal_is_the_help_command(): void
     {
@@ -167,6 +121,41 @@ EOF;
         array_unshift($rootTestTargets, 'autoreview');
 
         $this->assertEqualsCanonicalizing($rootTestTargets, $testPrerequisites);
+    }
+
+    protected static function getMakefilePath(): string
+    {
+        return self::MAKEFILE_PATH;
+    }
+
+    protected function getExpectedHelpOutput(): string
+    {
+        return <<<'EOF'
+[33mUsage:[0m
+  make TARGET
+
+[32m#
+# Commands
+#---------------------------------------------------------------------------[0m
+
+[33mcompile:[0m	 	 Bundles Infection into a PHAR
+[33mcompile-docker:[0m	 	 Bundles Infection into a PHAR using docker
+[33mcs:[0m	  	 	 Runs PHP-CS-Fixer
+[33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
+[33mprofile:[0m 	 	 Runs Blackfire
+[33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)
+[33mtest:[0m		 	 Runs all the tests
+[33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
+[33mtest-unit:[0m	 	 Runs the unit tests
+[33mtest-unit-parallel:[0m	 Runs the unit tests in parallel
+[33mtest-unit-docker:[0m	 Runs the unit tests on the different Docker platforms
+[33mtest-e2e:[0m 	 	 Runs the end-to-end tests
+[33mtest-e2e-phpunit:[0m	 Runs PHPUnit-enabled subset of end-to-end tests
+[33mtest-e2e-docker:[0m 	 Runs the end-to-end tests on the different Docker platforms
+[33mtest-infection:[0m		 Runs Infection against itself
+[33mtest-infection-docker:[0m	 Runs Infection against itself on the different Docker platforms
+
+EOF;
     }
 
     /**

@@ -29,6 +29,9 @@ parameters:
         -
             message: '#Function ini_get is unsafe to use#'
             path: ../tests/phpunit/Process/OriginalPhpProcessTest.php
+        -
+            message: '#Function shell_exec is unsafe to use#'
+            path: ../tests/phpunit/AutoReview/Makefile/MakefileTest.php
     level: 4
     paths:
         - ../tests/phpunit
