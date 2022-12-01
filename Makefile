@@ -27,7 +27,7 @@ PSALM=./.tools/psalm
 PSALM_URL="https://github.com/vimeo/psalm/releases/download/v4.15.0/psalm.phar"
 
 PHPUNIT=vendor/phpunit/phpunit/phpunit
-PARATEST=vendor/bin/paratest --runner=WrapperRunner
+PARATEST=vendor/bin/paratest
 
 INFECTION=./build/infection.phar
 
@@ -52,7 +52,9 @@ PHPUNIT_GROUP=default
 
 .PHONY: compile
 compile:	 	## Bundles Infection into a PHAR
-compile: $(INFECTION)
+compile:
+	rm $(INFECTION) || true
+	make $(INFECTION)
 
 .PHONY: compile-docker
 compile-docker:	 	## Bundles Infection into a PHAR using docker
@@ -89,11 +91,11 @@ phpstan-baseline: vendor $(PHPSTAN)
 
 .PHONY: psalm-baseline
 psalm-baseline: vendor
-	$(PSALM) --threads=4 --set-baseline=psalm-baseline.xml
+	$(PSALM) --threads=max --set-baseline=psalm-baseline.xml
 
 .PHONY: psalm
 psalm: vendor $(PSALM)
-	$(PSALM) --threads=4
+	$(PSALM) --threads=max
 
 .PHONY: validate
 validate:
@@ -129,18 +131,18 @@ test-docker:		## Runs all the tests on the different Docker platforms
 test-docker: autoreview test-unit-docker test-e2e-docker test-infection-docker
 
 .PHONY: test-autoreview
-test-autoreview:
+test-autoreview: $(PHPUNIT) vendor
 	$(PHPUNIT) --configuration=phpunit_autoreview.xml
 
 .PHONY: test-unit
 test-unit:	 	## Runs the unit tests
-test-unit: $(PHPUNIT)
+test-unit: $(PHPUNIT) vendor
 	$(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-unit-parallel
 test-unit-parallel:	## Runs the unit tests in parallel
-test-unit-parallel:
-	$(PARATEST)
+test-unit-parallel: $(PARATEST) vendor
+	$(PARATEST) --runner=WrapperRunner
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
@@ -157,7 +159,7 @@ test-e2e: test-e2e-phpunit
 
 .PHONY: test-e2e-phpunit
 test-e2e-phpunit:	## Runs PHPUnit-enabled subset of end-to-end tests
-test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES)
+test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES) vendor
 	$(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 
 .PHONY: test-e2e-docker
@@ -182,8 +184,8 @@ test-e2e-xdebug-80-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
 
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself
-test-infection:
-	$(INFECTION) --threads=4
+test-infection: $(INFECTION) vendor
+	$(INFECTION) --threads=max
 
 .PHONY: test-infection-docker
 test-infection-docker:	## Runs Infection against itself on the different Docker platforms
@@ -194,14 +196,14 @@ test-infection-phpdbg-docker: test-infection-phpdbg-80-docker
 
 .PHONY: test-infection-phpdbg-80-docker
 test-infection-phpdbg-80-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_80) phpdbg -qrr bin/infection --threads=4
+	$(DOCKER_RUN_80) phpdbg -qrr bin/infection --threads=max
 
 .PHONY: test-infection-xdebug-docker
 test-infection-xdebug-docker: test-infection-xdebug-80-docker
 
 .PHONY: test-infection-xdebug-80-docker
 test-infection-xdebug-80-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_80) ./bin/infection --threads=4
+	$(DOCKER_RUN_80) ./bin/infection --threads=max
 
 #
 # Rules from files (non-phony targets)
@@ -210,19 +212,20 @@ test-infection-xdebug-80-docker: $(DOCKER_FILE_IMAGE)
 $(BOX): Makefile
 	wget -q $(BOX_URL) --output-document=$(BOX)
 	chmod a+x $(BOX)
-	touch $@
+	touch -c $@
 
 $(PHP_CS_FIXER): Makefile
 	wget -q $(PHP_CS_FIXER_URL) --output-document=$(PHP_CS_FIXER)
 	chmod a+x $(PHP_CS_FIXER)
-	touch $@
+	touch -c $@
 
 $(PHPSTAN): vendor
+	touch -c $@
 
 $(PSALM): Makefile
 	wget -q $(PSALM_URL) --output-document=$(PSALM)
 	chmod a+x $(PSALM)
-	touch $@
+	touch -c $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	composer require infection/codeception-adapter infection/phpspec-adapter
@@ -234,7 +237,7 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 
 vendor: composer.lock
 	composer install --prefer-dist
-	touch $@
+	touch -c $@
 
 composer.lock: composer.json
 	composer install --prefer-dist
@@ -246,10 +249,11 @@ $(PHPUNIT): vendor phpunit.xml.dist
 phpunit.xml.dist:
 	# Not updating phpunit.xml with:
 	# phpunit --migrate-configuration || true
+	touch -c $@
 
 $(DOCKER_FILE_IMAGE): devTools/Dockerfile
 	docker-compose build
-	touch $@
+	touch -c $@
 
 tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
