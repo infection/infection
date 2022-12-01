@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Makefile;
 
-use function array_column;
 use function array_filter;
 use function array_map;
 use function array_shift;
 use function array_unshift;
 use function array_values;
+use function count;
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
 use function implode;
@@ -69,9 +69,9 @@ final class MakefileTest extends BaseMakefileTestCase
 
     public function test_it_declares_test_rules(): void
     {
-        $testRuleTargets = array_column(
+        $testRuleTargets = array_map(
+            static fn (Rule $rule) => $rule->getTarget(),
             self::getTestRules(false),
-            0,
         );
 
         $this->assertArrayContains(
@@ -86,9 +86,9 @@ final class MakefileTest extends BaseMakefileTestCase
 
     public function test_it_declares_docker_test_rules(): void
     {
-        $testRuleTargets = array_column(
+        $testRuleTargets = array_map(
+            static fn (Rule $rule) => $rule->getTarget(),
             self::getTestRules(true),
-            0,
         );
 
         $this->assertArrayContains(
@@ -324,7 +324,12 @@ EOF;
             }
         );
 
-        return array_column($subTestRules, 0);
+        return array_values(
+            array_map(
+                static fn (Rule $rule) => $rule->getTarget(),
+                $subTestRules,
+            ),
+        );
     }
 
     /**
