@@ -210,19 +210,20 @@ test-infection-xdebug-80-docker: $(DOCKER_FILE_IMAGE)
 $(BOX): Makefile
 	wget -q $(BOX_URL) --output-document=$(BOX)
 	chmod a+x $(BOX)
-	touch $@
+	touch -c $@
 
 $(PHP_CS_FIXER): Makefile
 	wget -q $(PHP_CS_FIXER_URL) --output-document=$(PHP_CS_FIXER)
 	chmod a+x $(PHP_CS_FIXER)
-	touch $@
+	touch -c $@
 
 $(PHPSTAN): vendor
+	touch -c $@
 
 $(PSALM): Makefile
 	wget -q $(PSALM_URL) --output-document=$(PSALM)
 	chmod a+x $(PSALM)
-	touch $@
+	touch -c $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	composer require infection/codeception-adapter infection/phpspec-adapter
@@ -234,7 +235,7 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 
 vendor: composer.lock
 	composer install --prefer-dist
-	touch $@
+	touch -c $@
 
 composer.lock: composer.json
 	composer install --prefer-dist
@@ -246,10 +247,11 @@ $(PHPUNIT): vendor phpunit.xml.dist
 phpunit.xml.dist:
 	# Not updating phpunit.xml with:
 	# phpunit --migrate-configuration || true
+	touch -c $@
 
 $(DOCKER_FILE_IMAGE): devTools/Dockerfile
 	docker-compose build
-	touch $@
+	touch -c $@
 
 tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
