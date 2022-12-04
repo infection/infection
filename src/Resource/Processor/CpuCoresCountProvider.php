@@ -37,6 +37,7 @@ namespace Infection\Resource\Processor;
 
 use Fidry\CpuCounter\CpuCoreCounter;
 use Fidry\CpuCounter\NumberOfCpuCoreNotFound;
+use function defined;
 
 /**
  * @internal
@@ -48,6 +49,10 @@ final class CpuCoresCountProvider
      */
     public static function provide(): int
     {
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            return 1;
+        }
+
         try {
             return (new CpuCoreCounter())->getCount();
         } catch (NumberOfCpuCoreNotFound $exception) {
