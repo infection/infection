@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function array_merge;
+use function class_exists;
 use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\DescribeCommand;
@@ -74,20 +75,7 @@ final class Application extends BaseApplication
 
     public function __construct(Container $container)
     {
-        try {
-            $version = (string) InstalledVersions::getPrettyVersion(self::PACKAGE_NAME);
-            // @codeCoverageIgnoreStart
-        } catch (OutOfBoundsException $e) {
-            if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#i', $e->getMessage()) === 0) {
-                throw $e;
-            }
-
-            // We have a bogus exception: how can Infection be not installed if we're here?
-            $version = 'not-installed';
-        }
-        // @codeCoverageIgnoreEnd
-
-        parent::__construct(self::NAME, $version);
+        parent::__construct(self::NAME, self::getPrettyVersion());
 
         $this->container = $container;
         $this->setDefaultCommand('run');
@@ -135,5 +123,28 @@ final class Application extends BaseApplication
         }
 
         OutputFormatterStyleConfigurator::configure($output);
+    }
+
+    private static function getPrettyVersion(): string
+    {
+        // Pre 2.0 Composer runtime didn't have this class.
+        // @codeCoverageIgnoreStart
+        if (!class_exists(InstalledVersions::class)) {
+            return 'unknown';
+        }
+        // @codeCoverageIgnoreEnd
+
+        try {
+            return (string) InstalledVersions::getPrettyVersion(self::PACKAGE_NAME);
+            // @codeCoverageIgnoreStart
+        } catch (OutOfBoundsException $e) {
+            if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#i', $e->getMessage()) === 0) {
+                throw $e;
+            }
+
+            // We have a bogus exception: how can Infection be not installed if we're here?
+            return 'not-installed';
+        }
+        // @codeCoverageIgnoreEnd
     }
 }
