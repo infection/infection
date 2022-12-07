@@ -55,7 +55,7 @@ final class LogicalAndNegation implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Negates whole AND (`&&`) condition.
+Negates a whole AND expression (`&&`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
