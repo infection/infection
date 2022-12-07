@@ -55,7 +55,7 @@ final class LogicalAndAllSubExprNegation implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Negates all sub-expressions at once in AND (`&&`).
+Negates all sub-expressions of an AND expression (`&&`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
