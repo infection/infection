@@ -55,7 +55,7 @@ final class ElseifNegation implements Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Negates an expression in elseif statement.',
+            'Negates an elseif expression.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
