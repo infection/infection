@@ -42,7 +42,7 @@ use PhpParser\Node;
  */
 trait SimpleExpression
 {
-    private function isSimpleExpression(Node\Expr $expr): bool
+    private function isSingleOperandExpression(Node\Expr $expr): bool
     {
         return $expr instanceof Node\Expr\FuncCall
             || $expr instanceof Node\Expr\MethodCall

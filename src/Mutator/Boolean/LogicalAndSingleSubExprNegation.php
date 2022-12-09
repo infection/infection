@@ -69,7 +69,7 @@ DIFF
         );
     }
 
-    protected function isInstanceOf(Node $node): bool
+    protected function isSupportedBinaryOpExpr(Node\Expr\BinaryOp $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\BooleanAnd;
     }

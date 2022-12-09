@@ -38,7 +38,6 @@ namespace Infection\Mutator\Util;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\SimpleExpression;
 use Infection\PhpParser\Visitor\ParentConnector;
-use LogicException;
 use PhpParser\Node;
 
 /**
@@ -67,16 +66,16 @@ abstract class AbstractSingleSubExprNegation implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        if (!$this->isInstanceOf($node)) {
+        if (!$this->isSupportedNode($node)) {
             return false;
         }
 
         $parent = ParentConnector::findParent($node);
 
-        return $parent !== null && !$this->isInstanceOf($parent); // only grandparent
+        return $parent !== null && !$this->isSupportedNode($parent); // only grandparent
     }
 
-    abstract protected function isInstanceOf(Node $node): bool;
+    abstract protected function isSupportedBinaryOpExpr(Node\Expr\BinaryOp $node): bool;
 
     /**
      * @param array<string, mixed> $attributes
@@ -85,14 +84,11 @@ abstract class AbstractSingleSubExprNegation implements Mutator
 
     private function countSubExpressionsToNegate(Node\Expr $node, int &$count = 0): int
     {
-        if ($this->isInstanceOf($node)) {
-            if (!isset($node->left, $node->right)) {
-                throw new LogicException('Node does not have left or right attribute. Given type ' . $node->getType());
-            }
-
+        if ($this->isSupportedNode($node)) {
+            /** @var Node\Expr\BinaryOp $node */
             $this->countSubExpressionsToNegate($node->left, $count);
             $this->countSubExpressionsToNegate($node->right, $count);
-        } elseif ($this->isSimpleExpression($node)) {
+        } elseif ($this->isSingleOperandExpression($node)) {
             ++$count;
         }
 
@@ -101,11 +97,8 @@ abstract class AbstractSingleSubExprNegation implements Mutator
 
     private function negateSubExpression(Node\Expr $node, int $negateExpressionAtIndex, int &$currentExpressionIndex = 0): Node\Expr
     {
-        if ($this->isInstanceOf($node)) {
-            if (!isset($node->left, $node->right)) {
-                throw new LogicException('Node does not have left or right attribute. Given type ' . $node->getType());
-            }
-
+        if ($this->isSupportedNode($node)) {
+            /** @var Node\Expr\BinaryOp $node */
             return $this->create(
                 $this->negateSubExpression($node->left, $negateExpressionAtIndex, $currentExpressionIndex),
                 $this->negateSubExpression($node->right, $negateExpressionAtIndex, $currentExpressionIndex),
@@ -113,7 +106,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
             );
         }
 
-        if ($this->isSimpleExpression($node)) {
+        if ($this->isSingleOperandExpression($node)) {
             if ($currentExpressionIndex === $negateExpressionAtIndex) {
                 ++$currentExpressionIndex;
 
@@ -124,5 +117,10 @@ abstract class AbstractSingleSubExprNegation implements Mutator
         }
 
         return $node;
+    }
+
+    private function isSupportedNode(Node $node): bool
+    {
+        return $node instanceof Node\Expr\BinaryOp && $this->isSupportedBinaryOpExpr($node);
     }
 }

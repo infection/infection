@@ -47,7 +47,7 @@ use PhpParser\Node;
  *
  * @implements Mutator<Node\Stmt\ElseIf_>
  */
-final class ElseifNegation implements Mutator
+final class ElseIfNegation implements Mutator
 {
     use GetMutatorName;
     use SimpleExpression;
@@ -89,6 +89,6 @@ DIFF
             return false;
         }
 
-        return $this->isSimpleExpression($node->cond);
+        return $this->isSingleOperandExpression($node->cond);
     }
 }

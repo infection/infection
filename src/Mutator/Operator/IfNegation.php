@@ -92,6 +92,6 @@ DIFF
             return false;
         }
 
-        return $this->isSimpleExpression($node->cond);
+        return $this->isSingleOperandExpression($node->cond);
     }
 }

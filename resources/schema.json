@@ -282,7 +282,7 @@
                 "Break_": { "$ref": "#/definitions/default-mutator-config" },
                 "Catch_": { "$ref": "#/definitions/default-mutator-config" },
                 "Continue_": { "$ref": "#/definitions/default-mutator-config" },
-                "ElseifNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "ElseIfNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "Ternary": { "$ref": "#/definitions/default-mutator-config" },
                 "Throw_": { "$ref": "#/definitions/default-mutator-config" },
                 "Finally_": { "$ref": "#/definitions/default-mutator-config" },
