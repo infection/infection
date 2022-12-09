@@ -85,7 +85,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
     private function countSubExpressionsToNegate(Node\Expr $node, int &$count = 0): int
     {
         if ($this->isSupportedNode($node)) {
-            /** @var Node\Expr\BinaryOp $node */
+            /* @var Node\Expr\BinaryOp $node */
             $this->countSubExpressionsToNegate($node->left, $count);
             $this->countSubExpressionsToNegate($node->right, $count);
         } elseif ($this->isSingleOperandExpression($node)) {
@@ -98,7 +98,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
     private function negateSubExpression(Node\Expr $node, int $negateExpressionAtIndex, int &$currentExpressionIndex = 0): Node\Expr
     {
         if ($this->isSupportedNode($node)) {
-            /** @var Node\Expr\BinaryOp $node */
+            /* @var Node\Expr\BinaryOp $node */
             return $this->create(
                 $this->negateSubExpression($node->left, $negateExpressionAtIndex, $currentExpressionIndex),
                 $this->negateSubExpression($node->right, $negateExpressionAtIndex, $currentExpressionIndex),
