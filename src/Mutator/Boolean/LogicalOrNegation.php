@@ -55,7 +55,7 @@ final class LogicalOrNegation implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Negates whole OR (`||`) condition.
+Negates a whole OR expression (`||`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
