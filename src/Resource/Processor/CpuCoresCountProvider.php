@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Processor;
 
+use function defined;
 use Fidry\CpuCounter\CpuCoreCounter;
 use Fidry\CpuCounter\NumberOfCpuCoreNotFound;
-use function defined;
 
 /**
  * @internal
