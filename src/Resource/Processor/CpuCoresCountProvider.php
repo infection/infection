@@ -36,17 +36,8 @@ declare(strict_types=1);
 namespace Infection\Resource\Processor;
 
 use function defined;
-use function extension_loaded;
-use const FILTER_VALIDATE_INT;
-use function filter_var;
-use function function_exists;
-use function is_int;
-use function is_readable;
-use Safe\Exceptions\ExecException;
-use function Safe\file_get_contents;
-use function Safe\shell_exec;
-use function substr_count;
-use function trim;
+use Fidry\CpuCoreCounter\CpuCoreCounter;
+use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
 
 /**
  * @internal
@@ -62,45 +53,10 @@ final class CpuCoresCountProvider
             return 1;
         }
 
-        if (!extension_loaded('pcntl') || !function_exists('shell_exec')) {
+        try {
+            return (new CpuCoreCounter())->getCount();
+        } catch (NumberOfCpuCoreNotFound $exception) {
             return 1;
         }
-
-        try {
-            // for Linux
-            $hasNproc = trim(@shell_exec('command -v nproc'));
-
-            if ($hasNproc !== '') {
-                $nproc = trim(shell_exec('nproc'));
-                $cpuCount = filter_var($nproc, FILTER_VALIDATE_INT);
-
-                if (is_int($cpuCount)) {
-                    return $cpuCount;
-                }
-            }
-        } catch (ExecException) {
-        }
-
-        try {
-            // for MacOS
-            $ncpu = trim(shell_exec('sysctl -n hw.ncpu'));
-            $cpuCount = filter_var($ncpu, FILTER_VALIDATE_INT);
-
-            if (is_int($cpuCount)) {
-                return $cpuCount;
-            }
-        } catch (ExecException) {
-        }
-
-        if (is_readable('/proc/cpuinfo')) {
-            $cpuInfo = file_get_contents('/proc/cpuinfo');
-            $cpuCount = substr_count($cpuInfo, 'processor');
-
-            if ($cpuCount > 0) {
-                return $cpuCount;
-            }
-        }
-
-        return 1;
     }
 }
