@@ -2,6 +2,7 @@
 
 namespace Infection\Tests\Fixtures\Finder;
 
+use Iterator;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Iterator\PathFilterIterator;
 
@@ -27,7 +28,7 @@ class MockRelativePathFinder extends Finder
         return $this;
     }
 
-    public function getIterator()
+    public function getIterator(): Iterator
     {
         $iterator = parent::getIterator();
 
