@@ -51,7 +51,7 @@ final class DummyFileSystem extends Filesystem
     {
     }
 
-    public function exists($files): void
+    public function exists(string|iterable $files): bool
     {
     }
 
@@ -87,11 +87,11 @@ final class DummyFileSystem extends Filesystem
     {
     }
 
-    public function readlink(string $path, bool $canonicalize = false): void
+    public function readlink(string $path, bool $canonicalize = false): ?string
     {
     }
 
-    public function makePathRelative(string $endPath, string $startPath): void
+    public function makePathRelative(string $endPath, string $startPath): string
     {
     }
 
@@ -99,11 +99,11 @@ final class DummyFileSystem extends Filesystem
     {
     }
 
-    public function isAbsolutePath(string $file): void
+    public function isAbsolutePath(string $file): bool
     {
     }
 
-    public function tempnam(string $dir, string $prefix): void
+    public function tempnam(string $dir, string $prefix, string $suffix = ''): string
     {
     }
 
