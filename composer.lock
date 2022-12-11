@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c53b2c0b2c97deb9ebc865c4d2e05c39",
+    "content-hash": "ed2bc542261671b15d412e5878dc1132",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -4908,7 +4908,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",
@@ -4919,7 +4919,7 @@
         "ext-simplexml": "*"
     },
     "platform-overrides": {
-        "php": "8.0.0"
+        "php": "8.1.0"
     },
     "plugin-api-version": "2.3.0"
 }
