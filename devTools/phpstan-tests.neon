@@ -18,7 +18,6 @@ parameters:
         - '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with string will always evaluate to true\.$#'
         - '#^Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with ''[a-zA-Z\\]+'' and [a-zA-Z\\]+ will always evaluate to (false|true)\.$#'
         - '#^Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with [a-zA-Z\\&]+ and mixed will always evaluate to true\.$#'
-        - '#^Call to method PHPUnit\\Framework\\Assert::assertTrue\(\) with true will always evaluate to true\.$#'
         - '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
         - '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
@@ -29,9 +28,6 @@ parameters:
         -
             message: '#Function ini_get is unsafe to use#'
             path: ../tests/phpunit/Process/OriginalPhpProcessTest.php
-        -
-            message: '#Function shell_exec is unsafe to use#'
-            path: ../tests/phpunit/AutoReview/Makefile/MakefileTest.php
     level: 4
     paths:
         - ../tests/phpunit
