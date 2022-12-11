@@ -34,7 +34,7 @@
                 <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
             </errorLevel>
         </InvalidReturnType>
-        
+
         <MethodSignatureMismatch>
             <errorLevel type="suppress">
                 <!-- TODO: this was caused by bumping the minimum requirement to PHP 8.1. To fix. -->

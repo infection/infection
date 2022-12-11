@@ -165,6 +165,8 @@ final class ProjectCodeProvider
         $finder = Finder::create()
             ->files()
             ->name('*.php')
+            ->notName('DummySymfony5FileSystem.php')
+            ->notName('DummySymfony6FileSystem.php')
             ->in(__DIR__ . '/../../../../src')
         ;
 
@@ -262,6 +264,8 @@ final class ProjectCodeProvider
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
+            ->notName('DummySymfony5FileSystem.php')
+            ->notName('DummySymfony6FileSystem.php')
             ->notPath('xdebug-filter.php')
             ->exclude([
                 'autoloaded',

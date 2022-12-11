@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use function class_alias;
 use Composer\InstalledVersions;
 use Composer\Semver\VersionParser;
-use Safe\class_alias;
 
 if (InstalledVersions::satisfies(new VersionParser(), 'symfony/filesystem', '^6.0')) {
     class_alias(DummySymfony6FileSystem::class, \Infection\FileSystem\DummyFileSystem::class);
