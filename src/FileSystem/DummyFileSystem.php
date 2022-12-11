@@ -35,87 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
-use Symfony\Component\Filesystem\Filesystem;
-use Traversable;
+use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
+use Safe\class_alias;
 
-/**
- * @internal
- */
-final class DummyFileSystem extends Filesystem
-{
-    public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false): void
-    {
-    }
-
-    public function mkdir($dirs, int $mode = 0777): void
-    {
-    }
-
-    public function exists(string|iterable $files): bool
-    {
-    }
-
-    public function touch($files, ?int $time = null, ?int $atime = null): void
-    {
-    }
-
-    public function remove($files): void
-    {
-    }
-
-    public function chmod($files, int $mode, int $umask = 0000, bool $recursive = false): void
-    {
-    }
-
-    public function chown($files, $user, bool $recursive = false): void
-    {
-    }
-
-    public function chgrp($files, $group, bool $recursive = false): void
-    {
-    }
-
-    public function rename(string $origin, string $target, bool $overwrite = false): void
-    {
-    }
-
-    public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false): void
-    {
-    }
-
-    public function hardlink(string $originFile, $targetFiles): void
-    {
-    }
-
-    public function readlink(string $path, bool $canonicalize = false): ?string
-    {
-    }
-
-    public function makePathRelative(string $endPath, string $startPath): string
-    {
-    }
-
-    public function mirror(string $originDir, string $targetDir, ?Traversable $iterator = null, array $options = []): void
-    {
-    }
-
-    public function isAbsolutePath(string $file): bool
-    {
-    }
-
-    public function tempnam(string $dir, string $prefix, string $suffix = ''): string
-    {
-    }
-
-    public function dumpFile(string $filename, $content): void
-    {
-    }
-
-    public function appendToFile(string $filename, $content): void
-    {
-    }
-
-    public static function handleError($type, $msg): void
-    {
-    }
+if (InstalledVersions::satisfies(new VersionParser(), 'symfony/filesystem', '^6.0')) {
+    class_alias(DummySymfony6FileSystem::class, \Infection\FileSystem\DummyFileSystem::class);
+} else {
+    class_alias(DummySymfony5FileSystem::class, \Infection\FileSystem\DummyFileSystem::class);
 }

@@ -55,6 +55,8 @@ parameters:
         - ../src
     excludePaths:
         - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
+        - %currentWorkingDirectory%/src/FileSystem/DummySymfony5FileSystem.php
+        - %currentWorkingDirectory%/src/FileSystem/DummySymfony6FileSystem.php
     stubFiles:
         - phpstan.stub
     treatPhpDocTypesAsCertain: false
