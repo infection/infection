@@ -73,7 +73,7 @@
     },
     "require-dev": {
         "ext-simplexml": "*",
-        "brianium/paratest": "^6.3",
+        "brianium/paratest": "^6.6",
         "fidry/makefile": "^0.2.0",
         "helmich/phpunit-json-assert": "^3.0",
         "phpspec/prophecy-phpunit": "^2.0",
@@ -88,9 +88,6 @@
         "thecodingmachine/phpstan-safe-rule": "^1.2.0"
     },
     "config": {
-        "platform": {
-            "php": "8.0.0"
-        },
         "sort-packages": true,
         "allow-plugins": {
             "phpstan/extension-installer": true,

@@ -17,18 +17,21 @@ jobs:
     strategy:
       matrix:
         operating-system: [ ubuntu-latest ]
-        php-version: [ '8.0' ]
+        php-version: [ '8.0', '8.1', '8.2' ]
         coverage-driver: [ pcov, xdebug ]
-        e2e-runner: [ 'bin/infection' ]
+        e2e-runner: [ 'bin/infection', 'build/infection.phar' ]
+        execute-flex-with-symfony-version: [ '^5', '^6' ]
+        exclude:
+          - php-version: 8.0
+            execute-flex-with-symfony-version: '^6'
+          - php-version: 8.1
+            coverage-driver: xdebug
+          - php-version: 8.2
+            coverage-driver: xdebug
         include:
           - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
 
-    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
+    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} and Symfony ${{ matrix.execute-flex-with-symfony-version }}, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
     steps:
       - name: Checkout code
@@ -45,7 +48,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
           coverage: ${{ matrix.coverage-driver }}
           ini-values: memory_limit=512M, xdebug.mode=off
-          tools: composer:v2.1
+          tools: flex, composer:v2.1
 
       - name: Get composer cache directory
         id: composer-cache
@@ -62,9 +65,17 @@ jobs:
             composer-${{ runner.os }}-
             composer-
 
+      - name: Configure Symfony Flex
+        if: matrix.execute-flex-with-symfony-version
+        run: composer config extra.symfony.require ${{ matrix.execute-flex-with-symfony-version }}
+
       - name: Install dependencies
         run: |
-          composer install --no-interaction --prefer-dist --no-progress
+          composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
+
+          if [[ "${{ matrix.execute-flex-with-symfony-version }}" != '' ]]; then
+            composer update "symfony/*"
+          fi
 
       - name: Run tests
         shell: bash
