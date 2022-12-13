@@ -51,7 +51,7 @@ final class DummySymfony5FileSystem extends Filesystem
     {
     }
 
-    public function exists($files): void
+    public function exists($files): bool
     {
     }
 
