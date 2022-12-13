@@ -17,27 +17,32 @@ jobs:
     strategy:
       matrix:
         operating-system: [ ubuntu-latest ]
-        php-version: [ '8.0' ]
+        php-version: [ '8.0', '8.1', '8.2' ]
         coverage-driver: [ pcov, xdebug ]
-        e2e-runner: [ 'bin/infection' ]
+        e2e-runner: [ 'bin/infection', 'build/infection.phar' ]
+        dependencies:
+          - "locked"
+          - "lowest"
+          - "highest"
+        exclude:
+          - php-version: 8.0
+            dependencies: 'highest'
+          - php-version: 8.1
+            coverage-driver: xdebug
+          - php-version: 8.2
+            coverage-driver: xdebug
+          - e2e-runner: 'build/infection.phar'
+            dependencies: 'lowest'
+          - e2e-runner: 'build/infection.phar'
+            dependencies: 'highest'
         include:
-          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection', dependencies: 'locked' }
 
-    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
+    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} and ${{ matrix.dependencies }} dependencies, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Configure for PHP >= 8.2
-        if: "matrix.php-version >= '8.2'"
-        run: |
-          composer config platform.php 8.1.99
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -58,23 +63,32 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}-
             composer-${{ runner.os }}-${{ matrix.php-version }}-
             composer-${{ runner.os }}-
             composer-
 
-      - name: Install dependencies
+      - name: Install locked dependencies
+        if: ${{ matrix.dependencies == 'locked' }}
         run: |
-          composer install --no-interaction --prefer-dist --no-progress
+          composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Install lowest dependencies
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: |
+          composer update --prefer-lowest --no-interaction --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Install highest dependencies
+        if: ${{ matrix.dependencies == 'highest' }}
+        run: |
+          composer update --no-interaction --prefer-dist --no-progress --optimize-autoloader
 
       - name: Run tests
         shell: bash
         run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
+          export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
 
           make test-unit
 
@@ -113,14 +127,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends expect
 
       - name: Run the whole set of E2E tests
-        if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection' && matrix.coverage-driver == 'xdebug'
         env:
           TERM: xterm-256color
         run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
-
           make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
       - name: Run the whole set of E2E tests with prefixed PHAR
@@ -136,8 +146,6 @@ jobs:
       - name: Run integration tests
         shell: bash
         run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
+          export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
 
           make test-unit PHPUNIT_GROUP=integration

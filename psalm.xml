@@ -27,5 +27,17 @@
                 <directory name="src/Mutator/Regex"/>
             </errorLevel>
         </ImpureFunctionCall>
+
+        <InvalidReturnType>
+            <errorLevel type="suppress">
+                <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
+            </errorLevel>
+        </InvalidReturnType>
+
+        <MethodSignatureMismatch>
+            <errorLevel type="suppress">
+                <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
+            </errorLevel>
+        </MethodSignatureMismatch>
     </issueHandlers>
 </psalm>
