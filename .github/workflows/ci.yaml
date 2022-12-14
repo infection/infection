@@ -90,9 +90,7 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
+          export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
 
           make test-unit
 
