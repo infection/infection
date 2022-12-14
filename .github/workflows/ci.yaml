@@ -31,6 +31,10 @@ jobs:
             coverage-driver: xdebug
           - php-version: 8.2
             coverage-driver: xdebug
+          - e2e-runner: 'build/infection.phar'
+            dependencies: 'lowest'
+          - e2e-runner: 'build/infection.phar'
+            dependencies: 'highest'
         include:
           - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection', dependencies: 'locked' }
 
