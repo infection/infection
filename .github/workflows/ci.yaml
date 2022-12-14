@@ -20,18 +20,21 @@ jobs:
         php-version: [ '8.0', '8.1', '8.2' ]
         coverage-driver: [ pcov, xdebug ]
         e2e-runner: [ 'bin/infection', 'build/infection.phar' ]
-        execute-flex-with-symfony-version: [ '^5', '^6' ]
+        dependencies:
+          - "locked"
+          - "lowest"
+          - "highest"
         exclude:
           - php-version: 8.0
-            execute-flex-with-symfony-version: '^6'
+            dependencies: 'highest'
           - php-version: 8.1
             coverage-driver: xdebug
           - php-version: 8.2
             coverage-driver: xdebug
         include:
-          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection', execute-flex-with-symfony-version: '^5' }
+          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection', dependencies: 'locked' }
 
-    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} and Symfony ${{ matrix.execute-flex-with-symfony-version }}, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
+    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} and ${{ matrix.dependencies }} dependencies, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
     steps:
       - name: Checkout code
@@ -48,7 +51,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
           coverage: ${{ matrix.coverage-driver }}
           ini-values: memory_limit=512M, xdebug.mode=off
-          tools: flex, composer:v2.1
+          tools: composer:v2.1
 
       - name: Get composer cache directory
         id: composer-cache
@@ -58,21 +61,27 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}-
             composer-${{ runner.os }}-${{ matrix.php-version }}-
             composer-${{ runner.os }}-
             composer-
 
-      - name: Configure Symfony Flex
-        if: matrix.execute-flex-with-symfony-version
-        run: composer config extra.symfony.require ${{ matrix.execute-flex-with-symfony-version }}
-
-      - name: Install dependencies
+      - name: Install locked dependencies
+        if: ${{ matrix.dependencies == 'locked' }}
         run: |
           composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
-          composer update "symfony/*"
+
+      - name: Install lowest dependencies
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: |
+          composer update --prefer-lowest --no-interaction --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Install highest dependencies
+        if: ${{ matrix.dependencies == 'highest' }}
+        run: |
+          composer update --no-interaction --prefer-dist --no-progress --optimize-autoloader
 
       - name: Run tests
         shell: bash
