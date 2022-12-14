@@ -4,6 +4,11 @@
     "source": {
         "directories": [
             "src"
+        ],
+        excludes: [
+            "src/FileSystem/DummyFileSystem.php",
+            "src/FileSystem/DummySymfony5FileSystem.php",
+            "src/FileSystem/DummySymfony6FileSystem.php"
         ]
     },
     "logs": {

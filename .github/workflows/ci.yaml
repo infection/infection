@@ -29,7 +29,7 @@ jobs:
           - php-version: 8.2
             coverage-driver: xdebug
         include:
-          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection', execute-flex-with-symfony-version: '^5' }
 
     name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} and Symfony ${{ matrix.execute-flex-with-symfony-version }}, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
@@ -72,10 +72,7 @@ jobs:
       - name: Install dependencies
         run: |
           composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
-
-          if [[ "${{ matrix.execute-flex-with-symfony-version }}" != '' ]]; then
-            composer update "symfony/*"
-          fi
+          composer update "symfony/*"
 
       - name: Run tests
         shell: bash
