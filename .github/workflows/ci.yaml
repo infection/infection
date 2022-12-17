@@ -44,11 +44,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Configure for PHP >= 8.2
-        if: "matrix.php-version >= '8.2'"
-        run: |
-          composer config platform.php 8.1.99
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -129,14 +124,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends expect
 
       - name: Run the whole set of E2E tests
-        if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection' && matrix.coverage-driver == 'xdebug'
         env:
           TERM: xterm-256color
         run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
-
           make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
       - name: Run the whole set of E2E tests with prefixed PHAR
@@ -152,8 +143,6 @@ jobs:
       - name: Run integration tests
         shell: bash
         run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
+          export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
 
           make test-unit PHPUNIT_GROUP=integration

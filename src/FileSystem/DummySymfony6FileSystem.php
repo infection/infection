@@ -104,10 +104,12 @@ final class DummySymfony6FileSystem extends Filesystem
 
     public function isAbsolutePath(string $file): bool
     {
+        return true;
     }
 
     public function tempnam(string $dir, string $prefix, string $suffix = ''): string
     {
+        return '';
     }
 
     public function dumpFile(string $filename, $content): void
@@ -115,10 +117,6 @@ final class DummySymfony6FileSystem extends Filesystem
     }
 
     public function appendToFile(string $filename, $content): void
-    {
-    }
-
-    public static function handleError($type, $msg): void
     {
     }
 }
