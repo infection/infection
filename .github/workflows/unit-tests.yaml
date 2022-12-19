@@ -21,7 +21,8 @@ jobs:
         php-version: [ '8.0', '8.1', '8.2' ]
         coverage-driver: [ pcov, xdebug ]
         dependency: [ lowest, highest ]
-      include:
+
+        include:
           # Check that everything is in order on Windows with the PHP version
           # configured in composer.json#config.platform.php
           - operating-system: 'windows-latest'
