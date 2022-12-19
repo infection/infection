@@ -1,7 +1,7 @@
 # yamllint disable rule:line-length
 # yamllint disable rule:braces
 
-name: Tests
+name: Unit & Integration Tests
 
 on:
   pull_request:
