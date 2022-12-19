@@ -137,7 +137,7 @@ test-autoreview: $(PHPUNIT) vendor
 .PHONY: test-unit
 test-unit:	 	## Runs the unit tests
 test-unit: $(PHPUNIT) vendor
-	$(PHPUNIT) --group $(PHPUNIT_GROUP)
+	$(PHPUNIT) --group $(PHPUNIT_GROUP) --exclude-group e2e
 
 .PHONY: test-unit-parallel
 test-unit-parallel:	## Runs the unit tests in parallel
