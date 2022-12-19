@@ -45,7 +45,7 @@ jobs:
           tools: composer
 
       - name: Remove the configured PHP platform
-        if: matrix.dependency != locked
+        if: matrix.dependency != 'locked'
         run: composer config --unset platform.php
 
       - name: Install dependencies
@@ -54,7 +54,7 @@ jobs:
             dependency-versions: highest
 
       - name: Configure the deprecations
-        if: matrix.dependency != locked
+        if: matrix.dependency != 'locked'
         run: echo "{SYMFONY_DEPRECATIONS_HELPER}={max[self]=0}" >> $GITHUB_ENV
 
       - name: Run the unit tests
