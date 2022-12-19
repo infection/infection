@@ -19,8 +19,9 @@ jobs:
         operating-system: [ 'windows-latest', 'ubuntu-latest' ]
         php-version: [ '8.0', '8.1', '8.2' ]
         coverage-driver: [ pcov, xdebug ]
+        dependency: [ lowest, highest ]
 
-    name: Unit & Integration tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} using ${{ matrix.coverage-driver }}
+    name: Unit & Integration tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependency }}) using ${{ matrix.coverage-driver }}
 
     steps:
       - name: Checkout code
