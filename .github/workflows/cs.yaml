@@ -19,6 +19,9 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
+          # Should use the lowest supported version to ensure the CS-Fixer does
+          # not get confused and apply a rule that would break on lower supported
+          # versions.
           php-version: 8.0
 
       - name: Restore PHP-CS-Fixer cache
