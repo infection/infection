@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ['8.0']
+        php-version: ['8.1']
 
     name: Autoreview on PHP ${{ matrix.php-version }}
 
@@ -28,7 +28,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: composer:v2.1
+          tools: composer
 
       - name: Get composer cache directory
         id: composer-cache
@@ -48,7 +48,6 @@ jobs:
         run: |
           composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Run tests
-        run: |
-          make autoreview -k
+      - name: Run auto-review tests
+        run: make autoreview --keep-going
 
