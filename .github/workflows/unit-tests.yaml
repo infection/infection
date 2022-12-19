@@ -17,10 +17,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        operating-system: [ 'windows-latest', 'ubuntu-latest' ]
+        operating-system: [ 'ubuntu-latest' ]
         php-version: [ '8.0', '8.1', '8.2' ]
         coverage-driver: [ pcov, xdebug ]
         dependency: [ lowest, highest ]
+      include:
+          # Check that everything is in order on Windows with the PHP version
+          # configured in composer.json#config.platform.php
+          - operating-system: 'windows-latest'
+            php-version: '8.0'
+            coverage-driver: pcov   # the driver does not really matter for this test
+            dependency: locked
 
     name: Unit & Integration tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependency }}) using ${{ matrix.coverage-driver }}
 
@@ -37,27 +44,21 @@ jobs:
           tools: composer
 
       - name: Remove the configured PHP platform
-        run: composer config --unset platform.php --no-update
+        if: matrix.dependency !== locked
+        run: composer config --unset platform.php
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2
         with:
             dependency-versions: highest
 
-      - name: Run tests
+      - name: Configure the deprecations
+        if: matrix.dependency !== locked
+        run: echo "{SYMFONY_DEPRECATIONS_HELPER}={max[self]=0}" >> $GITHUB_ENV
+
+      - name: Run the unit tests
+        run: make test-unit
+
+      - name: Run the integration tests
         shell: bash
-        run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
-
-          make test-unit
-
-      - name: Run integration tests
-        shell: bash
-        run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
-
-          make test-unit PHPUNIT_GROUP=integration
+        run: make test-unit PHPUNIT_GROUP=integration
