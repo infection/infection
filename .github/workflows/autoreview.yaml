@@ -16,7 +16,8 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ['8.1']
+        # Should use the latest supported PHP version
+        php-version: ['8.2']
 
     name: Autoreview on PHP ${{ matrix.php-version }}
 
@@ -49,5 +50,6 @@ jobs:
           composer install --no-interaction --prefer-dist --no-progress
 
       - name: Run auto-review tests
+        # Ensures we see all the errors
         run: make autoreview --keep-going
 
