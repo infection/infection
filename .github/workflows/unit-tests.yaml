@@ -1,0 +1,61 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.operating-system }}
+
+    strategy:
+      matrix:
+        operating-system: [ 'windows-latest', 'ubuntu-latest' ]
+        php-version: [ '8.0', '8.1', '8.2' ]
+        coverage-driver: [ pcov, xdebug ]
+
+    name: Unit & Integration tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} using ${{ matrix.coverage-driver }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v3
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: ${{ matrix.coverage-driver }}
+          ini-values: memory_limit=512M, xdebug.mode=off
+          tools: composer
+
+      - name: Remove the configured PHP platform
+        run: composer config --unset platform.php --no-update
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+            dependency-versions: highest
+
+      - name: Run tests
+        shell: bash
+        run: |
+          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
+            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
+          fi
+
+          make test-unit
+
+      - name: Run integration tests
+        shell: bash
+        run: |
+          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
+            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
+          fi
+
+          make test-unit PHPUNIT_GROUP=integration
