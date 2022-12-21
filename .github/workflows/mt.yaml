@@ -62,7 +62,7 @@ jobs:
 
       - name: Collect coverage report
         run: |
-            SYMFONY_DEPRECATIONS_HELPER=disabled php vendor/phpunit/phpunit/phpunit --stop-on-failure \
+          SYMFONY_DEPRECATIONS_HELPER=disabled php vendor/phpunit/phpunit/phpunit --stop-on-failure \
             --coverage-xml=build/logs/coverage-xml \
             --log-junit=build/logs/junit.xml
 
