@@ -51,6 +51,8 @@ jobs:
           coverage: ${{ matrix.coverage-driver }}
           ini-values: memory_limit=512M, xdebug.mode=off
           tools: composer:v2.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get composer cache directory
         id: composer-cache
