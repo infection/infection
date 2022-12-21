@@ -63,7 +63,7 @@ jobs:
 
       - name: Collect coverage report
         run: |
-          php -dxdebug.mode=coverage vendor/phpunit/phpunit/phpunit --stop-on-failure \
+            XDEBUG_MODE=coverage php vendor/phpunit/phpunit/phpunit --stop-on-failure \
             --coverage-xml=build/logs/coverage-xml \
             --log-junit=build/logs/junit.xml
 
