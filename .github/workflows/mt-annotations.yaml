@@ -18,7 +18,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
                   fetch-depth: 0
             - name: Setup PHP
@@ -27,6 +27,9 @@ jobs:
                   php-version: ${{ matrix.php-version }}
                   tools: composer:v2.1
                   coverage: pcov
+              env:
+                # This is necessary when installing a tool with a specific version
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Get composer cache directory
               id: composer-cache
@@ -49,4 +52,4 @@ jobs:
             - name: Run Infection for added files only
               run: |
                   git fetch origin $GITHUB_BASE_REF
-                  php bin/infection -j2 --git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations --only-covered
+                  php bin/infection --threads=max --git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations --only-covered

@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -36,6 +36,9 @@ jobs:
           php-version: ${{ matrix.php-version }}
           coverage: ${{ matrix.coverage-driver }}
           tools: composer:v2.1
+        env:
+          # This is necessary when installing a tool with a specific version
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get composer cache directory
         id: composer-cache
@@ -57,10 +60,19 @@ jobs:
 
       - name: Collect coverage report
         run: |
-          php vendor/phpunit/phpunit/phpunit --stop-on-failure --coverage-xml=build/logs/coverage-xml --log-junit=build/logs/junit.xml
+          php vendor/phpunit/phpunit/phpunit --stop-on-failure \
+            --coverage-xml=build/logs/coverage-xml \
+            --log-junit=build/logs/junit.xml
 
       - name: Run Infection
         env:
           INFECTION_BADGE_API_KEY: ${{ secrets.INFECTION_BADGE_API_KEY }}
         run: |
-          php bin/infection -j2 --skip-initial-tests --min-msi=$MIN_MSI --min-covered-msi=$MIN_COVERED_MSI --coverage=build/logs --log-verbosity=none --no-interaction --no-progress
+          php bin/infection --threads=max \
+            --skip-initial-tests \
+            --min-msi=$MIN_MSI \
+            --min-covered-msi=$MIN_COVERED_MSI \
+            --coverage=build/logs \
+            --log-verbosity=none \
+            --no-interaction \
+            --no-progress
