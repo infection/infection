@@ -10,7 +10,7 @@
 # - Using different code coverages
 # All of those variants may be interesting but are better tested in more scoped
 # tests like in ci.yaml.
-name: Infection on Infection
+name: Mutation Testing
 
 on:
   pull_request:
