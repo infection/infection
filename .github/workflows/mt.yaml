@@ -36,9 +36,9 @@ jobs:
           php-version: ${{ matrix.php-version }}
           coverage: ${{ matrix.coverage-driver }}
           tools: composer:v2.1
-          env:
-            # This is necessary when installing a tool with a specific version
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          # This is necessary when installing a tool with a specific version
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get composer cache directory
         id: composer-cache
