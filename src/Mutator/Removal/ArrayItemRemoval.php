@@ -143,6 +143,10 @@ DIFF
             return false;
         }
 
+        if ($parent instanceof Node\Arg && ParentConnector::findParent($parent) instanceof Node\Attribute) {
+            return false;
+        }
+
         return true;
     }
 
