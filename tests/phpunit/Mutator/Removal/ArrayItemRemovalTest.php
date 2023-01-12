@@ -36,7 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Removal;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 
+/**
+ * @group integration
+ */
 final class ArrayItemRemovalTest extends BaseMutatorTestCase
 {
     /**
@@ -113,6 +117,10 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
 
         yield 'It does not mutate lists with any number of elements' => [
             '<?php [$a, $b] = [];',
+        ];
+
+        yield 'It does not mutate arrays as an attribute argument' => [
+            MutatorFixturesProvider::getFixtureFileContent($this, 'does-not-mutate-array-in-attribute.php'),
         ];
     }
 }
