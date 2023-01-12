@@ -60,7 +60,7 @@ jobs:
         run: |
           composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Run tests
+      - name: Run unit tests
         shell: bash
         run: |
           if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
