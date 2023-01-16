@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use function get_class;
-use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function get_class;
+use function in_array;
 
 /**
  * @internal
@@ -83,28 +83,32 @@ DIFF
             return false;
         }
 
+        $equalOp = [
+            Node\Expr\BinaryOp\Identical::class,
+            Node\Expr\BinaryOp\Equal::class,
+        ];
+
         if (
-            (
-                $node->left instanceof Node\Expr\BinaryOp\Identical
-                && $node->right instanceof Node\Expr\BinaryOp\Identical
-            ) || (
-                $node->left instanceof Node\Expr\BinaryOp\Equal
-                && $node->right instanceof Node\Expr\BinaryOp\Equal
-            )
+            in_array(get_class($node->left), $equalOp, true) === true
+            && in_array(get_class($node->right), $equalOp, true) === true
         ) {
-            $varName = '';
+            $varNameLeft = null;
 
             if ($node->left->left instanceof Node\Expr\Variable) {
-                $varName = $node->left->left->name;
+                $varNameLeft = $node->left->left->name;
             } elseif ($node->left->right instanceof Node\Expr\Variable) {
-                $varName = $node->left->right->name;
+                $varNameLeft = $node->left->right->name;
             }
 
+            $varNameRight = null;
+
             if ($node->right->left instanceof Node\Expr\Variable) {
-                return $varName !== $node->right->left->name;
+                $varNameRight = $node->right->left->name;
             } elseif ($node->right->right instanceof Node\Expr\Variable) {
-                return $varName !== $node->right->right->name;
+                $varNameRight = $node->right->right->name;
             }
+
+            return $varNameLeft !== $varNameRight;
         }
 
         $greaterOp = [
