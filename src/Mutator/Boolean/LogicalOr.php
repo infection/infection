@@ -83,20 +83,6 @@ DIFF
             return false;
         }
 
-        $nodeLeftType = get_class($node->left);
-        $nodeRightType = get_class($node->right);
-
-        $mustCheckForVariableNamesNodeTypes = [
-            Node\Expr\BinaryOp\Identical::class,
-            Node\Expr\BinaryOp\NotIdentical::class,
-            Node\Expr\BinaryOp\Equal::class,
-            Node\Expr\BinaryOp\NotEqual::class,
-            Node\Expr\BinaryOp\Greater::class,
-            Node\Expr\BinaryOp\GreaterOrEqual::class,
-            Node\Expr\BinaryOp\Smaller::class,
-            Node\Expr\BinaryOp\SmallerOrEqual::class,
-        ];
-
         if (
             (
                 $node->left instanceof Node\Expr\BinaryOp\Identical
