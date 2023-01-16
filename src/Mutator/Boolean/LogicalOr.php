@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use function get_class;
+use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -77,6 +79,86 @@ DIFF
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\BooleanOr;
+        if (!$node instanceof Node\Expr\BinaryOp\BooleanOr) {
+            return false;
+        }
+
+        $nodeLeftType = get_class($node->left);
+        $nodeRightType = get_class($node->right);
+
+        $mustCheckForVariableNamesNodeTypes = [
+            Node\Expr\BinaryOp\Identical::class,
+            Node\Expr\BinaryOp\NotIdentical::class,
+            Node\Expr\BinaryOp\Equal::class,
+            Node\Expr\BinaryOp\NotEqual::class,
+            Node\Expr\BinaryOp\Greater::class,
+            Node\Expr\BinaryOp\GreaterOrEqual::class,
+            Node\Expr\BinaryOp\Smaller::class,
+            Node\Expr\BinaryOp\SmallerOrEqual::class,
+        ];
+
+        if (
+            (
+                $node->left instanceof Node\Expr\BinaryOp\Identical
+                && $node->right instanceof Node\Expr\BinaryOp\Identical
+            ) || (
+                $node->left instanceof Node\Expr\BinaryOp\Equal
+                && $node->right instanceof Node\Expr\BinaryOp\Equal
+            )
+        ) {
+            $varName = '';
+
+            if ($node->left->left instanceof Node\Expr\Variable) {
+                $varName = $node->left->left->name;
+            } elseif ($node->left->right instanceof Node\Expr\Variable) {
+                $varName = $node->left->right->name;
+            }
+
+            if ($node->right->left instanceof Node\Expr\Variable) {
+                return $varName !== $node->right->left->name;
+            } elseif ($node->right->right instanceof Node\Expr\Variable) {
+                return $varName !== $node->right->right->name;
+            }
+        }
+
+        $greaterOp = [
+            Node\Expr\BinaryOp\Greater::class,
+            Node\Expr\BinaryOp\GreaterOrEqual::class,
+        ];
+
+        $smallerOp = [
+            Node\Expr\BinaryOp\Smaller::class,
+            Node\Expr\BinaryOp\SmallerOrEqual::class,
+        ];
+
+        if (
+            (
+                in_array(get_class($node->left), $greaterOp, true) === true
+                && in_array(get_class($node->right), $smallerOp, true) === true
+            ) || (
+                in_array(get_class($node->left), $smallerOp, true) === true
+                && in_array(get_class($node->right), $greaterOp, true) === true
+            )
+        ) {
+            $varNameLeft = null;
+
+            if ($node->left->left instanceof Node\Expr\Variable) {
+                $varNameLeft = $node->left->left->name;
+            } elseif ($node->left->right instanceof Node\Expr\Variable) {
+                $varNameLeft = $node->left->right->name;
+            }
+
+            $varNameRight = null;
+
+            if ($node->right->left instanceof Node\Expr\Variable) {
+                $varNameRight = $node->right->left->name;
+            } elseif ($node->right->right instanceof Node\Expr\Variable) {
+                $varNameRight = $node->right->right->name;
+            }
+
+            return $varNameLeft !== $varNameRight;
+        }
+
+        return true;
     }
 }

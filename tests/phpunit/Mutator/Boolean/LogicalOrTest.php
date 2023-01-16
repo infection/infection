@@ -66,11 +66,62 @@ PHP
             ,
         ];
 
+        yield 'It mutates logical or if variables names are different' => [
+            <<<'PHP'
+<?php
+
+$myVar === true || $myOtherVar === false;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$myVar === true && $myOtherVar === false;
+PHP
+            ,
+        ];
+
         yield 'It does not mutate logical lower or' => [
             <<<'PHP'
 <?php
 
 true or false;
+PHP
+            ,
+        ];
+
+        yield 'It does not mutates logical or if same variable is tested against "Identical".' => [
+            <<<'PHP'
+<?php
+
+$myVar === 'hello' || $myVar === 'world';
+PHP
+            ,
+        ];
+
+        yield 'It does not mutates logical or if same variable is tested against "Identical" (mirrored).' => [
+            <<<'PHP'
+<?php
+
+$myVar === 'hello' || 'world' === $myVar;
+PHP
+            ,
+        ];
+
+        yield 'It does not mutates logical or if same variable is tested against "Greater" and "Smaller" #1.' => [
+            <<<'PHP'
+<?php
+
+$myVar < 5 || $myVar > 10;
+PHP
+            ,
+        ];
+
+        yield 'It does not mutates logical or if same variable is tested against "Greater" and "Smaller" #2.' => [
+            <<<'PHP'
+<?php
+
+$myVar < 10 || $myVar > 5;
 PHP
             ,
         ];
