@@ -99,11 +99,20 @@ PHP
             ,
         ];
 
-        yield 'It does not mutates logical or if same variable is tested against "Identical" (mirrored).' => [
+        yield 'It does not mutates logical or if same variable is tested against "Identical" (mirrored #1).' => [
             <<<'PHP'
 <?php
 
 $myVar === 'hello' || 'world' === $myVar;
+PHP
+            ,
+        ];
+
+        yield 'It does not mutates logical or if same variable is tested against "Identical" (mirrored #2).' => [
+            <<<'PHP'
+<?php
+
+'world' === $myVar || $myVar === 'hello';
 PHP
             ,
         ];
