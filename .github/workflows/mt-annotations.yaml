@@ -53,3 +53,19 @@ jobs:
               run: |
                   git fetch origin $GITHUB_BASE_REF
                   php bin/infection --threads=max --git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations --only-covered
+
+    # This is a meta job to avoid to have to constantly change the protection rules
+    # whenever we touch the matrix.
+    tests-status:
+        name: Annotations Status
+        runs-on: ubuntu-latest
+        needs: tests
+        if: always()
+        steps:
+            - name: Successful run
+              if: ${{ !(contains(needs.*.result, 'failure')) }}
+              run: exit 0
+
+            - name: Failing run
+              if: ${{ contains(needs.*.result, 'failure') }}
+              run: exit 1
