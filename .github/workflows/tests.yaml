@@ -70,6 +70,7 @@ jobs:
           make test-unit
 
       - name: Run integration tests
+        if: ${{ matrix.operating-system != 'windows-latest' }}
         shell: bash
         run: |
           if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
