@@ -1,0 +1,80 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+name: Unit & Integration Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.operating-system }}
+
+    strategy:
+      matrix:
+        operating-system: [ ubuntu-latest ]
+        php-version: [ '8.0', '8.1', '8.2' ]
+        coverage-driver: [ pcov, xdebug ]
+        include:
+          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug' }
+
+    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure for PHP >= 8.2
+        if: "matrix.php-version >= '8.2'"
+        run: |
+          composer config platform.php 8.1.99
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: ${{ matrix.coverage-driver }}
+          ini-values: memory_limit=512M, xdebug.mode=off
+          tools: composer
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+          restore-keys: |
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-
+            composer-
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run unit tests
+        shell: bash
+        run: |
+          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
+            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
+          fi
+
+          make test-unit
+
+      - name: Run integration tests
+        if: ${{ matrix.operating-system != 'windows-latest' }}
+        shell: bash
+        run: |
+          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
+            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
+          fi
+
+          make test-unit PHPUNIT_GROUP=integration
