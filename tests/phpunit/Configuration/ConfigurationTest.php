@@ -215,7 +215,8 @@ final class ConfigurationTest extends TestCase
                 'debug.log',
                 'mutator.log',
                 true,
-                StrykerConfig::forBadge('master')
+                StrykerConfig::forBadge('master'),
+                'summary.json'
             ),
             'default',
             'custom-dir',

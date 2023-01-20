@@ -90,6 +90,8 @@ class FileLoggerFactory
 
         yield $logConfig->getPerMutatorFilePath() => $this->createPerMutatorLogger();
 
+        yield $logConfig->getSummaryJsonLogFilePath() => $this->createSummaryJsonLogger();
+
         if ($logConfig->getUseGitHubAnnotationsLogger()) {
             yield GitHubAnnotationsLogger::DEFAULT_OUTPUT => $this->createGitHubAnnotationsLogger();
         }
@@ -156,5 +158,10 @@ class FileLoggerFactory
             $this->metricsCalculator,
             $this->resultsCollector
         );
+    }
+
+    private function createSummaryJsonLogger(): LineMutationTestingResultsLogger
+    {
+        return new SummaryJsonLogger($this->metricsCalculator);
     }
 }

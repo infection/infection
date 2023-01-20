@@ -54,7 +54,8 @@ final class LogsTest extends TestCase
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
         bool $useGitHubAnnotationsLogger,
-        ?StrykerConfig $strykerConfig
+        ?StrykerConfig $strykerConfig,
+        ?string $summaryJsonLogFilePath
     ): void {
         $logs = new Logs(
             $textLogFilePath,
@@ -64,7 +65,8 @@ final class LogsTest extends TestCase
             $debugLogFilePath,
             $perMutatorFilePath,
             $useGitHubAnnotationsLogger,
-            $strykerConfig
+            $strykerConfig,
+            $summaryJsonLogFilePath
         );
 
         $this->assertLogsStateIs(
@@ -76,7 +78,8 @@ final class LogsTest extends TestCase
             $debugLogFilePath,
             $perMutatorFilePath,
             $useGitHubAnnotationsLogger,
-            $strykerConfig
+            $strykerConfig,
+            $summaryJsonLogFilePath
         );
     }
 
@@ -93,6 +96,7 @@ final class LogsTest extends TestCase
             null,
             null,
             false,
+            null,
             null
         );
     }
@@ -108,6 +112,7 @@ final class LogsTest extends TestCase
             null,
             false,
             null,
+            null,
         ];
 
         yield 'complete' => [
@@ -119,6 +124,7 @@ final class LogsTest extends TestCase
             'perMutator.log',
             true,
             StrykerConfig::forBadge('master'),
+            'summary.json',
         ];
     }
 }

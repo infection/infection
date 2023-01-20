@@ -95,6 +95,10 @@
                 "github": {
                     "type": "boolean",
                     "description": "GitHub Annotations for escaped Mutants in the added/modifies files"
+                },
+                "summaryJson": {
+                    "type": "string",
+                    "definition": "Summary JSON log file, which contains only the statistics from the complete JSON file."
                 }
             }
         },

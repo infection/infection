@@ -88,7 +88,8 @@ class SchemaConfigurationFactory
             self::normalizeString($logs->debug ?? null),
             self::normalizeString($logs->perMutator ?? null),
             $logs->github ?? false,
-            self::createStrykerConfig($logs->stryker ?? null)
+            self::createStrykerConfig($logs->stryker ?? null),
+            self::normalizeString($logs->summaryJson ?? null),
         );
     }
 
