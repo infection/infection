@@ -278,8 +278,8 @@ final class FileLoggerFactoryTest extends TestCase
                 JsonLogger::class,
                 DebugFileLogger::class,
                 PerMutatorLogger::class,
-                GitHubAnnotationsLogger::class,
                 SummaryJsonLogger::class,
+                GitHubAnnotationsLogger::class,
             ],
         ];
     }
