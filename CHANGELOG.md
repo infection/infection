@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.26.18](https://github.com/infection/infection/tree/0.26.18) (2023-01-21)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.26.17...0.25.18)
+
+**Added:**
+
+* New logger "summaryJson" - machine-readable file in JSON format. (#1808)
+
 ## [0.26.17](https://github.com/infection/infection/tree/0.26.17) (2023-01-19)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.26.16...0.25.17)
