@@ -18,7 +18,12 @@ jobs:
       matrix:
         operating-system: [ ubuntu-latest ]
         php-version: [ '8.0', '8.1', '8.2' ]
+        # TODO: include phpdbg later
         coverage-driver: [ pcov, xdebug ]
+        # TODO: include "locked" & "lowest" later (requires fixes)
+        dependency: [ highest ]
+        # TODO: include Symfony6 later
+        symfony-version: [ '5.4.*' ]
         include:
           - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug' }
 
