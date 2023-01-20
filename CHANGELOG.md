@@ -1,5 +1,21 @@
 # Change Log
 
+## [0.26.17](https://github.com/infection/infection/tree/0.26.17) (2023-01-19)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.26.16...0.25.17)
+
+**Added:**
+
+- PHP 8.2 support
+
+**Fixed:**
+
+* ArrayItemRemoval mutator should not mutate an array when set as an attributes argument #1797
+* PHP Warning on startup when using Infection from PHAR #1770
+* PHP 8.2: Deprecated: Use of "static" in callables is deprecated in .../vendor/webmozart/assert/src/Assert.php on line 939 #1802
+* False positive: Throw_ mutant not covered by tests #1778
+* Line CodeCoverage is not a reliable source of truth #1750
+
 ## [0.26.16](https://github.com/infection/infection/tree/0.26.16) (2022-10-22)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.26.15...0.25.16)
