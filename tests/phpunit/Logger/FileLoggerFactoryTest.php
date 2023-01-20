@@ -51,6 +51,7 @@ use Infection\Logger\JsonLogger;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\SummaryFileLogger;
+use Infection\Logger\SummaryJsonLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
@@ -105,7 +106,8 @@ final class FileLoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 true,
-                null
+                null,
+                '/a/file',
             )
         );
 
@@ -146,6 +148,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 false,
+                null,
                 null
             ),
             [TextFileLogger::class],
@@ -160,6 +163,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 false,
+                null,
                 null
             ),
             [HtmlFileLogger::class],
@@ -174,6 +178,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 false,
+                null,
                 null
             ),
             [SummaryFileLogger::class],
@@ -188,6 +193,7 @@ final class FileLoggerFactoryTest extends TestCase
                 'debug_file',
                 null,
                 false,
+                null,
                 null
             ),
             [DebugFileLogger::class],
@@ -202,6 +208,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 false,
+                null,
                 null
             ),
             [JsonLogger::class],
@@ -216,6 +223,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 'per_muator',
                 false,
+                null,
                 null
             ),
             [PerMutatorLogger::class],
@@ -230,9 +238,25 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 true,
+                null,
                 null
             ),
             [GitHubAnnotationsLogger::class],
+        ];
+
+        yield 'summary-json logger' => [
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
+                null,
+                'summary-json'
+            ),
+            [SummaryJsonLogger::class],
         ];
 
         yield 'all loggers' => [
@@ -244,7 +268,8 @@ final class FileLoggerFactoryTest extends TestCase
                 'debug',
                 'per_mutator',
                 true,
-                StrykerConfig::forBadge('branch')
+                StrykerConfig::forBadge('branch'),
+                'summary-json'
             ),
             [
                 TextFileLogger::class,
@@ -254,6 +279,7 @@ final class FileLoggerFactoryTest extends TestCase
                 DebugFileLogger::class,
                 PerMutatorLogger::class,
                 GitHubAnnotationsLogger::class,
+                SummaryJsonLogger::class,
             ],
         ];
     }
