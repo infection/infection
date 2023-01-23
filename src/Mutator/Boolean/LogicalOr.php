@@ -88,9 +88,12 @@ DIFF
             Node\Expr\BinaryOp\Equal::class,
         ];
 
+        $classNodeLeft = get_class($node->left);
+        $classNodeRight = get_class($node->right);
+
         if (
-            in_array(get_class($node->left), $equalOp, true) === true
-            && in_array(get_class($node->right), $equalOp, true) === true
+            in_array($classNodeLeft, $equalOp, true)
+            && in_array($classNodeRight, $equalOp, true)
         ) {
             $varNameLeft = null;
 
@@ -123,11 +126,11 @@ DIFF
 
         if (
             (
-                in_array(get_class($node->left), $greaterOp, true) === true
-                && in_array(get_class($node->right), $smallerOp, true) === true
+                in_array($classNodeLeft, $greaterOp, true) === true
+                && in_array($classNodeRight, $smallerOp, true) === true
             ) || (
-                in_array(get_class($node->left), $smallerOp, true) === true
-                && in_array(get_class($node->right), $greaterOp, true) === true
+                in_array($classNodeLeft, $smallerOp, true) === true
+                && in_array($classNodeRight, $greaterOp, true) === true
             )
         ) {
             $varNameLeft = null;
