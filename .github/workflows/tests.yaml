@@ -18,9 +18,15 @@ jobs:
       matrix:
         operating-system: [ ubuntu-latest ]
         php-version: [ '8.0', '8.1', '8.2' ]
+        # TODO: include highest & lowest
+        dependency: [ locked ]
+        # TODO: include phpdbg later
         coverage-driver: [ pcov, xdebug ]
         include:
-          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug' }
+          - operating-system: windows-latest
+            php-version: '8.0'
+            dependency: locked
+            coverage-driver: xdebug
 
     name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependency }}), using ${{ matrix.coverage-driver }}
 
