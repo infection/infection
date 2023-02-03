@@ -69,6 +69,10 @@ jobs:
         run: |
           composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Configure the Symfony deprecations helper
+        if: ${{ matrix.php-version }} == '8.2'
+        run: echo "{SYMFONY_DEPRECATIONS_HELPER}={max[self]=0}" >> $GITHUB_ENV
+
       - name: Cache E2E tests dependencies
         if: runner.os == 'Windows'
         uses: actions/cache@v2
@@ -107,12 +111,7 @@ jobs:
         if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
         env:
           TERM: xterm-256color
-        run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
-
-          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
+        run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
       - name: Run the whole set of E2E tests with prefixed PHAR
         if: runner.os != 'Windows' && matrix.e2e-runner == 'build/infection.phar' && (matrix.php-version == '8.0' || matrix.php-version == '8.1')
