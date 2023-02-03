@@ -59,7 +59,7 @@
         "ondram/ci-detector": "^4.1.0",
         "sanmai/later": "^0.1.1",
         "sanmai/pipeline": "^5.1 || ^6",
-        "sebastian/diff": "^3.0.2 || ^4.0",
+        "sebastian/diff": "^3.0.2 || ^4.0 || ^5.0",
         "symfony/console": "^5.4 || ^6.0",
         "symfony/filesystem": "^5.4 || ^6.0",
         "symfony/finder": "^5.4 || ^6.0",

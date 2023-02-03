@@ -232,6 +232,7 @@ JSON
                     null,
                     null,
                     false,
+                    null,
                     null
                 ),
             ]),
@@ -259,6 +260,7 @@ JSON
                     null,
                     null,
                     false,
+                    null,
                     null
                 ),
             ]),
@@ -286,6 +288,7 @@ JSON
                     null,
                     null,
                     false,
+                    null,
                     null
                 ),
             ]),
@@ -313,6 +316,7 @@ JSON
                     null,
                     null,
                     false,
+                    null,
                     null
                 ),
             ]),
@@ -340,6 +344,7 @@ JSON
                     'debug.log',
                     null,
                     false,
+                    null,
                     null
                 ),
             ]),
@@ -367,6 +372,7 @@ JSON
                     null,
                     'perMutator.log',
                     false,
+                    null,
                     null
                 ),
             ]),
@@ -396,7 +402,8 @@ JSON
                     null,
                     null,
                     false,
-                    StrykerConfig::forBadge('master')
+                    StrykerConfig::forBadge('master'),
+                    null
                 ),
             ]),
         ];
@@ -425,7 +432,8 @@ JSON
                     null,
                     null,
                     false,
-                    StrykerConfig::forFullReport('master')
+                    StrykerConfig::forFullReport('master'),
+                    null
                 ),
             ]),
         ];
@@ -454,7 +462,8 @@ JSON
                     null,
                     null,
                     false,
-                    StrykerConfig::forBadge('/^foo$/')
+                    StrykerConfig::forBadge('/^foo$/'),
+                    null
                 ),
             ]),
         ];
@@ -483,7 +492,36 @@ JSON
                     null,
                     null,
                     false,
-                    StrykerConfig::forFullReport('/^foo$/')
+                    StrykerConfig::forFullReport('/^foo$/'),
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][summaryJson] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "summaryJson": "summary.json"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    null,
+                    'summary.json'
                 ),
             ]),
         ];
@@ -504,7 +542,8 @@ JSON
         "github": true,
         "stryker": {
             "badge": "master"
-        }
+        },
+        "summaryJson": "summary.json"
     }
 }
 JSON
@@ -519,7 +558,8 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    StrykerConfig::forBadge('master')
+                    StrykerConfig::forBadge('master'),
+                    'summary.json'
                 ),
             ]),
         ];
@@ -588,7 +628,8 @@ JSON
         "github": true ,
         "stryker": {
             "badge": " master "
-        }
+        },
+        "summaryJson": " summary.json "
     }
 }
 JSON
@@ -603,7 +644,8 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    StrykerConfig::forBadge('master')
+                    StrykerConfig::forBadge('master'),
+                    'summary.json'
                 ),
             ]),
         ];
@@ -2238,7 +2280,8 @@ JSON
         "github": true,
         "stryker": {
             "badge": "master"
-        }
+        },
+        "summaryJson": "summary.json"
     },
     "tmpDir": "custom-tmp",
     "phpUnit": {
@@ -2475,7 +2518,8 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     true,
-                    StrykerConfig::forBadge('master')
+                    StrykerConfig::forBadge('master'),
+                    'summary.json'
                 ),
                 'tmpDir' => 'custom-tmp',
                 'phpunit' => new PhpUnit(

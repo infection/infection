@@ -49,6 +49,7 @@ class Logs
     private ?string $perMutatorFilePath;
     private bool $useGitHubAnnotationsLogger;
     private ?StrykerConfig $strykerConfig;
+    private ?string $summaryJsonLogFilePath;
 
     public function __construct(
         ?string $textLogFilePath,
@@ -58,7 +59,8 @@ class Logs
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
         bool $useGitHubAnnotationsLogger,
-        ?StrykerConfig $strykerConfig
+        ?StrykerConfig $strykerConfig,
+        ?string $summaryJsonLogFilePath
     ) {
         $this->textLogFilePath = $textLogFilePath;
         $this->htmlLogFilePath = $htmlLogFilePath;
@@ -68,6 +70,7 @@ class Logs
         $this->perMutatorFilePath = $perMutatorFilePath;
         $this->useGitHubAnnotationsLogger = $useGitHubAnnotationsLogger;
         $this->strykerConfig = $strykerConfig;
+        $this->summaryJsonLogFilePath = $summaryJsonLogFilePath;
     }
 
     public static function createEmpty(): self
@@ -80,6 +83,7 @@ class Logs
             null,
             null,
             false,
+            null,
             null
         );
     }
@@ -132,5 +136,10 @@ class Logs
     public function getStrykerConfig(): ?StrykerConfig
     {
         return $this->strykerConfig;
+    }
+
+    public function getSummaryJsonLogFilePath(): ?string
+    {
+        return $this->summaryJsonLogFilePath;
     }
 }

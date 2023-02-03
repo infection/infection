@@ -806,7 +806,8 @@ final class ConfigurationFactoryTest extends TestCase
                     'debug.log',
                     'mutator.log',
                     true,
-                    StrykerConfig::forFullReport('master')
+                    StrykerConfig::forFullReport('master'),
+                    'summary.json'
                 ),
                 'config/tmp',
                 new PhpUnit(
@@ -862,7 +863,8 @@ final class ConfigurationFactoryTest extends TestCase
                 'debug.log',
                 'mutator.log',
                 true,
-                StrykerConfig::forFullReport('master')
+                StrykerConfig::forFullReport('master'),
+                'summary.json'
             ),
             'none',
             '/path/to/config/tmp/infection',
@@ -1289,6 +1291,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             $useGitHubAnnotationsLogger,
+            null,
             null,
         );
 
@@ -2079,6 +2082,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             true,
             null,
+            null,
         );
 
         return [
@@ -2096,6 +2100,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     false,
+                    null,
                     null,
                 ),
                 '',
