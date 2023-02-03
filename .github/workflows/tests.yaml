@@ -28,10 +28,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Configure for PHP >= 8.2
-        if: "matrix.php-version >= '8.2'"
-        run: |
-          composer config platform.php 8.1.99
+      - name: Remove the configured PHP platform
+        if: matrix.dependency != 'locked'
+        run: composer config --unset platform.php
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -49,16 +48,24 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}-
             composer-${{ runner.os }}-${{ matrix.php-version }}-
             composer-${{ runner.os }}-
             composer-
 
       - name: Install dependencies
-        run: |
-          composer install --no-interaction --prefer-dist --no-progress
+        if: ${{ matrix.dependencies == 'locked' }}
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install highest dependencies
+        if: ${{ matrix.dependencies == 'highest' }}
+        run: composer update --no-interaction --prefer-dist --no-progress
+
+      - name: Install lowest dependencies
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
 
       - name: Run unit tests
         shell: bash
