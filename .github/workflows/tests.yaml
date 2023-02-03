@@ -22,13 +22,16 @@ jobs:
         dependency: [ locked ]
         # TODO: include phpdbg later
         coverage-driver: [ pcov, xdebug ]
+        # TODO: include Symfony6 later
+        symfony-version: [ '5.4.*' ]
         include:
           - operating-system: windows-latest
             php-version: '8.0'
             dependency: locked
             coverage-driver: xdebug
+            symfony-version: '5.4.*'
 
-    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependency }}), using ${{ matrix.coverage-driver }}
+    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependency }}; Symfony ${{ matrix.symfony-version }}), using ${{ matrix.coverage-driver }}
 
     steps:
       - name: Checkout code
@@ -45,6 +48,17 @@ jobs:
           coverage: ${{ matrix.coverage-driver }}
           ini-values: memory_limit=512M, xdebug.mode=off
           tools: composer
+
+      - name: Enforce the Symfony version used
+        if: ${{ matrix.symfony-version }}
+        run: composer config extra.symfony.require ${{ matrix.symfony-version }}
+
+      # See https://symfony.com/doc/current/bundles/best_practices.html#require-a-specific-symfony-version
+      - name: Install Flex
+        if: ${{ matrix.symfony-version }}
+        run: |
+            composer global config --no-plugins allow-plugins.symfony/flex true
+            composer global require --no-progress --no-scripts --no-plugins symfony/flex
 
       - name: Get composer cache directory
         id: composer-cache
