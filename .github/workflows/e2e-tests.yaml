@@ -1,7 +1,7 @@
 # yamllint disable rule:line-length
 # yamllint disable rule:braces
 
-name: Tests
+name: E2E Tests
 
 on:
   pull_request:
@@ -30,7 +30,7 @@ jobs:
           - { operating-system: 'ubuntu-latest', php-version: '8.1', composer: 'composer:v2.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
 
-    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependency }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
+    name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependency }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
     steps:
       - name: Checkout code
@@ -136,7 +136,7 @@ jobs:
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
   tests-status:
-      name: CI Status
+      name: E2E Tests Status
       runs-on: ubuntu-latest
       needs: tests
       if: always()
