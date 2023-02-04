@@ -55,7 +55,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
@@ -75,7 +75,7 @@ jobs:
 
       - name: Cache E2E tests dependencies
         if: runner.os == 'Windows'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: tests/e2e/*/vendor
           key: e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}
