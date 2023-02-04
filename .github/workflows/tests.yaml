@@ -60,24 +60,18 @@ jobs:
         run: |
           composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Configure the Symfony deprecations helper
+        if: ${{ matrix.php-version }} == '8.2'
+        run: echo "{SYMFONY_DEPRECATIONS_HELPER}={max[self]=0}" >> $GITHUB_ENV
+
       - name: Run unit tests
         shell: bash
-        run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
-
-          make test-unit
+        run: make test-unit
 
       - name: Run integration tests
         if: ${{ matrix.operating-system != 'windows-latest' }}
         shell: bash
-        run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
-
-          make test-unit PHPUNIT_GROUP=integration
+        run: make test-unit PHPUNIT_GROUP=integration
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
