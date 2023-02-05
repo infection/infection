@@ -30,7 +30,7 @@ jobs:
             coverage-driver: xdebug
             symfony-version: '5.4.*'
 
-    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }}
+    name: Tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependencies }}; Symfony {{ matrix.symfony-version }}), using ${{ matrix.coverage-driver }}
 
     steps:
       - name: Checkout code
