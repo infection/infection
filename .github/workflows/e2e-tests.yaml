@@ -1,7 +1,7 @@
 # yamllint disable rule:line-length
 # yamllint disable rule:braces
 
-name: Tests
+name: E2E Tests
 
 on:
   pull_request:
@@ -18,7 +18,7 @@ jobs:
       matrix:
         operating-system: [ ubuntu-latest ]
         php-version: [ '8.0' ]
-        dependency: [ locked ]
+        dependencies: [ locked ]
         composer: [ 'composer:v2.1' ]
         coverage-driver: [ pcov, xdebug ]
         e2e-runner: [ 'bin/infection' ]
@@ -30,15 +30,11 @@ jobs:
           - { operating-system: 'ubuntu-latest', php-version: '8.1', composer: 'composer:v2.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
 
-    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependency }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
+    name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Remove the configured PHP platform
-        if: matrix.dependency != 'locked'
-        run: composer config --unset platform.php
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -51,9 +47,14 @@ jobs:
           # This is necessary when installing a tool with a specific version
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Remove the configured PHP platform
+        if: matrix.dependencies != 'locked'
+        run: composer config --unset platform.php
+
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        shell: bash
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -77,6 +78,10 @@ jobs:
       - name: Install lowest dependencies
         if: ${{ matrix.dependencies == 'lowest' }}
         run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
+
+      - name: Configure the Symfony deprecations helper
+        if: ${{ matrix.php-version }} == '8.2'
+        run: echo "{SYMFONY_DEPRECATIONS_HELPER}={max[self]=0}" >> $GITHUB_ENV
 
       - name: Cache E2E tests dependencies
         if: runner.os == 'Windows'
@@ -116,12 +121,7 @@ jobs:
         if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
         env:
           TERM: xterm-256color
-        run: |
-          if [[ "${{ matrix.php-version }}" == '8.2' ]]; then
-            export SYMFONY_DEPRECATIONS_HELPER=max[self]=0
-          fi
-
-          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
+        run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
       - name: Run the whole set of E2E tests with prefixed PHAR
         if: runner.os != 'Windows' && matrix.e2e-runner == 'build/infection.phar' && (matrix.php-version == '8.0' || matrix.php-version == '8.1')
@@ -136,7 +136,7 @@ jobs:
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
   tests-status:
-      name: CI Status
+      name: E2E Tests Status
       runs-on: ubuntu-latest
       needs: tests
       if: always()
