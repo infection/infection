@@ -33,42 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Logger;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Metrics\MetricsCalculator;
+use function json_encode;
+use const JSON_THROW_ON_ERROR;
 
-trait LogsAssertions
+/**
+ * @internal
+ */
+final class SummaryJsonLogger implements LineMutationTestingResultsLogger
 {
-    private function assertLogsStateIs(
-        Logs $logs,
-        ?string $expectedTextLogFilePath,
-        ?string $expectedHtmlLogFilePath,
-        ?string $expectedSummaryLogFilePath,
-        ?string $expectedJsonLogFilePath,
-        ?string $expectedDebugLogFilePath,
-        ?string $expectedPerMutatorFilePath,
-        bool $expectedUseGitHubAnnotationsLogger,
-        ?StrykerConfig $expectedStrykerConfig,
-        ?string $expectedSummaryJsonLogFilePath,
-    ): void {
-        $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
-        $this->assertSame($expectedHtmlLogFilePath, $logs->getHtmlLogFilePath());
-        $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
-        $this->assertSame($expectedJsonLogFilePath, $logs->getJsonLogFilePath());
-        $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
-        $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
-        $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger(), 'Use GithubAnnotationLogger is incorrect');
-        $this->assertSame($expectedSummaryJsonLogFilePath, $logs->getSummaryJsonLogFilePath());
+    public function __construct(private MetricsCalculator $metricsCalculator)
+    {
+    }
 
-        $strykerConfig = $logs->getStrykerConfig();
+    /**
+     * @return array{0: string}
+     */
+    public function getLogLines(): array
+    {
+        $data = [
+            'stats' => [
+                'totalMutantsCount' => $this->metricsCalculator->getTotalMutantsCount(),
+                'killedCount' => $this->metricsCalculator->getKilledCount(),
+                'notCoveredCount' => $this->metricsCalculator->getNotTestedCount(),
+                'escapedCount' => $this->metricsCalculator->getEscapedCount(),
+                'errorCount' => $this->metricsCalculator->getErrorCount(),
+                'syntaxErrorCount' => $this->metricsCalculator->getSyntaxErrorCount(),
+                'skippedCount' => $this->metricsCalculator->getSkippedCount(),
+                'ignoredCount' => $this->metricsCalculator->getIgnoredCount(),
+                'timeOutCount' => $this->metricsCalculator->getTimedOutCount(),
+                'msi' => $this->metricsCalculator->getMutationScoreIndicator(),
+                'mutationCodeCoverage' => $this->metricsCalculator->getCoverageRate(),
+                'coveredCodeMsi' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
+            ],
+        ];
 
-        if ($expectedStrykerConfig === null) {
-            $this->assertNull($strykerConfig);
-        } else {
-            $this->assertNotNull($strykerConfig);
-
-            self::assertEquals($expectedStrykerConfig, $strykerConfig);
-        }
+        return [json_encode($data, JSON_THROW_ON_ERROR)];
     }
 }

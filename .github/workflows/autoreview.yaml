@@ -36,7 +36,7 @@ jobs:
 
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -56,3 +56,18 @@ jobs:
         # Ensures we see all the errors
         run: make autoreview --keep-going
 
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  tests-status:
+    name: Autoreview Status
+    runs-on: ubuntu-latest
+    needs: tests
+    if: always()
+    steps:
+      - name: Successful run
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+
+      - name: Failing run
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1

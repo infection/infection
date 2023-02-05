@@ -46,7 +46,7 @@ jobs:
 
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -81,3 +81,19 @@ jobs:
             --log-verbosity=none \
             --no-interaction \
             --no-progress
+
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  tests-status:
+      name: Mutation Testing Status
+      runs-on: ubuntu-latest
+      needs: tests
+      if: always()
+      steps:
+          - name: Successful run
+            if: ${{ !(contains(needs.*.result, 'failure')) }}
+            run: exit 0
+
+          - name: Failing run
+            if: ${{ contains(needs.*.result, 'failure') }}
+            run: exit 1
