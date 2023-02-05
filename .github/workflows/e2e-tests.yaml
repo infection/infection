@@ -18,7 +18,7 @@ jobs:
       matrix:
         operating-system: [ ubuntu-latest ]
         php-version: [ '8.0' ]
-        dependency: [ locked ]
+        dependencies: [ locked ]
         composer: [ 'composer:v2.1' ]
         coverage-driver: [ pcov, xdebug ]
         e2e-runner: [ 'bin/infection' ]
@@ -30,7 +30,7 @@ jobs:
           - { operating-system: 'ubuntu-latest', php-version: '8.1', composer: 'composer:v2.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
 
-    name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependency }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
+    name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
     steps:
       - name: Checkout code
@@ -48,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Remove the configured PHP platform
-        if: matrix.dependency != 'locked'
+        if: matrix.dependencies != 'locked'
         run: composer config --unset platform.php
 
       - name: Get composer cache directory
