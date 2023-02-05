@@ -21,8 +21,7 @@ jobs:
         # TODO: include highest & lowest
         dependencies: [ locked ]
         coverage-driver: [ pcov, xdebug ]
-        # TODO: include Symfony6 later
-        symfony-version: [ '5.4.*' ]
+        symfony-version: [ '5.4.*', '6.*.*' ]
         include:
           - operating-system: windows-latest
             php-version: '8.0'
