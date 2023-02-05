@@ -18,11 +18,16 @@ jobs:
       matrix:
         operating-system: [ ubuntu-latest ]
         php-version: [ '8.0', '8.1', '8.2' ]
+        # TODO: include highest & lowest
+        dependencies: [ locked ]
         coverage-driver: [ pcov, xdebug ]
         include:
-          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug' }
+          - operating-system: windows-latest
+            php-version: '8.0'
+            dependencies: locked
+            coverage-driver: xdebug
 
-    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }}
+    name: CI on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }}
 
     steps:
       - name: Checkout code
@@ -36,10 +41,9 @@ jobs:
           ini-values: memory_limit=512M, xdebug.mode=off
           tools: composer
 
-      - name: Configure for PHP >= 8.2
-        if: "matrix.php-version >= '8.2'"
-        run: |
-            composer config platform.php 8.1.99
+      - name: Remove the configured PHP platform
+        if: matrix.dependencies != 'locked'
+        run: composer config --unset platform.php
 
       - name: Get composer cache directory
         id: composer-cache
@@ -50,16 +54,24 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}-
             composer-${{ runner.os }}-${{ matrix.php-version }}-
             composer-${{ runner.os }}-
             composer-
 
       - name: Install dependencies
-        run: |
-          composer install --no-interaction --prefer-dist --no-progress
+        if: ${{ matrix.dependencies == 'locked' }}
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install highest dependencies
+        if: ${{ matrix.dependencies == 'highest' }}
+        run: composer update --no-interaction --prefer-dist --no-progress
+
+      - name: Install lowest dependencies
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
 
       - name: Configure the Symfony deprecations helper
         if: ${{ matrix.php-version }} == '8.2'

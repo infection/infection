@@ -18,17 +18,19 @@ jobs:
       matrix:
         operating-system: [ ubuntu-latest ]
         php-version: [ '8.0' ]
+        dependencies: [ locked ]
+        composer: [ 'composer:v2.1' ]
         coverage-driver: [ pcov, xdebug ]
         e2e-runner: [ 'bin/infection' ]
         include:
-          - { operating-system: 'windows-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'windows-latest', php-version: '8.0', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.0', composer: 'composer:v2.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.0', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.1', composer: 'composer:v2.1', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.1', composer: 'composer:v2.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
 
-    name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
+    name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
     steps:
       - name: Checkout code
@@ -40,15 +42,14 @@ jobs:
           php-version: ${{ matrix.php-version }}
           coverage: ${{ matrix.coverage-driver }}
           ini-values: memory_limit=512M, xdebug.mode=off
-          tools: composer:v2.1
+          tools: ${{ matrix.composer }}
         env:
           # This is necessary when installing a tool with a specific version
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure for PHP >= 8.2
-        if: "matrix.php-version >= '8.2'"
-        run: |
-            composer config platform.php 8.1.99
+      - name: Remove the configured PHP platform
+        if: matrix.dependencies != 'locked'
+        run: composer config --unset platform.php
 
       - name: Get composer cache directory
         id: composer-cache
@@ -59,16 +60,24 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}-
             composer-${{ runner.os }}-${{ matrix.php-version }}-
             composer-${{ runner.os }}-
             composer-
 
       - name: Install dependencies
-        run: |
-          composer install --no-interaction --prefer-dist --no-progress
+        if: ${{ matrix.dependencies == 'locked' }}
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install highest dependencies
+        if: ${{ matrix.dependencies == 'highest' }}
+        run: composer update --no-interaction --prefer-dist --no-progress
+
+      - name: Install lowest dependencies
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
 
       - name: Configure the Symfony deprecations helper
         if: ${{ matrix.php-version }} == '8.2'
