@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.26.19](https://github.com/infection/infection/tree/0.26.19) (2023-02-06)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.26.18...0.25.19)
+
+**Added:**
+
+* PHPUnit 10 support
+
 ## [0.26.18](https://github.com/infection/infection/tree/0.26.18) (2023-01-21)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.26.17...0.25.18)
