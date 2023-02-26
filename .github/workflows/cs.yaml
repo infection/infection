@@ -14,15 +14,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
+          # Should use the lowest supported version to ensure the CS-Fixer does
+          # not get confused and apply a rule that would break on lower supported
+          # versions.
           php-version: 8.0
 
       - name: Restore PHP-CS-Fixer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .php_cs.cache
           key: "php-cs-fixer"

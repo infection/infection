@@ -127,7 +127,8 @@ final class SchemaConfigurationTest extends TestCase
                 'debug.log',
                 'mutator.log',
                 true,
-                StrykerConfig::forFullReport('master')
+                StrykerConfig::forFullReport('master'),
+                'summary.json'
             ),
             'path/to/tmp',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),

@@ -35,21 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Makefile;
 
-use function array_column;
 use function array_filter;
-use function array_key_exists;
+use function array_map;
 use function array_shift;
 use function array_unshift;
-use function current;
+use function array_values;
+use function count;
+use Fidry\Makefile\Rule;
+use Fidry\Makefile\Test\BaseMakefileTestCase;
 use function implode;
-use PHPUnit\Framework\TestCase;
 use function Safe\array_replace;
-use Safe\Exceptions\ExecException;
-use function Safe\file_get_contents;
-use function Safe\shell_exec;
 use function Safe\sprintf;
 use function Safe\substr;
-use function strpos;
+use function str_starts_with;
 use function substr_count;
 
 /**
@@ -57,25 +55,204 @@ use function substr_count;
  *
  * @group integration
  */
-final class MakefileTest extends TestCase
+final class MakefileTest extends BaseMakefileTestCase
 {
     private const MAKEFILE_PATH = __DIR__ . '/../../../../Makefile';
 
     public function test_the_default_goal_is_the_help_command(): void
     {
-        try {
-            shell_exec('command -v timeout');
-            $timeout = 'timeout 2s';
-        } catch (ExecException) {
-            $timeout = '';
-        }
-        $output = shell_exec(sprintf(
-            '%s make --silent --file %s 2>&1',
-            $timeout,
-            self::MAKEFILE_PATH
-        ));
+        $expected = self::executeMakeCommand('help');
+        $actual = self::executeMakeCommand('');
 
-        $expectedOutput = <<<'EOF'
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_declares_test_rules(): void
+    {
+        $testRuleTargets = array_map(
+            static fn (Rule $rule) => $rule->getTarget(),
+            self::getTestRules(false),
+        );
+
+        $this->assertArrayContains(
+            $testRuleTargets,
+            ['test', 'test-autoreview', 'test-unit', 'test-e2e']
+        );
+        $this->assertDoesNotArrayContain(
+            $testRuleTargets,
+            ['test-docker', 'test-unit-docker', 'test-e2e-docker']
+        );
+    }
+
+    public function test_it_declares_docker_test_rules(): void
+    {
+        $testRuleTargets = array_map(
+            static fn (Rule $rule) => $rule->getTarget(),
+            self::getTestRules(true),
+        );
+
+        $this->assertArrayContains(
+            $testRuleTargets,
+            ['test-docker', 'test-unit-docker', 'test-e2e-docker']
+        );
+        $this->assertDoesNotArrayContain(
+            $testRuleTargets,
+            ['test', 'test-autoreview', 'test-unit', 'test-e2e']
+        );
+    }
+
+    /**
+     * @dataProvider subTargetProvider
+     *
+     * @param list<string> $expected
+     * @param list<string> $notExpected
+     */
+    public function test_it_can_get_a_docker_test_target_sub_test_targets(
+        string $target,
+        array $expected,
+        array $notExpected
+    ): void {
+        $subTestTargets = self::getDockerSubTestTargets(
+            $target,
+            self::getTestRules(true),
+        );
+
+        $this->assertArrayContains(
+            $subTestTargets,
+            $expected,
+        );
+        $this->assertDoesNotArrayContain(
+            $subTestTargets,
+            $notExpected,
+        );
+    }
+
+    public static function subTargetProvider(): iterable
+    {
+        yield [
+            'test-docker',
+            ['test-unit-docker', 'test-e2e-docker'],
+            ['test-docker', 'test-unit', 'test-e2e'],
+        ];
+
+        yield [
+            'test-unit-docker',
+            ['test-unit-80-docker'],
+            ['test-unit-docker', 'test-unit-80', 'test-unit'],
+        ];
+    }
+
+    /**
+     * @dataProvider rootTestTargetProvider
+     *
+     * @param list<string> $expected
+     * @param list<string> $notExpected
+     */
+    public function test_it_can_get_all_the_root_test_targets(
+        bool $docker,
+        array $expected,
+        array $notExpected
+    ): void {
+        $dashCount = $docker ? 2 : 1;
+
+        $rootTestRules = self::getTestRules($docker);
+        array_shift($rootTestRules);
+
+        $rootTestTargets = self::getRootTestTargets(
+            $rootTestRules,
+            $dashCount,
+        );
+
+        $this->assertArrayContains(
+            $rootTestTargets,
+            $expected,
+        );
+        $this->assertDoesNotArrayContain(
+            $rootTestTargets,
+            $notExpected,
+        );
+    }
+
+    public static function rootTestTargetProvider(): iterable
+    {
+        yield [
+            true,
+            ['test-unit-docker', 'test-e2e-docker'],
+            ['test-docker', 'test-unit', 'test-e2e'],
+        ];
+
+        yield [
+            false,
+            ['test-unit', 'test-e2e'],
+            ['test', 'test-unit-docker', 'test-e2e-docker'],
+        ];
+    }
+
+    public function test_all_docker_test_targets_are_properly_declared(): void
+    {
+        $testRules = self::getTestRules(true);
+
+        foreach ($testRules as $rule) {
+            $target = $rule->getTarget();
+            $prerequisites = $rule->getPrerequisites();
+
+            $subTestTargets = self::getDockerSubTestTargets($target, $testRules);
+
+            if ($subTestTargets === []) {
+                continue;
+            }
+
+            if ($target === 'test-docker') {
+                array_unshift($subTestTargets, 'autoreview');
+            }
+
+            $this->assertSame(
+                $subTestTargets,
+                $prerequisites,
+                sprintf(
+                    'Expected the pre-requisite of the "%s" target to be "%s". Found "%s" instead',
+                    $target,
+                    implode(' ', $subTestTargets),
+                    implode(' ', $prerequisites)
+                )
+            );
+        }
+    }
+
+    public function test_the_test_target_runs_all_the_tests(): void
+    {
+        $testRules = self::getTestRules(false);
+
+        // Exclude itself
+        $testPrerequisites = array_shift($testRules)->getPrerequisites();
+
+        $rootTestTargets = self::getRootTestTargets($testRules, 1);
+        $rootTestTargets = array_replace($rootTestTargets, ['test-autoreview'], ['autoreview']);
+
+        $this->assertEqualsCanonicalizing($rootTestTargets, $testPrerequisites);
+    }
+
+    public function test_the_docker_test_target_runs_all_the_tests(): void
+    {
+        $testRules = self::getTestRules(true);
+
+        // Exclude itself
+        $testPrerequisites = array_shift($testRules)->getPrerequisites();
+
+        $rootTestTargets = self::getRootTestTargets($testRules, 2);
+        array_unshift($rootTestTargets, 'autoreview');
+
+        $this->assertEqualsCanonicalizing($rootTestTargets, $testPrerequisites);
+    }
+
+    protected static function getMakefilePath(): string
+    {
+        return self::MAKEFILE_PATH;
+    }
+
+    protected function getExpectedHelpOutput(): string
+    {
+        return <<<'EOF'
 [33mUsage:[0m
   make TARGET
 
@@ -101,261 +278,120 @@ final class MakefileTest extends TestCase
 [33mtest-infection-docker:[0m	 Runs Infection against itself on the different Docker platforms
 
 EOF;
-
-        $this->assertSame($expectedOutput, $output);
     }
 
-    public function test_the_makefile_can_be_parsed(): void
+    /**
+     * @return list<Rule>
+     */
+    private static function getTestRules(bool $dockerTargets): array
     {
-        Parser::parse(file_get_contents(self::MAKEFILE_PATH));
+        $filterDockerTarget = $dockerTargets
+            ? static fn (string $target) => substr($target, -7) === '-docker'
+            : static fn (string $target) => substr($target, -7) !== '-docker';
 
-        $this->assertTrue(true);
-    }
-
-    public function test_phony_targets_are_correctly_declared(): void
-    {
-        $targets = Parser::parse(file_get_contents(self::MAKEFILE_PATH));
-
-        $phony = null;
-        $targetComment = false;
-        $matchedPhony = true;
-
-        foreach ($targets as [$target, $dependencies]) {
-            if ($target === '.PHONY') {
-                $this->assertCount(
-                    1,
-                    $dependencies,
-                    sprintf(
-                        'Expected one target to be declared as .PHONY. Found: "%s"',
-                        implode('", "', $dependencies)
-                    )
-                );
-
-                $previousPhony = $phony;
-                $phony = current($dependencies);
-
-                $this->assertTrue(
-                    $matchedPhony,
-                    sprintf(
-                        '"%s" has been declared as a .PHONY target but no such target could '
-                        . 'be found',
-                        $previousPhony
-                    )
-                );
-
-                $targetComment = false;
-                $matchedPhony = false;
-
-                continue;
-            }
-
-            if ($dependencies !== [] && strpos($dependencies[0], '#') === 0) {
-                $this->assertStringStartsWith(
-                    '## ',
-                    $dependencies[0],
-                    'Expected the target comment to be a documented comment'
-                );
-
-                $this->assertSame(
-                    $phony,
-                    $target,
-                    'Expected the declared target to match the previous declared .PHONY'
-                );
-
-                $this->assertFalse(
-                    $targetComment,
-                    sprintf(
-                        'Did not expect to find twice the target comment line for "%s"',
-                        $target
-                    )
-                );
-
-                $this->assertFalse(
-                    $matchedPhony,
-                    sprintf(
-                        'Did not expect to find the target comment line before its target '
-                        . 'definition for "%s"',
-                        $target
-                    )
-                );
-
-                $targetComment = true;
-
-                continue;
-            }
-
-            if ($phony !== null && $matchedPhony === false) {
-                $matchedPhony = true;
-
-                $this->assertSame(
-                    $phony,
-                    $target,
-                    'Expected the declared target to match the previous declared .PHONY'
-                );
-
-                continue;
-            }
-
-            $phony = null;
-            $targetComment = false;
-            $matchedPhony = false;
-        }
-    }
-
-    public function test_no_target_is_being_declared_twice(): void
-    {
-        $targets = Parser::parse(file_get_contents(self::MAKEFILE_PATH));
-
-        $targetCounts = [];
-
-        foreach ($targets as [$target, $dependencies]) {
-            if ($target === '.PHONY') {
-                continue;
-            }
-
-            if ($dependencies !== [] && strpos($dependencies[0], '## ') === 0) {
-                continue;
-            }
-
-            if (array_key_exists($target, $targetCounts)) {
-                ++$targetCounts[$target];
-            } else {
-                $targetCounts[$target] = 1;
-            }
-        }
-
-        foreach ($targetCounts as $target => $count) {
-            $this->assertSame(
-                1,
-                $count,
-                sprintf('Expected to find only one declaration for the target "%s"', $target)
-            );
-        }
-    }
-
-    public function test_all_docker_test_targets_are_properly_declared(): void
-    {
-        $testTargets = array_filter(
-            Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
-            static function (array $targetSet): bool {
-                [$target, $dependencies] = $targetSet;
-
-                return strpos($target, 'test-') === 0
-                    && substr($target, -7) === '-docker'
-                    && ($dependencies === []
-                        || strpos($dependencies[0], '## ') !== 0
-                    )
-                ;
-            }
-        );
-
-        foreach ($testTargets as [$target, $dependencies]) {
-            $dashCount = substr_count($target, '-') - 1;
-
-            $subTestTargets = array_column(
-                array_filter(
-                    $testTargets,
-                    static function (array $targetSet) use ($target, $dashCount): bool {
-                        $targetWithoutSuffix = substr($target, 0, -7);
-
-                        $subTarget = substr($targetSet[0], 0, -7);
-
-                        return strpos($subTarget, $targetWithoutSuffix . '-') === 0
-                            && substr_count($subTarget, '-') === $dashCount + 1
-                        ;
-                    }
-                ),
-                0
-            );
-
-            if ($subTestTargets === []) {
-                continue;
-            }
-
-            if ($target === 'test-docker') {
-                array_unshift($subTestTargets, 'autoreview');
-            }
-
-            $this->assertSame(
-                $subTestTargets,
-                $dependencies,
-                sprintf(
-                    'Expected the dependencies of the "%s" target to be "%s". Found "%s" instead',
-                    $target,
-                    implode(' ', $subTestTargets),
-                    implode(' ', $dependencies)
-                )
-            );
-        }
-    }
-
-    public function test_the_test_target_runs_all_the_tests(): void
-    {
-        $testTargets = array_filter(
-            Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
-            static function (array $targetSet): bool {
-                [$target, $dependencies] = $targetSet;
-
-                return strpos($target, 'test') === 0
-                    && strpos($target, 'tests/') !== 0
-                    && substr($target, -7) !== '-docker'
-                    && ($dependencies === []
-                        || strpos($dependencies[0], '## ') !== 0
-                    )
-                ;
-            }
-        );
-
-        // Exclude itself
-        $testDependencies = array_shift($testTargets)[1];
-
-        $rootTestTargets = array_column(
+        return array_values(
             array_filter(
-                $testTargets,
-                static function (array $targetSet): bool {
-                    return strpos($targetSet[0], 'test-') === 0
-                        && substr_count($targetSet[0], '-') === 1;
+                self::getParsedRules(),
+                static function (Rule $rule) use ($filterDockerTarget): bool {
+                    $target = $rule->getTarget();
+
+                    return str_starts_with($target, 'test')
+                        && !str_starts_with($target, 'tests/')
+                        && $filterDockerTarget($target)
+                        && !$rule->isComment();
                 }
             ),
-            0
         );
-
-        $rootTestTargets = array_replace($rootTestTargets, ['test-autoreview'], ['autoreview']);
-
-        $this->assertSame($rootTestTargets, $testDependencies);
     }
 
-    public function test_the_docker_test_target_runs_all_the_tests(): void
+    /**
+     * @param list<Rule> $testRules
+     *
+     * @return list<string>
+     */
+    private static function getDockerSubTestTargets(string $target, array $testRules): array
     {
-        $testTargets = array_filter(
-            Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
-            static function (array $targetSet): bool {
-                [$target, $dependencies] = $targetSet;
+        $dashCount = substr_count($target, '-') - 1;
 
-                return strpos($target, 'test') === 0
-                    && substr($target, -7) === '-docker'
-                    && ($dependencies === []
-                        || strpos($dependencies[0], '## ') !== 0
-                    )
-                ;
+        $subTestRules = array_filter(
+            $testRules,
+            static function (Rule $rule) use ($target, $dashCount): bool {
+                $targetWithoutSuffix = substr($target, 0, -7);
+                $subTarget = substr($rule->getTarget(), 0, -7);
+
+                return str_starts_with($subTarget, $targetWithoutSuffix . '-')
+                    && substr_count($subTarget, '-') === $dashCount + 1;
             }
         );
 
-        $testDependencies = array_shift($testTargets)[1];
-
-        $rootTestTargets = array_column(
-            array_filter(
-                $testTargets,
-                static function (array $targetSet): bool {
-                    return strpos($targetSet[0], 'test-') === 0
-                        && substr_count($targetSet[0], '-') === 2;
-                }
+        return array_values(
+            array_map(
+                static fn (Rule $rule) => $rule->getTarget(),
+                $subTestRules,
             ),
-            0
+        );
+    }
+
+    /**
+     * @param list<Rule> $testRules
+     *
+     * @return list<string>
+     */
+    private static function getRootTestTargets(array $testRules, int $dashCount): array
+    {
+        $testTargets = array_map(
+            static fn (Rule $rule) => $rule->getTarget(),
+            $testRules,
         );
 
-        array_unshift($rootTestTargets, 'autoreview');
+        return array_values(
+            array_filter(
+                $testTargets,
+                static fn (string $target): bool => str_starts_with($target, 'test-')
+                    && substr_count($target, '-') === $dashCount,
+            ),
+        );
+    }
 
-        $this->assertSame($rootTestTargets, $testDependencies);
+    /**
+     * @template T
+     *
+     * @param T[] $array
+     * @param T[] $items
+     */
+    private function assertArrayContains(
+        array $array,
+        array $items
+    ): void {
+        if (count($items) === 0) {
+            $this->addToAssertionCount(1);
+
+            return;
+        }
+
+        foreach ($items as $item) {
+            $this->assertContains($item, $array);
+        }
+    }
+
+    /**
+     * @template T
+     *
+     * @param T[] $array
+     * @param T[] $items
+     */
+    private function assertDoesNotArrayContain(
+        array $array,
+        array $items
+    ): void {
+        if (count($items) === 0) {
+            $this->addToAssertionCount(1);
+
+            return;
+        }
+
+        foreach ($items as $item) {
+            $this->assertNotContains($item, $array);
+        }
     }
 }

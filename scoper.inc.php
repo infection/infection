@@ -34,6 +34,7 @@
 declare(strict_types=1);
 
 return [
+    'prefix' => 'Infected',
     'exclude-constants' => [
         // Symfony global constants
         '/^SYMFONY\_[\p{L}_]+$/',
