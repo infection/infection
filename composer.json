@@ -69,6 +69,7 @@
     },
     "conflict": {
         "phpunit/php-code-coverage": ">9,<9.1.4 || >9.2.17,<9.2.21",
+        "antecedent/patchwork": "<2.1.25",
         "dg/bypass-finals": "<1.4.1"
     },
     "require-dev": {
