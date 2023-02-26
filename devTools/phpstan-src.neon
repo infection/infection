@@ -47,9 +47,6 @@ parameters:
             message: '#^Function shell_exec is unsafe to use#'
             path: '../src/TestFramework/CommandLineBuilder.php'
 
-        -
-            message: '#^Parameter \#1 \$string of function trim expects string, string\|null given\.$#'
-            path: '../src/TestFramework/PhpUnit/Config/Path/PathReplacer.php'
 
 
     level: 8
