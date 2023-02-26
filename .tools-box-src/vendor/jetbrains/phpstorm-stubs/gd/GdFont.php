@@ -1,6 +1,0 @@
-<?php
-
-
-
-
-final class GdFont {}
