@@ -47,8 +47,6 @@ parameters:
             message: '#^Function shell_exec is unsafe to use#'
             path: '../src/TestFramework/CommandLineBuilder.php'
 
-
-
     level: 8
     paths:
         - ../src
