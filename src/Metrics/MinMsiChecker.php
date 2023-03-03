@@ -54,15 +54,16 @@ class MinMsiChecker
      */
     public function checkMetrics(
         int $totalMutantCount,
+        float $totalCoverage,
         float $msi,
         float $coveredCodeMsi,
         ConsoleOutput $consoleOutput
     ): void {
-        $this->checkMinMsi($totalMutantCount, $msi, $coveredCodeMsi);
+        $this->checkMinMsi($totalMutantCount, $totalCoverage, $msi, $coveredCodeMsi);
         $this->checkIfMinMsiCanBeIncreased($msi, $coveredCodeMsi, $consoleOutput);
     }
 
-    private function checkMinMsi(int $totalMutantCount, float $msi, float $coveredCodeMsi): void
+    private function checkMinMsi(int $totalMutantCount, float $totalCoverage, float $msi, float $coveredCodeMsi): void
     {
         if ($this->ignoreMsiWithNoMutations
             && $totalMutantCount === 0
@@ -77,7 +78,7 @@ class MinMsiChecker
             );
         }
 
-        if ($this->isCoveredCodeMsiInsufficient($coveredCodeMsi)) {
+        if ($totalCoverage > 0 && $this->isCoveredCodeMsiInsufficient($coveredCodeMsi)) {
             throw MinMsiCheckFailed::createCoveredMsi(
                 $this->minCoveredCodeMsi,
                 $coveredCodeMsi

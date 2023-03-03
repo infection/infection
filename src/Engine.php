@@ -76,6 +76,7 @@ final class Engine
         try {
             $this->minMsiChecker->checkMetrics(
                 $this->metricsCalculator->getTestedMutantsCount(),
+                $this->metricsCalculator->getCoverageRate(),
                 $this->metricsCalculator->getMutationScoreIndicator(),
                 $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
                 $this->consoleOutput
