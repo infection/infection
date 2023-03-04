@@ -42,6 +42,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function array_intersect;
+use function property_exists;
 
 /**
  * @internal
@@ -83,35 +85,52 @@ DIFF
             return false;
         }
 
-        $equalOp = [
-            Node\Expr\BinaryOp\Identical::class,
-            Node\Expr\BinaryOp\Equal::class,
-        ];
-
-        $classNodeLeft = get_class($node->left);
-        $classNodeRight = get_class($node->right);
+        $nodeLeft  = $node->left;
+        $nodeRight = $node->right;
 
         if (
-            in_array($classNodeLeft, $equalOp, true)
-            && in_array($classNodeRight, $equalOp, true)
+            !property_exists($nodeLeft, 'left')
+            || !property_exists($nodeLeft, 'right')
+            || !property_exists($nodeRight, 'left')
+            || !property_exists($nodeRight, 'right')
         ) {
-            $varNameLeft = null;
+            return true;
+        }
 
-            if ($node->left->left instanceof Node\Expr\Variable) {
-                $varNameLeft = $node->left->left->name;
-            } elseif ($node->left->right instanceof Node\Expr\Variable) {
-                $varNameLeft = $node->left->right->name;
+        $nodeLeftLeft  = $nodeLeft->left;
+        $nodeLeftRight = $nodeLeft->right;
+
+        $nodeRightLeft  = $nodeRight->left;
+        $nodeRightRight = $nodeRight->right;
+
+        $classNodeLeft  = get_class($nodeLeft);
+        $classNodeRight = get_class($nodeRight);
+
+        if (
+            Node\Expr\BinaryOp\Identical::class === $classNodeLeft
+            && Node\Expr\BinaryOp\Identical::class === $classNodeRight
+        ) {
+            $varNameLeft = [];
+
+            if ($nodeLeftLeft instanceof Node\Expr\Variable) {
+                $varNameLeft[] = $nodeLeftLeft->name;
             }
 
-            $varNameRight = null;
-
-            if ($node->right->left instanceof Node\Expr\Variable) {
-                $varNameRight = $node->right->left->name;
-            } elseif ($node->right->right instanceof Node\Expr\Variable) {
-                $varNameRight = $node->right->right->name;
+            if ($nodeLeftRight instanceof Node\Expr\Variable) {
+                $varNameLeft[] = $nodeLeftRight->name;
             }
 
-            return $varNameLeft !== $varNameRight;
+            $varNameRight = [];
+
+            if ($nodeRightLeft instanceof Node\Expr\Variable) {
+                $varNameRight[] = $nodeRightLeft->name;
+            }
+
+            if ($nodeRightRight instanceof Node\Expr\Variable) {
+                $varNameRight[] = $nodeRightRight->name;
+            }
+
+            return array_intersect($varNameLeft, $varNameRight) === [];
         }
 
         $greaterOp = [
@@ -126,30 +145,70 @@ DIFF
 
         if (
             (
-                in_array($classNodeLeft, $greaterOp, true) === true
-                && in_array($classNodeRight, $smallerOp, true) === true
+                in_array($classNodeLeft, $greaterOp, true)
+                && in_array($classNodeRight, $smallerOp, true)
             ) || (
-                in_array($classNodeLeft, $smallerOp, true) === true
-                && in_array($classNodeRight, $greaterOp, true) === true
+                in_array($classNodeLeft, $smallerOp, true)
+                && in_array($classNodeRight, $greaterOp, true)
             )
         ) {
             $varNameLeft = null;
+            $valueLeft   = null;
 
-            if ($node->left->left instanceof Node\Expr\Variable) {
-                $varNameLeft = $node->left->left->name;
-            } elseif ($node->left->right instanceof Node\Expr\Variable) {
-                $varNameLeft = $node->left->right->name;
+            $numberScalar = [
+                Node\Scalar\LNumber::class,
+                Node\Scalar\DNumber::class,
+            ];
+
+            if ($nodeLeftLeft instanceof Node\Expr\Variable) {
+                $varNameLeft = $nodeLeftLeft->name;
+            } elseif (in_array(get_class($nodeLeftLeft), $numberScalar, true)) {
+                $valueLeft = $nodeLeftLeft->value;
+            } else {
+                return true;
+            }
+
+            if ($nodeLeftRight instanceof Node\Expr\Variable && null === $varNameLeft) {
+                $varNameLeft = $nodeLeftRight->name;
+            } elseif (in_array(get_class($nodeLeftRight), $numberScalar, true) && null === $valueLeft) {
+                $valueLeft = $nodeLeftRight->value;
+            } else {
+                return true;
             }
 
             $varNameRight = null;
+            $valueRight   = null;
 
-            if ($node->right->left instanceof Node\Expr\Variable) {
-                $varNameRight = $node->right->left->name;
-            } elseif ($node->right->right instanceof Node\Expr\Variable) {
-                $varNameRight = $node->right->right->name;
+            if ($nodeRightLeft instanceof Node\Expr\Variable) {
+                $varNameRight = $nodeRightLeft->name;
+            } elseif (in_array(get_class($nodeRightLeft), $numberScalar, true)) {
+                $valueRight = $nodeRightLeft->value;
+            } else {
+                return true;
             }
 
-            return $varNameLeft !== $varNameRight;
+            if ($nodeRightRight instanceof Node\Expr\Variable && null === $varNameRight) {
+                $varNameRight = $nodeRightRight->name;
+            } elseif (in_array(get_class($nodeRightRight), $numberScalar, true) && null === $valueRight) {
+                $valueRight = $nodeRightRight->value;
+            } else {
+                return true;
+            }
+
+            if ($varNameLeft !== $varNameRight) {
+                return true;
+            }
+
+            return (match ("{$nodeLeft->getOperatorSigil()}::{$nodeRight->getOperatorSigil()}") {
+                '<::>'   => static fn() => $valueRight < $valueLeft, // a<5 && a>7; 7<a<5; 7<5;
+                '<::>='  => static fn() => $valueRight < $valueLeft, // a<5 && a>=7; 7<=a<5; 7<5;
+                '<=::>=' => static fn() => $valueRight <= $valueLeft, // a<=5 && a>=7; 7<=a<=5; 7<=5;
+                '<=::>'  => static fn() => $valueRight < $valueLeft, // a<=5 && a>7; 7<a<=5; 7<5;
+                '>::<'   => static fn() => $valueRight > $valueLeft, // a>5 && a<7; 7>a>5; 7>5;
+                '>::<='  => static fn() => $valueRight > $valueLeft, // a>5 && a<=7; 7>=a>5; 7>5;
+                '>=::<=' => static fn() => $valueRight >= $valueLeft, // a>=5 && a<=7; 7>=a>=5; 7>=5;
+                '>=::<'  => static fn() => $valueRight > $valueLeft, // a>=5 && a<7; 7>a>=5; 7>5;
+            })();
         }
 
         return true;
