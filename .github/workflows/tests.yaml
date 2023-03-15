@@ -18,8 +18,7 @@ jobs:
       matrix:
         operating-system: [ ubuntu-latest ]
         php-version: [ '8.0', '8.1', '8.2' ]
-        # TODO: include highest & lowest
-        dependencies: [ locked ]
+        dependencies: [ locked, lowest, highest ]
         coverage-driver: [ pcov, xdebug ]
         # TODO: include Symfony6 later
         symfony-version: [ '5.4.*' ]
@@ -49,12 +48,12 @@ jobs:
         run: composer config --unset platform.php
 
       - name: Enforce the Symfony version used
-        if: ${{ matrix.symfony-version }}
+        if: matrix.dependencies != 'locked'
         run: composer config extra.symfony.require ${{ matrix.symfony-version }}
 
       # See https://symfony.com/doc/current/bundles/best_practices.html#require-a-specific-symfony-version
       - name: Install Flex
-        if: ${{ matrix.symfony-version }}
+        if: matrix.dependencies != 'locked'
         run: |
             composer global config --no-plugins allow-plugins.symfony/flex true
             composer global require --no-progress --no-scripts --no-plugins symfony/flex
