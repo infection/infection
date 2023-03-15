@@ -16,6 +16,7 @@ jobs:
 
     strategy:
       matrix:
+        fail-fast: false
         operating-system: [ ubuntu-latest ]
         php-version: [ '8.0', '8.1', '8.2' ]
         dependencies: [ locked, lowest, highest ]
