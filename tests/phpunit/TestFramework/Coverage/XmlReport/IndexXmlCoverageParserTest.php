@@ -84,7 +84,7 @@ final class IndexXmlCoverageParserTest extends TestCase
         );
 
         // zeroLevel + noPercentage + firstLevel + secondLevel
-        $this->assertCount(5, $sourceFilesData);
+        $this->assertCount(5, [...$sourceFilesData]);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file(): void
