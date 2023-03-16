@@ -152,18 +152,18 @@ final class ProxyTraceTest extends TestCase
         // More extensive tests done on the ability to locate the tests are done in the TestLocator
         $this->assertCount(
             0,
-            $trace->getAllTestsForMutation(
+            iterator_to_array($trace->getAllTestsForMutation(
                 new NodeLineRangeData(1, 1),
                 false
-            )
+            ))
         );
 
         $this->assertCount(
             1,
-            $trace->getAllTestsForMutation(
+            iterator_to_array($trace->getAllTestsForMutation(
                 new NodeLineRangeData(20, 21),
                 false
-            )
+            ))
         );
 
         // This iterator_to_array is due to bug in our version of PHPUnit
