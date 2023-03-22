@@ -39,8 +39,9 @@ use function trim;
 
 /**
  * @internal
+ * @final
  */
-final class TimeFormatter
+class TimeFormatter
 {
     private const TIME_HORIZONS = [
         'h' => 3600,

@@ -43,8 +43,9 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class MemoryFormatter
+class MemoryFormatter
 {
     private const UNITS = [
         'B',
