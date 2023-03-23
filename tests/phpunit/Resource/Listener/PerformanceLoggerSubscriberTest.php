@@ -39,13 +39,12 @@ use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
-use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
+use Infection\Tests\Fixtures\Resource\Memory\FakeMemoryFormatter;
+use Infection\Tests\Fixtures\Resource\Time\FakeTimeFormatter;
 use function is_array;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function strpos;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class PerformanceLoggerSubscriberTest extends TestCase
@@ -65,14 +64,17 @@ final class PerformanceLoggerSubscriberTest extends TestCase
         $this->output->expects($this->once())
             ->method('writeln')
             ->with($this->callback(static function ($parameter): bool {
-                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
+                $expectedOutput = 'Time: 5s. Memory: 2.00KB. Threads: 1';
+
+                return is_array($parameter) && $parameter[0] === '' && $parameter[1] === $expectedOutput;
             }));
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
-            new Stopwatch(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
+            new StopWatch(),
+            new FakeTimeFormatter(5),
+            new FakeMemoryFormatter(2048),
+            1,
             $this->output
         ));
 

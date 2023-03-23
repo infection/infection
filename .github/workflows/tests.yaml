@@ -15,11 +15,11 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
 
     strategy:
+      fail-fast: false
       matrix:
         operating-system: [ ubuntu-latest ]
         php-version: [ '8.0', '8.1', '8.2' ]
-        # TODO: include highest & lowest
-        dependencies: [ locked ]
+        dependencies: [ locked, lowest, highest ]
         coverage-driver: [ pcov, xdebug ]
         symfony-version: [ '5.4.*', '6.*.*' ]
         include:
@@ -48,12 +48,16 @@ jobs:
         run: composer config --unset platform.php
 
       - name: Enforce the Symfony version used
-        if: ${{ matrix.symfony-version }}
+        if: matrix.dependencies != 'locked'
         run: composer config extra.symfony.require ${{ matrix.symfony-version }}
+
+      - name: Disable deprecations for non-locked dependencies
+        if: matrix.dependencies != 'locked'
+        run: echo "SYMFONY_DEPRECATIONS_HELPER=max[self]=0" >> $GITHUB_ENV
 
       # See https://symfony.com/doc/current/bundles/best_practices.html#require-a-specific-symfony-version
       - name: Install Flex
-        if: ${{ matrix.symfony-version }}
+        if: matrix.dependencies != 'locked'
         run: |
             composer global config --no-plugins allow-plugins.symfony/flex true
             composer global require --no-progress --no-scripts --no-plugins symfony/flex

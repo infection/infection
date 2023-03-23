@@ -46,8 +46,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class PerformanceLoggerSubscriberFactory implements SubscriberFactory
 {
-    public function __construct(private Stopwatch $stopwatch, private TimeFormatter $timeFormatter, private MemoryFormatter $memoryFormatter)
-    {
+    public function __construct(
+        private Stopwatch $stopwatch,
+        private TimeFormatter $timeFormatter,
+        private MemoryFormatter $memoryFormatter,
+        private int $threadCount,
+    ) {
     }
 
     public function create(OutputInterface $output): EventSubscriber
@@ -56,6 +60,7 @@ final class PerformanceLoggerSubscriberFactory implements SubscriberFactory
             $this->stopwatch,
             $this->timeFormatter,
             $this->memoryFormatter,
+            $this->threadCount,
             $output
         );
     }

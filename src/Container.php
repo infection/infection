@@ -433,7 +433,8 @@ final class Container
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
                 $container->getStopwatch(),
                 $container->getTimeFormatter(),
-                $container->getMemoryFormatter()
+                $container->getMemoryFormatter(),
+                $container->getConfiguration()->getThreadCount()
             ),
             CommandLineBuilder::class => static fn (): CommandLineBuilder => new CommandLineBuilder(),
             SourceFileCollector::class => static fn (): SourceFileCollector => new SourceFileCollector(),
