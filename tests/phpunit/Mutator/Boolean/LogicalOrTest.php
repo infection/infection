@@ -114,6 +114,20 @@ $myVar == 'hello' && $myVar == 'world';
 PHP
         ];
 
+        yield 'It does mutate logical or if same variable is tested against "Equal" & "Identical".' => [
+            <<<'PHP'
+<?php
+
+$myVar === 'hello' || $myVar == 'world';
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$myVar === 'hello' && $myVar == 'world';
+PHP
+        ];
+
         yield 'It does not mutate logical or if same variable is tested against "Identical" (mirrored #1).' => [
             <<<'PHP'
 <?php
