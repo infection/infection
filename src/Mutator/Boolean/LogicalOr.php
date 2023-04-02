@@ -89,10 +89,8 @@ DIFF
         $nodeRight = $node->right;
 
         if (
-            !property_exists($nodeLeft, 'left')
-            || !property_exists($nodeLeft, 'right')
-            || !property_exists($nodeRight, 'left')
-            || !property_exists($nodeRight, 'right')
+            !$nodeLeft instanceof Node\Expr\BinaryOp
+            || !$nodeRight instanceof Node\Expr\BinaryOp
         ) {
             return true;
         }
@@ -103,12 +101,9 @@ DIFF
         $nodeRightLeft = $nodeRight->left;
         $nodeRightRight = $nodeRight->right;
 
-        $classNodeLeft = get_class($nodeLeft);
-        $classNodeRight = get_class($nodeRight);
-
         if (
-            $classNodeLeft === Node\Expr\BinaryOp\Identical::class
-            && $classNodeRight === Node\Expr\BinaryOp\Identical::class
+            $nodeLeft instanceof Node\Expr\BinaryOp\Identical
+            && $nodeRight instanceof Node\Expr\BinaryOp\Identical
         ) {
             $varNameLeft = [];
 
@@ -133,36 +128,49 @@ DIFF
             return array_intersect($varNameLeft, $varNameRight) === [];
         }
 
-        $greaterOp = [
-            Node\Expr\BinaryOp\Greater::class,
-            Node\Expr\BinaryOp\GreaterOrEqual::class,
-        ];
-
-        $smallerOp = [
-            Node\Expr\BinaryOp\Smaller::class,
-            Node\Expr\BinaryOp\SmallerOrEqual::class,
-        ];
-
         if (
             (
-                in_array($classNodeLeft, $greaterOp, true)
-                && in_array($classNodeRight, $smallerOp, true)
-            ) || (
-                in_array($classNodeLeft, $smallerOp, true)
-                && in_array($classNodeRight, $greaterOp, true)
+                $nodeLeft instanceof Node\Expr\BinaryOp\Greater
+                && $nodeRight instanceof Node\Expr\BinaryOp\Smaller
+            ) ||
+            (
+                $nodeLeft instanceof Node\Expr\BinaryOp\Greater
+                && $nodeRight instanceof Node\Expr\BinaryOp\SmallerOrEqual
+            ) ||
+            (
+                $nodeLeft instanceof Node\Expr\BinaryOp\GreaterOrEqual
+                && $nodeRight instanceof Node\Expr\BinaryOp\SmallerOrEqual
+            ) ||
+            (
+                $nodeLeft instanceof Node\Expr\BinaryOp\GreaterOrEqual
+                && $nodeRight instanceof Node\Expr\BinaryOp\Smaller
+            ) ||
+            (
+                $nodeLeft instanceof Node\Expr\BinaryOp\Smaller
+                && $nodeRight instanceof Node\Expr\BinaryOp\Greater
+            ) ||
+            (
+                $nodeLeft instanceof Node\Expr\BinaryOp\Smaller
+                && $nodeRight instanceof Node\Expr\BinaryOp\GreaterOrEqual
+            ) ||
+            (
+                $nodeLeft instanceof Node\Expr\BinaryOp\SmallerOrEqual
+                && $nodeRight instanceof Node\Expr\BinaryOp\GreaterOrEqual
+            ) ||
+            (
+                $nodeLeft instanceof Node\Expr\BinaryOp\SmallerOrEqual
+                && $nodeRight instanceof Node\Expr\BinaryOp\Greater
             )
         ) {
             $varNameLeft = null;
             $valueLeft = null;
 
-            $numberScalar = [
-                Node\Scalar\LNumber::class,
-                Node\Scalar\DNumber::class,
-            ];
-
             if ($nodeLeftLeft instanceof Node\Expr\Variable) {
                 $varNameLeft = $nodeLeftLeft->name;
-            } elseif (in_array(get_class($nodeLeftLeft), $numberScalar, true)) {
+            } elseif (
+                $nodeLeftLeft instanceof Node\Scalar\LNumber
+                || $nodeLeftLeft instanceof Node\Scalar\DNumber
+            ) {
                 $valueLeft = $nodeLeftLeft->value;
             } else {
                 return true;
@@ -170,7 +178,12 @@ DIFF
 
             if ($nodeLeftRight instanceof Node\Expr\Variable && $varNameLeft === null) {
                 $varNameLeft = $nodeLeftRight->name;
-            } elseif (in_array(get_class($nodeLeftRight), $numberScalar, true) && $valueLeft === null) {
+            } elseif (
+                (
+                    $nodeLeftRight instanceof Node\Scalar\LNumber
+                    || $nodeLeftRight instanceof Node\Scalar\DNumber
+                ) && $valueLeft === null
+            ) {
                 $valueLeft = $nodeLeftRight->value;
             } else {
                 return true;
@@ -181,7 +194,10 @@ DIFF
 
             if ($nodeRightLeft instanceof Node\Expr\Variable) {
                 $varNameRight = $nodeRightLeft->name;
-            } elseif (in_array(get_class($nodeRightLeft), $numberScalar, true)) {
+            } elseif (
+                $nodeRightLeft instanceof Node\Scalar\LNumber
+                || $nodeRightLeft instanceof Node\Scalar\DNumber
+            ) {
                 $valueRight = $nodeRightLeft->value;
             } else {
                 return true;
@@ -189,7 +205,12 @@ DIFF
 
             if ($nodeRightRight instanceof Node\Expr\Variable && $varNameRight === null) {
                 $varNameRight = $nodeRightRight->name;
-            } elseif (in_array(get_class($nodeRightRight), $numberScalar, true) && $valueRight === null) {
+            } elseif (
+                (
+                    $nodeRightRight instanceof Node\Scalar\LNumber
+                    || $nodeRightRight instanceof Node\Scalar\DNumber
+                ) && $valueRight === null
+            ) {
                 $valueRight = $nodeRightRight->value;
             } else {
                 return true;
