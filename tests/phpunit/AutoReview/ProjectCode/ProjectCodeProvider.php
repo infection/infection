@@ -264,8 +264,6 @@ final class ProjectCodeProvider
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
-            ->notName('DummySymfony5FileSystem.php')
-            ->notName('DummySymfony6FileSystem.php')
             ->notPath('xdebug-filter.php')
             ->notName('DummySymfony5FileSystem.php')
             ->notName('DummySymfony6FileSystem.php')
