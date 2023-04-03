@@ -49,7 +49,8 @@ trait LogsAssertions
         ?string $expectedDebugLogFilePath,
         ?string $expectedPerMutatorFilePath,
         bool $expectedUseGitHubAnnotationsLogger,
-        ?StrykerConfig $expectedStrykerConfig
+        ?StrykerConfig $expectedStrykerConfig,
+        ?string $expectedSummaryJsonLogFilePath,
     ): void {
         $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
         $this->assertSame($expectedHtmlLogFilePath, $logs->getHtmlLogFilePath());
@@ -58,6 +59,7 @@ trait LogsAssertions
         $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
         $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
         $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger(), 'Use GithubAnnotationLogger is incorrect');
+        $this->assertSame($expectedSummaryJsonLogFilePath, $logs->getSummaryJsonLogFilePath());
 
         $strykerConfig = $logs->getStrykerConfig();
 

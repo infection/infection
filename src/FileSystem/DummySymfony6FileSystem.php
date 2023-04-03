@@ -53,6 +53,7 @@ final class DummySymfony6FileSystem extends Filesystem
 
     public function exists(string|iterable $files): bool
     {
+        return false;
     }
 
     public function touch($files, ?int $time = null, ?int $atime = null): void
@@ -89,10 +90,12 @@ final class DummySymfony6FileSystem extends Filesystem
 
     public function readlink(string $path, bool $canonicalize = false): ?string
     {
+        return '';
     }
 
     public function makePathRelative(string $endPath, string $startPath): string
     {
+        return '';
     }
 
     public function mirror(string $originDir, string $targetDir, ?Traversable $iterator = null, array $options = []): void
@@ -101,10 +104,12 @@ final class DummySymfony6FileSystem extends Filesystem
 
     public function isAbsolutePath(string $file): bool
     {
+        return true;
     }
 
     public function tempnam(string $dir, string $prefix, string $suffix = ''): string
     {
+        return '';
     }
 
     public function dumpFile(string $filename, $content): void
@@ -112,10 +117,6 @@ final class DummySymfony6FileSystem extends Filesystem
     }
 
     public function appendToFile(string $filename, $content): void
-    {
-    }
-
-    public static function handleError($type, $msg): void
     {
     }
 }

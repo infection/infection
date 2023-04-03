@@ -6,9 +6,9 @@
             "src"
         ],
         excludes: [
-            "src/FileSystem/DummyFileSystem.php",
-            "src/FileSystem/DummySymfony5FileSystem.php",
-            "src/FileSystem/DummySymfony6FileSystem.php"
+            "FileSystem/DummyFileSystem.php",
+            "FileSystem/DummySymfony5FileSystem.php",
+            "FileSystem/DummySymfony6FileSystem.php"
         ]
     },
     "logs": {

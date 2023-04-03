@@ -1,0 +1,120 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+name: Unit & Integration Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.operating-system }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ ubuntu-latest ]
+        php-version: [ '8.0', '8.1', '8.2' ]
+        dependencies: [ locked, lowest, highest ]
+        coverage-driver: [ pcov, xdebug ]
+        symfony-version: [ '5.4.*', '6.*.*' ]
+        include:
+          - operating-system: windows-latest
+            php-version: '8.0'
+            dependencies: locked
+            coverage-driver: xdebug
+            symfony-version: '5.4.*'
+
+    name: Tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependencies }}; Symfony ${{ matrix.symfony-version }}), using ${{ matrix.coverage-driver }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: ${{ matrix.coverage-driver }}
+          ini-values: memory_limit=512M, xdebug.mode=off
+          tools: composer
+
+      - name: Remove the configured PHP platform
+        if: matrix.dependencies != 'locked'
+        run: composer config --unset platform.php
+
+      - name: Enforce the Symfony version used
+        if: matrix.dependencies != 'locked'
+        run: composer config extra.symfony.require ${{ matrix.symfony-version }}
+
+      - name: Disable deprecations for non-locked dependencies
+        if: matrix.dependencies != 'locked'
+        run: echo "SYMFONY_DEPRECATIONS_HELPER=max[self]=0" >> $GITHUB_ENV
+
+      # See https://symfony.com/doc/current/bundles/best_practices.html#require-a-specific-symfony-version
+      - name: Install Flex
+        if: matrix.dependencies != 'locked'
+        run: |
+            composer global config --no-plugins allow-plugins.symfony/flex true
+            composer global require --no-progress --no-scripts --no-plugins symfony/flex
+
+      - name: Get composer cache directory
+        id: composer-cache
+        shell: bash
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}
+          restore-keys: |
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-
+            composer-
+
+      - name: Install dependencies
+        if: ${{ matrix.dependencies == 'locked' }}
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install highest dependencies
+        if: ${{ matrix.dependencies == 'highest' }}
+        run: composer update --no-interaction --prefer-dist --no-progress
+
+      - name: Install lowest dependencies
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
+
+      - name: Configure the Symfony deprecations helper
+        if: ${{ matrix.php-version }} == '8.2'
+        run: echo "{SYMFONY_DEPRECATIONS_HELPER}={max[self]=0}" >> $GITHUB_ENV
+
+      - name: Run unit tests
+        shell: bash
+        run: make test-unit
+
+      - name: Run integration tests
+        if: ${{ matrix.operating-system != 'windows-latest' }}
+        shell: bash
+        run: make test-unit PHPUNIT_GROUP=integration
+
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  tests-status:
+    name: Unit & Integration Tests Status
+    runs-on: ubuntu-latest
+    needs: tests
+    if: always()
+    steps:
+      - name: Successful run
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+
+      - name: Failing run
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1

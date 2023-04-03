@@ -33,43 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Time;
+namespace Infection\Logger;
 
-use function trim;
+use Infection\Metrics\MetricsCalculator;
+use function json_encode;
+use const JSON_THROW_ON_ERROR;
 
 /**
  * @internal
- * @final
  */
-class TimeFormatter
+final class SummaryJsonLogger implements LineMutationTestingResultsLogger
 {
-    private const TIME_HORIZONS = [
-        'h' => 3600,
-        'm' => 60,
-        's' => 1,
-    ];
+    public function __construct(private MetricsCalculator $metricsCalculator)
+    {
+    }
 
     /**
-     * Formats time in seconds to a more human-friendly format.
+     * @return array{0: string}
      */
-    public function toHumanReadableString(float $seconds): string
+    public function getLogLines(): array
     {
-        if ($seconds < 1) {
-            return '0s';
-        }
+        $data = [
+            'stats' => [
+                'totalMutantsCount' => $this->metricsCalculator->getTotalMutantsCount(),
+                'killedCount' => $this->metricsCalculator->getKilledCount(),
+                'notCoveredCount' => $this->metricsCalculator->getNotTestedCount(),
+                'escapedCount' => $this->metricsCalculator->getEscapedCount(),
+                'errorCount' => $this->metricsCalculator->getErrorCount(),
+                'syntaxErrorCount' => $this->metricsCalculator->getSyntaxErrorCount(),
+                'skippedCount' => $this->metricsCalculator->getSkippedCount(),
+                'ignoredCount' => $this->metricsCalculator->getIgnoredCount(),
+                'timeOutCount' => $this->metricsCalculator->getTimedOutCount(),
+                'msi' => $this->metricsCalculator->getMutationScoreIndicator(),
+                'mutationCodeCoverage' => $this->metricsCalculator->getCoverageRate(),
+                'coveredCodeMsi' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
+            ],
+        ];
 
-        $resultString = '';
-
-        foreach (self::TIME_HORIZONS as $unit => $unitValue) {
-            $intQuotient = (int) ($seconds / $unitValue);
-
-            if ($intQuotient !== 0) {
-                $resultString .= $intQuotient . $unit . ' ';
-            }
-
-            $seconds -= $unitValue * $intQuotient;
-        }
-
-        return trim($resultString);
+        return [json_encode($data, JSON_THROW_ON_ERROR)];
     }
 }

@@ -4,7 +4,7 @@
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
-    xsi:schemaLocation="https://getpsalm.org/schema/config.xsd vendor/vimeo/psalm/config.xsd"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
     errorBaseline="psalm-baseline.xml"
 >
     <projectFiles>
@@ -30,14 +30,12 @@
 
         <InvalidReturnType>
             <errorLevel type="suppress">
-                <!-- TODO: this was caused by bumping the minimum requirement to PHP 8.1. To fix. -->
                 <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
             </errorLevel>
         </InvalidReturnType>
 
         <MethodSignatureMismatch>
             <errorLevel type="suppress">
-                <!-- TODO: this was caused by bumping the minimum requirement to PHP 8.1. To fix. -->
                 <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
             </errorLevel>
         </MethodSignatureMismatch>

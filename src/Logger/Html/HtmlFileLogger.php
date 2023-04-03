@@ -56,7 +56,7 @@ final class HtmlFileLogger implements LineMutationTestingResultsLogger
                 <body>
                     <a href="/">Back</a>
                     <mutation-test-report-app title-postfix="Infection"></mutation-test-report-app>
-                    <script defer src="https://www.unpkg.com/mutation-testing-elements"></script>
+                    <script defer src="https://cdn.jsdelivr.net/npm/mutation-testing-elements/dist/mutation-test-elements.js"></script>
                     <script>
                         const app = document.getElementsByTagName('mutation-test-report-app').item(0);
                         function updateTheme() {

@@ -267,6 +267,8 @@ final class ProjectCodeProvider
             ->notName('DummySymfony5FileSystem.php')
             ->notName('DummySymfony6FileSystem.php')
             ->notPath('xdebug-filter.php')
+            ->notName('DummySymfony5FileSystem.php')
+            ->notName('DummySymfony6FileSystem.php')
             ->exclude([
                 'autoloaded',
                 'benchmark',

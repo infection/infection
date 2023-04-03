@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Infection\Tests\Fixtures\Finder;
 
 use Iterator;
@@ -8,15 +10,11 @@ use Symfony\Component\Finder\Iterator\PathFilterIterator;
 
 class MockRelativePathFinder extends Finder
 {
-    private $sourceDirectories;
+    private array $filters = [];
 
-    private $filters = [];
-
-    public function __construct(array $sourceDirectories)
+    public function __construct(private array $sourceDirectories)
     {
         parent::__construct();
-
-        $this->sourceDirectories = $sourceDirectories;
     }
 
     public function setFilter(array $filter): self

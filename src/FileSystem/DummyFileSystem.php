@@ -37,10 +37,10 @@ namespace Infection\FileSystem;
 
 use function class_alias;
 use Composer\InstalledVersions;
-use Composer\Semver\VersionParser;
+use function version_compare;
 
-if (InstalledVersions::satisfies(new VersionParser(), 'symfony/filesystem', '^6.0')) {
-    class_alias(DummySymfony6FileSystem::class, \Infection\FileSystem\DummyFileSystem::class);
-} else {
+if (version_compare((string) InstalledVersions::getPrettyVersion('symfony/filesystem'), 'v6.0', '<')) {
     class_alias(DummySymfony5FileSystem::class, \Infection\FileSystem\DummyFileSystem::class);
+} else {
+    class_alias(DummySymfony6FileSystem::class, \Infection\FileSystem\DummyFileSystem::class);
 }

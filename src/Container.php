@@ -147,6 +147,7 @@ use Psr\Log\NullLogger;
 use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -282,7 +283,7 @@ final class Container
                 $container->getPrinter(),
                 $container->getMutantCodeFactory()
             ),
-            Differ::class => static fn (): Differ => new Differ(new BaseDiffer()),
+            Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfiguration()->getThreadCount()),
             DryProcessRunner::class => static fn (): DryProcessRunner => new DryProcessRunner(),
@@ -432,7 +433,8 @@ final class Container
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
                 $container->getStopwatch(),
                 $container->getTimeFormatter(),
-                $container->getMemoryFormatter()
+                $container->getMemoryFormatter(),
+                $container->getConfiguration()->getThreadCount()
             ),
             CommandLineBuilder::class => static fn (): CommandLineBuilder => new CommandLineBuilder(),
             SourceFileCollector::class => static fn (): SourceFileCollector => new SourceFileCollector(),
