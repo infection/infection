@@ -25,27 +25,27 @@ final class FakeOutput implements OutputInterface
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function getVerbosity()
+    public function getVerbosity(): int
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function isQuiet()
+    public function isQuiet(): bool
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function isVerbose()
+    public function isVerbose(): bool
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function isVeryVerbose()
+    public function isVeryVerbose(): bool
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function isDebug()
+    public function isDebug(): bool
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
@@ -55,7 +55,7 @@ final class FakeOutput implements OutputInterface
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function isDecorated()
+    public function isDecorated(): bool
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
@@ -65,7 +65,7 @@ final class FakeOutput implements OutputInterface
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
 
-    public function getFormatter()
+    public function getFormatter(): OutputFormatterInterface
     {
         throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
     }
