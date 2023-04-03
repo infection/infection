@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use LogicException;
 use function array_intersect;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
@@ -226,6 +227,7 @@ DIFF
                 '>::<=' => static fn () => $valueRight > $valueLeft, // a>5 && a<=7; 7>=a>5; 7>5;
                 '>=::<=' => static fn () => $valueRight >= $valueLeft, // a>=5 && a<=7; 7>=a>=5; 7>=5;
                 '>=::<' => static fn () => $valueRight > $valueLeft, // a>=5 && a<7; 7>a>=5; 7>5;
+                default => throw new LogicException('This is an unreachable statement.')
             })();
         }
 
