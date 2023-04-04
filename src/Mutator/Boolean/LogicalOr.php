@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use LogicException;
 use function array_intersect;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use LogicException;
 use PhpParser\Node;
 
 /**
