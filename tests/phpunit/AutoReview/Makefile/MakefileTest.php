@@ -137,8 +137,8 @@ final class MakefileTest extends BaseMakefileTestCase
 
         yield [
             'test-unit-docker',
-            ['test-unit-80-docker'],
-            ['test-unit-docker', 'test-unit-80', 'test-unit'],
+            [],
+            ['test-unit-docker', 'test-unit'],
         ];
     }
 

@@ -17,17 +17,15 @@ jobs:
     strategy:
       matrix:
         operating-system: [ ubuntu-latest ]
-        php-version: [ '8.0' ]
+        php-version: [ '8.1' ]
         dependencies: [ locked ]
         composer: [ 'composer:v2.1' ]
         coverage-driver: [ pcov, xdebug ]
         e2e-runner: [ 'bin/infection' ]
         include:
-          - { operating-system: 'windows-latest', php-version: '8.0', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', composer: 'composer:v2.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.0', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.1', composer: 'composer:v2.1', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+          - { operating-system: 'windows-latest', php-version: '8.1', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.1', composer: 'composer:v2.1', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.1', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer:v2.1', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
 
     name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
