@@ -145,8 +145,10 @@ test-unit-parallel: $(PARATEST) vendor
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker:
-	@echo "No test currently registered"
+test-unit-docker: test-unit-81-docker
+
+test-unit-81-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
+	$(DOCKER_RUN_81) $(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests
@@ -160,15 +162,15 @@ test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES) vendor
 
 .PHONY: test-e2e-docker
 test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
-test-e2e-docker: test-e2e-phpdbg-docker test-e2e-xdebug-docker
-
-.PHONY: test-e2e-phpdbg-docker
-test-e2e-phpdbg-docker:
-	@echo "No test currently registered"
+test-e2e-docker: test-e2e-xdebug-docker
 
 .PHONY: test-e2e-xdebug-docker
-test-e2e-xdebug-docker:
-	@echo "No test currently registered"
+test-e2e-xdebug-docker: test-e2e-xdebug-81-docker
+
+.PHONY: test-e2e-xdebug-81-docker
+test-e2e-xdebug-81-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_81) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
+	$(DOCKER_RUN_81) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself
@@ -177,15 +179,14 @@ test-infection: $(INFECTION) vendor
 
 .PHONY: test-infection-docker
 test-infection-docker:	## Runs Infection against itself on the different Docker platforms
-test-infection-docker: test-infection-phpdbg-docker test-infection-xdebug-docker
-
-.PHONY: test-infection-phpdbg-docker
-test-infection-phpdbg-docker:
-	@echo "No test currently registered"
+test-infection-docker: test-infection-xdebug-docker
 
 .PHONY: test-infection-xdebug-docker
-test-infection-xdebug-docker:
-	@echo "No test currently registered"
+test-infection-xdebug-docker: test-infection-xdebug-81-docker
+
+.PHONY: test-infection-xdebug-81-docker
+test-infection-xdebug-81-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_81) ./bin/infection --threads=max
 
 #
 # Rules from files (non-phony targets)
