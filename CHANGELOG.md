@@ -1,5 +1,21 @@
 # Change Log
 
+## [0.26.20](https://github.com/infection/infection/tree/0.26.20) (2023-04-15)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.26.19...0.25.20)
+
+**Added:**
+
+* Add support for PHPUnit 10.1 and use `<source />` tag for coverage instead of `<coverage />` by @maks-rafalko in https://github.com
+* Log thread count as part of performance by @icanhazstring in https://github.com/infection/infection/pull/1836
+
+**Changed:**
+
+* Bump minimum PHP version required to PHP 8.1 by @theofidry in https://github.com/infection/infection/pull/1765
+* Declare conflict with uncompatible versions of antecedent/patchwork by @sanmai in https://github.com/infection/infection/pull/1829
+* Change CDN URL for mutation-testing-elements.js by @maks-rafalko in https://github.com/infection/infection/pull/1830
+* Trying to remove false positive on logical or. by @Neirda24 in https://github.com/infection/infection/pull/1801
+
 ## [0.26.19](https://github.com/infection/infection/tree/0.26.19) (2023-02-06)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.26.18...0.25.19)
