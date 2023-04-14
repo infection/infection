@@ -279,6 +279,30 @@ XML
         );
     }
 
+    public function test_it_adds_source_include_directories_to_post_10_1_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateSourceIncludeNodes($xPath, ['src/', 'examples/'], []);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <source>
+    <include>
+      <directory>src/</directory>
+      <directory>examples/</directory>
+    </include>
+  </source>
+</phpunit>
+XML
+        );
+    }
+
     public function test_it_removes_existing_loggers_from_post_93_configuration(): void
     {
         $this->assertItChangesPostPHPUnit93Configuration(

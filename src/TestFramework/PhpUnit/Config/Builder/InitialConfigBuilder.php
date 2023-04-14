@@ -109,6 +109,12 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addCoverageNodes(string $version, SafeDOMXPath $xPath): void
     {
+        if (version_compare($version, '10.1', '>=')) {
+            $this->configManipulator->addOrUpdateSourceIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
+
+            return;
+        }
+
         if (version_compare($version, '10', '>=')) {
             $this->configManipulator->addOrUpdateCoverageIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
