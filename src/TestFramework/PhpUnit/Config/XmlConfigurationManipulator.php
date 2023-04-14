@@ -161,6 +161,15 @@ final class XmlConfigurationManipulator
         $this->addOrUpdateCoverageNodes('coverage', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
 
+    /**
+     * @param string[] $srcDirs
+     * @param list<string> $filteredSourceFilesToMutate
+     */
+    public function addOrUpdateSourceIncludeNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
+    {
+        $this->addOrUpdateCoverageNodes('source', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
+    }
+
     public function validate(string $configPath, SafeDOMXPath $xPath): bool
     {
         if ($xPath->query('/phpunit')->length === 0) {

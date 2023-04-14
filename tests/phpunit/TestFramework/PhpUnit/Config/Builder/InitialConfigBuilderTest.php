@@ -282,7 +282,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(1, $coverageIncludeFiles->length);
     }
 
-    public function test_it_creates_coverage_include_node_if_does_not_exist_for_future_version_of_phpunit(): void
+    public function test_it_creates_coverage_include_node_if_does_not_exist_for_10_0_version_of_phpunit(): void
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
@@ -295,7 +295,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(2, $includedDirectories->length);
     }
 
-    public function test_it_does_not_create_legacy_coverage_filter_whitelist_node_for_future_version_of_phpunit(): void
+    public function test_it_does_not_create_legacy_coverage_filter_whitelist_node_for_10_0_version_of_phpunit(): void
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
@@ -306,6 +306,19 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
 
         $this->assertSame(0, $whitelistedDirectories->length);
+    }
+
+    public function test_it_creates_source_include_node_if_does_not_exist_for_10_1_version_of_phpunit(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('10.1'));
+
+        $includedDirectories = $this->queryXpath($xml, '/phpunit/source/include/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $includedDirectories);
+
+        $this->assertSame(2, $includedDirectories->length);
     }
 
     public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist(): void
