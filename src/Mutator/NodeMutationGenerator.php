@@ -141,6 +141,7 @@ class NodeMutationGenerator
             yield new Mutation(
                 $this->filePath,
                 $this->fileNodes,
+                $mutator::class,
                 $mutator->getName(),
                 $node->getAttributes(),
                 $node::class,

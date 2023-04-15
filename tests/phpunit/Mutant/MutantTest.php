@@ -106,6 +106,7 @@ final class MutantTest extends TestCase
                     new Node\Name('Acme'),
                     [new Node\Scalar\LNumber(0)]
                 )],
+                Plus::class,
                 MutatorName::getName(Plus::class),
                 $nominalAttributes,
                 Node\Scalar\LNumber::class,
@@ -128,6 +129,7 @@ final class MutantTest extends TestCase
                     new Node\Name('Acme'),
                     [new Node\Scalar\LNumber(0)]
                 )],
+                Plus::class,
                 MutatorName::getName(Plus::class),
                 $nominalAttributes,
                 Node\Scalar\LNumber::class,
