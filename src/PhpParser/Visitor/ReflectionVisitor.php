@@ -145,7 +145,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         do {
             $node = ParentConnector::findParent($node);
-        } while ($node !== null && ! $node instanceof Node\Param);
+        } while ($node !== null && !$node instanceof Node\Param);
 
         return $node !== null;
     }
