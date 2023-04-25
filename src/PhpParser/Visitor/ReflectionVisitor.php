@@ -129,19 +129,25 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * Loop on all parents of the node until one is a Node\Param or a function-like, which means it is part of a
+     * signature.
+     */
     private function isPartOfFunctionSignature(Node $node): bool
     {
         if ($this->isFunctionLikeNode($node)) {
             return true;
         }
 
-        $parent = ParentConnector::findParent($node);
-
-        if ($parent === null) {
-            return false;
+        if ($node instanceof Node\Param) {
+            return true;
         }
 
-        return $parent instanceof Node\Param || $node instanceof Node\Param;
+        do {
+            $node = ParentConnector::findParent($node);
+        } while ($node !== null && ! $node instanceof Node\Param);
+
+        return $node !== null;
     }
 
     /**
