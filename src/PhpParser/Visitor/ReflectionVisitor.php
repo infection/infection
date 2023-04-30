@@ -37,6 +37,7 @@ namespace Infection\PhpParser\Visitor;
 
 use function array_pop;
 use function count;
+use Error;
 use Infection\Reflection\AnonymousClassReflection;
 use Infection\Reflection\ClassReflection;
 use Infection\Reflection\CoreClassReflection;
@@ -190,7 +191,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         $fqn = FullyQualifiedClassNameManipulator::getFqcn($node);
 
         if ($fqn !== null) {
-            return CoreClassReflection::fromClassName($fqn->toString());
+            try {
+                return CoreClassReflection::fromClassName($fqn->toString());
+            } catch (Error $e) {
+                return new NullReflection();
+            }
         }
 
         // TODO: check against interfaces
