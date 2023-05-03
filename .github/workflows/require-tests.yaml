@@ -8,6 +8,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: infection/tests-checker-action@v1
+      - uses: infection/tests-checker-action@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
