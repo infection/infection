@@ -74,7 +74,7 @@ class DiffChangedLinesParser
 
         foreach ($lines as $line) {
             if (str_starts_with($line, 'diff ')) {
-                preg_match('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
+                preg_match('/diff.+a\/.*\sb\/(.*)/', $line, $matches);
 
                 Assert::keyExists(
                     $matches,
