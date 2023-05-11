@@ -66,7 +66,7 @@ abstract class AbstractFunctionUnwrapMutator implements Mutator
                 continue;
             }
 
-            yield $node->args[$index];
+            yield $node->args[$index]->value;
         }
     }
 
