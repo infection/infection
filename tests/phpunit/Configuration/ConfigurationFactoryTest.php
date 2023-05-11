@@ -289,21 +289,33 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'null html file log path with existing path from config file' => self::createValueForHtmlLogFilePath(
-            'from-config.html',
+            '/from-config.html',
             null,
-            'from-config.html'
+            '/from-config.html'
+        );
+
+        yield 'absolute html file log path' => self::createValueForHtmlLogFilePath(
+            '/path/to/from-config.html',
+            null,
+            '/path/to/from-config.html',
+        );
+
+        yield 'relative html file log path' => self::createValueForHtmlLogFilePath(
+            'relative/path/to/from-config.html',
+            null,
+            '/path/to/relative/path/to/from-config.html'
         );
 
         yield 'override html file log path from CLI option with existing path from config file' => self::createValueForHtmlLogFilePath(
-            'from-config.html',
-            'from-cli.html',
-            'from-cli.html'
+            '/from-config.html',
+            '/from-cli.html',
+            '/from-cli.html'
         );
 
         yield 'set html file log path from CLI option when config file has no setting' => self::createValueForHtmlLogFilePath(
             null,
-            'from-cli.html',
-            'from-cli.html'
+            '/from-cli.html',
+            '/from-cli.html'
         );
 
         yield 'null html file log path in config and CLI' => self::createValueForHtmlLogFilePath(
@@ -799,15 +811,15 @@ final class ConfigurationFactoryTest extends TestCase
                 10,
                 new Source(['src/'], ['vendor/']),
                 new Logs(
-                    'text.log',
-                    'report.html',
-                    'summary.log',
-                    'json.log',
-                    'debug.log',
-                    'mutator.log',
+                    '/text.log',
+                    '/report.html',
+                    '/summary.log',
+                    '/json.log',
+                    '/debug.log',
+                    '/mutator.log',
                     true,
                     StrykerConfig::forFullReport('master'),
-                    'summary.json'
+                    '/summary.json'
                 ),
                 'config/tmp',
                 new PhpUnit(
@@ -856,15 +868,15 @@ final class ConfigurationFactoryTest extends TestCase
             'src/Foo.php, src/Bar.php',
             ['vendor/'],
             new Logs(
-                'text.log',
-                'report.html',
-                'summary.log',
-                'json.log',
-                'debug.log',
-                'mutator.log',
+                '/text.log',
+                '/report.html',
+                '/summary.log',
+                '/json.log',
+                '/debug.log',
+                '/mutator.log',
                 true,
                 StrykerConfig::forFullReport('master'),
-                'summary.json'
+                '/summary.json'
             ),
             'none',
             '/path/to/config/tmp/infection',

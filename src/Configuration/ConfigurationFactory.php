@@ -40,11 +40,13 @@ use function array_key_exists;
 use function array_unique;
 use function array_values;
 use function dirname;
+use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Logger\FileLogger;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
@@ -153,7 +155,7 @@ class ConfigurationFactory
             ),
             $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
             $schema->getSource()->getExcludes(),
-            $this->retrieveLogs($schema->getLogs(), $useGitHubLogger, $htmlLogFilePath),
+            $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $htmlLogFilePath),
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
@@ -321,7 +323,7 @@ class ConfigurationFactory
         return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
     }
 
-    private function retrieveLogs(Logs $logs, ?bool $useGitHubLogger, ?string $htmlLogFilePath): Logs
+    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $htmlLogFilePath): Logs
     {
         if ($useGitHubLogger === null) {
             $useGitHubLogger = $this->detectCiGithubActions();
@@ -335,7 +337,17 @@ class ConfigurationFactory
             $logs->setHtmlLogFilePath($htmlLogFilePath);
         }
 
-        return $logs;
+        return new Logs(
+            self::pathToAbsolute($logs->getTextLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getHtmlLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getSummaryLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getJsonLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getDebugLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getPerMutatorFilePath(), $configDir),
+            $logs->getUseGitHubAnnotationsLogger(),
+            $logs->getStrykerConfig(),
+            self::pathToAbsolute($logs->getSummaryJsonLogFilePath(), $configDir),
+        );
     }
 
     private function detectCiGithubActions(): bool
@@ -347,5 +359,24 @@ class ConfigurationFactory
         }
 
         return $ci->getCiName() === CiDetector::CI_GITHUB_ACTIONS;
+    }
+
+    private static function pathToAbsolute(
+        ?string $path,
+        string $configDir,
+    ): ?string {
+        if ($path === null) {
+            return null;
+        }
+
+        if (in_array($path, FileLogger::ALLOWED_PHP_STREAMS, true)) {
+            return $path;
+        }
+
+        if (Path::isAbsolute($path)) {
+            return $path;
+        }
+
+        return sprintf('%s/%s', $configDir, $path);
     }
 }
