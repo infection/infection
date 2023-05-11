@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use Infection\Logger\FileLogger;
 use function array_fill_keys;
 use function array_key_exists;
 use function array_unique;
@@ -55,6 +56,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
+use function in_array;
 use function Safe\sprintf;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
@@ -365,6 +367,10 @@ class ConfigurationFactory
     ): ?string {
         if ($path === null) {
             return null;
+        }
+
+        if (in_array($path, FileLogger::ALLOWED_PHP_STREAMS)) {
+            return $path;
         }
 
         if (Path::isAbsolute($path)) {

@@ -50,6 +50,8 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class FileLogger implements MutationTestingResultsLogger
 {
+    public const ALLOWED_PHP_STREAMS = ['php://stdout', 'php://stderr'];
+
     public function __construct(private string $filePath, private Filesystem $fileSystem, private LineMutationTestingResultsLogger $lineLogger, private LoggerInterface $logger)
     {
     }
@@ -60,7 +62,7 @@ final class FileLogger implements MutationTestingResultsLogger
 
         // If the output should be written to a stream then just write it directly
         if (str_starts_with($this->filePath, 'php://')) {
-            if (in_array($this->filePath, ['php://stdout', 'php://stderr'], true)) {
+            if (in_array($this->filePath, self::ALLOWED_PHP_STREAMS, true)) {
                 file_put_contents($this->filePath, $content);
             } else {
                 // The Symfony filesystem component doesn't support using streams so provide a
