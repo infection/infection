@@ -76,7 +76,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
     }
 
     /**
-     * @return class-string
+     * @return class-string<Node\Expr\BinaryOp\BooleanOr|Node\Expr\BinaryOp\BooleanAnd>
      */
     abstract protected function getSupportedBinaryOpExprClass(): string;
 
