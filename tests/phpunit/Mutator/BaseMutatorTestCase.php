@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutator;
 use function array_shift;
 use function count;
 use function escapeshellarg;
+use function implode;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
@@ -47,6 +48,7 @@ use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
+use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
 use function Safe\exec;
@@ -86,9 +88,10 @@ abstract class BaseMutatorTestCase extends TestCase
             count($mutants),
             $expectedCodeSamples,
             sprintf(
-                'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator.',
+                'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Mutants are: %s',
                 count($expectedCodeSamples),
-                count($mutants)
+                count($mutants),
+                StringNormalizer::normalizeString(implode(PHP_EOL, $mutants))
             )
         );
 
