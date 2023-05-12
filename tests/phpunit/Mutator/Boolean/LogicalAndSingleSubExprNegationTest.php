@@ -114,6 +114,27 @@ PHP
             ],
         ];
 
+        yield 'It mutates method call with parameters' => [
+            <<<'PHP'
+<?php
+
+$var = $this->foo($a) && $bar->baz($b);
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$var = !$this->foo($a) && $bar->baz($b);
+PHP,
+                <<<'PHP'
+<?php
+
+$var = $this->foo($a) && !$bar->baz($b);
+PHP
+            ],
+        ];
+
         yield 'It mutates static calls' => [
             <<<'PHP'
 <?php
@@ -310,6 +331,15 @@ PHP
 $var = !a() && (b() || c());
 PHP
             ],
+        ];
+
+        yield 'It does not mutate if all are identical comparisons' => [
+            <<<'PHP'
+<?php
+
+$var = $a === false && b() === false && $c !== false && d() !== true;
+PHP
+            ,
         ];
     }
 }

@@ -69,13 +69,8 @@ DIFF
         );
     }
 
-    protected function isSupportedBinaryOpExpr(Node\Expr\BinaryOp $node): bool
+    protected function getSupportedBinaryOpExprClass(): string
     {
-        return $node instanceof Node\Expr\BinaryOp\BooleanOr;
-    }
-
-    protected function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr
-    {
-        return new Node\Expr\BinaryOp\BooleanOr($left, $right, $attributes);
+        return Node\Expr\BinaryOp\BooleanOr::class;
     }
 }

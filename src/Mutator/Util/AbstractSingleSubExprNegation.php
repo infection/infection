@@ -75,12 +75,17 @@ abstract class AbstractSingleSubExprNegation implements Mutator
         return $parent !== null && !$this->isSupportedNode($parent); // only grandparent
     }
 
-    abstract protected function isSupportedBinaryOpExpr(Node\Expr\BinaryOp $node): bool;
+    private function isSupportedBinaryOpExpr(Node\Expr\BinaryOp $node): bool
+    {
+        $class = $this->getSupportedBinaryOpExprClass();
+
+        return $node instanceof $class;
+    }
 
     /**
-     * @param array<string, mixed> $attributes
+     * @return class-string
      */
-    abstract protected function create(Node\Expr $left, Node\Expr $right, array $attributes): Node\Expr;
+    abstract protected function getSupportedBinaryOpExprClass(): string;
 
     private function countSubExpressionsToNegate(Node\Expr $node, int &$count = 0): int
     {
@@ -103,7 +108,9 @@ abstract class AbstractSingleSubExprNegation implements Mutator
             /** @var Node\Expr\BinaryOp $binaryOpNode */
             $binaryOpNode = $node;
 
-            return $this->create(
+            $binaryOpExprClass = $this->getSupportedBinaryOpExprClass();
+
+            return new $binaryOpExprClass(
                 $this->negateSubExpression($binaryOpNode->left, $negateExpressionAtIndex, $currentExpressionIndex),
                 $this->negateSubExpression($binaryOpNode->right, $negateExpressionAtIndex, $currentExpressionIndex),
                 $node->getAttributes(),
