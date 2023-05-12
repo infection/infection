@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -50,6 +51,8 @@ use PhpParser\Node;
 final class LogicalOrAllSubExprNegation implements Mutator
 {
     use GetMutatorName;
+
+    private const BOOLEANS = ['true', 'false'];
 
     public static function getDefinition(): ?Definition
     {
@@ -87,7 +90,16 @@ DIFF
 
         $parent = ParentConnector::findParent($node);
 
-        return $parent !== null && !$parent instanceof Node\Expr\BinaryOp\BooleanOr; // only grandparent
+        // only grandparent
+        if ($parent === null || $parent instanceof Node\Expr\BinaryOp\BooleanOr) {
+            return false;
+        }
+
+        if ($this->allSubConditionsAreNotMutable($node->left, $node->right)) {
+            return false;
+        }
+
+        return true;
     }
 
     private function negateEverySubExpression(Node\Expr|Node\Expr\BinaryOp\BooleanOr $node): Node\Expr
@@ -100,6 +112,47 @@ DIFF
             );
         }
 
+        // do not mutate `$a === false` to `!($a === true)` as this is a duplicate of FalseValue mutator
+        if ($this->isIdenticalComparisonWithBoolean($node)) {
+            return $node;
+        }
+
         return $node instanceof Node\Expr\BooleanNot ? $node->expr : new Node\Expr\BooleanNot($node);
+    }
+
+    /**
+     * `false === $a` or `$a === true` or `$b !== true` etc.
+     */
+    private function isIdenticalComparisonWithBoolean(Node\Expr|Node\Expr\BinaryOp\BooleanOr $node): bool
+    {
+        if (!$node instanceof Node\Expr\BinaryOp\Identical && !$node instanceof Node\Expr\BinaryOp\NotIdentical) {
+            return false;
+        }
+
+        return $this->isBoolean($node->left) || $this->isBoolean($node->right);
+    }
+
+    private function isBoolean(Node\Expr $node): bool
+    {
+        return $node instanceof Node\Expr\ConstFetch && in_array($node->name->toLowerString(), self::BOOLEANS, true);
+    }
+
+    /**
+     * For example if all of them are identical comparisons: `$a === true && $b === false`, we shouldn't mutate
+     */
+    private function allSubConditionsAreNotMutable(Node\Expr $left, Node\Expr $right): bool
+    {
+        $leftIsNotMutable = ($left instanceof Node\Expr\BinaryOp\BooleanOr || $left instanceof Node\Expr\BinaryOp\BooleanAnd)
+            ? $this->allSubConditionsAreNotMutable($left->left, $left->right)
+            : $this->isIdenticalComparisonWithBoolean($left);
+
+        // optimization: if left is mutable - no need to check right
+        if (!$leftIsNotMutable) {
+            return false;
+        }
+
+        return ($right instanceof Node\Expr\BinaryOp\BooleanOr || $right instanceof Node\Expr\BinaryOp\BooleanAnd)
+            ? $this->allSubConditionsAreNotMutable($right->left, $right->right)
+            : $this->isIdenticalComparisonWithBoolean($right);
     }
 }

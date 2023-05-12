@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use function array_map;
 use function array_shift;
 use function count;
 use function escapeshellarg;
+use function implode;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
@@ -48,9 +48,9 @@ use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
+use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
-use function implode;
 use function Safe\exec;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;

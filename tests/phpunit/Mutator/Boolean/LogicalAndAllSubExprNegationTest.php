@@ -182,7 +182,7 @@ PHP
 $var = !$a && b() === false && $c !== false;
 PHP
                 ,
-            ]
+            ],
         ];
 
         yield 'It mutates the only one mutable expression in the middle when others are not mutable' => [
@@ -199,7 +199,7 @@ PHP
 $var = $a === false && !b() && $c !== false;
 PHP
                 ,
-            ]
+            ],
         ];
 
         yield 'It mutates the only one mutable expression on the right when others are not mutable' => [
@@ -216,7 +216,7 @@ PHP
 $var = $a === false && b() === false && !$c;
 PHP
                 ,
-            ]
+            ],
         ];
     }
 }
