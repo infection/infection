@@ -98,7 +98,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     /**
      * @dataProvider provideTestCases
      */
-    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(bool $executeOnlyCoveringTestCases, array $testCases, ?string $expectedFilterOptionValue = null): void
+    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(bool $executeOnlyCoveringTestCases, array $testCases, string $phpUnitVersion, ?string $expectedFilterOptionValue = null): void
     {
         $configPath = '/the config/path';
 
@@ -123,7 +123,8 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 array_map(
                     static fn (string $testCase): TestLocation => TestLocation::forTestMethod($testCase),
                     $testCases
-                )
+                ),
+                $phpUnitVersion
             )
         );
     }
@@ -135,6 +136,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             [
                 'App\Test::test_case1',
             ],
+            '9.5',
         ];
 
         yield '1 test case' => [
@@ -142,6 +144,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             [
                 'App\Test::test_case1',
             ],
+            '9.5',
             '/Test\:\:test_case1/',
         ];
 
@@ -151,6 +154,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 'App\Test::test_case1',
                 'App\Test::test_case2',
             ],
+            '9.5',
             '/Test\:\:test_case1|Test\:\:test_case2/',
         ];
 
@@ -160,6 +164,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 'App\Test::test_case1 with data set "With special character >"',
                 'App\Test::test_case2',
             ],
+            '9.5',
             '/Test\:\:test_case1 with data set "With special character \\>"|Test\:\:test_case2/',
         ];
 
@@ -169,6 +174,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 'App\Test::test_case1 with data set "With special character @"',
                 'App\Test::test_case2',
             ],
+            '9.5',
             '/Test\:\:test_case1 with data set "With special character @"|Test\:\:test_case2/',
         ];
 
@@ -178,6 +184,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 'App\Test::test_case1 with data set "#1"',
                 'App\Test::test_case1 with data set "#2"',
             ],
+            '9.5',
             '/Test\:\:test_case1 with data set "\#1"|Test\:\:test_case1 with data set "\#2"/',
         ];
 
@@ -186,6 +193,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             [
                 'App\Test::test_case1 with data set "With special char \\"',
             ],
+            '9.5',
             '/Test\:\:test_case1 with data set "With special char \\\\"/',
         ];
 
@@ -194,6 +202,74 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             [
                 'App\Test::test_case1 with data set "With special chars ::"',
             ],
+            '9.5',
+            '/Test\:\:test_case1 with data set "With special chars \:\:"/',
+        ];
+
+        yield '1 test case - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1',
+            ],
+            '10.1',
+            '/Test\:\:test_case1/',
+        ];
+
+        yield '2 test cases - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1',
+                'App\Test::test_case2',
+            ],
+            '10.1',
+            '/Test\:\:test_case1|Test\:\:test_case2/',
+        ];
+
+        yield '1 simple test case, 1 with data set and special character > - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#With special character >',
+                'App\Test::test_case2',
+            ],
+            '10.1',
+            '/Test\:\:test_case1 with data set "With special character \\>"|Test\:\:test_case2/',
+        ];
+
+        yield '1 simple test case, 1 with data set and special character @ - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#With special character @',
+                'App\Test::test_case2',
+            ],
+            '10.1',
+            '/Test\:\:test_case1 with data set "With special character @"|Test\:\:test_case2/',
+        ];
+
+        yield '2 data sets from data provider for the same test case - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1##1',
+                'App\Test::test_case1##2',
+            ],
+            '10.1',
+            '/Test\:\:test_case1 with data set "\#1"|Test\:\:test_case1 with data set "\#2"/',
+        ];
+
+        yield '1 data set from data provider "With special char \\" - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#With special char \\"',
+            ],
+            '10.1',
+            '/Test\:\:test_case1 with data set "With special char \\\\""/',
+        ];
+
+        yield '1 data set from data provider "With special chars ::" - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#With special chars ::',
+            ],
+            '10.1',
             '/Test\:\:test_case1 with data set "With special chars \:\:"/',
         ];
     }

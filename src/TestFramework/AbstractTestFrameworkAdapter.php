@@ -99,7 +99,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
                     $mutationOriginalFilePath
                 ),
                 $extraOptions,
-                $coverageTests
+                $coverageTests,
+                $this->getVersion()
             )
         );
     }
