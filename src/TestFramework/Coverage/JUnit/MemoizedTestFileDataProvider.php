@@ -47,7 +47,7 @@ final class MemoizedTestFileDataProvider implements TestFileDataProvider
      */
     private array $cache = [];
 
-    public function __construct(private TestFileDataProvider $provider)
+    public function __construct(private readonly TestFileDataProvider $provider)
     {
     }
 

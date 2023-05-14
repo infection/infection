@@ -67,13 +67,13 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     private int $mutationCount = 0;
 
     public function __construct(
-        private OutputInterface $output,
-        private OutputFormatter $outputFormatter,
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedLogger $mutationTestingResultsLogger,
-        private bool $showMutations)
+        private readonly OutputInterface $output,
+        private readonly OutputFormatter $outputFormatter,
+        private readonly MetricsCalculator $metricsCalculator,
+        private readonly ResultsCollector $resultsCollector,
+        private readonly DiffColorizer $diffColorizer,
+        private readonly FederatedLogger $mutationTestingResultsLogger,
+        private readonly bool $showMutations)
     {
     }
 

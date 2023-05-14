@@ -49,7 +49,7 @@ final class JUnitTestCaseTimeAdder
     /**
      * @param TestLocation[] $tests
      */
-    public function __construct(private array $tests)
+    public function __construct(private readonly array $tests)
     {
     }
 

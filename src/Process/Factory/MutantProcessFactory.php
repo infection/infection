@@ -53,7 +53,7 @@ use function version_compare;
 class MutantProcessFactory
 {
     // TODO: is it necessary for the timeout to be an int?
-    public function __construct(private TestFrameworkAdapter $testFrameworkAdapter, private float $timeout, private EventDispatcher $eventDispatcher, private MutantExecutionResultFactory $resultFactory)
+    public function __construct(private readonly TestFrameworkAdapter $testFrameworkAdapter, private readonly float $timeout, private readonly EventDispatcher $eventDispatcher, private readonly MutantExecutionResultFactory $resultFactory)
     {
     }
 

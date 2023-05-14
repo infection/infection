@@ -54,7 +54,7 @@ use function version_compare;
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    public function __construct(private bool $executeOnlyCoveringTestCases)
+    public function __construct(private readonly bool $executeOnlyCoveringTestCases)
     {
     }
 

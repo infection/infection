@@ -42,7 +42,7 @@ namespace Infection\TestFramework\Coverage;
  */
 final class UncoveredTraceProvider implements TraceProvider
 {
-    public function __construct(private BufferedSourceFileFilter $bufferedFilter)
+    public function __construct(private readonly BufferedSourceFileFilter $bufferedFilter)
     {
     }
 

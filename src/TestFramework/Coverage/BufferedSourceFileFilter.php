@@ -68,7 +68,7 @@ class BufferedSourceFileFilter implements FileFilter
      * @param iterable<SplFileInfo> $sourceFiles
      */
     public function __construct(
-        private FileFilter $filter,
+        private readonly FileFilter $filter,
         iterable $sourceFiles
     ) {
         // Make a map of source files so we can check covered files against it.

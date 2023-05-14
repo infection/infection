@@ -52,7 +52,7 @@ class ResultsCollector implements Collector
      */
     private array $resultsByStatus = [];
 
-    private SortableMutantExecutionResults $allExecutionResults;
+    private readonly SortableMutantExecutionResults $allExecutionResults;
 
     public function __construct()
     {

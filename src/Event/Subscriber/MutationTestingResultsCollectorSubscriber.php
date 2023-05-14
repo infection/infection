@@ -44,7 +44,7 @@ use Infection\Metrics\Collector;
 final class MutationTestingResultsCollectorSubscriber implements EventSubscriber
 {
     /** @var Collector[] */
-    private array $collectors;
+    private readonly array $collectors;
 
     public function __construct(Collector ...$collectors)
     {

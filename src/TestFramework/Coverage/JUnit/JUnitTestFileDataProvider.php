@@ -50,7 +50,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
     private ?SafeDOMXPath $xPath = null;
 
-    public function __construct(private JUnitReportLocator $jUnitLocator)
+    public function __construct(private readonly JUnitReportLocator $jUnitLocator)
     {
     }
 

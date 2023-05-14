@@ -40,7 +40,7 @@ namespace Infection\Event;
  */
 final class MutationTestingWasStarted
 {
-    public function __construct(private int $mutationCount)
+    public function __construct(private readonly int $mutationCount)
     {
     }
 

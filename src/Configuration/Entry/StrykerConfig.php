@@ -47,7 +47,6 @@ use function Safe\sprintf;
 final class StrykerConfig
 {
     private string $branchMatch;
-    private bool $isForFullReport;
 
     /**
      * Stryker has 2 ways for integration (https://stryker-mutator.io/docs/General/dashboard):
@@ -56,10 +55,8 @@ final class StrykerConfig
      *
      * @throws InvalidArgumentException when the provided $branch looks like a regular expression, but is not a valid one
      */
-    private function __construct(string $branch, bool $isForFullReport)
+    private function __construct(string $branch, private readonly bool $isForFullReport)
     {
-        $this->isForFullReport = $isForFullReport;
-
         if (preg_match('#^/.+/$#', $branch) === 0) {
             $this->branchMatch = '/^' . preg_quote($branch, '/') . '$/';
 

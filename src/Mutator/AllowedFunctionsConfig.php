@@ -48,7 +48,7 @@ abstract class AllowedFunctionsConfig
     /**
      * @var string[]
      */
-    private array $allowedFunctions;
+    private readonly array $allowedFunctions;
 
     /**
      * @param array<string, bool> $settings

@@ -50,7 +50,7 @@ final class CoveredTraceProvider implements TraceProvider
      * @param PhpUnitXmlCoverageTraceProvider|TraceProvider $primaryTraceProvider
      * @param BufferedSourceFileFilter|FileFilter $bufferedFilter
      */
-    public function __construct(private TraceProvider $primaryTraceProvider, private JUnitTestExecutionInfoAdder $testFileDataAdder, private FileFilter $bufferedFilter)
+    public function __construct(private readonly TraceProvider $primaryTraceProvider, private readonly JUnitTestExecutionInfoAdder $testFileDataAdder, private readonly FileFilter $bufferedFilter)
     {
     }
 

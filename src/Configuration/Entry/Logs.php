@@ -41,36 +41,17 @@ namespace Infection\Configuration\Entry;
  */
 class Logs
 {
-    private ?string $textLogFilePath;
-    private ?string $htmlLogFilePath;
-    private ?string $summaryLogFilePath;
-    private ?string $jsonLogFilePath;
-    private ?string $debugLogFilePath;
-    private ?string $perMutatorFilePath;
-    private bool $useGitHubAnnotationsLogger;
-    private ?StrykerConfig $strykerConfig;
-    private ?string $summaryJsonLogFilePath;
-
     public function __construct(
-        ?string $textLogFilePath,
-        ?string $htmlLogFilePath,
-        ?string $summaryLogFilePath,
-        ?string $jsonLogFilePath,
-        ?string $debugLogFilePath,
-        ?string $perMutatorFilePath,
-        bool $useGitHubAnnotationsLogger,
-        ?StrykerConfig $strykerConfig,
-        ?string $summaryJsonLogFilePath
+        private readonly ?string $textLogFilePath,
+        private ?string $htmlLogFilePath,
+        private readonly ?string $summaryLogFilePath,
+        private readonly ?string $jsonLogFilePath,
+        private readonly ?string $debugLogFilePath,
+        private readonly ?string $perMutatorFilePath,
+        private bool $useGitHubAnnotationsLogger,
+        private readonly ?StrykerConfig $strykerConfig,
+        private readonly ?string $summaryJsonLogFilePath
     ) {
-        $this->textLogFilePath = $textLogFilePath;
-        $this->htmlLogFilePath = $htmlLogFilePath;
-        $this->summaryLogFilePath = $summaryLogFilePath;
-        $this->jsonLogFilePath = $jsonLogFilePath;
-        $this->debugLogFilePath = $debugLogFilePath;
-        $this->perMutatorFilePath = $perMutatorFilePath;
-        $this->useGitHubAnnotationsLogger = $useGitHubAnnotationsLogger;
-        $this->strykerConfig = $strykerConfig;
-        $this->summaryJsonLogFilePath = $summaryJsonLogFilePath;
     }
 
     public static function createEmpty(): self

@@ -53,11 +53,11 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class IndexXmlCoverageLocator
 {
-    private string $defaultIndexPath;
+    private readonly string $defaultIndexPath;
 
     private ?string $indexPath = null;
 
-    public function __construct(private string $coveragePath)
+    public function __construct(private readonly string $coveragePath)
     {
         $this->defaultIndexPath = Path::canonicalize($coveragePath . '/coverage-xml/index.xml');
     }

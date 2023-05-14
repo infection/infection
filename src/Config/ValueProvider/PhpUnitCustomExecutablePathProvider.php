@@ -55,22 +55,18 @@ use function trim;
  */
 final class PhpUnitCustomExecutablePathProvider
 {
-    private TestFrameworkFinder $phpUnitExecutableFinder;
-    private ConsoleHelper $consoleHelper;
-    private QuestionHelper $questionHelper;
-
-    public function __construct(TestFrameworkFinder $phpUnitExecutableFinder, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
-    {
-        $this->phpUnitExecutableFinder = $phpUnitExecutableFinder;
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+    public function __construct(
+        private readonly TestFrameworkFinder $phpUnitExecutableFinder,
+        private readonly ConsoleHelper $consoleHelper,
+        private readonly QuestionHelper $questionHelper
+    ) {
     }
 
     public function get(IO $io): ?string
     {
         try {
             $this->phpUnitExecutableFinder->find(TestFrameworkTypes::PHPUNIT);
-        } catch (FinderException $e) {
+        } catch (FinderException) {
             $io->writeln(['']);
 
             $questionText = $this->consoleHelper->getQuestion(
@@ -83,7 +79,7 @@ final class PhpUnitCustomExecutablePathProvider
             return str_replace(
                 DIRECTORY_SEPARATOR,
                 '/',
-                $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question)
+                (string) $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question)
             );
         }
 

@@ -73,30 +73,15 @@ class ConfigurationFactory
      */
     private const DEFAULT_TIMEOUT = 10;
 
-    private TmpDirProvider $tmpDirProvider;
-    private MutatorResolver $mutatorResolver;
-    private MutatorFactory $mutatorFactory;
-    private MutatorParser $mutatorParser;
-    private SourceFileCollector $sourceFileCollector;
-    private CiDetectorInterface $ciDetector;
-    private GitDiffFileProvider $gitDiffFileProvider;
-
     public function __construct(
-        TmpDirProvider $tmpDirProvider,
-        MutatorResolver $mutatorResolver,
-        MutatorFactory $mutatorFactory,
-        MutatorParser $mutatorParser,
-        SourceFileCollector $sourceFileCollector,
-        CiDetectorInterface $ciDetector,
-        GitDiffFileProvider $gitDiffFileProvider
+        private readonly TmpDirProvider $tmpDirProvider,
+        private readonly MutatorResolver $mutatorResolver,
+        private readonly MutatorFactory $mutatorFactory,
+        private readonly MutatorParser $mutatorParser,
+        private readonly SourceFileCollector $sourceFileCollector,
+        private readonly CiDetectorInterface $ciDetector,
+        private readonly GitDiffFileProvider $gitDiffFileProvider
     ) {
-        $this->tmpDirProvider = $tmpDirProvider;
-        $this->mutatorResolver = $mutatorResolver;
-        $this->mutatorFactory = $mutatorFactory;
-        $this->mutatorParser = $mutatorParser;
-        $this->sourceFileCollector = $sourceFileCollector;
-        $this->ciDetector = $ciDetector;
-        $this->gitDiffFileProvider = $gitDiffFileProvider;
     }
 
     public function create(
@@ -131,7 +116,7 @@ class ConfigurationFactory
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
-        $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
+        $testFramework ??= $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
 
         $skipCoverage = $existingCoveragePath !== null;
 
@@ -354,7 +339,7 @@ class ConfigurationFactory
     {
         try {
             $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException $e) {
+        } catch (CiNotDetectedException) {
             return false;
         }
 

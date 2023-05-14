@@ -86,7 +86,7 @@ final class ConsoleLogger extends AbstractLogger
         LogLevel::NOTICE => 'note',
     ];
 
-    public function __construct(private IO $io)
+    public function __construct(private readonly IO $io)
     {
     }
 

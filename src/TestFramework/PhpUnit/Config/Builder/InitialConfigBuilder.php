@@ -50,19 +50,19 @@ use Webmozart\Assert\Assert;
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
-    private string $originalXmlConfigContent;
+    private readonly string $originalXmlConfigContent;
 
     /**
      * @param string[] $srcDirs
      * @param list<string> $filteredSourceFilesToMutate
      */
     public function __construct(
-        private string $tmpDir,
+        private readonly string $tmpDir,
         string $originalXmlConfigContent,
-        private XmlConfigurationManipulator $configManipulator,
-        private XmlConfigurationVersionProvider $versionProvider,
-        private array $srcDirs,
-        private array $filteredSourceFilesToMutate
+        private readonly XmlConfigurationManipulator $configManipulator,
+        private readonly XmlConfigurationVersionProvider $versionProvider,
+        private readonly array $srcDirs,
+        private readonly array $filteredSourceFilesToMutate
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,

@@ -73,7 +73,7 @@ class DiffChangedLinesParser
         $resultMap = [];
 
         foreach ($lines as $line) {
-            if (str_starts_with($line, 'diff ')) {
+            if (str_starts_with((string) $line, 'diff ')) {
                 preg_match('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
 
                 Assert::keyExists(
@@ -83,7 +83,7 @@ class DiffChangedLinesParser
                 );
 
                 $filePath = realpath($matches[self::MATCH_INDEX]);
-            } elseif (str_starts_with($line, '@@ ')) {
+            } elseif (str_starts_with((string) $line, '@@ ')) {
                 Assert::string($filePath, sprintf('Real path for file from diff can not be calculated. Diff: %s', $unifiedGreppedDiff));
 
                 preg_match('/\s\+(.*)\s@/', $line, $matches);
@@ -97,7 +97,7 @@ class DiffChangedLinesParser
                 // can be "523,12", meaning from 523 lines new 12 are added; or just "532"
                 $linesText = $matches[self::MATCH_INDEX];
 
-                $lineParts = array_map('\intval', explode(',', $linesText));
+                $lineParts = array_map('\intval', explode(',', (string) $linesText));
 
                 Assert::minCount($lineParts, 1);
 

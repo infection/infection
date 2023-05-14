@@ -44,7 +44,7 @@ use const JSON_THROW_ON_ERROR;
  */
 final class SummaryJsonLogger implements LineMutationTestingResultsLogger
 {
-    public function __construct(private MetricsCalculator $metricsCalculator)
+    public function __construct(private readonly MetricsCalculator $metricsCalculator)
     {
     }
 

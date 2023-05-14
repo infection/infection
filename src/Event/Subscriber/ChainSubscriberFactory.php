@@ -42,7 +42,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class ChainSubscriberFactory
 {
-    private $factories;
+    /**
+     * @var SubscriberFactory[]
+     */
+    private readonly array $factories;
 
     public function __construct(SubscriberFactory ...$factories)
     {

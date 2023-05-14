@@ -45,9 +45,9 @@ final class Response
     public const HTTP_OK = 200;
     public const HTTP_CREATED = 201;
 
-    private int $statusCode;
+    private readonly int $statusCode;
 
-    public function __construct(int $statusCode, private string $body)
+    public function __construct(int $statusCode, private readonly string $body)
     {
         Assert::range(
             $statusCode,
