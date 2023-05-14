@@ -6,6 +6,8 @@
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
     errorBaseline="psalm-baseline.xml"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="false"
 >
     <projectFiles>
         <directory name="src" />
@@ -39,5 +41,11 @@
                 <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
             </errorLevel>
         </MethodSignatureMismatch>
+
+        <UnusedConstructor>
+            <errorLevel type="suppress">
+                <file name="src/CannotBeInstantiated.php" />
+            </errorLevel>
+        </UnusedConstructor>
     </issueHandlers>
 </psalm>

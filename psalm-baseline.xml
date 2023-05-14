@@ -1,31 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.x-dev@">
+<files psalm-version="5.11.0@c9b192ab8400fdaf04b2b13d110575adc879aa90">
+  <file src="src/Mutator/Extensions/BCMath.php">
+    <ImpureFunctionCall>
+      <code><![CDATA[$this->converters[$name->toLowerString()]($node)]]></code>
+    </ImpureFunctionCall>
+  </file>
+  <file src="src/Mutator/Extensions/MBString.php">
+    <ImpureFunctionCall>
+      <code><![CDATA[$this->converters[$name->toLowerString()]($node)]]></code>
+    </ImpureFunctionCall>
+  </file>
   <file src="src/Mutator/IgnoreMutator.php">
-    <InvalidArgument occurrences="1">
+    <InvalidArgument>
       <code>$node</code>
     </InvalidArgument>
   </file>
-  <file src="src/Mutator/Util/AbstractAllSubExprNegation.php">
-    <UndefinedPropertyFetch occurrences="2">
-      <code>$node-&gt;left</code>
-      <code>$node-&gt;right</code>
-    </UndefinedPropertyFetch>
-  </file>
   <file src="src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php">
-    <InvalidReturnType occurrences="1">
-      <code>iterable&lt;string, string&gt;</code>
+    <InvalidReturnType>
+      <code><![CDATA[iterable<string, string>]]></code>
     </InvalidReturnType>
   </file>
   <file src="src/TestFramework/Factory.php">
-    <InvalidArgument occurrences="1">
-      <code>$this-&gt;sourceFileFilter-&gt;filter($this-&gt;infectionConfig-&gt;getSourceFiles())</code>
+    <InvalidArgument>
+      <code><![CDATA[$this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles())]]></code>
     </InvalidArgument>
   </file>
   <file src="src/TestFramework/TestFrameworkExtraOptionsFilter.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>preg_replace('/\s+/', ' ', trim($actualExtraOptions))</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[preg_replace('/\s+/', ' ', trim($actualExtraOptions))]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
+    <InvalidReturnType>
       <code>string</code>
     </InvalidReturnType>
   </file>
