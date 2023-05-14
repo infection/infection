@@ -43,7 +43,7 @@ use Infection\Mutant\DetectionStatus;
  */
 final class FilteringResultsCollectorFactory
 {
-    public function __construct(private TargetDetectionStatusesProvider $statusesProvider)
+    public function __construct(private readonly TargetDetectionStatusesProvider $statusesProvider)
     {
     }
 

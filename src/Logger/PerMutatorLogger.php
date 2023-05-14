@@ -57,7 +57,7 @@ use function strlen;
  */
 final class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
-    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector)
+    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector)
     {
     }
 

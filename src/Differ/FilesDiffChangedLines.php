@@ -46,7 +46,7 @@ class FilesDiffChangedLines
     /** @var array<string, ChangedLinesRange[]> */
     private ?array $memoizedFilesChangedLinesMap = null;
 
-    public function __construct(private DiffChangedLinesParser $diffChangedLinesParser, private GitDiffFileProvider $diffFileProvider)
+    public function __construct(private readonly DiffChangedLinesParser $diffChangedLinesParser, private readonly GitDiffFileProvider $diffFileProvider)
     {
     }
 

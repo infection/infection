@@ -57,7 +57,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private ?DOMDocument $dom = null;
 
-    public function __construct(private string $tmpDir, private string $originalXmlConfigContent, private XmlConfigurationManipulator $configManipulator, private string $projectDir, private JUnitTestCaseSorter $jUnitTestCaseSorter)
+    public function __construct(private readonly string $tmpDir, private readonly string $originalXmlConfigContent, private readonly XmlConfigurationManipulator $configManipulator, private readonly string $projectDir, private readonly JUnitTestCaseSorter $jUnitTestCaseSorter)
     {
     }
 

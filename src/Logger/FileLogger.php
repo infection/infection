@@ -52,7 +52,7 @@ final class FileLogger implements MutationTestingResultsLogger
 {
     public const ALLOWED_PHP_STREAMS = ['php://stdout', 'php://stderr'];
 
-    public function __construct(private string $filePath, private Filesystem $fileSystem, private LineMutationTestingResultsLogger $lineLogger, private LoggerInterface $logger)
+    public function __construct(private readonly string $filePath, private readonly Filesystem $fileSystem, private readonly LineMutationTestingResultsLogger $lineLogger, private readonly LoggerInterface $logger)
     {
     }
 

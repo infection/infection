@@ -51,11 +51,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class PerformanceLoggerSubscriber implements EventSubscriber
 {
     public function __construct(
-        private Stopwatch $stopwatch,
-        private TimeFormatter $timeFormatter,
-        private MemoryFormatter $memoryFormatter,
-        private int $threadCount,
-        private OutputInterface $output)
+        private readonly Stopwatch $stopwatch,
+        private readonly TimeFormatter $timeFormatter,
+        private readonly MemoryFormatter $memoryFormatter,
+        private readonly int $threadCount,
+        private readonly OutputInterface $output)
     {
     }
 

@@ -64,7 +64,7 @@ final class MBString implements ConfigurableMutator
     /**
      * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>>
      */
-    private array $converters;
+    private readonly array $converters;
 
     public function __construct(MBStringConfig $config)
     {

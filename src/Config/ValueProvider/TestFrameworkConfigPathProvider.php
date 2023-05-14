@@ -57,15 +57,11 @@ use function trim;
  */
 final class TestFrameworkConfigPathProvider
 {
-    private TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator;
-    private ConsoleHelper $consoleHelper;
-    private QuestionHelper $questionHelper;
-
-    public function __construct(TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
-    {
-        $this->testFrameworkConfigLocator = $testFrameworkConfigLocator;
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+    public function __construct(
+        private readonly TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator,
+        private readonly ConsoleHelper $consoleHelper,
+        private readonly QuestionHelper $questionHelper
+    ) {
     }
 
     /**
@@ -77,7 +73,7 @@ final class TestFrameworkConfigPathProvider
             $this->testFrameworkConfigLocator->locate($testFramework);
 
             return null;
-        } catch (Exception $e) {
+        } catch (Exception) {
             if ($testFramework !== TestFrameworkTypes::PHPUNIT) {
                 return $this->askTestFrameworkConfigLocation($io, $dirsInCurrentDir, $testFramework, '');
             }
@@ -96,7 +92,7 @@ final class TestFrameworkConfigPathProvider
                     $this->testFrameworkConfigLocator->locate($testFramework, $defaultValue);
 
                     return $defaultValue;
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // just continue to ask question
                 }
             }

@@ -55,7 +55,7 @@ final class CpuCoresCountProvider
 
         try {
             return (new CpuCoreCounter())->getCount();
-        } catch (NumberOfCpuCoreNotFound $exception) {
+        } catch (NumberOfCpuCoreNotFound) {
             return 1;
         }
     }

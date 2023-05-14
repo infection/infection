@@ -22,6 +22,7 @@ PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download
 PHP_CS_FIXER_CACHE=.php_cs.cache
 
 PHPSTAN=./vendor/bin/phpstan
+RECTOR=./vendor/bin/rector
 
 PSALM=./.tools/psalm
 PSALM_URL="https://github.com/vimeo/psalm/releases/download/v4.15.0/psalm.phar"
@@ -96,6 +97,14 @@ psalm-baseline: vendor
 psalm: vendor $(PSALM)
 	$(PSALM) --threads=max
 
+.PHONY: rector
+rector: vendor $(RECTOR)
+	$(RECTOR) process
+
+.PHONY: rector-check
+rector-check: vendor $(RECTOR)
+	$(RECTOR) process --dry-run
+
 .PHONY: validate
 validate:
 	composer validate --strict
@@ -119,7 +128,7 @@ profile: vendor $(BENCHMARK_SOURCES)
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: phpstan psalm validate test-autoreview
+autoreview: phpstan psalm validate test-autoreview rector-check
 
 .PHONY: test
 test:		 	## Runs all the tests

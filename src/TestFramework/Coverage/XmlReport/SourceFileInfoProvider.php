@@ -58,7 +58,7 @@ class SourceFileInfoProvider
 {
     private ?SafeDOMXPath $xPath = null;
 
-    public function __construct(private string $coverageIndexPath, private string $coverageDir, private string $relativeCoverageFilePath, private string $projectSource)
+    public function __construct(private readonly string $coverageIndexPath, private readonly string $coverageDir, private readonly string $relativeCoverageFilePath, private readonly string $projectSource)
     {
     }
 
@@ -113,7 +113,7 @@ class SourceFileInfoProvider
             '/',
             array_filter([
                 $this->projectSource,
-                trim($relativeFilePath, '/'),
+                trim((string) $relativeFilePath, '/'),
                 $fileName,
             ])
         );

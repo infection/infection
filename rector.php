@@ -33,34 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Metrics;
+use Rector\Config\RectorConfig;
+use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\Set\ValueObject\LevelSetList;
 
-use function array_filter;
-use function array_key_exists;
-use Infection\Mutant\MutantExecutionResult;
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->paths([
+        __DIR__ . '/src',
+        // TODO uncomment as a separate PR
+        // __DIR__ . '/tests/phpunit',
+    ]);
 
-/**
- * @internal
- * @final
- */
-class FilteringResultsCollector implements Collector
-{
-    /**
-     * @param array<string, mixed> $targetDetectionStatuses
-     */
-    public function __construct(private readonly Collector $targetCollector, private readonly array $targetDetectionStatuses)
-    {
-    }
+    // define sets of rules
+    $rectorConfig->sets([
+        LevelSetList::UP_TO_PHP_81,
+    ]);
 
-    public function collect(MutantExecutionResult ...$executionResults): void
-    {
-        $executionResults = array_filter(
-            $executionResults,
-            fn (MutantExecutionResult $executionResults): bool => array_key_exists($executionResults->getDetectionStatus(), $this->targetDetectionStatuses)
-        );
-
-        if ($executionResults !== []) {
-            $this->targetCollector->collect(...$executionResults);
-        }
-    }
-}
+    $rectorConfig->skip([
+        ReadOnlyPropertyRector::class => [
+            // property can't be readonly as it's returned by reference and may be updated
+            __DIR__ . '/src/TestFramework/Coverage/TestLocations.php',
+        ],
+    ]);
+};

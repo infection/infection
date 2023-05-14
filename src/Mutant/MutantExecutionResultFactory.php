@@ -48,7 +48,7 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResultFactory
 {
-    public function __construct(private TestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(private readonly TestFrameworkAdapter $testFrameworkAdapter)
     {
     }
 

@@ -46,7 +46,7 @@ use Webmozart\Assert\Assert;
  */
 final class FormatterFactory
 {
-    public function __construct(private OutputInterface $output)
+    public function __construct(private readonly OutputInterface $output)
     {
     }
 

@@ -569,7 +569,7 @@ final class RunCommand extends BaseCommand
     {
         try {
             $locator->locateOneOf(SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES);
-        } catch (FileNotFound|FileOrDirectoryNotFound $exception) {
+        } catch (FileNotFound|FileOrDirectoryNotFound) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [

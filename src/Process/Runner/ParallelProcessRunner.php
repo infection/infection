@@ -64,7 +64,7 @@ final class ParallelProcessRunner implements ProcessRunner
     /**
      * @param int $poll Delay (in milliseconds) to wait in-between two polls
      */
-    public function __construct(private int $threadCount, private int $poll = 1000)
+    public function __construct(private readonly int $threadCount, private readonly int $poll = 1000)
     {
     }
 

@@ -53,11 +53,11 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class JUnitReportLocator
 {
-    private string $defaultJUnitPath;
+    private readonly string $defaultJUnitPath;
 
     private ?string $jUnitPath = null;
 
-    public function __construct(private string $coveragePath, string $defaultJUnitPath)
+    public function __construct(private readonly string $coveragePath, string $defaultJUnitPath)
     {
         $this->defaultJUnitPath = Path::canonicalize($defaultJUnitPath);
     }

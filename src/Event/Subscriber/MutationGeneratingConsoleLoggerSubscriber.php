@@ -46,9 +46,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
 {
-    private ProgressBar $progressBar;
+    private readonly ProgressBar $progressBar;
 
-    public function __construct(private OutputInterface $output)
+    public function __construct(private readonly OutputInterface $output)
     {
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('Processing source code files: %current%/%max%');

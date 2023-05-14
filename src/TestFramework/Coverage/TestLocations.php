@@ -46,7 +46,7 @@ final class TestLocations
      * @param array<int, array<int, TestLocation>> $byLine
      * @param array<string, SourceMethodLineRange> $byMethod
      */
-    public function __construct(private array $byLine = [], private array $byMethod = [])
+    public function __construct(private array $byLine = [], private readonly array $byMethod = [])
     {
     }
 

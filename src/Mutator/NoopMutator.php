@@ -50,7 +50,7 @@ final class NoopMutator implements Mutator
     /**
      * @param Mutator<TNode> $mutator
      */
-    public function __construct(private Mutator $mutator)
+    public function __construct(private readonly Mutator $mutator)
     {
     }
 

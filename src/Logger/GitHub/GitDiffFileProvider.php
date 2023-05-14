@@ -51,9 +51,9 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
  */
 class GitDiffFileProvider
 {
-    public const DEFAULT_BASE = 'origin/master';
+    final public const DEFAULT_BASE = 'origin/master';
 
-    public function __construct(private ShellCommandLineExecutor $shellCommandLineExecutor)
+    public function __construct(private readonly ShellCommandLineExecutor $shellCommandLineExecutor)
     {
     }
 
@@ -96,9 +96,7 @@ class GitDiffFileProvider
             '--diff-filter=AM',
         ]);
         $lines = explode(PHP_EOL, $filter);
-        $lines = array_filter($lines, static function ($line): bool {
-            return preg_match('/^(\\+|-|index)/', $line) === 0;
-        });
+        $lines = array_filter($lines, static fn ($line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
 
         return implode(PHP_EOL, $lines);
     }

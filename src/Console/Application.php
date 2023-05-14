@@ -71,13 +71,9 @@ final class Application extends BaseApplication
 
 ';
 
-    private Container $container;
-
-    public function __construct(Container $container)
+    public function __construct(private readonly Container $container)
     {
         parent::__construct(self::NAME, self::getPrettyVersion());
-
-        $this->container = $container;
         $this->setDefaultCommand('run');
     }
 

@@ -48,7 +48,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MemoryLimiter
 {
-    public function __construct(private Filesystem $fileSystem, private string $phpIniPath, private MemoryLimiterEnvironment $environment)
+    public function __construct(private readonly Filesystem $fileSystem, private readonly string $phpIniPath, private readonly MemoryLimiterEnvironment $environment)
     {
     }
 

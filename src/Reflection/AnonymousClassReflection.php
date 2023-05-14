@@ -42,7 +42,7 @@ use ReflectionClass;
  */
 final class AnonymousClassReflection implements ClassReflection
 {
-    private function __construct(private ReflectionClass $reflectionClass)
+    private function __construct(private readonly ReflectionClass $reflectionClass)
     {
     }
 

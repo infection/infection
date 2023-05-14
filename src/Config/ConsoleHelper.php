@@ -44,11 +44,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConsoleHelper
 {
-    private FormatterHelper $formatterHelper;
-
-    public function __construct(FormatterHelper $formatterHelper)
+    public function __construct(private readonly FormatterHelper $formatterHelper)
     {
-        $this->formatterHelper = $formatterHelper;
     }
 
     public function writeSection(OutputInterface $output, string $text, string $style = 'bg=blue;fg=white'): void

@@ -48,7 +48,7 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 {
     public const DEFAULT_OUTPUT = 'php://stdout';
 
-    public function __construct(private ResultsCollector $resultsCollector)
+    public function __construct(private readonly ResultsCollector $resultsCollector)
     {
     }
 

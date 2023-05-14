@@ -50,7 +50,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class FileLoggerFactory
 {
-    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector, private Filesystem $filesystem, private string $logVerbosity, private bool $debugMode, private bool $onlyCoveredCode, private LoggerInterface $logger, private StrykerHtmlReportBuilder $strykerHtmlReportBuilder)
+    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector, private readonly Filesystem $filesystem, private readonly string $logVerbosity, private readonly bool $debugMode, private readonly bool $onlyCoveredCode, private readonly LoggerInterface $logger, private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder)
     {
     }
 
