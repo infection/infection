@@ -77,6 +77,7 @@ final class MutatorFactory
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
 
+            /** @var Mutator<\PhpParser\Node> $mutator */
             $mutator =
                 is_a($mutatorClassName, ConfigurableMutator::class, true) ?
                     self::getConfigurableMutator($mutatorClassName, $settings) :

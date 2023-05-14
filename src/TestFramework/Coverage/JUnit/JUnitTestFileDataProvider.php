@@ -61,7 +61,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     {
         $xPath = $this->getXPath();
 
-        /** @var DOMNodeList<DOMElement> $nodes */
+        /** @var DOMNodeList<DOMElement>|null $nodes */
         $nodes = null;
 
         foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {
