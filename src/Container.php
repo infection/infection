@@ -397,12 +397,8 @@ final class Container
                     $config->getTmpDir()
                 );
             },
-            StopInfectionOnSigintSignalSubscriberFactory::class => static function (self $container): StopInfectionOnSigintSignalSubscriberFactory {
-                return new StopInfectionOnSigintSignalSubscriberFactory();
-            },
-            DispatchPcntlSignalSubscriberFactory::class => static function (self $container): DispatchPcntlSignalSubscriberFactory {
-                return new DispatchPcntlSignalSubscriberFactory();
-            },
+            StopInfectionOnSigintSignalSubscriberFactory::class => static fn(self $container): StopInfectionOnSigintSignalSubscriberFactory => new StopInfectionOnSigintSignalSubscriberFactory(),
+            DispatchPcntlSignalSubscriberFactory::class => static fn(self $container): DispatchPcntlSignalSubscriberFactory => new DispatchPcntlSignalSubscriberFactory(),
             InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
 

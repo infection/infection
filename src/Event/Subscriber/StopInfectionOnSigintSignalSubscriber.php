@@ -38,6 +38,7 @@ namespace Infection\Event\Subscriber;
 use function function_exists;
 use Infection\Event\MutationTestingWasStarted;
 use function Safe\pcntl_signal;
+use const SIGINT;
 
 /**
  * @internal
