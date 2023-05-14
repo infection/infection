@@ -33,17 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Event\Subscriber;
+
+use function function_exists;
+use Infection\Event\MutantProcessWasFinished;
+use function Safe\pcntl_signal_dispatch;
 
 /**
  * @internal
  */
-interface ProcessRunner
+final class DispatchPcntlSignalSubscriber implements EventSubscriber
 {
-    /**
-     * @param iterable<ProcessBearer> $processes
-     */
-    public function run(iterable $processes): void;
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    {
+        if (!function_exists('pcntl_signal_dispatch')) {
+            return;
+        }
 
-    public function stop(): void;
+        pcntl_signal_dispatch();
+    }
 }

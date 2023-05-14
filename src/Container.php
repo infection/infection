@@ -62,12 +62,14 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
 use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
+use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
@@ -382,7 +384,9 @@ final class Container
                 $container->getMutationTestingConsoleLoggerSubscriberFactory(),
                 $container->getMutationTestingResultsLoggerSubscriberFactory(),
                 $container->getPerformanceLoggerSubscriberFactory(),
-                $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory()
+                $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
+                $container->getStopInfectionOnSigintSignalSubscriberFactory(),
+                $container->getDispatchPcntlSignalSubscriberFactory(),
             ),
             CleanUpAfterMutationTestingFinishedSubscriberFactory::class => static function (self $container): CleanUpAfterMutationTestingFinishedSubscriberFactory {
                 $config = $container->getConfiguration();
@@ -392,6 +396,12 @@ final class Container
                     $container->getFileSystem(),
                     $config->getTmpDir()
                 );
+            },
+            StopInfectionOnSigintSignalSubscriberFactory::class => static function (self $container): StopInfectionOnSigintSignalSubscriberFactory {
+                return new StopInfectionOnSigintSignalSubscriberFactory();
+            },
+            DispatchPcntlSignalSubscriberFactory::class => static function (self $container): DispatchPcntlSignalSubscriberFactory {
+                return new DispatchPcntlSignalSubscriberFactory();
             },
             InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
@@ -948,6 +958,16 @@ final class Container
     public function getCleanUpAfterMutationTestingFinishedSubscriberFactory(): CleanUpAfterMutationTestingFinishedSubscriberFactory
     {
         return $this->get(CleanUpAfterMutationTestingFinishedSubscriberFactory::class);
+    }
+
+    public function getStopInfectionOnSigintSignalSubscriberFactory(): StopInfectionOnSigintSignalSubscriberFactory
+    {
+        return $this->get(StopInfectionOnSigintSignalSubscriberFactory::class);
+    }
+
+    public function getDispatchPcntlSignalSubscriberFactory(): DispatchPcntlSignalSubscriberFactory
+    {
+        return $this->get(DispatchPcntlSignalSubscriberFactory::class);
     }
 
     public function getInitialTestsConsoleLoggerSubscriberFactory(): InitialTestsConsoleLoggerSubscriberFactory

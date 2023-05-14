@@ -33,17 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Tests\Event\Subscriber;
 
-/**
- * @internal
- */
-interface ProcessRunner
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
+use Infection\Event\Subscriber\EventSubscriber;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
+
+final class DispatchPcntlSignalSubscriberFactoryTest extends TestCase
 {
-    /**
-     * @param iterable<ProcessBearer> $processes
-     */
-    public function run(iterable $processes): void;
+    public function test_it_creates_a_subscriber(): void
+    {
+        $outputMock = $this->createMock(OutputInterface::class);
 
-    public function stop(): void;
+        $subscriber = (new DispatchPcntlSignalSubscriberFactory())->create($outputMock);
+
+        $this->assertInstanceOf(DispatchPcntlSignalSubscriber::class, $subscriber);
+        $this->assertInstanceOf(EventSubscriber::class, $subscriber);
+    }
 }

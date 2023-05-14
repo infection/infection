@@ -33,17 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Event\Subscriber;
+
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-interface ProcessRunner
+final class StopInfectionOnSigintSignalSubscriberFactory implements SubscriberFactory
 {
-    /**
-     * @param iterable<ProcessBearer> $processes
-     */
-    public function run(iterable $processes): void;
-
-    public function stop(): void;
+    public function create(OutputInterface $output): EventSubscriber
+    {
+        return new StopInfectionOnSigintSignalSubscriber();
+    }
 }

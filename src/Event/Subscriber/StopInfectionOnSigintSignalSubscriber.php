@@ -33,17 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Event\Subscriber;
+
+use function function_exists;
+use Infection\Event\MutationTestingWasStarted;
+use function Safe\pcntl_signal;
 
 /**
  * @internal
  */
-interface ProcessRunner
+final class StopInfectionOnSigintSignalSubscriber implements EventSubscriber
 {
-    /**
-     * @param iterable<ProcessBearer> $processes
-     */
-    public function run(iterable $processes): void;
+    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
+    {
+        if (!function_exists('pcntl_signal')) {
+            return;
+        }
 
-    public function stop(): void;
+        pcntl_signal(SIGINT, static function () use ($event): void {
+            $event->getProcessRunner()->stop();
+        });
+    }
 }

@@ -68,7 +68,7 @@ class MutationTestingRunner
     public function run(iterable $mutations, string $testFrameworkExtraOptions): void
     {
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
-        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
+        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
 
         $processes = take($mutations)
             ->cast(fn (Mutation $mutation): Mutant => $this->mutantFactory->create($mutation))
