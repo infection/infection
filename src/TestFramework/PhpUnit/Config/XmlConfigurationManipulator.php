@@ -82,11 +82,11 @@ final class XmlConfigurationManipulator
     public function removeExistingLoggers(SafeDOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {
-            $node->parentNode->removeChild($node);
+            $node->parentNode?->removeChild($node);
         }
 
         foreach ($xPath->query('/phpunit/coverage/report') as $node) {
-            $node->parentNode->removeChild($node);
+            $node->parentNode?->removeChild($node);
         }
     }
 
@@ -359,7 +359,7 @@ final class XmlConfigurationManipulator
     private function removeCoverageChildNode(SafeDOMXPath $xPath, string $nodeQuery): void
     {
         foreach ($xPath->query($nodeQuery) as $node) {
-            $node->parentNode->removeChild($node);
+            $node->parentNode?->removeChild($node);
         }
     }
 

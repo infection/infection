@@ -106,7 +106,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
     /**
      * @param string[][] $table
      *
-     * @return string[];
+     * @return string[]
      */
     private static function formatTable(array $table): array
     {

@@ -13,11 +13,9 @@ parameters:
         - '#^Cannot call method (willReturn|shouldBeCalledTimes)\(\) on iterable<Infection\\Mutation\\Mutation>\.$#'
         - '#Offset .*\\.* does not exist on array<class-string<.*>.*#'
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'
-        - '#^Call to method PHPUnit\\Framework\\Assert::.* with array.* and array.* will always evaluate to false\.$#'
         - '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with SimpleXMLElement and ''Expected dumped…'' will always evaluate to true\.$#'
         - '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with string will always evaluate to true\.$#'
         - '#^Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with ''[a-zA-Z\\]+'' and [a-zA-Z\\]+ will always evaluate to (false|true)\.$#'
-        - '#^Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with [a-zA-Z\\&]+ and mixed will always evaluate to true\.$#'
         - '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
         - '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
@@ -28,6 +26,14 @@ parameters:
         -
             message: '#Function ini_get is unsafe to use#'
             path: ../tests/phpunit/Process/OriginalPhpProcessTest.php
+        -
+            message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertTrue\\(\\) with false will always evaluate to false\\.$#"
+            count: 1
+            path: ../tests/phpunit/Process/MutantProcessTest.php
+        -
+            message: "#^Class Infection\\\\FileSystem\\\\DummyFileSystem not found\\.$#"
+            count: 1
+            path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
     level: 4
     paths:
         - ../tests/phpunit
