@@ -4556,16 +4556,16 @@
         },
         {
             "name": "sidz/phpstan-rules",
-            "version": "0.2.1",
+            "version": "0.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sidz/phpstan-rules.git",
-                "reference": "50c7d978b92df0ac702c6d93e99a0fcf3477c8ce"
+                "reference": "7655675a4ddc75c129657c056016f6e83f45f0cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/50c7d978b92df0ac702c6d93e99a0fcf3477c8ce",
-                "reference": "50c7d978b92df0ac702c6d93e99a0fcf3477c8ce",
+                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/7655675a4ddc75c129657c056016f6e83f45f0cf",
+                "reference": "7655675a4ddc75c129657c056016f6e83f45f0cf",
                 "shasum": ""
             },
             "require": {
@@ -4604,7 +4604,7 @@
                 "issues": "https://github.com/sidz/phpstan-rules/issues",
                 "source": "https://github.com/sidz/phpstan-rules"
             },
-            "time": "2023-04-25T13:01:42+00:00"
+            "time": "2023-05-15T08:36:28+00:00"
         },
         {
             "name": "softcreatr/jsonpath",

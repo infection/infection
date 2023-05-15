@@ -13,8 +13,6 @@ parameters:
         - '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
         - '#^Dead catch - InvalidArgumentException is never thrown in the try block\.$#'
         - '#^Variable (method|property) (access|call) #'
-        # todo remove after https://github.com/sidz/phpstan-rules/pull/5 is merged
-        - "#^Do not use magic number in ternary operator. Move to constant with a suitable name.$#"
         -
             path: '../src/Mutator/MutatorResolver.php'
             message: '#^Method Infection\\Mutator\\MutatorResolver::resolveSettings\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
