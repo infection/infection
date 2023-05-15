@@ -48,6 +48,8 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResultFactory
 {
+    private const PROCESS_MIN_ERROR_CODE = 100;
+
     public function __construct(private readonly TestFrameworkAdapter $testFrameworkAdapter)
     {
     }
@@ -101,7 +103,7 @@ class MutantExecutionResultFactory
 
         $process = $mutantProcess->getProcess();
 
-        if ($process->getExitCode() > 100) {
+        if ($process->getExitCode() > self::PROCESS_MIN_ERROR_CODE) {
             // See \Symfony\Component\Process\Process::$exitCodes
             return DetectionStatus::ERROR;
         }

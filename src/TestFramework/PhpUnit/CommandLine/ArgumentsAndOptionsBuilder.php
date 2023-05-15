@@ -54,6 +54,8 @@ use function version_compare;
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
+    private const MAX_EXPLODE_PARTS = 2;
+
     public function __construct(private readonly bool $executeOnlyCoveringTestCases)
     {
     }
@@ -89,7 +91,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
             foreach ($tests as $testLocation) {
                 $testCaseString = $testLocation->getMethod();
 
-                $partsDelimitedByColons = explode('::', $testCaseString, 2);
+                $partsDelimitedByColons = explode('::', $testCaseString, self::MAX_EXPLODE_PARTS);
 
                 if (count($partsDelimitedByColons) > 1) {
                     $methodNameWithDataProvider = $this->getMethodNameWithDataProvider($partsDelimitedByColons[1], $testFrameworkVersion);
@@ -131,7 +133,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
          * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
          */
         if (version_compare($testFrameworkVersion, '10', '>=')) {
-            $methodNameParts = explode('#', $methodNameWithDataProviderResult, 2);
+            $methodNameParts = explode('#', $methodNameWithDataProviderResult, self::MAX_EXPLODE_PARTS);
 
             if (count($methodNameParts) > 1) {
                 $methodName = $methodNameParts[0];

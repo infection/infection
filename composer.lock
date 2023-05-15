@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b3340aaa3eb734490ed7318dc6065da6",
+    "content-hash": "290edf4f13c32b695fa9cdd7470b5c60",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -4553,6 +4553,58 @@
                 }
             ],
             "time": "2020-09-28T06:39:44+00:00"
+        },
+        {
+            "name": "sidz/phpstan-rules",
+            "version": "0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sidz/phpstan-rules.git",
+                "reference": "50c7d978b92df0ac702c6d93e99a0fcf3477c8ce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/50c7d978b92df0ac702c6d93e99a0fcf3477c8ce",
+                "reference": "50c7d978b92df0ac702c6d93e99a0fcf3477c8ce",
+                "shasum": ""
+            },
+            "require": {
+                "nikic/php-parser": "^4.14",
+                "php": "^7.2 || ^8.0, <8.3",
+                "phpstan/phpstan": "^1.8"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.4",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "phpstan-extension",
+            "autoload": {
+                "psr-4": {
+                    "Sid\\PHPStan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Oleg Zhulnev",
+                    "homepage": "https://github.com/sidz"
+                }
+            ],
+            "description": "Set of PHPStan rules",
+            "homepage": "https://github.com/sidz/phpstan-rules",
+            "keywords": [
+                "PHPStan",
+                "phpstan-extreme-rules",
+                "phpstan-rules"
+            ],
+            "support": {
+                "issues": "https://github.com/sidz/phpstan-rules/issues",
+                "source": "https://github.com/sidz/phpstan-rules"
+            },
+            "time": "2023-04-25T13:01:42+00:00"
         },
         {
             "name": "softcreatr/jsonpath",
