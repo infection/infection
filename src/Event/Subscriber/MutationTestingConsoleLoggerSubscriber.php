@@ -64,6 +64,9 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 {
     private const PAD_LENGTH = 8;
 
+    private const LOW_QUALITY_THRESHOLD = 50;
+    private const MEDIUM_QUALITY_THRESHOLD = 90;
+
     private int $mutationCount = 0;
 
     public function __construct(
@@ -231,11 +234,11 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
     private function getPercentageTag(float $percentage): string
     {
-        if ($percentage >= 0 && $percentage < 50) {
+        if ($percentage >= 0 && $percentage < self::LOW_QUALITY_THRESHOLD) {
             return 'low';
         }
 
-        if ($percentage >= 50 && $percentage < 90) {
+        if ($percentage >= self::LOW_QUALITY_THRESHOLD && $percentage < self::MEDIUM_QUALITY_THRESHOLD) {
             return 'medium';
         }
 

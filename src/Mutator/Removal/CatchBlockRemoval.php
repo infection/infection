@@ -51,6 +51,8 @@ final class CatchBlockRemoval implements Mutator
 {
     use GetMutatorName;
 
+    private const MIN_CATCH_COUNT_TO_MUTATE = 2;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -71,7 +73,7 @@ DIFF
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Stmt\TryCatch || count($node->catches) < 2) {
+        if (!$node instanceof Node\Stmt\TryCatch || count($node->catches) < self::MIN_CATCH_COUNT_TO_MUTATE) {
             return false;
         }
 

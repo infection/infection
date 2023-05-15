@@ -61,6 +61,8 @@ use Webmozart\Assert\Assert;
  */
 class TestFrameworkFinder
 {
+    private const BAT_EXTENSION_LENGTH = 4;
+
     /**
      * @var array<string, string>
      */
@@ -77,7 +79,7 @@ class TestFrameworkFinder
 
             Assert::string($this->cachedPath[$testFrameworkName]);
 
-            if (substr($this->cachedPath[$testFrameworkName], -4) === '.bat') {
+            if (substr($this->cachedPath[$testFrameworkName], -self::BAT_EXTENSION_LENGTH) === '.bat') {
                 $this->cachedPath[$testFrameworkName] = $this->findFromBatchFile($this->cachedPath[$testFrameworkName]);
             }
         }

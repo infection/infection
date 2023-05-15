@@ -44,6 +44,7 @@ final class Response
 {
     public const HTTP_OK = 200;
     public const HTTP_CREATED = 201;
+    public const HTTP_MAX_ERROR_CODE = 599;
 
     private readonly int $statusCode;
 
@@ -51,8 +52,8 @@ final class Response
     {
         Assert::range(
             $statusCode,
-            200,
-            599,
+            self::HTTP_OK,
+            self::HTTP_MAX_ERROR_CODE,
             'Expected an HTTP status code. Got "%s"'
         );
 

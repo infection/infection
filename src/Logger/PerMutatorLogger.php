@@ -57,6 +57,8 @@ use function strlen;
  */
 final class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
+    private const ROUND_PRECISION = 2;
+
     public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector)
     {
     }
@@ -99,7 +101,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
     {
         return sprintf(
             '%0.2f',
-            round($score, 2, PHP_ROUND_HALF_UP)
+            round($score, self::ROUND_PRECISION, PHP_ROUND_HALF_UP)
         );
     }
 

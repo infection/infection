@@ -1,9 +1,11 @@
 includes:
     - ../vendor/phpstan/phpstan/conf/bleedingEdge.neon
+    - ../vendor/sidz/phpstan-rules/rules.neon
 
 parameters:
     tmpDir: ../build/cache/phpstan-src
     inferPrivatePropertyTypeFromConstructor: true
+    sidzIgnoreMagicNumbers: [0, 0.0, 1, -1, 1.0, -1.0, 100]
     ignoreErrors:
         - '#generic class ReflectionClass (but )?does not specify its types#'
         - '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
@@ -77,6 +79,21 @@ parameters:
             message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNode\\>\\.$#"
             count: 1
             path: ../src/TestFramework/SafeDOMXPath.php
+
+        -
+            message: "#Do not use magic number (.*)#"
+            count: 5
+            path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
+
+        -
+            message: "#Do not use magic number (.*)#"
+            count: 12
+            path: ../src/Mutator/Extensions/MBString.php
+
+        -
+            message: "#Do not use magic number (.*)#"
+            count: 8
+            path: ../src/Mutator/Extensions/BCMath.php
 
     level: 8
     paths:
