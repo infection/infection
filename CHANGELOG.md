@@ -1,8 +1,46 @@
 # Change Log
 
+## [0.27.0](https://github.com/infection/infection/tree/0.27.0) (2023-05-16)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.26.21...0.27.0)
+
+**Added:**
+
+* Add negation mutators by @manhunto in https://github.com/infection/infection/pull/1753
+* Calculate results and show metrics if Infection is interrupted with `SIGINT` (ctrl + c) by @maks-rafalko in https://github.com/infection/infection/pull/1857
+
+**Changed:**
+
+* #857 Treat log paths as relative to config directory by @LeoVie  in https://github.com/infection/infection/pull/1851
+* Do not mutate `$var instanceof ClassName` inside `assert()` function as it's impossible or hard to kill by @maks-rafalko in https://github.com/infection/infection/pull/1852
+
+**Fixed:**
+
+* During all "unwrap" functions, return the real values instead of values wrapped with `Node\Arg()` class by @maks-rafalko in https://github.com/infection/infection/pull/1853
+* Make PHPUnit 10.1 XML coverage report and test cases names with provider compatible with Infection and old format by @maks-rafalko in https://github.com/infection/infection/pull/1854
+
+
+**Internal:**
+
+* Upgrade PHP-CS-Fixer by @maks-rafalko in https://github.com/infection/infection/pull/1855
+* Add GH Action to requrie tests in Pull Requests by @maks-rafalko in https://github.com/infection/infection/pull/1848
+* Update `sebastian/differ` to the latest verions by @maks-rafalko in https://github.com/infection/infection/pull/1850
+* Allow fidry/cpu-core-counter v0.5 by @Slamdunk in https://github.com/infection/infection/pull/1826
+* Remove `xdebug-filter.php` as it's not used and deprecated by @maks-rafalko in https://github.com/infection/infection/pull/1856
+* Upgrade PHPStan to the latest version and fix some errors by @maks-rafalko in https://github.com/infection/infection/pull/1859
+* Upgrade the codebase up to PHP 8.1 syntax using Rector by @maks-rafalko in https://github.com/infection/infection/pull/1860
+* Upgrade psalm to the latest version by @maks-rafalko in https://github.com/infection/infection/pull/1858
+* Integrate `sidz/phpstan-rules` to avoid magic numbers in our code base by @maks-rafalko in https://github.com/infection/infection/pull/1861
+
+## New Contributors
+* @manhunto made their first contribution in https://github.com/infection/infection/pull/1753
+* @LeoVie made their first contribution in https://github.com/infection/infection/pull/1851
+
+**Full Changelog**: https://github.com/infection/infection/compare/0.26.21...0.27.0
+
 ## [0.26.20](https://github.com/infection/infection/tree/0.26.20) (2023-04-15)
 
-[Full Changelog](https://github.com/infection/infection/compare/0.26.19...0.25.20)
+[Full Changelog](https://github.com/infection/infection/compare/0.26.19...0.26.20)
 
 **Added:**
 
