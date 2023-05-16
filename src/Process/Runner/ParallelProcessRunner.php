@@ -65,11 +65,18 @@ final class ParallelProcessRunner implements ProcessRunner
      */
     private array $availableThreadIndexes = [];
 
+    private bool $shouldStop = false;
+
     /**
      * @param int $poll Delay (in milliseconds) to wait in-between two polls
      */
     public function __construct(private readonly int $threadCount, private readonly int $poll = self::POLL_WAIT_IN_MS)
     {
+    }
+
+    public function stop(): void
+    {
+        $this->shouldStop = true;
     }
 
     public function run(iterable $processes): void
@@ -96,6 +103,10 @@ final class ParallelProcessRunner implements ProcessRunner
 
         // start the initial batch of processes
         while ($process = array_shift($bucket)) {
+            if ($this->shouldStop) {
+                break;
+            }
+
             $threadIndex = array_shift($this->availableThreadIndexes);
 
             Assert::integer($threadIndex, 'Thread index can not be null.');

@@ -35,17 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Event;
 
+use Infection\Process\Runner\ProcessRunner;
+
 /**
  * @internal
  */
 final class MutationTestingWasStarted
 {
-    public function __construct(private readonly int $mutationCount)
+    public function __construct(private readonly int $mutationCount, private readonly ProcessRunner $processRunner)
     {
     }
 
     public function getMutationCount(): int
     {
         return $this->mutationCount;
+    }
+
+    public function getProcessRunner(): ProcessRunner
+    {
+        return $this->processRunner;
     }
 }

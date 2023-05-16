@@ -47,4 +47,9 @@ final class DryProcessRunner implements ProcessRunner
             // not even trigger the callback process
         }
     }
+
+    public function stop(): void
+    {
+        // not applicable for DryRunner
+    }
 }

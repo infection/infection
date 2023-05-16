@@ -47,6 +47,7 @@ use Infection\Logger\FileLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use Infection\Tests\Logger\FakeMutationTestingResultsLogger;
@@ -117,7 +118,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             false
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasStarted(1));
+        $processRunner = $this->createMock(ProcessRunner::class);
+
+        $dispatcher->dispatch(new MutationTestingWasStarted(1, $processRunner));
     }
 
     public function test_it_reacts_on_mutation_process_finished(): void

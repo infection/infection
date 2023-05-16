@@ -51,8 +51,10 @@ use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\XdebugHandler;
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
+use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
@@ -113,6 +115,8 @@ final class ProjectCodeProvider
         FormatterName::class,
         ShellCommandLineExecutor::class,
         CpuCoresCountProvider::class,
+        DispatchPcntlSignalSubscriber::class,
+        StopInfectionOnSigintSignalSubscriber::class,
     ];
 
     /**
