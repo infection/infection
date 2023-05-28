@@ -33,102 +33,65 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Operator;
+namespace Infection\Mutator\Operator;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
+use PhpParser\Node;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Name;
 
-final class ElseifAlwaysFalseTest extends BaseMutatorTestCase
+/**
+ * @internal
+ *
+ * @implements Mutator<Node\Stmt\ElseIf_>
+ */
+final class ElseIfAlwaysFalse implements Mutator
 {
-    /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
-     */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        $this->doTest($input, $expected);
+        return new Definition(
+            'Changes elseif condition to false',
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null,
+            <<<'DIFF'
+if ($this->foo()) {
+- } elseif ($this->bar()) {
++ } elseif (false) {
+}
+DIFF
+        );
     }
 
-    public function mutationsProvider(): iterable
+    public function mutate(Node $node): iterable
     {
-        yield 'It mutates simple elseif condition to false' => [
-            <<<'PHP'
-<?php
+        yield new Node\Stmt\ElseIf_(
+            new ConstFetch(new Name('false')),
+            $node->stmts,
+            $node->getAttributes()
+        );
+    }
 
-if ($this->foo()) {
-    return 1;
-} elseif ($this->bar()) {
-    return 2;
-} else {
-    return 3;
-}
-PHP
-            ,
-            [
-                <<<'PHP'
-<?php
+    public function canMutate(Node $node): bool
+    {
+        if (!$node instanceof Node\Stmt\ElseIf_) {
+            return false;
+        }
 
-if ($this->foo()) {
-    return 1;
-} elseif (false) {
-    return 2;
-} else {
-    return 3;
-}
-PHP
-            ]
-        ];
+        $cond = $node->cond;
+        if ($cond instanceof Node\Expr\ConstFetch) {
+            return !$this->isBoolean($cond);
+        }
 
-        yield 'It mutates complex if condition to false' => [
-            <<<'PHP'
-<?php
+        return true;
+    }
 
-if ($this->foo()) {
-    return 1;
-} elseif ($this->bar() && $var !== false) {
-    return 2;
-} else {
-    return 3;
-}
-PHP
-            ,
-            [
-                <<<'PHP'
-<?php
-
-if ($this->foo()) {
-    return 1;
-} elseif (false) {
-    return 2;
-} else {
-    return 3;
-}
-PHP
-            ]
-        ];
-
-        yield 'It does not mutate false condition' => [
-            <<<'PHP'
-<?php
-
-if ($this->foo()) {
-    return 1;
-} elseif (false) {
-    return 2;
-}
-PHP
-        ];
-
-        yield 'It does not mutate true condition' => [
-            <<<'PHP'
-<?php
-
-if ($this->foo()) {
-    return 1;
-} elseif (true) {
-    return 2;
-}
-PHP
-        ];
+    private function isBoolean(ConstFetch $cond): bool
+    {
+        return in_array($cond->name->toLowerString(), ['true', 'false'], true);
     }
 }
