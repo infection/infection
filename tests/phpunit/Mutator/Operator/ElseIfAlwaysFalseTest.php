@@ -76,7 +76,7 @@ if ($this->foo()) {
     return 3;
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates complex if condition to false' => [
@@ -104,7 +104,7 @@ if ($this->foo()) {
     return 3;
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It does not mutate false condition' => [

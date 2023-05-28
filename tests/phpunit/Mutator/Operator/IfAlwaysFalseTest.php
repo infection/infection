@@ -68,7 +68,7 @@ if (false) {
     return 1;
 }
 PHP
-            ]
+            ],
         ];
 
         yield 'It mutates complex if condition to false' => [
@@ -88,7 +88,7 @@ if (false) {
     return 1;
 }
 PHP
-        ]
+        ],
     ];
 
         yield 'It preserve elseif and else expression' => [

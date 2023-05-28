@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -66,6 +67,13 @@ DIFF
         );
     }
 
+    /**
+     * @psalm-mutation-free
+     *
+     * @param Node\Stmt\If_ $node
+     *
+     * @return iterable<Node\Stmt\If_>
+     */
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\If_(
@@ -86,6 +94,7 @@ DIFF
         }
 
         $cond = $node->cond;
+
         if ($cond instanceof Node\Expr\ConstFetch) {
             return !$this->isBoolean($cond);
         }
