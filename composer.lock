@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "290edf4f13c32b695fa9cdd7470b5c60",
+    "content-hash": "def77790d12547a95ba46fb5f819ccba",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -4556,28 +4556,35 @@
         },
         {
             "name": "sidz/phpstan-rules",
-            "version": "0.2.2",
+            "version": "0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sidz/phpstan-rules.git",
-                "reference": "7655675a4ddc75c129657c056016f6e83f45f0cf"
+                "reference": "298e38aa73804a00f5a52c0873bfada8ca7d68fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/7655675a4ddc75c129657c056016f6e83f45f0cf",
-                "reference": "7655675a4ddc75c129657c056016f6e83f45f0cf",
+                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/298e38aa73804a00f5a52c0873bfada8ca7d68fc",
+                "reference": "298e38aa73804a00f5a52c0873bfada8ca7d68fc",
                 "shasum": ""
             },
             "require": {
                 "nikic/php-parser": "^4.14",
-                "php": "^7.2 || ^8.0, <8.3",
+                "php": "^8.1, <8.3",
                 "phpstan/phpstan": "^1.8"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.4",
-                "phpunit/phpunit": "^8.5"
+                "phpunit/phpunit": "^10.1"
             },
             "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "rules.neon"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Sid\\PHPStan\\": "src/"
@@ -4604,7 +4611,7 @@
                 "issues": "https://github.com/sidz/phpstan-rules/issues",
                 "source": "https://github.com/sidz/phpstan-rules"
             },
-            "time": "2023-05-15T08:36:28+00:00"
+            "time": "2023-05-30T18:52:51+00:00"
         },
         {
             "name": "softcreatr/jsonpath",
