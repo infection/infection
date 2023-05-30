@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\Event\MutationGenerationWasStarted;
-use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -54,7 +53,7 @@ final class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscrib
             '',
             'Generate mutants...',
             '',
-            sprintf('Processing source code files: %s', $event->getMutableFilesCount()),
+            'Processing source code files...',
         ]);
     }
 }
