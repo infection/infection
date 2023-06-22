@@ -108,7 +108,7 @@ class Configuration
         Assert::allString($sourceDirectories);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
         Assert::nullOrGreaterThanEq($minMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
 

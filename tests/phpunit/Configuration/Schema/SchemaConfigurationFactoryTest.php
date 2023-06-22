@@ -912,7 +912,7 @@ JSON
             ]),
         ];
 
-        foreach (TestFrameworkTypes::TYPES as $testFrameworkType) {
+        foreach (TestFrameworkTypes::getTypes() as $testFrameworkType) {
             yield '[testFramework] ' . $testFrameworkType => (static function () use (
                 $testFrameworkType
             ): array {

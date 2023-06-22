@@ -103,7 +103,6 @@ final class ProjectCodeProvider
         ComposerExecutableFinder::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
-        TestFrameworkTypes::class,
         NodeMutationGenerator::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
