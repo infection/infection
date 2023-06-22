@@ -45,7 +45,7 @@ final class TestFrameworkTypesTest extends TestCase
     {
         $types = TestFrameworkTypes::getTypes([]);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 TestFrameworkTypes::PEST,
                 TestFrameworkTypes::PHPUNIT,
@@ -68,13 +68,13 @@ final class TestFrameworkTypesTest extends TestCase
             ]
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 TestFrameworkTypes::PEST,
                 TestFrameworkTypes::PHPUNIT,
                 TestFrameworkTypes::PHPSPEC,
                 TestFrameworkTypes::CODECEPTION,
-                "dummy",
+                'dummy',
             ],
             $types
         );

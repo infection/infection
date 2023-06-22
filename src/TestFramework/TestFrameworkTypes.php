@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
+use function count;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
+use function is_a;
 use Webmozart\Assert\Assert;
 
 /**
