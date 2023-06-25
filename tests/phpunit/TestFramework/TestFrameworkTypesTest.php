@@ -33,58 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\TestFramework;
 
-use function count;
-use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
-use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
-use function is_a;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class TestFrameworkTypes
+final class TestFrameworkTypesTest extends TestCase
 {
-    public const PHPUNIT = 'phpunit';
-    public const PEST = 'pest';
-    public const PHPSPEC = 'phpspec';
-    public const CODECEPTION = 'codeception';
+    public function test_it_returns_default_types_when_no_test_framework_adapters_are_installed(): void
+    {
+        $types = TestFrameworkTypes::getTypes([]);
 
-    /**
-     * @var string[]
-     */
-    private static array $defaultTypes = [
-        self::PEST,
-        self::PHPUNIT,
-        self::PHPSPEC,
-        self::CODECEPTION,
-    ];
+        $this->assertSame(
+            [
+                TestFrameworkTypes::PEST,
+                TestFrameworkTypes::PHPUNIT,
+                TestFrameworkTypes::PHPSPEC,
+                TestFrameworkTypes::CODECEPTION,
+            ],
+            $types
+        );
+    }
 
-    /**
-     * @param mixed[] $installedExtensions
-     *
-     * @return string[]
-     */
-    public static function getTypes(
-        array $installedExtensions = GeneratedExtensionsConfig::EXTENSIONS
-    ): array {
-        $types = self::$defaultTypes;
+    public function test_it_uses_installed_test_framework_adapters(): void
+    {
+        $types = TestFrameworkTypes::getTypes(
+            [
+                'infection/codeception-adapter' => [
+                        'install_path' => '/path/to/dummy/adapter/factory.php',
+                        'extra' => ['class' => DummyTestFrameworkFactory::class],
+                        'version' => '1.0.0',
+                    ],
+            ]
+        );
 
-        if (count($installedExtensions) > 0) {
-            foreach ($installedExtensions as $installedExtension) {
-                $factory = $installedExtension['extra']['class'];
-
-                Assert::classExists($factory);
-
-                if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
-                    continue;
-                }
-
-                $types[] = $factory::getAdapterName();
-            }
-        }
-
-        return $types;
+        $this->assertSame(
+            [
+                TestFrameworkTypes::PEST,
+                TestFrameworkTypes::PHPUNIT,
+                TestFrameworkTypes::PHPSPEC,
+                TestFrameworkTypes::CODECEPTION,
+                'dummy',
+            ],
+            $types
+        );
     }
 }

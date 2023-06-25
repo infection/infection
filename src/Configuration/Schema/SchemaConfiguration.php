@@ -69,7 +69,7 @@ final class SchemaConfiguration
         private readonly ?string $testFrameworkExtraOptions
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
         $this->timeout = $timeout;
         $this->testFramework = $testFramework;
     }

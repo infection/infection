@@ -75,7 +75,6 @@ use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
@@ -103,7 +102,6 @@ final class ProjectCodeProvider
         ComposerExecutableFinder::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
-        TestFrameworkTypes::class,
         NodeMutationGenerator::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,

@@ -166,7 +166,7 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the Test framework to use ("%s")',
-                    implode('", "', TestFrameworkTypes::TYPES)
+                    implode('", "', TestFrameworkTypes::getTypes())
                 ),
                 Container::DEFAULT_TEST_FRAMEWORK
             )

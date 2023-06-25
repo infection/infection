@@ -88,7 +88,7 @@ final class ConfigureCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the Test framework to use ("%s")',
-                    implode('", "', TestFrameworkTypes::TYPES)
+                    implode('", "', TestFrameworkTypes::getTypes())
                 ),
                 TestFrameworkTypes::PHPUNIT
             );
