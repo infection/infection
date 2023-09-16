@@ -1,8 +1,9 @@
 name: Release
 
 on:
-  release:
-    types: [ created ]
+  push:
+    tags:
+      - '*'
 
 jobs:
   release:
@@ -50,7 +51,6 @@ jobs:
               build/infection.phar
 
       - name: Upload PHAR to release
-        if: github.event_name == 'release'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
