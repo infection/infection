@@ -327,6 +327,7 @@ class ConfigurationFactory
             self::pathToAbsolute($logs->getHtmlLogFilePath(), $configDir),
             self::pathToAbsolute($logs->getSummaryLogFilePath(), $configDir),
             self::pathToAbsolute($logs->getJsonLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getGitlabLogFilePath(), $configDir),
             self::pathToAbsolute($logs->getDebugLogFilePath(), $configDir),
             self::pathToAbsolute($logs->getPerMutatorFilePath(), $configDir),
             $logs->getUseGitHubAnnotationsLogger(),

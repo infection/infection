@@ -815,6 +815,7 @@ final class ConfigurationFactoryTest extends TestCase
                     '/report.html',
                     '/summary.log',
                     '/json.log',
+                    '/gitlab.log',
                     '/debug.log',
                     '/mutator.log',
                     true,
@@ -872,6 +873,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/report.html',
                 '/summary.log',
                 '/json.log',
+                '/gitlab.log',
                 '/debug.log',
                 '/mutator.log',
                 true,
@@ -1296,6 +1298,7 @@ final class ConfigurationFactoryTest extends TestCase
         bool $useGitHubAnnotationsLogger
     ): array {
         $expectedLogs = new Logs(
+            null,
             null,
             null,
             null,
@@ -2092,6 +2095,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
+            null,
             true,
             null,
             null,
@@ -2107,6 +2111,7 @@ final class ConfigurationFactoryTest extends TestCase
                 new Logs(
                     null,
                     $htmlFileLogPathInConfig,
+                    null,
                     null,
                     null,
                     null,
