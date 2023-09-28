@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.27.2](https://github.com/infection/infection/tree/0.27.3) (2023-09-28)
+## [0.27.3](https://github.com/infection/infection/tree/0.27.3) (2023-09-28)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.27.2...0.27.3)
 
