@@ -212,6 +212,7 @@ final class ConfigurationTest extends TestCase
                 'report.html',
                 'summary.log',
                 'json.log',
+                'gitlab.log',
                 'debug.log',
                 'mutator.log',
                 true,

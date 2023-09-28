@@ -102,6 +102,7 @@ trait ConfigurationAssertions
             $expectedLogs->getHtmlLogFilePath(),
             $expectedLogs->getSummaryLogFilePath(),
             $expectedLogs->getJsonLogFilePath(),
+            $expectedLogs->getGitlabLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
             $expectedLogs->getUseGitHubAnnotationsLogger(),

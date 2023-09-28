@@ -86,6 +86,8 @@ class FileLoggerFactory
 
         yield $logConfig->getJsonLogFilePath() => $this->createJsonLogger();
 
+        yield $logConfig->getGitlabLogFilePath() => $this->createGitlabLogger();
+
         yield $logConfig->getDebugLogFilePath() => $this->createDebugLogger();
 
         yield $logConfig->getPerMutatorFilePath() => $this->createPerMutatorLogger();
@@ -136,6 +138,11 @@ class FileLoggerFactory
             $this->resultsCollector,
             $this->onlyCoveredCode
         );
+    }
+
+    private function createGitlabLogger(): LineMutationTestingResultsLogger
+    {
+        return new GitLabCodeQualityLogger($this->resultsCollector);
     }
 
     private function createGitHubAnnotationsLogger(): LineMutationTestingResultsLogger

@@ -46,6 +46,7 @@ class Logs
         private ?string $htmlLogFilePath,
         private readonly ?string $summaryLogFilePath,
         private readonly ?string $jsonLogFilePath,
+        private ?string $gitlabLogFilePath,
         private readonly ?string $debugLogFilePath,
         private readonly ?string $perMutatorFilePath,
         private bool $useGitHubAnnotationsLogger,
@@ -57,6 +58,7 @@ class Logs
     public static function createEmpty(): self
     {
         return new self(
+            null,
             null,
             null,
             null,
@@ -79,6 +81,11 @@ class Logs
         return $this->htmlLogFilePath;
     }
 
+    public function setGitlabLogFilePath(string $gitlabLogFilePath): void
+    {
+        $this->gitlabLogFilePath = $gitlabLogFilePath;
+    }
+
     public function setHtmlLogFilePath(string $htmlLogFilePath): void
     {
         $this->htmlLogFilePath = $htmlLogFilePath;
@@ -92,6 +99,11 @@ class Logs
     public function getJsonLogFilePath(): ?string
     {
         return $this->jsonLogFilePath;
+    }
+
+    public function getGitlabLogFilePath(): ?string
+    {
+        return $this->gitlabLogFilePath;
     }
 
     public function getDebugLogFilePath(): ?string

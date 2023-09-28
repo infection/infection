@@ -45,6 +45,7 @@ use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\GitHubAnnotationsLogger;
+use Infection\Logger\GitLabCodeQualityLogger;
 use Infection\Logger\Html\HtmlFileLogger;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\JsonLogger;
@@ -105,6 +106,7 @@ final class FileLoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 '/a/file',
+                '/a/file',
                 true,
                 null,
                 '/a/file',
@@ -147,6 +149,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 false,
                 null,
                 null
@@ -158,6 +161,7 @@ final class FileLoggerFactoryTest extends TestCase
             new Logs(
                 null,
                 'html',
+                null,
                 null,
                 null,
                 null,
@@ -177,6 +181,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 false,
                 null,
                 null
@@ -186,6 +191,7 @@ final class FileLoggerFactoryTest extends TestCase
 
         yield 'debug logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -207,6 +213,7 @@ final class FileLoggerFactoryTest extends TestCase
                 'json_file',
                 null,
                 null,
+                null,
                 false,
                 null,
                 null
@@ -214,8 +221,25 @@ final class FileLoggerFactoryTest extends TestCase
             [JsonLogger::class],
         ];
 
+        yield 'GitLab logger' => [
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                'gitlab.log',
+                null,
+                null,
+                false,
+                null,
+                null
+            ),
+            [GitLabCodeQualityLogger::class],
+        ];
+
         yield 'per mutator logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -237,6 +261,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 true,
                 null,
                 null
@@ -246,6 +271,7 @@ final class FileLoggerFactoryTest extends TestCase
 
         yield 'summary-json logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -265,6 +291,7 @@ final class FileLoggerFactoryTest extends TestCase
                 'html',
                 'summary',
                 'json',
+                'gitlab',
                 'debug',
                 'per_mutator',
                 true,
@@ -276,6 +303,7 @@ final class FileLoggerFactoryTest extends TestCase
                 HtmlFileLogger::class,
                 SummaryFileLogger::class,
                 JsonLogger::class,
+                GitLabCodeQualityLogger::class,
                 DebugFileLogger::class,
                 PerMutatorLogger::class,
                 SummaryJsonLogger::class,

@@ -63,6 +63,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 '/a/file',
+                '/a/file',
                 true,
                 null,
                 '/a/file',
@@ -78,6 +79,7 @@ final class StrykerLoggerFactoryTest extends TestCase
 
         $logger = $factory->createFromLogEntries(
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -128,6 +130,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 false,
                 StrykerConfig::forBadge('foo'),
                 null
@@ -137,6 +140,7 @@ final class StrykerLoggerFactoryTest extends TestCase
 
         yield 'stryker for report logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -156,6 +160,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 'html',
                 'summary',
                 'json',
+                'gitlab',
                 'debug',
                 'per_mutator',
                 true,
