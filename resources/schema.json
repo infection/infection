@@ -98,7 +98,7 @@
                 },
                 "gitlab": {
                     "type": "string",
-                    "definition": "GitLab(Code Climate) code quality json file."
+                    "definition": "GitLab (Code Climate) code quality json file."
                 },
                 "summaryJson": {
                     "type": "string",
