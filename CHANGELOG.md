@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.27.2](https://github.com/infection/infection/tree/0.27.3) (2023-09-28)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.27.2...0.27.3)
+
+**Added:**
+
+* Add GitLab code quality reporting (`--logger-gitlab`) in https://github.com/infection/infection/pull/1878
+
 ## [0.27.0](https://github.com/infection/infection/tree/0.27.0) (2023-05-16)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.26.21...0.27.0)
