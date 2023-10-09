@@ -115,12 +115,6 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        $parent = $node->getAttribute('parent');
-        // Don't mutate destructured values in foreach loops
-        if ($parent instanceof Node\Stmt\Foreach_ && $parent->valueVar === $node) {
-            return;
-        }
-
         foreach ($this->getItemsIndexes($node->items) as $indexToRemove) {
             $newArrayNode = clone $node;
             unset($newArrayNode->items[$indexToRemove]);
@@ -147,6 +141,11 @@ DIFF
         }
 
         if ($parent instanceof Node\Arg && ParentConnector::findParent($parent) instanceof Node\Attribute) {
+            return false;
+        }
+
+        // Don't mutate destructured values in foreach loops
+        if ($parent instanceof Node\Stmt\Foreach_ && $parent->valueVar === $node) {
             return false;
         }
 
