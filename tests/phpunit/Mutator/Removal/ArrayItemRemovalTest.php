@@ -122,5 +122,9 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
         yield 'It does not mutate arrays as an attribute argument' => [
             MutatorFixturesProvider::getFixtureFileContent($this, 'does-not-mutate-array-in-attribute.php'),
         ];
+
+        yield 'It does not mutate destructured array values in foreach loops' => [
+            '<?php foreach ($items as [, $value]) {}',
+        ];
     }
 }
