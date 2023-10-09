@@ -116,7 +116,11 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        Assert::allNotNull($node->items);
+        $parent = $node->getAttribute('parent');
+        // Don't mutate destructured values in foreach loops
+        if ($parent instanceof Node\Stmt\Foreach_ && $parent->valueVar === $node) {
+            return;
+        }
 
         foreach ($this->getItemsIndexes($node->items) as $indexToRemove) {
             $newArrayNode = clone $node;
@@ -153,7 +157,7 @@ DIFF
     /**
      * @psalm-mutation-free
      *
-     * @param ArrayItem[] $items
+     * @param array<array-key, ArrayItem|null> $items
      *
      * @return int[]
      */
