@@ -38,6 +38,7 @@ namespace Infection\Tests\Resource\Memory;
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use const PHP_SAPI;
+use const PHP_VERSION_ID;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\ini_get;
@@ -111,15 +112,23 @@ final class MemoryLimiterEnvironmentTest extends TestCase
             $this->markTestSkipped('This test requires running without PHPDBG');
         }
 
-        $skipped = (new ReflectionClass(XdebugHandler::class))->getProperty('skipped');
-        $skipped->setAccessible(true);
-        $skipped->setValue('infection-fake');
+        $reflectionClass = new ReflectionClass(XdebugHandler::class);
+
+        if (PHP_VERSION_ID < 80300) {
+            $reflectionClass->getProperty('skipped')->setValue('infection-fake');
+        } else {
+            $reflectionClass->setStaticPropertyValue('skipped', 'infection-fake');
+        }
 
         try {
             $this->assertFalse($this->environment->isUsingSystemIni());
         } finally {
             // Restore original value
-            $skipped->setValue(null);
+            if (PHP_VERSION_ID < 80300) {
+                $reflectionClass->getProperty('skipped')->setValue(null);
+            } else {
+                $reflectionClass->setStaticPropertyValue('skipped', null);
+            }
         }
     }
 
