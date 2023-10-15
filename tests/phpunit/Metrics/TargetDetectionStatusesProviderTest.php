@@ -164,6 +164,22 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         ], $provider->get());
     }
 
+    public function test_it_provides_escaped_when_using_gitlab_logger(): void
+    {
+        $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getGitlabLogFilePath')
+            ->willReturn('gitlab.json')
+        ;
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+
+        $this->assertProvides([
+            DetectionStatus::ESCAPED,
+        ], $provider->get());
+    }
+
     public function test_it_provides_certain_statuses_for_json_logger(): void
     {
         $logs = $this->createMock(Logs::class);

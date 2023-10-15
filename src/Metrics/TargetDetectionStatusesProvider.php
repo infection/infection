@@ -119,6 +119,10 @@ class TargetDetectionStatusesProvider
             yield DetectionStatus::ESCAPED;
         }
 
+        if ($this->logConfig->getGitlabLogFilePath() !== null) {
+            yield DetectionStatus::ESCAPED;
+        }
+
         // Follows the logic in JsonLogger
         if ($this->logConfig->getJsonLogFilePath() !== null) {
             yield DetectionStatus::KILLED;
