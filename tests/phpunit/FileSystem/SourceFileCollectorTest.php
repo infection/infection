@@ -151,6 +151,17 @@ final class SourceFileCollectorTest extends TestCase
                 'case1/sub-dir/b.php',
             ],
         ];
+
+        yield 'one directory, no filter, one common excludes and one file exclude' => [
+            [self::FIXTURES . '/case0'],
+            [
+                'sub-dir',
+                'a.php',
+            ],
+            [
+                'case0/outside-symlink.php',
+            ],
+        ];
     }
 
     /**
