@@ -37,7 +37,7 @@ namespace Infection\Logger\Http;
 
 use function in_array;
 use Psr\Log\LoggerInterface;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal

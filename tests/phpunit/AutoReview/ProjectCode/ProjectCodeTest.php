@@ -48,7 +48,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 use function Safe\array_flip;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @coversNothing

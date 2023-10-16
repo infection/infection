@@ -41,7 +41,7 @@ use Later\Interfaces\Deferred;
 use function Later\lazy;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal

@@ -38,7 +38,7 @@ namespace Infection\Tests\TestFramework;
 use Infection\TestFramework\VersionParser;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 
 final class VersionParserTest extends TestCase
 {

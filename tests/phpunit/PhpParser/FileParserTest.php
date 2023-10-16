@@ -44,7 +44,7 @@ use PhpParser\Node;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**

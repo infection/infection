@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
-use function Safe\sprintf;
+use function sprintf;
 use UnexpectedValueException;
 
 /**

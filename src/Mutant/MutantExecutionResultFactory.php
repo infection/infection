@@ -38,7 +38,7 @@ namespace Infection\Mutant;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 

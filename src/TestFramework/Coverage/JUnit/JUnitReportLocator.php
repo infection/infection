@@ -42,7 +42,7 @@ use function file_exists;
 use function implode;
 use Infection\FileSystem\Locator\FileNotFound;
 use function iterator_to_array;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;

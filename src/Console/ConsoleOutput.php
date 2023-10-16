@@ -38,7 +38,7 @@ namespace Infection\Console;
 use function implode;
 use Infection\Logger\ConsoleLogger;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal

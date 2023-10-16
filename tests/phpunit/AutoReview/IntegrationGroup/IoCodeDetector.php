@@ -39,7 +39,7 @@ use function array_keys;
 use Infection\CannotBeInstantiated;
 use function Safe\file_get_contents;
 use function Safe\preg_match_all;
-use function Safe\sprintf;
+use function sprintf;
 use function strpos;
 
 final class IoCodeDetector

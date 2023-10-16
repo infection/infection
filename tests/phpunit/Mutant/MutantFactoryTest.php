@@ -47,7 +47,7 @@ use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 
 final class MutantFactoryTest extends TestCase
 {

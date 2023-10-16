@@ -42,7 +42,7 @@ use function array_values;
 use function class_exists;
 use function in_array;
 use InvalidArgumentException;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
 
 /**

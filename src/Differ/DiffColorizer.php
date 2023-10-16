@@ -38,7 +38,7 @@ namespace Infection\Differ;
 use function array_map;
 use function explode;
 use function implode;
-use function Safe\sprintf;
+use function sprintf;
 use function str_starts_with;
 
 /**

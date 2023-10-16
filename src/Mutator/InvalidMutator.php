@@ -37,7 +37,7 @@ namespace Infection\Mutator;
 
 use function array_keys;
 use RuntimeException;
-use function Safe\sprintf;
+use function sprintf;
 use Throwable;
 use Webmozart\Assert\Assert;
 

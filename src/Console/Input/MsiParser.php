@@ -41,7 +41,7 @@ use Infection\CannotBeInstantiated;
 use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
-use function Safe\sprintf;
+use function sprintf;
 use function strlen;
 use function trim;
 use Webmozart\Assert\Assert;

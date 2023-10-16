@@ -41,7 +41,7 @@ use function explode;
 use function Safe\preg_match;
 use function Safe\preg_split;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 use function str_starts_with;
 use Webmozart\Assert\Assert;
 

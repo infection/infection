@@ -39,7 +39,7 @@ use function array_filter;
 use function array_map;
 use function implode;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 

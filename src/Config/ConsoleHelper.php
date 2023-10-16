@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Config;
 
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 

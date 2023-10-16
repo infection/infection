@@ -52,7 +52,7 @@ use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
 use function Safe\exec;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase

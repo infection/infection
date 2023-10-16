@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Config;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Phar;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use function str_starts_with;
 use function strstr;

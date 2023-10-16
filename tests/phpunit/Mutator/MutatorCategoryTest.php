@@ -42,7 +42,7 @@ use function in_array;
 use Infection\Mutator\MutatorCategory;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\sprintf;
+use function sprintf;
 
 final class MutatorCategoryTest extends TestCase
 {

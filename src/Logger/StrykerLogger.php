@@ -46,7 +46,7 @@ use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Psr\Log\LoggerInterface;
 use function Safe\json_encode;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal

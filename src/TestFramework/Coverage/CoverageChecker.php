@@ -46,7 +46,7 @@ use function ini_get as ini_get_unsafe;
 use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
 use function strtolower;
 
 /**

@@ -42,7 +42,7 @@ use Infection\Differ\FilesDiffChangedLines;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 
 final class FilesDiffChangedLinesTest extends TestCase
 {

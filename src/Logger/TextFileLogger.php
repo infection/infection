@@ -42,7 +42,7 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Str;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use function str_repeat;
 use function strlen;
 

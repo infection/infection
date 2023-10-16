@@ -43,7 +43,7 @@ use Infection\TestFramework\SafeDOMXPath;
 use Safe\Exceptions\FilesystemException;
 use function Safe\file_get_contents;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;

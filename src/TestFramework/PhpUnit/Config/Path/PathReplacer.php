@@ -38,7 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Config\Path;
 use DOMElement;
 use DOMNode;
 use function ltrim;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
 use function trim;

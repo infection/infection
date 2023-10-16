@@ -45,7 +45,7 @@ use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
 use function Safe\ksort;
-use function Safe\sprintf;
+use function sprintf;
 use function str_pad;
 use const STR_PAD_LEFT;
 use const STR_PAD_RIGHT;

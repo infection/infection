@@ -39,7 +39,7 @@ use BlackfireProbe;
 use Closure;
 use Composer\Autoload\ClassLoader;
 use function extension_loaded;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 use Webmozart\Assert\Assert;

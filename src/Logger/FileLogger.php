@@ -40,7 +40,7 @@ use function in_array;
 use const PHP_EOL;
 use Psr\Log\LoggerInterface;
 use function Safe\file_put_contents;
-use function Safe\sprintf;
+use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;

@@ -37,7 +37,7 @@ namespace Infection\Mutator;
 
 use DomainException;
 use PhpParser\Node;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal

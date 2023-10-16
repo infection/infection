@@ -47,7 +47,7 @@ use function is_dir;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\json_decode;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
 use function trim;

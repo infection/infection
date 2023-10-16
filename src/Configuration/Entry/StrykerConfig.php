@@ -39,7 +39,7 @@ use InvalidArgumentException;
 use function preg_quote;
 use Safe\Exceptions\PcreException;
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal

@@ -46,7 +46,7 @@ use function Safe\curl_exec;
 use function Safe\curl_getinfo;
 use function Safe\curl_init;
 use function Safe\curl_setopt;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * Sends a CURL request to the Stryker dashboard API.
