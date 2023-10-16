@@ -5,6 +5,7 @@ parameters:
     tmpDir: ../build/cache/phpstan-src
     inferPrivatePropertyTypeFromConstructor: true
     sidzIgnoreMagicNumbers: [0, 0.0, 1, -1, 1.0, -1.0, 100]
+    sidzIgnoreNumericStrings: true
     ignoreErrors:
         - '#generic class ReflectionClass (but )?does not specify its types#'
         - '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
