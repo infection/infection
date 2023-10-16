@@ -59,17 +59,12 @@ class SourceFileCollector
             return [];
         }
 
-        $finder = Finder::create()
-            ->exclude($excludeDirectories)
+        return Finder::create()
             ->in($sourceDirectories)
+            ->exclude($excludeDirectories)
+            ->notPath($excludeDirectories)
             ->files()
             ->name('*.php')
         ;
-
-        foreach ($excludeDirectories as $excludeDirectory) {
-            $finder->notPath($excludeDirectory);
-        }
-
-        return $finder;
     }
 }
