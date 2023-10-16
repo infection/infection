@@ -42,7 +42,7 @@ use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

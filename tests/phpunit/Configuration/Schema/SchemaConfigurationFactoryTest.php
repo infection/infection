@@ -54,7 +54,7 @@ use JsonSchema\Validator;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
 use function var_export;
 

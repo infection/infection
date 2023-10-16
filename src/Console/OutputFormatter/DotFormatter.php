@@ -37,7 +37,7 @@ namespace Infection\Console\OutputFormatter;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use function Safe\sprintf;
+use function sprintf;
 use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;

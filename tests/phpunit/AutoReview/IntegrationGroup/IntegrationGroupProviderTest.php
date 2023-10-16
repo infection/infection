@@ -39,7 +39,7 @@ use function class_exists;
 use Infection\Tests\Console\E2ETest;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @covers \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider

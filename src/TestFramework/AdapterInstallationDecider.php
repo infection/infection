@@ -38,7 +38,7 @@ namespace Infection\TestFramework;
 use function array_key_exists;
 use function class_exists;
 use Infection\Console\IO;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 

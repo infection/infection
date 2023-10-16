@@ -54,7 +54,7 @@ use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
 
 final class MutatorFactoryTest extends TestCase

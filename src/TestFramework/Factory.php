@@ -49,8 +49,8 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
 use function iterator_to_array;
-use function Safe\sprintf;
 use SplFileInfo;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**

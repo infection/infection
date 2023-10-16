@@ -38,7 +38,7 @@ namespace Infection\Resource\Memory;
 use function log;
 use function number_format;
 use function round;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**

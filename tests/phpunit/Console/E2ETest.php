@@ -59,7 +59,7 @@ use function Safe\copy;
 use function Safe\file_get_contents;
 use function Safe\getcwd;
 use function Safe\ini_get;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use function strpos;
 use Symfony\Component\Console\Input\ArgvInput;

@@ -39,7 +39,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Process\Process;
 
 /**

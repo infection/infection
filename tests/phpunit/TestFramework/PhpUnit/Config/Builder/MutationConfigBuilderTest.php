@@ -54,7 +54,7 @@ use function Safe\exec;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 use function Safe\simplexml_load_string;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

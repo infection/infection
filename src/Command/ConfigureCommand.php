@@ -62,7 +62,7 @@ use function Safe\file_put_contents;
 use function Safe\glob;
 use function Safe\json_decode;
 use function Safe\json_encode;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
 use function str_starts_with;
 use Symfony\Component\Console\Input\InputOption;

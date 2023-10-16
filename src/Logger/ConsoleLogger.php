@@ -44,7 +44,7 @@ use function is_scalar;
 use function method_exists;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
-use function Safe\sprintf;
+use function sprintf;
 use function str_contains;
 use function strtr;
 use Symfony\Component\Console\Output\OutputInterface;

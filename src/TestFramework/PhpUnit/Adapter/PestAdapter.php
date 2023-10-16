@@ -40,7 +40,7 @@ use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal

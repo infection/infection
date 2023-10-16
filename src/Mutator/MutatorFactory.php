@@ -39,7 +39,7 @@ use function end;
 use function explode;
 use function is_a;
 use function Safe\array_flip;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**

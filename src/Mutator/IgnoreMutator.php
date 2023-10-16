@@ -39,7 +39,7 @@ use DomainException;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use PhpParser\Node;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * The mutators implement the ignore + canMutator pattern. The downside of this pattern is that

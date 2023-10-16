@@ -8,7 +8,7 @@ use Closure;
 use Infection\Process\Runner\ProcessBearer;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Process\Process;
-use function Safe\sprintf;
+
 
 final class DummyProcessBearer implements ProcessBearer
 {

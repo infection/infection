@@ -49,7 +49,7 @@ use function libxml_get_errors;
 use function libxml_use_internal_errors;
 use LibXMLError;
 use LogicException;
-use function Safe\sprintf;
+use function sprintf;
 use function version_compare;
 use Webmozart\Assert\Assert;
 

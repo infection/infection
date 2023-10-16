@@ -40,7 +40,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
-use function Safe\sprintf;
+use function sprintf;
 
 final class SubscriberTest extends TestCase
 {
