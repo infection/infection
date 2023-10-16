@@ -78,6 +78,27 @@ DIFF
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\AssignOp\Div;
+        if (!$node instanceof Node\Expr\AssignOp\Div) {
+            return false;
+        }
+
+        if ($this->isNumericOne($node->expr)) {
+            return false;
+        }
+
+        if ($node->expr instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->expr->expr)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function isNumericOne(Node $node): bool
+    {
+        if ($node instanceof Node\Scalar\LNumber && $node->value === 1) {
+            return true;
+        }
+
+        return $node instanceof Node\Scalar\DNumber && $node->value === 1.0;
     }
 }
