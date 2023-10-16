@@ -76,5 +76,45 @@ $a = 10 * 3;
 PHP
             ,
         ];
+
+        yield 'It does not mutate multiply by 1 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = 1;
+$a *= 1;
+PHP
+            ,
+        ];
+
+        yield 'It does not mutate multiply by -1 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = 1;
+$a *= -1;
+PHP
+            ,
+        ];
+
+        yield 'It does not mutate multiply by 1.0 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = 1;
+$a *= 1.0;
+PHP
+            ,
+        ];
+
+        yield 'It does not mutate multiply by -1.0 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = 1;
+$a *= -1.0;
+PHP
+            ,
+        ];
     }
 }
