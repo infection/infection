@@ -35,16 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Process\Factory;
 
-use Composer\InstalledVersions;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
-use function method_exists;
 use Symfony\Component\Process\Process;
-use function version_compare;
 
 /**
  * @internal
@@ -60,21 +57,15 @@ class MutantProcessFactory
     public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
-            $this->testFrameworkAdapter->getMutantCommandLine(
+            command: $this->testFrameworkAdapter->getMutantCommandLine(
                 $mutant->getTests(),
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getHash(),
                 $mutant->getMutation()->getOriginalFilePath(),
                 $testFrameworkExtraOptions
-            )
+            ),
+            timeout: $this->timeout
         );
-
-        $process->setTimeout($this->timeout);
-
-        if (method_exists($process, 'inheritEnvironmentVariables') && version_compare((string) InstalledVersions::getPrettyVersion('symfony/console'), 'v4.4', '<')) {
-            // in version 4.4.0 this method is deprecated and removed in 5.0.0
-            $process->inheritEnvironmentVariables();
-        }
 
         $mutantProcess = new MutantProcess($process, $mutant);
 
