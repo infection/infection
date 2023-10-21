@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
+use function array_flip;
 use Generator;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\DetectionStatus;
 use function iterator_to_array;
-use function Safe\array_flip;
 
 /**
  * @internal

@@ -66,9 +66,9 @@ use PhpParser\NodeAbstract;
 use function Safe\file_get_contents;
 use function Safe\preg_match;
 use function Safe\preg_split;
-use function Safe\substr;
 use function str_starts_with;
 use function strlen;
+use function substr;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 

@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function array_flip;
 use function end;
 use function explode;
 use function is_a;
-use function Safe\array_flip;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
