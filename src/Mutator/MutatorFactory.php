@@ -56,6 +56,7 @@ final class MutatorFactory
     {
         $mutators = [];
 
+        /** @var array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, string> $knownMutatorClassNames */
         $knownMutatorClassNames = array_flip(ProfileList::ALL_MUTATORS);
 
         foreach ($resolvedMutators as $mutatorClassName => $config) {
@@ -72,7 +73,6 @@ final class MutatorFactory
                 )
             );
 
-            /** @var mixed[] $settings */
             $settings = (array) ($config['settings'] ?? []);
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
