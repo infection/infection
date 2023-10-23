@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function array_flip;
 use function array_key_exists;
 use const FNM_NOESCAPE;
 use function fnmatch;
-use function Safe\array_flip;
 
 /**
  * @internal

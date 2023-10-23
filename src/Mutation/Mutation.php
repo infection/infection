@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use function array_flip;
 use function array_intersect_key;
 use function array_keys;
 use function implode;
@@ -44,7 +45,6 @@ use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
 use PhpParser\Node;
-use function Safe\array_flip;
 use Webmozart\Assert\Assert;
 
 /**

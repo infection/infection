@@ -45,9 +45,9 @@ use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
 use function implode;
 use function Safe\array_replace;
-use function Safe\substr;
 use function sprintf;
 use function str_starts_with;
+use function substr;
 use function substr_count;
 
 /**

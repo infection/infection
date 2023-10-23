@@ -35,15 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
+use function array_flip;
 use function array_keys;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
+use function ksort;
 use PHPUnit\Framework\TestCase;
-use function Safe\array_flip;
-use function Safe\ksort;
 
 final class TargetDetectionStatusesProviderTest extends TestCase
 {

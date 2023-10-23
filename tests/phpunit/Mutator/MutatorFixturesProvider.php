@@ -42,8 +42,8 @@ use function get_class;
 use Infection\CannotBeInstantiated;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
-use function Safe\substr;
 use function sprintf;
+use function substr;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 

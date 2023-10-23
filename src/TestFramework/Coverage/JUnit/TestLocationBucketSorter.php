@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use function Safe\ksort;
+use function ksort;
 
 /**
  * @internal
