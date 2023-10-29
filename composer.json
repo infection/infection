@@ -74,7 +74,6 @@
     },
     "require-dev": {
         "ext-simplexml": "*",
-        "brianium/paratest": "^6.3 || ^7.3",
         "fidry/makefile": "^0.2.0",
         "helmich/phpunit-json-assert": "^3.0",
         "phpspec/prophecy": "^1.15",
