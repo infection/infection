@@ -269,7 +269,6 @@ final class MakefileTest extends BaseMakefileTestCase
 [33mtest:[0m		 	 Runs all the tests
 [33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
 [33mtest-unit:[0m	 	 Runs the unit tests
-[33mtest-unit-parallel:[0m	 Runs the unit tests in parallel
 [33mtest-unit-docker:[0m	 Runs the unit tests on the different Docker platforms
 [33mtest-e2e:[0m 	 	 Runs the end-to-end tests
 [33mtest-e2e-phpunit:[0m	 Runs PHPUnit-enabled subset of end-to-end tests
