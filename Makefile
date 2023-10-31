@@ -28,6 +28,7 @@ PSALM=./.tools/psalm
 PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.11.0/psalm.phar"
 
 PHPUNIT=vendor/phpunit/phpunit/phpunit
+PARATEST=vendor/bin/paratest
 
 INFECTION=./build/infection.phar
 
@@ -145,6 +146,11 @@ test-autoreview: $(PHPUNIT) vendor
 test-unit:	 	## Runs the unit tests
 test-unit: $(PHPUNIT) vendor
 	$(PHPUNIT) --group $(PHPUNIT_GROUP) --exclude-group e2e
+
+.PHONY: test-unit-parallel
+test-unit-parallel:	## Runs the unit tests in parallel
+test-unit-parallel: $(PARATEST) vendor
+	$(PARATEST) --runner=WrapperRunner
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
