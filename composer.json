@@ -50,7 +50,7 @@
         "composer-runtime-api": "^2.0",
         "colinodell/json5": "^2.2",
         "composer/xdebug-handler": "^2.0 || ^3.0",
-        "fidry/cpu-core-counter": "^0.4.0 || ^0.5.0",
+        "fidry/cpu-core-counter": "^0.4.0 || ^0.5.0 || ^1.0",
         "infection/abstract-testframework-adapter": "^0.5.0",
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.5",
