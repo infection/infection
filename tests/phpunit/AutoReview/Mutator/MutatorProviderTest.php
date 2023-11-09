@@ -42,7 +42,7 @@ use Infection\Mutator\Mutator;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\class_implements;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @covers \Infection\Tests\AutoReview\Mutator\MutatorProvider

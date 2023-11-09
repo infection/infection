@@ -114,6 +114,7 @@ final class ConfigurationFactoryTest extends TestCase
         bool $inputIsForGitDiffLines,
         string $inputGitDiffBase,
         ?bool $inputUseGitHubAnnotationsLogger,
+        ?string $inputGitlabLogFilePath,
         ?string $inputHtmlLogFilePath,
         bool $inputUseNoopMutators,
         int $inputMsiPrecision,
@@ -170,6 +171,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputIsForGitDiffLines,
                 $inputGitDiffBase,
                 $inputUseGitHubAnnotationsLogger,
+                $inputGitlabLogFilePath,
                 $inputHtmlLogFilePath,
                 $inputUseNoopMutators,
                 $inputExecuteOnlyCoveringTestCases
@@ -258,6 +260,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             true,
             null,
+            null,
             false,
             2,
             10,
@@ -289,21 +292,33 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'null html file log path with existing path from config file' => self::createValueForHtmlLogFilePath(
-            'from-config.html',
+            '/from-config.html',
             null,
-            'from-config.html'
+            '/from-config.html'
+        );
+
+        yield 'absolute html file log path' => self::createValueForHtmlLogFilePath(
+            '/path/to/from-config.html',
+            null,
+            '/path/to/from-config.html',
+        );
+
+        yield 'relative html file log path' => self::createValueForHtmlLogFilePath(
+            'relative/path/to/from-config.html',
+            null,
+            '/path/to/relative/path/to/from-config.html'
         );
 
         yield 'override html file log path from CLI option with existing path from config file' => self::createValueForHtmlLogFilePath(
-            'from-config.html',
-            'from-cli.html',
-            'from-cli.html'
+            '/from-config.html',
+            '/from-cli.html',
+            '/from-cli.html'
         );
 
         yield 'set html file log path from CLI option when config file has no setting' => self::createValueForHtmlLogFilePath(
             null,
-            'from-cli.html',
-            'from-cli.html'
+            '/from-cli.html',
+            '/from-cli.html'
         );
 
         yield 'null html file log path in config and CLI' => self::createValueForHtmlLogFilePath(
@@ -433,6 +448,42 @@ final class ConfigurationFactoryTest extends TestCase
             true,
             true,
             true
+        );
+
+        yield 'null GitLab file log path with existing path from config file' => self::createValueForGitlabLogger(
+            '/from-config.json',
+            null,
+            '/from-config.json'
+        );
+
+        yield 'absolute GitLab file log path' => self::createValueForGitlabLogger(
+            '/path/to/from-config.json',
+            null,
+            '/path/to/from-config.json',
+        );
+
+        yield 'relative GitLab file log path' => self::createValueForGitlabLogger(
+            'relative/path/to/from-config.json',
+            null,
+            '/path/to/relative/path/to/from-config.json'
+        );
+
+        yield 'override GitLab file log path from CLI option with existing path from config file' => self::createValueForGitlabLogger(
+            '/from-config.json',
+            '/from-cli.json',
+            '/from-cli.json'
+        );
+
+        yield 'set GitLab file log path from CLI option when config file has no setting' => self::createValueForGitlabLogger(
+            null,
+            '/from-cli.json',
+            '/from-cli.json'
+        );
+
+        yield 'null GitLab file log path in config and CLI' => self::createValueForGitlabLogger(
+            null,
+            null,
+            null
         );
 
         yield 'ignoreMsiWithNoMutations not specified in schema and true in input' => self::createValueForIgnoreMsiWithNoMutations(
@@ -758,6 +809,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             false,
             null,
+            null,
             false,
             2,
             10,
@@ -799,15 +851,16 @@ final class ConfigurationFactoryTest extends TestCase
                 10,
                 new Source(['src/'], ['vendor/']),
                 new Logs(
-                    'text.log',
-                    'report.html',
-                    'summary.log',
-                    'json.log',
-                    'debug.log',
-                    'mutator.log',
+                    '/text.log',
+                    '/report.html',
+                    '/summary.log',
+                    '/json.log',
+                    '/gitlab.log',
+                    '/debug.log',
+                    '/mutator.log',
                     true,
                     StrykerConfig::forFullReport('master'),
-                    'summary.json'
+                    '/summary.json'
                 ),
                 'config/tmp',
                 new PhpUnit(
@@ -845,6 +898,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             false,
             null,
+            null,
             false,
             2,
             10,
@@ -856,15 +910,16 @@ final class ConfigurationFactoryTest extends TestCase
             'src/Foo.php, src/Bar.php',
             ['vendor/'],
             new Logs(
-                'text.log',
-                'report.html',
-                'summary.log',
-                'json.log',
-                'debug.log',
-                'mutator.log',
+                '/text.log',
+                '/report.html',
+                '/summary.log',
+                '/json.log',
+                '/gitlab.log',
+                '/debug.log',
+                '/mutator.log',
                 true,
                 StrykerConfig::forFullReport('master'),
-                'summary.json'
+                '/summary.json'
             ),
             'none',
             '/path/to/config/tmp/infection',
@@ -941,6 +996,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             false,
             null,
+            null,
             false,
             2,
             $expectedTimeOut,
@@ -1016,6 +1072,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             null,
             false,
             2,
@@ -1094,6 +1151,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             false,
             null,
+            null,
             false,
             2,
             10,
@@ -1169,6 +1227,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             null,
             false,
             2,
@@ -1247,6 +1306,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             false,
             null,
+            null,
             false,
             2,
             10,
@@ -1284,6 +1344,7 @@ final class ConfigurationFactoryTest extends TestCase
         bool $useGitHubAnnotationsLogger
     ): array {
         $expectedLogs = new Logs(
+            null,
             null,
             null,
             null,
@@ -1336,6 +1397,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             $inputUseGitHubAnnotationsLogger,
             null,
+            null,
             false,
             2,
             10,
@@ -1364,6 +1426,108 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+        ];
+    }
+
+    private static function createValueForGitlabLogger(
+        ?string $gitlabFileLogPathInConfig,
+        ?string $gitlabFileLogPathFromCliOption,
+        ?string $expectedGitlabFileLogPath
+    ): array {
+        $expectedLogs = new Logs(
+            null,
+            null,
+            null,
+            null,
+            $expectedGitlabFileLogPath,
+            null,
+            null,
+            false,
+            null,
+            null,
+        );
+
+        return [
+            false,
+            false,
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    $gitlabFileLogPathInConfig,
+                    null,
+                    null,
+                    false,
+                    null,
+                    null,
+                ),
+                '',
+                new PhpUnit(null, null),
+                null,
+                null,
+                null,
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            false,
+            'none',
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            0,
+            false,
+            'AM',
+            false,
+            'master',
+            false,
+            $gitlabFileLogPathFromCliOption,
+            null,
+            false,
+            2,
+            10,
+            [],
+            [],
+            'src/a.php,src/b.php',
+            [],
+            $expectedLogs,
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            'phpunit',
+            null,
+            null,
+            false,
+            '',
+            sys_get_temp_dir() . '/infection',
+            false,
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            [],
+            true,
         ];
     }
 
@@ -1412,6 +1576,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             null,
             false,
             2,
@@ -1490,6 +1655,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             false,
             null,
+            null,
             false,
             2,
             10,
@@ -1566,6 +1732,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             null,
             false,
             2,
@@ -1645,6 +1812,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             false,
             null,
+            null,
             false,
             2,
             10,
@@ -1721,6 +1889,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             null,
             false,
             2,
@@ -1800,6 +1969,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             false,
             null,
+            null,
             false,
             2,
             10,
@@ -1876,6 +2046,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             false,
+            null,
             null,
             false,
             2,
@@ -1958,6 +2129,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             false,
             null,
+            null,
             $useNoopMutatos,
             2,
             10,
@@ -2038,6 +2210,7 @@ final class ConfigurationFactoryTest extends TestCase
             'master',
             false,
             null,
+            null,
             false,
             2,
             10,
@@ -2080,6 +2253,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
+            null,
             true,
             null,
             null,
@@ -2095,6 +2269,7 @@ final class ConfigurationFactoryTest extends TestCase
                 new Logs(
                     null,
                     $htmlFileLogPathInConfig,
+                    null,
                     null,
                     null,
                     null,
@@ -2135,6 +2310,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             'master',
             true,
+            null,
             $htmlFileLogPathFromCliOption,
             false,
             2,

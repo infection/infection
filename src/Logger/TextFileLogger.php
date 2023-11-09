@@ -42,7 +42,7 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Str;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use function str_repeat;
 use function strlen;
 
@@ -51,7 +51,7 @@ use function strlen;
  */
 final class TextFileLogger implements LineMutationTestingResultsLogger
 {
-    public function __construct(private ResultsCollector $resultsCollector, private bool $debugVerbosity, private bool $onlyCoveredMode, private bool $debugMode)
+    public function __construct(private readonly ResultsCollector $resultsCollector, private readonly bool $debugVerbosity, private readonly bool $onlyCoveredMode, private readonly bool $debugMode)
     {
     }
 

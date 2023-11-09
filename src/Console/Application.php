@@ -45,7 +45,7 @@ use Infection\Container;
 use OutOfBoundsException;
 use function preg_quote;
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -71,13 +71,9 @@ final class Application extends BaseApplication
 
 ';
 
-    private Container $container;
-
-    public function __construct(Container $container)
+    public function __construct(private readonly Container $container)
     {
         parent::__construct(self::NAME, self::getPrettyVersion());
-
-        $this->container = $container;
         $this->setDefaultCommand('run');
     }
 

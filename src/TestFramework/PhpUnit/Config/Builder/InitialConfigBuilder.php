@@ -41,7 +41,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
-use function Safe\sprintf;
+use function sprintf;
 use function version_compare;
 use Webmozart\Assert\Assert;
 
@@ -50,19 +50,19 @@ use Webmozart\Assert\Assert;
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
-    private string $originalXmlConfigContent;
+    private readonly string $originalXmlConfigContent;
 
     /**
      * @param string[] $srcDirs
      * @param list<string> $filteredSourceFilesToMutate
      */
     public function __construct(
-        private string $tmpDir,
+        private readonly string $tmpDir,
         string $originalXmlConfigContent,
-        private XmlConfigurationManipulator $configManipulator,
-        private XmlConfigurationVersionProvider $versionProvider,
-        private array $srcDirs,
-        private array $filteredSourceFilesToMutate
+        private readonly XmlConfigurationManipulator $configManipulator,
+        private readonly XmlConfigurationVersionProvider $versionProvider,
+        private readonly array $srcDirs,
+        private readonly array $filteredSourceFilesToMutate
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,
@@ -109,6 +109,12 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addCoverageNodes(string $version, SafeDOMXPath $xPath): void
     {
+        if (version_compare($version, '10.1', '>=')) {
+            $this->configManipulator->addOrUpdateSourceIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
+
+            return;
+        }
+
         if (version_compare($version, '10', '>=')) {
             $this->configManipulator->addOrUpdateCoverageIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 

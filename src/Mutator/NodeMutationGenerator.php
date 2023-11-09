@@ -57,7 +57,7 @@ use Webmozart\Assert\Assert;
 class NodeMutationGenerator
 {
     /** @var Mutator<Node>[] */
-    private array $mutators;
+    private readonly array $mutators;
 
     private Node $currentNode;
     /** @var TestLocation[]|null */
@@ -71,14 +71,14 @@ class NodeMutationGenerator
      */
     public function __construct(
         array $mutators,
-        private string $filePath,
-        private array $fileNodes,
-        private Trace $trace,
-        private bool $onlyCovered,
-        private bool $isForGitDiffLines,
-        private ?string $gitDiffBase,
-        private LineRangeCalculator $lineRangeCalculator,
-        private FilesDiffChangedLines $filesDiffChangedLines
+        private readonly string $filePath,
+        private readonly array $fileNodes,
+        private readonly Trace $trace,
+        private readonly bool $onlyCovered,
+        private readonly bool $isForGitDiffLines,
+        private readonly ?string $gitDiffBase,
+        private readonly LineRangeCalculator $lineRangeCalculator,
+        private readonly FilesDiffChangedLines $filesDiffChangedLines
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 

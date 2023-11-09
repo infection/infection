@@ -20,6 +20,21 @@
         "global-ignoreSourceCodeByRegex": [
             "Assert::.*"
         ],
-        "@default": true
+        "@default": true,
+        "InstanceOf_": {
+            ignore: [
+                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
+            ]
+        },
+        "LogicalAnd": {
+            ignore: [
+                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
+            ]
+        },
+        "LogicalOr": {
+            ignore: [
+                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
+            ]
+        }
     }
 }

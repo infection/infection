@@ -38,7 +38,7 @@ namespace Infection\Resource\Memory;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -48,7 +48,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MemoryLimiter
 {
-    public function __construct(private Filesystem $fileSystem, private string $phpIniPath, private MemoryLimiterEnvironment $environment)
+    public function __construct(private readonly Filesystem $fileSystem, private readonly string $phpIniPath, private readonly MemoryLimiterEnvironment $environment)
     {
     }
 

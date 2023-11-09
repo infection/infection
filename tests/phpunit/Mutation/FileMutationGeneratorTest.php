@@ -55,7 +55,7 @@ use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 final class FileMutationGeneratorTest extends TestCase

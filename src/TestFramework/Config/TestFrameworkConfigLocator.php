@@ -38,7 +38,7 @@ namespace Infection\TestFramework\Config;
 use function file_exists;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -54,7 +54,7 @@ final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInte
         'dist.yml',
     ];
 
-    public function __construct(private string $configDir)
+    public function __construct(private readonly string $configDir)
     {
     }
 

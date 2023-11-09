@@ -35,14 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use function array_map;
-use function get_class;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
-use Infection\Logger\FederatedLogger;
-use Infection\Logger\FileLogger;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
-use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLogger;
 use Infection\Logger\StrykerLoggerFactory;
 use Infection\Metrics\MetricsCalculator;
@@ -50,7 +45,6 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\FakeCiDetector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 /**
  * @group integration
@@ -63,6 +57,7 @@ final class StrykerLoggerFactoryTest extends TestCase
 
         $logger = $factory->createFromLogEntries(
             new Logs(
+                '/a/file',
                 '/a/file',
                 '/a/file',
                 '/a/file',
@@ -84,6 +79,7 @@ final class StrykerLoggerFactoryTest extends TestCase
 
         $logger = $factory->createFromLogEntries(
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -134,6 +130,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 false,
                 StrykerConfig::forBadge('foo'),
                 null
@@ -143,6 +140,7 @@ final class StrykerLoggerFactoryTest extends TestCase
 
         yield 'stryker for report logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -162,6 +160,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 'html',
                 'summary',
                 'json',
+                'gitlab',
                 'debug',
                 'per_mutator',
                 true,
@@ -182,33 +181,5 @@ final class StrykerLoggerFactoryTest extends TestCase
             new FakeCiDetector(),
             new FakeLogger(),
         );
-    }
-
-    private function assertRegisteredLoggersAre(
-        array $expectedLoggerClasses,
-        MutationTestingResultsLogger $logger
-    ): void {
-        $this->assertInstanceOf(FederatedLogger::class, $logger);
-
-        $loggersReflection = (new ReflectionClass(FederatedLogger::class))->getProperty('loggers');
-        $loggersReflection->setAccessible(true);
-
-        $loggers = $loggersReflection->getValue($logger);
-
-        $fileLoggerDecoratedLogger = (new ReflectionClass(FileLogger::class))->getProperty('lineLogger');
-        $fileLoggerDecoratedLogger->setAccessible(true);
-
-        $actualLoggerClasses = array_map(
-            static function ($logger) use ($fileLoggerDecoratedLogger): string {
-                if ($logger instanceof FileLogger) {
-                    $logger = $fileLoggerDecoratedLogger->getValue($logger);
-                }
-
-                return get_class($logger);
-            },
-            $loggers
-        );
-
-        $this->assertSame($expectedLoggerClasses, $actualLoggerClasses);
     }
 }

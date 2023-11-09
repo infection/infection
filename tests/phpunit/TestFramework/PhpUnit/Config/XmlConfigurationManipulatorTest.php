@@ -47,8 +47,8 @@ use InvalidArgumentException;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\TestCase;
 use function restore_error_handler;
-use function Safe\sprintf;
 use function set_error_handler;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -274,6 +274,30 @@ XML
       <file>example/File2.php</file>
     </include>
   </coverage>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_adds_source_include_directories_to_post_10_1_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateSourceIncludeNodes($xPath, ['src/', 'examples/'], []);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <source>
+    <include>
+      <directory>src/</directory>
+      <directory>examples/</directory>
+    </include>
+  </source>
 </phpunit>
 XML
         );

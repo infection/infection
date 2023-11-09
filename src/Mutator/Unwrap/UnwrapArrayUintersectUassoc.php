@@ -47,6 +47,8 @@ use PhpParser\Node;
  */
 final class UnwrapArrayUintersectUassoc extends AbstractFunctionUnwrapMutator
 {
+    private const NON_MUTABLE_ARGS_COUNT = 2;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -106,7 +108,7 @@ DIFF
         yield from array_slice(
             array_keys($node->args),
             0,
-            count($node->args) - 2
+            count($node->args) - self::NON_MUTABLE_ARGS_COUNT,
         );
     }
 }

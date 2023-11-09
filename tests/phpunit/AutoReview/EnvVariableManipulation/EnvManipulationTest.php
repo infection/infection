@@ -38,7 +38,7 @@ namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
-use function Safe\sprintf;
+use function sprintf;
 
 final class EnvManipulationTest extends TestCase
 {

@@ -37,14 +37,14 @@ namespace Infection\Logger\Http;
 
 use function in_array;
 use Psr\Log\LoggerInterface;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
  */
 class StrykerDashboardClient
 {
-    public function __construct(private StrykerCurlClient $client, private LoggerInterface $logger)
+    public function __construct(private readonly StrykerCurlClient $client, private readonly LoggerInterface $logger)
     {
     }
 

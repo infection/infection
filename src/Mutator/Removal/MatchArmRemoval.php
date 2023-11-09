@@ -116,7 +116,7 @@ DIFF
         foreach ($node->arms as $i => $arm) {
             $arms = $node->arms;
 
-            if ($arm->conds !== null && count($arm->conds) > 1) {
+            if ($arm->conds !== null && count((array) $arm->conds) > 1) {
                 foreach ($arm->conds as $j => $cond) {
                     $conds = $arm->conds;
 

@@ -41,7 +41,7 @@ use Infection\CannotBeInstantiated;
 use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
-use function Safe\sprintf;
+use function sprintf;
 use function strlen;
 use function trim;
 use Webmozart\Assert\Assert;
@@ -52,7 +52,9 @@ use Webmozart\Assert\Assert;
 final class MsiParser
 {
     use CannotBeInstantiated;
+
     public const DEFAULT_PRECISION = 2;
+    private const EXPLODE_PARTS = 2;
 
     public static function detectPrecision(?string ...$values): int
     {
@@ -67,7 +69,7 @@ final class MsiParser
 
             $valueParts = explode('.', $value);
 
-            if (count($valueParts) !== 2) {
+            if (count($valueParts) !== self::EXPLODE_PARTS) {
                 continue;
             }
 

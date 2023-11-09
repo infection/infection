@@ -41,7 +41,7 @@ use function array_map;
 use function array_search;
 use function array_values;
 use function explode;
-use function Safe\sprintf;
+use function sprintf;
 use UnexpectedValueException;
 
 /**

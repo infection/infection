@@ -44,7 +44,7 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 

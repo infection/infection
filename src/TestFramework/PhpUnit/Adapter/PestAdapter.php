@@ -40,7 +40,7 @@ use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -49,7 +49,7 @@ final class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptio
 {
     private const NAME = 'Pest';
 
-    public function __construct(private PhpUnitAdapter $phpUnitAdapter)
+    public function __construct(private readonly PhpUnitAdapter $phpUnitAdapter)
     {
     }
 

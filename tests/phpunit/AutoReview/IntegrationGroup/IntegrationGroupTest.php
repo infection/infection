@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
+use function array_flip;
 use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\array_flip;
-use function Safe\sprintf;
+use function sprintf;
 use function strpos;
 
 final class IntegrationGroupTest extends TestCase

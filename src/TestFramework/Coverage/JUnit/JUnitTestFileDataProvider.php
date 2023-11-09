@@ -40,7 +40,7 @@ use DOMElement;
 use DOMNodeList;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -50,7 +50,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
     private ?SafeDOMXPath $xPath = null;
 
-    public function __construct(private JUnitReportLocator $jUnitLocator)
+    public function __construct(private readonly JUnitReportLocator $jUnitLocator)
     {
     }
 
@@ -61,7 +61,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     {
         $xPath = $this->getXPath();
 
-        /** @var DOMNodeList<DOMElement> $nodes */
+        /** @var DOMNodeList<DOMElement>|null $nodes */
         $nodes = null;
 
         foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {

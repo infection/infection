@@ -46,7 +46,6 @@ use function min;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ArrayItem;
 use function range;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -58,7 +57,7 @@ final class ArrayItemRemoval implements ConfigurableMutator
     use GetConfigClassName;
     use GetMutatorName;
 
-    public function __construct(private ArrayItemRemovalConfig $config)
+    public function __construct(private readonly ArrayItemRemovalConfig $config)
     {
     }
 
@@ -116,8 +115,6 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        Assert::allNotNull($node->items);
-
         foreach ($this->getItemsIndexes($node->items) as $indexToRemove) {
             $newArrayNode = clone $node;
             unset($newArrayNode->items[$indexToRemove]);
@@ -147,13 +144,18 @@ DIFF
             return false;
         }
 
+        // Don't mutate destructured values in foreach loops
+        if ($parent instanceof Node\Stmt\Foreach_ && $parent->valueVar === $node) {
+            return false;
+        }
+
         return true;
     }
 
     /**
      * @psalm-mutation-free
      *
-     * @param ArrayItem[] $items
+     * @param array<array-key, ArrayItem|null> $items
      *
      * @return int[]
      */

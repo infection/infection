@@ -40,11 +40,13 @@ use function array_key_exists;
 use function array_unique;
 use function array_values;
 use function dirname;
+use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Logger\FileLogger;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
@@ -55,7 +57,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -71,30 +73,15 @@ class ConfigurationFactory
      */
     private const DEFAULT_TIMEOUT = 10;
 
-    private TmpDirProvider $tmpDirProvider;
-    private MutatorResolver $mutatorResolver;
-    private MutatorFactory $mutatorFactory;
-    private MutatorParser $mutatorParser;
-    private SourceFileCollector $sourceFileCollector;
-    private CiDetectorInterface $ciDetector;
-    private GitDiffFileProvider $gitDiffFileProvider;
-
     public function __construct(
-        TmpDirProvider $tmpDirProvider,
-        MutatorResolver $mutatorResolver,
-        MutatorFactory $mutatorFactory,
-        MutatorParser $mutatorParser,
-        SourceFileCollector $sourceFileCollector,
-        CiDetectorInterface $ciDetector,
-        GitDiffFileProvider $gitDiffFileProvider
+        private readonly TmpDirProvider $tmpDirProvider,
+        private readonly MutatorResolver $mutatorResolver,
+        private readonly MutatorFactory $mutatorFactory,
+        private readonly MutatorParser $mutatorParser,
+        private readonly SourceFileCollector $sourceFileCollector,
+        private readonly CiDetectorInterface $ciDetector,
+        private readonly GitDiffFileProvider $gitDiffFileProvider
     ) {
-        $this->tmpDirProvider = $tmpDirProvider;
-        $this->mutatorResolver = $mutatorResolver;
-        $this->mutatorFactory = $mutatorFactory;
-        $this->mutatorParser = $mutatorParser;
-        $this->sourceFileCollector = $sourceFileCollector;
-        $this->ciDetector = $ciDetector;
-        $this->gitDiffFileProvider = $gitDiffFileProvider;
     }
 
     public function create(
@@ -121,6 +108,7 @@ class ConfigurationFactory
         bool $isForGitDiffLines,
         ?string $gitDiffBase,
         ?bool $useGitHubLogger,
+        ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases
@@ -129,7 +117,7 @@ class ConfigurationFactory
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
-        $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
+        $testFramework ??= $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
 
         $skipCoverage = $existingCoveragePath !== null;
 
@@ -153,7 +141,7 @@ class ConfigurationFactory
             ),
             $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
             $schema->getSource()->getExcludes(),
-            $this->retrieveLogs($schema->getLogs(), $useGitHubLogger, $htmlLogFilePath),
+            $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath),
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
@@ -321,7 +309,7 @@ class ConfigurationFactory
         return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
     }
 
-    private function retrieveLogs(Logs $logs, ?bool $useGitHubLogger, ?string $htmlLogFilePath): Logs
+    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath): Logs
     {
         if ($useGitHubLogger === null) {
             $useGitHubLogger = $this->detectCiGithubActions();
@@ -331,21 +319,55 @@ class ConfigurationFactory
             $logs->setUseGitHubAnnotationsLogger($useGitHubLogger);
         }
 
+        if ($gitlabLogFilePath !== null) {
+            $logs->setGitlabLogFilePath($gitlabLogFilePath);
+        }
+
         if ($htmlLogFilePath !== null) {
             $logs->setHtmlLogFilePath($htmlLogFilePath);
         }
 
-        return $logs;
+        return new Logs(
+            self::pathToAbsolute($logs->getTextLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getHtmlLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getSummaryLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getJsonLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getGitlabLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getDebugLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getPerMutatorFilePath(), $configDir),
+            $logs->getUseGitHubAnnotationsLogger(),
+            $logs->getStrykerConfig(),
+            self::pathToAbsolute($logs->getSummaryJsonLogFilePath(), $configDir),
+        );
     }
 
     private function detectCiGithubActions(): bool
     {
         try {
             $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException $e) {
+        } catch (CiNotDetectedException) {
             return false;
         }
 
         return $ci->getCiName() === CiDetector::CI_GITHUB_ACTIONS;
+    }
+
+    private static function pathToAbsolute(
+        ?string $path,
+        string $configDir,
+    ): ?string {
+        if ($path === null) {
+            return null;
+        }
+
+        if (in_array($path, FileLogger::ALLOWED_PHP_STREAMS, true)) {
+            return $path;
+        }
+
+        if (Path::isAbsolute($path)) {
+            return $path;
+        }
+
+        return sprintf('%s/%s', $configDir, $path);
     }
 }

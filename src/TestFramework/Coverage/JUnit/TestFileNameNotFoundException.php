@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use Exception;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal

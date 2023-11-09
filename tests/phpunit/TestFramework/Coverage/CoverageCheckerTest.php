@@ -45,7 +45,7 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use const PHP_SAPI;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -292,11 +292,8 @@ TXT
             $this->fail();
         } catch (CoverageNotFound $exception) {
             $this->assertSame(
-                sprintf(
-                    'Could not find the JUnit file report. Please ensure that the JUnit coverage '
-                    . 'report has been properly generated at the right place.',
-                    self::$coveragePath
-                ),
+                'Could not find the JUnit file report. Please ensure that the JUnit coverage '
+                . 'report has been properly generated at the right place.',
                 $exception->getMessage()
             );
             $this->assertSame(0, $exception->getCode());
@@ -358,12 +355,9 @@ TXT
             $this->fail();
         } catch (CoverageNotFound $exception) {
             $this->assertSame(
-                sprintf(
-                    'Could not find the JUnit file report. Please ensure that the JUnit coverage report has'
-                    . ' been properly generated at the right place. The Codeception option for the path '
-                    . 'given is "--xml"',
-                    self::$coveragePath
-                ),
+                'Could not find the JUnit file report. Please ensure that the JUnit coverage report has'
+                . ' been properly generated at the right place. The Codeception option for the path '
+                . 'given is "--xml"',
                 $exception->getMessage()
             );
             $this->assertSame(0, $exception->getCode());

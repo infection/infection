@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
+use function array_flip;
 use Infection\Metrics\Collector;
 use Infection\Metrics\FilteringResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use PHPUnit\Framework\TestCase;
-use function Safe\array_flip;
 
 final class FilteringResultsCollectorTest extends TestCase
 {

@@ -54,7 +54,7 @@ use JsonSchema\Validator;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
 use function var_export;
 
@@ -231,6 +231,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     false,
                     null,
                     null
@@ -255,6 +256,7 @@ JSON
                 'logs' => new Logs(
                     null,
                     'report.html',
+                    null,
                     null,
                     null,
                     null,
@@ -287,6 +289,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     false,
                     null,
                     null
@@ -315,6 +318,36 @@ JSON
                     'json.log',
                     null,
                     null,
+                    null,
+                    false,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][gitlab] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "gitlab": "gitlab.log"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    'gitlab.log',
+                    null,
+                    null,
                     false,
                     null,
                     null
@@ -337,6 +370,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     null,
                     null,
@@ -365,6 +399,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     null,
                     null,
@@ -401,6 +436,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     false,
                     StrykerConfig::forBadge('master'),
                     null
@@ -425,6 +461,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     null,
                     null,
@@ -461,6 +498,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     false,
                     StrykerConfig::forBadge('/^foo$/'),
                     null
@@ -485,6 +523,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     null,
                     null,
@@ -519,6 +558,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     false,
                     null,
                     'summary.json'
@@ -537,6 +577,7 @@ JSON
         "html": "report.html",
         "summary": "summary.log",
         "json": "json.log",
+        "gitlab": "gitlab.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
         "github": true,
@@ -555,6 +596,7 @@ JSON
                     'report.html',
                     'summary.log',
                     'json.log',
+                    'gitlab.log',
                     'debug.log',
                     'perMutator.log',
                     true,
@@ -623,6 +665,7 @@ JSON
         "html": " report.html ",
         "summary": " summary.log ",
         "json": " json.log ",
+        "gitlab": " gitlab.log",
         "debug": " debug.log ",
         "perMutator": " perMutator.log ",
         "github": true ,
@@ -641,6 +684,7 @@ JSON
                     'report.html',
                     'summary.log',
                     'json.log',
+                    'gitlab.log',
                     'debug.log',
                     'perMutator.log',
                     true,
@@ -912,7 +956,7 @@ JSON
             ]),
         ];
 
-        foreach (TestFrameworkTypes::TYPES as $testFrameworkType) {
+        foreach (TestFrameworkTypes::getTypes() as $testFrameworkType) {
             yield '[testFramework] ' . $testFrameworkType => (static function () use (
                 $testFrameworkType
             ): array {
@@ -2275,6 +2319,7 @@ JSON
         "html": "report.html",
         "summary": "summary.log",
         "json": "json.log",
+        "gitlab": "gitlab.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
         "github": true,
@@ -2515,6 +2560,7 @@ JSON
                     'report.html',
                     'summary.log',
                     'json.log',
+                    'gitlab.log',
                     'debug.log',
                     'perMutator.log',
                     true,

@@ -187,5 +187,19 @@ $b = $a('Bar', 0, -1);
 PHP
             ,
         ];
+
+        yield 'It mutates correctly complex code with dynamic method name. Related to https://github.com/infection/infection/issues/1799' => [
+            <<<'PHP'
+<?php
+
+$object->{substr($key, 0, -2)}();
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$object->{$key}();
+PHP
+        ];
     }
 }

@@ -45,7 +45,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -57,7 +57,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private ?DOMDocument $dom = null;
 
-    public function __construct(private string $tmpDir, private string $originalXmlConfigContent, private XmlConfigurationManipulator $configManipulator, private string $projectDir, private JUnitTestCaseSorter $jUnitTestCaseSorter)
+    public function __construct(private readonly string $tmpDir, private readonly string $originalXmlConfigContent, private readonly XmlConfigurationManipulator $configManipulator, private readonly string $projectDir, private readonly JUnitTestCaseSorter $jUnitTestCaseSorter)
     {
     }
 

@@ -37,7 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use const PHP_EOL;
 use RuntimeException;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal

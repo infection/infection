@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
+use function array_flip;
 use Generator;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\DetectionStatus;
 use function iterator_to_array;
-use function Safe\array_flip;
 
 /**
  * @internal
@@ -49,7 +49,7 @@ use function Safe\array_flip;
  */
 class TargetDetectionStatusesProvider
 {
-    public function __construct(private Logs $logConfig, private string $logVerbosity, private bool $onlyCoveredMode, private bool $showMutations)
+    public function __construct(private readonly Logs $logConfig, private readonly string $logVerbosity, private readonly bool $onlyCoveredMode, private readonly bool $showMutations)
     {
     }
 
@@ -116,6 +116,10 @@ class TargetDetectionStatusesProvider
         }
 
         if ($this->logConfig->getUseGitHubAnnotationsLogger()) {
+            yield DetectionStatus::ESCAPED;
+        }
+
+        if ($this->logConfig->getGitlabLogFilePath() !== null) {
             yield DetectionStatus::ESCAPED;
         }
 

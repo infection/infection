@@ -60,7 +60,7 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
  */
 final class Engine
 {
-    public function __construct(private Configuration $config, private TestFrameworkAdapter $adapter, private CoverageChecker $coverageChecker, private EventDispatcher $eventDispatcher, private InitialTestsRunner $initialTestsRunner, private MemoryLimiter $memoryLimiter, private MutationGenerator $mutationGenerator, private MutationTestingRunner $mutationTestingRunner, private MinMsiChecker $minMsiChecker, private ConsoleOutput $consoleOutput, private MetricsCalculator $metricsCalculator, private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter)
+    public function __construct(private readonly Configuration $config, private readonly TestFrameworkAdapter $adapter, private readonly CoverageChecker $coverageChecker, private readonly EventDispatcher $eventDispatcher, private readonly InitialTestsRunner $initialTestsRunner, private readonly MemoryLimiter $memoryLimiter, private readonly MutationGenerator $mutationGenerator, private readonly MutationTestingRunner $mutationTestingRunner, private readonly MinMsiChecker $minMsiChecker, private readonly ConsoleOutput $consoleOutput, private readonly MetricsCalculator $metricsCalculator, private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter)
     {
     }
 

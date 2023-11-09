@@ -38,7 +38,7 @@ namespace Infection\Mutant;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 
@@ -48,7 +48,9 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResultFactory
 {
-    public function __construct(private TestFrameworkAdapter $testFrameworkAdapter)
+    private const PROCESS_MIN_ERROR_CODE = 100;
+
+    public function __construct(private readonly TestFrameworkAdapter $testFrameworkAdapter)
     {
     }
 
@@ -101,7 +103,7 @@ class MutantExecutionResultFactory
 
         $process = $mutantProcess->getProcess();
 
-        if ($process->getExitCode() > 100) {
+        if ($process->getExitCode() > self::PROCESS_MIN_ERROR_CODE) {
             // See \Symfony\Component\Process\Process::$exitCodes
             return DetectionStatus::ERROR;
         }

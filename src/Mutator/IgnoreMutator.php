@@ -39,7 +39,7 @@ use DomainException;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use PhpParser\Node;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * The mutators implement the ignore + canMutator pattern. The downside of this pattern is that
@@ -61,7 +61,7 @@ final class IgnoreMutator implements Mutator
     /**
      * @param Mutator<TNode> $mutator
      */
-    public function __construct(private IgnoreConfig $config, private Mutator $mutator)
+    public function __construct(private readonly IgnoreConfig $config, private readonly Mutator $mutator)
     {
     }
 

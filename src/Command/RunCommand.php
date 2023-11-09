@@ -125,6 +125,9 @@ final class RunCommand extends BaseCommand
     /** @var string */
     private const OPTION_LOGGER_GITHUB = 'logger-github';
 
+    /** @var string */
+    private const OPTION_LOGGER_GITLAB = 'logger-gitlab';
+
     private const OPTION_LOGGER_HTML = 'logger-html';
 
     private const OPTION_USE_NOOP_MUTATORS = 'noop';
@@ -166,7 +169,7 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the Test framework to use ("%s")',
-                    implode('", "', TestFrameworkTypes::TYPES)
+                    implode('", "', TestFrameworkTypes::getTypes())
                 ),
                 Container::DEFAULT_TEST_FRAMEWORK
             )
@@ -273,6 +276,12 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_OPTIONAL,
                 'Log escaped Mutants as GitHub Annotations (automatically detected on Github Actions itself, use <comment>true</comment> to force-enable or <comment>false</comment> to force-disable it).',
                 false
+            )
+            ->addOption(
+                self::OPTION_LOGGER_GITLAB,
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Path to log escaped Mutants in the GitLab (Code Climate) JSON format.',
             )
             ->addOption(
                 self::OPTION_LOGGER_HTML,
@@ -404,6 +413,7 @@ final class RunCommand extends BaseCommand
         $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
         $testFrameworkExtraOptions = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK_OPTIONS));
         $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
+        $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
 
         /** @var string|null $minMsi */
@@ -489,6 +499,7 @@ final class RunCommand extends BaseCommand
             $isForGitDiffLines,
             $gitDiffBase,
             $this->getUseGitHubLogger($input),
+            $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES)
@@ -569,7 +580,7 @@ final class RunCommand extends BaseCommand
     {
         try {
             $locator->locateOneOf(SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES);
-        } catch (FileNotFound|FileOrDirectoryNotFound $exception) {
+        } catch (FileNotFound|FileOrDirectoryNotFound) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [

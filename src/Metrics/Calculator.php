@@ -49,7 +49,7 @@ final class Calculator
 
     private ?float $coveredMutationScoreIndicator = null;
 
-    public function __construct(private int $roundingPrecision, private int $killedCount, private int $errorCount, private int $timedOutCount, private int $notTestedCount, private int $totalCount)
+    public function __construct(private readonly int $roundingPrecision, private readonly int $killedCount, private readonly int $errorCount, private readonly int $timedOutCount, private readonly int $notTestedCount, private readonly int $totalCount)
     {
     }
 

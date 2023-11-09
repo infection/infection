@@ -45,13 +45,8 @@ use Symfony\Component\Console\Question\Question;
  */
 final class TextLogFileProvider
 {
-    private ConsoleHelper $consoleHelper;
-    private QuestionHelper $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    public function __construct(private readonly ConsoleHelper $consoleHelper, private readonly QuestionHelper $questionHelper)
     {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
     }
 
     /**

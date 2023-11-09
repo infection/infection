@@ -38,7 +38,7 @@ namespace Infection\Tests\AutoReview;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 

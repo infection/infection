@@ -39,7 +39,6 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use const PHP_VERSION_ID;
 use PhpParser\Node;
 
 /**
@@ -79,7 +78,6 @@ DIFF
 
     public function canMutate(Node $node): bool
     {
-        return PHP_VERSION_ID >= 80000
-            && $node instanceof Node\Expr\NullsafePropertyFetch;
+        return $node instanceof Node\Expr\NullsafePropertyFetch;
     }
 }

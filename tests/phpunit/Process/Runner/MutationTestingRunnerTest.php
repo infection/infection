@@ -61,7 +61,7 @@ use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -135,7 +135,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(0),
+                new MutationTestingWasStarted(0, $this->processRunnerMock),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -214,7 +214,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(3),
+                new MutationTestingWasStarted(3, $this->processRunnerMock),
                 $this->createMock(MutantProcessWasFinished::class),
                 new MutationTestingWasFinished(),
             ],
@@ -298,7 +298,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(0),
+                new MutationTestingWasStarted(0, $this->processRunnerMock),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -363,7 +363,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(0),
+                new MutationTestingWasStarted(0, $this->processRunnerMock),
                 new MutantProcessWasFinished(MutantExecutionResult::createFromNonCoveredMutant($mutant)),
                 new MutationTestingWasFinished(),
             ],
@@ -431,7 +431,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(0),
+                new MutationTestingWasStarted(0, $this->processRunnerMock),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()

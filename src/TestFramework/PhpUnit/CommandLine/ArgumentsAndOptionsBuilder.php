@@ -46,14 +46,17 @@ use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function ltrim;
 use function preg_quote;
 use function rtrim;
-use function Safe\sprintf;
+use function sprintf;
+use function version_compare;
 
 /**
  * @internal
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    public function __construct(private bool $executeOnlyCoveringTestCases)
+    private const MAX_EXPLODE_PARTS = 2;
+
+    public function __construct(private readonly bool $executeOnlyCoveringTestCases)
     {
     }
 
@@ -77,7 +80,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
     /**
      * @param TestLocation[] $tests
      */
-    public function buildForMutant(string $configPath, string $extraOptions, array $tests): array
+    public function buildForMutant(string $configPath, string $extraOptions, array $tests, string $testFrameworkVersion): array
     {
         $options = $this->buildForInitialTestsRun($configPath, $extraOptions);
 
@@ -88,11 +91,17 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
             foreach ($tests as $testLocation) {
                 $testCaseString = $testLocation->getMethod();
 
-                $partsDelimitedByColons = explode('::', $testCaseString, 2);
+                $partsDelimitedByColons = explode('::', $testCaseString, self::MAX_EXPLODE_PARTS);
 
                 if (count($partsDelimitedByColons) > 1) {
-                    $parts = explode('\\', $partsDelimitedByColons[0]);
-                    $testCaseString = sprintf('%s::%s', end($parts), $partsDelimitedByColons[1]);
+                    $methodNameWithDataProvider = $this->getMethodNameWithDataProvider($partsDelimitedByColons[1], $testFrameworkVersion);
+
+                    $testClassFullyQualifiedClassName = $partsDelimitedByColons[0];
+
+                    $parts = explode('\\', $testClassFullyQualifiedClassName);
+                    $classNameWithoutNamespace = end($parts);
+
+                    $testCaseString = sprintf('%s::%s', $classNameWithoutNamespace, $methodNameWithDataProvider);
                 }
 
                 if (array_key_exists($testCaseString, $usedTestCases)) {
@@ -111,5 +120,29 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         }
 
         return $options;
+    }
+
+    private function getMethodNameWithDataProvider(string $methodNameWithDataProvider, string $testFrameworkVersion): string
+    {
+        $methodNameWithDataProviderResult = $methodNameWithDataProvider;
+
+        /*
+         * in PHPUnit >=10 data providers with keys are stored as `Class\\test_method#some key`
+         * in PHPUnit <10 data providers with keys are stored as `Class\\test_method with data set "some key"`
+         *
+         * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
+         */
+        if (version_compare($testFrameworkVersion, '10', '>=')) {
+            $methodNameParts = explode('#', $methodNameWithDataProviderResult, self::MAX_EXPLODE_PARTS);
+
+            if (count($methodNameParts) > 1) {
+                $methodName = $methodNameParts[0];
+                $dataProviderKey = $methodNameParts[1];
+
+                $methodNameWithDataProviderResult = sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
+            }
+        }
+
+        return $methodNameWithDataProviderResult;
     }
 }

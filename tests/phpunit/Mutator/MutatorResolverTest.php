@@ -53,7 +53,7 @@ use Infection\Mutator\ProfileList;
 use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 
 final class MutatorResolverTest extends TestCase
 {

@@ -48,7 +48,7 @@ class FilteringResultsCollector implements Collector
     /**
      * @param array<string, mixed> $targetDetectionStatuses
      */
-    public function __construct(private Collector $targetCollector, private array $targetDetectionStatuses)
+    public function __construct(private readonly Collector $targetCollector, private readonly array $targetDetectionStatuses)
     {
     }
 
