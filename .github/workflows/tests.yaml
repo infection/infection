@@ -32,6 +32,8 @@ jobs:
           - php-version: '8.1'
             symfony-version: '7.*.*'
           - dependencies: 'locked'
+            symfony-version: '6.*.*'
+          - dependencies: 'locked'
             symfony-version: '7.*.*'
 
     name: Tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependencies }}; Symfony ${{ matrix.symfony-version }}), using ${{ matrix.coverage-driver }}
