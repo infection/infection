@@ -20,7 +20,7 @@ jobs:
         with:
           php-version: 8.1
           ini-values: memory_limit=512M, xdebug.mode=off
-          tools: 'composer:v2.1'
+          tools: 'composer'
         env:
           # This is necessary when installing a tool with a specific version
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
