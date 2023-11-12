@@ -33,58 +33,10 @@
 
 declare(strict_types=1);
 
-use Isolated\Symfony\Component\Finder\Finder;
-
-// see https://github.com/humbug/php-scoper/blob/0ed64857e86ae9ea4f5889c34e153f2cdbe968b5/docs/further-reading.md#polyfills
-$polyfillsBootstraps = \array_map(
-    static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
-    \iterator_to_array(
-        Finder::create()
-            ->files()
-            ->in(__DIR__ . '/vendor/symfony/polyfill-*')
-            ->name('bootstrap*.php'),
-        false,
-    ),
-);
-
-$polyfillsStubs = \array_map(
-    static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
-    \iterator_to_array(
-        Finder::create()
-            ->files()
-            ->in(__DIR__ . '/vendor/symfony/polyfill-*/Resources/stubs')
-            ->name('*.php'),
-        false,
-    ),
-);
-
 return [
-    'whitelist' => [
-        // PHP 8.0
-        'T_NAME_QUALIFIED',
-        'T_NAME_FULLY_QUALIFIED',
-        'T_NAME_RELATIVE',
-        'T_MATCH',
-        'T_NULLSAFE_OBJECT_OPERATOR',
-        'T_ATTRIBUTE',
-        // PHP 8.1
-        'T_AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG',
-        'T_AMPERSAND_FOLLOWED_BY_VAR_OR_VARARG',
-        'T_ENUM',
-        'T_READONLY',
-    ],
     'prefix' => 'Infected',
-    'exclude-classes' => [\Composer\InstalledVersions::class],
-    'exclude-namespaces' => [
-        'Symfony\Polyfill',
-    ],
     'exclude-constants' => [
         // Symfony global constants
         '/^SYMFONY\_[\p{L}_]+$/',
-    ],
-    'exclude-files' => [
-        'vendor/composer/InstalledVersions.php',
-        ...$polyfillsBootstraps,
-        ...$polyfillsStubs,
     ],
 ];

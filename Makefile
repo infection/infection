@@ -15,7 +15,7 @@ help:
 # Variables
 #---------------------------------------------------------------------------
 BOX=./.tools/box
-BOX_URL="https://github.com/humbug/box/releases/download/3.16.0/box.phar"
+BOX_URL="https://github.com/humbug/box/releases/download/4.5.1/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
 PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.16.0/php-cs-fixer.phar"
@@ -221,10 +221,13 @@ $(PSALM): Makefile
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	composer require infection/codeception-adapter infection/phpspec-adapter
+	# Workaround for https://github.com/box-project/box/issues/580
+	composer install --no-dev
 	$(BOX) --version
 	$(BOX) validate
 	$(BOX) compile
 	composer remove infection/codeception-adapter infection/phpspec-adapter
+	composer install
 	touch -c $@
 
 vendor: composer.lock
