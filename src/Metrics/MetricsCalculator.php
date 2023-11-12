@@ -39,7 +39,7 @@ use function array_key_exists;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -55,7 +55,7 @@ class MetricsCalculator implements Collector
 
     private ?Calculator $calculator = null;
 
-    public function __construct(private int $roundingPrecision)
+    public function __construct(private readonly int $roundingPrecision)
     {
         foreach (DetectionStatus::ALL as $status) {
             $this->countByStatus[$status] = 0;

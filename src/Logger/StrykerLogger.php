@@ -46,14 +46,14 @@ use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Psr\Log\LoggerInterface;
 use function Safe\json_encode;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
  */
 final class StrykerLogger implements MutationTestingResultsLogger
 {
-    public function __construct(private BuildContextResolver $buildContextResolver, private StrykerApiKeyResolver $strykerApiKeyResolver, private StrykerDashboardClient $strykerDashboardClient, private MetricsCalculator $metricsCalculator, private StrykerHtmlReportBuilder $strykerHtmlReportBuilder, private StrykerConfig $strykerConfig, private LoggerInterface $logger)
+    public function __construct(private readonly BuildContextResolver $buildContextResolver, private readonly StrykerApiKeyResolver $strykerApiKeyResolver, private readonly StrykerDashboardClient $strykerDashboardClient, private readonly MetricsCalculator $metricsCalculator, private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder, private readonly StrykerConfig $strykerConfig, private readonly LoggerInterface $logger)
     {
     }
 

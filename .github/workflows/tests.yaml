@@ -15,20 +15,26 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
 
     strategy:
+      fail-fast: false
       matrix:
         operating-system: [ ubuntu-latest ]
-        php-version: [ '8.0', '8.1', '8.2' ]
-        # TODO: include highest & lowest
-        dependencies: [ locked ]
+        php-version: [ '8.1', '8.2', '8.3' ]
+        dependencies: [ locked, lowest, highest ]
         coverage-driver: [ pcov, xdebug ]
-        # TODO: include Symfony6 later
-        symfony-version: [ '5.4.*' ]
+        symfony-version: [ '5.4.*', '6.*.*', '7.*.*' ]
         include:
           - operating-system: windows-latest
-            php-version: '8.0'
+            php-version: '8.1'
             dependencies: locked
             coverage-driver: xdebug
             symfony-version: '5.4.*'
+        exclude:
+          - php-version: '8.1'
+            symfony-version: '7.*.*'
+          - dependencies: 'locked'
+            symfony-version: '6.*.*'
+          - dependencies: 'locked'
+            symfony-version: '7.*.*'
 
     name: Tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependencies }}; Symfony ${{ matrix.symfony-version }}), using ${{ matrix.coverage-driver }}
 
@@ -48,13 +54,25 @@ jobs:
         if: matrix.dependencies != 'locked'
         run: composer config --unset platform.php
 
+      - name: Configure for PHP >= 8.3
+        if: "matrix.php-version >= '8.3'"
+        run: composer config platform.php 8.2.99
+
+      - name: Configure minimum-stability
+        if: matrix.symfony-version == '7.*.*'
+        run: composer config minimum-stability dev
+
       - name: Enforce the Symfony version used
-        if: ${{ matrix.symfony-version }}
+        if: matrix.dependencies != 'locked'
         run: composer config extra.symfony.require ${{ matrix.symfony-version }}
+
+      - name: Disable deprecations for non-locked dependencies
+        if: matrix.dependencies != 'locked'
+        run: echo "SYMFONY_DEPRECATIONS_HELPER=max[self]=0" >> $GITHUB_ENV
 
       # See https://symfony.com/doc/current/bundles/best_practices.html#require-a-specific-symfony-version
       - name: Install Flex
-        if: ${{ matrix.symfony-version }}
+        if: matrix.dependencies != 'locked'
         run: |
             composer global config --no-plugins allow-plugins.symfony/flex true
             composer global require --no-progress --no-scripts --no-plugins symfony/flex

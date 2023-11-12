@@ -49,7 +49,7 @@ use function libxml_get_errors;
 use function libxml_use_internal_errors;
 use LibXMLError;
 use LogicException;
-use function Safe\sprintf;
+use function sprintf;
 use function version_compare;
 use Webmozart\Assert\Assert;
 
@@ -58,7 +58,7 @@ use Webmozart\Assert\Assert;
  */
 final class XmlConfigurationManipulator
 {
-    public function __construct(private PathReplacer $pathReplacer, private string $phpUnitConfigDir)
+    public function __construct(private readonly PathReplacer $pathReplacer, private readonly string $phpUnitConfigDir)
     {
     }
 
@@ -82,11 +82,11 @@ final class XmlConfigurationManipulator
     public function removeExistingLoggers(SafeDOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {
-            $node->parentNode->removeChild($node);
+            $node->parentNode?->removeChild($node);
         }
 
         foreach ($xPath->query('/phpunit/coverage/report') as $node) {
-            $node->parentNode->removeChild($node);
+            $node->parentNode?->removeChild($node);
         }
     }
 
@@ -159,6 +159,15 @@ final class XmlConfigurationManipulator
     public function addOrUpdateCoverageIncludeNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
     {
         $this->addOrUpdateCoverageNodes('coverage', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
+    }
+
+    /**
+     * @param string[] $srcDirs
+     * @param list<string> $filteredSourceFilesToMutate
+     */
+    public function addOrUpdateSourceIncludeNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
+    {
+        $this->addOrUpdateCoverageNodes('source', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
 
     public function validate(string $configPath, SafeDOMXPath $xPath): bool
@@ -350,7 +359,7 @@ final class XmlConfigurationManipulator
     private function removeCoverageChildNode(SafeDOMXPath $xPath, string $nodeQuery): void
     {
         foreach ($xPath->query($nodeQuery) as $node) {
-            $node->parentNode->removeChild($node);
+            $node->parentNode?->removeChild($node);
         }
     }
 

@@ -49,12 +49,12 @@ use Webmozart\Assert\Assert;
 final class RootsFileOrDirectoryLocator implements Locator
 {
     /** @var string[] */
-    private array $roots;
+    private readonly array $roots;
 
     /**
      * @param string[] $roots
      */
-    public function __construct(array $roots, private Filesystem $filesystem)
+    public function __construct(array $roots, private readonly Filesystem $filesystem)
     {
         Assert::allString($roots);
 

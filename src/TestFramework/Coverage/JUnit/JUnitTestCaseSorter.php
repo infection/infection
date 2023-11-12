@@ -35,11 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use function array_key_exists;
 use function count;
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use function Safe\usort;
+use function usort;
 
 /**
  * @internal

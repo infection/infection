@@ -46,6 +46,7 @@ trait LogsAssertions
         ?string $expectedHtmlLogFilePath,
         ?string $expectedSummaryLogFilePath,
         ?string $expectedJsonLogFilePath,
+        ?string $expectedGitlabLogFilePath,
         ?string $expectedDebugLogFilePath,
         ?string $expectedPerMutatorFilePath,
         bool $expectedUseGitHubAnnotationsLogger,
@@ -56,6 +57,7 @@ trait LogsAssertions
         $this->assertSame($expectedHtmlLogFilePath, $logs->getHtmlLogFilePath());
         $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
         $this->assertSame($expectedJsonLogFilePath, $logs->getJsonLogFilePath());
+        $this->assertSame($expectedGitlabLogFilePath, $logs->getGitlabLogFilePath());
         $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
         $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
         $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger(), 'Use GithubAnnotationLogger is incorrect');

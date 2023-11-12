@@ -54,42 +54,15 @@ class Configuration
         'default',
     ];
 
-    private float $timeout;
+    private readonly float $timeout;
     /** @var string[] */
-    private array $sourceDirectories;
-    /** @var iterable<SplFileInfo> */
-    private iterable $sourceFiles;
-    private string $sourceFilesFilter;
-    /** @var string[] */
-    private array $sourceFilesExcludes;
-    private Logs $logs;
-    private string $logVerbosity;
-    private string $tmpDir;
-    private PhpUnit $phpUnit;
+    private readonly array $sourceDirectories;
+    private readonly string $logVerbosity;
     /** @var array<string, Mutator<\PhpParser\Node>> */
-    private array $mutators;
-    private string $testFramework;
-    private ?string $bootstrap = null;
-    private ?string $initialTestsPhpOptions = null;
-    private string $testFrameworkExtraOptions;
-    private string $coveragePath;
-    private bool $skipCoverage;
-    private bool $skipInitialTests;
-    private bool $debug;
-    private bool $onlyCovered;
-    private bool $noProgress;
-    private bool $ignoreMsiWithNoMutations;
+    private readonly array $mutators;
+    private readonly string $testFramework;
     private ?float $minMsi = null;
-    private bool $showMutations;
-    private ?float $minCoveredMsi = null;
-    private int $msiPrecision;
-    private int $threadCount;
-    private bool $dryRun;
-    /** @var array<string, array<int, string>> */
-    private array $ignoreSourceCodeMutatorsMap;
-    private bool $executeOnlyCoveringTestCases;
-    private bool $isForGitDiffLines;
-    private ?string $gitDiffBase;
+    private readonly int $threadCount;
 
     /**
      * @param string[] $sourceDirectories
@@ -101,75 +74,51 @@ class Configuration
     public function __construct(
         float $timeout,
         array $sourceDirectories,
-        iterable $sourceFiles,
-        string $sourceFilesFilter,
-        array $sourceFilesExcludes,
-        Logs $logs,
+        private readonly iterable $sourceFiles,
+        private readonly string $sourceFilesFilter,
+        private readonly array $sourceFilesExcludes,
+        private readonly Logs $logs,
         string $logVerbosity,
-        string $tmpDir,
-        PhpUnit $phpUnit,
+        private readonly string $tmpDir,
+        private readonly PhpUnit $phpUnit,
         array $mutators,
         string $testFramework,
-        ?string $bootstrap,
-        ?string $initialTestsPhpOptions,
-        string $testFrameworkExtraOptions,
-        string $coveragePath,
-        bool $skipCoverage,
-        bool $skipInitialTests,
-        bool $debug,
-        bool $onlyCovered,
-        bool $noProgress,
-        bool $ignoreMsiWithNoMutations,
+        private readonly ?string $bootstrap,
+        private readonly ?string $initialTestsPhpOptions,
+        private readonly string $testFrameworkExtraOptions,
+        private readonly string $coveragePath,
+        private readonly bool $skipCoverage,
+        private readonly bool $skipInitialTests,
+        private readonly bool $debug,
+        private readonly bool $onlyCovered,
+        private readonly bool $noProgress,
+        private readonly bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
-        bool $showMutations,
-        ?float $minCoveredMsi,
-        int $msiPrecision,
+        private readonly bool $showMutations,
+        private readonly ?float $minCoveredMsi,
+        private readonly int $msiPrecision,
         int $threadCount,
-        bool $dryRun,
-        array $ignoreSourceCodeMutatorsMap,
-        bool $executeOnlyCoveringTestCases,
-        bool $isForGitDiffLines,
-        ?string $gitDiffBase
+        private readonly bool $dryRun,
+        private readonly array $ignoreSourceCodeMutatorsMap,
+        private readonly bool $executeOnlyCoveringTestCases,
+        private readonly bool $isForGitDiffLines,
+        private readonly ?string $gitDiffBase
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
         Assert::nullOrGreaterThanEq($minMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
 
         $this->timeout = $timeout;
         $this->sourceDirectories = $sourceDirectories;
-        $this->sourceFiles = $sourceFiles;
-        $this->sourceFilesFilter = $sourceFilesFilter;
-        $this->sourceFilesExcludes = $sourceFilesExcludes;
-        $this->logs = $logs;
         $this->logVerbosity = $logVerbosity;
-        $this->tmpDir = $tmpDir;
-        $this->phpUnit = $phpUnit;
         $this->mutators = $mutators;
         $this->testFramework = $testFramework;
-        $this->bootstrap = $bootstrap;
-        $this->initialTestsPhpOptions = $initialTestsPhpOptions;
-        $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
-        $this->coveragePath = $coveragePath;
-        $this->skipCoverage = $skipCoverage;
-        $this->skipInitialTests = $skipInitialTests;
-        $this->debug = $debug;
-        $this->onlyCovered = $onlyCovered;
-        $this->noProgress = $noProgress;
-        $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
         $this->minMsi = $minMsi;
-        $this->showMutations = $showMutations;
-        $this->minCoveredMsi = $minCoveredMsi;
-        $this->msiPrecision = $msiPrecision;
         $this->threadCount = $threadCount;
-        $this->dryRun = $dryRun;
-        $this->ignoreSourceCodeMutatorsMap = $ignoreSourceCodeMutatorsMap;
-        $this->executeOnlyCoveringTestCases = $executeOnlyCoveringTestCases;
-        $this->isForGitDiffLines = $isForGitDiffLines;
-        $this->gitDiffBase = $gitDiffBase;
     }
 
     public function getProcessTimeout(): float

@@ -47,7 +47,7 @@ use function Infection\Tests\normalizePath;
 use const PATH_SEPARATOR;
 use function Safe\putenv;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 

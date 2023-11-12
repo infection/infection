@@ -35,15 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
+use function array_flip;
 use function array_keys;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
+use function ksort;
 use PHPUnit\Framework\TestCase;
-use function Safe\array_flip;
-use function Safe\ksort;
 
 final class TargetDetectionStatusesProviderTest extends TestCase
 {
@@ -155,6 +155,22 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->expects($this->once())
             ->method('getUseGitHubAnnotationsLogger')
             ->willReturn(true)
+        ;
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+
+        $this->assertProvides([
+            DetectionStatus::ESCAPED,
+        ], $provider->get());
+    }
+
+    public function test_it_provides_escaped_when_using_gitlab_logger(): void
+    {
+        $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getGitlabLogFilePath')
+            ->willReturn('gitlab.json')
         ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);

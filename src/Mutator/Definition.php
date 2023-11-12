@@ -42,17 +42,17 @@ use Webmozart\Assert\Assert;
  */
 final class Definition
 {
-    private string $category;
+    private readonly string $category;
 
     /**
      * @param string $description Explanation on what the mutator is about
      * @param string|null $remedies Guidelines or recommendations on how to kill the generated mutations
      */
     public function __construct(
-        private string $description,
+        private readonly string $description,
         string $category,
-        private ?string $remedies,
-        private string $diff
+        private readonly ?string $remedies,
+        private readonly string $diff
     ) {
         Assert::oneOf($category, MutatorCategory::ALL);
         $this->category = $category;

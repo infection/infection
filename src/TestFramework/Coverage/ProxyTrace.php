@@ -54,7 +54,7 @@ class ProxyTrace implements Trace
     /**
      * @param Deferred<TestLocations> $lazyTestLocations
      */
-    public function __construct(private SplFileInfo $sourceFile, private ?Deferred $lazyTestLocations = null)
+    public function __construct(private readonly SplFileInfo $sourceFile, private readonly ?Deferred $lazyTestLocations = null)
     {
     }
 

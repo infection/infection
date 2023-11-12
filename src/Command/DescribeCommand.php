@@ -41,7 +41,7 @@ use Infection\Console\IO;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Question\Question;
 use Webmozart\Assert\Assert;

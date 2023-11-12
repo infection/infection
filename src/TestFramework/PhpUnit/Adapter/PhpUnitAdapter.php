@@ -47,7 +47,7 @@ use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\VersionParser;
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
 use function trim;
 use function version_compare;
 
@@ -57,13 +57,13 @@ use function version_compare;
  */
 class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
 {
-    public const COVERAGE_DIR = 'coverage-xml';
+    final public const COVERAGE_DIR = 'coverage-xml';
 
     public function __construct(
         string $testFrameworkExecutable,
-        private string $tmpDir,
-        private string $jUnitFilePath,
-        private PCOVDirectoryProvider $pcovDirectoryProvider,
+        private readonly string $tmpDir,
+        private readonly string $jUnitFilePath,
+        private readonly PCOVDirectoryProvider $pcovDirectoryProvider,
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,

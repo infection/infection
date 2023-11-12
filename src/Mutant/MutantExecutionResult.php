@@ -50,8 +50,8 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResult
 {
-    private string $detectionStatus;
-    private string $mutatorName;
+    private readonly string $detectionStatus;
+    private readonly string $mutatorName;
 
     /**
      * @param Deferred<string> $mutantDiff
@@ -60,20 +60,20 @@ class MutantExecutionResult
      * @param TestLocation[] $tests
      */
     public function __construct(
-        private string $processCommandLine,
-        private string $processOutput,
+        private readonly string $processCommandLine,
+        private readonly string $processOutput,
         string $detectionStatus,
-        private Deferred $mutantDiff,
-        private string $mutantHash,
+        private readonly Deferred $mutantDiff,
+        private readonly string $mutantHash,
         string $mutatorName,
-        private string $originalFilePath,
-        private int $originalStartingLine,
-        private int $originalEndingLine,
-        private int $originalStartFilePosition,
-        private int $originalEndFilePosition,
-        private Deferred $originalCode,
-        private Deferred $mutatedCode,
-        private array $tests
+        private readonly string $originalFilePath,
+        private readonly int $originalStartingLine,
+        private readonly int $originalEndingLine,
+        private readonly int $originalStartFilePosition,
+        private readonly int $originalEndFilePosition,
+        private readonly Deferred $originalCode,
+        private readonly Deferred $mutatedCode,
+        private readonly array $tests
     ) {
         Assert::oneOf($detectionStatus, DetectionStatus::ALL);
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));

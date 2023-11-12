@@ -39,7 +39,7 @@ use function array_key_exists;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -52,7 +52,7 @@ class ResultsCollector implements Collector
      */
     private array $resultsByStatus = [];
 
-    private SortableMutantExecutionResults $allExecutionResults;
+    private readonly SortableMutantExecutionResults $allExecutionResults;
 
     public function __construct()
     {

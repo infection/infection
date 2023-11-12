@@ -48,7 +48,9 @@ use Infection\TestFramework\Coverage\Trace;
  */
 class JUnitTestExecutionInfoAdder
 {
-    public function __construct(private TestFrameworkAdapter $adapter, private TestFileDataProvider $testFileDataProvider)
+    private const MAX_EXPLODE_PARTS = 2;
+
+    public function __construct(private readonly TestFrameworkAdapter $adapter, private readonly TestFileDataProvider $testFileDataProvider)
     {
     }
 
@@ -94,7 +96,7 @@ class JUnitTestExecutionInfoAdder
 
     private function createCompleteTestLocation(TestLocation $test): TestLocation
     {
-        $class = explode(':', $test->getMethod(), 2)[0];
+        $class = explode(':', $test->getMethod(), self::MAX_EXPLODE_PARTS)[0];
 
         $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
 

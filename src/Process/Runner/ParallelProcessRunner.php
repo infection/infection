@@ -52,6 +52,10 @@ use Webmozart\Assert\Assert;
  */
 final class ParallelProcessRunner implements ProcessRunner
 {
+    private const POLL_WAIT_IN_MS = 1000;
+
+    private const NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
+
     /**
      * @var array<int, IndexedProcessBearer>
      */
@@ -61,11 +65,18 @@ final class ParallelProcessRunner implements ProcessRunner
      */
     private array $availableThreadIndexes = [];
 
+    private bool $shouldStop = false;
+
     /**
      * @param int $poll Delay (in milliseconds) to wait in-between two polls
      */
-    public function __construct(private int $threadCount, private int $poll = 1000)
+    public function __construct(private readonly int $threadCount, private readonly int $poll = self::POLL_WAIT_IN_MS)
     {
+    }
+
+    public function stop(): void
+    {
+        $this->shouldStop = true;
     }
 
     public function run(iterable $processes): void
@@ -92,6 +103,10 @@ final class ParallelProcessRunner implements ProcessRunner
 
         // start the initial batch of processes
         while ($process = array_shift($bucket)) {
+            if ($this->shouldStop) {
+                break;
+            }
+
             $threadIndex = array_shift($this->availableThreadIndexes);
 
             Assert::integer($threadIndex, 'Thread index can not be null.');
@@ -170,7 +185,7 @@ final class ParallelProcessRunner implements ProcessRunner
         $bucket[] = $input->current();
         $input->next();
 
-        return (int) (microtime(true) - $start) * 1_000_000; // ns to ms
+        return (int) (microtime(true) - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
     }
 
     /**

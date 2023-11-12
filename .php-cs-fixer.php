@@ -154,6 +154,7 @@ return (new Config())
         'phpdoc_no_empty_return' => true,
         'phpdoc_order' => true,
         'phpdoc_summary' => false,
+        'phpdoc_separation' => false,
         'self_static_accessor' => true,
         'single_line_throw' => false,
         'static_lambda' => true,

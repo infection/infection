@@ -41,11 +41,11 @@ use function count;
 use function implode;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
+use function ksort;
 use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
-use function Safe\ksort;
-use function Safe\sprintf;
+use function sprintf;
 use function str_pad;
 use const STR_PAD_LEFT;
 use const STR_PAD_RIGHT;
@@ -57,7 +57,9 @@ use function strlen;
  */
 final class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
-    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector)
+    private const ROUND_PRECISION = 2;
+
+    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector)
     {
     }
 
@@ -99,14 +101,14 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
     {
         return sprintf(
             '%0.2f',
-            round($score, 2, PHP_ROUND_HALF_UP)
+            round($score, self::ROUND_PRECISION, PHP_ROUND_HALF_UP)
         );
     }
 
     /**
      * @param string[][] $table
      *
-     * @return string[];
+     * @return string[]
      */
     private static function formatTable(array $table): array
     {

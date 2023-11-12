@@ -58,7 +58,7 @@ class MutationTestingRunner
     /**
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
-    public function __construct(private MutantProcessFactory $processFactory, private MutantFactory $mutantFactory, private ProcessRunner $processRunner, private EventDispatcher $eventDispatcher, private Filesystem $fileSystem, private DiffSourceCodeMatcher $diffSourceCodeMatcher, private bool $runConcurrently, private float $timeout, private array $ignoreSourceCodeMutatorsMap)
+    public function __construct(private readonly MutantProcessFactory $processFactory, private readonly MutantFactory $mutantFactory, private readonly ProcessRunner $processRunner, private readonly EventDispatcher $eventDispatcher, private readonly Filesystem $fileSystem, private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher, private bool $runConcurrently, private readonly float $timeout, private readonly array $ignoreSourceCodeMutatorsMap)
     {
     }
 
@@ -68,7 +68,7 @@ class MutationTestingRunner
     public function run(iterable $mutations, string $testFrameworkExtraOptions): void
     {
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
-        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
+        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
 
         $processes = take($mutations)
             ->cast(fn (Mutation $mutation): Mutant => $this->mutantFactory->create($mutation))

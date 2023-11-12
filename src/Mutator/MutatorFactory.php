@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function array_flip;
 use function end;
 use function explode;
 use function is_a;
-use function Safe\array_flip;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -56,6 +56,7 @@ final class MutatorFactory
     {
         $mutators = [];
 
+        /** @var array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, string> $knownMutatorClassNames */
         $knownMutatorClassNames = array_flip(ProfileList::ALL_MUTATORS);
 
         foreach ($resolvedMutators as $mutatorClassName => $config) {
@@ -72,11 +73,11 @@ final class MutatorFactory
                 )
             );
 
-            /** @var mixed[] $settings */
             $settings = (array) ($config['settings'] ?? []);
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
 
+            /** @var Mutator<\PhpParser\Node> $mutator */
             $mutator =
                 is_a($mutatorClassName, ConfigurableMutator::class, true) ?
                     self::getConfigurableMutator($mutatorClassName, $settings) :

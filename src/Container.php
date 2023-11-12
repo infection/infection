@@ -62,12 +62,14 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
 use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
+use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
@@ -145,9 +147,9 @@ use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use function Safe\getcwd;
-use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
+use function sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -171,6 +173,7 @@ final class Container
     public const DEFAULT_GIT_DIFF_LINES = false;
     public const DEFAULT_GIT_DIFF_BASE = null;
     public const DEFAULT_USE_GITHUB_LOGGER = null;
+    public const DEFAULT_GITLAB_LOGGER_PATH = null;
     public const DEFAULT_HTML_LOGGER_PATH = null;
     public const DEFAULT_USE_NOOP_MUTATORS = false;
     public const DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
@@ -382,7 +385,9 @@ final class Container
                 $container->getMutationTestingConsoleLoggerSubscriberFactory(),
                 $container->getMutationTestingResultsLoggerSubscriberFactory(),
                 $container->getPerformanceLoggerSubscriberFactory(),
-                $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory()
+                $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
+                $container->getStopInfectionOnSigintSignalSubscriberFactory(),
+                $container->getDispatchPcntlSignalSubscriberFactory(),
             ),
             CleanUpAfterMutationTestingFinishedSubscriberFactory::class => static function (self $container): CleanUpAfterMutationTestingFinishedSubscriberFactory {
                 $config = $container->getConfiguration();
@@ -393,6 +398,8 @@ final class Container
                     $config->getTmpDir()
                 );
             },
+            StopInfectionOnSigintSignalSubscriberFactory::class => static fn (self $container): StopInfectionOnSigintSignalSubscriberFactory => new StopInfectionOnSigintSignalSubscriberFactory(),
+            DispatchPcntlSignalSubscriberFactory::class => static fn (self $container): DispatchPcntlSignalSubscriberFactory => new DispatchPcntlSignalSubscriberFactory(),
             InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
 
@@ -433,7 +440,8 @@ final class Container
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
                 $container->getStopwatch(),
                 $container->getTimeFormatter(),
-                $container->getMemoryFormatter()
+                $container->getMemoryFormatter(),
+                $container->getConfiguration()->getThreadCount()
             ),
             CommandLineBuilder::class => static fn (): CommandLineBuilder => new CommandLineBuilder(),
             SourceFileCollector::class => static fn (): SourceFileCollector => new SourceFileCollector(),
@@ -581,6 +589,7 @@ final class Container
             self::DEFAULT_GIT_DIFF_LINES,
             self::DEFAULT_GIT_DIFF_BASE,
             self::DEFAULT_USE_GITHUB_LOGGER,
+            self::DEFAULT_GITLAB_LOGGER_PATH,
             self::DEFAULT_HTML_LOGGER_PATH,
             self::DEFAULT_USE_NOOP_MUTATORS,
             self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES
@@ -615,6 +624,7 @@ final class Container
         bool $isForGitDiffLines,
         ?string $gitDiffBase,
         ?bool $useGitHubLogger,
+        ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases
@@ -683,6 +693,7 @@ final class Container
                 $isForGitDiffLines,
                 $gitDiffBase,
                 $useGitHubLogger,
+                $gitlabLogFilePath,
                 $htmlLogFilePath,
                 $useNoopMutators,
                 $executeOnlyCoveringTestCases
@@ -947,6 +958,16 @@ final class Container
     public function getCleanUpAfterMutationTestingFinishedSubscriberFactory(): CleanUpAfterMutationTestingFinishedSubscriberFactory
     {
         return $this->get(CleanUpAfterMutationTestingFinishedSubscriberFactory::class);
+    }
+
+    public function getStopInfectionOnSigintSignalSubscriberFactory(): StopInfectionOnSigintSignalSubscriberFactory
+    {
+        return $this->get(StopInfectionOnSigintSignalSubscriberFactory::class);
+    }
+
+    public function getDispatchPcntlSignalSubscriberFactory(): DispatchPcntlSignalSubscriberFactory
+    {
+        return $this->get(DispatchPcntlSignalSubscriberFactory::class);
     }
 
     public function getInitialTestsConsoleLoggerSubscriberFactory(): InitialTestsConsoleLoggerSubscriberFactory

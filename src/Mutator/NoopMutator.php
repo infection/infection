@@ -37,7 +37,7 @@ namespace Infection\Mutator;
 
 use DomainException;
 use PhpParser\Node;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -50,7 +50,7 @@ final class NoopMutator implements Mutator
     /**
      * @param Mutator<TNode> $mutator
      */
-    public function __construct(private Mutator $mutator)
+    public function __construct(private readonly Mutator $mutator)
     {
     }
 

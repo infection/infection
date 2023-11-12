@@ -50,7 +50,7 @@ use function Safe\getcwd;
 use function Safe\preg_match;
 use function Safe\putenv;
 use function Safe\realpath;
-use function Safe\substr;
+use function substr;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use function trim;
@@ -61,6 +61,8 @@ use Webmozart\Assert\Assert;
  */
 class TestFrameworkFinder
 {
+    private const BAT_EXTENSION_LENGTH = 4;
+
     /**
      * @var array<string, string>
      */
@@ -77,7 +79,7 @@ class TestFrameworkFinder
 
             Assert::string($this->cachedPath[$testFrameworkName]);
 
-            if (substr($this->cachedPath[$testFrameworkName], -4) === '.bat') {
+            if (substr($this->cachedPath[$testFrameworkName], -self::BAT_EXTENSION_LENGTH) === '.bat') {
                 $this->cachedPath[$testFrameworkName] = $this->findFromBatchFile($this->cachedPath[$testFrameworkName]);
             }
         }
@@ -186,7 +188,7 @@ class TestFrameworkFinder
          *   php %~dp0/path %*
          */
         if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match) === 1) {
-            $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
+            $target = ltrim(rtrim(trim((string) $match[1]), '" %*'), '\\/');
             $script = realpath(dirname($path) . '/' . $target);
 
             if (file_exists($script)) {

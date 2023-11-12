@@ -124,6 +124,7 @@ final class SchemaConfigurationTest extends TestCase
                 'report.html',
                 'summary.log',
                 'json.log',
+                'gitlab.log',
                 'debug.log',
                 'mutator.log',
                 true,

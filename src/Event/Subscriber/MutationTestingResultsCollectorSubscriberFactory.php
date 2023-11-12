@@ -44,7 +44,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class MutationTestingResultsCollectorSubscriberFactory implements SubscriberFactory
 {
     /** @var Collector[] */
-    private array $collectors;
+    private readonly array $collectors;
 
     public function __construct(Collector ...$collectors)
     {

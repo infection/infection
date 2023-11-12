@@ -62,9 +62,9 @@ use function Safe\file_put_contents;
 use function Safe\glob;
 use function Safe\json_decode;
 use function Safe\json_encode;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
-use function strpos;
+use function str_starts_with;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -88,7 +88,7 @@ final class ConfigureCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the Test framework to use ("%s")',
-                    implode('", "', TestFrameworkTypes::TYPES)
+                    implode('", "', TestFrameworkTypes::getTypes())
                 ),
                 TestFrameworkTypes::PHPUNIT
             );
@@ -228,7 +228,7 @@ final class ConfigureCommand extends BaseCommand
         );
     }
 
-    private function abort(): void
+    private function abort(): never
     {
         throw new RuntimeException('Configuration generation aborted');
     }
@@ -244,10 +244,10 @@ final class ConfigureCommand extends BaseCommand
         try {
             $version = InstalledVersions::getPrettyVersion(Application::PACKAGE_NAME);
 
-            if ($version === null || strpos($version, 'dev-') === 0) {
+            if ($version === null || str_starts_with($version, 'dev-')) {
                 $version = 'master';
             }
-        } catch (OutOfBoundsException $e) {
+        } catch (OutOfBoundsException) {
             $version = 'master';
         }
 

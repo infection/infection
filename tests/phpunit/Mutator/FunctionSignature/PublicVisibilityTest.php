@@ -343,5 +343,41 @@ PHP
             }];
             PHP,
         ];
+
+        yield 'It does not remove attributes' => [
+            <<<'PHP'
+<?php
+
+namespace PublicVisibilityOneClass;
+
+class Test
+{
+    #[SomeAttribute1]
+    #[SomeAttribute2]
+    public function &foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP,
+            <<<'PHP'
+<?php
+
+namespace PublicVisibilityOneClass;
+
+class Test
+{
+    #[SomeAttribute1]
+    #[SomeAttribute2]
+    protected function &foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP
+            ,
+        ];
     }
 }

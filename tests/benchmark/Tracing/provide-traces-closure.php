@@ -71,6 +71,7 @@ $container = Container::create()->withValues(
     Container::DEFAULT_GIT_DIFF_LINES,
     Container::DEFAULT_GIT_DIFF_BASE,
     Container::DEFAULT_USE_GITHUB_LOGGER,
+    Container::DEFAULT_GITLAB_LOGGER_PATH,
     Container::DEFAULT_HTML_LOGGER_PATH,
     true,
     Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES

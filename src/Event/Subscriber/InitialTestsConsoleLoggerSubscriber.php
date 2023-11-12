@@ -41,7 +41,7 @@ use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
 use InvalidArgumentException;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -50,9 +50,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
 {
-    private ProgressBar $progressBar;
+    private readonly ProgressBar $progressBar;
 
-    public function __construct(private OutputInterface $output, private TestFrameworkAdapter $testFrameworkAdapter, private bool $debug)
+    public function __construct(private readonly OutputInterface $output, private readonly TestFrameworkAdapter $testFrameworkAdapter, private readonly bool $debug)
     {
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('verbose');

@@ -4,6 +4,11 @@
     "source": {
         "directories": [
             "src"
+        ],
+        excludes: [
+            "FileSystem/DummyFileSystem.php",
+            "FileSystem/DummySymfony5FileSystem.php",
+            "FileSystem/DummySymfony6FileSystem.php"
         ]
     },
     "logs": {
@@ -15,6 +20,21 @@
         "global-ignoreSourceCodeByRegex": [
             "Assert::.*"
         ],
-        "@default": true
+        "@default": true,
+        "InstanceOf_": {
+            ignore: [
+                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
+            ]
+        },
+        "LogicalAnd": {
+            ignore: [
+                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
+            ]
+        },
+        "LogicalOr": {
+            ignore: [
+                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
+            ]
+        }
     }
 }

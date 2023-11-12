@@ -81,6 +81,7 @@ DIFF
                 'params' => $node->getParams(),
                 'returnType' => $node->getReturnType(),
                 'stmts' => $node->getStmts(),
+                'attrGroups' => $node->getAttrGroups(),
             ],
             $node->getAttributes()
         );

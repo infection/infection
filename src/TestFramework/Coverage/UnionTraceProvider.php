@@ -47,7 +47,7 @@ final class UnionTraceProvider implements TraceProvider
      * @param CoveredTraceProvider|TraceProvider $coveredTraceProvider
      * @param UncoveredTraceProvider|TraceProvider $uncoveredTraceProvider
      */
-    public function __construct(private TraceProvider $coveredTraceProvider, private TraceProvider $uncoveredTraceProvider, private bool $onlyCovered)
+    public function __construct(private readonly TraceProvider $coveredTraceProvider, private readonly TraceProvider $uncoveredTraceProvider, private readonly bool $onlyCovered)
     {
     }
 

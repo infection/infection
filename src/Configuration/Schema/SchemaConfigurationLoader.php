@@ -54,13 +54,8 @@ final class SchemaConfigurationLoader
     private const DEFAULT_DIST_JSON_CONFIG_FILE = 'infection.json.dist';
     private const DEFAULT_JSON_CONFIG_FILE = 'infection.json';
 
-    private Locator $locator;
-    private SchemaConfigurationFileLoader $fileLoader;
-
-    public function __construct(Locator $locator, SchemaConfigurationFileLoader $fileLoader)
+    public function __construct(private readonly Locator $locator, private readonly SchemaConfigurationFileLoader $fileLoader)
     {
-        $this->locator = $locator;
-        $this->fileLoader = $fileLoader;
     }
 
     /**

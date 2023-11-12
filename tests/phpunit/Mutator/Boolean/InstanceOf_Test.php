@@ -96,5 +96,46 @@ PHP
                 ,
             ],
         ];
+
+        yield 'It does not mutate an instanceof comparison inside `assert()` function call with a class literal' => [
+            <<<'PHP'
+<?php
+
+return assert($example instanceof Example);
+PHP
+            ,
+        ];
+
+        yield 'It does not mutate an instanceof comparison inside `assert()` function call with variable' => [
+            <<<'PHP'
+<?php
+
+return assert($example instanceof $foo);
+PHP
+            ,
+        ];
+
+        yield 'It mutates an instanceof comparison inside other than `assert()` functions' => [
+            <<<'PHP'
+<?php
+
+return someFunc($example instanceof $foo);
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+return someFunc(true);
+PHP
+            ,
+                <<<'PHP'
+<?php
+
+return someFunc(false);
+PHP
+            ,
+            ],
+        ];
     }
 }

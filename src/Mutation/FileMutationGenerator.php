@@ -53,7 +53,7 @@ use Webmozart\Assert\Assert;
  */
 class FileMutationGenerator
 {
-    public function __construct(private FileParser $parser, private NodeTraverserFactory $traverserFactory, private LineRangeCalculator $lineRangeCalculator, private FilesDiffChangedLines $filesDiffChangedLines, private bool $isForGitDiffLines, private ?string $gitDiffBase)
+    public function __construct(private readonly FileParser $parser, private readonly NodeTraverserFactory $traverserFactory, private readonly LineRangeCalculator $lineRangeCalculator, private readonly FilesDiffChangedLines $filesDiffChangedLines, private readonly bool $isForGitDiffLines, private readonly ?string $gitDiffBase)
     {
     }
 

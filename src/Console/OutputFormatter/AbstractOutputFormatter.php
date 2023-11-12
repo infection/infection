@@ -47,7 +47,7 @@ abstract class AbstractOutputFormatter implements OutputFormatter
     /**
      * In progress bar lingo 0 stands for an unknown number of steps.
      */
-    public const UNKNOWN_COUNT = 0;
+    final public const UNKNOWN_COUNT = 0;
 
     protected int $callsCount = 0;
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use function array_flip;
 use function array_key_exists;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
@@ -43,7 +44,6 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
-use function Safe\array_flip;
 
 /**
  * @internal
@@ -58,7 +58,7 @@ final class TrueValue implements ConfigurableMutator
     /**
      * @var array<string, int>
      */
-    private array $allowedFunctions;
+    private readonly array $allowedFunctions;
 
     public function __construct(TrueValueConfig $config)
     {

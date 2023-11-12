@@ -50,7 +50,7 @@ use function log;
 use function microtime;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
-use function Safe\usort;
+use function usort;
 
 /**
  * Tagged as integration because it can be quite slow.

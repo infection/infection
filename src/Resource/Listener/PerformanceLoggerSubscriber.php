@@ -42,7 +42,7 @@ use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use function memory_get_peak_usage;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -50,7 +50,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class PerformanceLoggerSubscriber implements EventSubscriber
 {
-    public function __construct(private Stopwatch $stopwatch, private TimeFormatter $timeFormatter, private MemoryFormatter $memoryFormatter, private OutputInterface $output)
+    public function __construct(
+        private readonly Stopwatch $stopwatch,
+        private readonly TimeFormatter $timeFormatter,
+        private readonly MemoryFormatter $memoryFormatter,
+        private readonly int $threadCount,
+        private readonly OutputInterface $output)
     {
     }
 
@@ -66,9 +71,10 @@ final class PerformanceLoggerSubscriber implements EventSubscriber
         $this->output->writeln([
             '',
             sprintf(
-                'Time: %s. Memory: %s',
+                'Time: %s. Memory: %s. Threads: %s',
                 $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
+                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true)),
+                $this->threadCount
             ),
         ]);
     }

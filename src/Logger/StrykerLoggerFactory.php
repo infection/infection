@@ -51,7 +51,7 @@ use Psr\Log\LoggerInterface;
  */
 class StrykerLoggerFactory
 {
-    public function __construct(private MetricsCalculator $metricsCalculator, private StrykerHtmlReportBuilder $strykerHtmlReportBuilder, private CiDetector $ciDetector, private LoggerInterface $logger)
+    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder, private readonly CiDetector $ciDetector, private readonly LoggerInterface $logger)
     {
     }
 

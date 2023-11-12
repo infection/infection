@@ -66,9 +66,9 @@ use PhpParser\NodeAbstract;
 use function Safe\file_get_contents;
 use function Safe\preg_match;
 use function Safe\preg_split;
-use function Safe\substr;
 use function str_starts_with;
 use function strlen;
+use function substr;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
@@ -91,7 +91,7 @@ final class StrykerHtmlReportBuilder
     private const PLUS_LENGTH = 1;
     private const DIFF_HEADERS_LINES_COUNT = 3;
 
-    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector)
+    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector)
     {
     }
 

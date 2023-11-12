@@ -40,8 +40,8 @@ use function array_merge;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use function is_executable;
 use const PHP_SAPI;
-use function Safe\substr;
 use function shell_exec;
+use function substr;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -50,6 +50,8 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 class CommandLineBuilder
 {
+    private const BAT_EXTENSION_LENGTH = 4;
+
     /** @var string[]|null */
     private ?array $cachedPhpCmdLine = null;
 
@@ -123,6 +125,6 @@ class CommandLineBuilder
 
     private function isBatchFile(string $path): bool
     {
-        return substr($path, -4) === '.bat';
+        return substr($path, -self::BAT_EXTENSION_LENGTH) === '.bat';
     }
 }

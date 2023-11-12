@@ -48,7 +48,7 @@ final class NonMutableNodesIgnorerVisitor extends NodeVisitorAbstract
     /**
      * @param NodeIgnorer[] $nodeIgnorers
      */
-    public function __construct(private array $nodeIgnorers)
+    public function __construct(private readonly array $nodeIgnorers)
     {
     }
 

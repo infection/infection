@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use function array_flip;
 use function array_intersect_key;
 use function array_keys;
 use function implode;
@@ -44,7 +45,6 @@ use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
 use PhpParser\Node;
-use function Safe\array_flip;
 use Webmozart\Assert\Assert;
 
 /**
@@ -53,10 +53,10 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
-    private string $mutatorName;
+    private readonly string $mutatorName;
     /** @var array<string|int|float> */
-    private array $attributes;
-    private bool $coveredByTests;
+    private readonly array $attributes;
+    private readonly bool $coveredByTests;
     private ?float $nominalTimeToTest = null;
 
     private ?string $hash = null;
@@ -67,14 +67,14 @@ class Mutation
      * @param TestLocation[] $tests
      */
     public function __construct(
-        private string $originalFilePath,
-        private array $originalFileAst,
+        private readonly string $originalFilePath,
+        private readonly array $originalFileAst,
         string $mutatorName,
         array $attributes,
-        private string $mutatedNodeClass,
-        private MutatedNode $mutatedNode,
-        private int $mutationByMutatorIndex,
-        private array $tests
+        private readonly string $mutatedNodeClass,
+        private readonly MutatedNode $mutatedNode,
+        private readonly int $mutationByMutatorIndex,
+        private readonly array $tests
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 

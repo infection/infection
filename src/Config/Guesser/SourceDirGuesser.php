@@ -49,11 +49,8 @@ use function trim;
  */
 class SourceDirGuesser
 {
-    private stdClass $composerJsonContent;
-
-    public function __construct(stdClass $composerJsonContent)
+    public function __construct(private readonly stdClass $composerJsonContent)
     {
-        $this->composerJsonContent = $composerJsonContent;
     }
 
     /**
@@ -117,7 +114,7 @@ class SourceDirGuesser
      * @param string[]|string $path
      * @param string[] $dirs
      */
-    private function parsePath($path, array &$dirs): void
+    private function parsePath(array|string $path, array &$dirs): void
     {
         if (is_array($path)) {
             array_walk_recursive(

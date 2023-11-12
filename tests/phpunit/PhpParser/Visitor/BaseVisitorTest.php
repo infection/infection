@@ -41,7 +41,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
-use function Safe\sprintf;
+use function sprintf;
 
 abstract class BaseVisitorTest extends TestCase
 {

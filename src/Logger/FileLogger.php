@@ -40,7 +40,7 @@ use function in_array;
 use const PHP_EOL;
 use Psr\Log\LoggerInterface;
 use function Safe\file_put_contents;
-use function Safe\sprintf;
+use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -50,7 +50,9 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class FileLogger implements MutationTestingResultsLogger
 {
-    public function __construct(private string $filePath, private Filesystem $fileSystem, private LineMutationTestingResultsLogger $lineLogger, private LoggerInterface $logger)
+    public const ALLOWED_PHP_STREAMS = ['php://stdout', 'php://stderr'];
+
+    public function __construct(private readonly string $filePath, private readonly Filesystem $fileSystem, private readonly LineMutationTestingResultsLogger $lineLogger, private readonly LoggerInterface $logger)
     {
     }
 
@@ -60,7 +62,7 @@ final class FileLogger implements MutationTestingResultsLogger
 
         // If the output should be written to a stream then just write it directly
         if (str_starts_with($this->filePath, 'php://')) {
-            if (in_array($this->filePath, ['php://stdout', 'php://stderr'], true)) {
+            if (in_array($this->filePath, self::ALLOWED_PHP_STREAMS, true)) {
                 file_put_contents($this->filePath, $content);
             } else {
                 // The Symfony filesystem component doesn't support using streams so provide a

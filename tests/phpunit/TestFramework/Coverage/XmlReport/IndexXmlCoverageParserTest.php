@@ -47,7 +47,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
 use Traversable;
@@ -84,7 +84,7 @@ final class IndexXmlCoverageParserTest extends TestCase
         );
 
         // zeroLevel + noPercentage + firstLevel + secondLevel
-        $this->assertCount(5, $sourceFilesData);
+        $this->assertCount(5, [...$sourceFilesData]);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file(): void

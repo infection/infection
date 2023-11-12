@@ -42,8 +42,8 @@ use function current;
 use function end;
 use function explode;
 use function implode;
-use function Safe\substr;
 use function strlen;
+use function substr;
 use function trim;
 
 final class DocBlockParser

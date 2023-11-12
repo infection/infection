@@ -6,6 +6,8 @@
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
     errorBaseline="psalm-baseline.xml"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="false"
 >
     <projectFiles>
         <directory name="src" />
@@ -27,5 +29,23 @@
                 <directory name="src/Mutator/Regex"/>
             </errorLevel>
         </ImpureFunctionCall>
+
+        <InvalidReturnType>
+            <errorLevel type="suppress">
+                <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
+            </errorLevel>
+        </InvalidReturnType>
+
+        <MethodSignatureMismatch>
+            <errorLevel type="suppress">
+                <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
+            </errorLevel>
+        </MethodSignatureMismatch>
+
+        <UnusedConstructor>
+            <errorLevel type="suppress">
+                <file name="src/CannotBeInstantiated.php" />
+            </errorLevel>
+        </UnusedConstructor>
     </issueHandlers>
 </psalm>

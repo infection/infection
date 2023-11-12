@@ -51,8 +51,10 @@ use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\XdebugHandler;
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
+use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
@@ -73,15 +75,14 @@ use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
 use function ltrim;
 use ReflectionClass;
 use function Safe\sort;
-use function Safe\sprintf;
 use const SORT_STRING;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -101,7 +102,6 @@ final class ProjectCodeProvider
         ComposerExecutableFinder::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
-        TestFrameworkTypes::class,
         NodeMutationGenerator::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
@@ -113,6 +113,8 @@ final class ProjectCodeProvider
         FormatterName::class,
         ShellCommandLineExecutor::class,
         CpuCoresCountProvider::class,
+        DispatchPcntlSignalSubscriber::class,
+        StopInfectionOnSigintSignalSubscriber::class,
     ];
 
     /**
@@ -165,6 +167,8 @@ final class ProjectCodeProvider
         $finder = Finder::create()
             ->files()
             ->name('*.php')
+            ->notName('DummySymfony5FileSystem.php')
+            ->notName('DummySymfony6FileSystem.php')
             ->in(__DIR__ . '/../../../../src')
         ;
 
@@ -262,7 +266,8 @@ final class ProjectCodeProvider
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
-            ->notPath('xdebug-filter.php')
+            ->notName('DummySymfony5FileSystem.php')
+            ->notName('DummySymfony6FileSystem.php')
             ->exclude([
                 'autoloaded',
                 'benchmark',

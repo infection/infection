@@ -38,7 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Config\Path;
 use DOMElement;
 use DOMNode;
 use function ltrim;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
 use function trim;
@@ -48,7 +48,7 @@ use function trim;
  */
 final class PathReplacer
 {
-    public function __construct(private Filesystem $filesystem, private ?string $phpUnitConfigDir = null)
+    public function __construct(private readonly Filesystem $filesystem, private readonly ?string $phpUnitConfigDir = null)
     {
     }
 

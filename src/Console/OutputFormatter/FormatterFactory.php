@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Console\OutputFormatter;
 
 use function implode;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
@@ -46,7 +46,7 @@ use Webmozart\Assert\Assert;
  */
 final class FormatterFactory
 {
-    public function __construct(private OutputInterface $output)
+    public function __construct(private readonly OutputInterface $output)
     {
     }
 

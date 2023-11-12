@@ -33,13 +33,22 @@
 
 declare(strict_types=1);
 
-if (!\function_exists('xdebug_set_filter')) {
-    return;
-}
+namespace Infection\Mutator;
 
-// See https://xdebug.org/docs/all_functions
-xdebug_set_filter(
-    XDEBUG_FILTER_CODE_COVERAGE,
-    XDEBUG_PATH_WHITELIST,
-    [\dirname(__DIR__) . '/src/']
-);
+use PhpParser\Node;
+
+/**
+ * @internal
+ */
+trait SimpleExpression
+{
+    private function isSingleOperandExpression(Node\Expr $expr): bool
+    {
+        return $expr instanceof Node\Expr\FuncCall
+            || $expr instanceof Node\Expr\MethodCall
+            || $expr instanceof Node\Expr\StaticCall
+            || $expr instanceof Node\Expr\Variable
+            || $expr instanceof Node\Expr\ArrayDimFetch
+            || $expr instanceof Node\Expr\ClassConstFetch;
+    }
+}

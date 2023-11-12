@@ -50,7 +50,7 @@ class MutantProcess implements ProcessBearer
 
     private bool $timedOut = false;
 
-    public function __construct(private Process $process, private Mutant $mutant)
+    public function __construct(private readonly Process $process, private readonly Mutant $mutant)
     {
         $this->callback = static function (): void {};
     }

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\FileSystem;
 
 use const DIRECTORY_SEPARATOR;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;

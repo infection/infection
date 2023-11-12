@@ -48,9 +48,9 @@ use Webmozart\Assert\Assert;
  */
 final class SafeDOMXPath
 {
-    private DOMXPath $xPath;
+    private readonly DOMXPath $xPath;
 
-    public function __construct(private DOMDocument $document)
+    public function __construct(private readonly DOMDocument $document)
     {
         $this->xPath = new DOMXPath($document);
     }

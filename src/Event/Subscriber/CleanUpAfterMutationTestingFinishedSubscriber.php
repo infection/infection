@@ -44,7 +44,7 @@ use Symfony\Component\Finder\Finder;
  */
 final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscriber
 {
-    public function __construct(private Filesystem $filesystem, private string $tmpDir)
+    public function __construct(private readonly Filesystem $filesystem, private readonly string $tmpDir)
     {
     }
 

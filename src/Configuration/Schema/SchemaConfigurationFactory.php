@@ -85,6 +85,7 @@ class SchemaConfigurationFactory
             self::normalizeString($logs->html ?? null),
             self::normalizeString($logs->summary ?? null),
             self::normalizeString($logs->json ?? null),
+            self::normalizeString($logs->gitlab ?? null),
             self::normalizeString($logs->debug ?? null),
             self::normalizeString($logs->perMutator ?? null),
             $logs->github ?? false,

@@ -38,14 +38,19 @@ namespace Infection\Resource\Memory;
 use function log;
 use function number_format;
 use function round;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class MemoryFormatter
+class MemoryFormatter
 {
+    private const BYTES_IN_KB = 1024;
+
+    private const DECIMALS_TO_SHOW = 2;
+
     private const UNITS = [
         'B',
         'KB',
@@ -66,13 +71,13 @@ final class MemoryFormatter
             'Expected a positive or null amount of bytes. Got: %s'
         );
 
-        $power = $bytes > 0 ? (int) round(log($bytes, 1023)) : 0;
+        $power = $bytes > 0 ? (int) round(log($bytes, self::BYTES_IN_KB - 1)) : 0;
 
         return sprintf(
             '%s%s',
             number_format(
-                $bytes / (1024 ** $power),
-                2,
+                $bytes / (self::BYTES_IN_KB ** $power),
+                self::DECIMALS_TO_SHOW,
                 '.',
                 ','
             ),
