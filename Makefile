@@ -221,6 +221,7 @@ $(PSALM): Makefile
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	composer require infection/codeception-adapter infection/phpspec-adapter
+	# Workaround for https://github.com/box-project/box/issues/580
 	composer install --no-dev
 	$(BOX) --version
 	$(BOX) validate
