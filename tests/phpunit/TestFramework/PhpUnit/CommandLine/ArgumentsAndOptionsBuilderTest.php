@@ -272,5 +272,24 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             '10.1',
             '/Test\:\:test_case1 with data set "With special chars \:\:"/',
         ];
+
+        yield '1 test case from data provider with numeric data provider keys - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#0',
+                'App\Test::test_case1#1',
+            ],
+            '10.5',
+            '/Test\:\:test_case1 with data set \#0|Test\:\:test_case1 with data set \#1/',
+        ];
+
+        yield '1 test case from data provider with leading numbers in the key string - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#123a',
+            ],
+            '10.5',
+            '/Test\:\:test_case1 with data set "123a"/',
+        ];
     }
 }
