@@ -46,6 +46,7 @@ use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function ltrim;
 use function preg_quote;
 use function rtrim;
+use function Safe\preg_match;
 use function sprintf;
 use function version_compare;
 
@@ -127,8 +128,8 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         $methodNameWithDataProviderResult = $methodNameWithDataProvider;
 
         /*
-         * in PHPUnit >=10 data providers with keys are stored as `Class\\test_method#some key`
-         * in PHPUnit <10 data providers with keys are stored as `Class\\test_method with data set "some key"`
+         * in PHPUnit >=10 data providers with keys are stored as `Class\\test_method#some key` or `Class\\test_method#0`
+         * in PHPUnit <10 data providers with keys are stored as `Class\\test_method with data set "some key"` or `Class\\test_method with data set #0`
          *
          * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
          */
@@ -136,10 +137,13 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
             $methodNameParts = explode('#', $methodNameWithDataProviderResult, self::MAX_EXPLODE_PARTS);
 
             if (count($methodNameParts) > 1) {
-                $methodName = $methodNameParts[0];
-                $dataProviderKey = $methodNameParts[1];
+                [$methodName, $dataProviderKey] = $methodNameParts;
 
-                $methodNameWithDataProviderResult = sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
+                if (preg_match('/^(\d+)$/', $dataProviderKey) === 0) {
+                    $methodNameWithDataProviderResult = sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
+                } else {
+                    $methodNameWithDataProviderResult = sprintf('%s with data set #%s', $methodName, $dataProviderKey);
+                }
             }
         }
 
