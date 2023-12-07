@@ -225,7 +225,7 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	composer install --no-dev
 	$(BOX) --version
 	$(BOX) validate
-	$(BOX) compile
+	BOX_REQUIREMENT_CHECKER=0 $(BOX) compile
 	composer remove infection/codeception-adapter infection/phpspec-adapter
 	composer install
 	touch -c $@
