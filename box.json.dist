@@ -3,6 +3,7 @@
 
     "git-version": "package_version",
 
+    "check-requirements": false,
     "compression": "GZ",
     "compactors": [
         "KevinGH\\Box\\Compactor\\Json",
