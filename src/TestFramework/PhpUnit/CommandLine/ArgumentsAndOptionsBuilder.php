@@ -139,7 +139,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
             if (count($methodNameParts) > 1) {
                 [$methodName, $dataProviderKey] = $methodNameParts;
 
-                if (is_numeric($dataProviderKey)) {
+                if (!is_numeric($dataProviderKey)) {
                     $methodNameWithDataProviderResult = sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
                 } else {
                     $methodNameWithDataProviderResult = sprintf('%s with data set #%s', $methodName, $dataProviderKey);
