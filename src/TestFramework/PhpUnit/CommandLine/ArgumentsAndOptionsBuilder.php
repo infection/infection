@@ -43,10 +43,10 @@ use function end;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
+use function is_numeric;
 use function ltrim;
 use function preg_quote;
 use function rtrim;
-use function Safe\preg_match;
 use function sprintf;
 use function version_compare;
 
@@ -139,7 +139,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
             if (count($methodNameParts) > 1) {
                 [$methodName, $dataProviderKey] = $methodNameParts;
 
-                if (preg_match('/^(\d+)$/', $dataProviderKey) === 0) {
+                if (is_numeric($dataProviderKey)) {
                     $methodNameWithDataProviderResult = sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
                 } else {
                     $methodNameWithDataProviderResult = sprintf('%s with data set #%s', $methodName, $dataProviderKey);
