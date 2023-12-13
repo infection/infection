@@ -36,18 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use function array_fill_keys;
-use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\Boolean\TrueValueConfig;
 use Infection\Mutator\Definition;
-use Infection\Mutator\Extensions\BCMath;
-use Infection\Mutator\Extensions\BCMathConfig;
-use Infection\Mutator\Extensions\MBString;
-use Infection\Mutator\Extensions\MBStringConfig;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\ProfileList;
-use Infection\Mutator\Removal\ArrayItemRemoval;
-use Infection\Mutator\Removal\ArrayItemRemovalConfig;
 use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
@@ -91,11 +83,11 @@ final class DefinitionTest extends TestCase
     /**
      * @dataProvider mutatorsProvider
      */
-    public function test_it_must_be_instantiated_with_remedies(
+    public function test_it_must_define_remedies(
         Mutator $mutator
     ): void {
         $this->assertNotNull(
-            $mutator->getDefinition()->getRemedies(),
+            $mutator::getDefinition()->getRemedies(),
             sprintf(
                 'Definition of [%s] must provide remedies.',
                 $mutator->getName(),
@@ -115,31 +107,8 @@ final class DefinitionTest extends TestCase
         foreach ($mutators as $name => $mutator) {
             $this->assertInstanceOf(Mutator::class, $mutator);
 
-            switch ($mutator) {
-                case $mutator instanceof TrueValue:
-                    $actualMutatorClass = new TrueValue(new TrueValueConfig([]));
-
-                    break;
-                case $mutator instanceof ArrayItemRemoval:
-                    $actualMutatorClass = new ArrayItemRemoval(new ArrayItemRemovalConfig([]));
-
-                    break;
-                case $mutator instanceof BCMath:
-                    $actualMutatorClass = new BCMath(new BCMathConfig([]));
-
-                    break;
-                case $mutator instanceof MBString:
-                    $actualMutatorClass = new MBString(new MBStringConfig([]));
-
-                    break;
-                default:
-                    $actualMutatorClass = new $mutator();
-
-                    break;
-            }
-
             yield $name => [
-                $actualMutatorClass,
+                $mutator,
             ];
         }
     }
