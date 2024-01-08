@@ -55,7 +55,7 @@
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.5",
         "justinrainbow/json-schema": "^5.2.10",
-        "nikic/php-parser": "^4.15.1",
+        "nikic/php-parser": "^4.18 || ^5.0",
         "ondram/ci-detector": "^4.1.0",
         "sanmai/later": "^0.1.1",
         "sanmai/pipeline": "^5.1 || ^6",
@@ -86,7 +86,7 @@
         "phpstan/phpstan-webmozart-assert": "^1.0.2",
         "phpunit/phpunit": "^9.6",
         "rector/rector": "^0.16.0",
-        "sidz/phpstan-rules": "^0.4.0",
+        "sidz/phpstan-rules": "^0.4.3",
         "symfony/phpunit-bridge": "^5.4 || ^6.0 || ^7.0",
         "symfony/yaml": "^5.4 || ^6.0 || ^7.0",
         "thecodingmachine/phpstan-safe-rule": "^1.2.0"

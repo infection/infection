@@ -61,7 +61,7 @@ class Configuration
     /** @var array<string, Mutator<\PhpParser\Node>> */
     private readonly array $mutators;
     private readonly string $testFramework;
-    private ?float $minMsi = null;
+    private ?float $minMsi;
     private readonly int $threadCount;
 
     /**

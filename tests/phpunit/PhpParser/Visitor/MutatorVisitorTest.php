@@ -42,11 +42,9 @@ use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
-use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
-use PhpParser\ParserFactory;
 
 /**
  * @group integration
@@ -225,74 +223,6 @@ PHP
                         'endFilePos' => -1,
                     ],
                     ClassMethod::class,
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    []
-                ),
-            ];
-        })();
-
-        yield 'it does not mutate if the parser does not contain startTokenPos' => (static function (): iterable {
-            $badLexer = new Lexer\Emulative([
-                'usedAttributes' => [
-                    'comments',
-                    'startLine',
-                    'endLine',
-                    // missing startTokenPos
-                    'endTokenPos',
-                    'startFilePos',
-                    'endFilePos',
-                ],
-            ]);
-
-            $badParser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $badLexer);
-
-            return [
-                $nodes = $badParser->parse(<<<'PHP'
-<?php
-
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
-    public function bye() : string
-    {
-        return 'bye';
-    }
-}
-PHP
-                ),
-                <<<'PHP'
-<?php
-
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
-    public function bye() : string
-    {
-        return 'bye';
-    }
-}
-PHP
-                ,
-                new Mutation(
-                    'path/to/file',
-                    $nodes,
-                    MutatorName::getName(PublicVisibility::class),
-                    [
-                        'startTokenPos' => 29,
-                        'endTokenPos' => 48,
-                        'startLine' => -1,
-                        'endLine' => -1,
-                        'startFilePos' => -1,
-                        'endFilePos' => -1,
-                    ],
-                    MutatorName::getName(PublicVisibility::class),
                     MutatedNode::wrap(new Nop()),
                     0,
                     []

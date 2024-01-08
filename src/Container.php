@@ -95,7 +95,6 @@ use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
@@ -139,7 +138,6 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
-use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -297,17 +295,7 @@ final class Container
             MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(
                 new JUnitTestFileDataProvider($container->getJUnitReportLocator())
             ),
-            Lexer::class => static function (): Lexer {
-                $attributes = MutationAttributeKeys::ALL;
-                $attributes[] = 'comments';
-
-                return new Lexer\Emulative(['usedAttributes' => $attributes]);
-            },
-            Parser::class => static function (self $container): Parser {
-                $lexer = $container->getLexer();
-
-                return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-            },
+            Parser::class => static fn (): Parser => (new ParserFactory())->createForHostVersion(),
             FileParser::class => static fn (self $container): FileParser => new FileParser($container->getParser()),
             PrettyPrinterAbstract::class => static fn (): Standard => new Standard(),
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator($container->getConfiguration()->getMsiPrecision()),
@@ -838,11 +826,6 @@ final class Container
     public function getMemoizedTestFileDataProvider(): MemoizedTestFileDataProvider
     {
         return $this->get(MemoizedTestFileDataProvider::class);
-    }
-
-    public function getLexer(): Lexer
-    {
-        return $this->get(Lexer::class);
     }
 
     public function getParser(): Parser
