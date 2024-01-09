@@ -88,7 +88,7 @@ DIFF
             return [];
         }
 
-        yield $node->args[0];
+        yield $node->args[0]->value;
     }
 
     public function canMutate(Node $node): bool
