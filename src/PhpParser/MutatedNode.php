@@ -47,13 +47,13 @@ final class MutatedNode
     private $value;
 
     /**
-     * @param Node|Node[] $value
+     * @param int|Node|Node[] $value
      */
     private function __construct($value)
     {
         if (is_array($value)) {
             Assert::allIsInstanceOf($value, Node::class);
-        } else {
+        } else if (!is_int($value)) {
             Assert::isInstanceOf($value, Node::class);
         }
 
@@ -61,17 +61,17 @@ final class MutatedNode
     }
 
     /**
-     * @param Node|Node[] $value
+     * @param int|Node|Node[] $value
      */
-    public static function wrap(Node|array $value): self
+    public static function wrap(int|Node|array $value): self
     {
         return new self($value);
     }
 
     /**
-     * @return Node|Node[]
+     * @return int|Node|Node[]
      */
-    public function unwrap(): Node|array
+    public function unwrap(): int|Node|array
     {
         return $this->value;
     }

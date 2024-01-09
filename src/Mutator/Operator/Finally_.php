@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use function count;
+use PhpParser\NodeVisitor;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -73,11 +73,11 @@ DIFF
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Stmt\Nop>
+     * @return iterable<int>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Stmt\Nop();
+        yield NodeVisitor::REPLACE_WITH_NULL;
     }
 
     public function canMutate(Node $node): bool
@@ -95,6 +95,6 @@ DIFF
         $parentNode = ParentConnector::getParent($node);
         Assert::isInstanceOf($parentNode, Node\Stmt\TryCatch::class);
 
-        return count($parentNode->catches) > 0;
+        return $parentNode->catches !== [];
     }
 }
