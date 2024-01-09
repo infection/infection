@@ -51,7 +51,7 @@ final class Throw_Test extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield 'It removes the throw statement' => [
+        yield 'It removes the throw expression' => [
             <<<'PHP'
 <?php
 
@@ -64,6 +64,20 @@ PHP
 new \Exception();
 PHP
             ,
+        ];
+
+        yield 'It removes the throw expression while uses inside other expressions' => [
+            <<<'PHP'
+<?php
+
+$x ?? throw new \Exception();
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$x ?? new \Exception();
+PHP
         ];
     }
 }

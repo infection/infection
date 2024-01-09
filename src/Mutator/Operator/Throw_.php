@@ -44,7 +44,7 @@ use PhpParser\Node;
 /**
  * @internal
  *
- * @implements Mutator<Node\Stmt\Throw_>
+ * @implements Mutator<Node\Expr\Throw_>
  */
 final class Throw_ implements Mutator
 {
@@ -82,15 +82,15 @@ DIFF
      *
      * Replaces "throw new Exception();" with "new Exception();"
      *
-     * @return iterable<Node\Stmt\Expression>
+     * @return iterable<Node\Expr>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Stmt\Expression($node->expr);
+        yield $node->expr;
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Throw_;
+        return $node instanceof Node\Expr\Throw_;
     }
 }
