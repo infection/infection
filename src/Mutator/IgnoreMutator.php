@@ -92,7 +92,7 @@ final class IgnoreMutator implements Mutator
         return !$this->config->isIgnored(
             $reflectionClass->getName(),
             $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
+            $node->getStartLine()
         );
     }
 

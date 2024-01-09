@@ -46,10 +46,7 @@ use PHPUnit\Framework\TestCase;
 
 final class MutantCodeFactoryTest extends TestCase
 {
-    /**
-     * @var MutantCodeFactory
-     */
-    private $codeFactory;
+    private MutantCodeFactory $codeFactory;
 
     protected function setUp(): void
     {
@@ -71,9 +68,8 @@ final class MutantCodeFactoryTest extends TestCase
     /**
      * @dataProvider mutationProvider
      */
-    public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
-        Mutation $mutation
-    ): void {
+    public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(Mutation $mutation): void
+    {
         $originalNodesDump = SingletonContainer::getNodeDumper()->dump($mutation->getOriginalFileAst());
 
         $this->codeFactory->createCode($mutation);

@@ -107,7 +107,7 @@ namespace FunctionCall_ReturnTypehintFqcnAllowsNull;
 
 class Test
 {
-    function test() : ?\DateTime
+    function test(): ?\DateTime
     {
         count([]);
         return null;
@@ -131,7 +131,7 @@ namespace FunctionCall_ScalarReturnTypehintAllowsNull;
 
 class Test
 {
-    function test() : ?int
+    function test(): ?int
     {
         count([]);
         return null;
@@ -157,7 +157,7 @@ class Test
 {
     function test()
     {
-        \$a = function (\$element) : ?int {
+        \$a = function (\$element): ?int {
             return \$element;
         };
         count([]);

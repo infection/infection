@@ -171,7 +171,7 @@ PHP,
 
 new class
 {
-    public function mul(int $a, int $b) : int
+    public function mul(int $a, int $b): int
     {
         $c = $a / $b;
         return 1;

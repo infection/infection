@@ -66,7 +66,7 @@ function withoutChecks(callable $fn): void
 }',
             '<?php
 
-function withoutChecks(callable $fn) : void
+function withoutChecks(callable $fn): void
 {
     $this->useChecks = false;
     $fn();
@@ -90,7 +90,7 @@ function withoutChecks(callable $fn): void
 }',
             '<?php
 
-function withoutChecks(callable $fn) : void
+function withoutChecks(callable $fn): void
 {
     $this->useChecks = false;
     try {

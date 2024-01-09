@@ -64,7 +64,7 @@ PHP
 <?php
 
 $array = [1, 2];
-foreach (array() as $value) {
+foreach ([] as $value) {
 }
 PHP
             ,
@@ -84,7 +84,7 @@ PHP
 <?php
 
 $array = [1, 2];
-foreach (array() as $key => &$value) {
+foreach ([] as $key => &$value) {
     echo $value;
 }
 PHP

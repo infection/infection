@@ -64,7 +64,7 @@ PHP
 <?php
 
 $a = function () {
-    (yield $b);
+    yield $b;
 };
 PHP
             ,

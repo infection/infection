@@ -51,7 +51,7 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
 
     public function mutationsProvider(): iterable
     {
-        yield 'It mutates ' => [
+        yield 'It mutates' => [
             <<<'PHP'
 <?php
 
@@ -61,7 +61,7 @@ PHP
             <<<'PHP'
 <?php
 
-(int) ($foo = array());
+(int) $foo = [];
 PHP
         ];
 
@@ -84,7 +84,7 @@ PHP
             <<<'PHP'
 <?php
 
-(int) ($foo = array());
+(int) $foo = [];
 PHP
         ];
 
@@ -106,7 +106,7 @@ PHP
             <<<'PHP'
 <?php
 
-(int) ($a->b = array());
+(int) $a->b = [];
 PHP
         ];
 
@@ -120,7 +120,7 @@ PHP
             <<<'PHP'
 <?php
 
-(int) ($foo = array());
+(int) $foo = [];
 PHP
         ];
 
@@ -134,7 +134,7 @@ PHP
             <<<'PHP'
 <?php
 
-(int) ($foo = array());
+(int) $foo = [];
 PHP
         ];
     }
