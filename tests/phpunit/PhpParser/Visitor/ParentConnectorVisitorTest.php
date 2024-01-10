@@ -85,9 +85,7 @@ PHP;
 array(
     0: Stmt_Namespace(
         name: Name(
-            parts: array(
-                0: Foo
-            )
+            name: Foo
         )
         stmts: array(
             0: Stmt_Echo(
@@ -108,9 +106,7 @@ array(
     )
     1: Stmt_Namespace(
         name: Name(
-            parts: array(
-                0: Bar
-            )
+            name: Bar
         )
         stmts: array(
         )
@@ -127,9 +123,7 @@ STR
 array(
     0: Stmt_Namespace(
         name: Name(
-            parts: array(
-                0: Foo
-            )
+            name: Foo
         )
         stmts: array(
             0: Stmt_Echo(
@@ -149,9 +143,7 @@ array(
         )
     )
     1: Name(
-        parts: array(
-            0: Foo
-        )
+        name: Foo
     )
     2: Stmt_Echo(
         exprs: array(
@@ -175,17 +167,13 @@ array(
     )
     6: Stmt_Namespace(
         name: Name(
-            parts: array(
-                0: Bar
-            )
+            name: Bar
         )
         stmts: array(
         )
     )
     7: Name(
-        parts: array(
-            0: Bar
-        )
+        name: Bar
     )
 )
 STR
@@ -199,9 +187,7 @@ array(
     0: null
     1: Stmt_Namespace(
         name: Name(
-            parts: array(
-                0: Foo
-            )
+            name: Foo
         )
         stmts: array(
             0: Stmt_Echo(
@@ -222,9 +208,7 @@ array(
     )
     2: Stmt_Namespace(
         name: Name(
-            parts: array(
-                0: Foo
-            )
+            name: Foo
         )
         stmts: array(
             0: Stmt_Echo(
@@ -252,9 +236,7 @@ array(
     )
     4: Stmt_Namespace(
         name: Name(
-            parts: array(
-                0: Foo
-            )
+            name: Foo
         )
         stmts: array(
             0: Stmt_Echo(
@@ -283,9 +265,7 @@ array(
     6: null
     7: Stmt_Namespace(
         name: Name(
-            parts: array(
-                0: Bar
-            )
+            name: Bar
         )
         stmts: array(
         )

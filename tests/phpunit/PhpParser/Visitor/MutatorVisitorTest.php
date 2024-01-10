@@ -96,7 +96,7 @@ PHP
 
 class Test
 {
-    public function hello() : string
+    public function hello(): string
     {
         return 'hello';
     }
@@ -147,7 +147,7 @@ PHP
 
 class Test
 {
-    public function hello() : string
+    public function hello(): string
     {
         return 'hello';
     }
@@ -199,11 +199,11 @@ PHP
 
 class Test
 {
-    public function hello() : string
+    public function hello(): string
     {
         return 'hello';
     }
-    public function bye() : string
+    public function bye(): string
     {
         return 'bye';
     }

@@ -90,7 +90,7 @@ namespace PublicVisibilityOneClass;
 
 class Test
 {
-    protected function &foo(int $param, $test = 1) : bool
+    protected function &foo(int $param, $test = 1): bool
     {
         echo 1;
         return false;
@@ -109,7 +109,7 @@ namespace PublicVisibilityFinal;
 
 class Test
 {
-    protected final function foo(int $param, $test = 1) : bool
+    final protected function foo(int $param, $test = 1): bool
     {
         echo 1;
         return false;
@@ -128,7 +128,7 @@ namespace PublicVisibilityNonAbstractInAbstractClass;
 
 abstract class Test
 {
-    protected function foo(int $param, $test = 1) : bool
+    protected function foo(int $param, $test = 1): bool
     {
         echo 1;
         return false;
@@ -147,7 +147,7 @@ namespace PublicVisibilityStatic;
 
 class Test
 {
-    protected static function foo(int $param, $test = 1) : bool
+    protected static function foo(int $param, $test = 1): bool
     {
         echo 1;
         return false;
@@ -252,7 +252,7 @@ namespace NonSameAbstract;
 
 abstract class NonSameAbstract
 {
-    public abstract function foo();
+    abstract public function foo();
 }
 class Child extends NonSameAbstract
 {
@@ -307,7 +307,7 @@ namespace ProtectedParent;
 
 abstract class SameAbstract
 {
-    protected abstract function foo();
+    abstract protected function foo();
 }
 class Child extends SameAbstract
 {
@@ -336,7 +336,7 @@ PHP
 
             $var = ['class' => new class
             {
-                protected function foo() : bool
+                protected function foo(): bool
                 {
                     return true;
                 }
@@ -354,7 +354,7 @@ class Test
 {
     #[SomeAttribute1]
     #[SomeAttribute2]
-    public function &foo(int $param, $test = 1) : bool
+    public function &foo(int $param, $test = 1): bool
     {
         echo 1;
         return false;
@@ -370,7 +370,7 @@ class Test
 {
     #[SomeAttribute1]
     #[SomeAttribute2]
-    protected function &foo(int $param, $test = 1) : bool
+    protected function &foo(int $param, $test = 1): bool
     {
         echo 1;
         return false;

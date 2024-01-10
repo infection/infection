@@ -113,7 +113,7 @@ class Test
 {
     function test()
     {
-        \$a = function (\$element) : ?stdClass {
+        \$a = function (\$element): ?stdClass {
             return \$element;
         };
         new stdClass();
@@ -139,7 +139,7 @@ namespace NewObject_ReturnTypehintFqcnAllowsNull;
 use stdClass;
 class Test
 {
-    function test() : ?stdClass
+    function test(): ?stdClass
     {
         new stdClass();
         return null;
@@ -159,7 +159,7 @@ namespace NewObject_ScalarReturnTypehintsAllowsNull;
 use stdClass;
 class Test
 {
-    function test() : ?int
+    function test(): ?int
     {
         new stdClass();
         return null;
