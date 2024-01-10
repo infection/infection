@@ -116,13 +116,13 @@ DIFF
         foreach ($node->arms as $i => $arm) {
             $arms = $node->arms;
 
-            if ($arm->conds !== null && count((array) $arm->conds) > 1) {
+            if (count((array) $arm->conds) > 1) {
                 foreach ($arm->conds as $j => $cond) {
                     $conds = $arm->conds;
 
                     unset($conds[$j]);
 
-                    $arms[$i] = new Node\MatchArm($conds, $arm->body, $node->getAttributes());
+                    $arms[$i] = new Node\MatchArm(array_values($conds), $arm->body, $node->getAttributes());
 
                     yield new Node\Expr\Match_($node->cond, $arms, $node->getAttributes());
                 }
