@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use PhpParser\NodeVisitor;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use PhpParser\NodeVisitor;
 use Webmozart\Assert\Assert;
 
 /**
