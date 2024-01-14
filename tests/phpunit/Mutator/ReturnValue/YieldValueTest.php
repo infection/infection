@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
+use Composer\InstalledVersions;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use function version_compare;
 
 final class YieldValueTest extends BaseMutatorTestCase
 {
@@ -60,14 +62,27 @@ $a = function () {
 };
 PHP
             ,
-            <<<'PHP'
+            (static function () {
+                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
+                    return
+                        <<<'PHP'
+<?php
+
+$a = function () {
+    (yield $b);
+};
+PHP;
+                }
+
+                return
+                    <<<'PHP'
 <?php
 
 $a = function () {
     yield $b;
 };
-PHP
-            ,
+PHP;
+            })(),
         ];
 
         yield 'It does not mutate yields without a double arrow operator' => [

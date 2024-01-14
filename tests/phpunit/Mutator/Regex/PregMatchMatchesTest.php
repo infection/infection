@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
+use Composer\InstalledVersions;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use function version_compare;
 
 final class PregMatchMatchesTest extends BaseMutatorTestCase
 {
@@ -58,11 +60,23 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
 preg_match('/a/', 'b', $foo);
 PHP
             ,
-            <<<'PHP'
+            (static function () {
+                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
+                    return
+                        <<<'PHP'
+<?php
+
+(int) ($foo = []);
+PHP;
+                }
+
+                return
+                    <<<'PHP'
 <?php
 
 (int) $foo = [];
-PHP
+PHP;
+            })(),
         ];
 
         yield 'It does not mutate if the function is a variable' => [
@@ -81,11 +95,23 @@ PHP
 PreG_maTch('/a/', 'b', $foo);
 PHP
             ,
-            <<<'PHP'
+            (static function () {
+                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
+                    return
+                        <<<'PHP'
+<?php
+
+(int) ($foo = []);
+PHP;
+                }
+
+                return
+                    <<<'PHP'
 <?php
 
 (int) $foo = [];
-PHP
+PHP;
+            })(),
         ];
 
         yield 'It does not mutate if there are less than 3 arguments' => [
@@ -103,11 +129,23 @@ PHP
 preg_match('/a/', 'b', $a->b);
 PHP
             ,
-            <<<'PHP'
+            (static function () {
+                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
+                    return
+                        <<<'PHP'
+<?php
+
+(int) ($a->b = []);
+PHP;
+                }
+
+                return
+                    <<<'PHP'
 <?php
 
 (int) $a->b = [];
-PHP
+PHP;
+            })(),
         ];
 
         yield 'It mutates correctly even with four arguments' => [
@@ -117,11 +155,23 @@ PHP
 preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE);
 PHP
             ,
-            <<<'PHP'
+            (static function () {
+                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
+                    return
+                        <<<'PHP'
+<?php
+
+(int) ($foo = []);
+PHP;
+                }
+
+                return
+                    <<<'PHP'
 <?php
 
 (int) $foo = [];
-PHP
+PHP;
+            })(),
         ];
 
         yield 'It mutates correctly even with five arguments' => [
@@ -131,11 +181,23 @@ PHP
 preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE, 3);
 PHP
             ,
-            <<<'PHP'
+            (static function () {
+                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
+                    return
+                        <<<'PHP'
+<?php
+
+(int) ($foo = []);
+PHP;
+                }
+
+                return
+                    <<<'PHP'
 <?php
 
 (int) $foo = [];
-PHP
+PHP;
+            })(),
         ];
     }
 }
