@@ -35,16 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use Composer\InstalledVersions;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function version_compare;
 
 /**
  * @internal
  *
- * @implements Mutator<Node\Expr\Throw_>
+ * @implements Mutator<Node\Stmt\Throw_|Node\Expr\Throw_>
  */
 final class Throw_ implements Mutator
 {
@@ -82,15 +84,19 @@ DIFF
      *
      * Replaces "throw new Exception();" with "new Exception();"
      *
-     * @return iterable<Node\Expr>
+     * @return iterable<Node\Stmt\Expression|Node\Expr>
      */
     public function mutate(Node $node): iterable
     {
-        yield $node->expr;
+        if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
+            yield new Node\Stmt\Expression($node->expr);
+        } else {
+            yield $node->expr;
+        }
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Throw_;
+        return $node instanceof Node\Expr\Throw_ || $node instanceof Node\Stmt\Throw_;
     }
 }

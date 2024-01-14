@@ -56,6 +56,7 @@ class Mutation
     private readonly string $mutatorName;
     /** @var array<string|int|float> */
     private readonly array $attributes;
+    private readonly bool $coveredByTests;
     private ?float $nominalTimeToTest = null;
 
     private ?string $hash = null;
@@ -80,9 +81,9 @@ class Mutation
         foreach (MutationAttributeKeys::ALL as $key) {
             Assert::keyExists($attributes, $key);
         }
-
         $this->mutatorName = $mutatorName;
         $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
+        $this->coveredByTests = $tests !== [];
     }
 
     public function getOriginalFilePath(): string
@@ -141,9 +142,10 @@ class Mutation
         return $this->mutatedNode;
     }
 
+    // TODO: hasTest()?
     public function isCoveredByTest(): bool
     {
-        return $this->tests !== [];
+        return $this->coveredByTests;
     }
 
     /**

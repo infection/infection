@@ -33,75 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+namespace Infection\PhpParser\PrettyPrinter;
 
-use Composer\InstalledVersions;
-use function count;
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
-use PhpParser\NodeVisitor;
-use function version_compare;
-use Webmozart\Assert\Assert;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Stmt;
+use PhpParser\PrettyPrinter\Standard;
+use function preg_replace;
 
 /**
- * @internal
+ * Keep compatibility between PHP-Parser 4 and 5 as the 5th version follow PSR-12.
+ * Could be removed when PHP-Parser 4 support is dropped.
  *
- * @implements Mutator<Node\Stmt\Finally_>
+ * @see https://github.com/nikic/PHP-Parser/blob/master/UPGRADE-5.0.md#changes-to-the-pretty-printer
  */
-final class Finally_ implements Mutator
+final class BackwardCompatibleStandard extends Standard
 {
-    use GetMutatorName;
+    private const REPLACE_COLON_WITH_SPACE_REGEX = '#(^.*function .*\\(.*\\)) : #';
 
-    public static function getDefinition(): ?Definition
+    public function __construct(array $options = [])
     {
-        return new Definition(
-            'Removes the `finally` block.',
-            MutatorCategory::SEMANTIC_REDUCTION,
-            null,
-            <<<'DIFF'
-try {
-    // do smth
-+ }
-- } finally {
--
-- }
-DIFF
-        );
+        $options['shortArraySyntax'] = true;
+
+        parent::__construct($options);
     }
 
-    /**
-     * @psalm-mutation-free
-     *
-     * @return iterable<int|Node\Stmt\Nop>
-     */
-    public function mutate(Node $node): iterable
+    protected function pStmt_ClassMethod(Stmt\ClassMethod $node): string
     {
-        if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
-            yield new Node\Stmt\Nop();
-        } else {
-            yield NodeVisitor::REPLACE_WITH_NULL;
-        }
-    }
+        $content = parent::pStmt_ClassMethod($node);
 
-    public function canMutate(Node $node): bool
-    {
-        if (!$node instanceof Node\Stmt\Finally_) {
-            return false;
+        if (!$node->returnType instanceof Node) {
+            return $content;
         }
 
-        return $this->hasAtLeastOneCatchBlock($node);
+        return preg_replace(self::REPLACE_COLON_WITH_SPACE_REGEX, '$1: ', $content);
     }
 
-    private function hasAtLeastOneCatchBlock(Node $node): bool
+    protected function pStmt_Function(Stmt\Function_ $node): string
     {
-        /** @var Node\Stmt\TryCatch $parentNode */
-        $parentNode = ParentConnector::getParent($node);
-        Assert::isInstanceOf($parentNode, Node\Stmt\TryCatch::class);
+        $content = parent::pStmt_Function($node);
 
-        return count($parentNode->catches) > 0;
+        if (!$node->returnType instanceof Node) {
+            return $content;
+        }
+
+        return preg_replace(self::REPLACE_COLON_WITH_SPACE_REGEX, '$1: ', $content);
+    }
+
+    protected function pExpr_ClosureUse(Expr\ClosureUse $node): string
+    {
+        $content = parent::pExpr_ClosureUse($node);
+
+        return preg_replace(self::REPLACE_COLON_WITH_SPACE_REGEX, '$1: ', $content);
     }
 }
