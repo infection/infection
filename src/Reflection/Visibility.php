@@ -43,14 +43,8 @@ final class Visibility
     public const PUBLIC = 'public';
     public const PROTECTED = 'protected';
 
-    /**
-     * @var string
-     */
-    private $variant;
-
-    private function __construct(string $variant)
+    private function __construct(private readonly string $variant)
     {
-        $this->variant = $variant;
     }
 
     public static function asPublic(): self

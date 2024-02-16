@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use function array_values;
 use Infection\FileSystem\FileFilter;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\Trace;
+use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
 
 final class BufferedSourceFileFilterTest extends TestCase
 {
@@ -94,14 +96,10 @@ final class BufferedSourceFileFilterTest extends TestCase
         return $traceMock;
     }
 
-    private function createFileInfoMock(string $filename): SplFileInfo
+    private function createFileInfoMock(string $filename): MockSplFileInfo
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
-        $fileInfoMock
-            ->method('getRealPath')
-            ->willReturn($filename)
-        ;
-
-        return $fileInfoMock;
+        return new MockSplFileInfo([
+            'realPath' => $filename,
+        ]);
     }
 }

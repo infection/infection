@@ -47,26 +47,11 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 final class CoveredTraceProvider implements TraceProvider
 {
     /**
-     * @var TraceProvider
-     */
-    private $primaryTraceProvider;
-
-    private $testFileDataAdder;
-
-    private $bufferedFilter;
-
-    /**
      * @param PhpUnitXmlCoverageTraceProvider|TraceProvider $primaryTraceProvider
      * @param BufferedSourceFileFilter|FileFilter $bufferedFilter
      */
-    public function __construct(
-        TraceProvider $primaryTraceProvider,
-        JUnitTestExecutionInfoAdder $testFileDataAdder,
-        FileFilter $bufferedFilter
-    ) {
-        $this->primaryTraceProvider = $primaryTraceProvider;
-        $this->testFileDataAdder = $testFileDataAdder;
-        $this->bufferedFilter = $bufferedFilter;
+    public function __construct(private readonly TraceProvider $primaryTraceProvider, private readonly JUnitTestExecutionInfoAdder $testFileDataAdder, private readonly FileFilter $bufferedFilter)
+    {
     }
 
     /**

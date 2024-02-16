@@ -37,7 +37,7 @@ namespace Infection\Mutator;
 
 use function array_fill_keys;
 use function array_keys;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -48,7 +48,7 @@ abstract class AllowedFunctionsConfig
     /**
      * @var string[]
      */
-    private $allowedFunctions;
+    private readonly array $allowedFunctions;
 
     /**
      * @param array<string, bool> $settings

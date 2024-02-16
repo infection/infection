@@ -42,16 +42,13 @@ use ReflectionClass;
  */
 final class AnonymousClassReflection implements ClassReflection
 {
-    /**
-     * @var ReflectionClass
-     */
-    private $reflectionClass;
-
-    private function __construct(ReflectionClass $reflectionClass)
+    private function __construct(private readonly ReflectionClass $reflectionClass)
     {
-        $this->reflectionClass = $reflectionClass;
     }
 
+    /**
+     * @param class-string $className
+     */
     public static function fromClassName(string $className): self
     {
         return new self(new ReflectionClass($className));

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 /**
@@ -43,11 +44,17 @@ use PhpParser\Node;
  */
 final class LineRangeCalculator
 {
-    public function calculateRange(Node $node): NodeLineRangeData
+    public function calculateRange(Node $originalNode): NodeLineRangeData
     {
-        $node = $this->getOuterMostArrayNode($node);
+        if ($originalNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false) === true) {
+            $startLine = $originalNode->getStartLine();
+            // function signature node should always be 1-line range: (start, start)
+            return new NodeLineRangeData($startLine, $startLine);
+        }
 
-        return new NodeLineRangeData($node->getStartLine(), $node->getEndLine());
+        $outerMostArrayNode = $this->getOuterMostArrayNode($originalNode);
+
+        return new NodeLineRangeData($outerMostArrayNode->getStartLine(), $outerMostArrayNode->getEndLine());
     }
 
     /**

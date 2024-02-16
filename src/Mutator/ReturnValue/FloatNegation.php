@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Return_>
  */
 final class FloatNegation implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces a float value with its negated value. For example will replace `-33.4` 
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = -33.4;
++ $a = 33.4;
+DIFF
         );
     }
 
     /**
-     * @param Node\Stmt\Return_ $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Stmt\Return_>
      */
@@ -96,6 +102,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Stmt\Return_ $node
      */
     private function getFloatValueOfNode(Node $node): float

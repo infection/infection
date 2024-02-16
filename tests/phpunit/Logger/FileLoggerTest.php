@@ -64,6 +64,8 @@ final class FileLoggerTest extends FileSystemTestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->fileSystemMock = $this->createMock(Filesystem::class);
         $this->logger = new DummyLogger();
     }

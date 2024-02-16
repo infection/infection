@@ -57,20 +57,15 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     public const FUNCTION_SCOPE_KEY = 'functionScope';
     public const FUNCTION_NAME = 'functionName';
 
-    /**
-     * @var Node\Expr\Closure[]|Node\Stmt\ClassMethod[]|Node[]
-     */
-    private $functionScopeStack = [];
+    /** @var array<int, Node> */
+    private array $functionScopeStack = [];
 
     /**
      * @var ClassReflection[]
      */
-    private $classScopeStack = [];
+    private array $classScopeStack = [];
 
-    /**
-     * @var string|null
-     */
-    private $methodName;
+    private ?string $methodName = null;
 
     public function beforeTraverse(array $nodes): ?array
     {
@@ -127,26 +122,32 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             array_pop($this->functionScopeStack);
         }
 
-        if ($node instanceof  Node\Stmt\ClassLike) {
+        if ($node instanceof Node\Stmt\ClassLike) {
             array_pop($this->classScopeStack);
         }
 
         return null;
     }
 
+    /**
+     * Loop on all parents of the node until one is a Node\Param or a function-like, which means it is part of a
+     * signature.
+     */
     private function isPartOfFunctionSignature(Node $node): bool
     {
         if ($this->isFunctionLikeNode($node)) {
             return true;
         }
 
-        $parent = ParentConnector::findParent($node);
-
-        if ($parent === null) {
-            return false;
+        if ($node instanceof Node\Param) {
+            return true;
         }
 
-        return $parent instanceof Node\Param || $node instanceof Node\Param;
+        do {
+            $node = ParentConnector::findParent($node);
+        } while ($node !== null && !$node instanceof Node\Param);
+
+        return $node !== null;
     }
 
     /**
@@ -160,7 +161,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             return false;
         }
 
-        if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY)) {
+        if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY) !== null) {
             return true;
         }
 

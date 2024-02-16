@@ -42,13 +42,15 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use InvalidArgumentException;
+use const PHP_EOL;
 use function Safe\file_get_contents;
 use function Safe\realpath;
-use function Safe\sprintf;
-use function simplexml_load_string;
+use function Safe\simplexml_load_string;
+use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -98,9 +100,12 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_preserves_white_spaces_and_formatting(): void
     {
+        if (PHP_EOL === "\r\n") {
+            $this->markTestSkipped('Test fixture uses Unix line endings');
+        }
+
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/format-whitespace/original-phpunit.xml',
-            true
+            self::FIXTURES . '/format-whitespace/original-phpunit.xml'
         );
 
         $configurationPath = $builder->build('6.5');
@@ -115,8 +120,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         try {
             $this->createConfigBuilder(
-                self::FIXTURES . '/invalid/empty-phpunit.xml',
-                true
+                self::FIXTURES . '/invalid/empty-phpunit.xml'
             );
 
             $this->fail('Expected an exception to be thrown.');
@@ -131,8 +135,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     public function test_the_original_xml_config_must_be_a_valid_phpunit_config_file(): void
     {
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/invalid/invalid-phpunit.xml',
-            true
+            self::FIXTURES . '/invalid/invalid-phpunit.xml'
         );
 
         try {
@@ -216,7 +219,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(0, $logEntries->length);
     }
 
-    public function test_it_adds_needed_loggers(): void
+    public function test_it_does_not_add_coverage_loggers_ever_for_legacy_configuration(): void
     {
         $xml = file_get_contents($this->builder->build('6.5'));
 
@@ -224,24 +227,16 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $this->assertInstanceOf(DOMNodeList::class, $logEntries);
 
-        $this->assertSame(2, $logEntries->length);
-
-        // XML coverage logger
-        $this->assertSame($this->tmp . '/coverage-xml', $logEntries[0]->getAttribute('target'));
-        $this->assertSame('coverage-xml', $logEntries[0]->getAttribute('type'));
-
-        // JUnit coverage logger
-        $this->assertSame('junit', $logEntries[1]->getAttribute('type'));
-        $this->assertSame('/path/to/junit.xml', $logEntries[1]->getAttribute('target'));
+        $this->assertSame(0, $logEntries->length);
     }
 
-    public function test_it_does_not_add_coverage_loggers_if_should_be_skipped(): void
+    public function test_it_does_not_add_coverage_loggers_ever_for_latest_configuration(): void
     {
-        $builder = $this->createConfigBuilder(null, true);
+        $builder = $this->createConfigBuilderForPHPUnit93();
 
-        $xml = file_get_contents($builder->build('6.5'));
+        $xml = file_get_contents($builder->build('9.4'));
 
-        $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
+        $logEntries = $this->queryXpath($xml, '/phpunit/logging');
 
         $this->assertInstanceOf(DOMNodeList::class, $logEntries);
 
@@ -261,6 +256,71 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(2, $whitelistedDirectories->length);
     }
 
+    public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist_and_version_situation_is_uncertain(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('9.3'));
+
+        $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
+
+        $this->assertSame(2, $whitelistedDirectories->length);
+    }
+
+    public function test_it_replaces_coverage_filter_include_node_if_exists_but_filtered_source_files_provided(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_coverage_include_directories.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('9.3'));
+
+        $coverageIncludeFiles = $this->queryXpath($xml, '/phpunit/coverage/include/file');
+
+        $this->assertInstanceOf(DOMNodeList::class, $coverageIncludeFiles);
+
+        $this->assertSame(1, $coverageIncludeFiles->length);
+    }
+
+    public function test_it_creates_coverage_include_node_if_does_not_exist_for_10_0_version_of_phpunit(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('10.0'));
+
+        $includedDirectories = $this->queryXpath($xml, '/phpunit/coverage/include/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $includedDirectories);
+
+        $this->assertSame(2, $includedDirectories->length);
+    }
+
+    public function test_it_does_not_create_legacy_coverage_filter_whitelist_node_for_10_0_version_of_phpunit(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('10.0'));
+
+        $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
+
+        $this->assertSame(0, $whitelistedDirectories->length);
+    }
+
+    public function test_it_creates_source_include_node_if_does_not_exist_for_10_1_version_of_phpunit(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('10.1'));
+
+        $includedDirectories = $this->queryXpath($xml, '/phpunit/source/include/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $includedDirectories);
+
+        $this->assertSame(2, $includedDirectories->length);
+    }
+
     public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist(): void
     {
         $xml = file_get_contents($this->builder->build('6.5'));
@@ -270,6 +330,19 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
 
         $this->assertSame(1, $whitelistedDirectories->length);
+    }
+
+    public function test_it_does_not_create_coverage_include_node_if_already_exist(): void
+    {
+        $builder = $this->createConfigBuilderForPHPUnit93();
+
+        $xml = file_get_contents($builder->build('9.4'));
+
+        $includedDirectories = $this->queryXpath($xml, '/phpunit/coverage/include');
+
+        $this->assertInstanceOf(DOMNodeList::class, $includedDirectories);
+
+        $this->assertSame(1, $includedDirectories->length);
     }
 
     public function test_it_removes_printer_class(): void
@@ -347,7 +420,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
 
         $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
-        $this->assertSame('true', $failOnRisky[0]->value);
+        $this->assertSame('false', $failOnRisky[0]->value);
     }
 
     public function test_it_does_not_update_fail_on_warning_attributes_if_it_is_already_set(): void
@@ -361,14 +434,13 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnWarning'));
 
         $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
-        $this->assertSame('true', $failOnRisky[0]->value);
+        $this->assertSame('false', $failOnRisky[0]->value);
     }
 
     public function test_it_creates_a_configuration(): void
     {
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/phpunit.xml',
-            true
+            self::FIXTURES . '/phpunit.xml'
         );
 
         $configurationPath = $builder->build('6.5');
@@ -493,13 +565,17 @@ XML
         return (new DOMXPath($dom))->query($query);
     }
 
+    private function createConfigBuilderForPHPUnit93(): InitialConfigBuilder
+    {
+        return $this->createConfigBuilder(self::FIXTURES . '/phpunit_93.xml');
+    }
+
     private function createConfigBuilder(
         ?string $originalPhpUnitXmlConfigPath = null,
-        bool $skipCoverage = false
+        array $filteredSourceFilesToMutate = []
     ): InitialConfigBuilder {
         $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
 
-        $jUnitFilePath = '/path/to/junit.xml';
         $srcDirs = ['src', 'app'];
 
         $replacer = new PathReplacer(new Filesystem(), $this->projectPath);
@@ -508,9 +584,9 @@ XML
             $this->tmp,
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationManipulator($replacer, ''),
-            $jUnitFilePath,
+            new XmlConfigurationVersionProvider(),
             $srcDirs,
-            $skipCoverage
+            $filteredSourceFilesToMutate
         );
     }
 }

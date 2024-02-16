@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\BitwiseOr>
  */
 final class BitwiseOr implements Mutator
 {
@@ -53,12 +55,16 @@ final class BitwiseOr implements Mutator
         return new Definition(
             'Replaces a bitwise OR operator (`|`) with a bitwise AND operator (`&`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b | $c;
++ $a = $b & $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\BitwiseOr $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\BitwiseAnd>
      */

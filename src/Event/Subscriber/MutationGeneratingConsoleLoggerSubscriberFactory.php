@@ -42,11 +42,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutationGeneratingConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
-    private $skipProgressBar;
-
-    public function __construct(bool $skipProgressBar)
+    public function __construct(private readonly bool $skipProgressBar)
     {
-        $this->skipProgressBar = $skipProgressBar;
     }
 
     public function create(OutputInterface $output): EventSubscriber

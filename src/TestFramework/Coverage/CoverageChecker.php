@@ -42,47 +42,34 @@ use function implode;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use function ini_get as ini_get_unsafe;
 use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
 use function strtolower;
 
 /**
  * @internal
+ * @final
  */
-final class CoverageChecker
+class CoverageChecker
 {
     private const PHPUNIT = 'phpunit';
     private const CODECEPTION = 'codeception';
-
-    private $skipCoverage;
-    private $skipInitialTests;
-    private $initialTestPhpOptions;
-    private $coveragePath;
-    private $jUnitReport;
-    private $jUnitReportLocator;
-    private $frameworkAdapterName;
-    private $indexXmlCoverageLocator;
+    private readonly string $frameworkAdapterName;
 
     public function __construct(
-        bool $skipCoverage,
-        bool $skipInitialTests,
-        string $initialTestPhpOptions,
-        string $coveragePath,
-        bool $junitReport,
-        JUnitReportLocator $jUnitReportLocator,
+        private readonly bool $skipCoverage,
+        private readonly bool $skipInitialTests,
+        private readonly string $initialTestPhpOptions,
+        private readonly string $coveragePath,
+        private readonly bool $jUnitReport,
+        private readonly JUnitReportLocator $jUnitReportLocator,
         string $testFrameworkAdapterName,
-        IndexXmlCoverageLocator $indexXmlCoverageLocator
+        private readonly IndexXmlCoverageLocator $indexXmlCoverageLocator
     ) {
-        $this->skipCoverage = $skipCoverage;
-        $this->skipInitialTests = $skipInitialTests;
-        $this->initialTestPhpOptions = $initialTestPhpOptions;
-        $this->coveragePath = $coveragePath;
-        $this->jUnitReport = $junitReport;
-        $this->jUnitReportLocator = $jUnitReportLocator;
         $this->frameworkAdapterName = strtolower($testFrameworkAdapterName);
-        $this->indexXmlCoverageLocator = $indexXmlCoverageLocator;
     }
 
     public function checkCoverageRequirements(): void
@@ -100,9 +87,9 @@ final class CoverageChecker
         if (!$this->skipCoverage && !$this->hasCoverageGeneratorEnabled()) {
             throw new CoverageNotFound(<<<TXT
 Coverage needs to be generated but no code coverage generator (pcov, phpdbg or xdebug) has been detected. Please either:
-- Enable pcov and run infection again
+- Enable pcov and run Infection again
 - Use phpdbg, e.g. `phpdbg -qrr infection`
-- Enable Xdebug and run infection again
+- Enable Xdebug (in case of using Xdebug 3 check that `xdebug.mode` or environment variable XDEBUG_MODE set to `coverage`) and run Infection again
 - Use the "--coverage" option with path to the existing coverage report
 - Enable the code generator tool for the initial test run only, e.g. with `--initial-tests-php-options -d zend_extension=xdebug.so`
 TXT
@@ -171,9 +158,10 @@ TXT
     private function hasCoverageGeneratorEnabled(): bool
     {
         return PHP_SAPI === 'phpdbg'
-            || extension_loaded('xdebug')
+            || XdebugHandler::isXdebugActive()
             || extension_loaded('pcov')
-            || XdebugHandler::getSkippedVersion()
+            || XdebugHandler::getSkippedVersion() !== ''
+            || ini_get_unsafe('xdebug.mode') !== false
             || $this->isXdebugIncludedInInitialTestPhpOptions()
             || $this->isPcovIncludedInInitialTestPhpOptions();
     }

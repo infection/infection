@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 
+use function array_map;
+use Generator;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -47,7 +50,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->builder = new ArgumentsAndOptionsBuilder();
+        $this->builder = new ArgumentsAndOptionsBuilder(false);
     }
 
     public function test_it_can_build_the_command_without_extra_options(): void
@@ -59,7 +62,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--configuration',
                 $configPath,
             ],
-            $this->builder->build($configPath, '')
+            $this->builder->buildForInitialTestsRun($configPath, '')
         );
     }
 
@@ -74,7 +77,219 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--verbose',
                 '--debug',
             ],
-            $this->builder->build($configPath, '--verbose --debug')
+            $this->builder->buildForInitialTestsRun($configPath, '--verbose --debug')
         );
+    }
+
+    public function test_it_can_build_the_command_with_extra_options_that_contains_spaces(): void
+    {
+        $configPath = '/the config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--path=/a path/with spaces',
+            ],
+            $this->builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces')
+        );
+    }
+
+    /**
+     * @dataProvider provideTestCases
+     */
+    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(bool $executeOnlyCoveringTestCases, array $testCases, string $phpUnitVersion, ?string $expectedFilterOptionValue = null): void
+    {
+        $configPath = '/the config/path';
+
+        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases);
+
+        $expectedArgumentsAndOptions = [
+            '--configuration',
+            $configPath,
+            '--path=/a path/with spaces',
+        ];
+
+        if ($executeOnlyCoveringTestCases) {
+            $expectedArgumentsAndOptions[] = '--filter';
+            $expectedArgumentsAndOptions[] = $expectedFilterOptionValue;
+        }
+
+        $this->assertSame(
+            $expectedArgumentsAndOptions,
+            $builder->buildForMutant(
+                $configPath,
+                '--path=/a path/with spaces',
+                array_map(
+                    static fn (string $testCase): TestLocation => TestLocation::forTestMethod($testCase),
+                    $testCases
+                ),
+                $phpUnitVersion
+            )
+        );
+    }
+
+    public function provideTestCases(): Generator
+    {
+        yield '--only-covering-test-cases is disabled' => [
+            false,
+            [
+                'App\Test::test_case1',
+            ],
+            '9.5',
+        ];
+
+        yield '1 test case' => [
+            true,
+            [
+                'App\Test::test_case1',
+            ],
+            '9.5',
+            '/Test\:\:test_case1/',
+        ];
+
+        yield '2 test cases' => [
+            true,
+            [
+                'App\Test::test_case1',
+                'App\Test::test_case2',
+            ],
+            '9.5',
+            '/Test\:\:test_case1|Test\:\:test_case2/',
+        ];
+
+        yield '1 simple test case, 1 with data set and special character >' => [
+            true,
+            [
+                'App\Test::test_case1 with data set "With special character >"',
+                'App\Test::test_case2',
+            ],
+            '9.5',
+            '/Test\:\:test_case1 with data set "With special character \\>"|Test\:\:test_case2/',
+        ];
+
+        yield '1 simple test case, 1 with data set and special character @' => [
+            true,
+            [
+                'App\Test::test_case1 with data set "With special character @"',
+                'App\Test::test_case2',
+            ],
+            '9.5',
+            '/Test\:\:test_case1 with data set "With special character @"|Test\:\:test_case2/',
+        ];
+
+        yield '2 data sets from data provider for the same test case' => [
+            true,
+            [
+                'App\Test::test_case1 with data set "#1"',
+                'App\Test::test_case1 with data set "#2"',
+            ],
+            '9.5',
+            '/Test\:\:test_case1 with data set "\#1"|Test\:\:test_case1 with data set "\#2"/',
+        ];
+
+        yield '1 data set from data provider "With special char \\"' => [
+            true,
+            [
+                'App\Test::test_case1 with data set "With special char \\"',
+            ],
+            '9.5',
+            '/Test\:\:test_case1 with data set "With special char \\\\"/',
+        ];
+
+        yield '1 data set from data provider "With special chars ::"' => [
+            true,
+            [
+                'App\Test::test_case1 with data set "With special chars ::"',
+            ],
+            '9.5',
+            '/Test\:\:test_case1 with data set "With special chars \:\:"/',
+        ];
+
+        yield '1 test case - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1',
+            ],
+            '10.1',
+            '/Test\:\:test_case1/',
+        ];
+
+        yield '2 test cases - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1',
+                'App\Test::test_case2',
+            ],
+            '10.1',
+            '/Test\:\:test_case1|Test\:\:test_case2/',
+        ];
+
+        yield '1 simple test case, 1 with data set and special character > - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#With special character >',
+                'App\Test::test_case2',
+            ],
+            '10.1',
+            '/Test\:\:test_case1 with data set "With special character \\>"|Test\:\:test_case2/',
+        ];
+
+        yield '1 simple test case, 1 with data set and special character @ - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#With special character @',
+                'App\Test::test_case2',
+            ],
+            '10.1',
+            '/Test\:\:test_case1 with data set "With special character @"|Test\:\:test_case2/',
+        ];
+
+        yield '2 data sets from data provider for the same test case - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1##1',
+                'App\Test::test_case1##2',
+            ],
+            '10.1',
+            '/Test\:\:test_case1 with data set "\#1"|Test\:\:test_case1 with data set "\#2"/',
+        ];
+
+        yield '1 data set from data provider "With special char \\" - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#With special char \\"',
+            ],
+            '10.1',
+            '/Test\:\:test_case1 with data set "With special char \\\\""/',
+        ];
+
+        yield '1 data set from data provider "With special chars ::" - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#With special chars ::',
+            ],
+            '10.1',
+            '/Test\:\:test_case1 with data set "With special chars \:\:"/',
+        ];
+
+        yield '1 test case from data provider with numeric data provider keys - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#0',
+                'App\Test::test_case1#1',
+            ],
+            '10.5',
+            '/Test\:\:test_case1 with data set \#0|Test\:\:test_case1 with data set \#1/',
+        ];
+
+        yield '1 test case from data provider with leading numbers in the key string - PHPUnit10' => [
+            true,
+            [
+                'App\Test::test_case1#123a',
+            ],
+            '10.5',
+            '/Test\:\:test_case1 with data set "123a"/',
+        ];
     }
 }

@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use PHPUnit\Framework\TestCase;
 
@@ -121,11 +121,15 @@ final class SchemaConfigurationTest extends TestCase
             new Source(['src', 'lib'], ['fixtures', 'tests']),
             new Logs(
                 'text.log',
+                'report.html',
                 'summary.log',
                 'json.log',
+                'gitlab.log',
                 'debug.log',
                 'mutator.log',
-                new Badge('master')
+                true,
+                StrykerConfig::forFullReport('master'),
+                'summary.json'
             ),
             'path/to/tmp',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),

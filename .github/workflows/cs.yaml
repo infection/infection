@@ -1,0 +1,35 @@
+name: Coding Standards
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  coding-standards:
+    name: Coding Standards
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          # Should use the lowest supported version to ensure the CS-Fixer does
+          # not get confused and apply a rule that would break on lower supported
+          # versions.
+          php-version: 8.1
+
+      - name: Restore PHP-CS-Fixer cache
+        uses: actions/cache@v3
+        with:
+          path: .php_cs.cache
+          key: "php-cs-fixer"
+          restore-keys: "php-cs-fixer"
+
+      - name: Run PHP-CS-Fixer
+        run: make cs-check

@@ -40,11 +40,12 @@ use function array_unshift;
 use function count;
 use function implode;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
+use function ksort;
 use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
-use function Safe\ksort;
-use function Safe\sprintf;
+use function sprintf;
 use function str_pad;
 use const STR_PAD_LEFT;
 use const STR_PAD_RIGHT;
@@ -56,11 +57,10 @@ use function strlen;
  */
 final class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
-    private $metricsCalculator;
+    private const ROUND_PRECISION = 2;
 
-    public function __construct(MetricsCalculator $metricsCalculator)
+    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector)
     {
-        $this->metricsCalculator = $metricsCalculator;
     }
 
     public function getLogLines(): array
@@ -68,7 +68,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
         $calculatorPerMutator = $this->createMetricsPerMutators();
 
         $table = [
-            ['Mutator', 'Mutations', 'Killed', 'Escaped', 'Errors', 'Timed Out', 'Skipped', 'MSI (%s)', 'Covered MSI (%s)'],
+            ['Mutator', 'Mutations', 'Killed', 'Escaped', 'Errors', 'Syntax Errors', 'Timed Out', 'Skipped', 'Ignored', 'MSI (%s)', 'Covered MSI (%s)'],
         ];
 
         foreach ($calculatorPerMutator as $mutatorName => $calculator) {
@@ -80,8 +80,10 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
                 (string) $calculator->getKilledCount(),
                 (string) $calculator->getEscapedCount(),
                 (string) $calculator->getErrorCount(),
+                (string) $calculator->getSyntaxErrorCount(),
                 (string) $calculator->getTimedOutCount(),
                 (string) $calculator->getSkippedCount(),
+                (string) $calculator->getIgnoredCount(),
                 self::formatScore($calculator->getMutationScoreIndicator()),
                 self::formatScore($calculator->getCoveredCodeMutationScoreIndicator()),
             ];
@@ -99,14 +101,14 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
     {
         return sprintf(
             '%0.2f',
-            round($score, 2, PHP_ROUND_HALF_UP)
+            round($score, self::ROUND_PRECISION, PHP_ROUND_HALF_UP)
         );
     }
 
     /**
      * @param string[][] $table
      *
-     * @return string[];
+     * @return string[]
      */
     private static function formatTable(array $table): array
     {
@@ -140,7 +142,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
 
         foreach ($table as $row) {
             foreach ($row as $columnNumber => $cell) {
-                $sizes[$columnNumber] = (int) max($sizes[$columnNumber], strlen($cell));
+                $sizes[$columnNumber] = max($sizes[$columnNumber], strlen($cell));
             }
         }
 
@@ -154,8 +156,6 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
 
     /**
      * @param int[] $columnSizes
-     *
-     * @var int[]
      */
     private static function createSeparatorRow(array $columnSizes): string
     {
@@ -173,11 +173,11 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
      */
     private function createMetricsPerMutators(): array
     {
-        $executionResults = $this->metricsCalculator->getAllExecutionResults();
+        $allExecutionResults = $this->resultsCollector->getAllExecutionResults();
 
         $processPerMutator = [];
 
-        foreach ($executionResults as $executionResult) {
+        foreach ($allExecutionResults as $executionResult) {
             $mutatorName = $executionResult->getMutatorName();
             $processPerMutator[$mutatorName][] = $executionResult;
         }

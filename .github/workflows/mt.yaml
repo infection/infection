@@ -1,0 +1,99 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+# This build is to test the whole execute the PHPUnit tests & collect the coverage
+# report and run infection.
+# We are not interested in:
+# - Running it on different systems (e.g. Windows, which was disabled because too slow)
+# - Min/maxing the PHP version used: it can be any supported version
+# - Using different dependencies than the locked ones
+# - Using different code coverages
+# All of those variants may be interesting but are better tested in more scoped
+# tests like in ci.yaml.
+name: Mutation Testing
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+env:
+  MIN_MSI: 75.00
+  MIN_COVERED_MSI: 86.48
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    name: Infection complete run on Infection
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          # Any supported PHP version is fine
+          php-version: '8.2'
+          coverage: pcov
+          tools: composer
+        env:
+          # This is necessary when installing a tool with a specific version
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+          restore-keys: |
+            composer-${{ runner.os }}-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-
+            composer-
+
+      - name: Install dependencies
+        # Run the locked dependencies: we are not interested in testing different
+        # variations here so having a stable set is better.
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Collect coverage report
+        run: |
+          SYMFONY_DEPRECATIONS_HELPER=disabled php vendor/phpunit/phpunit/phpunit --stop-on-failure \
+            --coverage-xml=build/logs/coverage-xml \
+            --log-junit=build/logs/junit.xml
+
+      - name: Run Infection
+        env:
+          INFECTION_BADGE_API_KEY: ${{ secrets.INFECTION_BADGE_API_KEY }}
+        run: |
+          php bin/infection --threads=max \
+            --skip-initial-tests \
+            --min-msi=$MIN_MSI \
+            --min-covered-msi=$MIN_COVERED_MSI \
+            --coverage=build/logs \
+            --log-verbosity=none \
+            --no-interaction \
+            --no-progress
+
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  tests-status:
+      name: Mutation Testing Status
+      runs-on: ubuntu-latest
+      needs: tests
+      if: always()
+      steps:
+          - name: Successful run
+            if: ${{ !(contains(needs.*.result, 'failure')) }}
+            run: exit 0
+
+          - name: Failing run
+            if: ${{ contains(needs.*.result, 'failure') }}
+            run: exit 1

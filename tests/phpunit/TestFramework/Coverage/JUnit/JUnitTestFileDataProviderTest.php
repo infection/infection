@@ -52,6 +52,7 @@ final class JUnitTestFileDataProviderTest extends TestCase
     private const JUNIT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml';
     private const JUNIT_DIFF_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit2.xml';
     private const JUNIT_FEATURE_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_feature.xml';
+    private const JUNIT_CODECEPTION_CEST_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_codeception_cest.xml';
 
     /**
      * @var JUnitReportLocator|MockObject
@@ -143,6 +144,18 @@ final class JUnitTestFileDataProviderTest extends TestCase
         $testFileInfo = $this->provider->getTestFileInfo('FeatureA:Scenario A1');
 
         $this->assertSame('/codeception/tests/bdd/FeatureA.feature', $testFileInfo->path);
+    }
+
+    public function test_it_works_with_codeception_cest_format(): void
+    {
+        $this->jUnitLocatorMock
+            ->method('locate')
+            ->willReturn(self::JUNIT_CODECEPTION_CEST_FORMAT)
+        ;
+
+        $testFileInfo = $this->provider->getTestFileInfo('app\controllers\ExampleCest:FeatureA');
+
+        $this->assertSame('/app/controllers/ExampleCest.php', $testFileInfo->path);
     }
 
     /**

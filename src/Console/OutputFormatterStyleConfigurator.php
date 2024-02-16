@@ -59,17 +59,13 @@ final class OutputFormatterStyleConfigurator
     private static function configureMutantStyle(OutputFormatterInterface $formatter): void
     {
         $formatter->setStyle('with-error', new OutputFormatterStyle('green'));
-        $formatter->setStyle(
-            'uncovered',
-            new OutputFormatterStyle('blue', null, ['bold'])
-        );
+        $formatter->setStyle('with-syntax-error', new OutputFormatterStyle('red', null, ['bold']));
+        $formatter->setStyle('uncovered', new OutputFormatterStyle('blue', null, ['bold']));
         $formatter->setStyle('timeout', new OutputFormatterStyle('yellow'));
-        $formatter->setStyle(
-            'escaped',
-            new OutputFormatterStyle('red', null, ['bold'])
-        );
+        $formatter->setStyle('escaped', new OutputFormatterStyle('red', null, ['bold']));
         $formatter->setStyle('killed', new OutputFormatterStyle('green'));
         $formatter->setStyle('skipped', new OutputFormatterStyle('magenta'));
+        $formatter->setStyle('ignored', new OutputFormatterStyle('white'));
         $formatter->setStyle('code', new OutputFormatterStyle('white'));
     }
 

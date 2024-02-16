@@ -1,0 +1,10 @@
+version: '3'
+services:
+  php81:
+    build:
+      context: devTools
+      args:
+        PHP_VERSION: '8.1'
+        XDEBUG_VERSION: '3.1.5'
+    volumes:
+      - .:/opt/infection

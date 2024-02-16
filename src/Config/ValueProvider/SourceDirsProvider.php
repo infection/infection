@@ -53,18 +53,8 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
  */
 final class SourceDirsProvider
 {
-    private $consoleHelper;
-    private $questionHelper;
-    private $sourceDirGuesser;
-
-    public function __construct(
-        ConsoleHelper $consoleHelper,
-        QuestionHelper $questionHelper,
-        SourceDirGuesser $sourceDirGuesser
-    ) {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
-        $this->sourceDirGuesser = $sourceDirGuesser;
+    public function __construct(private readonly ConsoleHelper $consoleHelper, private readonly QuestionHelper $questionHelper, private readonly SourceDirGuesser $sourceDirGuesser)
+    {
     }
 
     /**
@@ -80,7 +70,7 @@ final class SourceDirsProvider
 
         $choices = array_unique(array_merge(['.'], array_values($dirsInCurrentDir), $guessedSourceDirs));
 
-        $defaultValues = $guessedSourceDirs ? implode(',', $guessedSourceDirs) : null;
+        $defaultValues = $guessedSourceDirs !== [] ? implode(',', $guessedSourceDirs) : null;
 
         $questionText = $this->consoleHelper->getQuestion(
             'Which source directories do you want to include (comma separated)?',

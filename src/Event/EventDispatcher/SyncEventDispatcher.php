@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Event\EventDispatcher;
 
-use function get_class;
 use Infection\Event\Subscriber\EventSubscriber;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
 use Webmozart\Assert\Assert;
 
 /**
@@ -49,11 +49,11 @@ final class SyncEventDispatcher implements EventDispatcher
     /**
      * @var callable[][]
      */
-    private $listeners = [];
+    private array $listeners = [];
 
     public function dispatch(object $event): void
     {
-        $name = get_class($event);
+        $name = $event::class;
 
         foreach ($this->getListeners($name) as $listener) {
             $listener($event);
@@ -82,14 +82,14 @@ final class SyncEventDispatcher implements EventDispatcher
             }
 
             foreach ($method->getParameters() as $param) {
-                $paramClass = $param->getClass();
-                Assert::notNull($paramClass);
+                $paramClass = $param->getType();
+                Assert::isInstanceOf($paramClass, ReflectionNamedType::class);
 
                 $closure = $method->getClosure($eventSubscriber);
                 Assert::notNull($closure);
 
                 // Returning a closure instead of array [$eventSubscriber, $method->name], should work the same
-                yield $paramClass->name => $closure;
+                yield $paramClass->getName() => $closure;
 
                 break;
             }

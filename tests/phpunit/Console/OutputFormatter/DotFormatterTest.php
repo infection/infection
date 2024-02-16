@@ -40,6 +40,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
+use function str_replace;
 use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,8 +58,10 @@ final class DotFormatterTest extends TestCase
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
+            . '<with-syntax-error>X</with-syntax-error>: syntax error, '
             . '<timeout>T</timeout>: timed out, '
-            . '<skipped>S</skipped>: skipped',
+            . '<skipped>S</skipped>: skipped, '
+            . '<ignored>I</ignored>: ignored',
             '',
         ]);
 
@@ -168,6 +171,23 @@ final class DotFormatterTest extends TestCase
         );
     }
 
+    public function test_ignored_logs_correctly_in_console(): void
+    {
+        $outputIgnored = $this->getStartOutputFormatter();
+        $outputIgnored
+            ->expects($this->once())
+            ->method('write')
+            ->with('<ignored>I</ignored>')
+        ;
+
+        $dot = new DotFormatter($outputIgnored);
+        $dot->start(10);
+        $dot->advance(
+            $this->createMutantExecutionResultsOfType(DetectionStatus::IGNORED)[0],
+            10
+        );
+    }
+
     public function test_it_prints_total_number_of_mutations(): void
     {
         $totalMutations = self::ANY_PRIME_NUMBER;
@@ -183,13 +203,13 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-.: killed, M: escaped, U: uncovered, E: fatal error, T: timed out, S: skipped
+.: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
 ..................................................   ( 50 / 127)
 ..................................................   (100 / 127)
 ...........................                          (127 / 127)
 TXT
-            ),
+        ),
             strip_tags($buffer->fetch())
         );
     }
@@ -212,13 +232,13 @@ TXT
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-.: killed, M: escaped, U: uncovered, E: fatal error, T: timed out, S: skipped
+.: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
 ..................................................   (   50)
 ..................................................   (  100)
 ...........................
 TXT
-            ),
+        ),
             strip_tags($buffer->fetch())
         );
     }
@@ -251,8 +271,10 @@ TXT
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
+            . '<with-syntax-error>X</with-syntax-error>: syntax error, '
             . '<timeout>T</timeout>: timed out, '
-            . '<skipped>S</skipped>: skipped',
+            . '<skipped>S</skipped>: skipped, '
+            . '<ignored>I</ignored>: ignored',
             '',
         ]);
 

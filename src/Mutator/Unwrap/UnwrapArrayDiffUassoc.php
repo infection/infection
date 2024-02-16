@@ -37,12 +37,11 @@ namespace Infection\Mutator\Unwrap;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
-use PhpParser\Node;
 
 /**
  * @internal
  */
-final class UnwrapArrayDiffUassoc extends AbstractUnwrapMutator
+final class UnwrapArrayDiffUassoc extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
@@ -63,17 +62,16 @@ $x = $array1;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_diff_uassoc($array1, $array2, $keyCompareFunc);
++ $x = $array1;
+DIFF
         );
     }
 
     protected function getFunctionName(): string
     {
         return 'array_diff_uassoc';
-    }
-
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
-    {
-        yield 0;
     }
 }

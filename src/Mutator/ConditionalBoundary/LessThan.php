@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Smaller>
  */
 final class LessThan implements Mutator
 {
@@ -58,12 +60,16 @@ TXT
             MutatorCategory::SEMANTIC_ADDITION,
             <<<'TXT'
 This mutator shifts the compared values highlighting an untested boundary.
-TXT
+TXT,
+            <<<'DIFF'
+- $a = $b < $c;
++ $a = $b <= $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\Smaller $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\SmallerOrEqual>
      */

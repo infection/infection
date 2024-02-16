@@ -42,10 +42,10 @@ use function file_exists;
 use function implode;
 use Infection\FileSystem\Locator\FileNotFound;
 use function iterator_to_array;
-use function Safe\sprintf;
+use function sprintf;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -53,17 +53,12 @@ use Webmozart\PathUtil\Path;
  */
 class IndexXmlCoverageLocator
 {
-    private $coveragePath;
-    private $defaultIndexPath;
+    private readonly string $defaultIndexPath;
 
-    /**
-     * @var string|null
-     */
-    private $indexPath;
+    private ?string $indexPath = null;
 
-    public function __construct(string $coveragePath)
+    public function __construct(private readonly string $coveragePath)
     {
-        $this->coveragePath = $coveragePath;
         $this->defaultIndexPath = Path::canonicalize($coveragePath . '/coverage-xml/index.xml');
     }
 
@@ -106,9 +101,7 @@ class IndexXmlCoverageLocator
                 implode(
                     '", "',
                     array_map(
-                        static function (SplFileInfo $fileInfo): string {
-                            return Path::canonicalize($fileInfo->getPathname());
-                        },
+                        static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
                         $files
                     )
                 )

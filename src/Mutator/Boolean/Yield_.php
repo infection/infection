@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\Yield_>
  */
 final class Yield_ implements Mutator
 {
@@ -62,12 +64,16 @@ TXT
 This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
 - completely disregarding the actual yielded pair. The yielded content should either be checked or
 the impure calls should be made outside of the scope of the yielded value.
-TXT
+TXT,
+            <<<'DIFF'
+- yield $key => $value;
++ yield $key > $value;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\Yield_ $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\Yield_>
      */
@@ -78,14 +84,11 @@ TXT
         /** @var Node\Expr $value */
         $value = $node->value;
 
-        $node->value = new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
-        $node->key = null;
-
-        yield $node;
+        yield new Node\Expr\Yield_(new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes()));
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Yield_ && $node->key;
+        return $node instanceof Node\Expr\Yield_ && $node->key !== null;
     }
 }

@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutator;
 use function array_shift;
 use function count;
 use function escapeshellarg;
-use function exec;
+use function implode;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
@@ -48,9 +48,11 @@ use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
+use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function Safe\exec;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase
@@ -67,10 +69,10 @@ abstract class BaseMutatorTestCase extends TestCase
     }
 
     /**
-     * @var string|string[]
-     * @var mixed[] $settings
+     * @param string|string[] $expectedCode
+     * @param mixed[] $settings
      */
-    final public function doTest(string $inputCode, $expectedCode = [], array $settings = []): void
+    final public function doTest(string $inputCode, $expectedCode = [], array $settings = [], bool $allowInvalidCode = false): void
     {
         $expectedCodeSamples = (array) $expectedCode;
 
@@ -86,9 +88,10 @@ abstract class BaseMutatorTestCase extends TestCase
             count($mutants),
             $expectedCodeSamples,
             sprintf(
-                'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator.',
+                'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Mutants are: %s',
                 count($expectedCodeSamples),
-                count($mutants)
+                count($mutants),
+                StringNormalizer::normalizeString(implode(PHP_EOL, $mutants))
             )
         );
 
@@ -106,7 +109,10 @@ abstract class BaseMutatorTestCase extends TestCase
                 StringNormalizer::normalizeString($expectedCodeSample),
                 StringNormalizer::normalizeString($realMutatedCode)
             );
-            $this->assertSyntaxIsValid($realMutatedCode);
+
+            if (!$allowInvalidCode) {
+                $this->assertSyntaxIsValid($realMutatedCode);
+            }
         }
     }
 
@@ -119,7 +125,7 @@ abstract class BaseMutatorTestCase extends TestCase
             ->getMutatorFactory()
             ->create([
                 $mutatorClassName => ['settings' => $settings],
-            ])[MutatorName::getName($mutatorClassName)]
+            ], false)[MutatorName::getName($mutatorClassName)]
         ;
     }
 

@@ -47,11 +47,11 @@ use InvalidArgumentException;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\TestCase;
 use function restore_error_handler;
-use function Safe\sprintf;
 use function set_error_handler;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @group integration
@@ -73,7 +73,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
     public function test_it_replaces_with_absolute_paths(): void
     {
-        $this->assertItChangesStandardConfiguration(
+        $this->assertItChangesPrePHPUnit93Configuration(
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->replaceWithAbsolutePaths($xPath);
             },
@@ -110,9 +110,39 @@ XML
         );
     }
 
-    public function test_it_removes_existing_loggers(): void
+    public function test_it_replaces_with_absolute_paths_xml_file_with_tabs(): void
     {
-        $this->assertItChangesStandardConfiguration(
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+    <testsuites>
+		<testsuite name="All Tests">
+			<directory suffix="UnitTest.php">
+				./Tests
+			</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->replaceWithAbsolutePaths($xPath);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <testsuites>
+    <testsuite name="All Tests">
+      <directory suffix="UnitTest.php">/Tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_removes_existing_loggers_from_pre_93_configuration(): void
+    {
+        $this->assertItChangesPrePHPUnit93Configuration(
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->removeExistingLoggers($xPath);
             },
@@ -146,9 +176,158 @@ XML
         );
     }
 
+    public function test_it_adds_coverage_whitelist_directories_to_pre_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, ['src/', 'examples/'], []);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <filter>
+    <whitelist>
+      <directory>src/</directory>
+      <directory>examples/</directory>
+    </whitelist>
+  </filter>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_adds_coverage_whitelist_files_to_pre_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes(
+                    $xPath,
+                    ['src/', 'examples/'],
+                    ['src/File1.php', 'example/File2.php']
+                );
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <filter>
+    <whitelist>
+      <file>src/File1.php</file>
+      <file>example/File2.php</file>
+    </whitelist>
+  </filter>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_adds_coverage_whitelist_directories_to_post_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateCoverageIncludeNodes($xPath, ['src/', 'examples/'], []);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <coverage>
+    <include>
+      <directory>src/</directory>
+      <directory>examples/</directory>
+    </include>
+  </coverage>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_adds_coverage_whitelist_files_to_post_93_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateCoverageIncludeNodes($xPath,
+                    ['src/', 'examples/'],
+                    ['src/File1.php', 'example/File2.php']
+                );
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <coverage>
+    <include>
+      <file>src/File1.php</file>
+      <file>example/File2.php</file>
+    </include>
+  </coverage>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_adds_source_include_directories_to_post_10_1_configuration(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+<phpunit cacheTokens="true">
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateSourceIncludeNodes($xPath, ['src/', 'examples/'], []);
+            },
+            <<<'XML'
+<phpunit cacheTokens="true">
+  <source>
+    <include>
+      <directory>src/</directory>
+      <directory>examples/</directory>
+    </include>
+  </source>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_removes_existing_loggers_from_post_93_configuration(): void
+    {
+        $this->assertItChangesPostPHPUnit93Configuration(
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->removeExistingLoggers($xPath);
+            },
+            <<<'XML'
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage disableCodeCoverageIgnore="true" ignoreDeprecatedCodeUnits="true" includeUncoveredFiles="true" processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <exclude>
+      <directory suffix=".php">src/generated</directory>
+      <file>src/autoload.php</file>
+    </exclude>
+  </coverage>
+</phpunit>
+XML
+        );
+    }
+
     public function test_it_sets_set_stop_on_failure(): void
     {
-        $this->assertItChangesStandardConfiguration(
+        $this->assertItChangesPrePHPUnit93Configuration(
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->setStopOnFailure($xPath);
             },
@@ -231,7 +410,7 @@ XML
 
     public function test_it_deactivates_colors(): void
     {
-        $this->assertItChangesStandardConfiguration(
+        $this->assertItChangesPrePHPUnit93Configuration(
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateColours($xPath);
             },
@@ -445,6 +624,55 @@ XML
         );
     }
 
+    public function test_it_activates_result_cache_and_execution_order_defects_for_phpunit_7_3(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->handleResultCacheAndExecutionOrder('7.3', $xPath, 'a1b2c3');
+            },
+            <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    executionOrder="defects"
+    cacheResult="true"
+    cacheResultFile=".phpunit.result.cache.a1b2c3"
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+        );
+    }
+
+    public function test_it_does_not_set_result_cache_for_phpunit_7_1(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->handleResultCacheAndExecutionOrder('7.1', $xPath, 'a1b2c3');
+            },
+            <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+        );
+    }
+
     public function test_it_removes_existing_printers(): void
     {
         $this->assertItChangesXML(<<<'XML'
@@ -537,7 +765,7 @@ XML
             $this->configManipulator->validate('/path/to/phpunit.xml', $xPath);
 
             $this->fail('Expected exception to be thrown');
-        } catch (InvalidArgumentException | InvalidPhpUnitConfiguration $exception) {
+        } catch (InvalidArgumentException|InvalidPhpUnitConfiguration $exception) {
             $this->assertSame(
                 $errorMessage,
                 normalizeLineReturn($exception->getMessage())
@@ -547,10 +775,24 @@ XML
         }
     }
 
+    public function test_it_works_if_schema_location_is_absent_but_xmlns_xsi_is_present(): void
+    {
+        $xPath = $this->createXPath(<<<XML
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        bootstrap="vendor/autoload.php"
+        colors="true">
+</phpunit>
+XML
+        );
+
+        $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
+    }
+
     /**
      * @dataProvider schemaProvider
      *
-     * @group integration Might require an external connection to download the XSD
+     * @group integration
+     * Might require an external connection to download the XSD
      */
     public function test_it_validates_xml_by_xsd(string $xsdSchema): void
     {
@@ -601,7 +843,8 @@ EOF
     /**
      * @dataProvider schemaProvider
      *
-     * @group integration Might require an external connection to download the XSD
+     * @group integration
+     * Might require an external connection to download the XSD
      */
     public function test_it_passes_validation_by_xsd(string $xsdSchema): void
     {
@@ -688,12 +931,12 @@ XML
         ];
 
         yield 'invalid URL' => [
-            'https://unknown.com',
+            'https://unknown.example.com',
             <<<'EOF'
 The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-[Warning] failed to load external entity "https://unknown.com"
+[Warning] failed to load external entity "https://unknown.example.com"
 
-[Error] Failed to locate the main schema resource at 'https://unknown.com'.
+[Error] Failed to locate the main schema resource at 'https://unknown.example.com'.
 
 
 EOF
@@ -701,9 +944,55 @@ EOF
         ];
     }
 
-    private function assertItChangesStandardConfiguration(Closure $changeXml, string $expectedXml): void
+    private function assertItChangesPostPHPUnit93Configuration(Closure $changeXml, string $expectedXml): void
     {
-        $xPath = $this->createXPath(<<<'XML'
+        $this->assertItChangesXML(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+
+    <coverage includeUncoveredFiles="true"
+              processUncoveredFiles="true"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+
+        <exclude>
+            <directory suffix=".php">src/generated</directory>
+            <file>src/autoload.php</file>
+        </exclude>
+
+        <report>
+            <clover outputFile="clover.xml"/>
+            <crap4j outputFile="crap4j.xml" threshold="50"/>
+            <html outputDirectory="html-coverage" lowUpperBound="50" highLowerBound="90"/>
+            <php outputFile="coverage.php"/>
+            <text outputFile="coverage.txt" showUncoveredFiles="false" showOnlySummary="true"/>
+            <xml outputDirectory="xml-coverage"/>
+        </report>
+    </coverage>
+
+    <logging>
+        <junit outputFile="junit.xml"/>
+        <teamcity outputFile="teamcity.txt"/>
+        <testdoxHtml outputFile="testdox.html"/>
+        <testdoxText outputFile="testdox.txt"/>
+        <testdoxXml outputFile="testdox.xml"/>
+        <text outputFile="logfile.txt"/>
+    </logging>
+</phpunit>
+XML
+            ,
+            $changeXml,
+            $expectedXml
+        );
+    }
+
+    private function assertItChangesPrePHPUnit93Configuration(Closure $changeXml, string $expectedXml): void
+    {
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -735,14 +1024,10 @@ EOF
     </logging>
 </phpunit>
 XML
+            ,
+            $changeXml,
+            $expectedXml
         );
-
-        $changeXml($this->configManipulator, $xPath);
-
-        $actualXml = $xPath->document->saveXML();
-
-        $this->assertNotFalse($actualXml);
-        $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
     }
 
     private function assertItChangesXML(string $inputXml, Closure $changeXml, string $expectedXml): void
@@ -762,7 +1047,9 @@ XML
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
-        $dom->loadXML($xml);
+        $success = $dom->loadXML($xml);
+
+        $this->assertTrue($success);
 
         return new SafeDOMXPath($dom);
     }

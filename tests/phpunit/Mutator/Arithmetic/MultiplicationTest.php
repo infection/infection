@@ -137,5 +137,47 @@ PHP
 $a = $b * -1.0;
 PHP
         ];
+
+        yield 'It does not mutate when class method returns type is integer' => [
+            <<<'PHP'
+<?php
+
+new class
+{
+    public function mul(int $a, int $b): int
+    {
+        return $a * $b;
+    }
+};
+PHP
+        ];
+
+        yield 'It mutates when class method returns type is integer' => [
+            <<<'PHP'
+<?php
+
+new class
+{
+    public function mul(int $a, int $b): int
+    {
+        $c = $a * $b;
+
+        return 1;
+    }
+};
+PHP,
+            <<<'PHP'
+<?php
+
+new class
+{
+    public function mul(int $a, int $b) : int
+    {
+        $c = $a / $b;
+        return 1;
+    }
+};
+PHP
+        ];
     }
 }

@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Equal>
  */
 final class EqualIdentical implements Mutator
 {
@@ -57,12 +59,16 @@ identical operator (`===`)).
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b == $c;
++ $a = $b === $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\Equal $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\Identical>
      */

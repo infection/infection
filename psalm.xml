@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="6"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    errorBaseline="psalm-baseline.xml"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="false"
+>
+    <projectFiles>
+        <directory name="src" />
+        <ignoreFiles>
+            <directory name="src/PhpParser" />
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <issueHandlers>
+        <ImpureMethodCall>
+            <errorLevel type="suppress">
+                <directory name="src/Mutator"/>
+            </errorLevel>
+        </ImpureMethodCall>
+
+        <ImpureFunctionCall>
+            <errorLevel type="suppress">
+                <directory name="src/Mutator/Regex"/>
+            </errorLevel>
+        </ImpureFunctionCall>
+
+        <InvalidReturnType>
+            <errorLevel type="suppress">
+                <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
+            </errorLevel>
+        </InvalidReturnType>
+
+        <MethodSignatureMismatch>
+            <errorLevel type="suppress">
+                <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
+            </errorLevel>
+        </MethodSignatureMismatch>
+
+        <UnusedConstructor>
+            <errorLevel type="suppress">
+                <file name="src/CannotBeInstantiated.php" />
+            </errorLevel>
+        </UnusedConstructor>
+    </issueHandlers>
+</psalm>

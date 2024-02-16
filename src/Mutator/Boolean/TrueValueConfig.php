@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\MutatorConfig;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -52,7 +52,7 @@ final class TrueValueConfig implements MutatorConfig
     /**
      * @var string[]
      */
-    private $allowedFunctions = [];
+    private array $allowedFunctions = [];
 
     /**
      * @param array<string, bool> $settings

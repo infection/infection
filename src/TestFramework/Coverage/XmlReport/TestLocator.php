@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use function array_key_exists;
+use function array_values;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -47,11 +48,8 @@ use Infection\TestFramework\Coverage\TestLocations;
  */
 class TestLocator
 {
-    private $testLocations;
-
-    public function __construct(TestLocations $testLocations)
+    public function __construct(private readonly TestLocations $testLocations)
     {
-        $this->testLocations = $testLocations;
     }
 
     public function hasTests(): bool
@@ -85,9 +83,9 @@ class TestLocator
      */
     private function getTestsForFunctionSignature(NodeLineRangeData $lineRange): iterable
     {
-        foreach ($lineRange->range as $line) {
-            yield from $this->getTestsForExecutedMethodOnLine($line);
-        }
+        Assert::count($lineRange->range, 1); // 1-line range
+
+        yield from $this->getTestsForExecutedMethodOnLine($lineRange->range[0]);
     }
 
     /**
@@ -95,11 +93,17 @@ class TestLocator
      */
     private function getTestsForLineRange(NodeLineRangeData $lineRange): iterable
     {
+        // same test can cover more than 1 line. To avoid many duplications, we need to return unique tests after
+        // accumulating them by each line from the range
+        $uniqueTestLocations = [];
+
         foreach ($lineRange->range as $line) {
-            if (array_key_exists($line, $this->testLocations->getTestsLocationsBySourceLine())) {
-                yield from $this->testLocations->getTestsLocationsBySourceLine()[$line];
+            foreach ($this->testLocations->getTestsLocationsBySourceLine()[$line] ?? [] as $testLocation) {
+                $uniqueTestLocations[$testLocation->getMethod()] = $testLocation;
             }
         }
+
+        yield from array_values($uniqueTestLocations);
     }
 
     /**

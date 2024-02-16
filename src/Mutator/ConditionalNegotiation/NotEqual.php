@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\NotEqual>
  */
 final class NotEqual implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces a not equal operator (`!=`) with its counterpart the not equal operator
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b != $c;
++ $a = $b == $c;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\NotEqual $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\Equal>
      */

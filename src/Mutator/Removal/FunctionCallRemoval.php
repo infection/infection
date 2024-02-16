@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -43,13 +44,15 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Expression>
  */
 final class FunctionCallRemoval implements Mutator
 {
     use GetMutatorName;
 
     /** @var string[] */
-    private $doNotRemoveFunctions = [
+    private array $doNotRemoveFunctions = [
         'assert',
         'closedir',
         'curl_close',
@@ -66,14 +69,17 @@ final class FunctionCallRemoval implements Mutator
         return new Definition(
             'Removes the function call.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- fooBar();
+DIFF
         );
     }
 
     /**
-     * Replaces "doSmth()" with ""
+     * @psalm-mutation-free
      *
-     * @param Node\Stmt\Expression $node
+     * Replaces "doSmth()" with ""
      *
      * @return iterable<Node\Stmt\Nop>
      */
@@ -98,6 +104,6 @@ final class FunctionCallRemoval implements Mutator
             return true;
         }
 
-        return !in_array($name->toLowerString(), $this->doNotRemoveFunctions);
+        return !in_array($name->toLowerString(), $this->doNotRemoveFunctions, true);
     }
 }

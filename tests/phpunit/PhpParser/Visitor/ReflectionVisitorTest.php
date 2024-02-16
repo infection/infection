@@ -86,6 +86,20 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         $this->assertSame($expected, $spyVisitor->isPartOfSignature());
     }
 
+    /**
+     * @dataProvider isPartOfSignatureFlagWithAttributesProvider
+     */
+    public function test_it_marks_nodes_which_are_part_of_the_function_signature_with_attributes(string $nodeClass, bool $expected): void
+    {
+        $code = $this->getFileContent('Reflection/rv-part-of-signature-flag-with-attributes.php');
+
+        $spyVisitor = $this->getPartOfSignatureSpyVisitor($nodeClass);
+
+        $this->parseAndTraverse($code, $spyVisitor);
+
+        $this->assertSame($expected, $spyVisitor->isPartOfSignature());
+    }
+
     public function test_it_detects_if_it_is_traversing_inside_class_method(): void
     {
         $code = $this->getFileContent('Reflection/rv-inside-class-method.php');
@@ -198,6 +212,25 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         yield [Node\Stmt\ClassMethod::class, true];
 
         yield [Node\Param::class, true];                    // $param
+
+        yield [Node\Scalar\DNumber::class, true];           // 2.0
+
+        yield [Node\Scalar\LNumber::class, false];          // 1
+
+        yield [Node\Expr\BinaryOp\Identical::class, false]; // ===
+
+        yield [Node\Arg::class, false];
+
+        yield [Node\Expr\Array_::class, false];             // []
+    }
+
+    public function isPartOfSignatureFlagWithAttributesProvider(): iterable
+    {
+        yield [Node\Stmt\ClassMethod::class, true];
+
+        yield [Node\Param::class, true];                    // $param
+
+        yield [Node\Expr\ConstFetch::class, true];          // false
 
         yield [Node\Scalar\DNumber::class, true];           // 2.0
 

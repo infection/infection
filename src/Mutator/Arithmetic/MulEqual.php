@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Mul>
  */
 final class MulEqual implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces a multiplication assignment operator (`*=`) with a division assignment 
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a *= $b;
++ $a /= $b;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\AssignOp\Mul $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\AssignOp\Div>
      */
@@ -72,6 +78,27 @@ TXT
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\AssignOp\Mul;
+        if (!$node instanceof Node\Expr\AssignOp\Mul) {
+            return false;
+        }
+
+        if ($this->isNumericOne($node->expr)) {
+            return false;
+        }
+
+        if ($node->expr instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->expr->expr)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function isNumericOne(Node $node): bool
+    {
+        if ($node instanceof Node\Scalar\LNumber && $node->value === 1) {
+            return true;
+        }
+
+        return $node instanceof Node\Scalar\DNumber && $node->value === 1.0;
     }
 }

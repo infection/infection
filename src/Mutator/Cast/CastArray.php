@@ -49,7 +49,11 @@ final class CastArray extends AbstractCastMutator
         return new Definition(
             'Removes an array cast operator (`(array)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = (array) $object;
++ $a = $object;
+DIFF
         );
     }
 

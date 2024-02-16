@@ -51,6 +51,7 @@ use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\Tests\SingletonContainer;
 use function is_readable;
 use const PHP_EOL;
+use const PHP_OS;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
@@ -58,7 +59,7 @@ use function Safe\copy;
 use function Safe\file_get_contents;
 use function Safe\getcwd;
 use function Safe\ini_get;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use function strpos;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -117,7 +118,7 @@ final class E2ETest extends TestCase
 
     protected function tearDown(): void
     {
-        if ($this->previousLoader) {
+        if ($this->previousLoader instanceof ClassLoader) {
             $this->previousLoader->unregister();
         }
 
@@ -148,8 +149,8 @@ final class E2ETest extends TestCase
             sprintf('--test-framework-options=--exclude-group=%s', self::EXCLUDED_GROUP),
         ]);
 
-        $this->assertRegExp('/\d+ mutations were generated/', $output);
-        $this->assertRegExp('/\d{2,} mutants were killed/', $output);
+        $this->assertMatchesRegularExpression('/\d+ mutations were generated/', $output);
+        $this->assertMatchesRegularExpression('/\d{2,} mutants were killed/', $output);
     }
 
     public function test_it_runs_configure_command_if_no_configuration(): void
@@ -196,9 +197,9 @@ final class E2ETest extends TestCase
         $this->installComposerDeps();
         $output = $this->runInfection(self::EXPECT_SUCCESS);
 
-        $this->assertRegExp('/You are running Infection with \w+ enabled./', $output);
-        $this->assertRegExp('/\d+ mutations were generated/', $output);
-        $this->assertRegExp('/\d+ mutants were killed/', $output);
+        $this->assertMatchesRegularExpression('/You are running Infection with \w+ enabled./', $output);
+        $this->assertMatchesRegularExpression('/\d+ mutations were generated/', $output);
+        $this->assertMatchesRegularExpression('/\d+ mutants were killed/', $output);
 
         if (isset($_SERVER['GOLDEN'])) {
             copy('infection.log', 'expected-output.txt');
@@ -275,6 +276,7 @@ final class E2ETest extends TestCase
 
         // $vendorDir is normally defined inside autoload_psr4.php, but PHPStan
         // can't see there, so have to both tell it so, and verify that too
+        // @phpstan-ignore-next-line
         $vendorDir = $vendorDir ?? null;
         $this->assertNotEmpty($vendorDir, 'Unexpected autoload_psr4.php found: please confirm that all dependencies are installed correctly for this fixture.');
 
@@ -327,8 +329,12 @@ final class E2ETest extends TestCase
 
     private function runInfection(int $expectedExitCode, array $argvExtra = []): string
     {
-        if (!extension_loaded('xdebug') && PHP_SAPI !== 'phpdbg' && !extension_loaded('pcov')) {
-            $this->markTestSkipped("Infection from within PHPUnit won't run without a coverage driver (pcov, xdebug, or phpdbg)");
+        if (!extension_loaded('xdebug') && PHP_SAPI !== 'phpdbg') {
+            $this->markTestSkipped("Infection from within PHPUnit won't run without Xdebug or PHPDBG");
+        }
+
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test can be unstable on Windows');
         }
 
         /*
@@ -344,7 +350,7 @@ final class E2ETest extends TestCase
             'run',
             '--verbose',
             '--no-interaction',
-            '--no-progress',
+            '--logger-github=false',
         ], $argvExtra));
 
         $output = new BufferedOutput();

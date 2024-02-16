@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use DOMDocument;
 use DOMElement;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
@@ -48,7 +49,8 @@ use function libxml_get_errors;
 use function libxml_use_internal_errors;
 use LibXMLError;
 use LogicException;
-use function Safe\sprintf;
+use function sprintf;
+use function version_compare;
 use Webmozart\Assert\Assert;
 
 /**
@@ -56,13 +58,8 @@ use Webmozart\Assert\Assert;
  */
 final class XmlConfigurationManipulator
 {
-    private $pathReplacer;
-    private $phpUnitConfigDir;
-
-    public function __construct(PathReplacer $pathReplacer, string $phpUnitConfigDir)
+    public function __construct(private readonly PathReplacer $pathReplacer, private readonly string $phpUnitConfigDir)
     {
-        $this->pathReplacer = $pathReplacer;
-        $this->phpUnitConfigDir = $phpUnitConfigDir;
     }
 
     public function replaceWithAbsolutePaths(SafeDOMXPath $xPath): void
@@ -79,18 +76,40 @@ final class XmlConfigurationManipulator
         }
     }
 
+    /**
+     * Removes existing loggers to improve throughput during MT. Initial test loggers are added through CLI arguments.
+     */
     public function removeExistingLoggers(SafeDOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {
-            $document = $xPath->document->documentElement;
-            Assert::isInstanceOf($document, DOMElement::class);
-            $document->removeChild($node);
+            $node->parentNode?->removeChild($node);
+        }
+
+        foreach ($xPath->query('/phpunit/coverage/report') as $node) {
+            $node->parentNode?->removeChild($node);
         }
     }
 
     public function deactivateResultCaching(SafeDOMXPath $xPath): void
     {
         $this->setAttributeValue($xPath, 'cacheResult', 'false');
+    }
+
+    public function handleResultCacheAndExecutionOrder(string $version, SafeDOMXPath $xPath, string $mutationHash): void
+    {
+        // starting from PHPUnit 7.3 we can set cache result and "defects" execution order https://github.com/sebastianbergmann/phpunit/blob/7.3.0/phpunit.xsd
+        if (version_compare($version, '7.3', '>=')) {
+            $this->setAttributeValue($xPath, 'cacheResult', 'true');
+            $this->setAttributeValue($xPath, 'cacheResultFile', sprintf('.phpunit.result.cache.%s', $mutationHash));
+            $this->setAttributeValue($xPath, 'executionOrder', 'defects');
+
+            return;
+        }
+
+        // from 7.2 to 7.3 we only can set "default" execution order and no cache result https://github.com/sebastianbergmann/phpunit/blob/7.2.0/phpunit.xsd
+        if (version_compare($version, '7.2', '>=')) {
+            $this->setAttributeValue($xPath, 'executionOrder', 'default');
+        }
     }
 
     public function deactivateStderrRedirection(SafeDOMXPath $xPath): void
@@ -124,6 +143,33 @@ final class XmlConfigurationManipulator
         );
     }
 
+    /**
+     * @param string[] $srcDirs
+     * @param list<string> $filteredSourceFilesToMutate
+     */
+    public function addOrUpdateLegacyCoverageWhitelistNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
+    {
+        $this->addOrUpdateCoverageNodes('filter', 'whitelist', $xPath, $srcDirs, $filteredSourceFilesToMutate);
+    }
+
+    /**
+     * @param string[] $srcDirs
+     * @param list<string> $filteredSourceFilesToMutate
+     */
+    public function addOrUpdateCoverageIncludeNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
+    {
+        $this->addOrUpdateCoverageNodes('coverage', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
+    }
+
+    /**
+     * @param string[] $srcDirs
+     * @param list<string> $filteredSourceFilesToMutate
+     */
+    public function addOrUpdateSourceIncludeNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
+    {
+        $this->addOrUpdateCoverageNodes('source', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
+    }
+
     public function validate(string $configPath, SafeDOMXPath $xPath): bool
     {
         if ($xPath->query('/phpunit')->length === 0) {
@@ -137,9 +183,8 @@ final class XmlConfigurationManipulator
         $schema = $xPath->query('/phpunit/@xsi:noNamespaceSchemaLocation');
 
         $original = libxml_use_internal_errors(true);
-        $schemaPath = $this->buildSchemaPath($schema[0]->nodeValue);
 
-        if ($schema->length && !$xPath->document->schemaValidate($schemaPath)) {
+        if ($schema->length > 0 && !$xPath->document->schemaValidate($this->buildSchemaPath($schema[0]->nodeValue))) {
             throw InvalidPhpUnitConfiguration::byXsdSchema(
                 $configPath,
                 $this->getXmlErrorsString()
@@ -159,6 +204,76 @@ final class XmlConfigurationManipulator
         );
     }
 
+    public function addFailOnAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
+    {
+        if (version_compare($version, '5.2', '<')) {
+            return;
+        }
+
+        $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
+        $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
+    }
+
+    /**
+     * @param string[] $srcDirs
+     * @param list<string> $filteredSourceFilesToMutate
+     */
+    private function addOrUpdateCoverageNodes(string $parentName, string $listName, SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
+    {
+        $coverageNodeExists = $this->nodeExists($xPath, "{$parentName}/{$listName}");
+
+        if ($coverageNodeExists) {
+            if ($filteredSourceFilesToMutate === []) {
+                // use original phpunit.xml's coverage setting since all files need to be mutated (no filter is set)
+                return;
+            }
+
+            $this->removeCoverageChildNode($xPath, "{$parentName}/{$listName}");
+        }
+
+        $filterNode = $this->getOrCreateNode($xPath, $xPath->document, $parentName);
+
+        $listNode = $xPath->document->createElement($listName);
+
+        if ($filteredSourceFilesToMutate === []) {
+            foreach ($srcDirs as $srcDir) {
+                $directoryNode = $xPath->document->createElement(
+                    'directory',
+                    $srcDir
+                );
+
+                $listNode->appendChild($directoryNode);
+            }
+        } else {
+            foreach ($filteredSourceFilesToMutate as $sourceFileRealPath) {
+                $directoryNode = $xPath->document->createElement(
+                    'file',
+                    $sourceFileRealPath
+                );
+
+                $listNode->appendChild($directoryNode);
+            }
+        }
+
+        $filterNode->appendChild($listNode);
+    }
+
+    private function nodeExists(SafeDOMXPath $xPath, string $nodeName): bool
+    {
+        return $xPath->query(sprintf('/phpunit/%s', $nodeName))->length > 0;
+    }
+
+    private function createNode(DOMDocument $dom, string $nodeName): DOMElement
+    {
+        $node = $dom->createElement($nodeName);
+        $document = $dom->documentElement;
+
+        Assert::isInstanceOf($document, DOMElement::class);
+        $document->appendChild($node);
+
+        return $node;
+    }
+
     private function getXmlErrorsString(): string
     {
         $errorsString = '';
@@ -168,7 +283,7 @@ final class XmlConfigurationManipulator
             $level = $this->getErrorLevelName($error);
             $errorsString .= sprintf('[%s] %s', $level, $error->message);
 
-            if ($error->file) {
+            if ($error->file !== '') {
                 $errorsString .= sprintf(' in %s (line %s, col %s)', $error->file, $error->line, $error->column);
             }
 
@@ -180,7 +295,7 @@ final class XmlConfigurationManipulator
 
     private function buildSchemaPath(string $nodeValue): string
     {
-        if (filter_var($nodeValue, FILTER_VALIDATE_URL)) {
+        if (filter_var($nodeValue, FILTER_VALIDATE_URL) !== false) {
             return $nodeValue;
         }
 
@@ -202,7 +317,7 @@ final class XmlConfigurationManipulator
             $name
         ));
 
-        if ($nodeList->length) {
+        if ($nodeList->length > 0) {
             $document = $xPath->document->documentElement;
             Assert::isInstanceOf($document, DOMElement::class);
             $document->removeAttribute($name);
@@ -216,7 +331,7 @@ final class XmlConfigurationManipulator
             $name
         ));
 
-        if ($nodeList->length) {
+        if ($nodeList->length > 0) {
             $nodeList[0]->nodeValue = $value;
         } else {
             $node = $xPath->query('/phpunit')[0];
@@ -239,5 +354,37 @@ final class XmlConfigurationManipulator
         }
 
         throw new LogicException(sprintf('Unknown lib XML error level "%s"', $error->level));
+    }
+
+    private function removeCoverageChildNode(SafeDOMXPath $xPath, string $nodeQuery): void
+    {
+        foreach ($xPath->query($nodeQuery) as $node) {
+            $node->parentNode?->removeChild($node);
+        }
+    }
+
+    private function getOrCreateNode(SafeDOMXPath $xPath, DOMDocument $dom, string $nodeName): DOMElement
+    {
+        $node = $xPath->query(sprintf('/phpunit/%s', $nodeName));
+
+        if ($node->length > 0) {
+            return $node[0];
+        }
+
+        return $this->createNode($dom, $nodeName);
+    }
+
+    private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
+    {
+        $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
+
+        if ($nodeList->length === 0) {
+            $node = $xPath->query('/phpunit')[0];
+            $node->setAttribute($attribute, $value);
+
+            return true;
+        }
+
+        return false;
     }
 }

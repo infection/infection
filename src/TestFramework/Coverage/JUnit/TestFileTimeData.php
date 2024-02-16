@@ -40,19 +40,7 @@ namespace Infection\TestFramework\Coverage\JUnit;
  */
 final class TestFileTimeData
 {
-    /**
-     * @var string
-     */
-    public $path;
-
-    /**
-     * @var float
-     */
-    public $time;
-
-    public function __construct(string $path, float $time)
+    public function __construct(public string $path, public float $time)
     {
-        $this->path = $path;
-        $this->time = $time;
     }
 }

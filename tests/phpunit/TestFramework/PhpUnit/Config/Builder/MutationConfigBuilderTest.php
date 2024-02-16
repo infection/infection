@@ -41,7 +41,6 @@ use DOMNode;
 use DOMNodeList;
 use DOMXPath;
 use function escapeshellarg;
-use function exec;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
@@ -51,9 +50,11 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
+use function Safe\exec;
 use function Safe\file_get_contents;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function Safe\simplexml_load_string;
+use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -92,7 +93,8 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
-            self::ORIGINAL_FILE_PATH
+            self::ORIGINAL_FILE_PATH,
+            '7.1'
         );
 
         $this->assertSame(
@@ -118,7 +120,8 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
-            self::ORIGINAL_FILE_PATH
+            self::ORIGINAL_FILE_PATH,
+            '7.1'
         );
 
         $tmp = $this->tmp;
@@ -132,7 +135,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
   ~
   ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
   -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" cacheResult="false" stderr="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
   <testsuites>
     <testsuite name="Infection testsuite with filtered tests"/>
   </testsuites>
@@ -168,7 +171,7 @@ XML
   ~
   ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
   -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" cacheResult="false" stderr="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
   <testsuites>
     <testsuite name="Infection testsuite with filtered tests">
       <file>/path/to/FooTest.php</file>
@@ -199,7 +202,8 @@ XML
                     ],
                     self::MUTATED_FILE_PATH,
                     'hash1',
-                    self::ORIGINAL_FILE_PATH
+                    self::ORIGINAL_FILE_PATH,
+                    '7.1'
                 )
             )
         );
@@ -237,7 +241,7 @@ PHP
   ~
   ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
   -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" cacheResult="false" stderr="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
   <testsuites>
     <testsuite name="Infection testsuite with filtered tests">
       <file>/path/to/BarTest.php</file>
@@ -268,7 +272,8 @@ XML
                     ],
                     self::MUTATED_FILE_PATH,
                     'hash2',
-                    self::ORIGINAL_FILE_PATH
+                    self::ORIGINAL_FILE_PATH,
+                    '7.1'
                 )
             )
         );
@@ -307,7 +312,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
     }
@@ -319,7 +325,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -347,7 +354,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -373,7 +381,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -389,7 +398,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -406,7 +416,8 @@ PHP
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
-            self::ORIGINAL_FILE_PATH
+            self::ORIGINAL_FILE_PATH,
+            '7.1'
         );
 
         $testSuite = $this->queryXpath(
@@ -425,7 +436,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -442,7 +454,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -450,6 +463,87 @@ PHP
 
         $this->assertInstanceOf(DOMNodeList::class, $printerClass);
         $this->assertSame(0, $printerClass->length);
+    }
+
+    public function test_it_does_not_set_default_execution_order_for_phpunit_7_1(): void
+    {
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_coverage_whitelist.xml');
+
+        $xml = file_get_contents(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
+            )
+        );
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
+
+        $this->assertSame(0, $executionOrder->length);
+    }
+
+    public function test_it_sets_default_execution_order_when_attribute_is_absent_for_phpunit_7_2(): void
+    {
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_coverage_whitelist.xml');
+
+        $xml = file_get_contents(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.2'
+            )
+        );
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
+
+        $this->assertSame('default', $executionOrder);
+    }
+
+    public function test_it_sets_default_execution_order_when_attribute_is_present_for_phpunit_7_2(): void
+    {
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_set.xml');
+
+        $xml = file_get_contents(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.2'
+            )
+        );
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
+
+        $this->assertSame('default', $executionOrder);
+    }
+
+    public function test_it_sets_defects_execution_order_and_cache_result_when_attribute_is_present_for_phpunit_7_3(): void
+    {
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_set.xml');
+
+        $xml = file_get_contents(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.3'
+            )
+        );
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
+        $this->assertSame('defects', $executionOrder);
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@cacheResult')[0]->nodeValue;
+        $this->assertSame('true', $executionOrder);
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@cacheResultFile')[0]->nodeValue;
+        $this->assertSame(sprintf('.phpunit.result.cache.%s', self::HASH), $executionOrder);
     }
 
     /**
@@ -467,7 +561,8 @@ PHP
                 $tests,
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -491,7 +586,8 @@ PHP
                 [],
                 self::MUTATED_FILE_PATH,
                 self::HASH,
-                self::ORIGINAL_FILE_PATH
+                self::ORIGINAL_FILE_PATH,
+                '7.1'
             )
         );
 
@@ -509,7 +605,8 @@ PHP
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
-            self::ORIGINAL_FILE_PATH
+            self::ORIGINAL_FILE_PATH,
+            '7.1'
         );
 
         $expectedCustomAutoloadFilePath = sprintf(
@@ -523,6 +620,108 @@ PHP
             'IncludeInterceptor.php',
             file_get_contents($expectedCustomAutoloadFilePath)
         );
+    }
+
+    /**
+     * @dataProvider failOnProvider
+     */
+    public function test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions(
+        string $version,
+        string $attributeName,
+        int $expectedNodeCount
+    ): void {
+        $xml = file_get_contents($this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH,
+            $version
+        ));
+
+        $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
+
+        $this->assertInstanceOf(DOMNodeList::class, $nodes);
+
+        $this->assertSame($expectedNodeCount, $nodes->length);
+    }
+
+    public function test_it_does_not_update_fail_on_risky_attributes_if_it_is_already_set(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_fail_on_risky_set.xml';
+
+        $builder = $this->createConfigBuilder($phpunitXmlPath);
+
+        $xml = file_get_contents($builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH,
+            '5.2'
+        ));
+
+        $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
+
+        $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
+        $this->assertSame('false', $failOnRisky[0]->value);
+    }
+
+    public function test_it_does_not_update_fail_on_warning_attributes_if_it_is_already_set(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_fail_on_warning_set.xml';
+
+        $builder = $this->createConfigBuilder($phpunitXmlPath);
+
+        $xml = file_get_contents($builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH,
+            '5.2'
+        ));
+
+        $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnWarning'));
+
+        $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
+        $this->assertSame('false', $failOnRisky[0]->value);
+    }
+
+    public function failOnProvider(): iterable
+    {
+        yield 'PHPUnit 5.1.99 runs without failOnRisky' => [
+            '5.1.99',
+            'failOnRisky',
+            0,
+        ];
+
+        yield 'PHPUnit 5.2 runs with failOnRisky' => [
+            '5.2',
+            'failOnRisky',
+            1,
+        ];
+
+        yield 'PHPUnit 5.3.1 runs with failOnRisky' => [
+            '5.3.1',
+            'failOnRisky',
+            1,
+        ];
+
+        yield 'PHPUnit 5.1.99 runs without resolveDependencies' => [
+            '5.1.99',
+            'failOnWarning',
+            0,
+        ];
+
+        yield 'PHPUnit 5.2 runs with resolveDependencies' => [
+            '5.2',
+            'failOnWarning',
+            1,
+        ];
+
+        yield 'PHPUnit 5.3.1 runs resolveDependencies' => [
+            '5.3.1',
+            'failOnWarning',
+            1,
+        ];
     }
 
     public function locationsProvider(): iterable

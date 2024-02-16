@@ -38,7 +38,7 @@ namespace Infection\Process\Runner;
 use Exception;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Process\Process;
 
 /**
@@ -47,18 +47,18 @@ use Symfony\Component\Process\Process;
 final class InitialTestsFailed extends Exception
 {
     public static function fromProcessAndAdapter(
-        Process $initialTestSuitProcess,
+        Process $initialTestSuiteProcess,
         TestFrameworkAdapter $testFrameworkAdapter
     ): self {
         $testFrameworkKey = $testFrameworkAdapter->getName();
 
         $lines = [
             'Project tests must be in a passing state before running Infection.',
-            $testFrameworkAdapter->getInitialTestsFailRecommendations($initialTestSuitProcess->getCommandLine()),
+            $testFrameworkAdapter->getInitialTestsFailRecommendations($initialTestSuiteProcess->getCommandLine()),
             sprintf(
                 '%s reported an exit code of %d.',
                 $testFrameworkKey,
-                $initialTestSuitProcess->getExitCode()
+                $initialTestSuiteProcess->getExitCode()
             ),
             sprintf(
                 'Refer to the %s\'s output below:',
@@ -66,12 +66,16 @@ final class InitialTestsFailed extends Exception
             ),
         ];
 
-        if ($stdOut = $initialTestSuitProcess->getOutput()) {
+        $stdOut = $initialTestSuiteProcess->getOutput();
+
+        if ($stdOut !== '') {
             $lines[] = 'STDOUT:';
             $lines[] = $stdOut;
         }
 
-        if ($stdError = $initialTestSuitProcess->getErrorOutput()) {
+        $stdError = $initialTestSuiteProcess->getErrorOutput();
+
+        if ($stdError !== '') {
             $lines[] = 'STDERR:';
             $lines[] = $stdError;
         }

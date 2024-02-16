@@ -43,11 +43,8 @@ use Infection\Mutant\MutantExecutionResult;
  */
 class MutantProcessWasFinished
 {
-    private $executionResult;
-
-    public function __construct(MutantExecutionResult $executionResult)
+    public function __construct(private readonly MutantExecutionResult $executionResult)
     {
-        $this->executionResult = $executionResult;
     }
 
     public function getExecutionResult(): MutantExecutionResult

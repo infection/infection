@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use function array_keys;
 use function array_slice;
 use function count;
 use Infection\Mutator\Definition;
@@ -44,8 +45,10 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapArrayUintersectUassoc extends AbstractUnwrapMutator
+final class UnwrapArrayUintersectUassoc extends AbstractFunctionUnwrapMutator
 {
+    private const NON_MUTABLE_ARGS_COUNT = 2;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -76,7 +79,19 @@ $x = ['baz' => 'bar'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_uintersect_uassoc(
+-     ['foo' => 'bar'],
+-     ['baz' => 'bar'],
+-     $value_compare_func,
+-     $key_compare_func
+- );
+# Mutation 1
++ $x = ['foo' => 'bar'];
+# Mutation 2
++ $x = ['baz' => 'bar'];
+DIFF
         );
     }
 
@@ -85,12 +100,15 @@ TXT
         return 'array_uintersect_uassoc';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_slice(
             array_keys($node->args),
             0,
-            count($node->args) - 2
+            count($node->args) - self::NON_MUTABLE_ARGS_COUNT,
         );
     }
 }

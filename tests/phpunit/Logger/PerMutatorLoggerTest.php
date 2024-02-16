@@ -37,6 +37,7 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\PerMutatorLogger;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use PHPUnit\Framework\TestCase;
 
 final class PerMutatorLoggerTest extends TestCase
@@ -49,9 +50,10 @@ final class PerMutatorLoggerTest extends TestCase
      */
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
         string $expectedContents
     ): void {
-        $logger = new PerMutatorLogger($metricsCalculator);
+        $logger = new PerMutatorLogger($metricsCalculator, $resultsCollector);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
@@ -60,24 +62,26 @@ final class PerMutatorLoggerTest extends TestCase
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
+            new ResultsCollector(),
             <<<'TXT'
 # Effects per Mutator
 
-| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | Skipped | MSI (%s) | Covered MSI (%s) |
-| ------- | --------- | ------ | ------- | ------ | --------- | ------- | -------- | ---------------- |
+| Mutator | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+| ------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
 
 TXT
         ];
 
         yield 'all mutations' => [
             $this->createCompleteMetricsCalculator(),
+            $this->createCompleteResultsCollector(),
             <<<'TXT'
 # Effects per Mutator
 
-| Mutator   | Mutations | Killed | Escaped | Errors | Timed Out | Skipped | MSI (%s) | Covered MSI (%s) |
-| --------- | --------- | ------ | ------- | ------ | --------- | ------- | -------- | ---------------- |
-| For_      |         6 |      1 |       1 |      1 |         1 |       1 |    60.00 |            75.00 |
-| PregQuote |         6 |      1 |       1 |      1 |         1 |       1 |    60.00 |            75.00 |
+| Mutator   | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+| --------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
+| For_      |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
+| PregQuote |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
 
 TXT
         ];

@@ -42,7 +42,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapArrayCombine extends AbstractUnwrapMutator
+final class UnwrapArrayCombine extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
@@ -69,7 +69,14 @@ $x = $array2;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_combine($array1, $array2);
+# Mutation 1
++ $x = $array1;
+# Mutation 2
++ $x = $array2;
+DIFF
         );
     }
 
@@ -78,6 +85,9 @@ TXT
         return 'array_combine';
     }
 
+    /**
+     * @psalm-pure
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield 0;

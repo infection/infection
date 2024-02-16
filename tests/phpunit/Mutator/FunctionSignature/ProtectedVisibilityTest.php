@@ -76,21 +76,6 @@ PHP
 
         yield 'It does not mutate final flag' => [
             MutatorFixturesProvider::getFixtureFileContent($this, 'pv-final.php'),
-            <<<'PHP'
-<?php
-
-namespace ProtectedVisibilityFinal;
-
-class Test
-{
-    private final function &foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-            ,
         ];
 
         yield 'It does not mutate abstract protected to private' => [
@@ -241,6 +226,42 @@ function something()
     };
 }
 PHP
+        ];
+
+        yield 'It does not remove attributes' => [
+            <<<'PHP'
+<?php
+
+namespace PublicVisibilityOneClass;
+
+class Test
+{
+    #[SomeAttribute1]
+    #[SomeAttribute2]
+    protected function &foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP,
+            <<<'PHP'
+<?php
+
+namespace PublicVisibilityOneClass;
+
+class Test
+{
+    #[SomeAttribute1]
+    #[SomeAttribute2]
+    private function &foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP
+            ,
         ];
     }
 }

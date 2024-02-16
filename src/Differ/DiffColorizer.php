@@ -38,8 +38,8 @@ namespace Infection\Differ;
 use function array_map;
 use function explode;
 use function implode;
-use function Safe\sprintf;
-use function strpos;
+use function sprintf;
+use function str_starts_with;
 
 /**
  * @internal
@@ -50,12 +50,12 @@ class DiffColorizer
     public function colorize(string $diff): string
     {
         $lines = array_map(
-            static function (string $line) {
-                if (strpos($line, '-') === 0) {
+            static function (string $line): string {
+                if (str_starts_with($line, '-')) {
                     return sprintf('<diff-del>%s</diff-del>', $line);
                 }
 
-                if (strpos($line, '+') === 0) {
+                if (str_starts_with($line, '+')) {
                     return sprintf('<diff-add>%s</diff-add>', $line);
                 }
 

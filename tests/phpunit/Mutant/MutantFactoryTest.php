@@ -47,7 +47,7 @@ use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 
 final class MutantFactoryTest extends TestCase
 {
@@ -168,8 +168,11 @@ final class MutantFactoryTest extends TestCase
             ->willReturn('code diff')
         ;
 
-        $this->mutantFactory->create($mutation);
-        $this->mutantFactory->create($mutation);
+        $this->mutantFactory->create($mutation)->getPrettyPrintedOriginalCode()->get();
+        $this->mutantFactory->create($mutation)->getDiff()->get();
+
+        $this->mutantFactory->create($mutation)->getPrettyPrintedOriginalCode()->get();
+        $this->mutantFactory->create($mutation)->getDiff()->get();
     }
 
     /**

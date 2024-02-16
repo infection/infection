@@ -35,13 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use function array_keys;
 use function array_map;
 use function array_values;
+use function count;
 use Infection\FileSystem\SourceFileCollector;
+use function natcasesort;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
-use function Safe\natcasesort;
-use Webmozart\PathUtil\Path;
+use function range;
+use Symfony\Component\Filesystem\Path;
 
 final class SourceFileCollectorTest extends TestCase
 {
@@ -146,6 +149,17 @@ final class SourceFileCollectorTest extends TestCase
             ['a.php'],
             [
                 'case1/sub-dir/b.php',
+            ],
+        ];
+
+        yield 'one directory, no filter, one common excludes and one file exclude' => [
+            [self::FIXTURES . '/case0'],
+            [
+                'sub-dir',
+                'a.php',
+            ],
+            [
+                'case0/outside-symlink.php',
             ],
         ];
     }

@@ -57,6 +57,7 @@ final class ProfileList
         '@extensions' => self::EXTENSIONS_PROFILE,
         '@function_signature' => self::FUNCTION_SIGNATURE_PROFILE,
         '@identical' => self::IDENTICAL_PROFILE,
+        '@loop' => self::LOOP_PROFILE,
         '@number' => self::NUMBER_PROFILE,
         '@operator' => self::OPERATOR_PROFILE,
         '@regex' => self::REGEX_PROFILE,
@@ -64,7 +65,6 @@ final class ProfileList
         '@return_value' => self::RETURN_VALUE_PROFILE,
         '@sort' => self::SORT_PROFILE,
         '@unwrap' => self::UNWRAP_PROFILE,
-        '@zero_iteration' => self::ZERO_ITERATION_PROFILE,
     ];
 
     public const ARITHMETIC_PROFILE = [
@@ -100,10 +100,16 @@ final class ProfileList
         // IdenticalEqual disabled from the default boolean profile
         Mutator\Boolean\InstanceOf_::class,
         Mutator\Boolean\LogicalAnd::class,
+        Mutator\Boolean\LogicalAndAllSubExprNegation::class,
+        Mutator\Boolean\LogicalAndNegation::class,
+        Mutator\Boolean\LogicalAndSingleSubExprNegation::class,
         Mutator\Boolean\LogicalLowerAnd::class,
         Mutator\Boolean\LogicalLowerOr::class,
         Mutator\Boolean\LogicalNot::class,
         Mutator\Boolean\LogicalOr::class,
+        Mutator\Boolean\LogicalOrAllSubExprNegation::class,
+        Mutator\Boolean\LogicalOrNegation::class,
+        Mutator\Boolean\LogicalOrSingleSubExprNegation::class,
         // NotEqualNotIdentical disabled from the default boolean profile
         // NotIdenticalNotEqual disabled from the default boolean profile
         Mutator\Boolean\TrueValue::class,
@@ -147,28 +153,42 @@ final class ProfileList
         Mutator\Number\DecrementInteger::class,
         Mutator\Number\IncrementInteger::class,
         Mutator\Number\OneZeroFloat::class,
-        Mutator\Number\OneZeroInteger::class,
     ];
 
     public const OPERATOR_PROFILE = [
         Mutator\Operator\AssignCoalesce::class,
         Mutator\Operator\Break_::class,
+        Mutator\Operator\Catch_::class,
         Mutator\Operator\Coalesce::class,
+        Mutator\Operator\Concat::class,
         Mutator\Operator\Continue_::class,
+        Mutator\Operator\ElseIfNegation::class,
         Mutator\Operator\Finally_::class,
-        Mutator\Operator\Spread::class,
+        Mutator\Operator\IfNegation::class,
+        Mutator\Operator\NullSafeMethodCall::class,
+        Mutator\Operator\NullSafePropertyCall::class,
+        Mutator\Operator\SpreadAssignment::class,
+        Mutator\Operator\SpreadOneItem::class,
+        Mutator\Operator\SpreadRemoval::class,
+        Mutator\Operator\Ternary::class,
         Mutator\Operator\Throw_::class,
     ];
 
     public const REGEX_PROFILE = [
         Mutator\Regex\PregMatchMatches::class,
+        Mutator\Regex\PregMatchRemoveCaret::class,
+        Mutator\Regex\PregMatchRemoveDollar::class,
+        Mutator\Regex\PregMatchRemoveFlags::class,
         Mutator\Regex\PregQuote::class,
     ];
 
     public const REMOVAL_PROFILE = [
         Mutator\Removal\ArrayItemRemoval::class,
+        Mutator\Removal\CatchBlockRemoval::class,
         Mutator\Removal\CloneRemoval::class,
+        Mutator\Removal\ConcatOperandRemoval::class,
         Mutator\Removal\FunctionCallRemoval::class,
+        Mutator\Removal\MatchArmRemoval::class,
         Mutator\Removal\MethodCallRemoval::class,
         Mutator\Removal\SharedCaseRemoval::class,
     ];
@@ -180,15 +200,18 @@ final class ProfileList
         Mutator\ReturnValue\IntegerNegation::class,
         Mutator\ReturnValue\NewObject::class,
         Mutator\ReturnValue\This::class,
+        Mutator\ReturnValue\YieldValue::class,
     ];
 
     public const SORT_PROFILE = [
         Mutator\Sort\Spaceship::class,
     ];
 
-    public const ZERO_ITERATION_PROFILE = [
-        Mutator\ZeroIteration\For_::class,
-        Mutator\ZeroIteration\Foreach_::class,
+    public const LOOP_PROFILE = [
+        Mutator\Loop\DoWhile::class,
+        Mutator\Loop\For_::class,
+        Mutator\Loop\Foreach_::class,
+        Mutator\Loop\While_::class,
     ];
 
     public const CAST_PROFILE = [
@@ -236,11 +259,18 @@ final class ProfileList
         Mutator\Unwrap\UnwrapArrayUintersectUassoc::class,
         Mutator\Unwrap\UnwrapArrayUnique::class,
         Mutator\Unwrap\UnwrapArrayValues::class,
+        Mutator\Unwrap\UnwrapFinally::class,
         Mutator\Unwrap\UnwrapLcFirst::class,
+        Mutator\Unwrap\UnwrapLtrim::class,
+        Mutator\Unwrap\UnwrapRtrim::class,
+        Mutator\Unwrap\UnwrapStrIreplace::class,
         Mutator\Unwrap\UnwrapStrRepeat::class,
         Mutator\Unwrap\UnwrapStrReplace::class,
+        Mutator\Unwrap\UnwrapStrRev::class,
+        Mutator\Unwrap\UnwrapStrShuffle::class,
         Mutator\Unwrap\UnwrapStrToLower::class,
         Mutator\Unwrap\UnwrapStrToUpper::class,
+        Mutator\Unwrap\UnwrapSubstr::class,
         Mutator\Unwrap\UnwrapTrim::class,
         Mutator\Unwrap\UnwrapUcFirst::class,
         Mutator\Unwrap\UnwrapUcWords::class,
@@ -259,6 +289,7 @@ final class ProfileList
         '@conditional_negotiation',
         '@extensions',
         '@function_signature',
+        '@loop',
         '@number',
         '@operator',
         '@regex',
@@ -266,7 +297,6 @@ final class ProfileList
         '@return_value',
         '@sort',
         '@unwrap',
-        '@zero_iteration',
     ];
 
     public const ALL_MUTATORS = [
@@ -302,10 +332,16 @@ final class ProfileList
         'IdenticalEqual' => Mutator\Boolean\IdenticalEqual::class,
         'InstanceOf_' => Mutator\Boolean\InstanceOf_::class,
         'LogicalAnd' => Mutator\Boolean\LogicalAnd::class,
+        'LogicalAndAllSubExprNegation' => Mutator\Boolean\LogicalAndAllSubExprNegation::class,
+        'LogicalAndNegation' => Mutator\Boolean\LogicalAndNegation::class,
+        'LogicalAndSingleSubExprNegation' => Mutator\Boolean\LogicalAndSingleSubExprNegation::class,
         'LogicalLowerAnd' => Mutator\Boolean\LogicalLowerAnd::class,
         'LogicalLowerOr' => Mutator\Boolean\LogicalLowerOr::class,
         'LogicalNot' => Mutator\Boolean\LogicalNot::class,
         'LogicalOr' => Mutator\Boolean\LogicalOr::class,
+        'LogicalOrAllSubExprNegation' => Mutator\Boolean\LogicalOrAllSubExprNegation::class,
+        'LogicalOrNegation' => Mutator\Boolean\LogicalOrNegation::class,
+        'LogicalOrSingleSubExprNegation' => Mutator\Boolean\LogicalOrSingleSubExprNegation::class,
         'NotEqualNotIdentical' => Mutator\Boolean\NotEqualNotIdentical::class,
         'NotIdenticalNotEqual' => Mutator\Boolean\NotIdenticalNotEqual::class,
         'TrueValue' => Mutator\Boolean\TrueValue::class,
@@ -335,25 +371,39 @@ final class ProfileList
         'DecrementInteger' => Mutator\Number\DecrementInteger::class,
         'IncrementInteger' => Mutator\Number\IncrementInteger::class,
         'OneZeroFloat' => Mutator\Number\OneZeroFloat::class,
-        'OneZeroInteger' => Mutator\Number\OneZeroInteger::class,
 
         // Operator
         'AssignCoalesce' => Mutator\Operator\AssignCoalesce::class,
         'Break_' => Mutator\Operator\Break_::class,
         'Coalesce' => Mutator\Operator\Coalesce::class,
+        'Concat' => Mutator\Operator\Concat::class,
         'Continue_' => Mutator\Operator\Continue_::class,
+        'ElseIfNegation' => Mutator\Operator\ElseIfNegation::class,
         'Finally_' => Mutator\Operator\Finally_::class,
-        'Spread' => Mutator\Operator\Spread::class,
+        'IfNegation' => Mutator\Operator\IfNegation::class,
+        'NullSafeMethodCall' => Mutator\Operator\NullSafeMethodCall::class,
+        'NullSafePropertyCall' => Mutator\Operator\NullSafePropertyCall::class,
+        'SpreadAssignment' => Mutator\Operator\SpreadAssignment::class,
+        'SpreadOneItem' => Mutator\Operator\SpreadOneItem::class,
+        'SpreadRemoval' => Mutator\Operator\SpreadRemoval::class,
+        'Ternary' => Mutator\Operator\Ternary::class,
         'Throw_' => Mutator\Operator\Throw_::class,
+        'Catch_' => Mutator\Operator\Catch_::class,
 
         // Regex
         'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
+        'PregMatchRemoveCaret' => Mutator\Regex\PregMatchRemoveCaret::class,
+        'PregMatchRemoveDollar' => Mutator\Regex\PregMatchRemoveDollar::class,
+        'PregMatchRemoveFlags' => Mutator\Regex\PregMatchRemoveFlags::class,
         'PregQuote' => Mutator\Regex\PregQuote::class,
 
         // Removal
         'ArrayItemRemoval' => Mutator\Removal\ArrayItemRemoval::class,
+        'CatchBlockRemoval' => Mutator\Removal\CatchBlockRemoval::class,
         'CloneRemoval' => Mutator\Removal\CloneRemoval::class,
+        'ConcatOperandRemoval' => Mutator\Removal\ConcatOperandRemoval::class,
         'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
+        'MatchArmRemoval' => Mutator\Removal\MatchArmRemoval::class,
         'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
         'SharedCaseRemoval' => Mutator\Removal\SharedCaseRemoval::class,
 
@@ -364,13 +414,16 @@ final class ProfileList
         'IntegerNegation' => Mutator\ReturnValue\IntegerNegation::class,
         'NewObject' => Mutator\ReturnValue\NewObject::class,
         'This' => Mutator\ReturnValue\This::class,
+        'YieldValue' => Mutator\ReturnValue\YieldValue::class,
 
         // Sort
         'Spaceship' => Mutator\Sort\Spaceship::class,
 
-        // Zero Iteration
-        'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
-        'For_' => Mutator\ZeroIteration\For_::class,
+        // Loop
+        'DoWhile' => Mutator\Loop\DoWhile::class,
+        'Foreach_' => Mutator\Loop\Foreach_::class,
+        'For_' => Mutator\Loop\For_::class,
+        'While_' => Mutator\Loop\While_::class,
 
         // Cast
         'CastArray' => Mutator\Cast\CastArray::class,
@@ -417,23 +470,31 @@ final class ProfileList
         'UnwrapArrayUnique' => Mutator\Unwrap\UnwrapArrayUnique::class,
         'UnwrapArrayValues' => Mutator\Unwrap\UnwrapArrayValues::class,
         'UnwrapLcFirst' => Mutator\Unwrap\UnwrapLcFirst::class,
+        'UnwrapLtrim' => Mutator\Unwrap\UnwrapLtrim::class,
+        'UnwrapRtrim' => Mutator\Unwrap\UnwrapRtrim::class,
+        'UnwrapStrIreplace' => Mutator\Unwrap\UnwrapStrIreplace::class,
         'UnwrapStrRepeat' => Mutator\Unwrap\UnwrapStrRepeat::class,
         'UnwrapStrReplace' => Mutator\Unwrap\UnwrapStrReplace::class,
+        'UnwrapStrRev' => Mutator\Unwrap\UnwrapStrRev::class,
+        'UnwrapStrShuffle' => Mutator\Unwrap\UnwrapStrShuffle::class,
         'UnwrapStrToLower' => Mutator\Unwrap\UnwrapStrToLower::class,
         'UnwrapStrToUpper' => Mutator\Unwrap\UnwrapStrToUpper::class,
+        'UnwrapSubstr' => Mutator\Unwrap\UnwrapSubstr::class,
         'UnwrapTrim' => Mutator\Unwrap\UnwrapTrim::class,
         'UnwrapUcFirst' => Mutator\Unwrap\UnwrapUcFirst::class,
         'UnwrapUcWords' => Mutator\Unwrap\UnwrapUcWords::class,
+        'UnwrapFinally' => Unwrap\UnwrapFinally::class,
 
         // Extensions
         'BCMath' => Mutator\Extensions\BCMath::class,
         'MBString' => Mutator\Extensions\MBString::class,
+
+        // Internal usage only
+        'SyntaxError' => Mutator\SyntaxError::class,
     ];
 
-    /**
-     * @var array<string, string>|null
-     */
-    private static $defaultProfileMutators;
+    /** @var array<string, string>|null */
+    private static ?array $defaultProfileMutators = null;
 
     /**
      * @return array<int, string>

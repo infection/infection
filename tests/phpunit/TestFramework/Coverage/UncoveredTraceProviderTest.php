@@ -39,15 +39,18 @@ use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
+use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
 
 final class UncoveredTraceProviderTest extends TestCase
 {
     public function test_it_provides_traces(): void
     {
         $filter = $this->createMock(BufferedSourceFileFilter::class);
-        $fileInfo = $this->createMock(SplFileInfo::class);
+        $fileInfo = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
         $filter
             ->expects($this->once())

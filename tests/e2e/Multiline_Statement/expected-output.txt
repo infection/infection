@@ -49,6 +49,9 @@ Line 22
 Errors mutants:
 ===============
 
+Syntax Errors mutants:
+======================
+
 Escaped mutants:
 ================
 
@@ -56,6 +59,9 @@ Timed Out mutants:
 ==================
 
 Skipped mutants:
+================
+
+Ignored mutants:
 ================
 
 Not Covered mutants:

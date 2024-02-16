@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use DateTimeImmutable as UnsafeDateTimeImmutable;
 use Infection\Console\IO;
 use Infection\Logger\ConsoleLogger;
 use function Infection\Tests\normalize_trailing_spaces;
@@ -43,7 +44,6 @@ use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Safe\DateTime;
-use Safe\DateTimeImmutable;
 use function Safe\fopen;
 use stdClass;
 use Symfony\Component\Console\Input\StringInput;
@@ -185,7 +185,7 @@ TXT
         yield 'object' => [new stdClass(), '[object stdClass]'];
 
         yield 'datetime' => [
-            DateTimeImmutable::createFromFormat(
+            UnsafeDateTimeImmutable::createFromFormat(
                 DateTime::ATOM,
                 '2020-04-26T07:32:25+00:00'
             ),

@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework;
 use Infection\TestFramework\VersionParser;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 
 final class VersionParserTest extends TestCase
 {
@@ -61,15 +62,18 @@ final class VersionParserTest extends TestCase
         $this->assertSame($expectedVersion, $result);
     }
 
-    public function test_it_throws_exception_when_content_has_no_version_substring(): void
+    /**
+     * @dataProvider invalidVersionProvider
+     */
+    public function test_it_throws_exception_when_content_has_no_version_substring(string $content): void
     {
         try {
-            $this->versionParser->parse('abc');
+            $this->versionParser->parse($content);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'Expected "abc" to be contain a valid SemVer (sub)string value.',
+                sprintf('Expected "%s" to be contain a valid SemVer (sub)string value.', $content),
                 $exception->getMessage()
             );
         }
@@ -110,5 +114,12 @@ final class VersionParserTest extends TestCase
         yield 'phpspec RC' => ['phpspec version 5.0.0-rc1', '5.0.0-rc1'];
 
         yield 'PHPUnit' => ['PHPUnit 7.5.11 by Sebastian Bergmann and contributors.', '7.5.11'];
+    }
+
+    public function invalidVersionProvider(): iterable
+    {
+        yield 'ascii-only string' => ['abc'];
+
+        yield 'with percent sign' => ['%~'];
     }
 }

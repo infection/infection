@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Return_>
  */
 final class IntegerNegation implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces an integer value with its negated value. For example will replace `-5` 
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = -5;
++ $a = 5;
+DIFF
         );
     }
 
     /**
-     * @param Node\Stmt\Return_ $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Stmt\Return_>
      */
@@ -96,6 +102,8 @@ TXT
     }
 
     /**
+     * @psalm-mutation-free
+     *
      * @param Node\Stmt\Return_ $node
      */
     private function getIntegerValueOfNode(Node $node): int

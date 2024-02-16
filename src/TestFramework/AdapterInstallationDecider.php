@@ -38,7 +38,7 @@ namespace Infection\TestFramework;
 use function array_key_exists;
 use function class_exists;
 use Infection\Console\IO;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
@@ -52,11 +52,8 @@ final class AdapterInstallationDecider
         TestFrameworkTypes::PHPSPEC => 'Infection\TestFramework\PhpSpec\PhpSpecAdapter',
     ];
 
-    private $questionHelper;
-
-    public function __construct(QuestionHelper $questionHelper)
+    public function __construct(private readonly QuestionHelper $questionHelper)
     {
-        $this->questionHelper = $questionHelper;
     }
 
     public function shouldBeInstalled(string $adapterName, IO $io): bool

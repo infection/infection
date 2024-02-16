@@ -40,8 +40,8 @@ use function in_array;
 use const PHP_EOL;
 use Psr\Log\LoggerInterface;
 use function Safe\file_put_contents;
-use function Safe\sprintf;
-use function strpos;
+use function sprintf;
+use function str_starts_with;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -50,21 +50,10 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class FileLogger implements MutationTestingResultsLogger
 {
-    private $filePath;
-    private $fileSystem;
-    private $lineLogger;
-    private $logger;
+    public const ALLOWED_PHP_STREAMS = ['php://stdout', 'php://stderr'];
 
-    public function __construct(
-        string $filePath,
-        Filesystem $fileSystem,
-        LineMutationTestingResultsLogger $lineLogger,
-        LoggerInterface $logger
-    ) {
-        $this->filePath = $filePath;
-        $this->fileSystem = $fileSystem;
-        $this->lineLogger = $lineLogger;
-        $this->logger = $logger;
+    public function __construct(private readonly string $filePath, private readonly Filesystem $fileSystem, private readonly LineMutationTestingResultsLogger $lineLogger, private readonly LoggerInterface $logger)
+    {
     }
 
     public function log(): void
@@ -72,8 +61,8 @@ final class FileLogger implements MutationTestingResultsLogger
         $content = implode(PHP_EOL, $this->lineLogger->getLogLines());
 
         // If the output should be written to a stream then just write it directly
-        if (strpos($this->filePath, 'php://') === 0) {
-            if (in_array($this->filePath, ['php://stdout', 'php://stderr'], true)) {
+        if (str_starts_with($this->filePath, 'php://')) {
+            if (in_array($this->filePath, self::ALLOWED_PHP_STREAMS, true)) {
                 file_put_contents($this->filePath, $content);
             } else {
                 // The Symfony filesystem component doesn't support using streams so provide a
@@ -96,5 +85,10 @@ final class FileLogger implements MutationTestingResultsLogger
                 $exception->getMessage()
             ));
         }
+    }
+
+    public function getFilePath(): string
+    {
+        return $this->filePath;
     }
 }

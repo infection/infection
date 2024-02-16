@@ -45,11 +45,8 @@ use Infection\Metrics\MetricsCalculator;
  */
 final class SummaryFileLogger implements LineMutationTestingResultsLogger
 {
-    private $metricsCalculator;
-
-    public function __construct(MetricsCalculator $metricsCalculator)
+    public function __construct(private readonly MetricsCalculator $metricsCalculator)
     {
-        $this->metricsCalculator = $metricsCalculator;
     }
 
     public function getLogLines(): array
@@ -59,9 +56,11 @@ final class SummaryFileLogger implements LineMutationTestingResultsLogger
             '',
             'Killed: ' . $this->metricsCalculator->getKilledCount(),
             'Errored: ' . $this->metricsCalculator->getErrorCount(),
+            'Syntax Errors: ' . $this->metricsCalculator->getSyntaxErrorCount(),
             'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
             'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
             'Skipped: ' . $this->metricsCalculator->getSkippedCount(),
+            'Ignored: ' . $this->metricsCalculator->getIgnoredCount(),
             'Not Covered: ' . $this->metricsCalculator->getNotTestedCount(),
             '',
         ];

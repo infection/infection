@@ -23,15 +23,15 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist>
+    <coverage cacheDirectory="./reports/.coverage-cache">
+        <include>
             <directory>src</directory>
-        </whitelist>
-    </filter>
+        </include>
+    </coverage>
 
     <groups>
         <exclude>
-            <group>large</group>
+            <group>e2e</group>
         </exclude>
     </groups>
 

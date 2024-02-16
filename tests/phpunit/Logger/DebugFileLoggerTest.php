@@ -37,6 +37,7 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\DebugFileLogger;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use PHPUnit\Framework\TestCase;
 
 final class DebugFileLoggerTest extends TestCase
@@ -49,10 +50,11 @@ final class DebugFileLoggerTest extends TestCase
      */
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
         bool $onlyCoveredMode,
         string $expectedContents
     ): void {
-        $logger = new DebugFileLogger($metricsCalculator, $onlyCoveredMode);
+        $logger = new DebugFileLogger($metricsCalculator, $resultsCollector, $onlyCoveredMode);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
@@ -61,6 +63,7 @@ final class DebugFileLoggerTest extends TestCase
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
+            new ResultsCollector(),
             false,
             <<<'TXT'
 Total: 0
@@ -71,6 +74,9 @@ Killed mutants:
 Errors mutants:
 ===============
 
+Syntax Errors mutants:
+======================
+
 Escaped mutants:
 ================
 
@@ -78,6 +84,9 @@ Timed Out mutants:
 ==================
 
 Skipped mutants:
+================
+
+Ignored mutants:
 ================
 
 Not Covered mutants:
@@ -88,9 +97,10 @@ TXT
 
         yield 'all mutations' => [
             $this->createCompleteMetricsCalculator(),
+            $this->createCompleteResultsCollector(),
             false,
             <<<'TXT'
-Total: 12
+Total: 16
 
 Killed mutants:
 ===============
@@ -112,6 +122,16 @@ Mutator: For_
 Line 10
 
 
+Syntax Errors mutants:
+======================
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+
 Escaped mutants:
 ================
 
@@ -139,6 +159,16 @@ Mutator: For_
 Line 10
 
 Mutator: PregQuote
+Line 10
+
+
+Ignored mutants:
+================
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
 Line 10
 
 
@@ -156,9 +186,10 @@ TXT
 
         yield 'all mutations only covered' => [
             $this->createCompleteMetricsCalculator(),
+            $this->createCompleteResultsCollector(),
             true,
             <<<'TXT'
-Total: 12
+Total: 16
 
 Killed mutants:
 ===============
@@ -172,6 +203,16 @@ Line 10
 
 Errors mutants:
 ===============
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
+Line 10
+
+
+Syntax Errors mutants:
+======================
 
 Mutator: PregQuote
 Line 9
@@ -207,6 +248,16 @@ Mutator: For_
 Line 10
 
 Mutator: PregQuote
+Line 10
+
+
+Ignored mutants:
+================
+
+Mutator: PregQuote
+Line 9
+
+Mutator: For_
 Line 10
 
 TXT

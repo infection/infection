@@ -37,12 +37,11 @@ namespace Infection\Mutator\Unwrap;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
-use PhpParser\Node;
 
 /**
  * @internal
  */
-final class UnwrapArrayValues extends AbstractUnwrapMutator
+final class UnwrapArrayValues extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
@@ -62,17 +61,16 @@ $x = [10 => 'Hello!'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_values([10 => 'Hello!']);
++ $x = [10 => 'Hello!'];
+DIFF
         );
     }
 
     protected function getFunctionName(): string
     {
         return 'array_values';
-    }
-
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
-    {
-        yield 0;
     }
 }

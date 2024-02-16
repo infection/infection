@@ -7,7 +7,7 @@ if test ! -f "$(which expect)"; then
 fi
 
 cd $(dirname $0)
-rm -v -f infection.json.dist infection.log
+rm -v -f infection.json5 infection.log
 
 set -e
 
@@ -18,9 +18,13 @@ else
     INFECTION="php ../../../bin/infection"
 fi
 export INFECTION
+unset CI
+unset CONTINUOUS_INTEGRATION
+unset TRAVIS
+unset GITHUB_ACTIONS
 
 ./do_configure.expect
 
 trap 'echo Final check failed: $(tail -n+$LINENO $0 | head -n1)' ERR
 
-test -f infection.json.dist
+test -f infection.json5

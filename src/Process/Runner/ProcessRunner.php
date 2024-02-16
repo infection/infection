@@ -44,4 +44,6 @@ interface ProcessRunner
      * @param iterable<ProcessBearer> $processes
      */
     public function run(iterable $processes): void;
+
+    public function stop(): void;
 }

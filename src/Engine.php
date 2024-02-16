@@ -45,6 +45,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
+use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -59,45 +60,8 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
  */
 final class Engine
 {
-    private $config;
-    private $adapter;
-    private $coverageChecker;
-    private $eventDispatcher;
-    private $initialTestsRunner;
-    private $memoryLimiter;
-    private $mutationGenerator;
-    private $mutationTestingRunner;
-    private $minMsiChecker;
-    private $consoleOutput;
-    private $metricsCalculator;
-    private $testFrameworkExtraOptionsFilter;
-
-    public function __construct(
-        Configuration $config,
-        TestFrameworkAdapter $adapter,
-        CoverageChecker $coverageChecker,
-        EventDispatcher $eventDispatcher,
-        InitialTestsRunner $initialTestsRunner,
-        MemoryLimiter $memoryLimiter,
-        MutationGenerator $mutationGenerator,
-        MutationTestingRunner $mutationTestingRunner,
-        MinMsiChecker $minMsiChecker,
-        ConsoleOutput $consoleOutput,
-        MetricsCalculator $metricsCalculator,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter
-    ) {
-        $this->config = $config;
-        $this->adapter = $adapter;
-        $this->coverageChecker = $coverageChecker;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->initialTestsRunner = $initialTestsRunner;
-        $this->memoryLimiter = $memoryLimiter;
-        $this->mutationGenerator = $mutationGenerator;
-        $this->mutationTestingRunner = $mutationTestingRunner;
-        $this->minMsiChecker = $minMsiChecker;
-        $this->consoleOutput = $consoleOutput;
-        $this->metricsCalculator = $metricsCalculator;
-        $this->testFrameworkExtraOptionsFilter = $testFrameworkExtraOptionsFilter;
+    public function __construct(private readonly Configuration $config, private readonly TestFrameworkAdapter $adapter, private readonly CoverageChecker $coverageChecker, private readonly EventDispatcher $eventDispatcher, private readonly InitialTestsRunner $initialTestsRunner, private readonly MemoryLimiter $memoryLimiter, private readonly MutationGenerator $mutationGenerator, private readonly MutationTestingRunner $mutationTestingRunner, private readonly MinMsiChecker $minMsiChecker, private readonly ConsoleOutput $consoleOutput, private readonly MetricsCalculator $metricsCalculator, private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter)
+    {
     }
 
     /**
@@ -109,14 +73,16 @@ final class Engine
         $this->runInitialTestSuite();
         $this->runMutationAnalysis();
 
-        $this->minMsiChecker->checkMetrics(
-            $this->metricsCalculator->getTotalMutantsCount(),
-            $this->metricsCalculator->getMutationScoreIndicator(),
-            $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
-            $this->consoleOutput
-        );
-
-        $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
+        try {
+            $this->minMsiChecker->checkMetrics(
+                $this->metricsCalculator->getTestedMutantsCount(),
+                $this->metricsCalculator->getMutationScoreIndicator(),
+                $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
+                $this->consoleOutput
+            );
+        } finally {
+            $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
+        }
     }
 
     private function runInitialTestSuite(): void
@@ -128,41 +94,70 @@ final class Engine
             return;
         }
 
-        $initialTestSuitProcess = $this->initialTestsRunner->run(
+        $initialTestSuiteProcess = $this->initialTestsRunner->run(
             $this->config->getTestFrameworkExtraOptions(),
-            explode(' ', (string) $this->config->getInitialTestsPhpOptions()),
+            $this->getInitialTestsPhpOptionsArray(),
             $this->config->shouldSkipCoverage()
         );
 
-        if (!$initialTestSuitProcess->isSuccessful()) {
-            throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuitProcess, $this->adapter);
+        if (!$initialTestSuiteProcess->isSuccessful()) {
+            throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuiteProcess, $this->adapter);
         }
 
         $this->coverageChecker->checkCoverageHasBeenGenerated(
-            $initialTestSuitProcess->getCommandLine(),
-            $initialTestSuitProcess->getOutput()
+            $initialTestSuiteProcess->getCommandLine(),
+            $initialTestSuiteProcess->getOutput()
         );
 
-        // Limit the memory used for the mutation processes based on the memory used for the initial
-        // test run
-        $this->memoryLimiter->limitMemory($initialTestSuitProcess->getOutput(), $this->adapter);
+        /*
+         * Limit the memory used for the mutation processes based on the memory
+         * used for the initial test run.
+         */
+        $this->memoryLimiter->limitMemory($initialTestSuiteProcess->getOutput(), $this->adapter);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getInitialTestsPhpOptionsArray(): array
+    {
+        return explode(' ', (string) $this->config->getInitialTestsPhpOptions());
     }
 
     private function runMutationAnalysis(): void
     {
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
-            $this->adapter instanceof IgnoresAdditionalNodes
-                ? $this->adapter->getNodeIgnorers()
-                : []
+            $this->getNodeIgnorers()
         );
 
-        $actualExtraOptions = $this->config->getTestFrameworkExtraOptions();
+        $this->mutationTestingRunner->run(
+            $mutations,
+            $this->getFilteredExtraOptionsForMutant()
+        );
+    }
 
-        $filteredExtraOptionsForMutant = $this->adapter instanceof ProvidesInitialRunOnlyOptions
-            ? $this->testFrameworkExtraOptionsFilter->filterForMutantProcess($actualExtraOptions, $this->adapter->getInitialRunOnlyOptions())
-            : $actualExtraOptions;
+    /**
+     * @return NodeIgnorer[]
+     */
+    private function getNodeIgnorers(): array
+    {
+        if ($this->adapter instanceof IgnoresAdditionalNodes) {
+            return $this->adapter->getNodeIgnorers();
+        }
 
-        $this->mutationTestingRunner->run($mutations, $filteredExtraOptionsForMutant);
+        return [];
+    }
+
+    private function getFilteredExtraOptionsForMutant(): string
+    {
+        if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
+            return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
+                $this->config->getTestFrameworkExtraOptions(),
+                $this->adapter->getInitialRunOnlyOptions()
+            );
+        }
+
+        return $this->config->getTestFrameworkExtraOptions();
     }
 }

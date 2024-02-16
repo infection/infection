@@ -38,10 +38,10 @@ namespace Infection\Configuration\Schema;
 use function array_filter;
 use function array_map;
 use function array_values;
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Entry\StrykerConfig;
 use stdClass;
 use function trim;
 
@@ -82,22 +82,35 @@ class SchemaConfigurationFactory
     {
         return new Logs(
             self::normalizeString($logs->text ?? null),
+            self::normalizeString($logs->html ?? null),
             self::normalizeString($logs->summary ?? null),
             self::normalizeString($logs->json ?? null),
+            self::normalizeString($logs->gitlab ?? null),
             self::normalizeString($logs->debug ?? null),
             self::normalizeString($logs->perMutator ?? null),
-            self::createBadge($logs->badge ?? null)
+            $logs->github ?? false,
+            self::createStrykerConfig($logs->stryker ?? null),
+            self::normalizeString($logs->summaryJson ?? null),
         );
     }
 
-    private static function createBadge(?stdClass $badge): ?Badge
+    private static function createStrykerConfig(?stdClass $stryker): ?StrykerConfig
     {
-        $branch = self::normalizeString($badge->branch ?? null);
+        if ($stryker === null) {
+            return null;
+        }
 
-        return $branch === null
-            ? null
-            : new Badge($branch)
-        ;
+        $branch = self::normalizeString($stryker->badge ?? $stryker->report ?? null);
+
+        if ($branch === null) {
+            return null;
+        }
+
+        if (($stryker->badge ?? null) !== null) {
+            return StrykerConfig::forBadge($branch);
+        }
+
+        return StrykerConfig::forFullReport($branch);
     }
 
     private static function createPhpUnit(stdClass $phpUnit): PhpUnit

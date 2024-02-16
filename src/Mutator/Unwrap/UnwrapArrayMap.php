@@ -39,11 +39,12 @@ use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function range;
 
 /**
  * @internal
  */
-final class UnwrapArrayMap extends AbstractUnwrapMutator
+final class UnwrapArrayMap extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
@@ -63,7 +64,11 @@ $x = ['foo', 'bar', 'baz'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_map($callback, ['foo', 'bar', 'baz']);
++ $x = ['foo', 'bar', 'baz'];
+DIFF
         );
     }
 
@@ -72,6 +77,9 @@ TXT
         return 'array_map';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from range(1, count($node->args) - 1);

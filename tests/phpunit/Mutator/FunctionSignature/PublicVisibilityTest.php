@@ -317,5 +317,67 @@ class Child extends SameAbstract
 }
 PHP
         ];
+
+        yield 'It does mutate anonymous classes' => [
+            <<<'PHP'
+            <?php
+
+            $var = [
+                'class' => new class() {
+                    public function foo(): bool
+                    {
+                        return true;
+                    }
+                },
+            ];
+            PHP,
+            <<<'PHP'
+            <?php
+
+            $var = ['class' => new class
+            {
+                protected function foo() : bool
+                {
+                    return true;
+                }
+            }];
+            PHP,
+        ];
+
+        yield 'It does not remove attributes' => [
+            <<<'PHP'
+<?php
+
+namespace PublicVisibilityOneClass;
+
+class Test
+{
+    #[SomeAttribute1]
+    #[SomeAttribute2]
+    public function &foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP,
+            <<<'PHP'
+<?php
+
+namespace PublicVisibilityOneClass;
+
+class Test
+{
+    #[SomeAttribute1]
+    #[SomeAttribute2]
+    protected function &foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP
+            ,
+        ];
     }
 }

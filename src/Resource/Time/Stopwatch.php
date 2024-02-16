@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Time;
 
+use function microtime;
 use Webmozart\Assert\Assert;
 
 // Cannot import this one as it would remove the ability to mock it
@@ -45,10 +46,7 @@ use Webmozart\Assert\Assert;
  */
 final class Stopwatch
 {
-    /**
-     * @var float|null
-     */
-    private $microTime;
+    private ?float $microTime = null;
 
     public function start(): void
     {

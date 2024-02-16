@@ -40,11 +40,8 @@ namespace Infection\Event;
  */
 final class InitialTestSuiteWasFinished
 {
-    private $outputText;
-
-    public function __construct(string $outputText)
+    public function __construct(private readonly string $outputText)
     {
-        $this->outputText = $outputText;
     }
 
     public function getOutputText(): string

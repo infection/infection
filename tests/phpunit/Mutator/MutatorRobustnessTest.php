@@ -41,10 +41,10 @@ use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Tests\Fixtures\NullMutationVisitor;
 use Infection\Tests\SingletonContainer;
+use function ksort;
 use PHPUnit\Framework\TestCase;
-use function Safe\ksort;
-use function Safe\sprintf;
 use const SORT_STRING;
+use function sprintf;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
@@ -73,10 +73,10 @@ final class MutatorRobustnessTest extends TestCase
             $this->addToAssertionCount(1);
         } catch (Throwable $throwable) {
             $this->fail(sprintf(
-               'The mutator "%s" could not parse the file "%s": %s.',
-               $mutator->getName(),
-               $fileName,
-               $throwable->getMessage()
+                'The mutator "%s" could not parse the file "%s": %s.',
+                $mutator->getName(),
+                $fileName,
+                $throwable->getMessage()
             ));
         }
     }
@@ -92,7 +92,7 @@ final class MutatorRobustnessTest extends TestCase
                 yield $title => [
                     $fileName,
                     $fileContents,
-                    $mutatorFactory->create([$mutatorClassName => []])[MutatorName::getName($mutatorClassName)],
+                    $mutatorFactory->create([$mutatorClassName => []], false)[MutatorName::getName($mutatorClassName)],
                 ];
             }
         }

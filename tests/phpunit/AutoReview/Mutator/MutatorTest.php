@@ -50,8 +50,8 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use function Safe\class_implements;
 use function Safe\sort;
-use function Safe\sprintf;
 use const SORT_STRING;
+use function sprintf;
 
 /**
  * @coversNothing

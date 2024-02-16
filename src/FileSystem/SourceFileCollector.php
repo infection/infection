@@ -56,21 +56,15 @@ class SourceFileCollector
         array $excludeDirectories
     ): iterable {
         if ($sourceDirectories === []) {
-            return;
+            return [];
         }
 
-        $finder = Finder::create()
-            ->exclude($excludeDirectories)
+        return Finder::create()
             ->in($sourceDirectories)
+            ->exclude($excludeDirectories)
+            ->notPath($excludeDirectories)
             ->files()
             ->name('*.php')
         ;
-
-        foreach ($excludeDirectories as $excludeDirectory) {
-            $finder->notPath($excludeDirectory);
-        }
-
-        // Generator here to make sure these files used only once
-        yield from $finder;
     }
 }

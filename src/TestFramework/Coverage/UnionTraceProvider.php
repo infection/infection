@@ -44,26 +44,11 @@ namespace Infection\TestFramework\Coverage;
 final class UnionTraceProvider implements TraceProvider
 {
     /**
-     * @var TraceProvider
-     */
-    private $coveredTraceProvider;
-
-    private $uncoveredTraceProvider;
-
-    private $onlyCovered;
-
-    /**
      * @param CoveredTraceProvider|TraceProvider $coveredTraceProvider
      * @param UncoveredTraceProvider|TraceProvider $uncoveredTraceProvider
      */
-    public function __construct(
-        TraceProvider $coveredTraceProvider,
-        TraceProvider $uncoveredTraceProvider,
-        bool $onlyCovered
-    ) {
-        $this->coveredTraceProvider = $coveredTraceProvider;
-        $this->uncoveredTraceProvider = $uncoveredTraceProvider;
-        $this->onlyCovered = $onlyCovered;
+    public function __construct(private readonly TraceProvider $coveredTraceProvider, private readonly TraceProvider $uncoveredTraceProvider, private readonly bool $onlyCovered)
+    {
     }
 
     /**

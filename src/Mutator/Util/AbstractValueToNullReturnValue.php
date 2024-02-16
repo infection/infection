@@ -43,6 +43,9 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @template TNode of Node
+ * @implements Mutator<TNode>
  */
 abstract class AbstractValueToNullReturnValue implements Mutator
 {

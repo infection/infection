@@ -42,6 +42,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractValueToNullReturnValue<Node\Stmt\Return_>
  */
 final class FunctionCall extends AbstractValueToNullReturnValue
 {
@@ -76,12 +78,22 @@ class X {
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+class X {
+    function foo()
+    {
+-        return bar();
++        bar();
++        return null;
+    }
+}
+DIFF
         );
     }
 
     /**
-     * @param Node\Stmt\Return_ $node
+     * @psalm-mutation-free
      *
      * @return iterable<array<Node\Stmt\Expression|Node\Stmt\Return_>>
      */

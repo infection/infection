@@ -36,14 +36,12 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use DOMDocument;
-use DOMElement;
-use DOMNode;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
-use function Safe\sprintf;
+use function sprintf;
 use function version_compare;
 use Webmozart\Assert\Assert;
 
@@ -52,35 +50,25 @@ use Webmozart\Assert\Assert;
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
-    private $tmpDir;
-    private $originalXmlConfigContent;
-    private $configManipulator;
-    private $jUnitFilePath;
-    private $srcDirs;
-    private $skipCoverage;
+    private readonly string $originalXmlConfigContent;
 
     /**
      * @param string[] $srcDirs
+     * @param list<string> $filteredSourceFilesToMutate
      */
     public function __construct(
-        string $tmpDir,
+        private readonly string $tmpDir,
         string $originalXmlConfigContent,
-        XmlConfigurationManipulator $configManipulator,
-        string $jUnitFilePath,
-        array $srcDirs,
-        bool $skipCoverage
+        private readonly XmlConfigurationManipulator $configManipulator,
+        private readonly XmlConfigurationVersionProvider $versionProvider,
+        private readonly array $srcDirs,
+        private readonly array $filteredSourceFilesToMutate
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,
             'The original XML config content cannot be an empty string'
         );
-
-        $this->tmpDir = $tmpDir;
         $this->originalXmlConfigContent = $originalXmlConfigContent;
-        $this->configManipulator = $configManipulator;
-        $this->jUnitFilePath = $jUnitFilePath;
-        $this->srcDirs = $srcDirs;
-        $this->skipCoverage = $skipCoverage;
     }
 
     public function build(string $version): string
@@ -98,9 +86,9 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $this->configManipulator->validate($path, $xPath);
 
-        $this->addCoverageFilterWhitelistIfDoesNotExist($xPath);
+        $this->addCoverageNodes($version, $xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
-        $this->addFailOnAttributesIfNotSet($version, $xPath);
+        $this->configManipulator->addFailOnAttributesIfNotSet($version, $xPath);
         $this->configManipulator->replaceWithAbsolutePaths($xPath);
         $this->configManipulator->setStopOnFailure($xPath);
         $this->configManipulator->deactivateColours($xPath);
@@ -108,11 +96,6 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator->deactivateStderrRedirection($xPath);
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
-
-        if (!$this->skipCoverage) {
-            $this->addCodeCoverageLogger($xPath);
-            $this->addJUnitLogger($xPath);
-        }
 
         file_put_contents($path, $dom->saveXML());
 
@@ -124,81 +107,34 @@ class InitialConfigBuilder implements ConfigBuilder
         return $this->tmpDir . '/phpunitConfiguration.initial.infection.xml';
     }
 
-    private function addJUnitLogger(SafeDOMXPath $xPath): void
+    private function addCoverageNodes(string $version, SafeDOMXPath $xPath): void
     {
-        $logging = $this->getOrCreateNode($xPath, 'logging');
+        if (version_compare($version, '10.1', '>=')) {
+            $this->configManipulator->addOrUpdateSourceIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
-        $junitLog = $xPath->document->createElement('log');
-        $junitLog->setAttribute('type', 'junit');
-        $junitLog->setAttribute('target', $this->jUnitFilePath);
-
-        $logging->appendChild($junitLog);
-    }
-
-    private function addCodeCoverageLogger(SafeDOMXPath $xPath): void
-    {
-        $logging = $this->getOrCreateNode($xPath, 'logging');
-
-        $coverageXmlLog = $xPath->document->createElement('log');
-        $coverageXmlLog->setAttribute('type', 'coverage-xml');
-        $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . PhpUnitAdapter::COVERAGE_DIR);
-
-        $logging->appendChild($coverageXmlLog);
-    }
-
-    private function addCoverageFilterWhitelistIfDoesNotExist(SafeDOMXPath $xPath): void
-    {
-        $filterNode = $this->getNode($xPath, 'filter');
-
-        if (!$filterNode) {
-            $filterNode = $this->createNode($xPath->document, 'filter');
-
-            $whiteListNode = $xPath->document->createElement('whitelist');
-
-            foreach ($this->srcDirs as $srcDir) {
-                $directoryNode = $xPath->document->createElement(
-                    'directory',
-                    $srcDir
-                );
-
-                $whiteListNode->appendChild($directoryNode);
-            }
-
-            $filterNode->appendChild($whiteListNode);
-        }
-    }
-
-    private function getOrCreateNode(SafeDOMXPath $xPath, string $nodeName): DOMElement
-    {
-        $node = $this->getNode($xPath, $nodeName);
-
-        if (!$node) {
-            $node = $this->createNode($xPath->document, $nodeName);
-        }
-        Assert::isInstanceOf($node, DOMElement::class);
-
-        return $node;
-    }
-
-    private function getNode(SafeDOMXPath $xPath, string $nodeName): ?DOMNode
-    {
-        $nodeList = $xPath->query(sprintf('/phpunit/%s', $nodeName));
-
-        if ($nodeList->length) {
-            return $nodeList->item(0);
+            return;
         }
 
-        return null;
-    }
+        if (version_compare($version, '10', '>=')) {
+            $this->configManipulator->addOrUpdateCoverageIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
-    private function createNode(DOMDocument $dom, string $nodeName): DOMElement
-    {
-        $node = $dom->createElement($nodeName);
-        $document = $dom->documentElement;
-        Assert::isInstanceOf($document, DOMElement::class);
-        $document->appendChild($node);
+            return;
+        }
 
-        return $node;
+        if (version_compare($version, '9.3', '<')) {
+            $this->configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
+
+            return;
+        }
+
+        // For versions between 9.3 and 10.0, fallback to version provider
+        if (version_compare($this->versionProvider->provide($xPath), '9.3', '>=')) {
+            $this->configManipulator->addOrUpdateCoverageIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
+
+            return;
+        }
+
+        $this->configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
     }
 
     private function addRandomTestsOrderAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
@@ -212,21 +148,11 @@ class InitialConfigBuilder implements ConfigBuilder
         }
     }
 
-    private function addFailOnAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
-    {
-        if (version_compare($version, '5.2', '<')) {
-            return;
-        }
-
-        $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
-        $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
-    }
-
     private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
     {
         $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
 
-        if (!$nodeList->length) {
+        if ($nodeList->length === 0) {
             $node = $xPath->query('/phpunit')[0];
             $node->setAttribute($attribute, $value);
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use function array_flip;
 use function array_key_exists;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
@@ -43,20 +44,21 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
-use function Safe\array_flip;
 
 /**
  * @internal
+ *
+ * @implements ConfigurableMutator<Node\Expr\ConstFetch>
  */
 final class TrueValue implements ConfigurableMutator
 {
-    use GetMutatorName;
     use GetConfigClassName;
+    use GetMutatorName;
 
     /**
      * @var array<string, int>
      */
-    private $allowedFunctions;
+    private readonly array $allowedFunctions;
 
     public function __construct(TrueValueConfig $config)
     {
@@ -68,12 +70,16 @@ final class TrueValue implements ConfigurableMutator
         return new Definition(
             'Replaces a boolean literal (`true`) with its opposite value (`false`). ',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = true;
++ $a = false;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\ConstFetch $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\ConstFetch>
      */

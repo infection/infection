@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Number;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use const PHP_INT_MAX;
+use const PHP_INT_MIN;
 
 final class IncrementIntegerTest extends BaseMutatorTestCase
 {
@@ -70,7 +72,36 @@ PHP
             ,
         ];
 
-        yield 'It does not increment the number zero' => [
+        yield 'It does not increment assigment of 0' => [
+            <<<'PHP'
+<?php
+
+$foo = 0;
+PHP
+            ,
+        ];
+
+        yield 'It does not increment 0 in greater comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo > 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in greater or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo >= 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in smaller comparison' => [
             <<<'PHP'
 <?php
 
@@ -78,7 +109,56 @@ if ($foo < 0) {
     echo 'bar';
 }
 PHP
-            ,
+        ];
+
+        yield 'It does not increment 0 in smaller or equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo <= 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo == 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in not equal comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo != 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo === 0) {
+    echo 'bar';
+}
+PHP
+        ];
+
+        yield 'It does not increment 0 in not identical comparison' => [
+            <<<'PHP'
+<?php
+
+if ($foo !== 0) {
+    echo 'bar';
+}
+PHP
         ];
 
         yield 'It increments one' => [
@@ -110,7 +190,7 @@ if ($foo === 1.0) {
 PHP
         ];
 
-        yield 'It decrements a negative integer' => [
+        yield 'It increments a negative integer' => [
             <<<'PHP'
 <?php
 
@@ -122,10 +202,83 @@ PHP
             <<<'PHP'
 <?php
 
-if ($foo === -11) {
+if ($foo === -9) {
     echo 'bar';
 }
 PHP
+            ,
+        ];
+
+        yield 'It does not increment limit argument of preg_split function when it equals to -1' => [
+            <<<'PHP'
+<?php
+preg_split('//', 'string', -1);
+PHP
+        ];
+
+        yield 'It does increment limit argument of preg_split function when it equals to 0' => [
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', 0);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', 1);
+PHP
+        ];
+
+        yield 'It does increment limit argument of preg_split function when it equals to -2' => [
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', -2);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+preg_split('//', 'string', -1);
+PHP
+        ];
+
+        $maxInt = PHP_INT_MAX;
+
+        yield 'It does not increment max int' => [
+            <<<"PHP"
+<?php
+
+random_int(10000000, {$maxInt});
+PHP
+            ,
+            <<<"PHP"
+<?php
+
+random_int(10000001, {$maxInt});
+PHP
+        ];
+
+        $minIntPlus1 = PHP_INT_MIN + 1;
+        $minIntPlus2 = $minIntPlus1 + 1;
+
+        yield 'It increments min int plus one, up to value of -PHP_INT_MAX' => [
+            <<<"PHP"
+            <?php
+
+            if (\$foo === {$minIntPlus1}) {
+                echo 'bar';
+            }
+            PHP
+            ,
+            <<<"PHP"
+            <?php
+
+            if (\$foo === {$minIntPlus2}) {
+                echo 'bar';
+            }
+            PHP
             ,
         ];
     }

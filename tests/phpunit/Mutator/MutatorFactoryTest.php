@@ -45,6 +45,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
+use Infection\Mutator\Sort\Spaceship;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use Infection\Tests\SingletonContainer;
@@ -53,7 +54,7 @@ use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
 
 final class MutatorFactoryTest extends TestCase
@@ -70,7 +71,7 @@ final class MutatorFactoryTest extends TestCase
 
     public function test_it_creates_no_mutator_if_no_profile_or_mutator_is_passed(): void
     {
-        $mutators = $this->mutatorFactory->create([]);
+        $mutators = $this->mutatorFactory->create([], false);
 
         $this->assertSame([], $mutators);
     }
@@ -80,7 +81,7 @@ final class MutatorFactoryTest extends TestCase
         $mutators = $this->mutatorFactory->create(array_fill_keys(
             ProfileList::ALL_MUTATORS,
             []
-        ));
+        ), false);
 
         $this->assertSameMutatorsByClass(
             array_values(ProfileList::ALL_MUTATORS),
@@ -94,8 +95,9 @@ final class MutatorFactoryTest extends TestCase
             TrueValue::class => [
                 'ignore' => ['A::B'],
             ],
-        ]);
+        ], false);
 
+        $this->assertContainsOnlyInstancesOf(IgnoreMutator::class, $mutators);
         $this->assertSameMutatorsByClass([TrueValue::class], $mutators);
 
         /** @var MockObject|ClassReflection $reflectionMock */
@@ -120,7 +122,7 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_cannot_create_a_mutator_with_invalid_settings(): void
     {
         try {
-            $this->mutatorFactory->create([Plus::class => false]);
+            $this->mutatorFactory->create([Plus::class => false], false);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
@@ -135,7 +137,7 @@ final class MutatorFactoryTest extends TestCase
     {
         $mutators = $this->mutatorFactory->create([
             Plus::class => ['unknown' => 'dunno'],
-        ]);
+        ], false);
 
         $this->assertSameMutatorsByClass([Plus::class], $mutators);
     }
@@ -147,7 +149,7 @@ final class MutatorFactoryTest extends TestCase
 
         $mutators = $this->mutatorFactory->create([
             TrueValue::class => ['settings' => $settings],
-        ]);
+        ], false);
 
         $this->assertSameMutatorsByClass([TrueValue::class], $mutators);
     }
@@ -155,15 +157,22 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_cannot_create_an_unknown_mutator(): void
     {
         try {
-            $this->mutatorFactory->create(['Unknwon\Mutator' => []]);
+            $this->mutatorFactory->create(['Unknown\Mutator' => []], false);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'Unknown mutator "Unknwon\Mutator"',
+                'Unknown mutator "Unknown\Mutator"',
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_it_can_parse_name(): void
+    {
+        $name = $this->mutatorFactory::getMutatorNameForClassName(Spaceship::class);
+
+        $this->assertSame('Spaceship', $name);
     }
 
     private function createBoolNode(string $boolean, string $functionName, ClassReflection $reflectionMock): Node
@@ -191,10 +200,14 @@ final class MutatorFactoryTest extends TestCase
         $decoratedMutatorReflection->setAccessible(true);
 
         foreach (array_values($actualMutators) as $index => $mutator) {
-            $this->assertInstanceOf(IgnoreMutator::class, $mutator);
+            $this->assertInstanceOf(Mutator::class, $mutator);
 
             $expectedMutatorClass = $expectedMutatorClassNames[$index];
-            $actualMutatorClass = get_class($decoratedMutatorReflection->getValue($mutator));
+            $actualMutatorClass = get_class(
+                $mutator instanceof IgnoreMutator ?
+                    $decoratedMutatorReflection->getValue($mutator) :
+                    $mutator
+            );
 
             $this->assertSame(
                 $expectedMutatorClass,

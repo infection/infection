@@ -49,7 +49,11 @@ final class CastString extends AbstractCastMutator
         return new Definition(
             'Removes a string cast operator (`(string)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = (string) $value;
++ $a = $value;
+DIFF
         );
     }
 

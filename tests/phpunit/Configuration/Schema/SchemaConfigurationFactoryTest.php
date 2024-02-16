@@ -42,10 +42,10 @@ use function array_map;
 use function array_merge;
 use function array_values;
 use function implode;
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Mutator\ProfileList;
@@ -54,15 +54,15 @@ use JsonSchema\Validator;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
 use function var_export;
 
 /**
- * @covers \Infection\Configuration\Entry\Badge
  * @covers \Infection\Configuration\Entry\Logs
  * @covers \Infection\Configuration\Entry\PhpUnit
  * @covers \Infection\Configuration\Entry\Source
+ * @covers \Infection\Configuration\Entry\StrykerConfig
  * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
  */
 final class SchemaConfigurationFactoryTest extends TestCase
@@ -82,7 +82,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
         '@removal',
         '@return_value',
         '@sort',
-        '@zero_iteration',
+        '@loop',
         '@default',
     ];
 
@@ -230,6 +230,39 @@ JSON
                     null,
                     null,
                     null,
+                    null,
+                    null,
+                    false,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][html] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "html": "report.html"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    'report.html',
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    null,
                     null
                 ),
             ]),
@@ -251,9 +284,13 @@ JSON
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
                     null,
+                    null,
                     'summary.log',
                     null,
                     null,
+                    null,
+                    null,
+                    false,
                     null,
                     null
                 ),
@@ -277,8 +314,41 @@ JSON
                 'logs' => new Logs(
                     null,
                     null,
+                    null,
                     'json.log',
                     null,
+                    null,
+                    null,
+                    false,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][gitlab] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "gitlab": "gitlab.log"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    'gitlab.log',
+                    null,
+                    null,
+                    false,
                     null,
                     null
                 ),
@@ -303,7 +373,11 @@ JSON
                     null,
                     null,
                     null,
+                    null,
+                    null,
                     'debug.log',
+                    null,
+                    false,
                     null,
                     null
                 ),
@@ -329,21 +403,25 @@ JSON
                     null,
                     null,
                     null,
+                    null,
+                    null,
                     'perMutator.log',
+                    false,
+                    null,
                     null
                 ),
             ]),
         ];
 
-        yield '[logs][badge] nominal' => [
+        yield '[logs][stryker] badge' => [
             <<<'JSON'
 {
     "source": {
         "directories": ["src"]
     },
     "logs": {
-        "badge": {
-            "branch": "master"
+        "stryker": {
+            "badge": "master"
         }
     }
 }
@@ -357,7 +435,133 @@ JSON
                     null,
                     null,
                     null,
-                    new Badge('master')
+                    null,
+                    null,
+                    false,
+                    StrykerConfig::forBadge('master'),
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][stryker] report' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "stryker": {
+            "report": "master"
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    StrykerConfig::forFullReport('master'),
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][stryker] badge regex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "stryker": {
+            "badge": "/^foo$/"
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    StrykerConfig::forBadge('/^foo$/'),
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][stryker] report regex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "stryker": {
+            "report": "/^foo$/"
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    StrykerConfig::forFullReport('/^foo$/'),
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[logs][summaryJson] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "summaryJson": "summary.json"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    null,
+                    'summary.json'
                 ),
             ]),
         ];
@@ -370,13 +574,17 @@ JSON
     },
     "logs": {
         "text": "text.log",
+        "html": "report.html",
         "summary": "summary.log",
         "json": "json.log",
+        "gitlab": "gitlab.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
-        "badge": {
-            "branch": "master"
-        }
+        "github": true,
+        "stryker": {
+            "badge": "master"
+        },
+        "summaryJson": "summary.json"
     }
 }
 JSON
@@ -385,11 +593,15 @@ JSON
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
                     'text.log',
+                    'report.html',
                     'summary.log',
                     'json.log',
+                    'gitlab.log',
                     'debug.log',
                     'perMutator.log',
-                    new Badge('master')
+                    true,
+                    StrykerConfig::forBadge('master'),
+                    'summary.json'
                 ),
             ]),
         ];
@@ -405,8 +617,32 @@ JSON
         "summary": "",
         "debug": "",
         "perMutator": "",
-        "badge": {
-            "branch": ""
+        "stryker": {
+            "report": ""
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => Logs::createEmpty(),
+            ]),
+        ];
+
+        yield '[logs] empty branch match regex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "text": "",
+        "summary": "",
+        "debug": "",
+        "perMutator": "",
+        "stryker": {
+            "badge": ""
         }
     }
 }
@@ -426,13 +662,17 @@ JSON
     },
     "logs": {
         "text": " text.log ",
+        "html": " report.html ",
         "summary": " summary.log ",
         "json": " json.log ",
+        "gitlab": " gitlab.log",
         "debug": " debug.log ",
         "perMutator": " perMutator.log ",
-        "badge": {
-            "branch": " master "
-        }
+        "github": true ,
+        "stryker": {
+            "badge": " master "
+        },
+        "summaryJson": " summary.json "
     }
 }
 JSON
@@ -441,11 +681,15 @@ JSON
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
                     'text.log',
+                    'report.html',
                     'summary.log',
                     'json.log',
+                    'gitlab.log',
                     'debug.log',
                     'perMutator.log',
-                    new Badge('master')
+                    true,
+                    StrykerConfig::forBadge('master'),
+                    'summary.json'
                 ),
             ]),
         ];
@@ -712,7 +956,7 @@ JSON
             ]),
         ];
 
-        foreach (TestFrameworkTypes::TYPES as $testFrameworkType) {
+        foreach (TestFrameworkTypes::getTypes() as $testFrameworkType) {
             yield '[testFramework] ' . $testFrameworkType => (static function () use (
                 $testFrameworkType
             ): array {
@@ -1005,6 +1249,32 @@ JSON
             ]),
         ];
 
+        yield '[mutators][TrueValue] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'TrueValue' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
         yield '[mutators][TrueValue] empty & untrimmed ignore' => [
             <<<'JSON'
 {
@@ -1181,6 +1451,32 @@ JSON
                         'ignore' => [
                             'fileA',
                             'fileB',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][ArrayItemRemoval] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ArrayItemRemoval": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'ArrayItemRemoval' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
                         ],
                     ],
                 ],
@@ -1369,6 +1665,32 @@ JSON
             ]),
         ];
 
+        yield '[mutators][BCMath] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "BCMath": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'BCMath' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
         yield '[mutators][BCMath] empty & untrimmed ignore' => [
             <<<'JSON'
 {
@@ -1547,6 +1869,32 @@ JSON
                         'ignore' => [
                             'fileA',
                             'fileB',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
+
+        yield '[mutators][MBString] ignoreSourceCodeByRegex' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "MBString": {
+            "ignoreSourceCodeByRegex": [".*test.*"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => [
+                    'MBString' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            '.*test.*',
                         ],
                     ],
                 ],
@@ -1851,66 +2199,66 @@ JSON
                     ]),
                 ];
             })();
-        }
 
-        yield '[mutators][profile] ' . $profile . ' ignore' => (static function () use (
-            $profile
-        ): array {
-            return [
-                <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "$profile": {
-            "ignore": ["fileA", "fileB"]
+            yield '[mutators][profile] ' . $profile . ' ignore' => (static function () use (
+                $profile
+            ): array {
+                return [
+                    <<<JSON
+    {
+        "source": {
+            "directories": ["src"]
+        },
+        "mutators": {
+            "$profile": {
+                "ignore": ["fileA", "fileB"]
+            }
         }
     }
-}
-JSON
-                ,
-                self::createConfig([
-                    'source' => new Source(['src'], []),
-                    'mutators' => [
-                        $profile => (object) [
-                            'ignore' => ['fileA', 'fileB'],
-                        ],
-                    ],
-                ]),
-            ];
-        })();
-
-        yield '[mutators][profile] ' . $profile . ' ignore empty & untrimmed' => (static function () use (
-            $profile
-        ): array {
-            return [
-                <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "$profile": {
-            "ignore": [" file ", ""]
-        }
-    }
-}
-JSON
-                ,
-                self::createConfig([
-                    'source' => new Source(['src'], []),
-                    'mutators' => [
-                        $profile => (object) [
-                            'ignore' => [
-                                ' file ',
-                                '',
+    JSON
+                    ,
+                    self::createConfig([
+                        'source' => new Source(['src'], []),
+                        'mutators' => [
+                            $profile => (object) [
+                                'ignore' => ['fileA', 'fileB'],
                             ],
                         ],
-                    ],
-                ]),
-            ];
-        })();
+                    ]),
+                ];
+            })();
+
+            yield '[mutators][profile] ' . $profile . ' ignore empty & untrimmed' => (static function () use (
+                $profile
+            ): array {
+                return [
+                    <<<JSON
+    {
+        "source": {
+            "directories": ["src"]
+        },
+        "mutators": {
+            "$profile": {
+                "ignore": [" file ", ""]
+            }
+        }
+    }
+    JSON
+                    ,
+                    self::createConfig([
+                        'source' => new Source(['src'], []),
+                        'mutators' => [
+                            $profile => (object) [
+                                'ignore' => [
+                                    ' file ',
+                                    '',
+                                ],
+                            ],
+                        ],
+                    ]),
+                ];
+            })();
+        }
 
         yield '[mutators][profile] nominal' => [
             <<<JSON
@@ -1931,7 +2279,7 @@ JSON
         "@removal": true,
         "@return_value": true,
         "@sort": true,
-        "@zero_iteration": true,
+        "@loop": true,
         "@default": true
     }
 }
@@ -1952,7 +2300,7 @@ JSON
                     '@removal' => true,
                     '@return_value' => true,
                     '@sort' => true,
-                    '@zero_iteration' => true,
+                    '@loop' => true,
                     '@default' => true,
                 ],
             ]),
@@ -1968,13 +2316,17 @@ JSON
     },
     "logs": {
         "text": "text.log",
+        "html": "report.html",
         "summary": "summary.log",
         "json": "json.log",
+        "gitlab": "gitlab.log",
         "debug": "debug.log",
         "perMutator": "perMutator.log",
-        "badge": {
-            "branch": "master"
-        }
+        "github": true,
+        "stryker": {
+            "badge": "master"
+        },
+        "summaryJson": "summary.json"
     },
     "tmpDir": "custom-tmp",
     "phpUnit": {
@@ -2111,7 +2463,6 @@ JSON
         "ProtectedVisibility": true,
         "DecrementInteger": true,
         "IncrementInteger": true,
-        "OneZeroInteger": true,
         "OneZeroFloat": true,
         "AssignCoalesce": true,
         "Break_": true,
@@ -2192,7 +2543,7 @@ JSON
         "@removal": true,
         "@return_value": true,
         "@sort": true,
-        "@zero_iteration": true,
+        "@loop": true,
         "@default": true
     }
 }
@@ -2206,11 +2557,15 @@ JSON
                 ),
                 'logs' => new Logs(
                     'text.log',
+                    'report.html',
                     'summary.log',
                     'json.log',
+                    'gitlab.log',
                     'debug.log',
                     'perMutator.log',
-                    new Badge('master')
+                    true,
+                    StrykerConfig::forBadge('master'),
+                    'summary.json'
                 ),
                 'tmpDir' => 'custom-tmp',
                 'phpunit' => new PhpUnit(
@@ -2324,7 +2679,6 @@ JSON
                     'ProtectedVisibility' => true,
                     'DecrementInteger' => true,
                     'IncrementInteger' => true,
-                    'OneZeroInteger' => true,
                     'OneZeroFloat' => true,
                     'AssignCoalesce' => true,
                     'Break_' => true,
@@ -2405,7 +2759,7 @@ JSON
                     '@removal' => true,
                     '@return_value' => true,
                     '@sort' => true,
-                    '@zero_iteration' => true,
+                    '@loop' => true,
                     '@default' => true,
                 ],
             ]),

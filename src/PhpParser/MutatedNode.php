@@ -63,7 +63,7 @@ final class MutatedNode
     /**
      * @param Node|Node[] $value
      */
-    public static function wrap($value): self
+    public static function wrap(Node|array $value): self
     {
         return new self($value);
     }
@@ -71,7 +71,7 @@ final class MutatedNode
     /**
      * @return Node|Node[]
      */
-    public function unwrap()
+    public function unwrap(): Node|array
     {
         return $this->value;
     }

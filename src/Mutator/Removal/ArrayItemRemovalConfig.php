@@ -50,8 +50,8 @@ final class ArrayItemRemovalConfig implements MutatorConfig
         'all',
     ];
 
-    private $remove;
-    private $limit;
+    private readonly string $remove;
+    private readonly int $limit;
 
     /**
      * @param array{remove: string|null, limit: int|null} $settings
@@ -73,11 +73,17 @@ final class ArrayItemRemovalConfig implements MutatorConfig
         );
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function getRemove(): string
     {
         return $this->remove;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function getLimit(): int
     {
         return $this->limit;

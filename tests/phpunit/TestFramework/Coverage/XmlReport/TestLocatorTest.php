@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
@@ -124,26 +125,6 @@ final class TestLocatorTest extends TestCase
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
                     'testFilePath' => '/path/to/acme/FooTest.php',
                     'testExecutionTime' => 0.456,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'testExecutionTime' => 0.123,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'testExecutionTime' => 0.456,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_1',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'testExecutionTime' => 0.456,
-                ],
-                [
-                    'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
-                    'testFilePath' => '/path/to/acme/FooTest.php',
-                    'testExecutionTime' => 0.123,
                 ],
             ],
         ];

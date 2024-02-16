@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use function array_keys;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
@@ -42,7 +43,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapArrayReplaceRecursive extends AbstractUnwrapMutator
+final class UnwrapArrayReplaceRecursive extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
@@ -62,7 +63,11 @@ $x = ['foo', 'bar', 'baz'];
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
++ $x = ['foo', 'bar', 'baz'];
+DIFF
         );
     }
 
@@ -71,6 +76,9 @@ TXT
         return 'array_replace_recursive';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_keys($node->args);

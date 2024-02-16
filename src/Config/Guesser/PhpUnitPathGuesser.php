@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Config\Guesser;
 
 use stdClass;
+use function str_contains;
+use function trim;
 
 /**
  * @internal
@@ -44,11 +46,8 @@ final class PhpUnitPathGuesser
 {
     private const CURRENT_DIR_PATH = '.';
 
-    private $composerJsonContent;
-
-    public function __construct(stdClass $composerJsonContent)
+    public function __construct(private readonly stdClass $composerJsonContent)
     {
-        $this->composerJsonContent = $composerJsonContent;
     }
 
     public function guess(): string
@@ -77,7 +76,7 @@ final class PhpUnitPathGuesser
     {
         foreach ($parsedPaths as $namespace => $parsedPath) {
             // for old Symfony projects (<=2.7) phpunit.xml is located in ./app folder
-            if (strpos($namespace, 'SymfonyStandard') !== false && trim($parsedPath, '/') === 'app') {
+            if (str_contains($namespace, 'SymfonyStandard') && trim($parsedPath, '/') === 'app') {
                 return 'app';
             }
         }

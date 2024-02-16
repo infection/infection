@@ -1,0 +1,71 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+name: Annotations
+
+on:
+    pull_request:
+
+jobs:
+    tests:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                php-version: ['8.1']
+
+        name: Mutation Testing Code Review Annotations ${{ matrix.php-version }}
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-version }}
+                  tools: composer:v2.1
+                  coverage: pcov
+              env:
+                # This is necessary when installing a tool with a specific version
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Get composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache dependencies
+              uses: actions/cache@v3
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+                  restore-keys: |
+                      composer-${{ runner.os }}-${{ matrix.php-version }}-
+                      composer-${{ runner.os }}-
+                      composer-
+
+            - name: Install dependencies
+              run: |
+                  composer install --no-interaction --prefer-dist --no-progress
+
+            - name: Run Infection for added files only
+              run: |
+                  git fetch origin $GITHUB_BASE_REF
+                  php bin/infection --threads=max --git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations --only-covered
+
+    # This is a meta job to avoid to have to constantly change the protection rules
+    # whenever we touch the matrix.
+    tests-status:
+        name: Annotations Status
+        runs-on: ubuntu-latest
+        needs: tests
+        if: always()
+        steps:
+            - name: Successful run
+              if: ${{ !(contains(needs.*.result, 'failure')) }}
+              run: exit 0
+
+            - name: Failing run
+              if: ${{ contains(needs.*.result, 'failure') }}
+              run: exit 1

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -52,22 +53,12 @@ use Webmozart\Assert\Assert;
  */
 class FileMutationGenerator
 {
-    private $parser;
-    private $traverserFactory;
-    private $lineRangeCalculator;
-
-    public function __construct(
-        FileParser $parser,
-        NodeTraverserFactory $traverserFactory,
-        LineRangeCalculator $lineRangeCalculator
-    ) {
-        $this->parser = $parser;
-        $this->traverserFactory = $traverserFactory;
-        $this->lineRangeCalculator = $lineRangeCalculator;
+    public function __construct(private readonly FileParser $parser, private readonly NodeTraverserFactory $traverserFactory, private readonly LineRangeCalculator $lineRangeCalculator, private readonly FilesDiffChangedLines $filesDiffChangedLines, private readonly bool $isForGitDiffLines, private readonly ?string $gitDiffBase)
+    {
     }
 
     /**
-     * @param Mutator[] $mutators
+     * @param Mutator<\PhpParser\Node>[] $mutators
      * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws UnparsableFile
@@ -87,18 +78,19 @@ class FileMutationGenerator
             return;
         }
 
-        $fileInfo = $trace->getSourceFileInfo();
-
-        $initialStatements = $this->parser->parse($fileInfo);
+        $initialStatements = $this->parser->parse($trace->getSourceFileInfo());
 
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 $mutators,
-                $fileInfo->getPathname(),
+                $trace->getRealPath(),
                 $initialStatements,
                 $trace,
                 $onlyCovered,
-                $this->lineRangeCalculator
+                $this->isForGitDiffLines,
+                $this->gitDiffBase,
+                $this->lineRangeCalculator,
+                $this->filesDiffChangedLines
             )
         );
 

@@ -43,13 +43,13 @@ use ReflectionException;
  */
 final class CoreClassReflection implements ClassReflection
 {
-    private $reflectionClass;
-
-    private function __construct(ReflectionClass $reflectionClass)
+    private function __construct(private readonly ReflectionClass $reflectionClass)
     {
-        $this->reflectionClass = $reflectionClass;
     }
 
+    /**
+     * @param class-string $className
+     */
     public static function fromClassName(string $className): self
     {
         return new self(new ReflectionClass($className));
@@ -59,7 +59,7 @@ final class CoreClassReflection implements ClassReflection
     {
         try {
             $method = $this->reflectionClass->getMethod($methodName)->getPrototype();
-        } catch (ReflectionException $e) {
+        } catch (ReflectionException) {
             return false;
         }
 

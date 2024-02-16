@@ -45,7 +45,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -53,35 +53,12 @@ use Webmozart\Assert\Assert;
  */
 class MutationConfigBuilder extends ConfigBuilder
 {
-    private $tmpDir;
-    private $projectDir;
-    private $originalXmlConfigContent;
-    private $configManipulator;
-    private $jUnitTestCaseSorter;
+    private ?string $originalBootstrapFile = null;
 
-    /**
-     * @var string|null
-     */
-    private $originalBootstrapFile;
+    private ?DOMDocument $dom = null;
 
-    /**
-     * @var DOMDocument|null
-     */
-    private $dom;
-
-    public function __construct(
-        string $tmpDir,
-        string $originalXmlConfigContent,
-        XmlConfigurationManipulator $configManipulator,
-        string $projectDir,
-        JUnitTestCaseSorter $jUnitTestCaseSorter
-    ) {
-        $this->tmpDir = $tmpDir;
-        $this->projectDir = $projectDir;
-
-        $this->originalXmlConfigContent = $originalXmlConfigContent;
-        $this->configManipulator = $configManipulator;
-        $this->jUnitTestCaseSorter = $jUnitTestCaseSorter;
+    public function __construct(private readonly string $tmpDir, private readonly string $originalXmlConfigContent, private readonly XmlConfigurationManipulator $configManipulator, private readonly string $projectDir, private readonly JUnitTestCaseSorter $jUnitTestCaseSorter)
+    {
     }
 
     /**
@@ -91,7 +68,8 @@ class MutationConfigBuilder extends ConfigBuilder
         array $tests,
         string $mutantFilePath,
         string $mutationHash,
-        string $mutationOriginalFilePath
+        string $mutationOriginalFilePath,
+        string $version
     ): string {
         $dom = $this->getDom();
         $xPath = new SafeDOMXPath($dom);
@@ -104,9 +82,11 @@ class MutationConfigBuilder extends ConfigBuilder
             $originalBootstrapFile = $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
         }
 
+        // activate PHPUnit's result cache and order tests by running defects first, then sorted by fastest first
+        $this->configManipulator->handleResultCacheAndExecutionOrder($version, $xPath, $mutationHash);
+        $this->configManipulator->addFailOnAttributesIfNotSet($version, $xPath);
         $this->configManipulator->setStopOnFailure($xPath);
         $this->configManipulator->deactivateColours($xPath);
-        $this->configManipulator->deactivateResultCaching($xPath);
         $this->configManipulator->deactivateStderrRedirection($xPath);
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
@@ -190,7 +170,7 @@ PHP
     {
         $bootstrap = $xPath->query('/phpunit/@bootstrap');
 
-        if ($bootstrap->length) {
+        if ($bootstrap->length > 0) {
             $bootstrap[0]->nodeValue = $customAutoloadFilePath;
         } else {
             $node = $xPath->query('/phpunit')[0];
@@ -247,7 +227,7 @@ PHP
         $nodeToAppendTestSuite = $testSuites->item(0);
 
         // If there is no `testsuites` node, append to root
-        if (!$nodeToAppendTestSuite) {
+        if ($nodeToAppendTestSuite === null) {
             $nodeToAppendTestSuite = $xPath->query('/phpunit')->item(0);
         }
 
@@ -271,7 +251,7 @@ PHP
     {
         $bootstrap = $xPath->query('/phpunit/@bootstrap');
 
-        if ($bootstrap->length) {
+        if ($bootstrap->length > 0) {
             return $bootstrap[0]->nodeValue;
         }
 

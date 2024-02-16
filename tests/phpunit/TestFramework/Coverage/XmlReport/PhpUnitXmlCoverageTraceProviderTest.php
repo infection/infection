@@ -42,6 +42,7 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\Tests\FileSystem\FileSystemTestCase;
+use function iterator_to_array;
 use function Safe\file_put_contents;
 
 /**

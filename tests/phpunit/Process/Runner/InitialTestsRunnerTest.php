@@ -46,6 +46,7 @@ use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use const PHP_SAPI;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function strpos;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\PhpExecutableFinder;

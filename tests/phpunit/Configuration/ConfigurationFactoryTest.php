@@ -36,13 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Infection\Configuration\ConfigurationFactory;
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
@@ -51,11 +52,13 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorParser;
+use Infection\Mutator\NoopMutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use function Infection\Tests\normalizePath;
 use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
@@ -66,6 +69,7 @@ use function sys_get_temp_dir;
 final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;
+    use ProphecyTrait;
 
     /**
      * @var array<string, Mutator>|null
@@ -87,6 +91,7 @@ final class ConfigurationFactoryTest extends TestCase
      */
     public function test_it_can_create_a_configuration(
         bool $ciDetected,
+        bool $githubActionsDetected,
         SchemaConfiguration $schema,
         ?string $inputExistingCoveragePath,
         ?string $inputInitialTestsPhpOptions,
@@ -105,6 +110,13 @@ final class ConfigurationFactoryTest extends TestCase
         string $inputFilter,
         int $inputThreadsCount,
         bool $inputDryRun,
+        ?string $inputGitDiffFilter,
+        bool $inputIsForGitDiffLines,
+        string $inputGitDiffBase,
+        ?bool $inputUseGitHubAnnotationsLogger,
+        ?string $inputGitlabLogFilePath,
+        ?string $inputHtmlLogFilePath,
+        bool $inputUseNoopMutators,
         int $inputMsiPrecision,
         int $expectedTimeout,
         array $expectedSourceDirectories,
@@ -129,10 +141,12 @@ final class ConfigurationFactoryTest extends TestCase
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
-        ?float $expectedMinCoveredMsi
+        ?float $expectedMinCoveredMsi,
+        array $expectedIgnoreSourceCodeMutatorsMap,
+        bool $inputExecuteOnlyCoveringTestCases
     ): void {
         $config = $this
-            ->createConfigurationFactory($ciDetected)
+            ->createConfigurationFactory($ciDetected, $githubActionsDetected)
             ->create(
                 $schema,
                 $inputExistingCoveragePath,
@@ -152,7 +166,15 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputTestFrameworkExtraOptions,
                 $inputFilter,
                 $inputThreadsCount,
-                $inputDryRun
+                $inputDryRun,
+                $inputGitDiffFilter,
+                $inputIsForGitDiffLines,
+                $inputGitDiffBase,
+                $inputUseGitHubAnnotationsLogger,
+                $inputGitlabLogFilePath,
+                $inputHtmlLogFilePath,
+                $inputUseNoopMutators,
+                $inputExecuteOnlyCoveringTestCases
             )
         ;
 
@@ -184,13 +206,21 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedMinCoveredMsi,
             $inputMsiPrecision,
             $inputThreadsCount,
-            $inputDryRun
+            $inputDryRun,
+            $expectedIgnoreSourceCodeMutatorsMap,
+            $inputExecuteOnlyCoveringTestCases,
+            $inputIsForGitDiffLines,
+            $inputGitDiffBase
         );
     }
 
     public function valueProvider(): iterable
     {
+        $expectedLogs = Logs::createEmpty();
+        $expectedLogs->setUseGitHubAnnotationsLogger(true);
+
         yield 'minimal' => [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -225,13 +255,20 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            'AM',
+            false,
+            'master',
+            true,
+            null,
+            null,
+            false,
             2,
             10,
             [],
             [],
-            '',
+            'src/a.php,src/b.php',
             [],
-            Logs::createEmpty(),
+            $expectedLogs,
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
@@ -250,7 +287,45 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            true,
         ];
+
+        yield 'null html file log path with existing path from config file' => self::createValueForHtmlLogFilePath(
+            '/from-config.html',
+            null,
+            '/from-config.html'
+        );
+
+        yield 'absolute html file log path' => self::createValueForHtmlLogFilePath(
+            '/path/to/from-config.html',
+            null,
+            '/path/to/from-config.html',
+        );
+
+        yield 'relative html file log path' => self::createValueForHtmlLogFilePath(
+            'relative/path/to/from-config.html',
+            null,
+            '/path/to/relative/path/to/from-config.html'
+        );
+
+        yield 'override html file log path from CLI option with existing path from config file' => self::createValueForHtmlLogFilePath(
+            '/from-config.html',
+            '/from-cli.html',
+            '/from-cli.html'
+        );
+
+        yield 'set html file log path from CLI option when config file has no setting' => self::createValueForHtmlLogFilePath(
+            null,
+            '/from-cli.html',
+            '/from-cli.html'
+        );
+
+        yield 'null html file log path in config and CLI' => self::createValueForHtmlLogFilePath(
+            null,
+            null,
+            null
+        );
 
         yield 'null timeout' => self::createValueForTimeout(
             null,
@@ -339,10 +414,76 @@ final class ConfigurationFactoryTest extends TestCase
             true
         );
 
-        yield 'ignoreMsiWithNoMutations not specified in schema and not specified in input' => self::createValueForIgnoreMsiWithNoMutations(
-            null,
-            null,
+        yield 'Github Actions annotation disabled, not logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
+            false,
+            false,
             false
+        );
+
+        yield 'Github Actions annotation disabled, not logged in Github Actions environment' => self::createValueForGithubActionsDetected(
+            false,
+            true,
+            false
+        );
+
+        yield 'Github Actions annotation not provided, not logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
+            null,
+            false,
+            false
+        );
+
+        yield 'Github Actions annotation not provided, logged in Github Actions environment' => self::createValueForGithubActionsDetected(
+            null,
+            true,
+            true
+        );
+
+        yield 'Github Actions annotation enabled, logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
+            true,
+            false,
+            true
+        );
+
+        yield 'Github Actions annotation enabled, logged in Github Actions environment' => self::createValueForGithubActionsDetected(
+            true,
+            true,
+            true
+        );
+
+        yield 'null GitLab file log path with existing path from config file' => self::createValueForGitlabLogger(
+            '/from-config.json',
+            null,
+            '/from-config.json'
+        );
+
+        yield 'absolute GitLab file log path' => self::createValueForGitlabLogger(
+            '/path/to/from-config.json',
+            null,
+            '/path/to/from-config.json',
+        );
+
+        yield 'relative GitLab file log path' => self::createValueForGitlabLogger(
+            'relative/path/to/from-config.json',
+            null,
+            '/path/to/relative/path/to/from-config.json'
+        );
+
+        yield 'override GitLab file log path from CLI option with existing path from config file' => self::createValueForGitlabLogger(
+            '/from-config.json',
+            '/from-cli.json',
+            '/from-cli.json'
+        );
+
+        yield 'set GitLab file log path from CLI option when config file has no setting' => self::createValueForGitlabLogger(
+            null,
+            '/from-cli.json',
+            '/from-cli.json'
+        );
+
+        yield 'null GitLab file log path in config and CLI' => self::createValueForGitlabLogger(
+            null,
+            null,
+            null
         );
 
         yield 'ignoreMsiWithNoMutations not specified in schema and true in input' => self::createValueForIgnoreMsiWithNoMutations(
@@ -405,25 +546,25 @@ final class ConfigurationFactoryTest extends TestCase
             21.2
         );
 
-        yield 'minCoveredMsi not specified in schema and not specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi not specified in schema and not specified in input' => self::createValueForMinCoveredMsi(
             null,
             null,
             null
         );
 
-        yield 'minCoveredMsi specified in schema and not specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi specified in schema and not specified in input' => self::createValueForMinCoveredMsi(
             33.3,
             null,
             33.3
         );
 
-        yield 'minCoveredMsi not specified in schema and specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi not specified in schema and specified in input' => self::createValueForMinCoveredMsi(
             null,
             21.2,
             21.2
         );
 
-        yield 'minCoveredMsi specified in schema and specified in input' => self::createValueForminCoveredMsi(
+        yield 'minCoveredMsi specified in schema and specified in input' => self::createValueForMinCoveredMsi(
             33.3,
             21.2,
             21.2
@@ -537,7 +678,8 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'no mutator' => self::createValueForMutators(
             [],
             '',
-            self::getDefaultMutators()
+            false,
+            self::getDefaultMutators(),
         );
 
         yield 'mutators from config' => self::createValueForMutators(
@@ -550,6 +692,7 @@ final class ConfigurationFactoryTest extends TestCase
                 ],
             ],
             '',
+            false,
             [
                 'MethodCallRemoval' => new IgnoreMutator(
                     new IgnoreConfig([
@@ -558,6 +701,52 @@ final class ConfigurationFactoryTest extends TestCase
                     new MethodCallRemoval()
                 ),
             ]
+        );
+
+        yield 'noop mutators from config' => self::createValueForMutators(
+            [
+                '@default' => false,
+                'MethodCallRemoval' => (object) [
+                    'ignore' => [
+                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                    ],
+                ],
+            ],
+            '',
+            true,
+            [
+                'MethodCallRemoval' => new NoopMutator(new IgnoreMutator(
+                    new IgnoreConfig([
+                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                    ]),
+                    new MethodCallRemoval()
+                )),
+            ]
+        );
+
+        yield 'ignore source code by regex' => self::createValueForIgnoreSourceCodeByRegex(
+            [
+                '@default' => false,
+                'MethodCallRemoval' => (object) [
+                    'ignoreSourceCodeByRegex' => ['Assert::.*'],
+                ],
+            ],
+            ['MethodCallRemoval' => ['Assert::.*']]
+        );
+
+        yield 'ignore source code by regex with duplicates' => self::createValueForIgnoreSourceCodeByRegex(
+            [
+                '@default' => false,
+                'MethodCallRemoval' => (object) [
+                    'ignoreSourceCodeByRegex' => [
+                        'Assert::.*',
+                        'Assert::.*',
+                        'Test::.*',
+                        'Test::.*',
+                    ],
+                ],
+            ],
+            ['MethodCallRemoval' => ['Assert::.*', 'Test::.*']]
         );
 
         yield 'mutators from config & input' => self::createValueForMutators(
@@ -570,21 +759,17 @@ final class ConfigurationFactoryTest extends TestCase
                 ],
             ],
             'AssignmentEqual,EqualIdentical',
+            false,
             (static function (): array {
                 return [
-                    'AssignmentEqual' => new IgnoreMutator(
-                        new IgnoreConfig([]),
-                        new AssignmentEqual()
-                    ),
-                    'EqualIdentical' => new IgnoreMutator(
-                        new IgnoreConfig([]),
-                        new EqualIdentical()
-                    ),
+                    'AssignmentEqual' => new AssignmentEqual(),
+                    'EqualIdentical' => new EqualIdentical(),
                 ];
             })()
         );
 
         yield 'with source files' => [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -619,6 +804,13 @@ final class ConfigurationFactoryTest extends TestCase
             'src/Foo.php, src/Bar.php',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             ['src/'],
@@ -647,21 +839,28 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
         ];
 
         yield 'complete' => [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 10,
                 new Source(['src/'], ['vendor/']),
                 new Logs(
-                    'text.log',
-                    'summary.log',
-                    'json.log',
-                    'debug.log',
-                    'mutator.log',
-                    new Badge('master')
+                    '/text.log',
+                    '/report.html',
+                    '/summary.log',
+                    '/json.log',
+                    '/gitlab.log',
+                    '/debug.log',
+                    '/mutator.log',
+                    true,
+                    StrykerConfig::forFullReport('master'),
+                    '/summary.json'
                 ),
                 'config/tmp',
                 new PhpUnit(
@@ -694,6 +893,13 @@ final class ConfigurationFactoryTest extends TestCase
             'src/Foo.php, src/Bar.php',
             4,
             true,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             ['src/'],
@@ -704,12 +910,16 @@ final class ConfigurationFactoryTest extends TestCase
             'src/Foo.php, src/Bar.php',
             ['vendor/'],
             new Logs(
-                'text.log',
-                'summary.log',
-                'json.log',
-                'debug.log',
-                'mutator.log',
-                new Badge('master')
+                '/text.log',
+                '/report.html',
+                '/summary.log',
+                '/json.log',
+                '/gitlab.log',
+                '/debug.log',
+                '/mutator.log',
+                true,
+                StrykerConfig::forFullReport('master'),
+                '/summary.json'
             ),
             'none',
             '/path/to/config/tmp/infection',
@@ -719,10 +929,7 @@ final class ConfigurationFactoryTest extends TestCase
             ),
             (static function (): array {
                 return [
-                    'TrueValue' => new IgnoreMutator(
-                        new IgnoreConfig([]),
-                        new TrueValue(new TrueValueConfig([]))
-                    ),
+                    'TrueValue' => new TrueValue(new TrueValueConfig([])),
                 ];
             })(),
             'phpspec',
@@ -739,6 +946,8 @@ final class ConfigurationFactoryTest extends TestCase
             72.3,
             true,
             81.5,
+            [],
+            false,
         ];
     }
 
@@ -747,6 +956,7 @@ final class ConfigurationFactoryTest extends TestCase
         int $expectedTimeOut
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -781,6 +991,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             $expectedTimeOut,
             [],
@@ -806,6 +1023,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
         ];
     }
 
@@ -814,6 +1033,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedTmpDir
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -848,6 +1068,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -873,6 +1100,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
         ];
     }
 
@@ -882,6 +1111,7 @@ final class ConfigurationFactoryTest extends TestCase
         string $expectedCoveragePath
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -916,6 +1146,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -941,6 +1178,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
         ];
     }
 
@@ -949,6 +1188,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedPhpUnitConfigDir
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -983,6 +1223,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -1008,6 +1255,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
         ];
     }
 
@@ -1018,6 +1267,7 @@ final class ConfigurationFactoryTest extends TestCase
     ): array {
         return [
             $ciDetected,
+            false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
                 null,
@@ -1051,6 +1301,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -1076,6 +1333,201 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
+        ];
+    }
+
+    private static function createValueForGithubActionsDetected(
+        ?bool $inputUseGitHubAnnotationsLogger,
+        bool $githubActionsDetected,
+        bool $useGitHubAnnotationsLogger
+    ): array {
+        $expectedLogs = new Logs(
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $useGitHubAnnotationsLogger,
+            null,
+            null,
+        );
+
+        return [
+            false,
+            $githubActionsDetected,
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                Logs::createEmpty(),
+                '',
+                new PhpUnit(null, null),
+                null,
+                null,
+                null,
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            false,
+            'none',
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            0,
+            false,
+            null,
+            false,
+            'master',
+            $inputUseGitHubAnnotationsLogger,
+            null,
+            null,
+            false,
+            2,
+            10,
+            [],
+            [],
+            '',
+            [],
+            $expectedLogs,
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            'phpunit',
+            null,
+            null,
+            false,
+            '',
+            sys_get_temp_dir() . '/infection',
+            false,
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            [],
+            false,
+        ];
+    }
+
+    private static function createValueForGitlabLogger(
+        ?string $gitlabFileLogPathInConfig,
+        ?string $gitlabFileLogPathFromCliOption,
+        ?string $expectedGitlabFileLogPath
+    ): array {
+        $expectedLogs = new Logs(
+            null,
+            null,
+            null,
+            null,
+            $expectedGitlabFileLogPath,
+            null,
+            null,
+            false,
+            null,
+            null,
+        );
+
+        return [
+            false,
+            false,
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    $gitlabFileLogPathInConfig,
+                    null,
+                    null,
+                    false,
+                    null,
+                    null,
+                ),
+                '',
+                new PhpUnit(null, null),
+                null,
+                null,
+                null,
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            false,
+            'none',
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            0,
+            false,
+            'AM',
+            false,
+            'master',
+            false,
+            $gitlabFileLogPathFromCliOption,
+            null,
+            false,
+            2,
+            10,
+            [],
+            [],
+            'src/a.php,src/b.php',
+            [],
+            $expectedLogs,
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            'phpunit',
+            null,
+            null,
+            false,
+            '',
+            sys_get_temp_dir() . '/infection',
+            false,
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            [],
+            true,
         ];
     }
 
@@ -1085,6 +1537,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?bool $expectedIgnoreMsiWithNoMutations
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -1119,6 +1572,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -1144,6 +1604,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
         ];
     }
 
@@ -1153,6 +1615,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?float $expectedMinMsi
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -1187,6 +1650,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -1212,6 +1682,8 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedMinMsi,
             false,
             null,
+            [],
+            false,
         ];
     }
 
@@ -1221,6 +1693,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?float $expectedMinCoveredMsi
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -1255,6 +1728,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -1280,6 +1760,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             $expectedMinCoveredMsi,
+            [],
+            false,
         ];
     }
 
@@ -1290,6 +1772,7 @@ final class ConfigurationFactoryTest extends TestCase
         string $expectedTestFrameworkExtraOptions
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -1324,6 +1807,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -1349,6 +1839,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
         ];
     }
 
@@ -1358,6 +1850,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedInitialTestPhpOptions
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -1392,6 +1885,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -1417,6 +1917,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
         ];
     }
 
@@ -1427,6 +1929,7 @@ final class ConfigurationFactoryTest extends TestCase
         string $expectedTestFrameworkExtraOptions
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -1461,6 +1964,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -1486,6 +1996,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
         ];
     }
 
@@ -1495,6 +2007,7 @@ final class ConfigurationFactoryTest extends TestCase
         string $expectedTestFrameworkExtraOptions
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -1529,6 +2042,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
             2,
             10,
             [],
@@ -1554,6 +2074,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
         ];
     }
 
@@ -1563,9 +2085,11 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForMutators(
         array $configMutators,
         string $inputMutators,
+        bool $useNoopMutatos,
         array $expectedMutators
     ): array {
         return [
+            false,
             false,
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -1600,6 +2124,13 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             0,
             false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            $useNoopMutatos,
             2,
             10,
             [],
@@ -1625,6 +2156,190 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            [],
+            false,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $configMutators
+     * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
+     */
+    private static function createValueForIgnoreSourceCodeByRegex(
+        array $configMutators,
+        array $expectedIgnoreSourceCodeMutatorsMap
+    ): array {
+        return [
+            false,
+            false,
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                Logs::createEmpty(),
+                null,
+                new PhpUnit(null, null),
+                null,
+                null,
+                null,
+                $configMutators,
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            false,
+            'none',
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            0,
+            false,
+            null,
+            false,
+            'master',
+            false,
+            null,
+            null,
+            false,
+            2,
+            10,
+            [],
+            [],
+            '',
+            [],
+            Logs::createEmpty(),
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            [
+                'MethodCallRemoval' => new MethodCallRemoval(),
+            ],
+            'phpunit',
+            null,
+            null,
+            false,
+            '',
+            sys_get_temp_dir() . '/infection',
+            false,
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            $expectedIgnoreSourceCodeMutatorsMap,
+            false,
+        ];
+    }
+
+    private static function createValueForHtmlLogFilePath(?string $htmlFileLogPathInConfig, ?string $htmlFileLogPathFromCliOption, ?string $expectedHtmlFileLogPath): array
+    {
+        $expectedLogs = new Logs(
+            null,
+            $expectedHtmlFileLogPath,
+            null,
+            null,
+            null,
+            null,
+            null,
+            true,
+            null,
+            null,
+        );
+
+        return [
+            false,
+            false,
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    null,
+                    $htmlFileLogPathInConfig,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    null,
+                    null,
+                ),
+                '',
+                new PhpUnit(null, null),
+                null,
+                null,
+                null,
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            false,
+            'none',
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            0,
+            false,
+            'AM',
+            false,
+            'master',
+            true,
+            null,
+            $htmlFileLogPathFromCliOption,
+            false,
+            2,
+            10,
+            [],
+            [],
+            'src/a.php,src/b.php',
+            [],
+            $expectedLogs,
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            'phpunit',
+            null,
+            null,
+            false,
+            '',
+            sys_get_temp_dir() . '/infection',
+            false,
+            false,
+            false,
+            false,
+            false,
+            null,
+            false,
+            null,
+            [],
+            true,
         ];
     }
 
@@ -1639,7 +2354,8 @@ final class ConfigurationFactoryTest extends TestCase
                 ->create(
                     SingletonContainer::getContainer()
                         ->getMutatorResolver()
-                        ->resolve(['@default' => true])
+                        ->resolve(['@default' => true]),
+                    false
                 )
             ;
         }
@@ -1647,7 +2363,7 @@ final class ConfigurationFactoryTest extends TestCase
         return self::$mutators;
     }
 
-    private function createConfigurationFactory(bool $ciDetected): ConfigurationFactory
+    private function createConfigurationFactory(bool $ciDetected, bool $githubActionsDetected): ConfigurationFactory
     {
         /** @var SourceFileCollector&ObjectProphecy $sourceFilesCollectorProphecy */
         $sourceFilesCollectorProphecy = $this->prophesize(SourceFileCollector::class);
@@ -1664,13 +2380,17 @@ final class ConfigurationFactoryTest extends TestCase
             ])
         ;
 
+        $gitDiffFilesProviderMock = $this->createMock(GitDiffFileProvider::class);
+        $gitDiffFilesProviderMock->method('provide')->willReturn('src/a.php,src/b.php');
+
         return new ConfigurationFactory(
             new TmpDirProvider(),
             SingletonContainer::getContainer()->getMutatorResolver(),
             SingletonContainer::getContainer()->getMutatorFactory(),
             new MutatorParser(),
             $sourceFilesCollectorProphecy->reveal(),
-            new DummyCiDetector($ciDetected)
+            new DummyCiDetector($ciDetected, $githubActionsDetected),
+            $gitDiffFilesProviderMock
         );
     }
 }

@@ -38,20 +38,23 @@ namespace Infection\Tests\Mutator;
 use function array_filter;
 use const ARRAY_FILTER_USE_KEY;
 use function array_values;
+use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NoopMutator;
 use Infection\Mutator\ProfileList;
+use Infection\Mutator\SyntaxError;
+use function ksort;
 use ReflectionClass;
-use function Safe\ksort;
 use function Safe\realpath;
-use function Safe\sprintf;
-use function Safe\substr;
 use const SORT_STRING;
+use function sprintf;
 use function str_replace;
+use function substr;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\PathUtil\Path;
 
 final class ProfileListProvider
 {
@@ -96,7 +99,7 @@ final class ProfileListProvider
             $shortClassName = substr($file->getFilename(), 0, -4);
             $className = self::getMutatorClassNameFromPath($file->getPathname());
 
-            if ($className === IgnoreMutator::class) {
+            if (in_array($className, [IgnoreMutator::class, NoopMutator::class, SyntaxError::class], true)) {
                 continue;
             }
 

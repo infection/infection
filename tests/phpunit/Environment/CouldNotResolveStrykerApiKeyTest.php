@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Environment;
 
+use function implode;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 
 final class CouldNotResolveStrykerApiKeyTest extends TestCase
 {

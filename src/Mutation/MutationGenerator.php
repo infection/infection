@@ -49,32 +49,25 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class MutationGenerator
+class MutationGenerator
 {
-    private $traceProvider;
-    private $mutators;
-    private $eventDispatcher;
-    private $fileMutationGenerator;
-    private $runConcurrently;
+    /** @var Mutator<\PhpParser\Node>[] */
+    private readonly array $mutators;
 
     /**
-     * @param Mutator[] $mutators
+     * @param Mutator<\PhpParser\Node>[] $mutators
      */
     public function __construct(
-        TraceProvider $traceProvider,
+        private readonly TraceProvider $traceProvider,
         array $mutators,
-        EventDispatcher $eventDispatcher,
-        FileMutationGenerator $fileMutationGenerator,
-        bool $runConcurrently
+        private readonly EventDispatcher $eventDispatcher,
+        private readonly FileMutationGenerator $fileMutationGenerator,
+        private bool $runConcurrently
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
-
-        $this->traceProvider = $traceProvider;
         $this->mutators = $mutators;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->fileMutationGenerator = $fileMutationGenerator;
-        $this->runConcurrently = $runConcurrently;
     }
 
     /**

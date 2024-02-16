@@ -1,0 +1,40 @@
+{
+    "$schema": "./resources/schema.json",
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "src"
+        ],
+        excludes: [
+            "FileSystem/DummyFileSystem.php",
+            "FileSystem/DummySymfony5FileSystem.php",
+            "FileSystem/DummySymfony6FileSystem.php"
+        ]
+    },
+    "logs": {
+        "stryker": {
+            "report": "master"
+        }
+    },
+    "mutators": {
+        "global-ignoreSourceCodeByRegex": [
+            "Assert::.*"
+        ],
+        "@default": true,
+        "InstanceOf_": {
+            ignore: [
+                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
+            ]
+        },
+        "LogicalAnd": {
+            ignore: [
+                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
+            ]
+        },
+        "LogicalOr": {
+            ignore: [
+                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
+            ]
+        }
+    }
+}

@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Mutator;
 
+use function class_exists;
 use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\class_implements;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @covers \Infection\Tests\AutoReview\Mutator\MutatorProvider

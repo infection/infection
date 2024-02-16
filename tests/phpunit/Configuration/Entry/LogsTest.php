@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Entry;
 
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\StrykerConfig;
 use PHPUnit\Framework\TestCase;
 
 final class LogsTest extends TestCase
@@ -48,29 +48,41 @@ final class LogsTest extends TestCase
      */
     public function test_it_can_be_instantiated(
         ?string $textLogFilePath,
+        ?string $htmlLogFilePath,
         ?string $summaryLogFilePath,
         ?string $jsonLogFilePath,
+        ?string $gitlabLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
-        ?Badge $badge
+        bool $useGitHubAnnotationsLogger,
+        ?StrykerConfig $strykerConfig,
+        ?string $summaryJsonLogFilePath
     ): void {
         $logs = new Logs(
             $textLogFilePath,
+            $htmlLogFilePath,
             $summaryLogFilePath,
             $jsonLogFilePath,
+            $gitlabLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
-            $badge
+            $useGitHubAnnotationsLogger,
+            $strykerConfig,
+            $summaryJsonLogFilePath
         );
 
         $this->assertLogsStateIs(
             $logs,
             $textLogFilePath,
+            $htmlLogFilePath,
             $summaryLogFilePath,
             $jsonLogFilePath,
+            $gitlabLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
-            $badge
+            $useGitHubAnnotationsLogger,
+            $strykerConfig,
+            $summaryJsonLogFilePath
         );
     }
 
@@ -85,6 +97,10 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
+            null,
+            false,
+            null,
             null
         );
     }
@@ -98,15 +114,23 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
+            false,
+            null,
+            null,
         ];
 
         yield 'complete' => [
             'text.log',
+            'report.html',
             'summary.log',
             'json.log',
+            'gitlab.log',
             'debug.log',
             'perMutator.log',
-            new Badge('master'),
+            true,
+            StrykerConfig::forBadge('master'),
+            'summary.json',
         ];
     }
 }

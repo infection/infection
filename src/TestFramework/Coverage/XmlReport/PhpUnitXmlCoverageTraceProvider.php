@@ -48,18 +48,8 @@ use function Safe\file_get_contents;
  */
 class PhpUnitXmlCoverageTraceProvider implements TraceProvider
 {
-    private $indexLocator;
-    private $indexParser;
-    private $parser;
-
-    public function __construct(
-        IndexXmlCoverageLocator $indexCoverageLocator,
-        IndexXmlCoverageParser $indexCoverageXmlParser,
-        XmlCoverageParser $coverageXmlParser
-    ) {
-        $this->indexLocator = $indexCoverageLocator;
-        $this->indexParser = $indexCoverageXmlParser;
-        $this->parser = $coverageXmlParser;
+    public function __construct(private readonly IndexXmlCoverageLocator $indexLocator, private readonly IndexXmlCoverageParser $indexParser, private readonly XmlCoverageParser $parser)
+    {
     }
 
     /**

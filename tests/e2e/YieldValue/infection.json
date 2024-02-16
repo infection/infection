@@ -1,0 +1,16 @@
+{
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "mutators": {
+        "Yield_": true,
+        "YieldValue": true
+    },
+    "logs": {
+        "perMutator": "infection.log"
+    },
+    "tmpDir": "."
+}

@@ -36,20 +36,24 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Finder;
 
 use const DIRECTORY_SEPARATOR;
+use function explode;
+use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
+use const PATH_SEPARATOR;
 use function Safe\putenv;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires I/O read & writes via the MockVendor
+ * @group integration
+ * Requires I/O read & writes via the MockVendor
  *
  * @see MockVendor
  */
@@ -63,11 +67,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     private static $pathName;
 
     /**
-     * @var array
-     */
-    private static $names;
-
-    /**
      * @var Filesystem
      */
     private $fileSystem;
@@ -78,7 +77,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     public static function setUpBeforeClass(): void
     {
         self::$pathName = getenv('PATH') ? 'PATH' : 'Path';
-        self::$names = [self::$pathName, 'PATHEXT'];
     }
 
     protected function setUp(): void
@@ -115,7 +113,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $frameworkFinder = new TestFrameworkFinder();
 
         $this->expectException(FinderException::class);
-        $this->expectExceptionMessageRegExp('/custom path/');
+        $this->expectExceptionMessage('custom path');
 
         $frameworkFinder->find('not-used', $filename);
     }

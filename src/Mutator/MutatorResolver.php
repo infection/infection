@@ -37,10 +37,12 @@ namespace Infection\Mutator;
 
 use function array_key_exists;
 use function array_merge_recursive;
+use function array_unique;
+use function array_values;
 use function class_exists;
-use function count;
+use function in_array;
 use InvalidArgumentException;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
 
 /**
@@ -48,7 +50,11 @@ use stdClass;
  */
 final class MutatorResolver
 {
+    private const IGNORE_SETTING = 'ignore';
+    private const IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'ignoreSourceCodeByRegex';
+
     private const GLOBAL_IGNORE_SETTING = 'global-ignore';
+    private const GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'global-ignoreSourceCodeByRegex';
 
     /**
      * Resolves the given hashmap of enabled, disabled or configured mutators
@@ -57,7 +63,7 @@ final class MutatorResolver
      *
      * @param array<string, bool|stdClass> $mutatorSettings
      *
-     * @return array<string, mixed[]>
+     * @return array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, mixed[]>
      */
     public function resolve(array $mutatorSettings): array
     {
@@ -70,10 +76,16 @@ final class MutatorResolver
                 /** @var string[] $globalSetting */
                 $globalSetting = $setting;
 
-                $globalSettings = ['ignore' => $globalSetting];
+                $globalSettings[self::IGNORE_SETTING] = $globalSetting;
                 unset($mutatorSettings[self::GLOBAL_IGNORE_SETTING]);
+            }
 
-                break;
+            if ($mutatorOrProfileOrGlobalSettingKey === self::GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING) {
+                /** @var string[] $globalSetting */
+                $globalSetting = $setting;
+
+                $globalSettings[self::IGNORE_SOURCE_CODE_BY_REGEX_SETTING] = array_values(array_unique($globalSetting));
+                unset($mutatorSettings[self::GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING]);
             }
         }
 
@@ -110,40 +122,46 @@ final class MutatorResolver
     }
 
     /**
-     * @param stdClass|bool $settings
      * @param array<string, string[]> $globalSettings
      *
      * @return array<string, mixed[]>|bool
      */
-    private static function resolveSettings($settings, array $globalSettings)
+    private static function resolveSettings(bool|stdClass|array $settings, array $globalSettings): array|bool
     {
         if ($settings === false) {
             return false;
-        }
-
-        if (count($globalSettings) === 0) {
-            return (array) $settings;
         }
 
         if ($settings === true) {
             return $globalSettings;
         }
 
-        return array_merge_recursive($globalSettings, (array) $settings);
+        if ($globalSettings === []) {
+            return (array) $settings;
+        }
+
+        $resultSettings = array_merge_recursive($globalSettings, (array) $settings);
+
+        foreach ($resultSettings as $key => &$settingValues) {
+            if (in_array($key, [self::IGNORE_SETTING, self::IGNORE_SOURCE_CODE_BY_REGEX_SETTING], true)) {
+                $settingValues = array_values(array_unique($settingValues));
+            }
+        }
+        unset($settingValues);
+
+        return $resultSettings;
     }
 
     /**
-     * @param array<string, mixed[]>|bool $settings
-     * @param array<string, array<string, string>> $mutators
+     * @param array<string, mixed>|bool $settings
+     * @param array<string, array<array-key, string>> $mutators
      */
     private static function registerFromProfile(
         string $profile,
-        $settings,
+        array|bool $settings,
         array &$mutators
     ): void {
         foreach (ProfileList::ALL_PROFILES[$profile] as $mutatorOrProfile) {
-            /** @var string $mutatorOrProfile */
-
             // A profile may refer to another collection of profiles
             if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
                 self::registerFromProfile(
@@ -180,7 +198,7 @@ final class MutatorResolver
      */
     private static function registerFromName(
         string $mutator,
-        $settings,
+        array|bool $settings,
         array &$mutators
     ): void {
         if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)) {
@@ -203,13 +221,27 @@ final class MutatorResolver
      */
     private static function registerFromClass(
         string $mutatorClassName,
-        $settings,
+        array|bool $settings,
         array &$mutators
     ): void {
         if ($settings === false) {
             unset($mutators[$mutatorClassName]);
-        } else {
-            $mutators[$mutatorClassName] = (array) $settings;
+
+            return;
         }
+
+        if ($settings === true || $settings === []) {
+            $mutators[$mutatorClassName] ??= [];
+
+            return;
+        }
+
+        if (!array_key_exists($mutatorClassName, $mutators)) {
+            $mutators[$mutatorClassName] = $settings;
+
+            return;
+        }
+
+        $mutators[$mutatorClassName] = array_merge_recursive($settings, $mutators[$mutatorClassName]);
     }
 }

@@ -48,16 +48,18 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements ConfigurableMutator<Node\Expr\FuncCall>
  */
 final class BCMath implements ConfigurableMutator
 {
-    use GetMutatorName;
     use GetConfigClassName;
+    use GetMutatorName;
 
     /**
      * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr>>
      */
-    private $converters;
+    private array $converters;
 
     public function __construct(BCMathConfig $config)
     {
@@ -82,12 +84,17 @@ $x = (string) ($a + $b);
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = bcadd($a, $b);
++ $x = (string) ($a + $b);
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\FuncCall $node
+     * @psalm-mutation-free
+     * @psalm-suppress ImpureMethodCall
      *
      * @return iterable<Node\Expr>
      */
@@ -210,6 +217,10 @@ TXT
     private static function makeBinaryOperatorMapper(string $operator): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($operator): iterable {
+            if ($node->args[0] instanceof Node\VariadicPlaceholder || $node->args[1] instanceof Node\VariadicPlaceholder) {
+                return;
+            }
+
             yield new $operator($node->args[0]->value, $node->args[1]->value);
         };
     }
@@ -230,6 +241,10 @@ TXT
     private static function makePowerModuloMapper(): Closure
     {
         return static function (Node\Expr\FuncCall $node): iterable {
+            if ($node->args[2] instanceof Node\VariadicPlaceholder) {
+                return;
+            }
+
             yield new Node\Expr\BinaryOp\Mod(
                 new Node\Expr\FuncCall(
                     new Node\Name('\pow'),

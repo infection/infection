@@ -39,6 +39,8 @@ use function array_map;
 use function implode;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use function range;
+use function strtoupper;
+use function ucfirst;
 
 final class BCMathTest extends BaseMutatorTestCase
 {
@@ -203,8 +205,8 @@ final class BCMathTest extends BaseMutatorTestCase
 
     private function generateArgumentsExpression(int $numberOfArguments): string
     {
-        return implode(', ', array_map(static function (string $argument) {
+        return implode(', ', array_map(static function (string $argument): string {
             return "'$argument'";
-        }, $numberOfArguments ? range(1, $numberOfArguments) : []));
+        }, $numberOfArguments > 0 ? range(1, $numberOfArguments) : []));
     }
 }

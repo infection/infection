@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="Test Suite" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.010499">
-    <testsuite name="Namespace_\Test\SourceClassTest" file="tests/SourceClassTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.010499">
-    </testsuite>
-  </testsuite>
-</testsuites>

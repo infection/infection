@@ -35,11 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use function array_key_exists;
 use function count;
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use function Safe\usort;
+use function usort;
 
 /**
  * @internal
@@ -49,7 +48,7 @@ final class JUnitTestCaseSorter
     /**
      * Expected average number of buckets. Exposed for testing purposes.
      *
-     * @var int[]
+     * @var int
      */
     public const BUCKETS_COUNT = 25;
 
@@ -97,9 +96,7 @@ final class JUnitTestCaseSorter
         if ($numberOfTestLocation < self::USE_BUCKET_SORT_AFTER) {
             usort(
                 $uniqueTestLocations,
-                static function (TestLocation $a, TestLocation $b) {
-                    return $a->getExecutionTime() <=> $b->getExecutionTime();
-                }
+                static fn (TestLocation $a, TestLocation $b): int => $a->getExecutionTime() <=> $b->getExecutionTime()
             );
 
             return self::sortedLocationsGenerator($uniqueTestLocations);

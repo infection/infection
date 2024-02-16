@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use function array_flip;
 use function array_intersect_key;
 use function array_keys;
 use function implode;
@@ -44,7 +45,6 @@ use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
 use PhpParser\Node;
-use function Safe\array_flip;
 use Webmozart\Assert\Assert;
 
 /**
@@ -53,24 +53,13 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
-    private $originalFilePath;
-    private $mutatorName;
-    private $mutatedNodeClass;
-    private $mutatedNode;
-    private $mutationByMutatorIndex;
-    private $attributes;
-    private $originalFileAst;
-    private $tests;
-    private $coveredByTests;
-    /**
-     * @var float|null
-     */
-    private $nominalTimeToTest;
+    private readonly string $mutatorName;
+    /** @var array<string|int|float> */
+    private readonly array $attributes;
+    private readonly bool $coveredByTests;
+    private ?float $nominalTimeToTest = null;
 
-    /**
-     * @var string|null
-     */
-    private $hash;
+    private ?string $hash = null;
 
     /**
      * @param Node[] $originalFileAst
@@ -78,29 +67,22 @@ class Mutation
      * @param TestLocation[] $tests
      */
     public function __construct(
-        string $originalFilePath,
-        array $originalFileAst,
+        private readonly string $originalFilePath,
+        private readonly array $originalFileAst,
         string $mutatorName,
         array $attributes,
-        string $mutatedNodeClass,
-        MutatedNode $mutatedNode,
-        int $mutationByMutatorIndex,
-        array $tests
+        private readonly string $mutatedNodeClass,
+        private readonly MutatedNode $mutatedNode,
+        private readonly int $mutationByMutatorIndex,
+        private readonly array $tests
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
         foreach (MutationAttributeKeys::ALL as $key) {
             Assert::keyExists($attributes, $key);
         }
-
-        $this->originalFilePath = $originalFilePath;
-        $this->originalFileAst = $originalFileAst;
         $this->mutatorName = $mutatorName;
         $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
-        $this->mutatedNodeClass = $mutatedNodeClass;
-        $this->mutatedNode = $mutatedNode;
-        $this->mutationByMutatorIndex = $mutationByMutatorIndex;
-        $this->tests = $tests;
         $this->coveredByTests = $tests !== [];
     }
 
@@ -133,6 +115,21 @@ class Mutation
     public function getOriginalStartingLine(): int
     {
         return (int) $this->attributes['startLine'];
+    }
+
+    public function getOriginalEndingLine(): int
+    {
+        return (int) $this->attributes['endLine'];
+    }
+
+    public function getOriginalStartFilePosition(): int
+    {
+        return (int) $this->attributes['startFilePos'];
+    }
+
+    public function getOriginalEndFilePosition(): int
+    {
+        return (int) $this->attributes['endFilePos'];
     }
 
     public function getMutatedNodeClass(): string

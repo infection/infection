@@ -43,42 +43,14 @@ use function round;
  */
 final class Calculator
 {
-    private $roundingPrecision;
-    private $killedCount;
-    private $errorCount;
-    private $timedOutCount;
-    private $notTestedCount;
-    private $totalCount;
+    private ?float $mutationScoreIndicator = null;
 
-    /**
-     * @var float|null
-     */
-    private $mutationScoreIndicator;
+    private ?float $coverageRate = null;
 
-    /**
-     * @var float|null
-     */
-    private $coverageRate;
+    private ?float $coveredMutationScoreIndicator = null;
 
-    /**
-     * @var float|null
-     */
-    private $coveredMutationScoreIndicator;
-
-    public function __construct(
-        int $roundingPrecision,
-        int $killedCount,
-        int $errorCount,
-        int $timedOutCount,
-        int $notTestedCount,
-        int $totalCount
-    ) {
-        $this->roundingPrecision = $roundingPrecision;
-        $this->killedCount = $killedCount;
-        $this->errorCount = $errorCount;
-        $this->timedOutCount = $timedOutCount;
-        $this->notTestedCount = $notTestedCount;
-        $this->totalCount = $totalCount;
+    public function __construct(private readonly int $roundingPrecision, private readonly int $killedCount, private readonly int $errorCount, private readonly int $timedOutCount, private readonly int $notTestedCount, private readonly int $totalCount)
+    {
     }
 
     public static function fromMetrics(MetricsCalculator $calculator): self
@@ -86,7 +58,7 @@ final class Calculator
         return new self(
             $calculator->getRoundingPrecision(),
             $calculator->getKilledCount(),
-            $calculator->getErrorCount(),
+            $calculator->getErrorCount() + $calculator->getSyntaxErrorCount(),
             $calculator->getTimedOutCount(),
             $calculator->getNotTestedCount(),
             $calculator->getTestedMutantsCount()

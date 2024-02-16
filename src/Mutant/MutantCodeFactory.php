@@ -47,11 +47,8 @@ use PhpParser\PrettyPrinterAbstract;
  */
 class MutantCodeFactory
 {
-    private $printer;
-
-    public function __construct(PrettyPrinterAbstract $prettyPrinter)
+    public function __construct(private readonly PrettyPrinterAbstract $printer)
     {
-        $this->printer = $prettyPrinter;
     }
 
     public function createCode(Mutation $mutation): string

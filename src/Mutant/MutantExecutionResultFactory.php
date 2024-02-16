@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
+use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 
@@ -47,11 +48,10 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResultFactory
 {
-    private $testFrameworkAdapter;
+    private const PROCESS_MIN_ERROR_CODE = 100;
 
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(private readonly TestFrameworkAdapter $testFrameworkAdapter)
     {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
     public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
@@ -65,11 +65,16 @@ class MutantExecutionResultFactory
             $this->retrieveProcessOutput($process),
             $this->retrieveDetectionStatus($mutantProcess),
             $mutant->getDiff(),
+            $mutation->getHash(),
             $mutation->getMutatorName(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalStartingLine(),
+            $mutation->getOriginalEndingLine(),
+            $mutation->getOriginalStartFilePosition(),
+            $mutation->getOriginalEndFilePosition(),
             $mutant->getPrettyPrintedOriginalCode(),
-            $mutant->getMutatedCode()
+            $mutant->getMutatedCode(),
+            $mutant->getTests()
         );
     }
 
@@ -98,13 +103,19 @@ class MutantExecutionResultFactory
 
         $process = $mutantProcess->getProcess();
 
-        if ($process->getExitCode() > 100) {
+        if ($process->getExitCode() > self::PROCESS_MIN_ERROR_CODE) {
             // See \Symfony\Component\Process\Process::$exitCodes
             return DetectionStatus::ERROR;
         }
 
-        if ($this->testFrameworkAdapter->testsPass($this->retrieveProcessOutput($process))) {
+        $output = $this->retrieveProcessOutput($process);
+
+        if ($process->getExitCode() === 0 && $this->testFrameworkAdapter->testsPass($output)) {
             return DetectionStatus::ESCAPED;
+        }
+
+        if ($this->testFrameworkAdapter instanceof SyntaxErrorAware && $this->testFrameworkAdapter->isSyntaxError($output)) {
+            return DetectionStatus::SYNTAX_ERROR;
         }
 
         return DetectionStatus::KILLED;

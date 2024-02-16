@@ -35,14 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutator\Loop\For_;
 use Infection\Mutator\Regex\PregQuote;
-use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\Mutator\MutatorName;
-use const PHP_EOL;
-use function str_replace;
+use function Infection\Tests\normalize_trailing_spaces;
+use function Later\now;
 
 trait CreateMetricsCalculator
 {
@@ -50,7 +52,23 @@ trait CreateMetricsCalculator
     {
         $calculator = new MetricsCalculator(2);
 
-        $calculator->collect(
+        $this->feedCollector($calculator);
+
+        return $calculator;
+    }
+
+    private function createCompleteResultsCollector(): ResultsCollector
+    {
+        $collector = new ResultsCollector();
+
+        $this->feedCollector($collector);
+
+        return $collector;
+    }
+
+    private function feedCollector(Collector $collector): void
+    {
+        $collector->collect(
             $this->createMutantExecutionResult(
                 0,
                 For_::class,
@@ -74,6 +92,18 @@ trait CreateMetricsCalculator
                 PregQuote::class,
                 DetectionStatus::ERROR,
                 'error#1'
+            ),
+            $this->createMutantExecutionResult(
+                0,
+                For_::class,
+                DetectionStatus::SYNTAX_ERROR,
+                'syntaxError#0'
+            ),
+            $this->createMutantExecutionResult(
+                1,
+                PregQuote::class,
+                DetectionStatus::SYNTAX_ERROR,
+                'syntaxError#1'
             ),
             $this->createMutantExecutionResult(
                 0,
@@ -122,10 +152,20 @@ trait CreateMetricsCalculator
                 PregQuote::class,
                 DetectionStatus::NOT_COVERED,
                 'notCovered#1'
+            ),
+            $this->createMutantExecutionResult(
+                0,
+                For_::class,
+                DetectionStatus::IGNORED,
+                'ignored#0'
+            ),
+            $this->createMutantExecutionResult(
+                1,
+                PregQuote::class,
+                DetectionStatus::IGNORED,
+                'ignored#1'
             )
         );
-
-        return $calculator;
     }
 
     private function createMutantExecutionResult(
@@ -138,9 +178,7 @@ trait CreateMetricsCalculator
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
             $detectionStatus,
-            str_replace(
-                "\n",
-                PHP_EOL,
+            now(normalize_trailing_spaces(
                 <<<DIFF
 --- Original
 +++ New
@@ -150,12 +188,17 @@ trait CreateMetricsCalculator
 + echo '$echoMutatedMessage';
 
 DIFF
-            ),
+            )),
+            'a1b2c3',
             MutatorName::getName($mutatorClassName),
             'foo/bar',
             10 - $i,
-            '<?php $a = 1;',
-            '<?php $a = 2;'
+            20 - $i,
+            10 - $i,
+            20 - $i,
+            now('<?php $a = 1;'),
+            now('<?php $a = 2;'),
+            []
         );
     }
 }

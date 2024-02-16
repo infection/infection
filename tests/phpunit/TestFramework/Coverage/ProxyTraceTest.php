@@ -40,46 +40,49 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use function iterator_to_array;
+use function Later\now;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
 
 final class ProxyTraceTest extends TestCase
 {
     public function test_it_exposes_its_source_file_file_info(): void
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
-        $actual = (new ProxyTrace($fileInfoMock, []))->getSourceFileInfo();
+        $actual = (new ProxyTrace($fileInfoMock))->getSourceFileInfo();
 
-        $this->assertSame(
-            $fileInfoMock,
-            $actual
-        );
+        $this->assertSame($fileInfoMock, $actual);
     }
 
     public function test_it_exposes_its_source_file_real_path(): void
     {
         $expected = 'Foo.php';
 
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
-        $fileInfoMock
-            ->method('getRealPath')
-            ->willReturn($expected)
-        ;
+        $fileInfoMock = new MockSplFileInfo([
+            'realPath' => $expected,
+        ]);
 
-        $actual = (new ProxyTrace($fileInfoMock, []))->getRealPath();
+        $actual = (new ProxyTrace($fileInfoMock))->getRealPath();
 
         $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_retrieve_the_test_locations(): void
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
+
         $tests = new TestLocations();
 
-        $trace = new ProxyTrace($fileInfoMock, [$tests]);
+        $trace = new ProxyTrace($fileInfoMock, now($tests));
 
         $actual = $trace->getTests();
+
         $this->assertSame($tests, $actual);
 
         // From cache
@@ -89,16 +92,44 @@ final class ProxyTraceTest extends TestCase
 
     public function test_it_has_no_tests_if_no_covered(): void
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
-        $trace = new ProxyTrace($fileInfoMock, [new TestLocations()]);
+        $trace = new ProxyTrace($fileInfoMock, now(new TestLocations()));
 
         $this->assertFalse($trace->hasTests());
     }
 
+    public function test_it_returns_null_for_no_tests(): void
+    {
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
+
+        $trace = new ProxyTrace($fileInfoMock, null);
+
+        $this->assertFalse($trace->hasTests());
+
+        $this->assertNull($trace->getTests());
+    }
+
+    public function test_it_returns_empty_iterable_for_no_tests(): void
+    {
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
+
+        $trace = new ProxyTrace($fileInfoMock, null);
+
+        $this->assertCount(0, $trace->getAllTestsForMutation(new NodeLineRangeData(1, 2), false));
+    }
+
     public function test_it_exposes_its_test_locations(): void
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
+        $fileInfoMock = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
         $tests = new TestLocations(
             [
@@ -114,42 +145,42 @@ final class ProxyTraceTest extends TestCase
             ]
         );
 
-        $trace = new ProxyTrace($fileInfoMock, [$tests]);
+        $trace = new ProxyTrace($fileInfoMock, now($tests));
 
         $this->assertTrue($trace->hasTests());
 
         // More extensive tests done on the ability to locate the tests are done in the TestLocator
         $this->assertCount(
             0,
-            $trace->getAllTestsForMutation(
+            [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(1, 1),
                 false
-            )
+            )]
         );
 
         $this->assertCount(
             1,
-            $trace->getAllTestsForMutation(
+            [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(20, 21),
                 false
-            )
+            )]
         );
 
         // This iterator_to_array is due to bug in our version of PHPUnit
         $this->assertCount(
             0,
-            iterator_to_array($trace->getAllTestsForMutation(
+            [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(1, 1),
                 true
-            ))
+            )]
         );
 
         $this->assertCount(
             1,
-            iterator_to_array($trace->getAllTestsForMutation(
-                new NodeLineRangeData(19, 22),
+            [...$trace->getAllTestsForMutation(
+                new NodeLineRangeData(19, 19),
                 true
-            ))
+            )]
         );
     }
 }

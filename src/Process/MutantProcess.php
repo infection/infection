@@ -46,19 +46,12 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcess implements ProcessBearer
 {
-    private $process;
-    private $mutant;
-    private $callback;
+    private Closure $callback;
 
-    /**
-     * @var bool
-     */
-    private $timedOut = false;
+    private bool $timedOut = false;
 
-    public function __construct(Process $process, Mutant $mutant)
+    public function __construct(private readonly Process $process, private readonly Mutant $mutant)
     {
-        $this->process = $process;
-        $this->mutant = $mutant;
         $this->callback = static function (): void {};
     }
 

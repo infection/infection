@@ -38,10 +38,9 @@ namespace Infection\Tests\Mutant;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
-use Infection\Mutator\ZeroIteration\For_;
+use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
@@ -96,7 +95,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            new Mutant(
+            MutantBuilder::build(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -166,7 +165,7 @@ DIFF,
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            new Mutant(
+            MutantBuilder::build(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -248,7 +247,7 @@ DIFF,
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            new Mutant(
+            MutantBuilder::build(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -317,7 +316,7 @@ DIFF,
             ->willReturn('Tests passed!')
         ;
         $processMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getExitCode')
             ->willReturn(0)
         ;
@@ -331,7 +330,7 @@ DIFF,
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            new Mutant(
+            MutantBuilder::build(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -400,7 +399,7 @@ DIFF,
             ->willReturn('Tests failed!')
         ;
         $processMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getExitCode')
             ->willReturn(0)
         ;
@@ -414,7 +413,7 @@ DIFF,
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            new Mutant(
+            MutantBuilder::build(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -457,6 +456,98 @@ DIFF,
             $this->resultFactory->createFromProcess($mutantProcess),
             $processCommandLine,
             'Tests failed!',
+            DetectionStatus::KILLED,
+            $mutantDiff,
+            $mutatorName,
+            $originalFilePath,
+            $originalStartingLine
+        );
+    }
+
+    /**
+     * PHPUnit can return "Tests passed! OK (10 tests, 32 assertions)" output, however
+     * return code will be non-zero.
+     *
+     * This happens when, for example, symfony/phpunit-bridge is used, and it detects
+     * outstanding deprecations which fails PHPUnit execution, while all the tests are passing
+     *
+     * See https://github.com/infection/infection/issues/1620#issuecomment-999073728
+     */
+    public function test_it_marks_mutant_as_killed_when_tests_pass_from_output_but_exit_code_is_non_zero(): void
+    {
+        $processMock = $this->createMock(Process::class);
+        $processMock
+            ->method('getCommandLine')
+            ->willReturn(
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+            )
+        ;
+        $processMock
+            ->method('isTerminated')
+            ->willReturn(true)
+        ;
+        $processMock
+            ->method('getOutput')
+            ->willReturn('Tests passed! OK (10 tests, 32 assertions)')
+        ;
+        $processMock
+            ->expects($this->exactly(2))
+            ->method('getExitCode')
+            ->willReturn(1) // PHPUnit says tests passed, but return code is non-zero
+        ;
+
+        $this->testFrameworkAdapterMock
+            ->expects($this->never())
+            ->method('testsPass')
+            ->with('Tests passed! OK (10 tests, 32 assertions)')
+            ->willReturn(true)
+        ;
+
+        $mutantProcess = new MutantProcess(
+            $processMock,
+            MutantBuilder::build(
+                '/path/to/mutant',
+                new Mutation(
+                    $originalFilePath = 'path/to/Foo.php',
+                    [],
+                    $mutatorName = MutatorName::getName(For_::class),
+                    [
+                        'startLine' => $originalStartingLine = 10,
+                        'endLine' => 15,
+                        'startTokenPos' => 0,
+                        'endTokenPos' => 8,
+                        'startFilePos' => 2,
+                        'endFilePos' => 4,
+                    ],
+                    'Unknown',
+                    MutatedNode::wrap(new Nop()),
+                    0,
+                    [
+                        new TestLocation(
+                            'FooTest::test_it_can_instantiate',
+                            '/path/to/acme/FooTest.php',
+                            0.01
+                        ),
+                    ]
+                ),
+                'killed#0',
+                $mutantDiff = <<<'DIFF'
+--- Original
++++ New
+@@ @@
+
+- echo 'original';
++ echo 'killed#0';
+
+DIFF,
+                '<?php $a = 1;'
+            )
+        );
+
+        $this->assertResultStateIs(
+            $this->resultFactory->createFromProcess($mutantProcess),
+            $processCommandLine,
+            'Tests passed! OK (10 tests, 32 assertions)',
             DetectionStatus::KILLED,
             $mutantDiff,
             $mutatorName,

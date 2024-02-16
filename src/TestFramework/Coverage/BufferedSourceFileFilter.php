@@ -56,25 +56,21 @@ use Webmozart\Assert\Assert;
  */
 class BufferedSourceFileFilter implements FileFilter
 {
-    private $filter;
-
     /**
      * An associative array mapping real paths to SplFileInfo objects.
      *
      * @var array<string, SplFileInfo>
      */
-    private $sourceFiles = [];
+    private array $sourceFiles = [];
 
     /**
      * @param SourceFileFilter|FileFilter $filter
      * @param iterable<SplFileInfo> $sourceFiles
      */
     public function __construct(
-        FileFilter $filter,
+        private readonly FileFilter $filter,
         iterable $sourceFiles
     ) {
-        $this->filter = $filter;
-
         // Make a map of source files so we can check covered files against it.
         // We don't filter here on the assumption that hash table lookups are faster.
         foreach ($sourceFiles as $sourceFile) {
@@ -85,7 +81,7 @@ class BufferedSourceFileFilter implements FileFilter
     public function filter(iterable $input): iterable
     {
         return take($this->filter->filter($input))
-            ->filter(function (Trace $trace) {
+            ->filter(function (Trace $trace): bool {
                 $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
 
                 Assert::string($traceRealPath);

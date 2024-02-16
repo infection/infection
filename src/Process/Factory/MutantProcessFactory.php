@@ -41,7 +41,6 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
-use function method_exists;
 use Symfony\Component\Process\Process;
 
 /**
@@ -50,42 +49,23 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcessFactory
 {
-    private $testFrameworkAdapter;
-    private $timeout;
-    private $eventDispatcher;
-    private $resultFactory;
-
     // TODO: is it necessary for the timeout to be an int?
-    public function __construct(
-        TestFrameworkAdapter $testFrameworkAdapter,
-        float $timeout,
-        EventDispatcher $eventDispatcher,
-        MutantExecutionResultFactory $resultFactory
-    ) {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-        $this->timeout = $timeout;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->resultFactory = $resultFactory;
+    public function __construct(private readonly TestFrameworkAdapter $testFrameworkAdapter, private readonly float $timeout, private readonly EventDispatcher $eventDispatcher, private readonly MutantExecutionResultFactory $resultFactory)
+    {
     }
 
     public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
-            $this->testFrameworkAdapter->getMutantCommandLine(
+            command: $this->testFrameworkAdapter->getMutantCommandLine(
                 $mutant->getTests(),
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getHash(),
                 $mutant->getMutation()->getOriginalFilePath(),
                 $testFrameworkExtraOptions
-            )
+            ),
+            timeout: $this->timeout
         );
-
-        $process->setTimeout($this->timeout);
-
-        if (method_exists($process, 'inheritEnvironmentVariables')) {
-            // in version 4.4.0 this method is deprecated and removed in 5.0.0
-            $process->inheritEnvironmentVariables();
-        }
 
         $mutantProcess = new MutantProcess($process, $mutant);
 

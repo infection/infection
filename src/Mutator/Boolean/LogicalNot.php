@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BooleanNot>
  */
 final class LogicalNot implements Mutator
 {
@@ -53,12 +55,16 @@ final class LogicalNot implements Mutator
         return new Definition(
             'Removes a negation operator (`!`), e.g. transforms `!$foo` with `$foo`.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = !$b;
++ $a = $b;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BooleanNot $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr>
      */

@@ -10,11 +10,14 @@
 /build/                 export-ignore
 /devTools/              export-ignore
 /tests/                 export-ignore
-/appveyor.yml           export-ignore
 /box.json.dist          export-ignore
 /codecov.yml            export-ignore
-/infection.json.dist    export-ignore
+/composer.lock          export-ignore
+/infection.json         export-ignore
 /Makefile               export-ignore
 /phpunit.xml.dist       export-ignore
 /phpunit_autoreview.xml export-ignore
+/psalm.xml              export-ignore
+/psalm-baseline.xml     export-ignore
+/scoper.inc.php         export-ignore
 /setup_environment.sh   export-ignore

@@ -39,23 +39,14 @@ use Infection\Console\ConsoleOutput;
 
 /**
  * @internal
+ * @final
  */
-final class MinMsiChecker
+class MinMsiChecker
 {
     private const VALUE_OVER_REQUIRED_TOLERANCE = 2;
 
-    private $ignoreMsiWithNoMutations;
-    private $minMsi;
-    private $minCoveredCodeMsi;
-
-    public function __construct(
-        bool $ignoreMsiWithNoMutations,
-        float $minMsi,
-        float $minCoveredMsi
-    ) {
-        $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
-        $this->minMsi = $minMsi;
-        $this->minCoveredCodeMsi = $minCoveredMsi;
+    public function __construct(private readonly bool $ignoreMsiWithNoMutations, private readonly float $minMsi, private readonly float $minCoveredCodeMsi)
+    {
     }
 
     /**
@@ -113,12 +104,12 @@ final class MinMsiChecker
 
     private function isMsiInsufficient(float $msi): bool
     {
-        return $this->minMsi && ($msi < $this->minMsi);
+        return $this->minMsi > 0 && $msi < $this->minMsi;
     }
 
     private function isCoveredCodeMsiInsufficient(float $coveredCodeMsi): bool
     {
-        return $this->minCoveredCodeMsi && ($coveredCodeMsi < $this->minCoveredCodeMsi);
+        return $this->minCoveredCodeMsi > 0 && $coveredCodeMsi < $this->minCoveredCodeMsi;
     }
 
     private function canIncreaseMsi(float $msi): bool

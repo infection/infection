@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Infection\Configuration\Configuration;
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
@@ -57,6 +57,7 @@ final class ConfigurationTest extends TestCase
      * @param string[] $sourceFilesExcludes
      * @param SplFileInfo[] $sourceFiles
      * @param Mutator[] $mutators
+     * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function test_it_can_be_instantiated(
         float $timeout,
@@ -85,7 +86,11 @@ final class ConfigurationTest extends TestCase
         ?float $minCoveredMsi,
         int $msiPrecision,
         int $threadsCount,
-        bool $dryRun
+        bool $dryRun,
+        array $ignoreSourceCodeMutatorsMap,
+        bool $executeOnlyCoveringTestCases,
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase
     ): void {
         $config = new Configuration(
             $timeout,
@@ -114,7 +119,11 @@ final class ConfigurationTest extends TestCase
             $minCoveredMsi,
             $msiPrecision,
             $threadsCount,
-            $dryRun
+            $dryRun,
+            $ignoreSourceCodeMutatorsMap,
+            $executeOnlyCoveringTestCases,
+            $isForGitDiffLines,
+            $gitDiffBase
         );
 
         $this->assertConfigurationStateIs(
@@ -145,7 +154,11 @@ final class ConfigurationTest extends TestCase
             $minCoveredMsi,
             $msiPrecision,
             $threadsCount,
-            $dryRun
+            $dryRun,
+            $ignoreSourceCodeMutatorsMap,
+            $executeOnlyCoveringTestCases,
+            $isForGitDiffLines,
+            $gitDiffBase
         );
     }
 
@@ -179,6 +192,10 @@ final class ConfigurationTest extends TestCase
             2,
             0,
             false,
+            [],
+            false,
+            false,
+            'master',
         ];
 
         yield 'nominal' => [
@@ -192,11 +209,15 @@ final class ConfigurationTest extends TestCase
             ['exclude-dir'],
             new Logs(
                 'text.log',
+                'report.html',
                 'summary.log',
                 'json.log',
+                'gitlab.log',
                 'debug.log',
                 'mutator.log',
-                new Badge('master')
+                true,
+                StrykerConfig::forBadge('master'),
+                'summary.json'
             ),
             'default',
             'custom-dir',
@@ -221,6 +242,12 @@ final class ConfigurationTest extends TestCase
             2,
             4,
             true,
+            [
+                'For_' => ['.*someMethod.*'],
+            ],
+            true,
+            false,
+            'master',
         ];
     }
 }

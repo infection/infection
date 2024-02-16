@@ -40,7 +40,9 @@ use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Console\IO;
 use LogicException;
+use const PHP_OS;
 use PHPUnit\Framework\MockObject\MockObject;
+use function stripos;
 
 /**
  * @group integration

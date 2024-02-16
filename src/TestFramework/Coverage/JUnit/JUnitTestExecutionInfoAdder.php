@@ -48,20 +48,10 @@ use Infection\TestFramework\Coverage\Trace;
  */
 class JUnitTestExecutionInfoAdder
 {
-    /**
-     * @var TestFileDataProvider
-     */
-    private $testFileDataProvider;
+    private const MAX_EXPLODE_PARTS = 2;
 
-    private $adapter;
-
-    public function __construct(
-        TestFrameworkAdapter $adapter,
-        TestFileDataProvider $testFileDataProvider
-    ) {
-        $this->adapter = $adapter;
-
-        $this->testFileDataProvider = $testFileDataProvider;
+    public function __construct(private readonly TestFrameworkAdapter $adapter, private readonly TestFileDataProvider $testFileDataProvider)
+    {
     }
 
     /**
@@ -87,7 +77,13 @@ class JUnitTestExecutionInfoAdder
     {
         /** @var Trace $trace */
         foreach ($traces as $trace) {
-            foreach ($trace->getTests()->getTestsLocationsBySourceLine() as &$testsLocations) {
+            $tests = $trace->getTests();
+
+            if ($tests === null) {
+                continue;
+            }
+
+            foreach ($tests->getTestsLocationsBySourceLine() as &$testsLocations) {
                 foreach ($testsLocations as $line => $test) {
                     $testsLocations[$line] = $this->createCompleteTestLocation($test);
                 }
@@ -100,7 +96,7 @@ class JUnitTestExecutionInfoAdder
 
     private function createCompleteTestLocation(TestLocation $test): TestLocation
     {
-        $class = explode(':', $test->getMethod(), 2)[0];
+        $class = explode(':', $test->getMethod(), self::MAX_EXPLODE_PARTS)[0];
 
         $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
 

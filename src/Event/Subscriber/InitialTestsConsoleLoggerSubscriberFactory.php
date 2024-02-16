@@ -43,18 +43,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class InitialTestsConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
-    private $skipProgressBar;
-    private $testFrameworkAdapter;
-    private $debug;
-
-    public function __construct(
-        bool $skipProgressBar,
-        TestFrameworkAdapter $testFrameworkAdapter,
-        bool $debug
-    ) {
-        $this->skipProgressBar = $skipProgressBar;
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-        $this->debug = $debug;
+    public function __construct(private readonly bool $skipProgressBar, private readonly TestFrameworkAdapter $testFrameworkAdapter, private readonly bool $debug)
+    {
     }
 
     public function create(OutputInterface $output): EventSubscriber

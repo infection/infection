@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\ShiftLeft>
  */
 final class ShiftLeft implements Mutator
 {
@@ -56,12 +58,16 @@ Replaces a bitwise shift left operator (`<<`) with a bitwise shift right operato
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = $b << 1;
++ $a = $b >> 1;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\BinaryOp\ShiftLeft $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\BinaryOp\ShiftRight>
      */

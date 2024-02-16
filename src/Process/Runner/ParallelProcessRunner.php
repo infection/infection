@@ -38,8 +38,12 @@ namespace Infection\Process\Runner;
 use function array_shift;
 use function count;
 use Generator;
+use function max;
+use function microtime;
+use function range;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use function usleep;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -48,21 +52,31 @@ use function usleep;
  */
 final class ParallelProcessRunner implements ProcessRunner
 {
-    /**
-     * @var ProcessBearer[]
-     */
-    private $runningProcesses = [];
+    private const POLL_WAIT_IN_MS = 1000;
 
-    private $threadCount;
-    private $poll;
+    private const NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
+
+    /**
+     * @var array<int, IndexedProcessBearer>
+     */
+    private array $runningProcesses = [];
+    /**
+     * @var array<int, int>
+     */
+    private array $availableThreadIndexes = [];
+
+    private bool $shouldStop = false;
 
     /**
      * @param int $poll Delay (in milliseconds) to wait in-between two polls
      */
-    public function __construct(int $threadCount, int $poll = 1000)
+    public function __construct(private readonly int $threadCount, private readonly int $poll = self::POLL_WAIT_IN_MS)
     {
-        $this->threadCount = $threadCount;
-        $this->poll = $poll;
+    }
+
+    public function stop(): void
+    {
+        $this->shouldStop = true;
     }
 
     public function run(iterable $processes): void
@@ -85,10 +99,19 @@ final class ParallelProcessRunner implements ProcessRunner
         self::fillBucketOnce($bucket, $generator, 1);
 
         $threadCount = max(1, $this->threadCount);
+        $this->availableThreadIndexes = range(1, $threadCount);
 
         // start the initial batch of processes
         while ($process = array_shift($bucket)) {
-            $this->startProcess($process);
+            if ($this->shouldStop) {
+                break;
+            }
+
+            $threadIndex = array_shift($this->availableThreadIndexes);
+
+            Assert::integer($threadIndex, 'Thread index can not be null.');
+
+            $this->startProcess($process, $threadIndex);
 
             if (count($this->runningProcesses) >= $threadCount) {
                 do {
@@ -112,18 +135,22 @@ final class ParallelProcessRunner implements ProcessRunner
     private function freeTerminatedProcesses(): bool
     {
         // remove any finished process from the stack
-        foreach ($this->runningProcesses as $index => $processBearer) {
+        foreach ($this->runningProcesses as $index => $indexedProcessBearer) {
+            $processBearer = $indexedProcessBearer->processBearer;
             $process = $processBearer->getProcess();
 
             try {
                 $process->checkTimeout();
-            } catch (ProcessTimedOutException $exception) {
+            } catch (ProcessTimedOutException) {
                 $processBearer->markAsTimedOut();
             }
 
             if (!$process->isRunning()) {
                 $processBearer->terminateProcess();
 
+                $this->availableThreadIndexes[] = $indexedProcessBearer->threadIndex;
+
+                unset($this->runningProcesses[$index]->processBearer);
                 unset($this->runningProcesses[$index]);
 
                 return true;
@@ -133,11 +160,14 @@ final class ParallelProcessRunner implements ProcessRunner
         return false;
     }
 
-    private function startProcess(ProcessBearer $processBearer): void
+    private function startProcess(ProcessBearer $processBearer, int $threadIndex): void
     {
-        $processBearer->getProcess()->start();
+        $processBearer->getProcess()->start(null, [
+            'INFECTION' => '1',
+            'TEST_TOKEN' => $threadIndex,
+        ]);
 
-        $this->runningProcesses[] = $processBearer;
+        $this->runningProcesses[] = new IndexedProcessBearer($threadIndex, $processBearer);
     }
 
     /**
@@ -152,12 +182,10 @@ final class ParallelProcessRunner implements ProcessRunner
 
         $start = microtime(true);
 
-        if ($input->valid()) {
-            $bucket[] = $input->current();
-            $input->next();
-        }
+        $bucket[] = $input->current();
+        $input->next();
 
-        return (int) (microtime(true) - $start) * 1000000; // ns to ms
+        return (int) (microtime(true) - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
     }
 
     /**

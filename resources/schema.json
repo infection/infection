@@ -6,6 +6,9 @@
         "source"
     ],
     "properties": {
+        "$schema": {
+            "type": "string"
+        },
         "timeout": {
             "type": "number",
             "description": "The allowed timeout in seconds.",
@@ -49,11 +52,15 @@
                 },
                 "summary": {
                     "type": "string",
-                    "definition": "Summary log file, which display the amount of mutants per category, (Killed, Errored, Escaped, Timed Out & Not Covered). More intended for internal purposes."
+                    "definition": "Summary log file, which displays the amount of mutants per category, (Killed, Errored, Escaped, Timed Out & Not Covered). More intended for internal purposes."
                 },
                 "json": {
                     "type": "string",
                     "definition": "JSON log file, which contains information about all mutants, as well as the source and mutated code and test framework output. Useful for using on CI servers to be able to programmatically analyze it."
+                },
+                "html": {
+                    "type": "string",
+                    "definition": "HTML report, which displays MSI values as well as mutated files with Killed and Escaped mutants with diffs for them. Human readable report, similar to PHPUnit HTML report."
                 },
                 "debug": {
                     "type": "string",
@@ -63,16 +70,39 @@
                     "type": "string",
                     "description": "Markdown file which will give a break-down of the effectiveness of each mutator."
                 },
-                "badge": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": ["branch"],
-                    "properties": {
-                        "branch": {
-                            "type": "string",
-                            "description": "Mutation score badge for your GitHub project."
+                "stryker": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "required": ["badge"],
+                            "description": "Mutation score badge for your GitHub project. If provided, Infection will report results for matching branches to an upstream reporting dashboard.",
+                            "additionalProperties": false,
+                            "properties": {
+                                "badge": { "$ref": "#/definitions/stryker-branch" }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "required": ["report"],
+                            "description": "Mutation testing HTML report for your GitHub project. If provided, Infection will report results for matching branches to an upstream reporting dashboard.",
+                            "additionalProperties": false,
+                            "properties": {
+                                "report": { "$ref": "#/definitions/stryker-branch" }
+                            }
                         }
-                    }
+                    ]
+                },
+                "github": {
+                    "type": "boolean",
+                    "description": "GitHub Annotations for escaped Mutants in the added/modifies files"
+                },
+                "gitlab": {
+                    "type": "string",
+                    "definition": "GitLab (Code Climate) code quality json file."
+                },
+                "summaryJson": {
+                    "type": "string",
+                    "definition": "Summary JSON log file, which contains only the statistics from the complete JSON file."
                 }
             }
         },
@@ -118,8 +148,17 @@
             "properties": {
                 "global-ignore": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
                         "type": "string"
+                    }
+                },
+                "global-ignoreSourceCodeByRegex": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "format": "regex"
                     }
                 },
 
@@ -136,7 +175,7 @@
                 "@removal": { "$ref": "#/definitions/default-mutator-config" },
                 "@return_value": { "$ref": "#/definitions/default-mutator-config" },
                 "@sort": { "$ref": "#/definitions/default-mutator-config" },
-                "@zero_iteration": { "$ref": "#/definitions/default-mutator-config" },
+                "@loop": { "$ref": "#/definitions/default-mutator-config" },
                 "@cast": { "$ref": "#/definitions/default-mutator-config" },
                 "@unwrap": { "$ref": "#/definitions/default-mutator-config" },
                 "@extensions": { "$ref": "#/definitions/default-mutator-config" },
@@ -172,10 +211,16 @@
                 "IdenticalEqual": { "$ref": "#/definitions/default-mutator-config" },
                 "InstanceOf_": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalAnd": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalAndAllSubExprNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalAndNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalAndSingleSubExprNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalLowerAnd": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalLowerOr": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalNot": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalOr": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalOrAllSubExprNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalOrNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalOrSingleSubExprNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "NotEqualNotIdentical": { "$ref": "#/definitions/default-mutator-config" },
                 "NotIdenticalNotEqual": { "$ref": "#/definitions/default-mutator-config" },
                 "TrueValue": {
@@ -189,8 +234,17 @@
                             "properties": {
                                 "ignore": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string"
+                                    }
+                                },
+                                "ignoreSourceCodeByRegex": {
+                                    "type": "array",
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -210,6 +264,7 @@
                     ]
                 },
                 "Yield_": { "$ref": "#/definitions/default-mutator-config" },
+                "YieldValue": { "$ref": "#/definitions/default-mutator-config" },
                 "GreaterThan": { "$ref": "#/definitions/default-mutator-config" },
                 "GreaterThanOrEqualTo": { "$ref": "#/definitions/default-mutator-config" },
                 "LessThan": { "$ref": "#/definitions/default-mutator-config" },
@@ -226,16 +281,25 @@
                 "ProtectedVisibility": { "$ref": "#/definitions/default-mutator-config" },
                 "DecrementInteger": { "$ref": "#/definitions/default-mutator-config" },
                 "IncrementInteger": { "$ref": "#/definitions/default-mutator-config" },
-                "OneZeroInteger": { "$ref": "#/definitions/default-mutator-config" },
                 "OneZeroFloat": { "$ref": "#/definitions/default-mutator-config" },
                 "AssignCoalesce": { "$ref": "#/definitions/default-mutator-config" },
                 "Break_": { "$ref": "#/definitions/default-mutator-config" },
+                "Catch_": { "$ref": "#/definitions/default-mutator-config" },
                 "Continue_": { "$ref": "#/definitions/default-mutator-config" },
+                "ElseIfNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "Ternary": { "$ref": "#/definitions/default-mutator-config" },
                 "Throw_": { "$ref": "#/definitions/default-mutator-config" },
                 "Finally_": { "$ref": "#/definitions/default-mutator-config" },
+                "IfNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "Coalesce": { "$ref": "#/definitions/default-mutator-config" },
+                "Concat": { "$ref": "#/definitions/default-mutator-config" },
                 "PregQuote": { "$ref": "#/definitions/default-mutator-config" },
                 "PregMatchMatches": { "$ref": "#/definitions/default-mutator-config" },
+                "PregMatchRemoveCaret": { "$ref": "#/definitions/default-mutator-config" },
+                "PregMatchRemoveDollar": { "$ref": "#/definitions/default-mutator-config" },
+                "PregMatchRemoveFlags": { "$ref": "#/definitions/default-mutator-config" },
+                "NullSafePropertyCall": { "$ref": "#/definitions/default-mutator-config" },
+                "NullSafeMethodCall": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItemRemoval": {
                     "anyOf": [
                         {
@@ -247,8 +311,17 @@
                             "properties": {
                                 "ignore": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string"
+                                    }
+                                },
+                                "ignoreSourceCodeByRegex": {
+                                    "type": "array",
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -273,9 +346,12 @@
                         }
                     ]
                 },
+                "CatchBlockRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "FunctionCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "MatchArmRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "MethodCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "CloneRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "ConcatOperandRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "SharedCaseRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayOneItem": { "$ref": "#/definitions/default-mutator-config" },
                 "FloatNegation": { "$ref": "#/definitions/default-mutator-config" },
@@ -284,9 +360,14 @@
                 "NewObject": { "$ref": "#/definitions/default-mutator-config" },
                 "This": { "$ref": "#/definitions/default-mutator-config" },
                 "Spaceship": { "$ref": "#/definitions/default-mutator-config" },
-                "Spread": { "$ref": "#/definitions/default-mutator-config" },
+                "SpreadOneItem": { "$ref": "#/definitions/default-mutator-config" },
+                "SpreadAssignment": { "$ref": "#/definitions/default-mutator-config" },
+                "SpreadRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "SyntaxError": { "$ref": "#/definitions/default-mutator-config" },
                 "Foreach_": { "$ref": "#/definitions/default-mutator-config" },
                 "For_": { "$ref": "#/definitions/default-mutator-config" },
+                "DoWhile": { "$ref": "#/definitions/default-mutator-config" },
+                "While_": { "$ref": "#/definitions/default-mutator-config" },
                 "CastArray": { "$ref": "#/definitions/default-mutator-config" },
                 "CastBool": { "$ref": "#/definitions/default-mutator-config" },
                 "CastFloat": { "$ref": "#/definitions/default-mutator-config" },
@@ -328,11 +409,18 @@
                 "UnwrapArrayUintersectUassoc": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapArrayUnique": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapArrayValues": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapFinally": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapLcFirst": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapLtrim": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapRtrim": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapStrIreplace": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrRepeat": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrReplace": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapStrRev": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapStrShuffle": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrToLower": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapStrToUpper": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapSubstr": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapTrim": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapUcFirst": { "$ref": "#/definitions/default-mutator-config" },
                 "UnwrapUcWords": { "$ref": "#/definitions/default-mutator-config" },
@@ -347,8 +435,17 @@
                             "properties": {
                                 "ignore": {
                                     "type": "array",
+                                    "uniqueItems": true,
                                     "items": {
                                         "type": "string"
+                                    }
+                                },
+                                "ignoreSourceCodeByRegex": {
+                                    "type": "array",
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -401,6 +498,14 @@
                                     "type": "array",
                                     "items": {
                                         "type": "string"
+                                    }
+                                },
+                                "ignoreSourceCodeByRegex": {
+                                    "type": "array",
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "format": "regex"
                                     }
                                 },
                                 "settings": {
@@ -503,12 +608,34 @@
                     "properties": {
                         "ignore": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
                                 "type": "string"
+                            }
+                        },
+                        "ignoreSourceCodeByRegex": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "type": "string",
+                                "format": "regex"
                             }
                         }
                     }
                 }
+            ]
+        },
+        "stryker-branch": {
+            "type": "string",
+            "description": "Mutation score badge for your GitHub project. If this value starts and ends with \"/\", it will be considered a regular expression.",
+            "examples": [
+                "main",
+                "master",
+                "develop",
+                "latest",
+                "/1\\.\\d+/",
+                "/release-.*/",
+                "/feature\\/.*/"
             ]
         }
     }

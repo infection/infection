@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\Clone_>
  */
 final class CloneRemoval implements Mutator
 {
@@ -53,12 +55,16 @@ final class CloneRemoval implements Mutator
         return new Definition(
             'Removes the clone keyword, e.g. replacing `clone $x` with `$x`.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $a = clone $x;
++ $a = $x;
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\Clone_ $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr>
      */

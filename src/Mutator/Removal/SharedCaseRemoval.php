@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Switch_>
  */
 final class SharedCaseRemoval implements Mutator
 {
@@ -53,7 +55,17 @@ final class SharedCaseRemoval implements Mutator
         return new Definition(
             'Removes `case`s from `switch`.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+switch ($x) {
+-   case 1:
+    case 2:
+        fooBar();
+        break;
+    default:
+        baz();
+}
+DIFF
         );
     }
 
@@ -73,7 +85,7 @@ final class SharedCaseRemoval implements Mutator
     }
 
     /**
-     * @param Node\Stmt\Switch_ $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Stmt\Switch_>
      */

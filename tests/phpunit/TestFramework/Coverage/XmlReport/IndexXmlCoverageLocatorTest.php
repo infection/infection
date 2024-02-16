@@ -43,8 +43,8 @@ use function Infection\Tests\normalizePath;
 use const PHP_OS_FAMILY;
 use function Safe\chdir;
 use function Safe\realpath;
-use function Safe\sprintf;
 use function Safe\touch;
+use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

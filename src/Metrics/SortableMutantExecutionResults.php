@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Metrics;
 
 use Infection\Mutant\MutantExecutionResult;
-use function Safe\usort;
+use function usort;
 
 /**
  * @internal
@@ -46,12 +46,9 @@ final class SortableMutantExecutionResults
     /**
      * @var MutantExecutionResult[]
      */
-    private $executionResults = [];
+    private array $executionResults = [];
 
-    /**
-     * @var bool
-     */
-    private $sorted = false;
+    private bool $sorted = false;
 
     public function add(MutantExecutionResult $executionResult): void
     {

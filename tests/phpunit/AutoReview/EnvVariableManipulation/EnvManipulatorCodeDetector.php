@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
 use Infection\CannotBeInstantiated;
-use function Safe\sprintf;
+use function sprintf;
 use function strpos;
 
 final class EnvManipulatorCodeDetector

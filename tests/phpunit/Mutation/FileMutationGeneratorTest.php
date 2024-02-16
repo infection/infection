@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use function current;
+use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -50,10 +51,11 @@ use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\SingletonContainer;
+use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 final class FileMutationGeneratorTest extends TestCase
@@ -61,29 +63,35 @@ final class FileMutationGeneratorTest extends TestCase
     private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Files';
 
     /**
-     * @var FileParser|MockObject
+     * @var FileParser&MockObject
      */
     private $fileParserMock;
 
     /**
-     * @var NodeTraverserFactory|MockObject
+     * @var NodeTraverserFactory&MockObject
      */
     private $traverserFactoryMock;
 
+    private FileMutationGenerator $mutationGenerator;
+
     /**
-     * @var FileMutationGenerator
+     * @var FilesDiffChangedLines&MockObject
      */
-    private $mutationGenerator;
+    private $filesDiffChangedLines;
 
     protected function setUp(): void
     {
         $this->fileParserMock = $this->createMock(FileParser::class);
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
+        $this->filesDiffChangedLines = $this->createMock(FilesDiffChangedLines::class);
 
         $this->mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
             $this->traverserFactoryMock,
-            new LineRangeCalculator()
+            new LineRangeCalculator(),
+            $this->filesDiffChangedLines,
+            false,
+            'master'
         );
     }
 
@@ -102,6 +110,11 @@ final class FileMutationGeneratorTest extends TestCase
             ->expects($this->once())
             ->method('getAllTestsForMutation')
             ->willReturn([])
+        ;
+        $traceMock
+            ->expects($this->once())
+            ->method('getRealPath')
+            ->willReturn(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php')
         ;
 
         $mutationGenerator = SingletonContainer::getContainer()->getFileMutationGenerator();
@@ -196,7 +209,10 @@ final class FileMutationGeneratorTest extends TestCase
         $mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
             $this->traverserFactoryMock,
-            new LineRangeCalculator()
+            new LineRangeCalculator(),
+            $this->filesDiffChangedLines,
+            false,
+            'master'
         );
 
         $mutations = $mutationGenerator->generate(

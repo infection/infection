@@ -37,21 +37,20 @@ namespace Infection\Mutator\Unwrap;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
-use PhpParser\Node;
 
 /**
  * @internal
  */
-final class UnwrapArrayColumn extends AbstractUnwrapMutator
+final class UnwrapArrayColumn extends AbstractFunctionUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_chunk` function call with its first operand. For example:
+Replaces an `array_column` function call with its first operand. For example:
 
 ```php
-$x = array_chunk($array, 2);
+$x = array_column($array, 'id');
 ```
 
 Will be mutated to:
@@ -62,17 +61,16 @@ $x = $array;
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- $x = array_column($array, 'id');
++ $x = $array;
+DIFF
         );
     }
 
     protected function getFunctionName(): string
     {
         return 'array_column';
-    }
-
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
-    {
-        yield 0;
     }
 }

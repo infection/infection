@@ -35,17 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
-use function array_merge;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutator\ZeroIteration\For_;
-use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 
 final class MetricsCalculatorTest extends TestCase
 {
-    private $id = 0;
+    use CreateMutantExecutionResult;
 
     public function test_it_shows_zero_values_by_default(): void
     {
@@ -57,13 +53,6 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0, $calculator->getTimedOutCount());
         $this->assertSame(0, $calculator->getNotTestedCount());
         $this->assertSame(0, $calculator->getTotalMutantsCount());
-
-        $this->assertSame([], $calculator->getKilledExecutionResults());
-        $this->assertSame([], $calculator->getErrorExecutionResults());
-        $this->assertSame([], $calculator->getEscapedExecutionResults());
-        $this->assertSame([], $calculator->getTimedOutExecutionResults());
-        $this->assertSame([], $calculator->getNotCoveredExecutionResults());
-        $this->assertSame([], $calculator->getAllExecutionResults());
 
         $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(0.0, $calculator->getCoverageRate());
@@ -106,22 +95,6 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(2, $calculator->getTimedOutCount());
         $this->assertSame(1, $calculator->getNotTestedCount());
 
-        $this->assertSame($expectedKilledResults, $calculator->getKilledExecutionResults());
-        $this->assertSame($expectedErrorResults, $calculator->getErrorExecutionResults());
-        $this->assertSame($expectedEscapedResults, $calculator->getEscapedExecutionResults());
-        $this->assertSame($expectedTimedOutResults, $calculator->getTimedOutExecutionResults());
-        $this->assertSame($expectedNotCoveredResults, $calculator->getNotCoveredExecutionResults());
-        $this->assertSame(
-            array_merge(
-                $expectedKilledResults,
-                $expectedErrorResults,
-                $expectedEscapedResults,
-                $expectedTimedOutResults,
-                $expectedNotCoveredResults
-            ),
-            $calculator->getAllExecutionResults()
-        );
-
         $this->assertSame(14, $calculator->getTotalMutantsCount());
         $this->assertSame(78.57, $calculator->getMutationScoreIndicator());
         $this->assertSame(92.86, $calculator->getCoverageRate());
@@ -133,7 +106,6 @@ final class MetricsCalculatorTest extends TestCase
         $calculator = new MetricsCalculator(2);
 
         $this->assertSame(0, $calculator->getKilledCount());
-        $this->assertSame([], $calculator->getKilledExecutionResults());
 
         $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(0.0, $calculator->getCoverageRate());
@@ -146,59 +118,9 @@ final class MetricsCalculatorTest extends TestCase
         );
 
         $this->assertSame(1, $calculator->getKilledCount());
-        $this->assertSame($expectedKilledResults, $calculator->getKilledExecutionResults());
 
         $this->assertSame(100.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(100.0, $calculator->getCoverageRate());
         $this->assertSame(100.0, $calculator->getCoveredCodeMutationScoreIndicator());
-    }
-
-    /**
-     * @return MutantExecutionResult[]
-     */
-    private function addMutantExecutionResult(
-        MetricsCalculator $calculator,
-        string $detectionStatus,
-        int $count
-    ): array {
-        $executionResults = [];
-
-        for ($i = 0; $i < $count; ++$i) {
-            $executionResults[] = $this->createMutantExecutionResult($detectionStatus);
-        }
-
-        $calculator->collect(...$executionResults);
-
-        return $executionResults;
-    }
-
-    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
-    {
-        $id = $this->id;
-        ++$this->id;
-
-        return new MutantExecutionResult(
-            'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            'process output',
-            $detectionStatus,
-            str_replace(
-                "\n",
-                PHP_EOL,
-                <<<DIFF
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'mutated';
-
-DIFF
-            ),
-            MutatorName::getName(For_::class),
-            'foo/bar',
-            $id,
-            '<?php $a = 1;',
-            '<?php $a = 1;'
-        );
     }
 }

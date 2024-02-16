@@ -45,7 +45,7 @@ final class DryProcessRunnerTest extends TestCase
     {
         $called = false;
 
-        $processes = (static function () use (&$called) {
+        $processes = (static function () use (&$called): iterable {
             yield new FakeProcessBearer();
 
             $called = true;

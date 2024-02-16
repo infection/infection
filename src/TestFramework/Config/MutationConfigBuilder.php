@@ -37,9 +37,9 @@ namespace Infection\TestFramework\Config;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Phar;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
-use function strpos;
+use function str_starts_with;
 use function strstr;
 use Webmozart\Assert\Assert;
 
@@ -55,14 +55,15 @@ abstract class MutationConfigBuilder
         array $tests,
         string $mutantFilePath,
         string $mutationHash,
-        string $mutationOriginalFilePath
+        string $mutationOriginalFilePath,
+        string $version
     ): string;
 
     protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutantFilePath): string
     {
         $infectionPhar = '';
 
-        if (strpos(__FILE__, 'phar:') === 0) {
+        if (str_starts_with(__FILE__, 'phar:')) {
             $infectionPhar = sprintf(
                 '\Phar::loadPhar("%s", "%s");',
                 str_replace('phar://', '', Phar::running(true)),

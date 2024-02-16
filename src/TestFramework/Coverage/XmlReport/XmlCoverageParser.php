@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\SafeDOMXPath;
+use function Later\lazy;
 use Webmozart\Assert\Assert;
 
 /**
@@ -59,7 +60,7 @@ class XmlCoverageParser
     {
         return new ProxyTrace(
             $provider->provideFileInfo(),
-            self::createTestLocationsGenerator($provider->provideXPath())
+            lazy(self::createTestLocationsGenerator($provider->provideXPath()))
         );
     }
 
@@ -110,8 +111,7 @@ class XmlCoverageParser
     }
 
     /**
-     * @param DOMNodeList|DOMElement[] $coveredLineNodes
-     * @phpstan-param DOMNodeList<DOMElement> $coveredLineNodes
+     * @param DOMNodeList<DOMElement> $coveredLineNodes
      *
      * @return array<int, array<int, TestLocation>>
      */
@@ -144,9 +144,7 @@ class XmlCoverageParser
     }
 
     /**
-     * @param DOMNodeList|DOMElement[] $methodsCoverageNodes
-     *
-     * @phpstan-param DOMNodeList<DOMElement> $methodsCoverageNodes
+     * @param DOMNodeList<DOMElement> $methodsCoverageNodes
      *
      * @return SourceMethodLineRange[]
      */
@@ -155,6 +153,10 @@ class XmlCoverageParser
         $methodsCoverage = [];
 
         foreach ($methodsCoverageNodes as $methodsCoverageNode) {
+            if ((int) $methodsCoverageNode->getAttribute('coverage') === 0) {
+                continue;
+            }
+
             $methodName = $methodsCoverageNode->getAttribute('name');
 
             $start = $methodsCoverageNode->getAttribute('start');

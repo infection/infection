@@ -37,7 +37,9 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use function abs;
 use function array_map;
+use function array_reverse;
 use function array_slice;
+use ArrayIterator;
 use function extension_loaded;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
@@ -48,7 +50,7 @@ use function log;
 use function microtime;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
-use function Safe\usort;
+use function usort;
 
 /**
  * Tagged as integration because it can be quite slow.
@@ -57,6 +59,13 @@ use function Safe\usort;
  */
 final class TestLocationBucketSorterTest extends TestCase
 {
+    /**
+     * Used for floating point comparisons.
+     *
+     * @var float
+     */
+    private const EPSILON = 0.001;
+
     public function test_it_sorts(): void
     {
         $testLocation = new TestLocation('', '', 0.0);
@@ -98,7 +107,7 @@ final class TestLocationBucketSorterTest extends TestCase
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort([$testLocation2, $testLocation1]),
             false
-            );
+        );
 
         $this->assertSame([$testLocation1, $testLocation2], $sortedTestLocations);
     }
@@ -106,10 +115,12 @@ final class TestLocationBucketSorterTest extends TestCase
     /**
      * @dataProvider locationsArrayProvider
      *
-     * @param TestLocation[] $uniqueTestLocations
+     * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
-    public function test_it_sorts_correctly(array $uniqueTestLocations): void
+    public function test_it_sorts_correctly(ArrayIterator $uniqueTestLocations): void
     {
+        $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
+
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort($uniqueTestLocations),
             false
@@ -126,10 +137,12 @@ final class TestLocationBucketSorterTest extends TestCase
      *
      * @dataProvider locationsArrayProvider
      *
-     * @param TestLocation[] $uniqueTestLocations
+     * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
-    public function test_quicksort_sorts_correctly(array $uniqueTestLocations): void
+    public function test_quicksort_sorts_correctly(ArrayIterator $uniqueTestLocations): void
     {
+        $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
+
         self::quicksort($uniqueTestLocations);
 
         $this->assertTrue(
@@ -141,13 +154,15 @@ final class TestLocationBucketSorterTest extends TestCase
     /**
      * @dataProvider locationsArrayProvider
      *
-     * @param TestLocation[] $uniqueTestLocations
+     * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
-    public function test_it_sorts_faster_than_quicksort(array $uniqueTestLocations): void
+    public function test_it_sorts_faster_than_quicksort(ArrayIterator $uniqueTestLocations): void
     {
         if (extension_loaded('xdebug') || PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('Benchmarks under xdebug or phpdbg are brittle');
         }
+
+        $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
 
         if (self::areConstraintsOrderValid($uniqueTestLocations)) {
             // Ignore silently as to not pollute to the log.
@@ -163,7 +178,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         for ($i = 0; $i < $tries; ++$i) {
             $start = microtime(true);
-            iterator_to_array(
+            $dummy = iterator_to_array(
                 TestLocationBucketSorter::bucketSort($uniqueTestLocations),
                 false
             );
@@ -181,7 +196,7 @@ final class TestLocationBucketSorterTest extends TestCase
             $totalQuickSort += microtime(true) - $start;
         }
 
-        $this->assertGreaterThanOrEqual(0.01, abs($totalQuickSort - $totalBucketSort));
+        $this->assertGreaterThanOrEqual(self::EPSILON, self::getRelativeError($totalQuickSort, $totalBucketSort));
     }
 
     public static function locationsArrayProvider(): iterable
@@ -193,16 +208,32 @@ final class TestLocationBucketSorterTest extends TestCase
             JUnitTimes::JUNIT_TIMES
         );
 
-        yield [array_slice($locations, 0, JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * 10)];
+        yield 'Ten times the minimal amount of locations' => [new ArrayIterator(array_slice($locations, 0, JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * 10))];
 
-        yield [$locations];
+        yield 'All locations' => [new ArrayIterator($locations)];
+    }
+
+    /**
+     * Finds relative error.
+     *
+     * @see https://floating-point-gui.de/errors/comparison/
+     * @see https://stackoverflow.com/questions/4915462/how-should-i-do-floating-point-comparison
+     */
+    private static function getRelativeError(float $a, float $b): float
+    {
+        // We do not expect A or B to be extremely small or large: these are edge cases,
+        // and they will need special handling which we avoid simplicity sake.
+        self::assertGreaterThan(self::EPSILON, abs($a));
+        self::assertGreaterThan(self::EPSILON, abs($b));
+
+        return abs($a - $b) / (abs($a) + abs($b));
     }
 
     private static function quicksort(&$uniqueTestLocations): void
     {
         usort(
             $uniqueTestLocations,
-            static function (TestLocation $a, TestLocation $b) {
+            static function (TestLocation $a, TestLocation $b): int {
                 return $a->getExecutionTime() <=> $b->getExecutionTime();
             }
         );

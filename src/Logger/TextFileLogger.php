@@ -38,11 +38,11 @@ namespace Infection\Logger;
 use function array_map;
 use function explode;
 use function implode;
-use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Str;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use function str_repeat;
 use function strlen;
 
@@ -51,62 +51,57 @@ use function strlen;
  */
 final class TextFileLogger implements LineMutationTestingResultsLogger
 {
-    private $metricsCalculator;
-    private $debugVerbosity;
-    private $onlyCoveredMode;
-    private $debugMode;
-
-    public function __construct(
-        MetricsCalculator $metricsCalculator,
-        bool $debugVerbosity,
-        bool $onlyCoveredMode,
-        bool $debugMode
-    ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->debugVerbosity = $debugVerbosity;
-        $this->onlyCoveredMode = $onlyCoveredMode;
-        $this->debugMode = $debugMode;
+    public function __construct(private readonly ResultsCollector $resultsCollector, private readonly bool $debugVerbosity, private readonly bool $onlyCoveredMode, private readonly bool $debugMode)
+    {
     }
 
     public function getLogLines(): array
     {
         $separateSections = false;
 
+        $logs = [];
+
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getEscapedExecutionResults(),
+            $this->resultsCollector->getEscapedExecutionResults(),
             'Escaped',
             $separateSections
         );
 
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getTimedOutExecutionResults(),
+            $this->resultsCollector->getTimedOutExecutionResults(),
             'Timed Out',
             $separateSections
         );
 
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getSkippedExecutionResults(),
+            $this->resultsCollector->getSkippedExecutionResults(),
             'Skipped',
             $separateSections
         );
 
         if ($this->debugVerbosity) {
             $logs[] = $this->getResultsLine(
-                $this->metricsCalculator->getKilledExecutionResults(),
+                $this->resultsCollector->getKilledExecutionResults(),
                 'Killed',
                 $separateSections
             );
 
             $logs[] = $this->getResultsLine(
-                $this->metricsCalculator->getErrorExecutionResults(),
+                $this->resultsCollector->getErrorExecutionResults(),
                 'Errors',
+                $separateSections
+            );
+
+            $logs[] = $this->getResultsLine(
+                $this->resultsCollector->getSyntaxErrorExecutionResults(),
+                'Syntax Errors',
                 $separateSections
             );
         }
 
         if (!$this->onlyCoveredMode) {
             $logs[] = $this->getResultsLine(
-                $this->metricsCalculator->getNotCoveredExecutionResults(),
+                $this->resultsCollector->getNotCoveredExecutionResults(),
                 'Not Covered',
                 $separateSections
             );
@@ -197,9 +192,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
         return implode(
             PHP_EOL,
             array_map(
-                static function (string $line): string {
-                    return '  ' . $line;
-                },
+                static fn (string $line): string => '  ' . $line,
                 explode(PHP_EOL, Str::trimLineReturns($value))
             )
         );

@@ -38,10 +38,14 @@ namespace Infection\Mutator\Number;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
+use const PHP_INT_MAX;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractNumberMutator<Node\Scalar\LNumber>
  */
 final class IncrementInteger extends AbstractNumberMutator
 {
@@ -52,24 +56,91 @@ final class IncrementInteger extends AbstractNumberMutator
         return new Definition(
             'Increments an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = 20;
++ $a = 21;
+DIFF
         );
     }
 
     /**
-     * @param Node\Scalar\LNumber $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Scalar\LNumber>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Scalar\LNumber($node->value + 1);
+        $parentNode = ParentConnector::getParent($node);
+
+        $value = $node->value + 1;
+
+        /*
+         * Parser gives us only positive numbers we have to check if parent node
+         * isn't a minus sign. If so, then means we have a negated positive number so
+         * we have to substract to it instead of adding.
+         */
+        if ($parentNode instanceof Node\Expr\UnaryMinus) {
+            $value = $node->value - 1;
+        }
+
+        yield new Node\Scalar\LNumber($value);
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Scalar\LNumber
-            && $node->value !== 0
-            && !$this->isPartOfSizeComparison($node);
+        if (!$node instanceof Node\Scalar\LNumber) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        // We cannot increment largest positive integer, but we can do that for a negative integer
+        if ($node->value === PHP_INT_MAX && !$parentNode instanceof Node\Expr\UnaryMinus) {
+            return false;
+        }
+
+        if (
+            $node->value === 0
+            && ($this->isPartOfComparison($node) || $parentNode instanceof Node\Expr\Assign)
+        ) {
+            return false;
+        }
+
+        if ($this->isPartOfSizeComparison($node)) {
+            return false;
+        }
+
+        if ($this->isPregSplitLimitZeroOrMinusOneArgument($node)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool
+    {
+        if ($node->value !== 1) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Expr\UnaryMinus) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($parentNode);
+
+        if (!$parentNode instanceof Node\Arg) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($parentNode);
+
+        return $parentNode instanceof Node\Expr\FuncCall
+            && $parentNode->name instanceof Node\Name
+            && $parentNode->name->toLowerString() === 'preg_split'
+        ;
     }
 }

@@ -46,6 +46,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\ClassMethod>
  */
 final class PublicVisibility implements Mutator
 {
@@ -56,12 +58,16 @@ final class PublicVisibility implements Mutator
         return new Definition(
             'Replaces the `public` method visibility keyword with `protected`.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- public function foo() {
++ protected function foo() {
+DIFF
         );
     }
 
     /**
-     * @param Node\Stmt\ClassMethod $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Stmt\ClassMethod>
      */
@@ -75,6 +81,7 @@ final class PublicVisibility implements Mutator
                 'params' => $node->getParams(),
                 'returnType' => $node->getReturnType(),
                 'stmts' => $node->getStmts(),
+                'attrGroups' => $node->getAttrGroups(),
             ],
             $node->getAttributes()
         );

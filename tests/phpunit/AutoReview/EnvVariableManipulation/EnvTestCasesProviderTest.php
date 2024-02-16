@@ -38,7 +38,7 @@ namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 use function class_exists;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @covers \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider

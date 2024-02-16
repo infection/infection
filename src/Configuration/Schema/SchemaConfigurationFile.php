@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
+use ColinODell\Json5\SyntaxError;
 use function is_file;
 use function is_readable;
+use function json5_decode;
 use function Safe\file_get_contents;
-use Seld\JsonLint\JsonParser;
-use Seld\JsonLint\ParsingException;
 use stdClass;
 
 /**
@@ -47,16 +47,10 @@ use stdClass;
  */
 final class SchemaConfigurationFile
 {
-    private $path;
+    private ?stdClass $decodedContents = null;
 
-    /**
-     * @var stdClass|null
-     */
-    private $decodedContents;
-
-    public function __construct(string $path)
+    public function __construct(private readonly string $path)
     {
-        $this->path = $path;
     }
 
     public function getPath(): string
@@ -84,11 +78,8 @@ final class SchemaConfigurationFile
         $contents = file_get_contents($this->path);
 
         try {
-            return $this->decodedContents = (new JsonParser())->parse(
-                $contents,
-                JsonParser::DETECT_KEY_CONFLICTS
-            );
-        } catch (ParsingException $exception) {
+            return $this->decodedContents = json5_decode($contents);
+        } catch (SyntaxError $exception) {
             throw InvalidFile::createForInvalidJson($this, $exception->getMessage(), $exception);
         }
     }

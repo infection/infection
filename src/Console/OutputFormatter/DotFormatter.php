@@ -37,7 +37,7 @@ namespace Infection\Console\OutputFormatter;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use function Safe\sprintf;
+use function sprintf;
 use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -49,11 +49,8 @@ final class DotFormatter extends AbstractOutputFormatter
 {
     private const DOTS_PER_ROW = 50;
 
-    private $output;
-
-    public function __construct(OutputInterface $output)
+    public function __construct(private readonly OutputInterface $output)
     {
-        $this->output = $output;
     }
 
     public function start(int $mutationCount): void
@@ -66,8 +63,10 @@ final class DotFormatter extends AbstractOutputFormatter
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
+            . '<with-syntax-error>X</with-syntax-error>: syntax error, '
             . '<timeout>T</timeout>: timed out, '
-            . '<skipped>S</skipped>: skipped',
+            . '<skipped>S</skipped>: skipped, '
+            . '<ignored>I</ignored>: ignored',
             '',
         ]);
     }
@@ -99,6 +98,14 @@ final class DotFormatter extends AbstractOutputFormatter
                 break;
             case DetectionStatus::ERROR:
                 $this->output->write('<with-error>E</with-error>');
+
+                break;
+            case DetectionStatus::SYNTAX_ERROR:
+                $this->output->write('<with-syntax-error>X</with-syntax-error>');
+
+                break;
+            case DetectionStatus::IGNORED:
+                $this->output->write('<ignored>I</ignored>');
 
                 break;
         }

@@ -54,104 +54,71 @@ class Configuration
         'default',
     ];
 
-    private $timeout;
-    private $sourceDirectories;
-    private $sourceFiles;
-    private $sourceFilesFilter;
-    private $sourceFilesExcludes;
-    private $logs;
-    private $logVerbosity;
-    private $tmpDir;
-    private $phpUnit;
-    private $mutators;
-    private $testFramework;
-    private $bootstrap;
-    private $initialTestsPhpOptions;
-    private $testFrameworkExtraOptions;
-    private $coveragePath;
-    private $skipCoverage;
-    private $skipInitialTests;
-    private $debug;
-    private $onlyCovered;
-    private $noProgress;
-    private $ignoreMsiWithNoMutations;
-    private $minMsi;
-    private $showMutations;
-    private $minCoveredMsi;
-    private $msiPrecision;
-    private $threadCount;
-    private $dryRun;
+    private readonly float $timeout;
+    /** @var string[] */
+    private readonly array $sourceDirectories;
+    private readonly string $logVerbosity;
+    /** @var array<string, Mutator<\PhpParser\Node>> */
+    private readonly array $mutators;
+    private readonly string $testFramework;
+    private ?float $minMsi = null;
+    private readonly int $threadCount;
 
     /**
      * @param string[] $sourceDirectories
      * @param string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
-     * @param array<string, Mutator> $mutators
+     * @param array<string, Mutator<\PhpParser\Node>> $mutators
+     * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
         float $timeout,
         array $sourceDirectories,
-        iterable $sourceFiles,
-        string $sourceFilesFilter,
-        array $sourceFilesExcludes,
-        Logs $logs,
+        private readonly iterable $sourceFiles,
+        private readonly string $sourceFilesFilter,
+        private readonly array $sourceFilesExcludes,
+        private readonly Logs $logs,
         string $logVerbosity,
-        string $tmpDir,
-        PhpUnit $phpUnit,
+        private readonly string $tmpDir,
+        private readonly PhpUnit $phpUnit,
         array $mutators,
         string $testFramework,
-        ?string $bootstrap,
-        ?string $initialTestsPhpOptions,
-        string $testFrameworkExtraOptions,
-        string $coveragePath,
-        bool $skipCoverage,
-        bool $skipInitialTests,
-        bool $debug,
-        bool $onlyCovered,
-        bool $noProgress,
-        bool $ignoreMsiWithNoMutations,
+        private readonly ?string $bootstrap,
+        private readonly ?string $initialTestsPhpOptions,
+        private readonly string $testFrameworkExtraOptions,
+        private readonly string $coveragePath,
+        private readonly bool $skipCoverage,
+        private readonly bool $skipInitialTests,
+        private readonly bool $debug,
+        private readonly bool $onlyCovered,
+        private readonly bool $noProgress,
+        private readonly bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
-        bool $showMutations,
-        ?float $minCoveredMsi,
-        int $msiPrecision,
+        private readonly bool $showMutations,
+        private readonly ?float $minCoveredMsi,
+        private readonly int $msiPrecision,
         int $threadCount,
-        bool $dryRun
+        private readonly bool $dryRun,
+        private readonly array $ignoreSourceCodeMutatorsMap,
+        private readonly bool $executeOnlyCoveringTestCases,
+        private readonly bool $isForGitDiffLines,
+        private readonly ?string $gitDiffBase
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
         Assert::nullOrGreaterThanEq($minMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
 
         $this->timeout = $timeout;
         $this->sourceDirectories = $sourceDirectories;
-        $this->sourceFiles = $sourceFiles;
-        $this->sourceFilesFilter = $sourceFilesFilter;
-        $this->sourceFilesExcludes = $sourceFilesExcludes;
-        $this->logs = $logs;
         $this->logVerbosity = $logVerbosity;
-        $this->tmpDir = $tmpDir;
-        $this->phpUnit = $phpUnit;
         $this->mutators = $mutators;
         $this->testFramework = $testFramework;
-        $this->bootstrap = $bootstrap;
-        $this->initialTestsPhpOptions = $initialTestsPhpOptions;
-        $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
-        $this->coveragePath = $coveragePath;
-        $this->skipCoverage = $skipCoverage;
-        $this->skipInitialTests = $skipInitialTests;
-        $this->debug = $debug;
-        $this->onlyCovered = $onlyCovered;
-        $this->noProgress = $noProgress;
-        $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
         $this->minMsi = $minMsi;
-        $this->showMutations = $showMutations;
-        $this->minCoveredMsi = $minCoveredMsi;
-        $this->msiPrecision = $msiPrecision;
         $this->threadCount = $threadCount;
-        $this->dryRun = $dryRun;
     }
 
     public function getProcessTimeout(): float
@@ -209,7 +176,7 @@ class Configuration
     }
 
     /**
-     * @return array<string, Mutator>
+     * @return array<string, Mutator<\PhpParser\Node>>
      */
     public function getMutators(): array
     {
@@ -299,5 +266,28 @@ class Configuration
     public function isDryRun(): bool
     {
         return $this->dryRun;
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function getIgnoreSourceCodeMutatorsMap(): array
+    {
+        return $this->ignoreSourceCodeMutatorsMap;
+    }
+
+    public function getExecuteOnlyCoveringTestCases(): bool
+    {
+        return $this->executeOnlyCoveringTestCases;
+    }
+
+    public function isForGitDiffLines(): bool
+    {
+        return $this->isForGitDiffLines;
+    }
+
+    public function getGitDiffBase(): ?string
+    {
+        return $this->gitDiffBase;
     }
 }

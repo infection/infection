@@ -42,24 +42,20 @@ use Webmozart\Assert\Assert;
  */
 final class Definition
 {
-    private $description;
-    private $category;
-    private $remedies;
+    private readonly string $category;
 
     /**
      * @param string $description Explanation on what the mutator is about
      * @param string|null $remedies Guidelines or recommendations on how to kill the generated mutations
      */
     public function __construct(
-        string $description,
+        private readonly string $description,
         string $category,
-        ?string $remedies
+        private readonly ?string $remedies,
+        private readonly string $diff
     ) {
         Assert::oneOf($category, MutatorCategory::ALL);
-
-        $this->description = $description;
         $this->category = $category;
-        $this->remedies = $remedies;
     }
 
     public function getDescription(): string
@@ -75,5 +71,10 @@ final class Definition
     public function getRemedies(): ?string
     {
         return $this->remedies;
+    }
+
+    public function getDiff(): string
+    {
+        return $this->diff;
     }
 }

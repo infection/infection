@@ -17,6 +17,10 @@ else
     INFECTION="php ../../../bin/infection --test-framework=codeception"
 fi
 export INFECTION
+unset CI
+unset CONTINUOUS_INTEGRATION
+unset TRAVIS
+unset GITHUB_ACTIONS
 
 ./check_auto_install.expect
 

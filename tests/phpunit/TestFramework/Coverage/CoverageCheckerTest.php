@@ -45,8 +45,8 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use const PHP_SAPI;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
-use Webmozart\PathUtil\Path;
+use function sprintf;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * All these tests should be ran in separate processes, as otherwise they may rely
@@ -55,7 +55,8 @@ use Webmozart\PathUtil\Path;
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  *
- * @group integration Requires some I/O operations
+ * @group integration
+ * Requires some I/O operations
  */
 final class CoverageCheckerTest extends TestCase
 {
@@ -139,9 +140,9 @@ final class CoverageCheckerTest extends TestCase
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(<<<TXT
 Coverage needs to be generated but no code coverage generator (pcov, phpdbg or xdebug) has been detected. Please either:
-- Enable pcov and run infection again
+- Enable pcov and run Infection again
 - Use phpdbg, e.g. `phpdbg -qrr infection`
-- Enable Xdebug and run infection again
+- Enable Xdebug (in case of using Xdebug 3 check that `xdebug.mode` or environment variable XDEBUG_MODE set to `coverage`) and run Infection again
 - Use the "--coverage" option with path to the existing coverage report
 - Enable the code generator tool for the initial test run only, e.g. with `--initial-tests-php-options -d zend_extension=xdebug.so`
 TXT
@@ -291,11 +292,8 @@ TXT
             $this->fail();
         } catch (CoverageNotFound $exception) {
             $this->assertSame(
-                sprintf(
-                    'Could not find the JUnit file report. Please ensure that the JUnit coverage '
-                    . 'report has been properly generated at the right place.',
-                    self::$coveragePath
-                ),
+                'Could not find the JUnit file report. Please ensure that the JUnit coverage '
+                . 'report has been properly generated at the right place.',
                 $exception->getMessage()
             );
             $this->assertSame(0, $exception->getCode());
@@ -357,12 +355,9 @@ TXT
             $this->fail();
         } catch (CoverageNotFound $exception) {
             $this->assertSame(
-                sprintf(
-                    'Could not find the JUnit file report. Please ensure that the JUnit coverage report has'
-                    . ' been properly generated at the right place. The Codeception option for the path '
-                    . 'given is "--xml"',
-                    self::$coveragePath
-                ),
+                'Could not find the JUnit file report. Please ensure that the JUnit coverage report has'
+                . ' been properly generated at the right place. The Codeception option for the path '
+                . 'given is "--xml"',
                 $exception->getMessage()
             );
             $this->assertSame(0, $exception->getCode());

@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Event;
 
+use function class_exists;
 use function in_array;
 use Infection\Event\Subscriber\EventSubscriber;
 use PHPUnit\Framework\TestCase;
 use function Safe\class_implements;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @covers \Infection\Tests\AutoReview\Event\SubscriberProvider

@@ -64,12 +64,12 @@ final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
                 '',
                 'Generate mutants...',
                 '',
-                'Processing source code files: 123',
+                'Processing source code files...',
             ]);
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriber($this->output));
 
-        $dispatcher->dispatch(new MutationGenerationWasStarted(123));
+        $dispatcher->dispatch(new MutationGenerationWasStarted(0));
     }
 }

@@ -52,6 +52,7 @@ trait ConfigurationAssertions
      * @param string[] $expectedSourceDirectories
      * @param string[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
+     * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
      */
     private function assertConfigurationStateIs(
         Configuration $configuration,
@@ -81,7 +82,11 @@ trait ConfigurationAssertions
         ?float $expectedMinCoveredMsi,
         int $expectedMsiPrecision,
         int $expectedThreadCount,
-        bool $expectedDryRyn
+        bool $expectedDryRyn,
+        array $expectedIgnoreSourceCodeMutatorsMap,
+        bool $expectedExecuteOnlyCoveringTestCases,
+        bool $expectedIsForGitDiffLines,
+        ?string $expectedGitDiffBase
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
@@ -94,11 +99,15 @@ trait ConfigurationAssertions
         $this->assertLogsStateIs(
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),
+            $expectedLogs->getHtmlLogFilePath(),
             $expectedLogs->getSummaryLogFilePath(),
             $expectedLogs->getJsonLogFilePath(),
+            $expectedLogs->getGitlabLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
-            $expectedLogs->getBadge()
+            $expectedLogs->getUseGitHubAnnotationsLogger(),
+            $expectedLogs->getStrykerConfig(),
+            $expectedLogs->getSummaryJsonLogFilePath()
         );
         $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity());
         $this->assertSame($expectedTmpDir, $configuration->getTmpDir());
@@ -128,6 +137,10 @@ trait ConfigurationAssertions
         $this->assertSame($expectedMsiPrecision, $configuration->getMsiPrecision());
         $this->assertSame($expectedThreadCount, $configuration->getThreadCount());
         $this->assertSame($expectedDryRyn, $configuration->isDryRun());
+        $this->assertSame($expectedIgnoreSourceCodeMutatorsMap, $configuration->getIgnoreSourceCodeMutatorsMap());
+        $this->assertSame($expectedExecuteOnlyCoveringTestCases, $configuration->getExecuteOnlyCoveringTestCases());
+        $this->assertSame($expectedIsForGitDiffLines, $configuration->isForGitDiffLines());
+        $this->assertSame($expectedGitDiffBase, $configuration->getGitDiffBase());
     }
 
     /**

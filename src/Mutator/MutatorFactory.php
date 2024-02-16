@@ -35,10 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use function in_array;
-use function Safe\array_flip;
-use function Safe\class_implements;
-use function Safe\sprintf;
+use function array_flip;
+use function end;
+use function explode;
+use function is_a;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -47,14 +48,15 @@ use Webmozart\Assert\Assert;
 final class MutatorFactory
 {
     /**
-     * @param array<string, mixed[]> $resolvedMutators
+     * @param array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, mixed[]> $resolvedMutators
      *
-     * @return array<string, Mutator>
+     * @return array<string, Mutator<\PhpParser\Node>>
      */
-    public function create(array $resolvedMutators): array
+    public function create(array $resolvedMutators, bool $useNoopMutators): array
     {
         $mutators = [];
 
+        /** @var array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, string> $knownMutatorClassNames */
         $knownMutatorClassNames = array_flip(ProfileList::ALL_MUTATORS);
 
         foreach ($resolvedMutators as $mutatorClassName => $config) {
@@ -71,25 +73,47 @@ final class MutatorFactory
                 )
             );
 
-            /** @var mixed[] $settings */
             $settings = (array) ($config['settings'] ?? []);
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
 
-            if (in_array(ConfigurableMutator::class, class_implements($mutatorClassName), true)) {
-                $configClassName = $mutatorClassName::getConfigClassName();
+            /** @var Mutator<\PhpParser\Node> $mutator */
+            $mutator =
+                is_a($mutatorClassName, ConfigurableMutator::class, true) ?
+                    self::getConfigurableMutator($mutatorClassName, $settings) :
+                    new $mutatorClassName();
 
-                $mutator = new $mutatorClassName(new $configClassName($settings));
-            } else {
-                $mutator = new $mutatorClassName();
+            if ($ignored !== []) {
+                $mutator = new IgnoreMutator(new IgnoreConfig($ignored), $mutator);
             }
 
-            $mutators[(string) $mutator->getName()] = new IgnoreMutator(
-                new IgnoreConfig($ignored),
-                $mutator
-            );
+            if ($useNoopMutators) {
+                $mutator = new NoopMutator($mutator);
+            }
+
+            $mutators[$mutator->getName()] = $mutator;
         }
 
         return $mutators;
+    }
+
+    public static function getMutatorNameForClassName(string $className): string
+    {
+        $parts = explode('\\', $className);
+
+        return end($parts);
+    }
+
+    /**
+     * @param class-string<ConfigurableMutator<\PhpParser\Node>> $mutatorClassName
+     * @param mixed[] $settings
+     *
+     * @return ConfigurableMutator<\PhpParser\Node>
+     */
+    private static function getConfigurableMutator(string $mutatorClassName, array $settings): ConfigurableMutator
+    {
+        $configClassName = $mutatorClassName::getConfigClassName();
+
+        return new $mutatorClassName(new $configClassName($settings));
     }
 }

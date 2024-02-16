@@ -46,57 +46,32 @@ use Webmozart\Assert\Assert;
  */
 final class SchemaConfiguration
 {
-    private $file;
-    private $timeout;
-    private $source;
-    private $logs;
-    private $tmpDir;
-    private $phpUnit;
-    private $ignoreMsiWithNoMutations;
-    private $minMsi;
-    private $minCoveredMsi;
-    private $mutators;
-    private $testFramework;
-    private $bootstrap;
-    private $initialTestsPhpOptions;
-    private $testFrameworkExtraOptions;
+    private readonly ?float $timeout;
+    private readonly ?string $testFramework;
 
     /**
      * @param array<string, mixed> $mutators
      */
     public function __construct(
-        string $file,
+        private readonly string $file,
         ?float $timeout,
-        Source $source,
-        Logs $logs,
-        ?string $tmpDir,
-        PhpUnit $phpUnit,
-        ?bool $ignoreMsiWithNoMutations,
-        ?float $minMsi,
-        ?float $minCoveredMsi,
-        array $mutators,
+        private readonly Source $source,
+        private readonly Logs $logs,
+        private readonly ?string $tmpDir,
+        private readonly PhpUnit $phpUnit,
+        private readonly ?bool $ignoreMsiWithNoMutations,
+        private readonly ?float $minMsi,
+        private readonly ?float $minCoveredMsi,
+        private readonly array $mutators,
         ?string $testFramework,
-        ?string $bootstrap,
-        ?string $initialTestsPhpOptions,
-        ?string $testFrameworkExtraOptions
+        private readonly ?string $bootstrap,
+        private readonly ?string $initialTestsPhpOptions,
+        private readonly ?string $testFrameworkExtraOptions
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
-
-        $this->file = $file;
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
         $this->timeout = $timeout;
-        $this->source = $source;
-        $this->logs = $logs;
-        $this->tmpDir = $tmpDir;
-        $this->phpUnit = $phpUnit;
-        $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
-        $this->minMsi = $minMsi;
-        $this->minCoveredMsi = $minCoveredMsi;
-        $this->mutators = $mutators;
         $this->testFramework = $testFramework;
-        $this->bootstrap = $bootstrap;
-        $this->initialTestsPhpOptions = $initialTestsPhpOptions;
-        $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
     }
 
     public function getFile(): string

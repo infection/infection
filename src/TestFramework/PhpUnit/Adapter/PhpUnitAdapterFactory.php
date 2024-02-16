@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -44,6 +45,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Filesystem;
@@ -56,6 +58,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
      * @param string[] $sourceDirectories
+     * @param list<string> $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -65,9 +68,11 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         string $jUnitFilePath,
         string $projectDir,
         array $sourceDirectories,
-        bool $skipCoverage
+        bool $skipCoverage,
+        bool $executeOnlyCoveringTestCases = false,
+        array $filteredSourceFilesToMutate = []
     ): TestFrameworkAdapter {
-        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the phpunit adapter');
+        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
@@ -81,13 +86,16 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 
         return new PhpUnitAdapter(
             $testFrameworkExecutable,
+            $tmpDir,
+            $jUnitFilePath,
+            new PCOVDirectoryProvider(),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
-                $jUnitFilePath,
+                new XmlConfigurationVersionProvider(),
                 $sourceDirectories,
-                $skipCoverage
+                $filteredSourceFilesToMutate
             ),
             new MutationConfigBuilder(
                 $tmpDir,
@@ -96,7 +104,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $projectDir,
                 new JUnitTestCaseSorter()
             ),
-            new ArgumentsAndOptionsBuilder(),
+            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases),
             new VersionParser(),
             new CommandLineBuilder()
         );

@@ -39,10 +39,10 @@ use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
 use function Infection\Tests\normalizeLineReturn;
+use function json_last_error_msg;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\json_decode;
-use function Safe\json_last_error_msg;
 use Webmozart\Assert\Assert;
 
 final class SchemaValidatorTest extends TestCase
@@ -81,7 +81,7 @@ final class SchemaValidatorTest extends TestCase
         yield 'empty JSON' => [
             self::createConfigWithContents(
                 $path,
-               '{}'
+                '{}'
             ),
             <<<'ERROR'
 "/path/to/config" does not match the expected JSON schema:

@@ -38,7 +38,8 @@ namespace Infection\FileSystem\Finder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use function Safe\getcwd;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
+use function str_contains;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -54,8 +55,10 @@ final class ComposerExecutableFinder
         $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
 
         foreach ($probable as $name) {
-            if ($path = $finder->find($name, null, $immediatePaths)) {
-                if (strpos($path, '.phar') === false) {
+            $path = $finder->find($name, null, $immediatePaths);
+
+            if ($path !== null) {
+                if (!str_contains($path, '.phar')) {
                     return $path;
                 }
 

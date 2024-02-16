@@ -43,13 +43,17 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\IdenticalEqual;
 use Infection\Mutator\Boolean\NotIdenticalNotEqual;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\Extensions\MBString;
+use Infection\Mutator\Loop\For_;
 use Infection\Mutator\MutatorResolver;
+use Infection\Mutator\Number\DecrementInteger;
+use Infection\Mutator\Number\IncrementInteger;
+use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\ProfileList;
-use Infection\Mutator\ZeroIteration\For_;
 use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 
 final class MutatorResolverTest extends TestCase
 {
@@ -265,6 +269,161 @@ final class MutatorResolverTest extends TestCase
         $this->assertSame(['ignore' => ['A::B', 'B::C']], $resolvedMutators[IdenticalEqual::class]);
     }
 
+    public function test_it_can_resolve_mutators_with_global_ignore_source_code_by_regex_setting(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            'global-ignoreSourceCodeByRegex' => ['A::B'],
+            MutatorName::getName(Plus::class) => true,
+            MutatorName::getName(For_::class) => false,
+            MutatorName::getName(IdenticalEqual::class) => [
+                'ignoreSourceCodeByRegex' => ['B::C'],
+            ],
+        ]);
+
+        $this->assertSameMutatorsByClass(
+            [
+                Plus::class,
+                IdenticalEqual::class,
+            ],
+            $resolvedMutators
+        );
+
+        $this->assertSame(['ignoreSourceCodeByRegex' => ['A::B']], $resolvedMutators[Plus::class]);
+        $this->assertSame(['ignoreSourceCodeByRegex' => ['A::B', 'B::C']], $resolvedMutators[IdenticalEqual::class]);
+    }
+
+    public function test_it_can_resolve_mutators_with_both_global_settings_at_the_same_time(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            'global-ignore' => ['A::B'],
+            'global-ignoreSourceCodeByRegex' => ['A::B'],
+            MutatorName::getName(Plus::class) => true,
+            MutatorName::getName(For_::class) => false,
+            MutatorName::getName(IdenticalEqual::class) => [
+                'ignore' => ['B::C'],
+                'ignoreSourceCodeByRegex' => ['B::C'],
+            ],
+        ]);
+
+        $this->assertSameMutatorsByClass(
+            [
+                Plus::class,
+                IdenticalEqual::class,
+            ],
+            $resolvedMutators
+        );
+
+        $this->assertSame(
+            [
+                'ignore' => ['A::B'],
+                'ignoreSourceCodeByRegex' => ['A::B'],
+            ],
+            $resolvedMutators[Plus::class]
+        );
+        $this->assertSame(
+            [
+                'ignore' => ['A::B', 'B::C'],
+                'ignoreSourceCodeByRegex' => ['A::B', 'B::C'],
+            ],
+            $resolvedMutators[IdenticalEqual::class]
+        );
+    }
+
+    public function test_it_can_resolve_mutators_with_duplicate_global_settings(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            'global-ignoreSourceCodeByRegex' => ['A::B', 'A::B', 'C::D'],
+            MutatorName::getName(Plus::class) => true,
+            MutatorName::getName(For_::class) => false,
+            MutatorName::getName(MBString::class) => [
+                'settings' => ['mb_substr' => false],
+            ],
+            MutatorName::getName(IdenticalEqual::class) => [
+                'ignoreSourceCodeByRegex' => [],
+            ],
+        ]);
+
+        $this->assertSameMutatorsByClass(
+            [
+                Plus::class,
+                MBString::class,
+                IdenticalEqual::class,
+            ],
+            $resolvedMutators
+        );
+
+        $this->assertSame(
+            [
+                'ignoreSourceCodeByRegex' => ['A::B', 'C::D'],
+            ],
+            $resolvedMutators[Plus::class]
+        );
+
+        $this->assertSame(
+            [
+                'ignoreSourceCodeByRegex' => ['A::B', 'C::D'],
+                'settings' => ['mb_substr' => false],
+            ],
+            $resolvedMutators[MBString::class]
+        );
+
+        $this->assertSame(
+            [
+                'ignoreSourceCodeByRegex' => ['A::B', 'C::D'],
+            ],
+            $resolvedMutators[IdenticalEqual::class]
+        );
+    }
+
+    public function test_it_can_resolve_mutators_with_duplicate_global_and_per_mutator_settings(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            'global-ignore' => ['A::B'],
+            'global-ignoreSourceCodeByRegex' => ['A::B', 'A::B', 'C::D'],
+            MutatorName::getName(Plus::class) => true,
+            MutatorName::getName(For_::class) => false,
+            MutatorName::getName(MBString::class) => [
+                'settings' => ['mb_substr' => false],
+            ],
+            MutatorName::getName(IdenticalEqual::class) => [
+                'ignore' => ['B::C'],
+                'ignoreSourceCodeByRegex' => ['A::B', 'B::C'],
+            ],
+        ]);
+
+        $this->assertSameMutatorsByClass(
+            [
+                Plus::class,
+                MBString::class,
+                IdenticalEqual::class,
+            ],
+            $resolvedMutators
+        );
+
+        $this->assertSame(
+            [
+                'ignore' => ['A::B'],
+                'ignoreSourceCodeByRegex' => ['A::B', 'C::D'],
+            ],
+            $resolvedMutators[Plus::class]
+        );
+        $this->assertSame(
+            [
+                'ignore' => ['A::B'],
+                'ignoreSourceCodeByRegex' => ['A::B', 'C::D'],
+                'settings' => ['mb_substr' => false],
+            ],
+            $resolvedMutators[MBString::class]
+        );
+        $this->assertSame(
+            [
+                'ignore' => ['A::B', 'B::C'],
+                'ignoreSourceCodeByRegex' => ['A::B', 'C::D', 'B::C'],
+            ],
+            $resolvedMutators[IdenticalEqual::class]
+        );
+    }
+
     public function test_it_always_enrich_global_settings_for_a_mutator_regardless_of_the_order(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve([
@@ -305,6 +464,98 @@ final class MutatorResolverTest extends TestCase
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_it_correct_when_profile_overrides_mutator(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            'DecrementInteger' => [
+                'ignore' => [
+                    'Infected\\SourceClass::add',
+                ],
+            ],
+            '@number' => true,
+        ]);
+
+        $this->assertSame(
+            [
+                DecrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::add',
+                    ],
+                ],
+                IncrementInteger::class => [
+                ],
+                OneZeroFloat::class => [
+                ],
+            ],
+            $resolvedMutators
+        );
+    }
+
+    public function test_it_correct_when_mutator_overrides_profile(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            '@number' => true,
+            'DecrementInteger' => [
+                'ignore' => [
+                    'Infected\\SourceClass::add',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                DecrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::add',
+                    ],
+                ],
+                IncrementInteger::class => [
+                ],
+                OneZeroFloat::class => [
+                ],
+            ],
+            $resolvedMutators
+        );
+    }
+
+    public function test_it_correct_when_mutator_overrides_profile_with_settings(): void
+    {
+        $resolvedMutators = $this->mutatorResolver->resolve([
+            '@number' => [
+                'ignore' => [
+                    'Infected\\SourceClass::substract',
+                ],
+            ],
+            'DecrementInteger' => [
+                'ignore' => [
+                    'Infected\\SourceClass::add',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                DecrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::add',
+                        'Infected\\SourceClass::substract',
+                    ],
+                ],
+                IncrementInteger::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::substract',
+                    ],
+                ],
+                OneZeroFloat::class => [
+                    'ignore' => [
+                        'Infected\\SourceClass::substract',
+                    ],
+                ],
+            ],
+            $resolvedMutators
+        );
     }
 
     /**

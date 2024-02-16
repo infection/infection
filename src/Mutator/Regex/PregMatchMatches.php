@@ -44,10 +44,14 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\FuncCall>
  */
 final class PregMatchMatches implements Mutator
 {
     use GetMutatorName;
+
+    private const MIN_ARGS_TO_MUTATE = 3;
 
     public static function getDefinition(): ?Definition
     {
@@ -72,17 +76,25 @@ if ((int) $matches = []) {
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+- preg_match('/pattern/', $subject, $matches, $flags);
++ (int) $matches = [];
+DIFF
         );
     }
 
     /**
-     * @param Node\Expr\FuncCall $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\Cast\Int_>
      */
     public function mutate(Node $node): iterable
     {
+        if ($node->args[2] instanceof Node\VariadicPlaceholder) {
+            return [];
+        }
+
         yield new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
     }
 
@@ -97,6 +109,6 @@ TXT
             return false;
         }
 
-        return count($node->args) >= 3;
+        return count($node->args) >= self::MIN_ARGS_TO_MUTATE;
     }
 }

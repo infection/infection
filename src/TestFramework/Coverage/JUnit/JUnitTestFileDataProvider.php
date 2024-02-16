@@ -40,7 +40,7 @@ use DOMElement;
 use DOMNodeList;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -48,16 +48,10 @@ use Webmozart\Assert\Assert;
  */
 final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
-    private $jUnitLocator;
+    private ?SafeDOMXPath $xPath = null;
 
-    /**
-     * @var SafeDOMXPath|null
-     */
-    private $xPath;
-
-    public function __construct(JUnitReportLocator $jUnitLocator)
+    public function __construct(private readonly JUnitReportLocator $jUnitLocator)
     {
-        $this->jUnitLocator = $jUnitLocator;
     }
 
     /**
@@ -67,7 +61,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     {
         $xPath = $this->getXPath();
 
-        /** @var DOMNodeList<DOMElement> $nodes */
+        /** @var DOMNodeList<DOMElement>|null $nodes */
         $nodes = null;
 
         foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {
@@ -108,6 +102,9 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
         // A format where the class name is inside `file` attribute of `testcase` tag
         yield '//testcase[contains(@file, "%s")][1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
+
+        // A format where the class name parsed from feature and is inside `class` attribute of `testcase` tag
+        yield '//testcase[@class="%s"][1]' => preg_replace('/^(.*):+.*$/', '$1', $fullyQualifiedClassName);
     }
 
     private function getXPath(): SafeDOMXPath

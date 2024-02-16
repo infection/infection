@@ -43,6 +43,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Plus>
  */
 final class PlusEqual implements Mutator
 {
@@ -56,14 +58,18 @@ Replaces an addition assignment operator (`+=`) with a subtraction assignment op
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a += $b;
++ $a -= $b;
+DIFF
         );
     }
 
     /**
      * Replaces "+=" with "-="
      *
-     * @param Node\Expr\AssignOp\Plus $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Expr\AssignOp\Minus>
      */

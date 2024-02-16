@@ -35,12 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Logger\Http;
 
-use function curl_close;
+use const CURLINFO_HTTP_CODE;
+use const CURLOPT_CUSTOMREQUEST;
+use const CURLOPT_HEADER;
+use const CURLOPT_HTTPHEADER;
+use const CURLOPT_POSTFIELDS;
+use const CURLOPT_RETURNTRANSFER;
+use const CURLOPT_URL;
 use function Safe\curl_exec;
 use function Safe\curl_getinfo;
 use function Safe\curl_init;
 use function Safe\curl_setopt;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * Sends a CURL request to the Stryker dashboard API.
@@ -48,8 +54,8 @@ use function Safe\sprintf;
  * @internal
  * @final
  *
- * @see https://github.com/stryker-mutator/stryker-handbook/blob/master/dashboard.md#send-a-report-via-curl
- * @see https://github.com/stryker-mutator/mutation-testing-elements/tree/master/packages/mutation-testing-report-schema
+ * @see https://stryker-mutator.io/docs/General/dashboard
+ * @see https://github.com/stryker-mutator/mutation-testing-elements/blob/master/packages/report-schema/src/mutation-testing-report-schema.json
  */
 class StrykerCurlClient
 {
@@ -76,19 +82,15 @@ class StrykerCurlClient
 
         $handle = curl_init();
 
-        try {
-            curl_setopt($handle, CURLOPT_URL, $url);
-            curl_setopt($handle, CURLOPT_CUSTOMREQUEST, 'PUT');
-            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($handle, CURLOPT_POSTFIELDS, $reportJson);
-            curl_setopt($handle, CURLOPT_HEADER, true);
+        curl_setopt($handle, CURLOPT_URL, $url);
+        curl_setopt($handle, CURLOPT_CUSTOMREQUEST, 'PUT');
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($handle, CURLOPT_POSTFIELDS, $reportJson);
+        curl_setopt($handle, CURLOPT_HEADER, true);
 
-            $body = (string) curl_exec($handle);
-            $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        } finally {
-            curl_close($handle);
-        }
+        $body = (string) curl_exec($handle);
+        $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
         return new Response($statusCode, $body);
     }

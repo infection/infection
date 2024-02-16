@@ -36,14 +36,15 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use function Safe\preg_replace;
-use function Safe\sprintf;
+use function sprintf;
 use function trim;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class TestFrameworkExtraOptionsFilter
+class TestFrameworkExtraOptionsFilter
 {
     /**
      * @param string[] $initialRunOnlyOptions
@@ -58,6 +59,6 @@ final class TestFrameworkExtraOptionsFilter
             Assert::notNull($actualExtraOptions);
         }
 
-        return (string) preg_replace('/\s+/', ' ', trim($actualExtraOptions));
+        return preg_replace('/\s+/', ' ', trim($actualExtraOptions));
     }
 }

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use function range;
 use Webmozart\Assert\Assert;
 
 /**
@@ -55,7 +56,7 @@ final class NodeLineRangeData
     /**
      * @var array<int, int>
      */
-    public $range;
+    public array $range;
 
     public function __construct(int $start, int $end)
     {

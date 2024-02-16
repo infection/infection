@@ -34,8 +34,8 @@
 
 declare(strict_types=1);
 
-set_error_handler(static function ($errno, $errstr): void {
-    var_dump($errno, $errstr);
-}, E_ALL);
+\set_error_handler(static function ($errno, $errstr): void {
+    \var_dump($errno, $errstr);
+}, \E_ALL);
 
 require __DIR__ . '/infection';

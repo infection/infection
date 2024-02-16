@@ -39,6 +39,7 @@ use PhpParser\Node;
 
 /**
  * @internal
+ * @template TNode of Node
  */
 interface Mutator
 {
@@ -49,6 +50,10 @@ interface Mutator
     public function canMutate(Node $node): bool;
 
     /**
+     * @psalm-mutation-free
+     *
+     * @param TNode $node
+     *
      * @return iterable<Node|Node[]>
      */
     public function mutate(Node $node): iterable;

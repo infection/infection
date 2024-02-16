@@ -40,10 +40,13 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
+use const PHP_INT_MAX;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractNumberMutator<Node\Scalar\LNumber>
  */
 final class DecrementInteger extends AbstractNumberMutator
 {
@@ -63,23 +66,57 @@ final class DecrementInteger extends AbstractNumberMutator
         return new Definition(
             'Decrements an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+- $a = 20;
++ $a = 19;
+DIFF
         );
     }
 
     /**
-     * @param Node\Scalar\LNumber $node
+     * @psalm-mutation-free
      *
      * @return iterable<Node\Scalar\LNumber>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Scalar\LNumber($node->value - 1);
+        $parentNode = ParentConnector::getParent($node);
+
+        $value = $node->value - 1;
+
+        /*
+         * Parser gives us only positive numbers we have to check if parent node
+         * isn't a minus sign. If so, then means we have a negated positive number so
+         * we have to add to it instead of substracting.
+         */
+        if ($parentNode instanceof Node\Expr\UnaryMinus) {
+            // PHP Parser reads negative number as a pair of minus sign and a positive int,
+            // but positive part of PHP_INT_MIN leads to an overflow into float. To work
+            // around this we have to cast the result value back to int after adding one.
+            $value = $node->value + 1;
+        }
+
+        yield new Node\Scalar\LNumber($value);
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Scalar\LNumber || $node->value === 1) {
+        if (!$node instanceof Node\Scalar\LNumber) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        // We cannot increment PHP_INT_MAX as part of a negative number, leads to parser bugs.
+        if ($node->value === PHP_INT_MAX && $parentNode instanceof Node\Expr\UnaryMinus) {
+            return false;
+        }
+
+        if (
+            $node->value === 1
+            && ($this->isPartOfComparison($node) || $parentNode instanceof Node\Expr\Assign)
+        ) {
             return false;
         }
 
@@ -88,6 +125,10 @@ final class DecrementInteger extends AbstractNumberMutator
         }
 
         if ($this->isPartOfSizeComparison($node)) {
+            return false;
+        }
+
+        if ($this->isPregSplitLimitZeroOrMinusOneArgument($node)) {
             return false;
         }
 
@@ -100,11 +141,12 @@ final class DecrementInteger extends AbstractNumberMutator
             return true;
         }
 
-        $parentNode = ParentConnector::getParent($node);
-
-        if (!$this->isComparison($parentNode)) {
+        if (!$this->isPartOfComparison($node)) {
             return true;
         }
+
+        $parentNode = ParentConnector::getParent($node);
+
         /** @var Node\Expr\BinaryOp $parentNode */
         if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
             && in_array(
@@ -129,26 +171,8 @@ final class DecrementInteger extends AbstractNumberMutator
         return true;
     }
 
-    private function isComparison(Node $parentNode): bool
+    private function isArrayZeroIndexAccess(Node\Scalar\LNumber $node): bool
     {
-        return $parentNode instanceof Node\Expr\BinaryOp\Identical
-            || $parentNode instanceof Node\Expr\BinaryOp\NotIdentical
-            || $parentNode instanceof Node\Expr\BinaryOp\Equal
-            || $parentNode instanceof Node\Expr\BinaryOp\NotEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual
-        ;
-    }
-
-    private function isArrayZeroIndexAccess(Node $node): bool
-    {
-        if (!$node instanceof Node\Scalar\LNumber) {
-            return false;
-        }
-
-        /** @var Node\Scalar\LNumber $node */
         if ($node->value !== 0) {
             return false;
         }
@@ -158,5 +182,33 @@ final class DecrementInteger extends AbstractNumberMutator
         }
 
         return false;
+    }
+
+    private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool
+    {
+        if ($node->value !== 0) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Arg) {
+            if (!$parentNode instanceof Node\Expr\UnaryMinus) {
+                return false;
+            }
+
+            $parentNode = ParentConnector::getParent($node);
+
+            if (!$parentNode instanceof Node\Arg) {
+                return false;
+            }
+        }
+
+        $parentNode = ParentConnector::getParent($parentNode);
+
+        return $parentNode instanceof Node\Expr\FuncCall
+            && $parentNode->name instanceof Node\Name
+            && $parentNode->name->toLowerString() === 'preg_split'
+        ;
     }
 }
