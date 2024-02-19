@@ -14,5 +14,8 @@
     },
     "require": {
         "webmozart/assert": "^1.9"
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }

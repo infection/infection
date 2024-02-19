@@ -14,5 +14,8 @@
     },
     "require": {
         "composer/xdebug-handler": "^1"
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }

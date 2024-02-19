@@ -11,5 +11,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5.5"
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }
