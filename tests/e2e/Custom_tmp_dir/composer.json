@@ -11,5 +11,8 @@
         "psr-4": {
             "TmpNamespace_\\Test\\": "tests/"
         }
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }
