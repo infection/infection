@@ -15,6 +15,7 @@ Please read documentation here: [infection.github.io][doc]
 
 * Twitter: [@infection_php][twitter]
 * Discord: https://discord.gg/ZUmyHTJ
+* [Playground](https://infection-php.dev/) - try it right in your browser!
 
 ### Contributing
 
