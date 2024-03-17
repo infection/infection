@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function array_map;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
@@ -48,6 +49,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
+use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
@@ -58,7 +60,7 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
      * @param string[] $sourceDirectories
-     * @param list<\SplFileInfo> $filteredSourceFilesToMutate
+     * @param list<SplFileInfo> $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -70,7 +72,8 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
         array $sourceDirectories,
         bool $skipCoverage,
         bool $executeOnlyCoveringTestCases = false,
-        array $filteredSourceFilesToMutate = []
+        array $filteredSourceFilesToMutate = [],
+        ?string $mapSourceClassToTestStrategy = null,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
 
@@ -96,7 +99,7 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
                 new XmlConfigurationVersionProvider(),
                 $sourceDirectories,
                 array_map(
-                    fn (\SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
+                    static fn (SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
                     $filteredSourceFilesToMutate
                 )
             ),
@@ -107,7 +110,7 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
                 $projectDir,
                 new JUnitTestCaseSorter()
             ),
-            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, $filteredSourceFilesToMutate),
+            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, $filteredSourceFilesToMutate, $mapSourceClassToTestStrategy),
             new VersionParser(),
             new CommandLineBuilder()
         );

@@ -42,6 +42,7 @@ use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
+use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
@@ -90,7 +91,8 @@ final class ConfigurationTest extends TestCase
         array $ignoreSourceCodeMutatorsMap,
         bool $executeOnlyCoveringTestCases,
         bool $isForGitDiffLines,
-        ?string $gitDiffBase
+        ?string $gitDiffBase,
+        ?string $mapSourceClassToTest,
     ): void {
         $config = new Configuration(
             $timeout,
@@ -123,7 +125,8 @@ final class ConfigurationTest extends TestCase
             $ignoreSourceCodeMutatorsMap,
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
-            $gitDiffBase
+            $gitDiffBase,
+            $mapSourceClassToTest
         );
 
         $this->assertConfigurationStateIs(
@@ -158,7 +161,8 @@ final class ConfigurationTest extends TestCase
             $ignoreSourceCodeMutatorsMap,
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
-            $gitDiffBase
+            $gitDiffBase,
+            $mapSourceClassToTest
         );
     }
 
@@ -196,6 +200,7 @@ final class ConfigurationTest extends TestCase
             false,
             false,
             'master',
+            null,
         ];
 
         yield 'nominal' => [
@@ -248,6 +253,7 @@ final class ConfigurationTest extends TestCase
             true,
             false,
             'master',
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 }

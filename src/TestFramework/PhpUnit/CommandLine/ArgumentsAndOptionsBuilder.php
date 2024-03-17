@@ -41,15 +41,17 @@ use function array_merge;
 use function count;
 use function end;
 use function explode;
+use function implode;
+use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function is_numeric;
 use function ltrim;
 use function preg_quote;
 use function rtrim;
+use SplFileInfo;
 use function sprintf;
 use function version_compare;
-use \SplFileInfo;
 
 /**
  * @internal
@@ -59,13 +61,13 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
     private const MAX_EXPLODE_PARTS = 2;
 
     /**
-     * @param list<\SplFileInfo> $filteredSourceFilesToMutate
+     * @param list<SplFileInfo> $filteredSourceFilesToMutate
      */
     public function __construct(
         private readonly bool $executeOnlyCoveringTestCases,
-        private readonly array $filteredSourceFilesToMutate
-    )
-    {
+        private readonly array $filteredSourceFilesToMutate,
+        private readonly ?string $mapSourceClassToTestStrategy,
+    ) {
     }
 
     /**
@@ -75,40 +77,17 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
     {
         $options = $this->prepareArguments($configPath, $extraOptions);
 
-        // todo and --some-option
-        // todo add exception if --filter already used
-        if ($this->filteredSourceFilesToMutate !== []) {
+        if ($this->filteredSourceFilesToMutate !== []
+            && $this->mapSourceClassToTestStrategy !== null
+            && !in_array('--filter', $options, true)) {
             $options[] = '--filter';
+
             $options[] = implode(
                 '|',
                 array_map(
-                    fn (SplFileInfo $sourceFile): string => sprintf('%sTest', $sourceFile->getBasename('.' . $sourceFile->getExtension())),
+                    static fn (SplFileInfo $sourceFile): string => sprintf('%sTest', $sourceFile->getBasename('.' . $sourceFile->getExtension())),
                     $this->filteredSourceFilesToMutate,
                 )
-            );
-
-            // --map-source-file-to-test-class
-
-            var_dump($options);
-        }
-
-        return $options;
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function prepareArguments(string $configPath, string $extraOptions): array
-    {
-        $options = [
-            '--configuration',
-            $configPath,
-        ];
-
-        if ($extraOptions !== '') {
-            $options = array_merge(
-                $options,
-                array_map(static fn ($option): string => '--' . $option, explode(' --', ltrim($extraOptions, '-')))
             );
         }
 
@@ -156,6 +135,26 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 
             $options[] = '--filter';
             $options[] = $filterString;
+        }
+
+        return $options;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function prepareArguments(string $configPath, string $extraOptions): array
+    {
+        $options = [
+            '--configuration',
+            $configPath,
+        ];
+
+        if ($extraOptions !== '') {
+            $options = array_merge(
+                $options,
+                array_map(static fn ($option): string => '--' . $option, explode(' --', ltrim($extraOptions, '-')))
+            );
         }
 
         return $options;

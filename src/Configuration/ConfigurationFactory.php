@@ -111,7 +111,8 @@ class ConfigurationFactory
         ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
         bool $useNoopMutators,
-        bool $executeOnlyCoveringTestCases
+        bool $executeOnlyCoveringTestCases,
+        ?string $mapSourceClassToTestStrategy
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -166,7 +167,8 @@ class ConfigurationFactory
             $ignoreSourceCodeMutatorsMap,
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
-            $gitDiffBase
+            $gitDiffBase,
+            $mapSourceClassToTestStrategy
         );
     }
 

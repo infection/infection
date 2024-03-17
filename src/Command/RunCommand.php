@@ -39,6 +39,7 @@ use function extension_loaded;
 use function file_exists;
 use function getenv;
 use function implode;
+use function in_array;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
@@ -59,9 +60,11 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
+use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use function is_numeric;
+use function is_string;
 use function max;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
@@ -121,6 +124,8 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     private const OPTION_GIT_DIFF_BASE = 'git-diff-base';
+
+    private const OPTION_MAP_SOURCE_CLASS_TO_TEST = 'map-source-class-to-test';
 
     /** @var string */
     private const OPTION_LOGGER_GITHUB = 'logger-github';
@@ -275,6 +280,13 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Log escaped Mutants as GitHub Annotations (automatically detected on Github Actions itself, use <comment>true</comment> to force-enable or <comment>false</comment> to force-disable it).',
+                false
+            )
+            ->addOption(
+                self::OPTION_MAP_SOURCE_CLASS_TO_TEST,
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Enables test files filtering during "Initial Tests Run" stage when `--filter`/`--git-diff-filter`/`--git-diff-lines` are used. With this option, only those test files are executed to provide coverage, that cover changed/added source files.',
                 false
             )
             ->addOption(
@@ -502,7 +514,8 @@ final class RunCommand extends BaseCommand
             $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
-            (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES)
+            (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
+            $this->getMapSourceClassToTest($input)
         );
     }
 
@@ -667,5 +680,32 @@ final class RunCommand extends BaseCommand
 
         // we subtract 1 here to not use all the available cores by Infection
         return max(1, CpuCoresCountProvider::provide() - 1);
+    }
+
+    private function getMapSourceClassToTest(InputInterface $input): ?string
+    {
+        $inputValue = $input->getOption(self::OPTION_MAP_SOURCE_CLASS_TO_TEST);
+
+        // `false` means the option was not provided at all -> user does not care and it will be auto-detected
+        // `null` means the option was provided without any argument -> user wants to enable it
+        // any string: the argument provided, but only `'simple'` is allowed for now
+        if ($inputValue === false) {
+            return null;
+        }
+
+        if ($inputValue === null) {
+            return MapSourceClassToTestStrategy::SIMPLE;
+        }
+
+        if (is_string($inputValue) && !in_array($inputValue, [MapSourceClassToTestStrategy::SIMPLE], true)) {
+            throw new InvalidArgumentException(sprintf(
+                'Cannot pass "%s" to "--%s": only "%s" or no argument is supported',
+                $inputValue,
+                self::OPTION_MAP_SOURCE_CLASS_TO_TEST,
+                MapSourceClassToTestStrategy::SIMPLE
+            ));
+        }
+
+        return (string) $inputValue;
     }
 }

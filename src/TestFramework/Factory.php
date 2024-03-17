@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function array_filter;
-use function array_map;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
@@ -85,7 +83,8 @@ final class Factory
                 $this->infectionConfig->getSourceDirectories(),
                 $skipCoverage,
                 $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
-                $filteredSourceFilesToMutate
+                $filteredSourceFilesToMutate,
+                $this->infectionConfig->getMapSourceClassToTestStrategy()
             );
         }
 
@@ -105,7 +104,8 @@ final class Factory
                 $this->infectionConfig->getSourceDirectories(),
                 $skipCoverage,
                 $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
-                $filteredSourceFilesToMutate
+                $filteredSourceFilesToMutate,
+                $this->infectionConfig->getMapSourceClassToTestStrategy()
             );
         }
 
@@ -154,6 +154,9 @@ final class Factory
             return [];
         }
 
-        return iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()));
+        /** @var list<SplFileInfo> $files */
+        $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()));
+
+        return $files;
     }
 }

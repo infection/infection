@@ -86,7 +86,8 @@ trait ConfigurationAssertions
         array $expectedIgnoreSourceCodeMutatorsMap,
         bool $expectedExecuteOnlyCoveringTestCases,
         bool $expectedIsForGitDiffLines,
-        ?string $expectedGitDiffBase
+        ?string $expectedGitDiffBase,
+        ?string $expectedMapSourceClassToTest
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
@@ -141,6 +142,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedExecuteOnlyCoveringTestCases, $configuration->getExecuteOnlyCoveringTestCases());
         $this->assertSame($expectedIsForGitDiffLines, $configuration->isForGitDiffLines());
         $this->assertSame($expectedGitDiffBase, $configuration->getGitDiffBase());
+        $this->assertSame($expectedMapSourceClassToTest, $configuration->getMapSourceClassToTestStrategy());
     }
 
     /**
