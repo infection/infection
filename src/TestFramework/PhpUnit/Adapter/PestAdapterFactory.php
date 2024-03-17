@@ -58,7 +58,7 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
      * @param string[] $sourceDirectories
-     * @param list<string> $filteredSourceFilesToMutate
+     * @param list<\SplFileInfo> $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -95,7 +95,10 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
                 $sourceDirectories,
-                $filteredSourceFilesToMutate
+                array_map(
+                    fn (\SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
+                    $filteredSourceFilesToMutate
+                )
             ),
             new MutationConfigBuilder(
                 $tmpDir,
@@ -104,7 +107,7 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
                 $projectDir,
                 new JUnitTestCaseSorter()
             ),
-            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases),
+            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, $filteredSourceFilesToMutate),
             new VersionParser(),
             new CommandLineBuilder()
         );

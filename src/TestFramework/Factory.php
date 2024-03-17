@@ -146,7 +146,7 @@ final class Factory
     /**
      * Get only those source files that will be mutated to use them in coverage whitelist
      *
-     * @return list<string>
+     * @return list<SplFileInfo>
      */
     private function getFilteredSourceFilesToMutate(): array
     {
@@ -154,12 +154,6 @@ final class Factory
             return [];
         }
 
-        /** @var list<string> $filteredPaths */
-        $filteredPaths = array_filter(array_map(
-            static fn (SplFileInfo $file) => $file->getRealPath(),
-            iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()))
-        ));
-
-        return $filteredPaths;
+        return iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()));
     }
 }

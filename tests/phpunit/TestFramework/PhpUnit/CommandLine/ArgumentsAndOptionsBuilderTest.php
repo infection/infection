@@ -50,7 +50,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->builder = new ArgumentsAndOptionsBuilder(false);
+        $this->builder = new ArgumentsAndOptionsBuilder(false, []);
     }
 
     public function test_it_can_build_the_command_without_extra_options(): void
@@ -102,7 +102,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     {
         $configPath = '/the config/path';
 
-        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases);
+        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, []);
 
         $expectedArgumentsAndOptions = [
             '--configuration',

@@ -49,6 +49,7 @@ use function preg_quote;
 use function rtrim;
 use function sprintf;
 use function version_compare;
+use \SplFileInfo;
 
 /**
  * @internal
@@ -57,11 +58,47 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 {
     private const MAX_EXPLODE_PARTS = 2;
 
-    public function __construct(private readonly bool $executeOnlyCoveringTestCases)
+    /**
+     * @param list<\SplFileInfo> $filteredSourceFilesToMutate
+     */
+    public function __construct(
+        private readonly bool $executeOnlyCoveringTestCases,
+        private readonly array $filteredSourceFilesToMutate
+    )
     {
     }
 
+    /**
+     * @return list<string>
+     */
     public function buildForInitialTestsRun(string $configPath, string $extraOptions): array
+    {
+        $options = $this->prepareArguments($configPath, $extraOptions);
+
+        // todo and --some-option
+        // todo add exception if --filter already used
+        if ($this->filteredSourceFilesToMutate !== []) {
+            $options[] = '--filter';
+            $options[] = implode(
+                '|',
+                array_map(
+                    fn (SplFileInfo $sourceFile): string => sprintf('%sTest', $sourceFile->getBasename('.' . $sourceFile->getExtension())),
+                    $this->filteredSourceFilesToMutate,
+                )
+            );
+
+            // --map-source-file-to-test-class
+
+            var_dump($options);
+        }
+
+        return $options;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function prepareArguments(string $configPath, string $extraOptions): array
     {
         $options = [
             '--configuration',
@@ -80,10 +117,11 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 
     /**
      * @param TestLocation[] $tests
+     * @return list<string>
      */
     public function buildForMutant(string $configPath, string $extraOptions, array $tests, string $testFrameworkVersion): array
     {
-        $options = $this->buildForInitialTestsRun($configPath, $extraOptions);
+        $options = $this->prepareArguments($configPath, $extraOptions);
 
         if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
             $filterString = '/';
