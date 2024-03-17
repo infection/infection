@@ -75,7 +75,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
      */
     public function buildForInitialTestsRun(string $configPath, string $extraOptions): array
     {
-        $options = $this->prepareArguments($configPath, $extraOptions);
+        $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
         if ($this->filteredSourceFilesToMutate !== []
             && $this->mapSourceClassToTestStrategy !== null
@@ -85,7 +85,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
             $options[] = implode(
                 '|',
                 array_map(
-                    static fn (SplFileInfo $sourceFile): string => sprintf('%sTest', $sourceFile->getBasename('.' . $sourceFile->getExtension())),
+                    $this->mapSourceClassToTestClass(...),
                     $this->filteredSourceFilesToMutate,
                 )
             );
@@ -100,7 +100,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
      */
     public function buildForMutant(string $configPath, string $extraOptions, array $tests, string $testFrameworkVersion): array
     {
-        $options = $this->prepareArguments($configPath, $extraOptions);
+        $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
         if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
             $filterString = '/';
@@ -140,10 +140,15 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         return $options;
     }
 
+    private function mapSourceClassToTestClass(SplFileInfo $sourceFile): string
+    {
+        return sprintf('%sTest', $sourceFile->getBasename('.' . $sourceFile->getExtension()));
+    }
+
     /**
      * @return list<string>
      */
-    private function prepareArguments(string $configPath, string $extraOptions): array
+    private function prepareArgumentsAndOptions(string $configPath, string $extraOptions): array
     {
         $options = [
             '--configuration',
@@ -153,7 +158,10 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         if ($extraOptions !== '') {
             $options = array_merge(
                 $options,
-                array_map(static fn ($option): string => '--' . $option, explode(' --', ltrim($extraOptions, '-')))
+                array_map(
+                    static fn ($option): string => '--' . $option,
+                    explode(' --', ltrim($extraOptions, '-'))
+                )
             );
         }
 
