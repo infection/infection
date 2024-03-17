@@ -79,7 +79,8 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 
         if ($this->filteredSourceFilesToMutate !== []
             && $this->mapSourceClassToTestStrategy !== null
-            && !in_array('--filter', $options, true)) {
+            && !in_array('--filter', $options, true)
+        ) {
             $options[] = '--filter';
 
             $options[] = implode(
