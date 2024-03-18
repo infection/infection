@@ -66,6 +66,9 @@ jobs:
         if: matrix.dependencies != 'locked'
         run: composer config extra.symfony.require ${{ matrix.symfony-version }}
 
+      - name: Disable deprecations for non-locked dependencies
+        run: echo "SYMFONY_DEPRECATIONS_HELPER=disabled=1" >> $GITHUB_ENV
+
       # See https://symfony.com/doc/current/bundles/best_practices.html#require-a-specific-symfony-version
       - name: Install Flex
         if: matrix.dependencies != 'locked'
