@@ -27,7 +27,7 @@ RECTOR=./vendor/bin/rector
 PSALM=./.tools/psalm
 PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.11.0/psalm.phar"
 
-PHPUNIT=./vendor/bin/phpunit
+PHPUNIT=vendor/phpunit/phpunit/phpunit
 PARATEST=vendor/bin/paratest
 
 INFECTION=./build/infection.phar
