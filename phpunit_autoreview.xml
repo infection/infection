@@ -1,34 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/9.2.xsd"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/10.4.xsd"
          bootstrap="./vendor/autoload.php"
          colors="true"
          executionOrder="random"
          stopOnFailure="true"
          failOnWarning="true"
          failOnRisky="true"
-         verbose="true"
+         cacheDirectory=".phpunit.autoreview.cache"
 >
 
-    <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
-    </php>
+  <testsuites>
+    <testsuite name="Auto-Review Test Suite">
+      <directory>tests/phpunit/AutoReview</directory>
+    </testsuite>
+  </testsuites>
 
-    <testsuites>
-        <testsuite name="Auto-Review Test Suite">
-            <directory>tests/phpunit/AutoReview</directory>
-        </testsuite>
-    </testsuites>
-
-    <filter>
-        <whitelist>
-            <directory>tests/phpunit/AutoReview</directory>
-        </whitelist>
-    </filter>
-
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
-        <listener class="Symfony\Bridge\PhpUnit\CoverageListener" />
-    </listeners>
-
+  <source>
+    <include>
+      <directory>tests/phpunit/AutoReview</directory>
+    </include>
+  </source>
 </phpunit>

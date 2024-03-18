@@ -2,6 +2,8 @@
 !/build/.gitkeep
 !/build/cache/.gitkeep
 .phpunit.result.cache
+.phpunit.cache
+.phpunit.autoreview.cache
 /*.phar
 /.box_dump/
 /.ci/keys.asc
