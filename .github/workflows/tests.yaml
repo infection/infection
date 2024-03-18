@@ -106,7 +106,7 @@ jobs:
 
       - name: Run unit tests
         shell: bash
-        run: make test-unit
+        run: SYMFONY_DEPRECATIONS_HELPER=disabled make test-unit
 
       - name: Run integration tests
         if: ${{ matrix.operating-system != 'windows-latest' }}
