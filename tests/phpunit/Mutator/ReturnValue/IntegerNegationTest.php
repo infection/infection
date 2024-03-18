@@ -51,7 +51,7 @@ final class IntegerNegationTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates negative -1 int return to positive' => [
             <<<'PHP'

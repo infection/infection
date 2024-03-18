@@ -50,11 +50,11 @@ final class PathReplacerTest extends TestCase
     /**
      * @var string
      */
-    private $projectPath;
+    private static $projectPath;
 
     protected function setUp(): void
     {
-        $this->projectPath = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
+        self::$projectPath = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
     }
 
     /**
@@ -75,16 +75,16 @@ final class PathReplacerTest extends TestCase
         $this->assertSame($expectedPath, p($node->nodeValue));
     }
 
-    public function pathProvider(): iterable
+    public static function pathProvider(): iterable
     {
-        yield ['autoload.php', $this->projectPath . '/autoload.php'];
+        yield ['autoload.php', self::$projectPath . '/autoload.php'];
 
-        yield ['./autoload.php', $this->projectPath . '/autoload.php'];
+        yield ['./autoload.php', self::$projectPath . '/autoload.php'];
 
-        yield ['../autoload.php', $this->projectPath . '/../autoload.php'];
+        yield ['../autoload.php', self::$projectPath . '/../autoload.php'];
 
         yield ['/autoload.php', '/autoload.php'];
 
-        yield ['./*Bundle', $this->projectPath . '/*Bundle'];
+        yield ['./*Bundle', self::$projectPath . '/*Bundle'];
     }
 }

@@ -43,7 +43,7 @@ use Infection\Tests\SingletonContainer;
 /**
  * @group integration
  */
-final class ParentConnectorVisitorTest extends BaseVisitorTest
+final class ParentConnectorVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'
 <?php
@@ -63,7 +63,7 @@ PHP;
         $parentSpyVisitor = new ParentConnectorSpyVisitor();
 
         $nodes = $this->traverse(
-            $this->parseCode(self::CODE),
+            self::parseCode(self::CODE),
             [
                 $stackSpyVisitor,
                 new ParentConnectorVisitor(),

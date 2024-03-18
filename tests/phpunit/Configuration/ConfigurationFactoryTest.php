@@ -214,7 +214,7 @@ final class ConfigurationFactoryTest extends TestCase
         );
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         $expectedLogs = Logs::createEmpty();
         $expectedLogs->setUseGitHubAnnotationsLogger(true);

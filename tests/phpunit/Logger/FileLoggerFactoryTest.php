@@ -134,7 +134,7 @@ final class FileLoggerFactoryTest extends TestCase
         $this->assertRegisteredLoggersAre($expectedLoggerClasses, $logger);
     }
 
-    public function logsProvider(): iterable
+    public static function logsProvider(): iterable
     {
         yield 'no logger' => [
             Logs::createEmpty(),

@@ -57,7 +57,7 @@ final class NodeLineRangeDataTest extends TestCase
         $this->assertSame($expected, $range->range);
     }
 
-    public function providesLineRanges(): iterable
+    public static function providesLineRanges(): iterable
     {
         yield 'Single line range' => [10, 10, [10]];
 

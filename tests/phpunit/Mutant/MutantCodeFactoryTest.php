@@ -83,7 +83,7 @@ final class MutantCodeFactoryTest extends TestCase
         $this->assertSame($originalNodesDump, $originalNodesDumpAfterMutation);
     }
 
-    public function mutationProvider(): iterable
+    public static function mutationProvider(): iterable
     {
         yield [
             new Mutation(

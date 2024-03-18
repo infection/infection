@@ -115,7 +115,7 @@ final class StrykerLoggerFactoryTest extends TestCase
         $this->assertInstanceOf($expectedLogger, $logger);
     }
 
-    public function logsProvider(): iterable
+    public static function logsProvider(): iterable
     {
         yield 'no logger' => [
             Logs::createEmpty(),

@@ -52,7 +52,7 @@ final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
         $this->assertSame($count, $spy->nodeCounter);
     }
 
-    public function provideIgnoreCases(): iterable
+    public static function provideIgnoreCases(): iterable
     {
         yield 'interfaces are ignored' => [
             <<<'PHP'

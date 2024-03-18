@@ -44,7 +44,7 @@ use PhpParser\Node;
 /**
  * @group integration
  */
-final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
+final class FullyQualifiedClassNameVisitorTest extends \Infection\Tests\PhpParser\Visitor\BaseVisitorTestCase
 {
     /**
      * @dataProvider codeProvider
@@ -56,7 +56,7 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
         $spyVisitor = new FullyQualifiedClassNameSpyVisitor();
 
         $this->traverse(
-            $this->parseCode($code),
+            self::parseCode($code),
             [
                 new FullyQualifiedClassNameVisitor(),
                 $spyVisitor,
@@ -76,7 +76,7 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
         $this->assertSame($expected, $actual);
     }
 
-    public function codeProvider(): iterable
+    public static function codeProvider(): iterable
     {
         yield 'global class' => [
             <<<'PHP'

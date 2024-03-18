@@ -47,7 +47,7 @@ use function stripos;
 /**
  * @group integration
  */
-final class SourceDirsProviderTest extends BaseProviderTest
+final class SourceDirsProviderTest extends BaseProviderTestCase
 {
     /**
      * @var SourceDirsProvider

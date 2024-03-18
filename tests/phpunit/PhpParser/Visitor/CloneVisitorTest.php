@@ -44,7 +44,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * @group integration
  */
-final class CloneVisitorTest extends BaseVisitorTest
+final class CloneVisitorTest extends \Infection\Tests\PhpParser\Visitor\BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'
 <?php declare(strict_types=1);
@@ -59,7 +59,7 @@ PHP;
 
     public function test_mutating_nodes_during_traverse_mutates_the_original_nodes(): void
     {
-        $originalNodes = $this->parseCode(self::CODE);
+        $originalNodes = self::parseCode(self::CODE);
 
         $originalDump = SingletonContainer::getNodeDumper()->dump($originalNodes);
 
@@ -73,7 +73,7 @@ PHP;
 
     public function test_mutating_nodes_during_traverse_with_the_clone_visitor_does_not_mutate_the_original_nodes(): void
     {
-        $originalNodes = $this->parseCode(self::CODE);
+        $originalNodes = self::parseCode(self::CODE);
 
         $originalDump = SingletonContainer::getNodeDumper()->dump($originalNodes);
 

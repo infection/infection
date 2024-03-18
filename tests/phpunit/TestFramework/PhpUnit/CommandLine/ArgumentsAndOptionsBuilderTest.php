@@ -129,7 +129,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
     }
 
-    public function provideTestCases(): Generator
+    public static function provideTestCases(): Generator
     {
         yield '--only-covering-test-cases is disabled' => [
             false,

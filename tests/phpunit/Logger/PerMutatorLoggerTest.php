@@ -58,7 +58,7 @@ final class PerMutatorLoggerTest extends TestCase
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
@@ -73,8 +73,8 @@ TXT
         ];
 
         yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
-            $this->createCompleteResultsCollector(),
+            self::createCompleteMetricsCalculator(),
+            self::createCompleteResultsCollector(),
             <<<'TXT'
 # Effects per Mutator
 

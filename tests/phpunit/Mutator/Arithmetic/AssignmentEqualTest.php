@@ -49,7 +49,7 @@ final class AssignmentEqualTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates a comparison to an assignment' => [
             <<<'PHP'

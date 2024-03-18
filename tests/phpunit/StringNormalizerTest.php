@@ -49,7 +49,7 @@ final class StringNormalizerTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function stringValuesProvider(): iterable
+    public static function stringValuesProvider(): iterable
     {
         yield 'empty' => ['', ''];
 

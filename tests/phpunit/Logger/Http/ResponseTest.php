@@ -66,7 +66,7 @@ final class ResponseTest extends TestCase
         }
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         yield 'empty' => [200, ''];
 

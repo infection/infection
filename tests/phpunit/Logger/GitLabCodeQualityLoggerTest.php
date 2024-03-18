@@ -65,7 +65,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations; only covered' => [
             new ResultsCollector(),
@@ -73,7 +73,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         ];
 
         yield 'all mutations; only covered' => [
-            $this->createCompleteResultsCollector(),
+            self::createCompleteResultsCollector(),
             [
                 [
                     'type' => 'issue',
@@ -109,7 +109,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         ];
 
         yield 'Non UTF-8 characters' => [
-            $this->createNonUtf8CharactersCollector(),
+            self::createNonUtf8CharactersCollector(),
             [
                 [
                     'type' => 'issue',
@@ -135,12 +135,12 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         $this->assertSame($expectedJson, json_decode($logger->getLogLines()[0], true, JSON_THROW_ON_ERROR));
     }
 
-    private function createNonUtf8CharactersCollector(): ResultsCollector
+    private static function createNonUtf8CharactersCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::ESCAPED,

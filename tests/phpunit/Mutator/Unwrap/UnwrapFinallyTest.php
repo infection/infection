@@ -50,7 +50,7 @@ final class UnwrapFinallyTest extends BaseMutatorTestCase
         $this->doTest($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Can unwrap try-finally block without catches' => [
             '<?php

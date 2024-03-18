@@ -110,7 +110,7 @@ final class TmpDirProviderTest extends TestCase
         }
     }
 
-    public function tmpDirProvider(): iterable
+    public static function tmpDirProvider(): iterable
     {
         yield 'root dir path' => [
             '/',
@@ -128,7 +128,7 @@ final class TmpDirProviderTest extends TestCase
         ];
     }
 
-    public function invalidTmpDirProvider(): iterable
+    public static function invalidTmpDirProvider(): iterable
     {
         yield 'empty dir path' => [
             '',

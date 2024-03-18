@@ -144,7 +144,7 @@ final class RootsFileLocatorTest extends TestCase
         }
     }
 
-    public function pathsProvider(): iterable
+    public static function pathsProvider(): iterable
     {
         $root = realpath(self::FIXTURES_DIR);
 
@@ -289,7 +289,7 @@ final class RootsFileLocatorTest extends TestCase
         }
     }
 
-    public function invalidPathsProvider(): iterable
+    public static function invalidPathsProvider(): iterable
     {
         yield [
             ['/nowhere'],
@@ -323,7 +323,7 @@ final class RootsFileLocatorTest extends TestCase
         }
     }
 
-    public function multiplePathsProvider(): iterable
+    public static function multiplePathsProvider(): iterable
     {
         $root = realpath(self::FIXTURES_DIR);
 
@@ -388,7 +388,7 @@ final class RootsFileLocatorTest extends TestCase
         ];
     }
 
-    public function multipleInvalidPathsProvider(): iterable
+    public static function multipleInvalidPathsProvider(): iterable
     {
         $root1 = realpath(self::FIXTURES_DIR);
         $root2 = realpath(self::FIXTURES_DIR) . '/dir';

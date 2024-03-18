@@ -49,7 +49,7 @@ final class AssignCoalesceTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutate coalesce when right part is a scalar value' => [
             <<<'PHP'

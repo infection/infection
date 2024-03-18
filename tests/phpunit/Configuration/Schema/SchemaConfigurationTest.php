@@ -96,7 +96,7 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions());
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         yield 'minimal' => [
             '',

@@ -49,7 +49,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates logical or' => [
             <<<'PHP'
@@ -75,13 +75,13 @@ PHP
             ,
         ];
 
-        yield from $this->equalityMutationsProvider();
-        yield from $this->nonMutableSmallerAndGreaterMatrixMutationsProvider();
-        yield from $this->mutableSmallerAndGreaterMatrixMutationsProvider();
-        yield from $this->smallerAndGreaterMatrixWithSameValueMutationsProvider();
+        yield from self::equalityMutationsProvider();
+        yield from self::nonMutableSmallerAndGreaterMatrixMutationsProvider();
+        yield from self::mutableSmallerAndGreaterMatrixMutationsProvider();
+        yield from self::smallerAndGreaterMatrixWithSameValueMutationsProvider();
     }
 
-    private function equalityMutationsProvider(): iterable
+    private static function equalityMutationsProvider(): iterable
     {
         yield 'It does not mutate logical or if same variable is tested against "Identical".' => [
             <<<'PHP'
@@ -155,7 +155,7 @@ PHP
         ];
     }
 
-    private function nonMutableSmallerAndGreaterMatrixMutationsProvider(): iterable
+    private static function nonMutableSmallerAndGreaterMatrixMutationsProvider(): iterable
     {
         yield 'It does not mutate logical or if same variable is tested against "Smaller" and "Greater" #1.' => [
             <<<'PHP'
@@ -286,7 +286,7 @@ PHP
         ];
     }
 
-    private function mutableSmallerAndGreaterMatrixMutationsProvider(): iterable
+    private static function mutableSmallerAndGreaterMatrixMutationsProvider(): iterable
     {
         yield 'It mutates logical or if same variable is tested against "Smaller" and "Greater" and values permits it #1.' => [
             <<<'PHP'
@@ -513,7 +513,7 @@ PHP
         ];
     }
 
-    private function smallerAndGreaterMatrixWithSameValueMutationsProvider(): iterable
+    private static function smallerAndGreaterMatrixWithSameValueMutationsProvider(): iterable
     {
         yield 'It mutates logical or if same variable is tested against "Smaller" and "Greater" and values are the same.' => [
             <<<'PHP'

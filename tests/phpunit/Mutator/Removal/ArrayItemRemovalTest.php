@@ -54,7 +54,7 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
         $this->doTest($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It does not mutate empty arrays' => [
             '<?php $a = [];',
@@ -120,7 +120,7 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
         ];
 
         yield 'It does not mutate arrays as an attribute argument' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'does-not-mutate-array-in-attribute.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'does-not-mutate-array-in-attribute.php'),
         ];
 
         yield 'It does not mutate destructured array values in foreach loops' => [

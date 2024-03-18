@@ -81,7 +81,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $this->assertJsonDocumentMatchesSchema($report);
     }
 
-    public function metricsProvider()
+    public static function metricsProvider()
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
@@ -108,8 +108,8 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $realPathForHtmlReport2 = realpath(__DIR__ . '/../../Fixtures/ForHtmlReport2.php');
 
         yield 'different mutations' => [
-            $this->createFullHtmlReportMetricsCalculator(),
-            $this->createFullHtmlReportResultsCollector(),
+            self::createFullHtmlReportMetricsCalculator(),
+            self::createFullHtmlReportResultsCollector(),
             [
                 'schemaVersion' => '1',
                 'thresholds' => [
@@ -239,20 +239,20 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         ];
     }
 
-    private function createFullHtmlReportMetricsCalculator(): MetricsCalculator
+    private static function createFullHtmlReportMetricsCalculator(): MetricsCalculator
     {
         $collector = new MetricsCalculator(2);
 
-        $this->initHtmlReportCollector($collector);
+        self::initHtmlReportCollector($collector);
 
         return $collector;
     }
 
-    private function createFullHtmlReportResultsCollector(): ResultsCollector
+    private static function createFullHtmlReportResultsCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
-        $this->initHtmlReportCollector($collector);
+        self::initHtmlReportCollector($collector);
 
         return $collector;
     }
@@ -283,11 +283,11 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         );
     }
 
-    private function initHtmlReportCollector(Collector $collector): void
+    private static function initHtmlReportCollector(Collector $collector): void
     {
         $collector->collect(
             // this tests diffs on the method signature line
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
                 --- Original
@@ -316,7 +316,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 ]
             ),
             // this tests diff on the one-line method call removal
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
                 --- Original
@@ -344,7 +344,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 'PHPUnit output. Tests: 1, Assertions: 3. Failure: 1) TestClass::test_method1 Failed'
             ),
             // this tests diff on the multi-line (in original source code) method call removal
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
                 --- Original
@@ -372,7 +372,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 'PHPUnit output. Tests: 1, Assertions: 3. Failure: 1) TestClass::test_method1 with data set #1'
             ),
             // this tests diff on the one-line diff with array item removal
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
                 --- Original
@@ -402,7 +402,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 'PHPUnit output. Tests: 3, Assertions: 3'
             ),
             // add one test for the second file
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
                 --- Original
@@ -430,7 +430,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             ),
             //
             // with non UTF-8 character
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
                 --- Original
@@ -462,7 +462,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
     /**
      * @param array<int, TestLocation> $testLocations
      */
-    private function createMutantExecutionResult(
+    private static function createMutantExecutionResult(
         string $detectionStatus,
         string $diff,
         string $mutantHash,

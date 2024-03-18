@@ -175,7 +175,7 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver->resolve();
     }
 
-    public function provideBlankOrEmptyString(): iterable
+    public static function provideBlankOrEmptyString(): iterable
     {
         yield 'string-blank' => [' '];
 

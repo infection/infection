@@ -79,7 +79,7 @@ final class IgnoreConfigTest extends TestCase
         $this->assertFalse($config->isIgnored($class, $method, $lineNumber));
     }
 
-    public function ignoredValuesProvider(): iterable
+    public static function ignoredValuesProvider(): iterable
     {
         foreach ([null, 50] as $lineNumber) {
             $titleSuffix = $lineNumber === null ? '' : ' with line number #' . $lineNumber;
@@ -135,7 +135,7 @@ final class IgnoreConfigTest extends TestCase
         ];
     }
 
-    public function nonIgnoredValuesProvider(): iterable
+    public static function nonIgnoredValuesProvider(): iterable
     {
         foreach ([null, 50] as $lineNumber) {
             $titleSuffix = $lineNumber === null ? '' : ' with line number #' . $lineNumber;

@@ -685,7 +685,7 @@ PHP
         $this->assertSame('false', $failOnRisky[0]->value);
     }
 
-    public function failOnProvider(): iterable
+    public static function failOnProvider(): iterable
     {
         yield 'PHPUnit 5.1.99 runs without failOnRisky' => [
             '5.1.99',
@@ -724,7 +724,7 @@ PHP
         ];
     }
 
-    public function locationsProvider(): iterable
+    public static function locationsProvider(): iterable
     {
         yield [
             [

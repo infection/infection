@@ -74,7 +74,7 @@ final class SchemaValidatorTest extends TestCase
         }
     }
 
-    public function configProvider(): iterable
+    public static function configProvider(): iterable
     {
         $path = '/path/to/config';
 

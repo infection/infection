@@ -50,7 +50,7 @@ final class SharedCaseRemovalTest extends BaseMutatorTestCase
         $this->doTest($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It does not mutate single cases with a body' => [
             '<?php

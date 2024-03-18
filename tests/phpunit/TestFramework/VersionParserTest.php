@@ -79,7 +79,7 @@ final class VersionParserTest extends TestCase
         }
     }
 
-    public function versionProvider(): iterable
+    public static function versionProvider(): iterable
     {
         yield 'nominal stable' => ['7.0.2', '7.0.2'];
 
@@ -116,7 +116,7 @@ final class VersionParserTest extends TestCase
         yield 'PHPUnit' => ['PHPUnit 7.5.11 by Sebastian Bergmann and contributors.', '7.5.11'];
     }
 
-    public function invalidVersionProvider(): iterable
+    public static function invalidVersionProvider(): iterable
     {
         yield 'ascii-only string' => ['abc'];
 

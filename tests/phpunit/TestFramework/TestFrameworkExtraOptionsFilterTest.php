@@ -52,7 +52,7 @@ final class TestFrameworkExtraOptionsFilterTest extends TestCase
         $this->assertSame($expectedExtraOptions, $filteredOptions);
     }
 
-    public function mutantProcessProvider(): iterable
+    public static function mutantProcessProvider(): iterable
     {
         yield ['--filter=someTest#2 --a --b=value', '--a --b=value'];
 

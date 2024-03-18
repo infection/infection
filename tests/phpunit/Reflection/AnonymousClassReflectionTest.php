@@ -46,7 +46,7 @@ final class AnonymousClassReflectionTest extends ClassReflectionTestCase
         $this->assertSame('', $reflection->getName());
     }
 
-    protected function createFromName(string $name): ClassReflection
+    protected static function createFromName(string $name): ClassReflection
     {
         return AnonymousClassReflection::fromClassName($name);
     }

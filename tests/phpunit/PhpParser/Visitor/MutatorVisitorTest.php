@@ -51,7 +51,7 @@ use PhpParser\ParserFactory;
 /**
  * @group integration
  */
-final class MutatorVisitorTest extends BaseVisitorTest
+final class MutatorVisitorTest extends BaseVisitorTestCase
 {
     /**
      * @dataProvider providesMutationCases
@@ -73,11 +73,11 @@ final class MutatorVisitorTest extends BaseVisitorTest
         $this->assertSame($expectedCodeOutput, StringNormalizer::normalizeString($output));
     }
 
-    public function providesMutationCases(): iterable
+    public static function providesMutationCases(): iterable
     {
-        yield 'it mutates the correct node' => (function (): iterable {
+        yield 'it mutates the correct node' => (static function (): iterable {
             return [
-                $nodes = $this->parseCode(<<<'PHP'
+                $nodes = self::parseCode(<<<'PHP'
 <?php
 
 class Test
@@ -126,9 +126,9 @@ PHP
             ];
         })();
 
-        yield 'it can mutate the node with multiple-ones' => (function (): iterable {
+        yield 'it can mutate the node with multiple-ones' => (static function (): iterable {
             return [
-                $nodes = $this->parseCode(<<<'PHP'
+                $nodes = self::parseCode(<<<'PHP'
 <?php
 
 class Test
@@ -178,9 +178,9 @@ PHP
             ];
         })();
 
-        yield 'it does not mutate if only one of start or end position is correctly set' => (function (): iterable {
+        yield 'it does not mutate if only one of start or end position is correctly set' => (static function (): iterable {
             return [
-                $nodes = $this->parseCode(<<<'PHP'
+                $nodes = self::parseCode(<<<'PHP'
 <?php
 
 class Test

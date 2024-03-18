@@ -100,7 +100,7 @@ final class SchemaConfigurationLoaderTest extends TestCase
         $this->assertSame($expectedConfig, $actualConfig);
     }
 
-    public function configurationPathsProvider(): iterable
+    public static function configurationPathsProvider(): iterable
     {
         $config = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 

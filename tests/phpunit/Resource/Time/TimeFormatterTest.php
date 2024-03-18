@@ -60,7 +60,7 @@ final class TimeFormatterTest extends TestCase
         $this->assertSame($expectedString, $timeString);
     }
 
-    public function timeProvider(): iterable
+    public static function timeProvider(): iterable
     {
         foreach (self::secondsProvider() as $i => $set) {
             yield 'seconds#' . $i => $set;

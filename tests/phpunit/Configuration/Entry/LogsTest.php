@@ -105,7 +105,7 @@ final class LogsTest extends TestCase
         );
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         yield 'minimal' => [
             null,

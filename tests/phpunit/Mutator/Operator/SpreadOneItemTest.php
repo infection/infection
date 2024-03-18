@@ -49,7 +49,7 @@ final class SpreadOneItemTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Spread one item for a raw array' => [
             <<<'PHP'
