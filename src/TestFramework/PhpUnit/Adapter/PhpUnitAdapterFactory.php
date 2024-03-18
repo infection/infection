@@ -110,7 +110,11 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $projectDir,
                 new JUnitTestCaseSorter()
             ),
-            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, $filteredSourceFilesToMutate, $mapSourceClassToTestStrategy),
+            new ArgumentsAndOptionsBuilder(
+                $executeOnlyCoveringTestCases,
+                $filteredSourceFilesToMutate,
+                $mapSourceClassToTestStrategy
+            ),
             new VersionParser(),
             new CommandLineBuilder()
         );

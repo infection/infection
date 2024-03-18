@@ -41,4 +41,12 @@ namespace Infection\TestFramework;
 final class MapSourceClassToTestStrategy
 {
     public const SIMPLE = 'simple';
+
+    /**
+     * @return list<string>
+     */
+    public static function getAll(): array
+    {
+        return [self::SIMPLE];
+    }
 }

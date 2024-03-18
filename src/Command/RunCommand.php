@@ -64,7 +64,6 @@ use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use function is_numeric;
-use function is_string;
 use function max;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
@@ -697,7 +696,7 @@ final class RunCommand extends BaseCommand
             return MapSourceClassToTestStrategy::SIMPLE;
         }
 
-        if (is_string($inputValue) && !in_array($inputValue, [MapSourceClassToTestStrategy::SIMPLE], true)) {
+        if (!in_array($inputValue, MapSourceClassToTestStrategy::getAll(), true)) {
             throw new InvalidArgumentException(sprintf(
                 'Cannot pass "%s" to "--%s": only "%s" or no argument is supported',
                 $inputValue,
@@ -706,6 +705,6 @@ final class RunCommand extends BaseCommand
             ));
         }
 
-        return (string) $inputValue;
+        return $inputValue;
     }
 }
