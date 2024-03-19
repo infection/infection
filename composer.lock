@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8cdf52939b7918f58fceacc31011569e",
+    "content-hash": "3fe1922e709c4ab91ad45b147f4d6d31",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -2331,32 +2331,27 @@
         },
         {
             "name": "fidry/makefile",
-            "version": "0.2.1",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theofidry/makefile.git",
-                "reference": "50abe0df37018458b1ab355e56063618d5ba8d10"
+                "reference": "be5a048dcc5648d04e924facce0f85b406d731e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theofidry/makefile/zipball/50abe0df37018458b1ab355e56063618d5ba8d10",
-                "reference": "50abe0df37018458b1ab355e56063618d5ba8d10",
+                "url": "https://api.github.com/repos/theofidry/makefile/zipball/be5a048dcc5648d04e924facce0f85b406d731e4",
+                "reference": "be5a048dcc5648d04e924facce0f85b406d731e4",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.4 || ^8.0",
-                "symfony/polyfill-php80": "^1.27",
-                "symfony/polyfill-php81": "^1.27",
-                "thecodingmachine/safe": "^1.3 || ^2.0"
+                "php": "^8.1",
+                "thecodingmachine/safe": "^2.0"
             },
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.4",
                 "ergebnis/composer-normalize": "^2.28",
                 "infection/infection": "^0.26",
-                "phpspec/prophecy-phpunit": "^2.0",
-                "phpunit/phpunit": "^9.4.3",
-                "symfony/phpunit-bridge": "^6.2",
-                "webmozarts/strict-phpunit": "^7.3"
+                "phpunit/phpunit": "^10.3"
             },
             "type": "library",
             "extra": {
@@ -2389,7 +2384,7 @@
             ],
             "support": {
                 "issues": "https://github.com/theofidry/makefile/issues",
-                "source": "https://github.com/theofidry/makefile/tree/0.2.1"
+                "source": "https://github.com/theofidry/makefile/tree/1.0.1"
             },
             "funding": [
                 {
@@ -2397,7 +2392,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-12-08T10:13:52+00:00"
+            "time": "2023-10-13T23:49:14+00:00"
         },
         {
             "name": "helmich/phpunit-json-assert",
@@ -4740,30 +4735,40 @@
             "time": "2020-10-27T11:37:08+00:00"
         },
         {
-            "name": "symfony/polyfill-php81",
-            "version": "v1.27.0",
+            "name": "symfony/phpunit-bridge",
+            "version": "v5.4.26",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/polyfill-php81.git",
-                "reference": "707403074c8ea6e2edaf8794b0157a0bfa52157a"
+                "url": "https://github.com/symfony/phpunit-bridge.git",
+                "reference": "d04639b395e25efa4260fc5b12a9fa1eafb38a64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php81/zipball/707403074c8ea6e2edaf8794b0157a0bfa52157a",
-                "reference": "707403074c8ea6e2edaf8794b0157a0bfa52157a",
+                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/d04639b395e25efa4260fc5b12a9fa1eafb38a64",
+                "reference": "d04639b395e25efa4260fc5b12a9fa1eafb38a64",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1"
+                "php": ">=7.1.3",
+                "symfony/deprecation-contracts": "^2.1|^3"
             },
-            "type": "library",
+            "conflict": {
+                "phpunit/phpunit": "<7.5|9.1.2"
+            },
+            "require-dev": {
+                "symfony/error-handler": "^4.4|^5.0|^6.0"
+            },
+            "suggest": {
+                "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
+            },
+            "bin": [
+                "bin/simple-phpunit"
+            ],
+            "type": "symfony-bridge",
             "extra": {
-                "branch-alias": {
-                    "dev-main": "1.27-dev"
-                },
                 "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
+                    "name": "phpunit/phpunit",
+                    "url": "https://github.com/sebastianbergmann/phpunit"
                 }
             },
             "autoload": {
@@ -4771,10 +4776,10 @@
                     "bootstrap.php"
                 ],
                 "psr-4": {
-                    "Symfony\\Polyfill\\Php81\\": ""
+                    "Symfony\\Bridge\\PhpUnit\\": ""
                 },
-                "classmap": [
-                    "Resources/stubs"
+                "exclude-from-classmap": [
+                    "/Tests/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -4791,16 +4796,10 @@
                     "homepage": "https://symfony.com/contributors"
                 }
             ],
-            "description": "Symfony polyfill backporting some PHP 8.1+ features to lower PHP versions",
+            "description": "Provides utilities for PHPUnit, especially user deprecation notices management",
             "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "polyfill",
-                "portable",
-                "shim"
-            ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php81/tree/v1.27.0"
+                "source": "https://github.com/symfony/phpunit-bridge/tree/v5.4.26"
             },
             "funding": [
                 {
@@ -4816,7 +4815,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-11-03T14:55:06+00:00"
+            "time": "2023-07-12T15:44:31+00:00"
         },
         {
             "name": "symfony/yaml",
