@@ -110,8 +110,7 @@ return (new Config())
         'concat_space' => ['spacing' => 'one'],
         // TODO: enable back
         'fully_qualified_strict_types' => false,
-        // TODO: enable
-        'get_class_to_class_keyword' => false,
+        'get_class_to_class_keyword' => true,
         'global_namespace_import' => [
             'import_classes' => true,
             'import_constants' => true,
