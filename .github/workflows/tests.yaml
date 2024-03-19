@@ -111,7 +111,7 @@ jobs:
       - name: Run integration tests
         if: ${{ matrix.operating-system != 'windows-latest' }}
         shell: bash
-        run: SYMFONY_DEPRECATIONS_HELPER=disabled make test-unit PHPUNIT_GROUP=integration
+        run: make test-unit PHPUNIT_GROUP=integration
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
