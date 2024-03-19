@@ -49,7 +49,7 @@ final class ConcatTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Flips two concatenated variables' => [
             <<<'PHP'

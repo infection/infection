@@ -49,7 +49,7 @@ final class DocBlockParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function docBlocksProvider(): iterable
+    public static function docBlocksProvider(): iterable
     {
         yield ['', ''];
 

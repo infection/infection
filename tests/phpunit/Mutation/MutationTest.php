@@ -94,7 +94,7 @@ final class MutationTest extends TestCase
         $this->assertSame($expectedHash, $mutation->getHash());
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         $nominalAttributes = [
             'startLine' => $originalStartingLine = 3,

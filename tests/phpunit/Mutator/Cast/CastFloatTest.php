@@ -49,7 +49,7 @@ final class CastFloatTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to float' => [
             <<<'PHP'

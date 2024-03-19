@@ -49,7 +49,7 @@ final class CoalesceTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutate coalesce and flip operands' => [
             <<<'PHP'

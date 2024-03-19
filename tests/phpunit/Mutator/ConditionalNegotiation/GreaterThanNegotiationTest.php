@@ -49,7 +49,7 @@ final class GreaterThanNegotiationTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates greater than' => [
             <<<'PHP'

@@ -49,7 +49,7 @@ final class LessThanOrEqualToTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates less than or equal to' => [
             <<<'PHP'

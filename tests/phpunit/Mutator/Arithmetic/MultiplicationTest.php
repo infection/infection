@@ -49,7 +49,7 @@ final class MultiplicationTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates normal multiplication' => [
                 <<<'PHP'

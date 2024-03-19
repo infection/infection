@@ -49,7 +49,7 @@ final class LogicalOrNegationTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates or with two expressions' => [
             <<<'PHP'

@@ -49,7 +49,7 @@ final class NotIdenticalNotEqualTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates not identical operator into not equal operator with two variables' => [
             <<<'PHP'

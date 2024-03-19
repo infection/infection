@@ -278,7 +278,7 @@ final class PhpUnitAdapterTest extends TestCase
         );
     }
 
-    public function passOutputProvider(): iterable
+    public static function passOutputProvider(): iterable
     {
         yield ['OK, but incomplete, skipped, or risky tests!', true];
 
@@ -291,14 +291,14 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['No tests executed!', true];
     }
 
-    public function syntaxErrorOutputProvider(): iterable
+    public static function syntaxErrorOutputProvider(): iterable
     {
         yield ['OK, but incomplete, skipped, or risky tests!', false];
 
         yield ['ParseError: syntax error, unexpected ">"', true];
     }
 
-    public function memoryReportProvider(): iterable
+    public static function memoryReportProvider(): iterable
     {
         yield ['Memory: 8.00MB', 8.0];
 

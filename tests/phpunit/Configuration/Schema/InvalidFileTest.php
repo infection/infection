@@ -101,7 +101,7 @@ final class InvalidFileTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    public function jsonErrorProvider(): iterable
+    public static function jsonErrorProvider(): iterable
     {
         yield [
             new SchemaConfigurationFile('/path/to/config'),

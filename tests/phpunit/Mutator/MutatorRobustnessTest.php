@@ -81,11 +81,11 @@ final class MutatorRobustnessTest extends TestCase
         }
     }
 
-    public function mutatorWithCodeCaseProvider(): iterable
+    public static function mutatorWithCodeCaseProvider(): iterable
     {
         $mutatorFactory = SingletonContainer::getContainer()->getMutatorFactory();
 
-        foreach ($this->provideCodeSamples() as [$fileName, $fileContents]) {
+        foreach (self::provideCodeSamples() as [$fileName, $fileContents]) {
             foreach (ProfileList::ALL_MUTATORS as $mutatorClassName) {
                 $title = sprintf('[%s] %s', $mutatorClassName, $fileName);
 
@@ -98,7 +98,7 @@ final class MutatorRobustnessTest extends TestCase
         }
     }
 
-    private function provideCodeSamples(): iterable
+    private static function provideCodeSamples(): iterable
     {
         if (self::$files !== null) {
             yield from self::$files;

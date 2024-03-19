@@ -59,7 +59,7 @@ final class DiffSourceCodeMatcherTest extends TestCase
         $this->assertSame($expectedMatches, $matches, 'Provided regex does not match the Mutant\'s diff');
     }
 
-    public function diffRegexProvider(): Generator
+    public static function diffRegexProvider(): Generator
     {
         yield 'Method name with PublicVisibility mutator' => [
             '.*getString.*',

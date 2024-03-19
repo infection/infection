@@ -75,7 +75,7 @@ final class SourceFileCollectorTest extends TestCase
         }
     }
 
-    public function sourceFilesProvider(): iterable
+    public static function sourceFilesProvider(): iterable
     {
         yield 'empty' => [
             [],

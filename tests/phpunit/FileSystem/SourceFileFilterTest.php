@@ -128,7 +128,7 @@ final class SourceFileFilterTest extends TestCase
         $this->assertFiltersExpectedInput($filter, $filePaths, $expectedFilePaths);
     }
 
-    public function filterProvider(): iterable
+    public static function filterProvider(): iterable
     {
         yield 'empty' => ['', []];
 

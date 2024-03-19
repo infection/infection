@@ -51,7 +51,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It does not decrement an integer in a comparison' => [
             <<<'PHP'

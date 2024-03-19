@@ -911,14 +911,14 @@ XML
         );
     }
 
-    public function schemaProvider(): iterable
+    public static function schemaProvider(): iterable
     {
         yield 'remote XSD' => ['https://raw.githubusercontent.com/sebastianbergmann/phpunit/7.4.0/phpunit.xsd'];
 
         yield 'local XSD' => ['./vendor/phpunit/phpunit/phpunit.xsd'];
     }
 
-    public function invalidSchemaProvider(): iterable
+    public static function invalidSchemaProvider(): iterable
     {
         yield 'empty' => [
             '',

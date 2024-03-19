@@ -112,7 +112,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
         );
     }
 
-    public function provideRawConfig(): iterable
+    public static function provideRawConfig(): iterable
     {
         // The schema is given as a JSON here to be closer to how the user configure the schema
         yield 'minimal' => [

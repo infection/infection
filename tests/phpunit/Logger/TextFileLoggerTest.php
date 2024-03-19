@@ -73,7 +73,7 @@ final class TextFileLoggerTest extends TestCase
         string $expectedContents
     ): void {
         $logger = new TextFileLogger(
-            $this->createCompleteResultsCollector(),
+            self::createCompleteResultsCollector(),
             $debugVerbosity,
             $onlyCoveredMode,
             $debugMode
@@ -82,7 +82,7 @@ final class TextFileLoggerTest extends TestCase
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function emptyMetricsProvider(): iterable
+    public static function emptyMetricsProvider(): iterable
     {
         yield 'no debug verbosity; no debug mode' => [
             false,
@@ -269,7 +269,7 @@ TXT
         ];
     }
 
-    public function completeMetricsProvider(): iterable
+    public static function completeMetricsProvider(): iterable
     {
         yield 'no debug verbosity; no debug mode' => [
             false,

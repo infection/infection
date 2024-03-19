@@ -48,7 +48,7 @@ abstract class BaseVisitorTest extends TestCase
     /**
      * @return Node[]
      */
-    final protected function parseCode(string $code): array
+    final protected static function parseCode(string $code): array
     {
         return (array) SingletonContainer::getContainer()->getParser()->parse($code);
     }

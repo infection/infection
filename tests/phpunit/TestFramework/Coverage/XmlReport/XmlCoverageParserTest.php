@@ -156,7 +156,7 @@ XML;
         $this->assertArrayNotHasKey(11, $coverageData->getTestsLocationsBySourceLine());
     }
 
-    public function sourceFileInfoProviderProvider(): iterable
+    public static function sourceFileInfoProviderProvider(): iterable
     {
         foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
             yield [

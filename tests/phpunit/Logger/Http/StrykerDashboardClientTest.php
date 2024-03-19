@@ -115,7 +115,7 @@ EOF
         );
     }
 
-    public function provideResponseStatusCodes(): Generator
+    public static function provideResponseStatusCodes(): Generator
     {
         yield '200 OK' => [Response::HTTP_OK];
 

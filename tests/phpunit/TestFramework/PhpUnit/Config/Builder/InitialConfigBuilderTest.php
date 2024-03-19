@@ -479,7 +479,7 @@ XML
         );
     }
 
-    public function executionOrderProvider(): iterable
+    public static function executionOrderProvider(): iterable
     {
         yield 'PHPUnit 7.1.99 runs without random test order' => [
             '7.1.99',
@@ -518,7 +518,7 @@ XML
         ];
     }
 
-    public function failOnProvider(): iterable
+    public static function failOnProvider(): iterable
     {
         yield 'PHPUnit 5.1.99 runs without failOnRisky' => [
             '5.1.99',

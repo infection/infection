@@ -52,7 +52,7 @@ final class TrueValueTest extends BaseMutatorTestCase
         $this->doTest($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates true to false' => [
                 <<<'PHP'

@@ -49,7 +49,7 @@ final class LogicalLowerOrTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates logical lower or' => [
             <<<'PHP'

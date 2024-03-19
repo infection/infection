@@ -63,7 +63,7 @@ PHP;
         $parentSpyVisitor = new ParentConnectorSpyVisitor();
 
         $nodes = $this->traverse(
-            $this->parseCode(self::CODE),
+            self::parseCode(self::CODE),
             [
                 $stackSpyVisitor,
                 new ParentConnectorVisitor(),

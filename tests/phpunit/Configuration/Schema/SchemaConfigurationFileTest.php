@@ -137,7 +137,7 @@ final class SchemaConfigurationFileTest extends TestCase
         }
     }
 
-    public function invalidConfigContentsProvider(): iterable
+    public static function invalidConfigContentsProvider(): iterable
     {
         yield 'unknown path' => [
             '/nowhere',

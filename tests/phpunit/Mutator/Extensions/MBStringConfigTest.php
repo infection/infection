@@ -79,7 +79,7 @@ final class MBStringConfigTest extends TestCase
         }
     }
 
-    public function settingsProvider(): iterable
+    public static function settingsProvider(): iterable
     {
         yield 'default' => [
             [],

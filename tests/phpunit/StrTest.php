@@ -51,7 +51,7 @@ final class StrTest extends TestCase
         );
     }
 
-    public function stringProvider(): iterable
+    public static function stringProvider(): iterable
     {
         yield 'empty' => [
             '',

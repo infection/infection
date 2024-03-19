@@ -75,7 +75,7 @@ final class MemoryFormatterTest extends TestCase
         }
     }
 
-    public function bytesProvider(): iterable
+    public static function bytesProvider(): iterable
     {
         yield [0., '0.00B'];
 

@@ -198,7 +198,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         );
     }
 
-    public function providesMockSetup(): array
+    public static function providesMockSetup(): array
     {
         return [
             'composer-bat' => ['setUpComposerBatchTest'],

@@ -49,7 +49,7 @@ final class CastStringTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to string' => [
             <<<'PHP'

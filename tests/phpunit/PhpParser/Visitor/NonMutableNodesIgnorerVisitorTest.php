@@ -87,7 +87,7 @@ PHP
 
     private function parseAndTraverse(string $code): void
     {
-        $nodes = $this->parseCode($code);
+        $nodes = self::parseCode($code);
 
         $this->traverse(
             $nodes,
