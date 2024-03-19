@@ -58,7 +58,7 @@ final class PhpUnitCustomExecutablePathProvider
     public function __construct(
         private readonly TestFrameworkFinder $phpUnitExecutableFinder,
         private readonly ConsoleHelper $consoleHelper,
-        private readonly QuestionHelper $questionHelper
+        private readonly QuestionHelper $questionHelper,
     ) {
     }
 
@@ -70,7 +70,7 @@ final class PhpUnitCustomExecutablePathProvider
             $io->writeln(['']);
 
             $questionText = $this->consoleHelper->getQuestion(
-                'We did not find phpunit executable. Please provide custom absolute path'
+                'We did not find phpunit executable. Please provide custom absolute path',
             );
 
             $question = new Question($questionText);
@@ -79,7 +79,7 @@ final class PhpUnitCustomExecutablePathProvider
             return str_replace(
                 DIRECTORY_SEPARATOR,
                 '/',
-                (string) $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question)
+                (string) $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question),
             );
         }
 

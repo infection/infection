@@ -121,7 +121,7 @@ class SourceDirGuesser
                 $path,
                 function ($el) use (&$dirs): void {
                     $this->parsePath($el, $dirs);
-                }
+                },
             );
         }
 

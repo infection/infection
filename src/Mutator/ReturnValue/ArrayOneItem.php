@@ -78,7 +78,7 @@ TXT
             <<<'DIFF'
 - return $array;
 + return count($array) > 1 ? array_slice($array, 0, 1, true) : $array;
-DIFF
+DIFF,
         );
     }
 
@@ -98,7 +98,7 @@ DIFF
             new Node\Expr\Ternary(
                 new Node\Expr\BinaryOp\Greater(
                     new Node\Expr\FuncCall(new Node\Name('count'), [new Node\Arg($arrayVariable)]),
-                    new Node\Scalar\LNumber(1)
+                    new Node\Scalar\LNumber(1),
                 ),
                 new Node\Expr\FuncCall(new Node\Name('array_slice'), [
                     new Node\Arg($arrayVariable),
@@ -106,8 +106,8 @@ DIFF
                     new Node\Arg(new Node\Scalar\LNumber(1)),
                     new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
                 ]),
-                $arrayVariable
-            )
+                $arrayVariable,
+            ),
         );
     }
 

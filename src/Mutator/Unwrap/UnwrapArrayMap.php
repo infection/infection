@@ -68,7 +68,7 @@ TXT
             <<<'DIFF'
 - $x = array_map($callback, ['foo', 'bar', 'baz']);
 + $x = ['foo', 'bar', 'baz'];
-DIFF
+DIFF,
         );
     }
 

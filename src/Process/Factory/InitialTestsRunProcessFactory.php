@@ -57,7 +57,7 @@ class InitialTestsRunProcessFactory
     public function createProcess(
         string $testFrameworkExtraOptions,
         array $phpExtraOptions,
-        bool $skipCoverage
+        bool $skipCoverage,
     ): Process {
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
         $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
@@ -66,9 +66,9 @@ class InitialTestsRunProcessFactory
             command: $this->testFrameworkAdapter->getInitialTestRunCommandLine(
                 $testFrameworkExtraOptions,
                 $phpExtraOptions,
-                $skipCoverage
+                $skipCoverage,
             ),
-            timeout: null // Ignore the default timeout of 60 seconds
+            timeout: null, // Ignore the default timeout of 60 seconds
         );
     }
 }

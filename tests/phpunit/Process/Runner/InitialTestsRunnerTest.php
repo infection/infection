@@ -123,7 +123,7 @@ STR
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_map('get_class', $this->eventDispatcher->getEvents())
+            array_map('get_class', $this->eventDispatcher->getEvents()),
         );
     }
 
@@ -168,7 +168,7 @@ STR
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_map('get_class', $this->eventDispatcher->getEvents())
+            array_map('get_class', $this->eventDispatcher->getEvents()),
         );
     }
 

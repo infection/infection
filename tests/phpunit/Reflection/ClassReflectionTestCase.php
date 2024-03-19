@@ -49,7 +49,7 @@ abstract class ClassReflectionTestCase extends TestCase
         ClassReflection $reflection,
         string $method,
         Visibility $visibility,
-        bool $hasParent
+        bool $hasParent,
     ): void {
         $this->assertSame($hasParent, $reflection->hasParentMethodWithVisibility($method, $visibility));
     }

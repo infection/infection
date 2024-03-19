@@ -53,7 +53,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactory implements Subs
             ? new NullSubscriber()
             : new CleanUpAfterMutationTestingFinishedSubscriber(
                 $this->fileSystem,
-                $this->tmpDir
+                $this->tmpDir,
             )
         ;
     }

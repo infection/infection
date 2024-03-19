@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = substr('abcde', 0, -1);
 + $x = 'abcde';
-DIFF
+DIFF,
         );
     }
 

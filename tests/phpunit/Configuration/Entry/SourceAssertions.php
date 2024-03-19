@@ -42,7 +42,7 @@ trait SourceAssertions
     private function assertSourceStateIs(
         Source $source,
         array $expectedDirectories,
-        array $expectedExcludes
+        array $expectedExcludes,
     ): void {
         $this->assertSame($expectedDirectories, $source->getDirectories());
         $this->assertSame($expectedExcludes, $source->getExcludes());

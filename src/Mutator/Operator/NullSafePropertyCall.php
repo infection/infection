@@ -62,7 +62,7 @@ TXT
             <<<'DIFF'
 - $object?->property;
 + $object->property;
-DIFF
+DIFF,
         );
     }
 

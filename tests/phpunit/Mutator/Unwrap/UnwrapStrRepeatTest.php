@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = 'Hello!';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of str_repeat' => [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a = 'Hello!';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -110,7 +110,7 @@ $a = 'Hello!';
 if ($a === $b) {
     return true;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when str_repeat is wrongly capitalized' => [
@@ -124,7 +124,7 @@ PHP
 <?php
 
 $a = 'Hello!';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when str_repeat uses other functions as input' => [
@@ -141,7 +141,7 @@ PHP
 <?php
 
 $a = $foo->bar();
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -159,7 +159,7 @@ PHP
 $a = array_map(function ($b) {
     return $b;
 }, ['A', 'B']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other str_ calls' => [
@@ -167,7 +167,7 @@ PHP
 <?php
 
 $a = str_pad('Hello!', 8, '!');
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named str_repeat' => [
@@ -177,7 +177,7 @@ PHP
 function str_repeat($input, $multiplier)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [

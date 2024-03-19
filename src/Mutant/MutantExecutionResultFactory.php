@@ -74,7 +74,7 @@ class MutantExecutionResultFactory
             $mutation->getOriginalEndFilePosition(),
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
-            $mutant->getTests()
+            $mutant->getTests(),
         );
     }
 
@@ -84,8 +84,8 @@ class MutantExecutionResultFactory
             $process->isTerminated(),
             sprintf(
                 'Cannot retrieve a non-terminated process output. Got "%s"',
-                $process->getStatus()
-            )
+                $process->getStatus(),
+            ),
         );
 
         return $process->getOutput();

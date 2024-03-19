@@ -63,8 +63,8 @@ abstract class AllowedFunctionsConfig
                 $enabled,
                 sprintf(
                     'Expected the value for "%s" to be a boolean. Got "%%s" instead',
-                    $functionName
-                )
+                    $functionName,
+                ),
             );
             Assert::oneOf($functionName, $knownFunctions);
 

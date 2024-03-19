@@ -49,7 +49,7 @@ final class UnparsableFileTest extends TestCase
 
         $this->assertSame(
             'Could not parse the file "/path/to/file". Check if it is a valid PHP file',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertSame($previous, $exception->getPrevious());

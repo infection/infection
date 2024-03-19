@@ -51,7 +51,7 @@ class Logs
         private readonly ?string $perMutatorFilePath,
         private bool $useGitHubAnnotationsLogger,
         private readonly ?StrykerConfig $strykerConfig,
-        private readonly ?string $summaryJsonLogFilePath
+        private readonly ?string $summaryJsonLogFilePath,
     ) {
     }
 
@@ -67,7 +67,7 @@ class Logs
             null,
             false,
             null,
-            null
+            null,
         );
     }
 

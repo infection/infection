@@ -100,7 +100,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter->limitMemory(
             '',
-            new FakeAwareAdapter(10)
+            new FakeAwareAdapter(10),
         );
     }
 
@@ -109,7 +109,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
      */
     public function test_it_applies_memory_limit_if_possible(
         float $memoryLimit,
-        float $expectedLimit
+        float $expectedLimit,
     ): void {
         $filename = $this->tmp . '/fake-ini' . microtime() . '.ini';
 
@@ -124,7 +124,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
             ->method('appendToFile')
             ->with(
                 $filename,
-                PHP_EOL . sprintf('memory_limit = %dM', $expectedLimit)
+                PHP_EOL . sprintf('memory_limit = %dM', $expectedLimit),
             );
 
         $this->configureEnvironmentToBeCalledOnce();

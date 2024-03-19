@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = str_shuffle('Hello!');
 + $x = 'Hello!';
-DIFF
+DIFF,
         );
     }
 

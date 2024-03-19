@@ -57,7 +57,7 @@ final class FileOrDirectoryNotFound extends RuntimeException
             $file,
             $roots === []
                 ? ''
-                : sprintf(' in "%s"', implode('", "', $roots))
+                : sprintf(' in "%s"', implode('", "', $roots)),
         ));
     }
 
@@ -72,8 +72,8 @@ final class FileOrDirectoryNotFound extends RuntimeException
             sprintf(
                 'The path "%s" does not contain any of the requested files: "%s"',
                 $path,
-                implode('", "', $files)
-            )
+                implode('", "', $files),
+            ),
         );
     }
 
@@ -94,8 +94,8 @@ final class FileOrDirectoryNotFound extends RuntimeException
                     implode('", "', $files),
                     $roots === []
                         ? ''
-                        : sprintf(' in "%s"', implode('", "', $roots))
-                )
+                        : sprintf(' in "%s"', implode('", "', $roots)),
+                ),
         );
     }
 }

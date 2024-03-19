@@ -46,7 +46,7 @@ final class MinMsiCheckFailedTest extends TestCase
 
         $this->assertSame(
             'The minimum required MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -56,7 +56,7 @@ final class MinMsiCheckFailedTest extends TestCase
 
         $this->assertSame(
             'The minimum required Covered Code MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 }

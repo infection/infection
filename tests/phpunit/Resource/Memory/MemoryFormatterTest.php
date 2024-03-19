@@ -70,7 +70,7 @@ final class MemoryFormatterTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected a positive or null amount of bytes. Got: -1',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

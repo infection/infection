@@ -59,7 +59,7 @@ final class Division implements Mutator
             <<<'DIFF'
 - $a = $b / $c;
 + $a = $b * $c;
-DIFF
+DIFF,
         );
     }
 

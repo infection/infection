@@ -82,7 +82,7 @@ TXT
 # Mutation 2
 + preg_match('/^test$/g', $string);
 
-DIFF
+DIFF,
         );
     }
 

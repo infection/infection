@@ -53,7 +53,7 @@ final class CastInt extends AbstractCastMutator
             <<<'DIFF'
 - $a = (int) $value;
 + $a = $value;
-DIFF
+DIFF,
         );
     }
 

@@ -104,7 +104,7 @@ TXT
 + $x = [0, 2];
 # Mutation 3
 + $x = [0, 1];
-DIFF
+DIFF,
         );
     }
 
@@ -167,7 +167,7 @@ DIFF
             default => range(
                 0,
                 min(count($items),
-                    $this->config->getLimit()) - 1
+                    $this->config->getLimit()) - 1,
             ),
         };
     }

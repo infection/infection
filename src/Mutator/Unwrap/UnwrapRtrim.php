@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = rtrim('Hello! ');
 + $x = 'Hello! ';
-DIFF
+DIFF,
         );
     }
 

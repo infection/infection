@@ -87,8 +87,8 @@ final class ProjectCodeTest extends TestCase
                     . ' or add it to %s::NON_TESTED_CONCRETE_CLASSES',
                     $testClassName,
                     $className,
-                    ProjectCodeProvider::class
-                )
+                    ProjectCodeProvider::class,
+                ),
             );
 
             return;
@@ -101,14 +101,14 @@ final class ProjectCodeTest extends TestCase
                 . 'tested concrete classes in %s::NON_TESTED_CONCRETE_CLASSES',
                 $className,
                 $testClassName,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
 
         $this->markTestSkipped(sprintf(
             'No test found for "%s". You can improve this by adding the test "%s".',
             $className,
-            $testClassName
+            $testClassName,
         ));
     }
 
@@ -127,8 +127,8 @@ final class ProjectCodeTest extends TestCase
                     sprintf(
                         'The "%s" class is an extension point, but does not have a PHP '
                         . 'doc-block or an empty one. Consider adding one to improve usability.',
-                        $className
-                    )
+                        $className,
+                    ),
                 );
             }
 
@@ -139,8 +139,8 @@ final class ProjectCodeTest extends TestCase
                     'The "%s" class is marked as an extension point in %s::EXTENSION_POINTS'
                     . '; It should either not be tagged as "@internal" or not be listed there.',
                     $className,
-                    ProjectCodeProvider::class
-                )
+                    ProjectCodeProvider::class,
+                ),
             );
 
             return;
@@ -153,8 +153,8 @@ final class ProjectCodeTest extends TestCase
                 'The "%s" class is not an extension point: it should be marked as internal'
                 . ' or listed as an extension point in %s::EXTENSION_POINTS.',
                 $className,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
     }
 
@@ -167,8 +167,8 @@ final class ProjectCodeTest extends TestCase
 
         $tagsAsKeys = array_flip(
             SingletonContainer::getPHPDocParser()->parse(
-                (string) $reflectionClass->getDocComment()
-            )
+                (string) $reflectionClass->getDocComment(),
+            ),
         );
 
         $pass = $reflectionClass->isTrait()
@@ -185,8 +185,8 @@ final class ProjectCodeTest extends TestCase
                     'The class "%s" is registered to "%s::NON_FINAL_EXTENSION_CLASSES but '
                     . 'this should not be necessary.',
                     $className,
-                    ProjectCodeProvider::class
-                )
+                    ProjectCodeProvider::class,
+                ),
             );
         } else {
             $this->assertTrue(
@@ -196,8 +196,8 @@ final class ProjectCodeTest extends TestCase
                     . 'class. Either fix it or if it is an extension point, add it to '
                     . '%s::NON_FINAL_EXTENSION_CLASSES.',
                     $className,
-                    ProjectCodeProvider::class
-                )
+                    ProjectCodeProvider::class,
+                ),
             );
         }
     }
@@ -220,8 +220,8 @@ final class ProjectCodeTest extends TestCase
                 sprintf(
                     'The "%s" class must have exactly 1 public property as it is a streamwrapper. ' .
                     'If this has changed due to recent PHP developments, consider updating this test.',
-                    $className
-                )
+                    $className,
+                ),
             );
 
             $this->assertSame(
@@ -230,8 +230,8 @@ final class ProjectCodeTest extends TestCase
                 sprintf(
                     'The "%s" class must have exactly 1 public property named "context". ' .
                     'If this has changed due to recent PHP developments, consider updating this test.',
-                    $className
-                )
+                    $className,
+                ),
             );
 
             return;
@@ -245,15 +245,15 @@ final class ProjectCodeTest extends TestCase
                 return sprintf(
                     '%s#%s',
                     $reflectionProperty->getDeclaringClass()->getName(),
-                    $reflectionProperty->getName()
+                    $reflectionProperty->getName(),
                 );
             },
             array_filter(
                 $properties,
                 static function (ReflectionProperty $property) use ($className): bool {
                     return $property->class === $className;
-                }
-            )
+                },
+            ),
         );
 
         $this->assertSame(
@@ -262,8 +262,8 @@ final class ProjectCodeTest extends TestCase
             sprintf(
                 'The class "%s" should not have any public properties declared. If it has '
                 . 'properties that needs to be accessed, getters should be used instead.',
-                $className
-            )
+                $className,
+            ),
         );
     }
 
@@ -280,8 +280,8 @@ final class ProjectCodeTest extends TestCase
             || $reflectionClass->isFinal(),
             sprintf(
                 'The test class "%s" should be a trait, an abstract or final class.',
-                $className
-            )
+                $className,
+            ),
         );
     }
 }

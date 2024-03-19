@@ -74,7 +74,7 @@ final class EnvTestCasesProvider
             static function (string $className): ?array {
                 return self::envTestCaseTuple($className);
             },
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true)
+            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
         )));
 
         yield from self::$envTestCaseClassesTuple;

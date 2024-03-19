@@ -70,7 +70,7 @@ TXT
             <<<'DIFF'
 - preg_match('/^test$/', $string);
 + preg_match('/^test/', $string);
-DIFF
+DIFF,
         );
     }
 

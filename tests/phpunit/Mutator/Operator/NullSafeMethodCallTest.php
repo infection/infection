@@ -67,7 +67,7 @@ PHP
 <?php
 
 $class->getName();
-PHP
+PHP,
         ];
 
         yield 'Mutate nullsafe method call only' => [
@@ -81,7 +81,7 @@ PHP
 <?php
 
 $class->getName()?->property;
-PHP
+PHP,
         ];
 
         yield 'Mutate chain of nullsafe method calls' => [
@@ -101,7 +101,7 @@ PHP,
 <?php
 
 $class?->getObject()->getName();
-PHP
+PHP,
                 ],
         ];
 
@@ -128,7 +128,7 @@ PHP,
 <?php
 
 $class->{$methodCall}();
-PHP
+PHP,
         ];
     }
 }

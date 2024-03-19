@@ -74,7 +74,7 @@
     },
     "require-dev": {
         "ext-simplexml": "*",
-        "fidry/makefile": "^1.0.1",
+        "fidry/makefile": "^1.0",
         "helmich/phpunit-json-assert": "^3.0",
         "phpspec/prophecy": "^1.15",
         "phpspec/prophecy-phpunit": "^2.0",

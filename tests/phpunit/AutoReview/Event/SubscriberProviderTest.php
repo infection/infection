@@ -59,8 +59,8 @@ final class SubscriberProviderTest extends TestCase
                 'The "%s" class was expected to be an event subscriber, but it is not a ' .
                 '"%s".',
                 $className,
-                EventSubscriber::class
-            )
+                EventSubscriber::class,
+            ),
         );
     }
 }

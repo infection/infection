@@ -58,7 +58,7 @@ final class IgnoreConfigTest extends TestCase
         array $ignored,
         string $class,
         string $method,
-        ?int $lineNumber
+        ?int $lineNumber,
     ): void {
         $config = new IgnoreConfig($ignored);
 
@@ -72,7 +72,7 @@ final class IgnoreConfigTest extends TestCase
         array $ignored,
         string $class,
         string $method,
-        ?int $lineNumber
+        ?int $lineNumber,
     ): void {
         $config = new IgnoreConfig($ignored);
 

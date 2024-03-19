@@ -63,7 +63,7 @@ PHP
 <?php
 
 isset($b) ? 'C' : 'B';
-PHP
+PHP,
         ];
 
         yield 'Mutates ternary expression without values in the if condition' => [
@@ -79,7 +79,7 @@ PHP
 
 $foo = 'foo';
 $foo ? 'bar' : $foo;
-PHP
+PHP,
         ];
 
         if (PHP_VERSION_ID < 80000) {
@@ -101,7 +101,7 @@ PHP
 <?php
 
 (true ? 'true' : false) ? 'f' : 't';
-PHP
+PHP,
                 ],
             ];
 
@@ -123,7 +123,7 @@ PHP
 <?php
 
 (true ?: false) ? 'f' : (true ?: false);
-PHP
+PHP,
                 ],
             ];
 
@@ -145,7 +145,7 @@ PHP
 <?php
 
 (true ? 'true' : false) ? 'f' : 't';
-PHP
+PHP,
                 ],
             ];
 
@@ -167,7 +167,7 @@ PHP
 <?php
 
 (true ?: false) ? 'f' : 't';
-PHP
+PHP,
                 ],
             ];
         }

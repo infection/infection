@@ -88,9 +88,9 @@ abstract class FileSystemTestCase extends TestCase
                     '%s/%s/%s',
                     realpath(sys_get_temp_dir()),
                     self::TMP_DIR_NAME,
-                    $testToken === false || $testToken === '' ? '1' : $testToken
-                )
-            )
+                    $testToken === false || $testToken === '' ? '1' : $testToken,
+                ),
+            ),
         );
     }
 }

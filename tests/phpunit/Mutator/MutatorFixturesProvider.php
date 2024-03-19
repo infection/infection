@@ -63,7 +63,7 @@ final class MutatorFixturesProvider
         return file_get_contents(sprintf(
             '%s/%s',
             self::getTestCaseFixtureDir($class),
-            $file
+            $file,
         ));
     }
 
@@ -81,7 +81,7 @@ final class MutatorFixturesProvider
         return self::$testCaseFixtureDirMapping[$testCaseClass] = Path::canonicalize(sprintf(
             '%s/%s',
             self::MUTATOR_FIXTURES_DIR,
-            substr(end($testCaseClassParts), 0, -4)
+            substr(end($testCaseClassParts), 0, -4),
         ));
     }
 }

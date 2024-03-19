@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = array_chunk($array, 2);
 + $x = $array;
-DIFF
+DIFF,
         );
     }
 

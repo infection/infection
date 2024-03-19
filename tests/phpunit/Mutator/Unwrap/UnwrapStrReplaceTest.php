@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = 'Good Afternoon!';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of str_replace' => [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a = 'Good Afternoon!';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -110,7 +110,7 @@ $a = 'Good Afternoon!';
 if ($a === $a) {
     return true;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when str_replace is wrongly capitalized' => [
@@ -124,7 +124,7 @@ PHP
 <?php
 
 $a = 'Good Afternoon!';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when str_replace uses another function as input' => [
@@ -138,7 +138,7 @@ PHP
 <?php
 
 $a = $foo->bar();
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -156,7 +156,7 @@ PHP
 $a = array_reduce($words, function (string $carry, string $item) {
     return $carry . substr($item, 0, 1);
 });
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other str_ calls' => [
@@ -164,7 +164,7 @@ PHP
 <?php
 
 $a = str_ireplace('Afternoon', 'Evening' ,'Good Afternoon!');
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named str_replace' => [
@@ -174,7 +174,7 @@ PHP
 function str_replace($search , $replace , $subject , int &$count = null)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [

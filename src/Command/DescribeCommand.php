@@ -67,14 +67,14 @@ final class DescribeCommand extends BaseCommand
             $question = new Question('What mutator do you wish to describe?');
             $question->setAutocompleterValues(array_keys(ProfileList::ALL_MUTATORS));
             $mutator = $io->askQuestion(
-                $question
+                $question,
             );
         }
 
         if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)) {
             $io->error(sprintf(
                 '"The %s mutator does not exist"',
-                $mutator
+                $mutator,
             ));
 
             return false;
@@ -90,7 +90,7 @@ final class DescribeCommand extends BaseCommand
         if ($definition === null) {
             $io->error(sprintf(
                 'Mutator "%s" does not have a definition',
-                $mutator
+                $mutator,
             ));
 
             return false;
@@ -108,7 +108,7 @@ final class DescribeCommand extends BaseCommand
                 '',
                 'For example:',
                 $diffColorizer->colorize($diff),
-            ]
+            ],
         );
 
         $remedy = $definition->getRemedies();

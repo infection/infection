@@ -62,7 +62,7 @@ final class InvalidSchema extends UnexpectedValueException
             $config->getPath(),
             $errors === []
                 ? '.'
-                : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
+                : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors),
         ));
     }
 }

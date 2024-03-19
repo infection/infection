@@ -62,7 +62,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--configuration',
                 $configPath,
             ],
-            $this->builder->buildForInitialTestsRun($configPath, '')
+            $this->builder->buildForInitialTestsRun($configPath, ''),
         );
     }
 
@@ -77,7 +77,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--verbose',
                 '--debug',
             ],
-            $this->builder->buildForInitialTestsRun($configPath, '--verbose --debug')
+            $this->builder->buildForInitialTestsRun($configPath, '--verbose --debug'),
         );
     }
 
@@ -91,7 +91,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 $configPath,
                 '--path=/a path/with spaces',
             ],
-            $this->builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces')
+            $this->builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces'),
         );
     }
 
@@ -122,10 +122,10 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--path=/a path/with spaces',
                 array_map(
                     static fn (string $testCase): TestLocation => TestLocation::forTestMethod($testCase),
-                    $testCases
+                    $testCases,
                 ),
-                $phpUnitVersion
-            )
+                $phpUnitVersion,
+            ),
         );
     }
 

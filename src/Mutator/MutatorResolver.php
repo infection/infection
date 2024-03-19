@@ -96,7 +96,7 @@ final class MutatorResolver
                 self::registerFromProfile(
                     $mutatorOrProfile,
                     $resolvedSettings,
-                    $mutators
+                    $mutators,
                 );
 
                 continue;
@@ -106,7 +106,7 @@ final class MutatorResolver
                 self::registerFromName(
                     $mutatorOrProfile,
                     $resolvedSettings,
-                    $mutators
+                    $mutators,
                 );
 
                 continue;
@@ -114,7 +114,7 @@ final class MutatorResolver
 
             throw new InvalidArgumentException(sprintf(
                 'The profile or mutator "%s" was not recognized.',
-                $mutatorOrProfile
+                $mutatorOrProfile,
             ));
         }
 
@@ -159,7 +159,7 @@ final class MutatorResolver
     private static function registerFromProfile(
         string $profile,
         array|bool $settings,
-        array &$mutators
+        array &$mutators,
     ): void {
         foreach (ProfileList::ALL_PROFILES[$profile] as $mutatorOrProfile) {
             // A profile may refer to another collection of profiles
@@ -167,7 +167,7 @@ final class MutatorResolver
                 self::registerFromProfile(
                     $mutatorOrProfile,
                     $settings,
-                    $mutators
+                    $mutators,
                 );
 
                 continue;
@@ -177,7 +177,7 @@ final class MutatorResolver
                 self::registerFromClass(
                     $mutatorOrProfile,
                     $settings,
-                    $mutators
+                    $mutators,
                 );
 
                 continue;
@@ -187,7 +187,7 @@ final class MutatorResolver
                 'The "%s" profile contains the "%s" mutator which was '
                 . 'not recognized.',
                 $profile,
-                $mutatorOrProfile
+                $mutatorOrProfile,
             ));
         }
     }
@@ -199,19 +199,19 @@ final class MutatorResolver
     private static function registerFromName(
         string $mutator,
         array|bool $settings,
-        array &$mutators
+        array &$mutators,
     ): void {
         if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)) {
             throw new InvalidArgumentException(sprintf(
                 'The "%s" mutator/profile was not recognized.',
-                $mutator
+                $mutator,
             ));
         }
 
         self::registerFromClass(
             ProfileList::ALL_MUTATORS[$mutator],
             $settings,
-            $mutators
+            $mutators,
         );
     }
 
@@ -222,7 +222,7 @@ final class MutatorResolver
     private static function registerFromClass(
         string $mutatorClassName,
         array|bool $settings,
-        array &$mutators
+        array &$mutators,
     ): void {
         if ($settings === false) {
             unset($mutators[$mutatorClassName]);

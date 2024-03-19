@@ -71,7 +71,7 @@ final class NoopMutatorTest extends TestCase
         } catch (DomainException $exception) {
             $this->assertSame(
                 'The class "Infection\Mutator\NoopMutator" does not have a definition',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -123,7 +123,7 @@ final class NoopMutatorTest extends TestCase
 
         $this->assertSame(
             MutatorName::getName(Plus::class),
-            $ignoreMutator->getName()
+            $ignoreMutator->getName(),
         );
     }
 }

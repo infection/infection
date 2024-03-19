@@ -67,7 +67,7 @@ foreach ($collection as $item) {
 +       continue;
     }
 }
-DIFF
+DIFF,
         );
     }
 

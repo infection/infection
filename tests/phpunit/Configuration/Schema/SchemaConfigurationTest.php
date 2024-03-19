@@ -61,7 +61,7 @@ final class SchemaConfigurationTest extends TestCase
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkExtraOptions
+        ?string $testFrameworkExtraOptions,
     ): void {
         $config = new SchemaConfiguration(
             $path,
@@ -77,7 +77,7 @@ final class SchemaConfigurationTest extends TestCase
             $testFramework,
             $bootstrap,
             $initialTestsPhpOptions,
-            $testFrameworkExtraOptions
+            $testFrameworkExtraOptions,
         );
 
         $this->assertSame($path, $config->getFile());
@@ -129,7 +129,7 @@ final class SchemaConfigurationTest extends TestCase
                 'mutator.log',
                 true,
                 StrykerConfig::forFullReport('master'),
-                'summary.json'
+                'summary.json',
             ),
             'path/to/tmp',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),

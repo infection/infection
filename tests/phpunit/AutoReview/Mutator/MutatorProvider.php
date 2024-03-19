@@ -78,7 +78,7 @@ final class MutatorProvider
         if (self::$mutatorClasses === null) {
             self::$mutatorClasses = array_column(
                 iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
-                1
+                1,
             );
         }
 
@@ -89,7 +89,7 @@ final class MutatorProvider
     {
         if (self::$concreteMutatorClasses === null) {
             self::$concreteMutatorClasses = ConcreteClassReflector::filterByConcreteClasses(
-                iterator_to_array(self::provideMutatorClasses(), false)
+                iterator_to_array(self::provideMutatorClasses(), false),
             );
         }
 

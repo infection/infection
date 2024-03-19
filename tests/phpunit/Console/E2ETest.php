@@ -370,7 +370,7 @@ Unexpected exit code. Command output was:
 $outputText
 --- end of output
 
-EOF
+EOF,
         );
 
         return $outputText;

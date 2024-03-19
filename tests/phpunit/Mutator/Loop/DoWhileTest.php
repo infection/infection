@@ -64,7 +64,7 @@ PHP
 
 do {
 } while (false);
-PHP
+PHP,
         ];
 
         yield 'It mutates expression part from variable to false' => [
@@ -82,7 +82,7 @@ PHP
 do {
     $condition = true;
 } while (false);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate expression part in while loop to false' => [
@@ -91,7 +91,7 @@ PHP
 
 while (true) {
 }
-PHP
+PHP,
         ];
     }
 }

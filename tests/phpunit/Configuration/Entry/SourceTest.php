@@ -52,7 +52,7 @@ final class SourceTest extends TestCase
         $this->assertSourceStateIs(
             $source,
             $directories,
-            $excludes
+            $excludes,
         );
     }
 

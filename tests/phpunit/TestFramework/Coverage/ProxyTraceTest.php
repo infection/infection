@@ -140,9 +140,9 @@ final class ProxyTraceTest extends TestCase
             [
                 '__construct' => new SourceMethodLineRange(
                     19,
-                    22
+                    22,
                 ),
-            ]
+            ],
         );
 
         $trace = new ProxyTrace($fileInfoMock, now($tests));
@@ -154,16 +154,16 @@ final class ProxyTraceTest extends TestCase
             0,
             [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(1, 1),
-                false
-            )]
+                false,
+            )],
         );
 
         $this->assertCount(
             1,
             [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(20, 21),
-                false
-            )]
+                false,
+            )],
         );
 
         // This iterator_to_array is due to bug in our version of PHPUnit
@@ -171,16 +171,16 @@ final class ProxyTraceTest extends TestCase
             0,
             [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(1, 1),
-                true
-            )]
+                true,
+            )],
         );
 
         $this->assertCount(
             1,
             [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(19, 19),
-                true
-            )]
+                true,
+            )],
         );
     }
 }

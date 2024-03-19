@@ -71,7 +71,7 @@ final class ConsoleLoggerTest extends TestCase
     public function test_the_log_level_is_added_to_the_message(
         string $logLevel,
         int $outputVerbosity,
-        bool $outputsMessage
+        bool $outputsMessage,
     ): void {
         $output = new BufferedOutput($outputVerbosity);
 
@@ -96,12 +96,12 @@ final class ConsoleLoggerTest extends TestCase
                 'foo' => 'oof',
                 'bar' => 'rab',
                 'baz' => 'zab',
-            ]
+            ],
         );
 
         $this->assertSame(
             '[error] oof rab baz' . PHP_EOL,
-            $output->fetch()
+            $output->fetch(),
         );
     }
 
@@ -117,12 +117,12 @@ final class ConsoleLoggerTest extends TestCase
         $logger->log(
             LogLevel::ERROR,
             '{value}',
-            ['value' => $value]
+            ['value' => $value],
         );
 
         $this->assertSame(
             '[error] ' . $expected . PHP_EOL,
-            $output->fetch()
+            $output->fetch(),
         );
     }
 
@@ -142,7 +142,7 @@ final class ConsoleLoggerTest extends TestCase
 
 TXT
             ,
-            normalize_trailing_spaces($output->fetch())
+            normalize_trailing_spaces($output->fetch()),
         );
 
         $logger->log(LogLevel::WARNING, 'message', ['block' => true]);
@@ -154,7 +154,7 @@ TXT
 
 TXT
             ,
-            normalize_trailing_spaces($output->fetch())
+            normalize_trailing_spaces($output->fetch()),
         );
 
         $logger->log(LogLevel::ERROR, 'message', ['block' => true]);
@@ -166,7 +166,7 @@ TXT
 
 TXT
             ,
-            normalize_trailing_spaces($output->fetch())
+            normalize_trailing_spaces($output->fetch()),
         );
     }
 
@@ -187,7 +187,7 @@ TXT
         yield 'datetime' => [
             UnsafeDateTimeImmutable::createFromFormat(
                 DateTime::ATOM,
-                '2020-04-26T07:32:25+00:00'
+                '2020-04-26T07:32:25+00:00',
             ),
             '2020-04-26T07:32:25+00:00',
         ];

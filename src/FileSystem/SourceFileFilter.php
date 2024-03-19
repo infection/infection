@@ -62,7 +62,7 @@ class SourceFileFilter implements FileFilter
     {
         $this->filters = array_filter(array_map(
             'trim',
-            explode(',', $filter)
+            explode(',', $filter),
         ));
     }
 
@@ -86,7 +86,7 @@ class SourceFileFilter implements FileFilter
             $iterator = new RealPathFilterIterator(
                 $iterator,
                 $this->filters,
-                []
+                [],
             );
         }
 

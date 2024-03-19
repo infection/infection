@@ -105,7 +105,7 @@ class FileLoggerFactory
             $filePath,
             $this->filesystem,
             $lineLogger,
-            $this->logger
+            $this->logger,
         );
     }
 
@@ -115,7 +115,7 @@ class FileLoggerFactory
             $this->resultsCollector,
             $this->logVerbosity === LogVerbosity::DEBUG,
             $this->onlyCoveredCode,
-            $this->debugMode
+            $this->debugMode,
         );
     }
 
@@ -136,7 +136,7 @@ class FileLoggerFactory
         return new JsonLogger(
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->onlyCoveredCode
+            $this->onlyCoveredCode,
         );
     }
 
@@ -155,7 +155,7 @@ class FileLoggerFactory
         return new DebugFileLogger(
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->onlyCoveredCode
+            $this->onlyCoveredCode,
         );
     }
 
@@ -163,7 +163,7 @@ class FileLoggerFactory
     {
         return new PerMutatorLogger(
             $this->metricsCalculator,
-            $this->resultsCollector
+            $this->resultsCollector,
         );
     }
 

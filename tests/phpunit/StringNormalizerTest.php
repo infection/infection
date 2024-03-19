@@ -64,7 +64,7 @@ TXT
             <<<'TXT'
 
 
-TXT
+TXT,
         ];
 
         yield 'text' => ['foo', 'foo'];
@@ -84,7 +84,7 @@ TXT
  foo
  bar
 
-TXT
+TXT,
         ];
     }
 }

@@ -71,7 +71,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         if ($extraOptions !== '') {
             $options = array_merge(
                 $options,
-                array_map(static fn ($option): string => '--' . $option, explode(' --', ltrim($extraOptions, '-')))
+                array_map(static fn ($option): string => '--' . $option, explode(' --', ltrim($extraOptions, '-'))),
             );
         }
 

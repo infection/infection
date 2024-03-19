@@ -60,7 +60,7 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTestCase
             [
                 new FullyQualifiedClassNameVisitor(),
                 $spyVisitor,
-            ]
+            ],
         );
 
         $actual = array_map(
@@ -70,7 +70,7 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTestCase
                     (string) FullyQualifiedClassNameManipulator::getFqcn($node),
                 ];
             },
-            $spyVisitor->getCollectedNodes()
+            $spyVisitor->getCollectedNodes(),
         );
 
         $this->assertSame($expected, $actual);

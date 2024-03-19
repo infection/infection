@@ -67,7 +67,7 @@ function test()
     $className = 'SimpleClass';
     $instance = new $className();
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate with not nullable return typehint' => [
@@ -94,7 +94,7 @@ class Test
         return null;
     }
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when scalar return typehint does not allow null' => [

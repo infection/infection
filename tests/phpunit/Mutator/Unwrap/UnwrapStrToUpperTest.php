@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = 'infection';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of strtoupper' => [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a = 'infection';
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other strto calls' => [
@@ -98,7 +98,7 @@ PHP
 <?php
 
 $a = strtolower('INFECTION');
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named strtoupper' => [
@@ -108,7 +108,7 @@ PHP
 function strtoupper($text)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -128,7 +128,7 @@ $a = 'infection';
 if ($a === $a) {
     return true;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when strtoupper is wrongly capitalized' => [
@@ -142,7 +142,7 @@ PHP
 <?php
 
 $a = 'infection';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when strtoupper uses another function as input' => [
@@ -156,7 +156,7 @@ PHP
 <?php
 
 $a = $foo->bar();
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -170,7 +170,7 @@ PHP
 <?php
 
 $a = array_map('strtoupper', 'infection');
-PHP
+PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [

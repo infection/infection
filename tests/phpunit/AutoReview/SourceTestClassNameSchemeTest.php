@@ -43,7 +43,7 @@ final class SourceTestClassNameSchemeTest extends TestCase
     {
         $this->assertSame(
             'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Tests\Acme\FooTest')
+            SourceTestClassNameScheme::getSourceClassName('Infection\Tests\Acme\FooTest'),
         );
     }
 
@@ -51,7 +51,7 @@ final class SourceTestClassNameSchemeTest extends TestCase
     {
         $this->assertSame(
             'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Acme\Foo')
+            SourceTestClassNameScheme::getSourceClassName('Infection\Acme\Foo'),
         );
     }
 
@@ -59,7 +59,7 @@ final class SourceTestClassNameSchemeTest extends TestCase
     {
         $this->assertSame(
             'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo')
+            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo'),
         );
     }
 
@@ -67,7 +67,7 @@ final class SourceTestClassNameSchemeTest extends TestCase
     {
         $this->assertSame(
             'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo')
+            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo'),
         );
     }
 }

@@ -63,7 +63,7 @@ final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
                     // Also a class-like name is an Identifier so it needs to be casted to string to
                     // be usable as a name
                     ? Node\Name\FullyQualified::concat($this->namespace, $node->name->toString())
-                    : null
+                    : null,
             );
         }
 

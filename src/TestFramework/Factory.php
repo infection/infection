@@ -75,7 +75,7 @@ final class Factory
             return PhpUnitAdapterFactory::create(
                 $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
-                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
+                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
                 ),
                 $this->tmpDir,
                 $phpUnitConfigPath,
@@ -85,7 +85,7 @@ final class Factory
                 $this->infectionConfig->getSourceDirectories(),
                 $skipCoverage,
                 $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
-                $filteredSourceFilesToMutate
+                $filteredSourceFilesToMutate,
             );
         }
 
@@ -95,7 +95,7 @@ final class Factory
             return PestAdapterFactory::create(
                 $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PEST,
-                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
+                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
                 ),
                 $this->tmpDir,
                 $pestConfigPath,
@@ -105,7 +105,7 @@ final class Factory
                 $this->infectionConfig->getSourceDirectories(),
                 $skipCoverage,
                 $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
-                $filteredSourceFilesToMutate
+                $filteredSourceFilesToMutate,
             );
         }
 
@@ -131,7 +131,7 @@ final class Factory
                     $this->jUnitFilePath,
                     $this->projectDir,
                     $this->infectionConfig->getSourceDirectories(),
-                    $skipCoverage
+                    $skipCoverage,
                 );
             }
         }
@@ -139,7 +139,7 @@ final class Factory
         throw new InvalidArgumentException(sprintf(
             'Invalid name of test framework "%s". Available names are: %s',
             $adapterName,
-            implode(', ', $availableTestFrameworks)
+            implode(', ', $availableTestFrameworks),
         ));
     }
 
@@ -157,7 +157,7 @@ final class Factory
         /** @var list<string> $filteredPaths */
         $filteredPaths = array_filter(array_map(
             static fn (SplFileInfo $file) => $file->getRealPath(),
-            iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()))
+            iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles())),
         ));
 
         return $filteredPaths;

@@ -66,7 +66,7 @@ TXT
             <<<'DIFF'
 - $x = array_diff_uassoc($array1, $array2, $keyCompareFunc);
 + $x = $array1;
-DIFF
+DIFF,
         );
     }
 

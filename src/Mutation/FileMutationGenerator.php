@@ -69,7 +69,7 @@ class FileMutationGenerator
         Trace $trace,
         bool $onlyCovered,
         array $mutators,
-        array $nodeIgnorers
+        array $nodeIgnorers,
     ): iterable {
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
@@ -90,8 +90,8 @@ class FileMutationGenerator
                 $this->isForGitDiffLines,
                 $this->gitDiffBase,
                 $this->lineRangeCalculator,
-                $this->filesDiffChangedLines
-            )
+                $this->filesDiffChangedLines,
+            ),
         );
 
         $traverser = $this->traverserFactory->create($mutationCollectorVisitor, $nodeIgnorers);

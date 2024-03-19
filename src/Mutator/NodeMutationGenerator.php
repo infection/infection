@@ -78,7 +78,7 @@ class NodeMutationGenerator
         private readonly bool $isForGitDiffLines,
         private readonly ?string $gitDiffBase,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly FilesDiffChangedLines $filesDiffChangedLines
+        private readonly FilesDiffChangedLines $filesDiffChangedLines,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -125,7 +125,7 @@ class NodeMutationGenerator
             throw InvalidMutator::create(
                 $this->filePath,
                 $mutator->getName(),
-                $throwable
+                $throwable,
             );
         }
 
@@ -146,7 +146,7 @@ class NodeMutationGenerator
                 $node::class,
                 MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
-                $tests
+                $tests,
             );
 
             ++$mutationByMutatorIndex;
@@ -176,7 +176,7 @@ class NodeMutationGenerator
 
         $testsMemoized = $this->trace->getAllTestsForMutation(
             $this->lineRangeCalculator->calculateRange($this->currentNode),
-            $this->isOnFunctionSignature()
+            $this->isOnFunctionSignature(),
         );
 
         if ($testsMemoized instanceof Traversable) {

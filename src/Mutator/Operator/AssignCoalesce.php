@@ -62,7 +62,7 @@ TXT
             <<<'DIFF'
 - $this->request->data['comments']['user_id'] ??= 'value';
 + $this->request->data['comments']['user_id'] = 'value';
-DIFF
+DIFF,
         );
     }
 
