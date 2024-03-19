@@ -65,8 +65,7 @@ final class IoCodeDetectorTest extends TestCase
 echo basename('/etc/sudoers.d', '.d');
 PHP
             ,
-            false,  // Cannot detect this one since the call is not fully-qualified and there is no
-                    // use statements - too tricky to detect
+            false,  // Cannot detect this one since the call is not fully-qualified and there is no use statements - too tricky to detect
         ];
 
         yield 'core function - use statement' => [

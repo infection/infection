@@ -58,21 +58,18 @@ final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
 <?php
 
 preg_match('~some-regexp$~igu', 'irrelevant');
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 preg_match('~some-regexp$~gu', 'irrelevant');
-PHP
-            ,
+PHP,
                 <<<'PHP'
 <?php
 
 preg_match('~some-regexp$~iu', 'irrelevant');
-PHP
-            ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -94,8 +91,7 @@ PHP,
 <?php
 
 pReG_MaTcH('~some-regexp$~ig', 'irrelevant');
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
@@ -116,15 +112,13 @@ PHP,
 <?php
 
 pReG_MaTcH('^some-regexp$^ig', 'irrelevant');
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 pReG_MaTcH('^some-regexp$^g', 'irrelevant');
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -138,8 +132,7 @@ PHP,
 <?php
 
 preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate regular expression when provided with an unpacked array' => [
@@ -147,8 +140,7 @@ PHP
 <?php
 
 preg_match(...foo());
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate regular expression when provided with a variable' => [
@@ -156,8 +148,7 @@ PHP
 <?php
 
 preg_match($regex, 'irrelevant');
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate when provided with a variable function name' => [
@@ -167,8 +158,7 @@ PHP
 $f = 'preg_match';
 
 $f('~some-regexp$~ig', 'irrelevant');
-PHP
-            ,
+PHP,
         ];
     }
 }

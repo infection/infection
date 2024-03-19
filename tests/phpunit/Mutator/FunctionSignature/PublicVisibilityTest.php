@@ -83,7 +83,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
     {
         yield 'It mutates public to protected' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-one-class.php'),
-                <<<'PHP'
+            <<<'PHP'
 <?php
 
 namespace PublicVisibilityOneClass;
@@ -96,9 +96,8 @@ class Test
         return false;
     }
 }
-PHP
-                ,
-            ];
+PHP,
+        ];
 
         yield 'It does not mutate final flag' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-final.php'),
@@ -115,8 +114,7 @@ class Test
         return false;
     }
 }
-PHP
-            ,
+PHP,
         ];
 
         yield 'It mutates non abstract public to protected in an abstract class' => [
@@ -134,13 +132,12 @@ abstract class Test
         return false;
     }
 }
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate static flag' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-static.php'),
-        <<<'PHP'
+            <<<'PHP'
 <?php
 
 namespace PublicVisibilityStatic;
@@ -153,8 +150,7 @@ class Test
         return false;
     }
 }
-PHP
-        ,
+PHP,
         ];
 
         yield 'It replaces visibility if not set' => [
@@ -170,8 +166,7 @@ class Test
     {
     }
 }
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate an interface' => [
@@ -239,8 +234,7 @@ class Child extends SameParent
     {
     }
 }
-PHP
-            ,
+PHP,
         ];
 
         yield 'it does mutate non-inherited methods' => [
@@ -280,8 +274,7 @@ function something()
         }
     };
 }
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
@@ -376,8 +369,7 @@ class Test
         return false;
     }
 }
-PHP
-            ,
+PHP,
         ];
     }
 }

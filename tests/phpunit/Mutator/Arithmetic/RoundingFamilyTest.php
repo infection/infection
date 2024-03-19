@@ -63,9 +63,8 @@ PHP
 <?php
 
 $var = floor(1.23);
-PHP
-            ,
-            <<<'PHP'
+PHP,
+                <<<'PHP'
 <?php
 
 $var = ceil(1.23);
@@ -78,15 +77,13 @@ PHP,
 <?php
 
 $var = floor(1.23);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $var = ceil(1.23);
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -100,15 +97,13 @@ PHP,
 <?php
 
 $var = ceil(1.23);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $var = floor(1.23);
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -122,15 +117,13 @@ PHP,
 <?php
 
 $var = CeIl(1.23);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $var = floor(1.23);
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -153,15 +146,13 @@ PHP,
 <?php
 
 $var = round(1.23, 2, PHP_ROUND_HALF_UP);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $var = floor(1.23);
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -183,16 +174,14 @@ PHP,
 
 $float = 1.23;
 return \ceil($float);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $float = 1.23;
 return floor($float);
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -208,16 +197,14 @@ PHP,
 
 while (\floor(1.23)) {
 }
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 while (ceil(1.23)) {
 }
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -239,8 +226,7 @@ PHP
 <?php
 
 echo floor($result = $this->average());
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -254,15 +240,13 @@ PHP,
 <?php
 
 return round($this->positive / $this->total);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 return floor($this->positive / $this->total);
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
