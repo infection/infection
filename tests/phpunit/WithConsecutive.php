@@ -49,7 +49,7 @@ use RuntimeException;
  * Originally copied from https://gist.github.com/oleg-andreyev/85c74dbf022237b03825c7e9f4439303 and modified
  * See also https://github.com/sebastianbergmann/phpunit/issues/4026#issuecomment-1644072411
  */
-class WithConsecutive
+final class WithConsecutive
 {
     /**
      * @param array<mixed> $parameterGroups
