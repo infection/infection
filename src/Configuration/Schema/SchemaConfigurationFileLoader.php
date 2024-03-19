@@ -52,7 +52,7 @@ class SchemaConfigurationFileLoader
 
         return $this->factory->create(
             $rawConfig->getPath(),
-            $rawConfig->getDecodedContents()
+            $rawConfig->getDecodedContents(),
         );
     }
 }

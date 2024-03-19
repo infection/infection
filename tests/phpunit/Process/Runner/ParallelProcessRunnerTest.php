@@ -166,7 +166,7 @@ final class ParallelProcessRunnerTest extends TestCase
             false,
             static function () use ($eventDispatcher): void {
                 $eventDispatcher->dispatch(new DummyEvent());
-            }
+            },
         );
     }
 
@@ -193,7 +193,7 @@ final class ParallelProcessRunnerTest extends TestCase
             true,
             static function () use ($eventDispatcher): void {
                 $eventDispatcher->dispatch(new DummyEvent());
-            }
+            },
         );
     }
 

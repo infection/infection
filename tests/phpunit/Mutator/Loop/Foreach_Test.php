@@ -87,7 +87,7 @@ $array = [1, 2];
 foreach (array() as $key => &$value) {
     echo $value;
 }
-PHP
+PHP,
         ];
     }
 }

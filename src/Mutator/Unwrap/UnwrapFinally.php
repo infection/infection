@@ -66,7 +66,7 @@ $check = true;
 - }
 + $callback();
 + $check = false
-DIFF
+DIFF,
         );
     }
 

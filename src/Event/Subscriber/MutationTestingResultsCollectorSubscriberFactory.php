@@ -54,7 +54,7 @@ final class MutationTestingResultsCollectorSubscriberFactory implements Subscrib
     public function create(OutputInterface $output): EventSubscriber
     {
         return new MutationTestingResultsCollectorSubscriber(
-            ...$this->collectors
+            ...$this->collectors,
         );
     }
 }

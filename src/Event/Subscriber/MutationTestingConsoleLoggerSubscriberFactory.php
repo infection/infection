@@ -66,7 +66,7 @@ final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberF
             $this->resultsCollector,
             $this->diffColorizer,
             $this->mutationTestingResultsLogger,
-            $this->showMutations
+            $this->showMutations,
         );
     }
 }

@@ -74,7 +74,7 @@ if (!$this->fooBar()) {
 } else {
     return 3;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates array item fetch' => [
@@ -91,7 +91,7 @@ PHP
 
 if (!$array[0]) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -109,7 +109,7 @@ PHP
 
 if (!$foo) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -145,7 +145,7 @@ PHP
 
 if (!self::foo()) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -163,7 +163,7 @@ PHP
 
 if (!self::FOO) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -181,7 +181,7 @@ PHP
 
 if (!$foo()) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -199,7 +199,7 @@ PHP
 
 if (!($this->foo)()) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -217,7 +217,7 @@ PHP
 
 if (!a()) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -227,7 +227,7 @@ PHP
 
 if (!$this->fooBar()) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate equal comparison' => [
@@ -236,7 +236,7 @@ PHP
 
 if ($this->fooBar() == 1) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate not equal comparison' => [
@@ -245,7 +245,7 @@ PHP
 
 if ($this->fooBar() != 1) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate identical comparison' => [
@@ -254,7 +254,7 @@ PHP
 
 if ($this->fooBar() === true) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate not identical comparison' => [
@@ -263,7 +263,7 @@ PHP
 
 if ($this->fooBar() !== true) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate and condition' => [
@@ -272,7 +272,7 @@ PHP
 
 if (a() && b()) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate or condition' => [
@@ -281,7 +281,7 @@ PHP
 
 if (a() || b()) {
 }
-PHP
+PHP,
         ];
     }
 }

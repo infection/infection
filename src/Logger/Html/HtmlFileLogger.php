@@ -70,7 +70,7 @@ final class HtmlFileLogger implements LineMutationTestingResultsLogger
                     </script>
                 </body>
             </html>
-            HTML
+            HTML,
         ];
     }
 

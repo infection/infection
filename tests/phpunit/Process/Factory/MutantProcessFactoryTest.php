@@ -77,9 +77,9 @@ final class MutantProcessFactoryTest extends TestCase
                     new TestLocation(
                         'FooTest::test_it_can_instantiate',
                         '/path/to/acme/FooTest.php',
-                        0.01
+                        0.01,
                     ),
-                ]
+                ],
             ),
             'killed#0',
             $mutantDiff = <<<'DIFF'
@@ -91,7 +91,7 @@ final class MutantProcessFactoryTest extends TestCase
 + echo 'killed#0';
 
 DIFF,
-            '<?php $a = 1;'
+            '<?php $a = 1;',
         );
 
         $testFrameworkExtraOptions = '--verbose';
@@ -104,7 +104,7 @@ DIFF,
                 $mutantFilePath,
                 $this->isType('string'),
                 $originalFilePath,
-                $testFrameworkExtraOptions
+                $testFrameworkExtraOptions,
             )
             ->willReturn(['/usr/bin/php', 'bin/phpunit', '--filter', '/path/to/acme/FooTest.php'])
         ;
@@ -127,7 +127,7 @@ DIFF,
             $testFrameworkAdapterMock,
             100,
             $eventDispatcher,
-            $resultFactoryMock
+            $resultFactoryMock,
         );
 
         $mutantProcess = $factory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
@@ -138,7 +138,7 @@ DIFF,
             PHP_OS_FAMILY === 'Windows'
                 ? '"/usr/bin/php" "bin/phpunit" --filter "/path/to/acme/FooTest.php"'
                 : "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
-            $process->getCommandLine()
+            $process->getCommandLine(),
         );
         $this->assertSame(100., $process->getTimeout());
         $this->assertFalse($process->isStarted());

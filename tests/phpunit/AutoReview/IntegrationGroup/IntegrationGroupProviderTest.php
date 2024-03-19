@@ -53,22 +53,22 @@ final class IntegrationGroupProviderTest extends TestCase
     {
         $this->assertTrue(
             class_exists($testCaseClassName, true),
-            sprintf('Expected "%s" to be a class.', $testCaseClassName)
+            sprintf('Expected "%s" to be a class.', $testCaseClassName),
         );
 
         $testCaseReflection = new ReflectionClass($testCaseClassName);
 
         $this->assertInstanceOf(
             TestCase::class,
-            $testCaseReflection->newInstanceWithoutConstructor()
+            $testCaseReflection->newInstanceWithoutConstructor(),
         );
 
         $this->assertFalse(
             $testCaseReflection->isAbstract(),
             sprintf(
                 'Expected "%s" to be an actual test case, not a base (abstract) one.',
-                $testCaseClassName
-            )
+                $testCaseClassName,
+            ),
         );
 
         $this->assertFileExists($fileWithIoOperations);

@@ -88,7 +88,7 @@ class X {
 +        return null;
     }
 }
-DIFF
+DIFF,
         );
     }
 
@@ -105,7 +105,7 @@ DIFF
         yield [
             new Node\Stmt\Expression($expr),
             new Node\Stmt\Return_(
-                new Node\Expr\ConstFetch(new Node\Name('null'))
+                new Node\Expr\ConstFetch(new Node\Name('null')),
             ),
         ];
     }

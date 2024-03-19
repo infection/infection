@@ -70,7 +70,7 @@ class Test
         return count($collection) > 1 ? array_slice($collection, 0, 1, true) : $collection;
     }
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate the method call' => [

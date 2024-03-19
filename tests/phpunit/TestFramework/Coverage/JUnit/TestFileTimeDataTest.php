@@ -44,7 +44,7 @@ final class TestFileTimeDataTest extends TestCase
     {
         $testFileTimeData = new TestFileTimeData(
             '/path/to/Test.php',
-            2.345
+            2.345,
         );
 
         $this->assertSame('/path/to/Test.php', $testFileTimeData->path);

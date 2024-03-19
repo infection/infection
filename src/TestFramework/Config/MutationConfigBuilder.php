@@ -56,7 +56,7 @@ abstract class MutationConfigBuilder
         string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath,
-        string $version
+        string $version,
     ): string;
 
     protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutantFilePath): string
@@ -67,7 +67,7 @@ abstract class MutationConfigBuilder
             $infectionPhar = sprintf(
                 '\Phar::loadPhar("%s", "%s");',
                 str_replace('phar://', '', Phar::running(true)),
-                'infection.phar'
+                'infection.phar',
             );
         }
 

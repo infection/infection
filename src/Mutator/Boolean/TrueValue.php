@@ -74,7 +74,7 @@ final class TrueValue implements ConfigurableMutator
             <<<'DIFF'
 - $a = true;
 + $a = false;
-DIFF
+DIFF,
         );
     }
 

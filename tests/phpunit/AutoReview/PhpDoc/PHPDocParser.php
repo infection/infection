@@ -53,13 +53,13 @@ final class PHPDocParser
         $escapedPhpDoc = preg_replace(
             '/\p{L}@[\p{L}\\\\]+/u',
             '',
-            $phpDoc
+            $phpDoc,
         );
 
         preg_match_all(
             '/@[\p{L}\\\\]+/u',
             $escapedPhpDoc,
-            $matches
+            $matches,
         );
 
         return array_values(array_unique($matches[0], SORT_STRING));

@@ -72,7 +72,7 @@ class SchemaValidator
 
         $errors = array_map(
             static fn (array $error): string => sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL),
-            $validator->getErrors()
+            $validator->getErrors(),
         );
 
         throw InvalidSchema::create($rawConfig, $errors);

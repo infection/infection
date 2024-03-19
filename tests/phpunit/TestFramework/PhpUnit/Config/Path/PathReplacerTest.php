@@ -62,7 +62,7 @@ final class PathReplacerTest extends TestCase
      */
     public function test_it_replaces_relative_path_with_absolute_path(
         string $originalPath,
-        string $expectedPath
+        string $expectedPath,
     ): void {
         $pathReplacer = new PathReplacer(new Filesystem());
 

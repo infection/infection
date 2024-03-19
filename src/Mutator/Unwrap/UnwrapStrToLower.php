@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = strtolower('Hello!');
 + $x = 'Hello!';
-DIFF
+DIFF,
         );
     }
 

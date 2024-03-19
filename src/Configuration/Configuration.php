@@ -102,7 +102,7 @@ class Configuration
         private readonly array $ignoreSourceCodeMutatorsMap,
         private readonly bool $executeOnlyCoveringTestCases,
         private readonly bool $isForGitDiffLines,
-        private readonly ?string $gitDiffBase
+        private readonly ?string $gitDiffBase,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);

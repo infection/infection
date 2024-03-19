@@ -192,7 +192,7 @@ PHP
 if (0 > count($a)) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement zero when it is compared as more or equal than count()' => [
@@ -311,7 +311,7 @@ PHP
 <?php
 
 $foo = 9;
-PHP
+PHP,
         ];
 
         yield 'It decrements an assignment of 0' => [
@@ -325,7 +325,7 @@ PHP
 <?php
 
 $foo = -1;
-PHP
+PHP,
         ];
 
         yield 'It does not decrement an assignment of 1' => [
@@ -333,7 +333,7 @@ PHP
 <?php
 
 $foo = 1;
-PHP
+PHP,
         ];
 
         yield 'It does not decrement 1 in greater comparison' => [
@@ -343,7 +343,7 @@ PHP
 if ($foo > 1) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement 1 in greater or equal comparison' => [
@@ -353,7 +353,7 @@ PHP
 if ($foo >= 1) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement 1 in smaller comparison' => [
@@ -363,7 +363,7 @@ PHP
 if ($foo < 1) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement 1 in smaller or equal comparison' => [
@@ -373,7 +373,7 @@ PHP
 if ($foo <= 1) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement 1 in equal comparison' => [
@@ -383,7 +383,7 @@ PHP
 if ($foo == 1) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement 1 in not equal comparison' => [
@@ -393,7 +393,7 @@ PHP
 if ($foo != 1) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement 1 in identical comparison' => [
@@ -403,7 +403,7 @@ PHP
 if ($foo === 1) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement 1 in not identical comparison' => [
@@ -413,7 +413,7 @@ PHP
 if ($foo !== 1) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of grapheme_strlen()' => [
@@ -423,7 +423,7 @@ PHP
 if (grapheme_strlen($a) === 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of iconv_strlen()' => [
@@ -433,7 +433,7 @@ PHP
 if (iconv_strlen($a) === 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of mb_strlen()' => [
@@ -443,7 +443,7 @@ PHP
 if (mb_strlen($a) === 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of sizeof()' => [
@@ -453,7 +453,7 @@ PHP
 if (sizeof($a) === 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of strlen()' => [
@@ -463,14 +463,14 @@ PHP
 if (strlen($a) === 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not decrement when it is accessed zero index of an array' => [
             <<<'PHP'
 <?php
 $b = $a[0];
-PHP
+PHP,
         ];
 
         yield 'It does not decrement limit argument of preg_split function when it equals to 0' => [
@@ -478,7 +478,7 @@ PHP
 <?php
 
 preg_split('//', 'string', 0);
-PHP
+PHP,
         ];
 
         yield 'It does decrement limit argument of preg_split function when it greater than 0' => [
@@ -492,7 +492,7 @@ PHP
 <?php
 
 preg_split('//', 'string', 0);
-PHP
+PHP,
         ];
 
         yield 'It does decrement limit argument of preg_split function when it equal to -1' => [
@@ -506,7 +506,7 @@ PHP
 <?php
 
 preg_split('//', 'string', -2);
-PHP
+PHP,
         ];
 
         $minInt = PHP_INT_MIN;
@@ -518,7 +518,7 @@ PHP
 if (1 === {$minInt}) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         $maxInt = PHP_INT_MAX;

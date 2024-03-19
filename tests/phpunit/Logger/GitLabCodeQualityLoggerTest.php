@@ -58,7 +58,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
      */
     public function test_it_logs_correctly_with_mutations(
         ResultsCollector $resultsCollector,
-        array $expectedContents
+        array $expectedContents,
     ): void {
         $logger = new GitLabCodeQualityLogger($resultsCollector);
 
@@ -144,7 +144,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                 0,
                 For_::class,
                 DetectionStatus::ESCAPED,
-                base64_decode('abc', true) // produces non UTF-8 character
+                base64_decode('abc', true), // produces non UTF-8 character
             ),
         );
 

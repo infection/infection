@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = 'good afternoon!';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of ucwords' => [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a = 'good afternoon!';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -110,7 +110,7 @@ $a = 'good afternoon!';
 if ($a === $a) {
     return true;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when ucwords is wrongly capitalized' => [
@@ -124,7 +124,7 @@ PHP
 <?php
 
 $a = 'good afternoon!';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when ucwords uses another function as input' => [
@@ -138,7 +138,7 @@ PHP
 <?php
 
 $a = $foo->bar();
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -156,7 +156,7 @@ PHP
 $a = array_reduce($words, function (string $carry, string $item) {
     return $carry . substr($item, 0, 1);
 });
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other calls' => [
@@ -164,7 +164,7 @@ PHP
 <?php
 
 $a = strtolower('Good Afternoon!');
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named ucwords' => [
@@ -174,7 +174,7 @@ PHP
 function ucwords($string)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
@@ -199,7 +199,7 @@ PHP
 <?php
 
 $a = 'good|afternoon|world';
-PHP
+PHP,
         ];
     }
 }

@@ -78,7 +78,7 @@ final class Engine
                 $this->metricsCalculator->getTestedMutantsCount(),
                 $this->metricsCalculator->getMutationScoreIndicator(),
                 $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
-                $this->consoleOutput
+                $this->consoleOutput,
             );
         } finally {
             $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
@@ -97,7 +97,7 @@ final class Engine
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
             $this->config->getTestFrameworkExtraOptions(),
             $this->getInitialTestsPhpOptionsArray(),
-            $this->config->shouldSkipCoverage()
+            $this->config->shouldSkipCoverage(),
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
@@ -106,7 +106,7 @@ final class Engine
 
         $this->coverageChecker->checkCoverageHasBeenGenerated(
             $initialTestSuiteProcess->getCommandLine(),
-            $initialTestSuiteProcess->getOutput()
+            $initialTestSuiteProcess->getOutput(),
         );
 
         /*
@@ -128,12 +128,12 @@ final class Engine
     {
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
-            $this->getNodeIgnorers()
+            $this->getNodeIgnorers(),
         );
 
         $this->mutationTestingRunner->run(
             $mutations,
-            $this->getFilteredExtraOptionsForMutant()
+            $this->getFilteredExtraOptionsForMutant(),
         );
     }
 
@@ -154,7 +154,7 @@ final class Engine
         if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
             return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
                 $this->config->getTestFrameworkExtraOptions(),
-                $this->adapter->getInitialRunOnlyOptions()
+                $this->adapter->getInitialRunOnlyOptions(),
             );
         }
 

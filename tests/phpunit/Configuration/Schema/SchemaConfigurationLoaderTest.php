@@ -67,7 +67,7 @@ final class SchemaConfigurationLoaderTest extends TestCase
 
         $this->loader = new SchemaConfigurationLoader(
             $this->locatorStub,
-            $this->configFileLoaderStub
+            $this->configFileLoaderStub,
         );
     }
 
@@ -79,7 +79,7 @@ final class SchemaConfigurationLoaderTest extends TestCase
     public function test_it_loads_the_located_file(
         array $potentialPaths,
         string $expectedPath,
-        SchemaConfiguration $expectedConfig
+        SchemaConfiguration $expectedConfig,
     ): void {
         $this->locatorStub
             ->expects($this->once())

@@ -47,7 +47,7 @@ final class InvalidPhpUnitConfigurationTest extends TestCase
 
         $this->assertSame(
             'The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -55,7 +55,7 @@ final class InvalidPhpUnitConfigurationTest extends TestCase
     {
         $exception = InvalidPhpUnitConfiguration::byXsdSchema(
             '/path/to/phpunit.xml',
-            '<lib-xml-errors>'
+            '<lib-xml-errors>',
         );
 
         $this->assertSame(
@@ -64,7 +64,7 @@ The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
 <lib-xml-errors>
 TXT
             ,
-            normalizeLineReturn($exception->getMessage())
+            normalizeLineReturn($exception->getMessage()),
         );
     }
 }

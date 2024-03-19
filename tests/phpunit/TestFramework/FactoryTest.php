@@ -83,7 +83,7 @@ final class FactoryTest extends TestCase
                         'extra' => ['class' => DummyTestFrameworkFactory::class],
                         'version' => '1.0.0',
                     ],
-            ]
+            ],
         );
 
         $adapter = $factory->create('dummy', false);

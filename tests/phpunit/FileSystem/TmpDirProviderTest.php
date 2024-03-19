@@ -56,7 +56,7 @@ final class TmpDirProviderTest extends TestCase
      */
     public function test_it_provides_a_tmp_dir_path(
         string $tmpDir,
-        string $expectedTmpDir
+        string $expectedTmpDir,
     ): void {
         $actualTmpDir = $this->tmpDirProvider->providePath($tmpDir);
 
@@ -70,11 +70,11 @@ final class TmpDirProviderTest extends TestCase
 
         $this->assertSame(
             $expectedTmpDir,
-            $this->tmpDirProvider->providePath($tmpDir)
+            $this->tmpDirProvider->providePath($tmpDir),
         );
         $this->assertSame(
             $expectedTmpDir,
-            $this->tmpDirProvider->providePath($tmpDir)
+            $this->tmpDirProvider->providePath($tmpDir),
         );
     }
 
@@ -82,12 +82,12 @@ final class TmpDirProviderTest extends TestCase
     {
         $this->assertSame(
             '/path/to/tmp/infection',
-            $this->tmpDirProvider->providePath('/path/to/tmp')
+            $this->tmpDirProvider->providePath('/path/to/tmp'),
         );
 
         $this->assertSame(
             '/path/to/another-tmp/infection',
-            $this->tmpDirProvider->providePath('/path/to/another-tmp')
+            $this->tmpDirProvider->providePath('/path/to/another-tmp'),
         );
     }
 
@@ -96,7 +96,7 @@ final class TmpDirProviderTest extends TestCase
      */
     public function test_the_tmp_dir_given_must_be_an_absolute_path(
         string $tmpDir,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         try {
             $this->tmpDirProvider->providePath($tmpDir);
@@ -105,7 +105,7 @@ final class TmpDirProviderTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 $expectedErrorMessage,
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

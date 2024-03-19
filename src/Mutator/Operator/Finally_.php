@@ -66,7 +66,7 @@ try {
 - } finally {
 -
 - }
-DIFF
+DIFF,
         );
     }
 

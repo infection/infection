@@ -57,8 +57,8 @@ final class FormatterFactory
             FormatterName::ALL,
             sprintf(
                 'Unknown formatter %%s. The known formatters are: "%s"',
-                implode('", "', FormatterName::ALL)
-            )
+                implode('", "', FormatterName::ALL),
+            ),
         );
 
         return match ($formatterName) {

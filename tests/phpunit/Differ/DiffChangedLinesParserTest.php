@@ -116,7 +116,7 @@ final class DiffChangedLinesParserTest extends TestCase
                 static function (ChangedLinesRange $changedLinesRange): array {
                     return [$changedLinesRange->getStartLine(), $changedLinesRange->getEndLine()];
                 },
-                $changedLinesRanges
+                $changedLinesRanges,
             );
         }
 

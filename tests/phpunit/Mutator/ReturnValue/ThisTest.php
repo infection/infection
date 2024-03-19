@@ -69,7 +69,7 @@ class Test
         return null;
     }
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate non \'this\' return statements' => [

@@ -95,7 +95,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             $this->diffColorizerMock,
             new FederatedLogger(),
             $showMutations,
-            new FakeOutputFormatter()
+            new FakeOutputFormatter(),
         );
 
         $outputMock = $this->createMock(OutputInterface::class);

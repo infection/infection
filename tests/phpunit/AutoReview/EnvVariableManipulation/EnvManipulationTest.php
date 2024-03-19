@@ -47,11 +47,11 @@ final class EnvManipulationTest extends TestCase
      */
     public function test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait(
         string $testCaseClassName,
-        string $fileWithEnvManipulations
+        string $fileWithEnvManipulations,
     ): void {
         $import = sprintf(
             'use %s;',
-            BacksUpEnvironmentVariables::class
+            BacksUpEnvironmentVariables::class,
         );
 
         $this->assertStringContainsString(
@@ -65,8 +65,8 @@ TXT
                 ,
                 $testCaseClassName,
                 BacksUpEnvironmentVariables::class,
-                $fileWithEnvManipulations
-            )
+                $fileWithEnvManipulations,
+            ),
         );
     }
 }

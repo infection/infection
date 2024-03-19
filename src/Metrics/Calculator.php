@@ -61,7 +61,7 @@ final class Calculator
             $calculator->getErrorCount() + $calculator->getSyntaxErrorCount(),
             $calculator->getTimedOutCount(),
             $calculator->getNotTestedCount(),
-            $calculator->getTestedMutantsCount()
+            $calculator->getTestedMutantsCount(),
         );
     }
 

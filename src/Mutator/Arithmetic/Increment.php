@@ -63,7 +63,7 @@ TXT
             <<<'DIFF'
 - $a++;
 + $a--;
-DIFF
+DIFF,
         );
     }
 

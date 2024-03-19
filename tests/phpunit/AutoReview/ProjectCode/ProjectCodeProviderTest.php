@@ -61,8 +61,8 @@ final class ProjectCodeProviderTest extends TestCase
                 . ' problematic file is not a class file declaration, add it to the list of '
                 . 'excluded files in %s::provideSourceClasses().',
                 $className,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
     }
 
@@ -75,8 +75,8 @@ final class ProjectCodeProviderTest extends TestCase
             class_exists($className, true),
             sprintf(
                 'Expected "%s" to be a class.',
-                $className
-            )
+                $className,
+            ),
         );
     }
 
@@ -91,8 +91,8 @@ final class ProjectCodeProviderTest extends TestCase
                 'The class "%s" no longer exists. Please remove it from the list of non tested '
                 . 'classes in %s::NON_TESTED_CONCRETE_CLASSES.',
                 $className,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
     }
 
@@ -105,8 +105,8 @@ final class ProjectCodeProviderTest extends TestCase
             class_exists($className, true) || trait_exists($className, true),
             sprintf(
                 'Expected "%s" to be either a class or a trait.',
-                $className
-            )
+                $className,
+            ),
         );
     }
 
@@ -125,8 +125,8 @@ final class ProjectCodeProviderTest extends TestCase
                 . ' problematic file is not a class file declaration, add it to the list of '
                 . 'excluded files in %s::provideTestClasses().',
                 $className,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
     }
 
@@ -144,8 +144,8 @@ final class ProjectCodeProviderTest extends TestCase
                 . ' interface or trait. Please check for typos in the class name. If the '
                 . ' class no longer exists, remove it from %s::NON_FINAL_EXTENSION_CLASSES.',
                 $className,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
     }
 }

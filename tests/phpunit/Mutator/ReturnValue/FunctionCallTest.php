@@ -78,7 +78,7 @@ class Test
         return null;
     }
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when scalar return typehint does not allow null' => [

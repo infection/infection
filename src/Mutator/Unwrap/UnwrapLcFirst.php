@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = lcfirst('Hello!');
 + $x = 'Hello!';
-DIFF
+DIFF,
         );
     }
 

@@ -73,7 +73,7 @@ TXT
             <<<'DIFF'
 - $x = preg_quote($string, $delimiter);
 + $x = $string;
-DIFF
+DIFF,
         );
     }
 

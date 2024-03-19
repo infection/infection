@@ -87,7 +87,7 @@ final class Application extends BaseApplication
         return trim(sprintf(
             '<info>%s</info> version <comment>%s</comment>',
             $this->getName(),
-            $this->getVersion()
+            $this->getVersion(),
         ));
     }
 
@@ -104,7 +104,7 @@ final class Application extends BaseApplication
                 new ConfigureCommand(),
                 new RunCommand(),
                 new DescribeCommand(),
-            ]
+            ],
         );
 
         return $commands;

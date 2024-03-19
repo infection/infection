@@ -49,7 +49,7 @@ final class SummaryFileLoggerTest extends TestCase
      */
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
-        string $expectedContents
+        string $expectedContents,
     ): void {
         $logger = new SummaryFileLogger($metricsCalculator);
 
@@ -72,7 +72,7 @@ Skipped: 0
 Ignored: 0
 Not Covered: 0
 
-TXT
+TXT,
         ];
 
         yield 'all mutations' => [
@@ -89,7 +89,7 @@ Skipped: 2
 Ignored: 2
 Not Covered: 2
 
-TXT
+TXT,
         ];
     }
 }

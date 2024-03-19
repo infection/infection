@@ -66,7 +66,7 @@ TXT
             <<<'DIFF'
 - $x = array_diff_key($array1, $array2);
 + $x = $array1;
-DIFF
+DIFF,
         );
     }
 

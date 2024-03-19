@@ -73,7 +73,7 @@ final class TestLocatorTest extends TestCase
     public function test_it_can_locate_the_tests_executing_the_given_range(
         NodeLineRangeData $range,
         bool $onFunctionSignature,
-        array $expectedTests
+        array $expectedTests,
     ): void {
         $testLocator = $this->createTestLocator('/path/to/acme/Foo.php');
 
@@ -87,7 +87,7 @@ final class TestLocatorTest extends TestCase
      */
     public function test_it_cannot_locate_any_tests_executing_the_given_range_if_no_tests_are_found(
         NodeLineRangeData $range,
-        bool $onFunctionSignature
+        bool $onFunctionSignature,
     ): void {
         $testLocator = $this->createTestLocator('/path/to/unknown-file');
 
@@ -174,38 +174,38 @@ final class TestLocatorTest extends TestCase
                         new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_0',
                             '/path/to/acme/FooTest.php',
-                            0.123
+                            0.123,
                         ),
                         new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_1',
                             '/path/to/acme/FooTest.php',
-                            0.456
+                            0.456,
                         ),
                     ],
                     30 => [
                         new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_0',
                             '/path/to/acme/FooTest.php',
-                            0.123
+                            0.123,
                         ),
                         new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_1',
                             '/path/to/acme/FooTest.php',
-                            0.456
+                            0.456,
                         ),
                     ],
                     31 => [
                         new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_1',
                             '/path/to/acme/FooTest.php',
-                            0.456
+                            0.456,
                         ),
                     ],
                     34 => [
                         new TestLocation(
                             'Infection\\Acme\\FooTest::test_it_can_do_0',
                             '/path/to/acme/FooTest.php',
-                            0.123
+                            0.123,
                         ),
                     ],
                 ],
@@ -213,7 +213,7 @@ final class TestLocatorTest extends TestCase
                     'do0' => new SourceMethodLineRange(19, 22),
                     'do1' => new SourceMethodLineRange(24, 35),
                     'doSomethingUncovered' => new SourceMethodLineRange(3, 5),
-                ]
+                ],
             ),
         ];
     }

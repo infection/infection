@@ -73,7 +73,7 @@ class MutantExecutionResult
         private readonly int $originalEndFilePosition,
         private readonly Deferred $originalCode,
         private readonly Deferred $mutatedCode,
-        private readonly array $tests
+        private readonly array $tests,
     ) {
         Assert::oneOf($detectionStatus, DetectionStatus::ALL);
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
@@ -205,7 +205,7 @@ class MutantExecutionResult
             $mutation->getOriginalEndFilePosition(),
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
-            $mutant->getTests()
+            $mutant->getTests(),
         );
     }
 }

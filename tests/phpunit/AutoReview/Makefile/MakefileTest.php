@@ -76,11 +76,11 @@ final class MakefileTest extends BaseMakefileTestCase
 
         $this->assertArrayContains(
             $testRuleTargets,
-            ['test', 'test-autoreview', 'test-unit', 'test-e2e']
+            ['test', 'test-autoreview', 'test-unit', 'test-e2e'],
         );
         $this->assertDoesNotArrayContain(
             $testRuleTargets,
-            ['test-docker', 'test-unit-docker', 'test-e2e-docker']
+            ['test-docker', 'test-unit-docker', 'test-e2e-docker'],
         );
     }
 
@@ -93,11 +93,11 @@ final class MakefileTest extends BaseMakefileTestCase
 
         $this->assertArrayContains(
             $testRuleTargets,
-            ['test-docker', 'test-unit-docker', 'test-e2e-docker']
+            ['test-docker', 'test-unit-docker', 'test-e2e-docker'],
         );
         $this->assertDoesNotArrayContain(
             $testRuleTargets,
-            ['test', 'test-autoreview', 'test-unit', 'test-e2e']
+            ['test', 'test-autoreview', 'test-unit', 'test-e2e'],
         );
     }
 
@@ -110,7 +110,7 @@ final class MakefileTest extends BaseMakefileTestCase
     public function test_it_can_get_a_docker_test_target_sub_test_targets(
         string $target,
         array $expected,
-        array $notExpected
+        array $notExpected,
     ): void {
         $subTestTargets = self::getDockerSubTestTargets(
             $target,
@@ -151,7 +151,7 @@ final class MakefileTest extends BaseMakefileTestCase
     public function test_it_can_get_all_the_root_test_targets(
         bool $docker,
         array $expected,
-        array $notExpected
+        array $notExpected,
     ): void {
         $dashCount = $docker ? 2 : 1;
 
@@ -213,8 +213,8 @@ final class MakefileTest extends BaseMakefileTestCase
                     'Expected the pre-requisite of the "%s" target to be "%s". Found "%s" instead',
                     $target,
                     implode(' ', $subTestTargets),
-                    implode(' ', $prerequisites)
-                )
+                    implode(' ', $prerequisites),
+                ),
             );
         }
     }
@@ -299,7 +299,7 @@ EOF;
                         && !str_starts_with($target, 'tests/')
                         && $filterDockerTarget($target)
                         && !$rule->isComment();
-                }
+                },
             ),
         );
     }
@@ -321,7 +321,7 @@ EOF;
 
                 return str_starts_with($subTarget, $targetWithoutSuffix . '-')
                     && substr_count($subTarget, '-') === $dashCount + 1;
-            }
+            },
         );
 
         return array_values(
@@ -361,7 +361,7 @@ EOF;
      */
     private function assertArrayContains(
         array $array,
-        array $items
+        array $items,
     ): void {
         if (count($items) === 0) {
             $this->addToAssertionCount(1);
@@ -382,7 +382,7 @@ EOF;
      */
     private function assertDoesNotArrayContain(
         array $array,
-        array $items
+        array $items,
     ): void {
         if (count($items) === 0) {
             $this->addToAssertionCount(1);

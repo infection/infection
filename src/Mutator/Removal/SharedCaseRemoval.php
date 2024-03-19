@@ -65,7 +65,7 @@ switch ($x) {
     default:
         baz();
 }
-DIFF
+DIFF,
         );
     }
 
@@ -102,7 +102,7 @@ DIFF
                 yield new Node\Stmt\Switch_(
                     $node->cond,
                     $cases,
-                    $node->getAttributes()
+                    $node->getAttributes(),
                 );
 
                 continue;
@@ -116,13 +116,13 @@ DIFF
                 $cases[$i - 1] = new Node\Stmt\Case_(
                     $lastCase->cond,
                     $case->stmts,
-                    $lastCase->getAttributes()
+                    $lastCase->getAttributes(),
                 );
 
                 yield new Node\Stmt\Switch_(
                     $node->cond,
                     $cases,
-                    $node->getAttributes()
+                    $node->getAttributes(),
                 );
             }
         }

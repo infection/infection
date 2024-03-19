@@ -82,7 +82,7 @@ PHP;
             [
                 new CloneVisitor(),
                 $this->createMutateStringValueVisitor(),
-            ]
+            ],
         );
 
         $newDump = SingletonContainer::getNodeDumper()->dump($traversedNodes);

@@ -72,7 +72,7 @@ final class FunctionCallRemoval implements Mutator
             null,
             <<<'DIFF'
 - fooBar();
-DIFF
+DIFF,
         );
     }
 

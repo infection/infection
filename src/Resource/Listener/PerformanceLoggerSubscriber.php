@@ -74,7 +74,7 @@ final class PerformanceLoggerSubscriber implements EventSubscriber
                 'Time: %s. Memory: %s. Threads: %s',
                 $this->timeFormatter->toHumanReadableString($time),
                 $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true)),
-                $this->threadCount
+                $this->threadCount,
             ),
         ]);
     }

@@ -96,7 +96,7 @@ final class JUnitTestCaseSorter
         if ($numberOfTestLocation < self::USE_BUCKET_SORT_AFTER) {
             usort(
                 $uniqueTestLocations,
-                static fn (TestLocation $a, TestLocation $b): int => $a->getExecutionTime() <=> $b->getExecutionTime()
+                static fn (TestLocation $a, TestLocation $b): int => $a->getExecutionTime() <=> $b->getExecutionTime(),
             );
 
             return self::sortedLocationsGenerator($uniqueTestLocations);
@@ -106,7 +106,7 @@ final class JUnitTestCaseSorter
          * For large number of tests use a more efficient algorithm.
          */
         return self::sortedLocationsGenerator(
-            TestLocationBucketSorter::bucketSort($uniqueTestLocations)
+            TestLocationBucketSorter::bucketSort($uniqueTestLocations),
         );
     }
 

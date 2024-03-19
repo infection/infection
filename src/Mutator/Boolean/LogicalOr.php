@@ -61,7 +61,7 @@ final class LogicalOr implements Mutator
             <<<'DIFF'
 - $a = $b || $c;
 + $a = $b && $c;
-DIFF
+DIFF,
         );
     }
 
@@ -227,7 +227,7 @@ DIFF
                 '>::<=' => static fn () => $valueRight > $valueLeft, // a>5 && a<=7; 7>=a>5; 7>5;
                 '>=::<=' => static fn () => $valueRight >= $valueLeft, // a>=5 && a<=7; 7>=a>=5; 7>=5;
                 '>=::<' => static fn () => $valueRight > $valueLeft, // a>=5 && a<7; 7>a>=5; 7>5;
-                default => throw new LogicException('This is an unreachable statement.')
+                default => throw new LogicException('This is an unreachable statement.'),
             })();
         }
 

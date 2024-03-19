@@ -59,7 +59,7 @@ final class Minus implements Mutator
             <<<'DIFF'
 - $a = $b - $c;
 + $a = $b + $c;
-DIFF
+DIFF,
         );
     }
 

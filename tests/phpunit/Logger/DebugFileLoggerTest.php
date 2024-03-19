@@ -52,7 +52,7 @@ final class DebugFileLoggerTest extends TestCase
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,
         bool $onlyCoveredMode,
-        string $expectedContents
+        string $expectedContents,
     ): void {
         $logger = new DebugFileLogger($metricsCalculator, $resultsCollector, $onlyCoveredMode);
 
@@ -92,7 +92,7 @@ Ignored mutants:
 Not Covered mutants:
 ====================
 
-TXT
+TXT,
         ];
 
         yield 'all mutations' => [
@@ -181,7 +181,7 @@ Line 9
 Mutator: For_
 Line 10
 
-TXT
+TXT,
         ];
 
         yield 'all mutations only covered' => [
@@ -260,7 +260,7 @@ Line 9
 Mutator: For_
 Line 10
 
-TXT
+TXT,
         ];
     }
 }

@@ -55,7 +55,7 @@ final class FormatterFactoryTest extends TestCase
      */
     public function test_it_can_create_all_known_factories(
         string $formatterName,
-        string $expectedFormatterClassName
+        string $expectedFormatterClassName,
     ): void {
         $outputMock = $this->createMock(OutputInterface::class);
         $outputMock
@@ -91,8 +91,8 @@ final class FormatterFactoryTest extends TestCase
             sprintf(
                 'Expected the given map to contain all the known formatters "%s". Got "%s"',
                 implode('", "', FormatterName::ALL),
-                implode('", "', array_keys($map))
-            )
+                implode('", "', array_keys($map)),
+            ),
         );
 
         foreach ($map as $formatterName => $formatterClassName) {

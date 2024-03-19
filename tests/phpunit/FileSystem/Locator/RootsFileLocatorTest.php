@@ -71,7 +71,7 @@ final class RootsFileLocatorTest extends TestCase
     public function test_it_can_locate_files(
         array $roots,
         string $file,
-        string $expected
+        string $expected,
     ): void {
         $path = (new RootsFileLocator($roots, $this->filesystem))->locate($file);
 
@@ -86,7 +86,7 @@ final class RootsFileLocatorTest extends TestCase
     public function test_it_throws_an_exception_if_file_or_folder_does_not_exist(
         array $roots,
         string $file,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $locator = new RootsFileLocator($roots, $this->filesystem);
 
@@ -110,7 +110,7 @@ final class RootsFileLocatorTest extends TestCase
     public function test_it_can_locate_one_of_the_given_files(
         array $roots,
         array $files,
-        string $expected
+        string $expected,
     ): void {
         $path = (new RootsFileLocator($roots, $this->filesystem))->locateOneOf($files);
 
@@ -126,7 +126,7 @@ final class RootsFileLocatorTest extends TestCase
     public function test_locate_any_throws_exception_if_no_file_could_be_found(
         array $roots,
         array $files,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $locator = new RootsFileLocator($roots, $this->filesystem);
 
@@ -137,7 +137,7 @@ final class RootsFileLocatorTest extends TestCase
         } catch (FileNotFound $exception) {
             $this->assertSame(
                 $expectedErrorMessage,
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertNull($exception->getPrevious());
@@ -317,7 +317,7 @@ final class RootsFileLocatorTest extends TestCase
                 'broken-symlink',
                 sprintf(
                     'Could not locate the file "broken-symlink" in "%s".',
-                    $fixturesDir
+                    $fixturesDir,
                 ),
             ];
         }
@@ -417,7 +417,7 @@ final class RootsFileLocatorTest extends TestCase
             sprintf(
                 'Could not locate the files "/unknown1", "/unknown2" in "%s", "%s"',
                 $root1,
-                $root2
+                $root2,
             ),
         ];
     }

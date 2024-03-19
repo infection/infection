@@ -67,7 +67,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
         $factory = new CleanUpAfterMutationTestingFinishedSubscriberFactory(
             false,
             $this->fileSystemMock,
-            '/path/to/tmp'
+            '/path/to/tmp',
         );
 
         $subscriber = $factory->create(new FakeOutput());
@@ -80,7 +80,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
         $factory = new CleanUpAfterMutationTestingFinishedSubscriberFactory(
             true,
             $this->fileSystemMock,
-            '/path/to/tmp'
+            '/path/to/tmp',
         );
 
         $subscriber = $factory->create(new FakeOutput());

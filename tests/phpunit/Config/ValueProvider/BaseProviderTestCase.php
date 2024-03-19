@@ -77,7 +77,7 @@ abstract class BaseProviderTestCase extends TestCase
      */
     final protected function createStreamableInput(
         $stream,
-        bool $interactive = true
+        bool $interactive = true,
     ): InputInterface {
         Assert::resource($stream);
 

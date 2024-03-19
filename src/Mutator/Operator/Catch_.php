@@ -64,7 +64,7 @@ try {
 + } catch (\Exception $e) {
     throw $e;
 }
-DIFF
+DIFF,
         );
     }
 
