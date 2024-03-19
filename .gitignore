@@ -1,8 +1,6 @@
 !/.tools/.gitkeep
 !/build/.gitkeep
 !/build/cache/.gitkeep
-.phpunit.autoreview.cache
-.phpunit.cache
 .phpunit.result.cache
 /*.phar
 /.box_dump/

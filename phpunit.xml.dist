@@ -6,30 +6,38 @@
          executionOrder="random"
          failOnWarning="true"
          failOnRisky="true"
-         cacheDirectory=".phpunit.cache"
+         verbose="true"
 >
 
-  <php>
-    <env name="COLUMNS" value="100" force="true"/>
-  </php>
+    <php>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
+        <env name="COLUMNS" value="100" force="true" />
+    </php>
 
-  <testsuites>
-    <testsuite name="Infection Test Suite">
-      <directory>tests/phpunit</directory>
-      <exclude>tests/phpunit/AutoReview</exclude>
-      <exclude>tests/phpunit/Fixtures</exclude>
-    </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite name="Infection Test Suite">
+            <directory>tests/phpunit</directory>
 
-  <groups>
-    <exclude>
-      <group>e2e</group>
-    </exclude>
-  </groups>
+            <exclude>tests/phpunit/AutoReview</exclude>
+            <exclude>tests/phpunit/Fixtures</exclude>
+        </testsuite>
+    </testsuites>
 
-  <source>
-    <include>
-      <directory>src</directory>
-    </include>
-  </source>
+    <coverage cacheDirectory="./reports/.coverage-cache">
+        <include>
+            <directory>src</directory>
+        </include>
+    </coverage>
+
+    <groups>
+        <exclude>
+            <group>e2e</group>
+        </exclude>
+    </groups>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+        <listener class="Symfony\Bridge\PhpUnit\CoverageListener" />
+    </listeners>
+
 </phpunit>

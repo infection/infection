@@ -80,7 +80,7 @@ jobs:
 
       - name: Configure the Symfony deprecations helper
         if: ${{ matrix.php-version }} == '8.2'
-        run: echo "{SYMFONY_DEPRECATIONS_HELPER}={disabled=1}" >> $GITHUB_ENV
+        run: echo "{SYMFONY_DEPRECATIONS_HELPER}={max[self]=0}" >> $GITHUB_ENV
 
       - name: Cache E2E tests dependencies
         if: runner.os == 'Windows'
