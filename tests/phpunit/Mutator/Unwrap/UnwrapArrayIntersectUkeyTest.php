@@ -64,7 +64,7 @@ PHP
 
 $a = ['foo' => 'bar'];
 PHP
-            ,
+                ,
                 <<<'PHP'
 <?php
 
@@ -104,7 +104,7 @@ $a = \array_intersect_ukey(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
 PHP
             ,
             [
-               <<<'PHP'
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];

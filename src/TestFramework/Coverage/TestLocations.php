@@ -53,7 +53,7 @@ final class TestLocations
     /**
      * This method needs to be able to return a reference for performance reasons.
      *
-     * @see \Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder
+     * @see JUnit\JUnitTestExecutionInfoAdder
      *
      * @return array<int, array<int, TestLocation>>
      */

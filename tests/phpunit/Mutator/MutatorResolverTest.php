@@ -123,8 +123,8 @@ final class MutatorResolverTest extends TestCase
     public function test_it_will_remove_the_mutators_from_the_ignored_profile_even_if_included_from_a_different_profile(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve([
-             '@default' => true,
-             '@boolean' => false,
+            '@default' => true,
+            '@boolean' => false,
         ]);
 
         $expectedMutators = array_values(array_diff(

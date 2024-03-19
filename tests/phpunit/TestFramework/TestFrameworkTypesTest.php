@@ -61,10 +61,10 @@ final class TestFrameworkTypesTest extends TestCase
         $types = TestFrameworkTypes::getTypes(
             [
                 'infection/codeception-adapter' => [
-                        'install_path' => '/path/to/dummy/adapter/factory.php',
-                        'extra' => ['class' => DummyTestFrameworkFactory::class],
-                        'version' => '1.0.0',
-                    ],
+                    'install_path' => '/path/to/dummy/adapter/factory.php',
+                    'extra' => ['class' => DummyTestFrameworkFactory::class],
+                    'version' => '1.0.0',
+                ],
             ]
         );
 

@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use function array_map;
-use function get_class;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
@@ -349,7 +348,7 @@ final class FileLoggerFactoryTest extends TestCase
                     $logger = $fileLoggerDecoratedLogger->getValue($logger);
                 }
 
-                return get_class($logger);
+                return $logger::class;
             },
             $loggers
         );

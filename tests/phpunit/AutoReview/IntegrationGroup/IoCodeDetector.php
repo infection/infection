@@ -40,7 +40,7 @@ use Infection\CannotBeInstantiated;
 use function Safe\file_get_contents;
 use function Safe\preg_match_all;
 use function sprintf;
-use function strpos;
+use function str_contains;
 
 final class IoCodeDetector
 {
@@ -148,7 +148,7 @@ final class IoCodeDetector
     public static function codeContainsIoOperations(string $code): bool
     {
         foreach (self::getStatements() as $statement) {
-            if (strpos($code, $statement) !== false) {
+            if (str_contains($code, $statement)) {
                 return true;
             }
         }

@@ -38,7 +38,6 @@ namespace Infection\Tests\Process\Runner;
 use function array_map;
 use ArrayIterator;
 use function count;
-use function get_class;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\DiffSourceCodeMatcher;
@@ -463,7 +462,7 @@ final class MutationTestingRunnerTest extends TestCase
             $this->assertIsInstanceOfAny($expectedClasses, $expectedEvent);
             $this->assertArrayHasKey($index, $actualEvents, $assertionErrorMessage);
 
-            $expectedEventClass = get_class($expectedEvent);
+            $expectedEventClass = $expectedEvent::class;
 
             // Handle mocks
             foreach ($expectedClasses as $expectedClassName) {
@@ -510,7 +509,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->fail(sprintf(
             'Expected to be an instance of any of "%s" but got "%s" instead',
             implode('", "', $expectedClasses),
-            get_class($value)
+            $value::class
         ));
     }
 

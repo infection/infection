@@ -70,8 +70,8 @@ PHP
 
 $a = ['baz' => 'bar'];
 PHP
-                ],
-            ];
+            ],
+        ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'

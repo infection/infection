@@ -85,7 +85,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'location' => [
                         'path' => 'foo/bar',
                         'lines' => [
-                          'begin' => 9,
+                            'begin' => 9,
                         ],
                     ],
                     'severity' => 'major',
@@ -100,7 +100,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'location' => [
                         'path' => 'foo/bar',
                         'lines' => [
-                          'begin' => 10,
+                            'begin' => 10,
                         ],
                     ],
                     'severity' => 'major',
@@ -121,7 +121,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'location' => [
                         'path' => 'foo/bar',
                         'lines' => [
-                          'begin' => 10,
+                            'begin' => 10,
                         ],
                     ],
                     'severity' => 'major',

@@ -40,7 +40,7 @@ use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
-use function strpos;
+use function str_contains;
 
 final class IntegrationGroupTest extends TestCase
 {
@@ -69,7 +69,7 @@ TXT
             )
         );
 
-        if (strpos($phpDoc, '@group integration') === false) {
+        if (!str_contains($phpDoc, '@group integration')) {
             $this->fail(sprintf(
                 <<<'TXT'
 Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been

@@ -64,8 +64,8 @@ PHP
 
 $var = floor(1.23);
 PHP
-            ,
-            <<<'PHP'
+                ,
+                <<<'PHP'
 <?php
 
 $var = ceil(1.23);

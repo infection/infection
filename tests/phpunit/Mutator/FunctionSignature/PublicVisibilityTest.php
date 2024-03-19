@@ -83,7 +83,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
     {
         yield 'It mutates public to protected' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-one-class.php'),
-                <<<'PHP'
+            <<<'PHP'
 <?php
 
 namespace PublicVisibilityOneClass;
@@ -97,8 +97,8 @@ class Test
     }
 }
 PHP
-                ,
-            ];
+            ,
+        ];
 
         yield 'It does not mutate final flag' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-final.php'),
@@ -140,7 +140,7 @@ PHP
 
         yield 'It does not mutate static flag' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-static.php'),
-        <<<'PHP'
+            <<<'PHP'
 <?php
 
 namespace PublicVisibilityStatic;
@@ -154,7 +154,7 @@ class Test
     }
 }
 PHP
-        ,
+            ,
         ];
 
         yield 'It replaces visibility if not set' => [

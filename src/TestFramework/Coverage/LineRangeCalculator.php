@@ -48,6 +48,7 @@ final class LineRangeCalculator
     {
         if ($originalNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false) === true) {
             $startLine = $originalNode->getStartLine();
+
             // function signature node should always be 1-line range: (start, start)
             return new NodeLineRangeData($startLine, $startLine);
         }
