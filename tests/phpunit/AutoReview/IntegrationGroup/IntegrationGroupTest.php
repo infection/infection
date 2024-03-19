@@ -40,7 +40,7 @@ use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
-use function str_contains;
+use function strpos;
 
 final class IntegrationGroupTest extends TestCase
 {
@@ -49,7 +49,7 @@ final class IntegrationGroupTest extends TestCase
      */
     public function test_the_test_cases_requiring_io_operations_belongs_to_the_integration_group(
         string $testCaseClassName,
-        string $fileWithIoOperations
+        string $fileWithIoOperations,
     ): void {
         $reflectionClass = new ReflectionClass($testCaseClassName);
 
@@ -65,11 +65,11 @@ found in the file "%s".
 TXT
                 ,
                 $testCaseClassName,
-                $fileWithIoOperations
-            )
+                $fileWithIoOperations,
+            ),
         );
 
-        if (!str_contains($phpDoc, '@group integration')) {
+        if (strpos($phpDoc, '@group integration') === false) {
             $this->fail(sprintf(
                 <<<'TXT'
 Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been
@@ -77,7 +77,7 @@ found in the file "%s".
 TXT
                 ,
                 $testCaseClassName,
-                $fileWithIoOperations
+                $fileWithIoOperations,
             ));
         }
     }

@@ -62,7 +62,7 @@ TXT
             <<<'DIFF'
 - $object?->getObject();
 + $object->getObject();
-DIFF
+DIFF,
         );
     }
 

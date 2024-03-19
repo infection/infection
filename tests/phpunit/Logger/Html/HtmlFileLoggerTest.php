@@ -71,7 +71,7 @@ final class HtmlFileLoggerTest extends TestCase
                 </body>
             </html>
             HTML,
-            $logLines[0]
+            $logLines[0],
         );
     }
 }

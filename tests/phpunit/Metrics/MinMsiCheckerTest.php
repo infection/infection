@@ -69,8 +69,8 @@ final class MinMsiCheckerTest extends TestCase
 
         $this->consoleOutput = new ConsoleOutput(
             new ConsoleLogger(
-                new IO(new StringInput(''), $this->output)
-            )
+                new IO(new StringInput(''), $this->output),
+            ),
         );
     }
 
@@ -85,7 +85,7 @@ final class MinMsiCheckerTest extends TestCase
         } catch (MinMsiCheckFailed $exception) {
             $this->assertSame(
                 'The minimum required MSI percentage should be 10%, but actual is 8%. Improve your tests!',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
 
             $this->assertSame('', $this->output->fetch());
@@ -103,7 +103,7 @@ final class MinMsiCheckerTest extends TestCase
         } catch (MinMsiCheckFailed $exception) {
             $this->assertSame(
                 'The minimum required Covered Code MSI percentage should be 10%, but actual is 8%. Improve your tests!',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
 
             $this->assertSame('', $this->output->fetch());
@@ -125,7 +125,7 @@ final class MinMsiCheckerTest extends TestCase
 
 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -144,7 +144,7 @@ TXT
 
 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -166,7 +166,7 @@ TXT
 
 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 

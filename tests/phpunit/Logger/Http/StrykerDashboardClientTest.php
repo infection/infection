@@ -71,7 +71,7 @@ final class StrykerDashboardClientTest extends TestCase
 
         $this->dashboardClient = new StrykerDashboardClient(
             $this->clientMock,
-            $this->logger
+            $this->logger,
         );
     }
 
@@ -87,7 +87,7 @@ final class StrykerDashboardClientTest extends TestCase
                 'infection/infection',
                 'master',
                 self::API_KEY,
-                '{"mutationScore": 80.31}'
+                '{"mutationScore": 80.31}',
             )
             ->willReturn(new Response(201, 'Report received!'))
         ;
@@ -96,7 +96,7 @@ final class StrykerDashboardClientTest extends TestCase
             'infection/infection',
             'master',
             self::API_KEY,
-            '{"mutationScore": 80.31}'
+            '{"mutationScore": 80.31}',
         );
 
         $this->assertSame(
@@ -111,7 +111,7 @@ EOF
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -131,7 +131,7 @@ EOF
                 'infection/infection',
                 'master',
                 self::API_KEY,
-                '{"mutationScore": 80.31}'
+                '{"mutationScore": 80.31}',
             )
             ->willReturn(new Response(400, 'Report invalid!'))
         ;
@@ -140,7 +140,7 @@ EOF
             'infection/infection',
             'master',
             self::API_KEY,
-            '{"mutationScore": 80.31}'
+            '{"mutationScore": 80.31}',
         );
 
         $this->assertSame(
@@ -160,7 +160,7 @@ EOF
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 }

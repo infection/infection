@@ -60,7 +60,7 @@ PHP
 <?php
 
 $->methodCall();
-PHP
+PHP,
         ];
     }
 }

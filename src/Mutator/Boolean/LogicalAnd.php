@@ -59,7 +59,7 @@ final class LogicalAnd implements Mutator
             <<<'DIFF'
 - $a = $b && User;
 + $a = $b || $c;
-DIFF
+DIFF,
         );
     }
 

@@ -46,14 +46,14 @@ final class FinderException extends RuntimeException
     public static function composerNotFound(): self
     {
         return new self(
-            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.'
+            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.',
         );
     }
 
     public static function phpExecutableNotFound(): self
     {
         return new self(
-            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.'
+            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.',
         );
     }
 
@@ -63,8 +63,8 @@ final class FinderException extends RuntimeException
             sprintf(
                 'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
                 $testFrameworkName,
-                $testFrameworkName
-            )
+                $testFrameworkName,
+            ),
         );
     }
 
@@ -73,8 +73,8 @@ final class FinderException extends RuntimeException
         return new self(
             sprintf('The custom path to %s was set as "%s" but this file did not exist.',
                 $testFrameworkName,
-                $customPath
-            )
+                $customPath,
+            ),
         );
     }
 }

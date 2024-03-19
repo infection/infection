@@ -79,7 +79,7 @@ TXT
 + for ([] as $b]) {
       // ...
 }
-DIFF
+DIFF,
         );
     }
 
@@ -98,7 +98,7 @@ DIFF
                 'byRef' => $node->byRef,
                 'stmts' => $node->stmts,
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

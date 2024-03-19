@@ -53,7 +53,7 @@ trait CreateMutantExecutionResult
     private function addMutantExecutionResult(
         Collector $collector,
         string $detectionStatus,
-        int $count = 1
+        int $count = 1,
     ): array {
         $executionResults = [];
 
@@ -86,7 +86,7 @@ trait CreateMutantExecutionResult
 - echo 'original';
 + echo 'mutated';
 
-DIFF
+DIFF,
             )),
             'a1b2c3',
             MutatorName::getName(For_::class),
@@ -97,7 +97,7 @@ DIFF
             10 + $id,
             now('<?php $a = 1;'),
             now('<?php $a = 1;'),
-            []
+            [],
         );
     }
 }

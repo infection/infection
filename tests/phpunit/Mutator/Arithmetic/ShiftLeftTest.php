@@ -69,7 +69,7 @@ PHP
         ];
 
         yield 'It does not mutate shift right' => [
-            <<<'PHP'
+        <<<'PHP'
 <?php
 
 $a = 1;

@@ -62,7 +62,7 @@ TXT
             <<<'DIFF'
 - if ($a === self::VALUE);
 + if ($a = self::VALUE);
-DIFF
+DIFF,
         );
     }
 

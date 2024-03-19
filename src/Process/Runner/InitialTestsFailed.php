@@ -48,7 +48,7 @@ final class InitialTestsFailed extends Exception
 {
     public static function fromProcessAndAdapter(
         Process $initialTestSuiteProcess,
-        TestFrameworkAdapter $testFrameworkAdapter
+        TestFrameworkAdapter $testFrameworkAdapter,
     ): self {
         $testFrameworkKey = $testFrameworkAdapter->getName();
 
@@ -58,11 +58,11 @@ final class InitialTestsFailed extends Exception
             sprintf(
                 '%s reported an exit code of %d.',
                 $testFrameworkKey,
-                $initialTestSuiteProcess->getExitCode()
+                $initialTestSuiteProcess->getExitCode(),
             ),
             sprintf(
                 'Refer to the %s\'s output below:',
-                $testFrameworkKey
+                $testFrameworkKey,
             ),
         ];
 

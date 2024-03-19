@@ -60,7 +60,7 @@ final class PathReplacer
             $newPath = sprintf(
                 '%s/%s',
                 $this->phpUnitConfigDir,
-                ltrim($path, '\/')
+                ltrim($path, '\/'),
             );
 
             // remove all occurrences of "/./". realpath can't be used because of glob patterns

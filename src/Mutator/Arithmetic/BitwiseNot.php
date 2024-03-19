@@ -59,7 +59,7 @@ final class BitwiseNot implements Mutator
             <<<'DIFF'
 - $a = ~$b;
 + $a = $b;
-DIFF
+DIFF,
         );
     }
 

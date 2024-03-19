@@ -70,7 +70,7 @@ final class StrykerConfig
             throw new InvalidArgumentException(
                 sprintf('Provided branchMatchRegex "%s" is not a valid regex', $branch),
                 0,
-                $invalidRegex
+                $invalidRegex,
             );
         }
 

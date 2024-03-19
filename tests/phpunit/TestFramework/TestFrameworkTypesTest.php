@@ -52,7 +52,7 @@ final class TestFrameworkTypesTest extends TestCase
                 TestFrameworkTypes::PHPSPEC,
                 TestFrameworkTypes::CODECEPTION,
             ],
-            $types
+            $types,
         );
     }
 
@@ -61,11 +61,11 @@ final class TestFrameworkTypesTest extends TestCase
         $types = TestFrameworkTypes::getTypes(
             [
                 'infection/codeception-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => DummyTestFrameworkFactory::class],
-                    'version' => '1.0.0',
-                ],
-            ]
+                        'install_path' => '/path/to/dummy/adapter/factory.php',
+                        'extra' => ['class' => DummyTestFrameworkFactory::class],
+                        'version' => '1.0.0',
+                    ],
+            ],
         );
 
         $this->assertSame(
@@ -76,7 +76,7 @@ final class TestFrameworkTypesTest extends TestCase
                 TestFrameworkTypes::CODECEPTION,
                 'dummy',
             ],
-            $types
+            $types,
         );
     }
 }

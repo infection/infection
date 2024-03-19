@@ -73,7 +73,7 @@ TXT
             <<<'DIFF'
 - $x = preg_quote($string, $delimiter);
 + $x = $string;
-DIFF
+DIFF,
         );
     }
 
@@ -93,8 +93,8 @@ DIFF
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\FuncCall
-            && $node->name instanceof Node\Name
-            && $node->name->toLowerString() === 'preg_quote';
+        return $node instanceof Node\Expr\FuncCall &&
+            $node->name instanceof Node\Name &&
+            $node->name->toLowerString() === 'preg_quote';
     }
 }

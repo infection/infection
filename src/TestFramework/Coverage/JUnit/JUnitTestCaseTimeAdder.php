@@ -56,7 +56,7 @@ final class JUnitTestCaseTimeAdder
     public function getTotalTestTime(): float
     {
         return array_sum(
-            $this->uniqueTestLocations()
+            $this->uniqueTestLocations(),
         );
     }
 

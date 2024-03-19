@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = array_reverse(['foo', 'bar', 'baz'], 1);
 + $x = ['foo', 'bar', 'baz'];
-DIFF
+DIFF,
         );
     }
 

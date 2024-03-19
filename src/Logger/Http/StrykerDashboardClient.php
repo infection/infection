@@ -52,13 +52,13 @@ class StrykerDashboardClient
         string $repositorySlug,
         string $branch,
         string $apiKey,
-        string $reportJson
+        string $reportJson,
     ): void {
         $response = $this->client->request(
             $repositorySlug,
             $branch,
             $apiKey,
-            $reportJson
+            $reportJson,
         );
 
         $statusCode = $response->getStatusCode();
@@ -66,14 +66,14 @@ class StrykerDashboardClient
         if (!in_array($statusCode, [Response::HTTP_OK, Response::HTTP_CREATED], true)) {
             $this->logger->warning(sprintf(
                 'Stryker dashboard returned an unexpected response code: %s',
-                $statusCode)
+                $statusCode),
             );
         }
 
         $this->logger->notice(sprintf(
             'Dashboard response:%s%s',
             "\r\n",
-            $response->getBody()
+            $response->getBody(),
         ));
     }
 }

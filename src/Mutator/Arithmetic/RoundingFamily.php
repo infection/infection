@@ -73,7 +73,7 @@ TXT
 + $a = ceil($b);
 # Mutation 2
 + $a = round($b);
-DIFF
+DIFF,
         );
     }
 
@@ -95,7 +95,7 @@ DIFF
             yield new Node\Expr\FuncCall(
                 new Node\Name($functionName),
                 [$node->args[0]],
-                $node->getAttributes()
+                $node->getAttributes(),
             );
         }
     }
@@ -106,8 +106,8 @@ DIFF
             return false;
         }
 
-        if (!$node->name instanceof Node\Name
-            || !in_array($node->name->toLowerString(), self::MUTATORS_MAP, true)
+        if (!$node->name instanceof Node\Name ||
+            !in_array($node->name->toLowerString(), self::MUTATORS_MAP, true)
         ) {
             return false;
         }

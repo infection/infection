@@ -58,7 +58,7 @@ final class MethodCallRemoval implements Mutator
             null,
             <<<'DIFF'
 - $this->fooBar();
-DIFF
+DIFF,
         );
     }
 

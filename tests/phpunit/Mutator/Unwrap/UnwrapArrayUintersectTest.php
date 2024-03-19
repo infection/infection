@@ -255,7 +255,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_uintersect' => [
@@ -265,7 +265,7 @@ PHP
 function array_uintersect($array, $array1, $array2)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
@@ -275,7 +275,7 @@ PHP
 $a = 'array_uintersect';
 
 $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-PHP
+PHP,
         ];
     }
 }

@@ -124,7 +124,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->expectExceptionMessage(sprintf(
             'Could not locate the XML coverage index file. More than one file has been found: "%s", "%s"',
             normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'index.xml')),
-            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'sub-dir/index.xml'))
+            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'sub-dir/index.xml')),
         ));
 
         $this->locator->locate();
@@ -135,7 +135,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not find any "index.xml" file in "%s"',
-            $this->tmp
+            $this->tmp,
         ));
 
         $this->locator->locate();
@@ -148,7 +148,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not find any "index.xml" file in "%s"',
-            $this->tmp . '/unknown-dir'
+            $this->tmp . '/unknown-dir',
         ));
 
         $this->locator->locate();

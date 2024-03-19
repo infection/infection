@@ -68,7 +68,7 @@ PHP
 <?php
 
 $a = ['D'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when the $initial parameter is provided as a constant' => [
@@ -88,7 +88,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when the $initial parameter is provided and a backslash is in front of array_reduce' => [
@@ -108,7 +108,7 @@ PHP
 <?php
 
 $a = ['D'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within if statements when the $initial parameter is provided' => [
@@ -128,7 +128,7 @@ $a = ['A', 1, 'C'];
 if (['D'] === $a) {
     return true;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when the $initial parameter is provided and array_reduce is wrongly capitalized' => [
@@ -148,7 +148,7 @@ PHP
 <?php
 
 $a = ['D'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when the $initial parameter is provided and array_reduce uses other functions as input' => [
@@ -166,7 +166,7 @@ PHP
 <?php
 
 $a = $foo->qux();
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when the $initial parameter is provided in a more complex situation' => [
@@ -180,7 +180,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['D']);
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when the the $initial parameter is provided and the $callback parameter is provided as a variable' => [
@@ -194,7 +194,7 @@ PHP
 <?php
 
 $a = ['D'];
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when the $initial parameter is not provided' => [
@@ -204,7 +204,7 @@ PHP
 $a = array_reduce(['A', 1, 'C'], function ($carry, $item) {
     return $item;
 });
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
@@ -212,7 +212,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_reduce' => [
@@ -222,7 +222,7 @@ PHP
 function array_reduce($array, $callback, $initial = null)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [

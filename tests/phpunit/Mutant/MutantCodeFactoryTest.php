@@ -61,7 +61,7 @@ final class MutantCodeFactoryTest extends TestCase
      */
     public function test_it_creates_the_mutant_code_from_the_given_mutation(
         Mutation $mutation,
-        string $expectedMutantCode
+        string $expectedMutantCode,
     ): void {
         $mutantCode = $this->codeFactory->createCode($mutation);
 
@@ -72,7 +72,7 @@ final class MutantCodeFactoryTest extends TestCase
      * @dataProvider mutationProvider
      */
     public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
-        Mutation $mutation
+        Mutation $mutation,
     ): void {
         $originalNodesDump = SingletonContainer::getNodeDumper()->dump($mutation->getOriginalFileAst());
 
@@ -98,7 +98,7 @@ final class MutantCodeFactoryTest extends TestCase
                             'endLine' => 3,
                             'endTokenPos' => 4,
                             'endFilePos' => 20,
-                        ]
+                        ],
                     ),
                     [new Node\Stmt\Echo_(
                         [new Node\Scalar\LNumber(
@@ -111,7 +111,7 @@ final class MutantCodeFactoryTest extends TestCase
                                 'endTokenPos' => 9,
                                 'endFilePos' => 30,
                                 'kind' => 10,
-                            ]
+                            ],
                         )],
                         [
                             'startLine' => 5,
@@ -120,7 +120,7 @@ final class MutantCodeFactoryTest extends TestCase
                             'endLine' => 5,
                             'endTokenPos' => 10,
                             'endFilePos' => 31,
-                        ]
+                        ],
                     )],
                     [
                         'startLine' => 3,
@@ -130,7 +130,7 @@ final class MutantCodeFactoryTest extends TestCase
                         'endTokenPos' => 10,
                         'endFilePos' => 31,
                         'kind' => 1,
-                    ]
+                    ],
                 )],
                 MutatorName::getName(Plus::class),
                 [
@@ -154,11 +154,11 @@ final class MutantCodeFactoryTest extends TestCase
                             'endTokenPos' => 9,
                             'endFilePos' => 30,
                             'kind' => 10,
-                        ]
-                    )
+                        ],
+                    ),
                 ),
                 0,
-                []
+                [],
             ),
             <<<'PHP'
 <?php
@@ -166,7 +166,7 @@ final class MutantCodeFactoryTest extends TestCase
 namespace Acme;
 
 echo 15;
-PHP
+PHP,
         ];
     }
 }

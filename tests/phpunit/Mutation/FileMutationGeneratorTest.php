@@ -91,7 +91,7 @@ final class FileMutationGeneratorTest extends TestCase
             new LineRangeCalculator(),
             $this->filesDiffChangedLines,
             false,
-            'master'
+            'master',
         );
     }
 
@@ -100,7 +100,7 @@ final class FileMutationGeneratorTest extends TestCase
         $traceMock = $this->createTraceMock(
             self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php',
             '',
-            ''
+            '',
         );
         $traceMock
             ->expects($this->never())
@@ -123,7 +123,7 @@ final class FileMutationGeneratorTest extends TestCase
             $traceMock,
             false,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
-            []
+            [],
         );
 
         $mutations = iterator_to_array($mutations, false);
@@ -140,7 +140,7 @@ final class FileMutationGeneratorTest extends TestCase
 
         $this->assertSame(
             MutatorName::getName(Plus::class),
-            $mutation->getMutatorName()
+            $mutation->getMutatorName(),
         );
     }
 
@@ -153,7 +153,7 @@ final class FileMutationGeneratorTest extends TestCase
         string $relativePathname,
         ?bool $hasTests,
         bool $onlyCovered,
-        string $expectedFilePath
+        string $expectedFilePath,
     ): void {
         $nodeIgnorers = [new FakeIgnorer()];
 
@@ -187,7 +187,7 @@ final class FileMutationGeneratorTest extends TestCase
             $trace,
             $onlyCovered,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
-            $nodeIgnorers
+            $nodeIgnorers,
         );
 
         $mutations = iterator_to_array($mutations, false);
@@ -202,7 +202,7 @@ final class FileMutationGeneratorTest extends TestCase
         string $file,
         string $relativePath,
         string $relativePathname,
-        ?bool $hasTests = null
+        ?bool $hasTests = null,
     ): void {
         $this->fileParserMock
             ->expects($this->never())
@@ -220,7 +220,7 @@ final class FileMutationGeneratorTest extends TestCase
             new LineRangeCalculator(),
             $this->filesDiffChangedLines,
             false,
-            'master'
+            'master',
         );
 
         $trace = $this->createTraceMock($file, $relativePath, $relativePathname, $hasTests);
@@ -229,7 +229,7 @@ final class FileMutationGeneratorTest extends TestCase
             $trace,
             true,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
-            []
+            [],
         );
 
         $mutations = iterator_to_array($mutations, false);
@@ -242,7 +242,7 @@ final class FileMutationGeneratorTest extends TestCase
         foreach (self::provideBoolean() as $hasTests) {
             $title = sprintf(
                 'path - only covered: false - has tests: %s',
-                $hasTests ? 'true' : 'false'
+                $hasTests ? 'true' : 'false',
             );
 
             yield $title => [
@@ -258,7 +258,7 @@ final class FileMutationGeneratorTest extends TestCase
         foreach (self::provideBoolean() as $hasTests) {
             $title = sprintf(
                 'real path - only covered: false - has tests: %s',
-                $hasTests ? 'true' : 'false'
+                $hasTests ? 'true' : 'false',
             );
 
             yield $title => [
@@ -319,7 +319,7 @@ final class FileMutationGeneratorTest extends TestCase
         string $file,
         string $relativePath,
         string $relativePathname,
-        ?bool $hasTests = null
+        ?bool $hasTests = null,
     ): Trace {
         $proxyTraceMock = $this->createMock(Trace::class);
         $proxyTraceMock

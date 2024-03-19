@@ -94,7 +94,7 @@ TXT
             <<<'DIFF'
 - $x = mb_strlen($str) < 10;
 + $x = strlen($str) < 10;
-DIFF
+DIFF,
         );
     }
 
@@ -150,7 +150,7 @@ DIFF
                 'mb_substr' => self::makeFunctionAndRemoveExtraArgsMapper('substr', 3),
                 'mb_convert_case' => self::makeConvertCaseMapper(),
             ],
-            array_fill_keys($allowedFunctions, null)
+            array_fill_keys($allowedFunctions, null),
         );
     }
 
@@ -255,7 +255,7 @@ DIFF
         return new Node\Expr\FuncCall(
             new Node\Name($newFuncName, $node->name->getAttributes()),
             $args,
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 }

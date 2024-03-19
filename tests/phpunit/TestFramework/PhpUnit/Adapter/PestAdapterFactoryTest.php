@@ -53,7 +53,7 @@ final class PestAdapterFactoryTest extends TestCase
             '/path/to/junit.xml',
             '/path/to/project',
             [],
-            true
+            true,
         );
 
         $this->assertSame('Pest', $adapter->getName());

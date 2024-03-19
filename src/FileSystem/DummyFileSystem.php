@@ -40,7 +40,7 @@ use Composer\InstalledVersions;
 use function version_compare;
 
 if (version_compare((string) InstalledVersions::getPrettyVersion('symfony/filesystem'), 'v6.0', '<')) {
-    class_alias(DummySymfony5FileSystem::class, DummyFileSystem::class);
+    class_alias(DummySymfony5FileSystem::class, \Infection\FileSystem\DummyFileSystem::class);
 } else {
-    class_alias(DummySymfony6FileSystem::class, DummyFileSystem::class);
+    class_alias(DummySymfony6FileSystem::class, \Infection\FileSystem\DummyFileSystem::class);
 }

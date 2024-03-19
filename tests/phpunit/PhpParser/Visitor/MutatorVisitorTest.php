@@ -61,11 +61,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
     public function test_it_mutates_the_correct_node(
         array $nodes,
         string $expectedCodeOutput,
-        Mutation $mutation
+        Mutation $mutation,
     ): void {
         $this->traverse(
             $nodes,
-            [new MutatorVisitor($mutation)]
+            [new MutatorVisitor($mutation)],
         );
 
         $output = SingletonContainer::getPrinter()->prettyPrintFile($nodes);
@@ -121,7 +121,7 @@ PHP
                     ClassMethod::class,
                     MutatedNode::wrap(new Nop()),
                     0,
-                    []
+                    [],
                 ),
             ];
         })();
@@ -173,7 +173,7 @@ PHP
                     ClassMethod::class,
                     MutatedNode::wrap([new Nop(), new Nop()]),
                     0,
-                    []
+                    [],
                 ),
             ];
         })();
@@ -227,7 +227,7 @@ PHP
                     ClassMethod::class,
                     MutatedNode::wrap(new Nop()),
                     0,
-                    []
+                    [],
                 ),
             ];
         })();
@@ -295,7 +295,7 @@ PHP
                     MutatorName::getName(PublicVisibility::class),
                     MutatedNode::wrap(new Nop()),
                     0,
-                    []
+                    [],
                 ),
             ];
         })();

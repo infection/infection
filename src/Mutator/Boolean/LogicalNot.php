@@ -59,7 +59,7 @@ final class LogicalNot implements Mutator
             <<<'DIFF'
 - $a = !$b;
 + $a = $b;
-DIFF
+DIFF,
         );
     }
 
@@ -80,8 +80,8 @@ DIFF
         }
 
         // e.g. "!!someFunc()"
-        $isDoubledLogicalNot = ($node->expr instanceof Node\Expr\BooleanNot)
-            || $node->getAttribute('parent') instanceof Node\Expr\BooleanNot;
+        $isDoubledLogicalNot = ($node->expr instanceof Node\Expr\BooleanNot) ||
+            $node->getAttribute('parent') instanceof Node\Expr\BooleanNot;
 
         return !$isDoubledLogicalNot;
     }

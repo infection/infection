@@ -66,18 +66,18 @@ PHP
 
 preg_match('~some-regexp$~gu', 'irrelevant');
 PHP
-                ,
+            ,
                 <<<'PHP'
 <?php
 
 preg_match('~some-regexp$~iu', 'irrelevant');
 PHP
-                ,
+            ,
                 <<<'PHP'
 <?php
 
 preg_match('~some-regexp$~ig', 'irrelevant');
-PHP
+PHP,
             ],
         ];
 
@@ -86,7 +86,7 @@ PHP
 <?php
 
 preg_match('~some-regexp$~', 'irrelevant');
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly preg_match function is wrongly capitalized' => [
@@ -107,7 +107,7 @@ PHP
 <?php
 
 pReG_MaTcH('~some-regexp$~i', 'irrelevant');
-PHP
+PHP,
             ],
         ];
 
@@ -129,7 +129,7 @@ PHP
 <?php
 
 pReG_MaTcH('^some-regexp$^i', 'irrelevant');
-PHP
+PHP,
             ],
         ];
 

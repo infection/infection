@@ -66,7 +66,7 @@ final class TextLogFileProvider
 
         $questionText = $this->consoleHelper->getQuestion(
             'Where do you want to store the text log file?',
-            ''
+            '',
         );
 
         $question = new Question($questionText, '');
@@ -75,7 +75,7 @@ final class TextLogFileProvider
         $answer = $this->questionHelper->ask(
             $io->getInput(),
             $io->getOutput(),
-            $question
+            $question,
         );
 
         return $answer === '' ? null : $answer;

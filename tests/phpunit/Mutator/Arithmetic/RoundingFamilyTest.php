@@ -64,12 +64,12 @@ PHP
 
 $var = floor(1.23);
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $var = ceil(1.23);
-PHP
+PHP,
             ],
         ];
 
@@ -91,7 +91,7 @@ PHP
 <?php
 
 $var = round(1.23);
-PHP
+PHP,
             ],
         ];
 
@@ -113,7 +113,7 @@ PHP
 <?php
 
 $var = round(1.23);
-PHP
+PHP,
             ],
         ];
 
@@ -135,7 +135,7 @@ PHP
 <?php
 
 $var = round(1.23);
-PHP
+PHP,
             ],
         ];
 
@@ -145,7 +145,7 @@ PHP
 
 $foo = 'floor';
 $foo(1.23);
-PHP
+PHP,
         ];
 
         yield 'It mutates round() to floor() and ceil() and leaves only 1 argument' => [
@@ -166,7 +166,7 @@ PHP
 <?php
 
 $var = ceil(1.23);
-PHP
+PHP,
             ],
         ];
 
@@ -174,7 +174,7 @@ PHP
             <<<'PHP'
 <?php
  strtolower('lower');
-PHP
+PHP,
         ];
 
         yield 'It mutates \ceil() to round() and floor()' => [
@@ -198,7 +198,7 @@ PHP
 
 $float = 1.23;
 return round($float);
-PHP
+PHP,
             ],
         ];
 
@@ -223,7 +223,7 @@ PHP
 
 while (round(1.23)) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -245,7 +245,7 @@ PHP
 <?php
 
 echo round($result = $this->average());
-PHP
+PHP,
             ],
         ];
 
@@ -267,7 +267,7 @@ PHP
 <?php
 
 return ceil($this->positive / $this->total);
-PHP
+PHP,
             ],
         ];
     }

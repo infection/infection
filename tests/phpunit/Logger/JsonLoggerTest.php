@@ -62,7 +62,7 @@ final class JsonLoggerTest extends TestCase
         bool $onlyCovered,
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,
-        array $expectedContents
+        array $expectedContents,
     ): void {
         $logger = new JsonLogger($metricsCalculator, $resultsCollector, $onlyCovered);
 
@@ -421,7 +421,7 @@ final class JsonLoggerTest extends TestCase
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,
-                'uncovered#0'
+                'uncovered#0',
             ),
         );
     }
@@ -451,7 +451,7 @@ final class JsonLoggerTest extends TestCase
                 0,
                 For_::class,
                 DetectionStatus::IGNORED,
-                'ignored#0'
+                'ignored#0',
             ),
         );
     }
@@ -465,7 +465,7 @@ final class JsonLoggerTest extends TestCase
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,
-                base64_decode('abc', true) // produces non UTF-8 character
+                base64_decode('abc', true), // produces non UTF-8 character
             ),
         );
 

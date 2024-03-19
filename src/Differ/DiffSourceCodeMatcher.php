@@ -44,7 +44,7 @@ use function str_contains;
 final class DiffSourceCodeMatcher
 {
     private const POSSIBLE_DELIMITERS = [
-        '#', '%', ':', ';', '=', '?', '@', '^', '~',
+            '#', '%', ':', ';', '=', '?', '@', '^', '~',
     ];
 
     public function matches(string $diff, string $sourceCodeRegex): bool

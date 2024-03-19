@@ -61,7 +61,7 @@ class X {
 +        return null;
     }
 }
-DIFF
+DIFF,
         );
     }
 
@@ -75,15 +75,15 @@ DIFF
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Return_(
-            new Node\Expr\ConstFetch(new Node\Name('null'))
+            new Node\Expr\ConstFetch(new Node\Name('null')),
         );
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Return_
-            && $node->expr instanceof Node\Expr\Variable
-            && $node->expr->name === 'this'
+        return $node instanceof Node\Stmt\Return_ &&
+            $node->expr instanceof Node\Expr\Variable &&
+            $node->expr->name === 'this'
             && $this->isNullReturnValueAllowed($node);
     }
 }

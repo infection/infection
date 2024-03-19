@@ -70,7 +70,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         array $sourceDirectories,
         bool $skipCoverage,
         bool $executeOnlyCoveringTestCases = false,
-        array $filteredSourceFilesToMutate = []
+        array $filteredSourceFilesToMutate = [],
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
 
@@ -79,9 +79,9 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(
                 new Filesystem(),
-                $testFrameworkConfigDir
+                $testFrameworkConfigDir,
             ),
-            $testFrameworkConfigDir
+            $testFrameworkConfigDir,
         );
 
         return new PhpUnitAdapter(
@@ -95,18 +95,18 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
                 $sourceDirectories,
-                $filteredSourceFilesToMutate
+                $filteredSourceFilesToMutate,
             ),
             new MutationConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
                 $projectDir,
-                new JUnitTestCaseSorter()
+                new JUnitTestCaseSorter(),
             ),
             new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases),
             new VersionParser(),
-            new CommandLineBuilder()
+            new CommandLineBuilder(),
         );
     }
 

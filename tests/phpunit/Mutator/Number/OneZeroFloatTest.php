@@ -104,7 +104,7 @@ PHP
 <?php
 
 'a' . '0.0';
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other floats' => [
@@ -125,7 +125,7 @@ PHP
 if ($a < 0.0) {
     echo "small";
 }
-PHP
+PHP,
         ];
     }
 }

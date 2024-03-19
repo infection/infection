@@ -64,12 +64,12 @@ PHP
 
 $a = ['foo' => 'bar'];
 PHP
-                ,
+            ,
                 <<<'PHP'
 <?php
 
 $a = ['baz' => 'bar'];
-PHP
+PHP,
             ],
         ];
 
@@ -104,7 +104,7 @@ $a = \array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc
 PHP
             ,
             [
-                <<<'PHP'
+               <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
@@ -254,7 +254,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_intersect_uassoc' => [
@@ -264,7 +264,7 @@ PHP
 function array_intersect_uassoc($array, $array1, $keyCompareFunc)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
@@ -274,7 +274,7 @@ PHP
 $a = 'array_intersect_uassoc';
 
 $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
+PHP,
         ];
     }
 }

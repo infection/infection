@@ -63,7 +63,7 @@ if ($this->foo()) {
 - } elseif ($this->bar()) {
 + } elseif (!$this->bar()) {
 }
-DIFF
+DIFF,
         );
     }
 
@@ -79,7 +79,7 @@ DIFF
         yield new Node\Stmt\ElseIf_(
             new Node\Expr\BooleanNot($node->cond),
             $node->stmts,
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

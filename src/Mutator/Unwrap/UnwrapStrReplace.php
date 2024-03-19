@@ -66,7 +66,7 @@ TXT
             <<<'DIFF'
 - $x = str_replace('%body%', 'black', '<body text=%body%>');
 + $x = '<body text=%body%>';
-DIFF
+DIFF,
         );
     }
 

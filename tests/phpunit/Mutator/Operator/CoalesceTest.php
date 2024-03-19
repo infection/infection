@@ -66,7 +66,7 @@ PHP
 $foo = 'foo';
 $bar = 'bar';
 $bar ?? $foo;
-PHP
+PHP,
         ];
 
         yield 'Mutate more than one coalesce operators and flip operands' => [
@@ -96,7 +96,7 @@ $foo = 'foo';
 $bar = 'bar';
 $baz = 'baz';
 $bar ?? $foo ?? $baz;
-PHP
+PHP,
             ],
         ];
 
@@ -136,7 +136,7 @@ $foo = 'foo';
 $bar = 'bar';
 $baz = 'baz';
 $bar ?? $foo ?? $baz ?? 'oof';
-PHP
+PHP,
             ],
         ];
 
@@ -146,7 +146,7 @@ PHP
 
 define('FOO', 'foo');
 FOO ?? 'bar';
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when left operator is constant defined in class' => [
@@ -161,7 +161,7 @@ new class {
         return self::FOO ?? 'bar';
     }
 };
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when null is used with one coalesce' => [
@@ -189,7 +189,7 @@ PHP
 $foo = 'foo';
 $bar = 'bar';
 $bar ?? $foo ?? null;
-PHP
+PHP,
         ];
     }
 }

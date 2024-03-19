@@ -74,7 +74,7 @@ TXT
             <<<'DIFF'
 - $x = [...$collection];
 + $x = $collection;
-DIFF
+DIFF,
         );
     }
 

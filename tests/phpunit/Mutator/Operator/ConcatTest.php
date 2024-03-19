@@ -66,7 +66,7 @@ PHP
 $a = 'foo';
 $b = 'bar';
 $b . $a;
-PHP
+PHP,
         ];
 
         yield 'Flips multiple concatenated variables' => [
@@ -96,7 +96,7 @@ $a = 'foo';
 $b = 'bar';
 $c = 'baz';
 $a . $c . $b;
-PHP
+PHP,
             ],
         ];
 

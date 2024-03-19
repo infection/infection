@@ -62,7 +62,7 @@ final class IfNegation implements Mutator
 - if ($this->fooBar()) {
 + if (!$this->fooBar()) {
 }
-DIFF
+DIFF,
         );
     }
 
@@ -82,7 +82,7 @@ DIFF
                 'else' => $node->else,
                 'stmts' => $node->stmts,
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

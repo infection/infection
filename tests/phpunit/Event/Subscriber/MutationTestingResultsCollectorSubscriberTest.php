@@ -61,13 +61,13 @@ final class MutationTestingResultsCollectorSubscriberTest extends TestCase
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsCollectorSubscriber(
             $collectorA,
-            $collectorB
+            $collectorB,
         ));
 
         $dispatcher->dispatch(
             new MutantProcessWasFinished(
-                $this->createMock(MutantExecutionResult::class)
-            )
+                $this->createMock(MutantExecutionResult::class),
+            ),
         );
     }
 }

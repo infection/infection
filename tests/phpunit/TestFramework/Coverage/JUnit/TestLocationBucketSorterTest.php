@@ -72,7 +72,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort([$testLocation]),
-            false
+            false,
         );
 
         $this->assertSame([$testLocation], $sortedTestLocations);
@@ -93,7 +93,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort(array_reverse($testLocations)),
-            false
+            false,
         );
 
         $this->assertSame($testLocations, $sortedTestLocations);
@@ -106,7 +106,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort([$testLocation2, $testLocation1]),
-            false
+            false,
         );
 
         $this->assertSame([$testLocation1, $testLocation2], $sortedTestLocations);
@@ -123,12 +123,12 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort($uniqueTestLocations),
-            false
+            false,
         );
 
         $this->assertTrue(
             self::areConstraintsOrderValid($sortedTestLocations),
-            'Bucket sort failed order check'
+            'Bucket sort failed order check',
         );
     }
 
@@ -147,7 +147,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $this->assertTrue(
             self::areConstraintsOrderValid($uniqueTestLocations),
-            'Quicksort failed order check'
+            'Quicksort failed order check',
         );
     }
 
@@ -180,7 +180,7 @@ final class TestLocationBucketSorterTest extends TestCase
             $start = microtime(true);
             $dummy = iterator_to_array(
                 TestLocationBucketSorter::bucketSort($uniqueTestLocations),
-                false
+                false,
             );
             $totalBucketSort += microtime(true) - $start;
         }
@@ -205,7 +205,7 @@ final class TestLocationBucketSorterTest extends TestCase
             static function (float $executionTime): TestLocation {
                 return new TestLocation('', '', $executionTime);
             },
-            JUnitTimes::JUNIT_TIMES
+            JUnitTimes::JUNIT_TIMES,
         );
 
         yield 'Ten times the minimal amount of locations' => [new ArrayIterator(array_slice($locations, 0, JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * 10))];
@@ -235,7 +235,7 @@ final class TestLocationBucketSorterTest extends TestCase
             $uniqueTestLocations,
             static function (TestLocation $a, TestLocation $b): int {
                 return $a->getExecutionTime() <=> $b->getExecutionTime();
-            }
+            },
         );
     }
 

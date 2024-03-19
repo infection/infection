@@ -52,7 +52,7 @@ final class Definition
         private readonly string $description,
         string $category,
         private readonly ?string $remedies,
-        private readonly string $diff
+        private readonly string $diff,
     ) {
         Assert::oneOf($category, MutatorCategory::ALL);
         $this->category = $category;

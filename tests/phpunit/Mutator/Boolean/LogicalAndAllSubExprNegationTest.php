@@ -63,7 +63,7 @@ PHP
 <?php
 
 $var = !a() && !b();
-PHP
+PHP,
             ],
         ];
 
@@ -79,7 +79,7 @@ PHP
 <?php
 
 $var = !a() && !b() && !c() && !d();
-PHP
+PHP,
             ],
         ];
 
@@ -95,7 +95,7 @@ PHP
 <?php
 
 $var = !(!a() && b());
-PHP
+PHP,
             ],
         ];
 
@@ -111,7 +111,7 @@ PHP
 <?php
 
 $var = !($a = 1) && !$b;
-PHP
+PHP,
             ],
         ];
 

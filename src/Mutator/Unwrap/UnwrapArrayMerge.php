@@ -77,7 +77,7 @@ TXT
 + $x = ['foo', 'bar', 'baz'];
 # Mutation 2
 + $x = ['oof'];
-DIFF
+DIFF,
         );
     }
 

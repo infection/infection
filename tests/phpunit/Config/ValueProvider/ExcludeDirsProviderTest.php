@@ -75,7 +75,7 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
         $this->provider = new ExcludeDirsProvider(
             $this->createMock(ConsoleHelper::class),
             $this->getQuestionHelper(),
-            $this->fileSystem
+            $this->fileSystem,
         );
     }
 
@@ -92,10 +92,10 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
         $excludedDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             $dirsInCurrentFolder,
-            ['.']
+            ['.'],
         );
 
         $this->assertContains($excludedRootDir, $excludedDirs);
@@ -110,10 +110,10 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
         $excludeDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("abc\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             ['src'],
-            ['src']
+            ['src'],
         );
 
         $this->assertCount(0, $excludeDirs);
@@ -134,10 +134,10 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
         $excludeDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("foo\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             ['src'],
-            [$this->workspace]
+            [$this->workspace],
         );
 
         $this->assertContains('foo', $excludeDirs);
@@ -160,10 +160,10 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
         $excludeDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("$dirA\n$dirA\n$dirC\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             [$dirA, $dirB, $dirC],
-            ['.']
+            ['.'],
         );
 
         $this->assertSame([0 => $dirA, 1 => $dirC], $excludeDirs);

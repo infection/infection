@@ -61,7 +61,7 @@ class DiffColorizer
 
                 return $line;
             },
-            explode("\n", $diff)
+            explode("\n", $diff),
         );
 
         return sprintf('<code>%s%s</code>', "\n", implode("\n", $lines));

@@ -74,7 +74,7 @@ PHP;
         $this->parseAndTraverse(
             self::CODE_WITH_ONE_IGNORED_NODE,
             $spy = $this->createSpy(),
-            $ignorer
+            $ignorer,
         );
 
         $this->assertSame(0, $spy->nodeCounter);
@@ -92,7 +92,7 @@ PHP;
         $this->parseAndTraverse(
             self::CODE_WITH_ONE_COUNTED_NODE,
             $spy = $this->createSpy(),
-            $ignorer
+            $ignorer,
         );
 
         $this->assertSame(1, $spy->nodeCounter);

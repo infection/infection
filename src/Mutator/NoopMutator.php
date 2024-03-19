@@ -58,7 +58,7 @@ final class NoopMutator implements Mutator
     {
         throw new DomainException(sprintf(
             'The class "%s" does not have a definition',
-            self::class
+            self::class,
         ));
     }
 

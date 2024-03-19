@@ -46,7 +46,7 @@ use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use const PHP_SAPI;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function str_contains;
+use function strpos;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -123,7 +123,7 @@ STR
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_map('get_class', $this->eventDispatcher->getEvents())
+            array_map('get_class', $this->eventDispatcher->getEvents()),
         );
     }
 
@@ -154,7 +154,7 @@ STR
             $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
         } catch (RuntimeException $e) {
             // Signal 11, AKA "segmentation fault", is not something we can do anything about
-            if (extension_loaded('xdebug') && str_contains($e->getMessage(), 'The process has been signaled with signal "11"')) {
+            if (extension_loaded('xdebug') && strpos($e->getMessage(), 'The process has been signaled with signal "11"') !== false) {
                 $this->markTestIncomplete($e->getMessage());
             }
 
@@ -168,7 +168,7 @@ STR
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_map('get_class', $this->eventDispatcher->getEvents())
+            array_map('get_class', $this->eventDispatcher->getEvents()),
         );
     }
 

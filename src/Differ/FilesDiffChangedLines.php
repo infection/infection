@@ -54,7 +54,7 @@ class FilesDiffChangedLines
     {
         $map = $this->memoizedFilesChangedLinesMap
             ?? $this->memoizedFilesChangedLinesMap = $this->diffChangedLinesParser->parse(
-                $this->diffFileProvider->provideWithLines($gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE)
+                $this->diffFileProvider->provideWithLines($gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE),
             );
 
         foreach ($map[$fileRealPath] ?? [] as $changedLinesRange) {

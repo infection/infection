@@ -96,7 +96,7 @@ final class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptio
             $mutatedFilePath,
             $mutationHash,
             $mutationOriginalFilePath,
-            sprintf('--colors=never %s', $extraOptions)
+            sprintf('--colors=never %s', $extraOptions),
         );
     }
 

@@ -164,7 +164,7 @@ final class MockVendor
     {
         $files = array_filter(
             [$this->vendorBinLink, $this->vendorBinBat],
-            'file_exists'
+            'file_exists',
         );
 
         $this->fileSystem->remove($files);

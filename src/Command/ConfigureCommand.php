@@ -90,9 +90,9 @@ final class ConfigureCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the Test framework to use ("%s")',
-                    implode('", "', TestFrameworkTypes::getTypes())
+                    implode('", "', TestFrameworkTypes::getTypes()),
                 ),
-                TestFrameworkTypes::PHPUNIT
+                TestFrameworkTypes::PHPUNIT,
             );
     }
 
@@ -110,7 +110,7 @@ final class ConfigureCommand extends BaseCommand
         $consoleHelper = new ConsoleHelper($formatterHelper);
         $consoleHelper->writeSection(
             $io->getOutput(),
-            'Welcome to the Infection config generator'
+            'Welcome to the Infection config generator',
         );
 
         $io->newLine();
@@ -145,7 +145,7 @@ final class ConfigureCommand extends BaseCommand
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,
             $questionHelper,
-            $fileSystem
+            $fileSystem,
         );
 
         $excludedDirs = $excludeDirsProvider->get($io, $dirsInCurrentDir, $sourceDirs);
@@ -154,7 +154,7 @@ final class ConfigureCommand extends BaseCommand
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get(
             $io,
             $dirsInCurrentDir,
-            $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK)
+            $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK),
         );
 
         $phpUnitExecutableFinder = new TestFrameworkFinder();
@@ -169,7 +169,7 @@ final class ConfigureCommand extends BaseCommand
         $io->newLine();
         $io->writeln(sprintf(
             'Configuration file "<comment>%s</comment>" was created.',
-            SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE
+            SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE,
         ));
         $io->newLine();
 
@@ -185,7 +185,7 @@ final class ConfigureCommand extends BaseCommand
         array $excludedDirs,
         ?string $phpUnitConfigPath = null,
         ?string $phpUnitCustomExecutablePath = null,
-        ?string $textLogFilePath = null
+        ?string $textLogFilePath = null,
     ): void {
         $configObject = new stdClass();
 
@@ -230,7 +230,7 @@ final class ConfigureCommand extends BaseCommand
 
         file_put_contents(
             SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE,
-            json_encode($configObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            json_encode($configObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
         );
     }
 

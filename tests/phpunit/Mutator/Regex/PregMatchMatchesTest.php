@@ -62,7 +62,7 @@ PHP
 <?php
 
 (int) ($foo = array());
-PHP
+PHP,
         ];
 
         yield 'It does not mutate if the function is a variable' => [
@@ -71,11 +71,11 @@ PHP
 
 $foo = 'preg_match';
 $foo('/a/', 'b', $bar);
-PHP
+PHP,
         ];
 
         yield 'It mutates if preg_match is incorrectly cased' => [
-            <<<'PHP'
+          <<<'PHP'
 <?php
 
 PreG_maTch('/a/', 'b', $foo);
@@ -85,7 +85,7 @@ PHP
 <?php
 
 (int) ($foo = array());
-PHP
+PHP,
         ];
 
         yield 'It does not mutate if there are less than 3 arguments' => [
@@ -93,7 +93,7 @@ PHP
 <?php
 
 preg_match('/asdfa/', 'foo');
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly if the 3rd variable is a property' => [
@@ -107,7 +107,7 @@ PHP
 <?php
 
 (int) ($a->b = array());
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly even with four arguments' => [
@@ -121,7 +121,7 @@ PHP
 <?php
 
 (int) ($foo = array());
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly even with five arguments' => [
@@ -135,7 +135,7 @@ PHP
 <?php
 
 (int) ($foo = array());
-PHP
+PHP,
         ];
     }
 }
