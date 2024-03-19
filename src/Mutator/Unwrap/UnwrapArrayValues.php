@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = array_values([10 => 'Hello!']);
 + $x = [10 => 'Hello!'];
-DIFF
+DIFF,
         );
     }
 

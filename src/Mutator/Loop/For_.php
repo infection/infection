@@ -79,7 +79,7 @@ TXT
 + for ($i=0; false; $i++) {
       // ...
 }
-DIFF
+DIFF,
         );
     }
 
@@ -97,7 +97,7 @@ DIFF
                 'loop' => $node->loop,
                 'stmts' => $node->stmts,
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

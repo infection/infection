@@ -48,7 +48,7 @@ final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
         $logger = $this->createMock(MutationTestingResultsLogger::class);
 
         $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger
+            $logger,
         );
 
         $subscriber = $factory->create(new FakeOutput());

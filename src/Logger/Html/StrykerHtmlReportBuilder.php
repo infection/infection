@@ -256,13 +256,13 @@ final class StrykerHtmlReportBuilder
                     'statusReason' => Str::convertToUtf8(Str::trimLineReturns($result->getProcessOutput())),
                     'coveredBy' => array_unique(array_map(
                         fn (TestLocation $testLocation): string => $this->buildTestMethodId($testLocation->getMethod()),
-                        $result->getTests()
+                        $result->getTests(),
                     )),
                     'killedBy' => $this->getKilledBy($result->getProcessOutput()),
                     'testsCompleted' => $this->getTestsCompleted($result->getProcessOutput()),
                 ];
             },
-            $results
+            $results,
         );
     }
 
@@ -279,8 +279,8 @@ final class StrykerHtmlReportBuilder
                 @@ @@
                  */
                 array_slice($lines, self::DIFF_HEADERS_LINES_COUNT),
-                static fn (string $line): bool => str_starts_with($line, '+')
-            )
+                static fn (string $line): bool => str_starts_with($line, '+'),
+            ),
         );
 
         return implode(PHP_EOL, $lines);

@@ -83,7 +83,7 @@ TXT
 + while (false) {
       // ...
 }
-DIFF
+DIFF,
         );
     }
 
@@ -97,7 +97,7 @@ DIFF
         yield new Node\Stmt\While_(
             new Node\Expr\ConstFetch(new Node\Name('false')),
             $node->stmts,
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

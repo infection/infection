@@ -47,7 +47,7 @@ final class StrykerConfigTest extends TestCase
         $this->assertSame(
             $willMatch,
             StrykerConfig::forBadge($branchMatch)
-                ->applicableForBranch($branchName)
+                ->applicableForBranch($branchName),
         );
     }
 

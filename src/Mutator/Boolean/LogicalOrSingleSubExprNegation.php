@@ -65,7 +65,7 @@ TXT
 + $a = !$b || $c;
 # Mutation 2
 + $a = $b || !$c;
-DIFF
+DIFF,
         );
     }
 

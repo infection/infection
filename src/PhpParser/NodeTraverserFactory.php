@@ -76,7 +76,7 @@ class NodeTraverserFactory
             [
                 'preserveOriginalNames' => true,
                 'replaceNodes' => false,
-            ])
+            ]),
         );
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());

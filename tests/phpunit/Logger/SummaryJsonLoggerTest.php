@@ -56,7 +56,7 @@ final class SummaryJsonLoggerTest extends TestCase
      */
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
-        array $expectedContents
+        array $expectedContents,
     ): void {
         $logger = new SummaryJsonLogger($metricsCalculator);
 
@@ -167,7 +167,7 @@ final class SummaryJsonLoggerTest extends TestCase
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,
-                'uncovered#0'
+                'uncovered#0',
             ),
         );
     }
@@ -188,7 +188,7 @@ final class SummaryJsonLoggerTest extends TestCase
                 0,
                 For_::class,
                 DetectionStatus::IGNORED,
-                'ignored#0'
+                'ignored#0',
             ),
         );
     }

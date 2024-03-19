@@ -78,7 +78,7 @@ class MutationTestingRunner
                 foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] ?? [] as $sourceCodeRegex) {
                     if ($this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {
                         $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                            MutantExecutionResult::createFromIgnoredMutant($mutant)
+                            MutantExecutionResult::createFromIgnoredMutant($mutant),
                         ));
 
                         return false;
@@ -94,7 +94,7 @@ class MutationTestingRunner
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromNonCoveredMutant($mutant)
+                    MutantExecutionResult::createFromNonCoveredMutant($mutant),
                 ));
 
                 return false;
@@ -106,7 +106,7 @@ class MutationTestingRunner
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromTimeSkippedMutant($mutant)
+                    MutantExecutionResult::createFromTimeSkippedMutant($mutant),
                 ));
 
                 return false;

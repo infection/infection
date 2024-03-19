@@ -85,7 +85,7 @@ final class IntegrationGroupProvider
             static function (string $className): ?array {
                 return self::ioTestCaseTuple($className);
             },
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true)
+            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
         )));
 
         foreach (self::KNOWN_INTEGRATIONAL_TESTS as $testCaseClass) {

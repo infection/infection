@@ -55,7 +55,7 @@ final class VersionParser
         Assert::notSame(
             $matched,
             0,
-            sprintf('Expected "%s" to be contain a valid SemVer (sub)string value.', str_replace('%', '%%', $content))
+            sprintf('Expected "%s" to be contain a valid SemVer (sub)string value.', str_replace('%', '%%', $content)),
         );
 
         return $matches[0];

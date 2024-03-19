@@ -87,7 +87,7 @@ final class StrykerLoggerTest extends TestCase
             $this->metricsCalculatorMock,
             new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
             StrykerConfig::forBadge('master'),
-            $this->logger
+            $this->logger,
         );
     }
 
@@ -117,7 +117,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -143,7 +143,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -170,7 +170,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -198,7 +198,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -226,7 +226,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -251,7 +251,7 @@ final class StrykerLoggerTest extends TestCase
             $this->metricsCalculatorMock,
             new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
             StrykerConfig::forBadge('/^\d+\\.x$/'),
-            $this->logger
+            $this->logger,
         );
 
         $strykerLogger->log();
@@ -264,7 +264,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -295,7 +295,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -331,7 +331,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -364,7 +364,7 @@ final class StrykerLoggerTest extends TestCase
             $this->metricsCalculatorMock,
             new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
             StrykerConfig::forBadge('/^\d+\\.x$/'),
-            $this->logger
+            $this->logger,
         );
 
         $strykerLogger->log();
@@ -377,7 +377,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -413,7 +413,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -426,7 +426,7 @@ final class StrykerLoggerTest extends TestCase
             $this->metricsCalculatorMock,
             new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
             StrykerConfig::forFullReport('master'),
-            $this->logger
+            $this->logger,
         );
 
         $this->ciDetectorEnv->setVariables([
@@ -459,7 +459,7 @@ final class StrykerLoggerTest extends TestCase
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 }

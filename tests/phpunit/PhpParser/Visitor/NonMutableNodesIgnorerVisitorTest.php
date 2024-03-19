@@ -99,7 +99,7 @@ PHP
                     }
                 }]),
                 $this->spyVisitor,
-            ]
+            ],
         );
     }
 }

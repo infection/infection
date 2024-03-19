@@ -53,9 +53,9 @@ $input = new ArgvInput(
             MAX_MUTATIONS_COUNT_ARG,
             InputArgument::OPTIONAL,
             'Maximum number of mutations retrieved. Use -1 for no maximum',
-            50
+            50,
         ),
-    ])
+    ]),
 );
 $output = new ConsoleOutput();
 $io = new SymfonyStyle($input, $output);
@@ -68,5 +68,5 @@ BlackfireInstrumentor::profile(
     static function () use ($generateMutations, $maxMutationsCount): void {
         $generateMutations($maxMutationsCount);
     },
-    $io
+    $io,
 );

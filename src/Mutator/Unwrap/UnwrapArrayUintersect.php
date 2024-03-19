@@ -87,7 +87,7 @@ TXT
 + $x = ['foo' => 'bar'];
 # Mutation 2
 + $x = ['baz' => 'bar'];
-DIFF
+DIFF,
         );
     }
 
@@ -104,7 +104,7 @@ DIFF
         yield from array_slice(
             array_keys($node->args),
             0,
-            count($node->args) - 1
+            count($node->args) - 1,
         );
     }
 }

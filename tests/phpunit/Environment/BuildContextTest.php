@@ -47,7 +47,7 @@ final class BuildContextTest extends TestCase
 
         $buildContext = new BuildContext(
             $repositorySlug,
-            $branch
+            $branch,
         );
 
         $this->assertSame($repositorySlug, $buildContext->repositorySlug());

@@ -64,7 +64,7 @@ class MutationGenerator
         array $mutators,
         private readonly EventDispatcher $eventDispatcher,
         private readonly FileMutationGenerator $fileMutationGenerator,
-        private bool $runConcurrently
+        private bool $runConcurrently,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
         $this->mutators = $mutators;
@@ -92,7 +92,7 @@ class MutationGenerator
                 $trace,
                 $onlyCovered,
                 $this->mutators,
-                $nodeIgnorers
+                $nodeIgnorers,
             );
 
             $this->eventDispatcher->dispatch(new MutableFileWasProcessed());

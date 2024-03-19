@@ -77,7 +77,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         if ($nodes->length === 0) {
             throw TestFileNameNotFoundException::notFoundFromFQN(
                 $fullyQualifiedClassName,
-                $this->jUnitLocator->locate()
+                $this->jUnitLocator->locate(),
             );
         }
 
@@ -85,7 +85,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
         return new TestFileTimeData(
             $nodes[0]->getAttribute('file'),
-            (float) $nodes[0]->getAttribute('time')
+            (float) $nodes[0]->getAttribute('time'),
         );
     }
 

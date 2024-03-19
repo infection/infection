@@ -57,14 +57,14 @@ final class TmpDirProvider
             Path::isAbsolute($baseTmpDir),
             sprintf(
                 'Expected the temporary directory passed to be an absolute path. Got "%s"',
-                $baseTmpDir
-            )
+                $baseTmpDir,
+            ),
         );
 
         return str_replace(
             [DIRECTORY_SEPARATOR, '//'],
             ['/', '/'],
-            sprintf('%s/%s', $baseTmpDir, self::BASE_DIR_NAME)
+            sprintf('%s/%s', $baseTmpDir, self::BASE_DIR_NAME),
         );
     }
 }

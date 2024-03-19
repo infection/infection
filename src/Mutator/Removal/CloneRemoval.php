@@ -59,7 +59,7 @@ final class CloneRemoval implements Mutator
             <<<'DIFF'
 - $a = clone $x;
 + $a = $x;
-DIFF
+DIFF,
         );
     }
 

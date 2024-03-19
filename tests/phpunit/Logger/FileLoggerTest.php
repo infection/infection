@@ -89,7 +89,7 @@ TXT;
             self::LOG_FILE_PATH,
             $this->fileSystemMock,
             new DummyLineMutationTestingResultsLogger(['foo', 'bar']),
-            $this->logger
+            $this->logger,
         );
 
         $debugFileLogger->log();
@@ -103,7 +103,7 @@ TXT;
             'php://stdout',
             $this->fileSystemMock,
             new DummyLineMutationTestingResultsLogger([]),
-            $this->logger
+            $this->logger,
         );
 
         $debugFileLogger->log();
@@ -117,7 +117,7 @@ TXT;
             'php://memory',
             $this->fileSystemMock,
             new DummyLineMutationTestingResultsLogger(['foo', 'bar']),
-            $this->logger
+            $this->logger,
         );
 
         $debugFileLogger->log();
@@ -130,7 +130,7 @@ TXT;
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -146,7 +146,7 @@ TXT;
             self::LOG_FILE_PATH,
             $this->fileSystemMock,
             new DummyLineMutationTestingResultsLogger([]),
-            $this->logger
+            $this->logger,
         );
 
         $debugFileLogger->log();
@@ -159,7 +159,7 @@ TXT;
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 }

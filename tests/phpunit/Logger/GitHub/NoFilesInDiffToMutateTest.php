@@ -47,7 +47,7 @@ final class NoFilesInDiffToMutateTest extends TestCase
         $this->assertInstanceOf(NoFilesInDiffToMutate::class, $exception);
         $this->assertSame(
             'No files in diff found, skipping mutation analysis.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 }

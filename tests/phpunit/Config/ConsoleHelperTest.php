@@ -50,7 +50,7 @@ final class ConsoleHelperTest extends TestCase
             ->with(
                 'foo',
                 'bg=blue;fg=white',
-                true
+                true,
             )
             ->willReturn('Formatted Foo');
 
@@ -61,7 +61,7 @@ final class ConsoleHelperTest extends TestCase
                     '',
                     'Formatted Foo',
                     '',
-                ]
+                ],
             );
         $console = new ConsoleHelper($formatHelper);
 
@@ -74,7 +74,7 @@ final class ConsoleHelperTest extends TestCase
 
         $this->assertSame(
             '<info>Would you like a cup of tea?</info>: ',
-            $consoleHelper->getQuestion('Would you like a cup of tea?')
+            $consoleHelper->getQuestion('Would you like a cup of tea?'),
         );
     }
 
@@ -84,7 +84,7 @@ final class ConsoleHelperTest extends TestCase
 
         $this->assertSame(
             '<info>Would you like a cup of tea?</info> [<comment>yes</comment>]: ',
-            $consoleHelper->getQuestion('Would you like a cup of tea?', 'yes')
+            $consoleHelper->getQuestion('Would you like a cup of tea?', 'yes'),
         );
     }
 }

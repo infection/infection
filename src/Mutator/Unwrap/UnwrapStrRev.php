@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = strrev('Hello!');
 + $x = 'Hello!';
-DIFF
+DIFF,
         );
     }
 

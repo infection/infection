@@ -88,8 +88,8 @@ final class SubscriberTest extends TestCase
                 . ' event. Got "%d"',
                 $subscriberClass,
                 $method->getName(),
-                $method->getNumberOfParameters()
-            )
+                $method->getNumberOfParameters(),
+            ),
         );
 
         $eventParameter = $method->getParameters()[0];
@@ -99,16 +99,16 @@ final class SubscriberTest extends TestCase
             $eventType,
             sprintf(
                 'Expected the parameter "%s" to have a type',
-                $eventParameter->getName()
-            )
+                $eventParameter->getName(),
+            ),
         );
         $this->assertInstanceOf(
             ReflectionNamedType::class,
             $eventType,
             sprintf(
                 'Expected the parameter "%s" to have the type against its class',
-                $eventParameter->getName()
-            )
+                $eventParameter->getName(),
+            ),
         );
 
         $expectedSubscriptionMethodName = 'on' . (new ReflectionClass($eventType->getName()))->getShortName();
@@ -116,7 +116,7 @@ final class SubscriberTest extends TestCase
         $this->assertSame(
             $expectedSubscriptionMethodName,
             $method->getName(),
-            'Expected the subscription method to follow the project naming convention'
+            'Expected the subscription method to follow the project naming convention',
         );
     }
 }

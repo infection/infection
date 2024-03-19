@@ -81,7 +81,7 @@ class IndexXmlCoverageLocator
         if (!file_exists($this->coveragePath)) {
             throw new FileNotFound(sprintf(
                 'Could not find any "index.xml" file in "%s"',
-                $this->coveragePath
+                $this->coveragePath,
             ));
         }
 
@@ -91,7 +91,7 @@ class IndexXmlCoverageLocator
                 ->in($this->coveragePath)
                 ->name('/^index\.xml$/i')
                 ->sortByName(),
-            false
+            false,
         );
 
         if (count($files) > 1) {
@@ -102,9 +102,9 @@ class IndexXmlCoverageLocator
                     '", "',
                     array_map(
                         static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
-                        $files
-                    )
-                )
+                        $files,
+                    ),
+                ),
             ));
         }
 
@@ -116,7 +116,7 @@ class IndexXmlCoverageLocator
 
         throw new FileNotFound(sprintf(
             'Could not find any "index.xml" file in "%s"',
-            $this->coveragePath
+            $this->coveragePath,
         ));
     }
 }

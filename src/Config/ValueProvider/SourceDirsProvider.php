@@ -74,7 +74,7 @@ final class SourceDirsProvider
 
         $questionText = $this->consoleHelper->getQuestion(
             'Which source directories do you want to include (comma separated)?',
-            $defaultValues
+            $defaultValues,
         );
 
         $question = new ChoiceQuestion($questionText, $choices, $defaultValues);

@@ -62,7 +62,7 @@ TXT
             <<<'DIFF'
 - $a = -33.4;
 + $a = 33.4;
-DIFF
+DIFF,
         );
     }
 
@@ -74,7 +74,7 @@ DIFF
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Return_(
-            new Node\Scalar\DNumber(-1 * $this->getFloatValueOfNode($node), $node->getAttributes())
+            new Node\Scalar\DNumber(-1 * $this->getFloatValueOfNode($node), $node->getAttributes()),
         );
     }
 

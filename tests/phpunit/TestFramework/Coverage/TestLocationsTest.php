@@ -58,7 +58,7 @@ final class TestLocationsTest extends TestCase
                     new TestLocation(
                         '\A\B\C::test_it_works',
                         '/path/to/A/B/C.php',
-                        0.34325
+                        0.34325,
                     ),
                 ],
             ],
@@ -92,7 +92,7 @@ final class TestLocationsTest extends TestCase
                     ],
                 ],
             ],
-            TestLocationsNormalizer::normalize([$testLocations])
+            TestLocationsNormalizer::normalize([$testLocations]),
         );
     }
 
@@ -104,7 +104,7 @@ final class TestLocationsTest extends TestCase
                     new TestLocation(
                         '\A\B\C::test_it_works',
                         '/path/to/A/B/C.php',
-                        0.34325
+                        0.34325,
                     ),
                 ],
             ],
@@ -144,7 +144,7 @@ final class TestLocationsTest extends TestCase
                     ],
                 ],
             ],
-            TestLocationsNormalizer::normalize([$testLocations])
+            TestLocationsNormalizer::normalize([$testLocations]),
         );
 
         foreach ($testLocations->getTestsLocationsBySourceLine() as &$testsLocations) {
@@ -172,7 +172,7 @@ final class TestLocationsTest extends TestCase
                     ],
                 ],
             ],
-            TestLocationsNormalizer::normalize([$testLocations])
+            TestLocationsNormalizer::normalize([$testLocations]),
         );
     }
 }

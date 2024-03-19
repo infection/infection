@@ -76,7 +76,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
         $processMock
             ->method('getCommandLine')
             ->willReturn(
-                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             )
         ;
         $processMock
@@ -112,7 +112,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                     'Unknown',
                     MutatedNode::wrap(new Nop()),
                     0,
-                    []
+                    [],
                 ),
                 'notCovered#0',
                 $mutantDiff = <<<'DIFF'
@@ -124,8 +124,8 @@ final class MutantExecutionResultFactoryTest extends TestCase
 + echo 'notCovered#0';
 
 DIFF,
-                '<?php $a = 1;'
-            )
+                '<?php $a = 1;',
+            ),
         );
 
         $this->assertResultStateIs(
@@ -136,7 +136,7 @@ DIFF,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
         );
     }
 
@@ -146,7 +146,7 @@ DIFF,
         $processMock
             ->method('getCommandLine')
             ->willReturn(
-                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             )
         ;
         $processMock
@@ -186,9 +186,9 @@ DIFF,
                         new TestLocation(
                             'FooTest::test_it_can_instantiate',
                             '/path/to/acme/FooTest.php',
-                            0.01
+                            0.01,
                         ),
-                    ]
+                    ],
                 ),
                 'timedOut#0',
                 $mutantDiff = <<<'DIFF'
@@ -200,8 +200,8 @@ DIFF,
 + echo 'timedOut#0';
 
 DIFF,
-                '<?php $a = 1;'
-            )
+                '<?php $a = 1;',
+            ),
         );
         $mutantProcess->markAsTimedOut();
 
@@ -213,7 +213,7 @@ DIFF,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
         );
     }
 
@@ -223,7 +223,7 @@ DIFF,
         $processMock
             ->method('getCommandLine')
             ->willReturn(
-                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             )
         ;
         $processMock
@@ -268,9 +268,9 @@ DIFF,
                         new TestLocation(
                             'FooTest::test_it_can_instantiate',
                             '/path/to/acme/FooTest.php',
-                            0.01
+                            0.01,
                         ),
-                    ]
+                    ],
                 ),
                 'errored#0',
                 $mutantDiff = <<<'DIFF'
@@ -282,8 +282,8 @@ DIFF,
 + echo 'errored#0';
 
 DIFF,
-                '<?php $a = 1;'
-            )
+                '<?php $a = 1;',
+            ),
         );
 
         $this->assertResultStateIs(
@@ -294,7 +294,7 @@ DIFF,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
         );
     }
 
@@ -304,7 +304,7 @@ DIFF,
         $processMock
             ->method('getCommandLine')
             ->willReturn(
-                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             )
         ;
         $processMock
@@ -351,9 +351,9 @@ DIFF,
                         new TestLocation(
                             'FooTest::test_it_can_instantiate',
                             '/path/to/acme/FooTest.php',
-                            0.01
+                            0.01,
                         ),
-                    ]
+                    ],
                 ),
                 'escaped#0',
                 $mutantDiff = <<<'DIFF'
@@ -365,8 +365,8 @@ DIFF,
 + echo 'escaped#0';
 
 DIFF,
-                '<?php $a = 1;'
-            )
+                '<?php $a = 1;',
+            ),
         );
 
         $this->assertResultStateIs(
@@ -377,7 +377,7 @@ DIFF,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
         );
     }
 
@@ -387,7 +387,7 @@ DIFF,
         $processMock
             ->method('getCommandLine')
             ->willReturn(
-                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             )
         ;
         $processMock
@@ -434,9 +434,9 @@ DIFF,
                         new TestLocation(
                             'FooTest::test_it_can_instantiate',
                             '/path/to/acme/FooTest.php',
-                            0.01
+                            0.01,
                         ),
-                    ]
+                    ],
                 ),
                 'killed#0',
                 $mutantDiff = <<<'DIFF'
@@ -448,8 +448,8 @@ DIFF,
 + echo 'killed#0';
 
 DIFF,
-                '<?php $a = 1;'
-            )
+                '<?php $a = 1;',
+            ),
         );
 
         $this->assertResultStateIs(
@@ -460,7 +460,7 @@ DIFF,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
         );
     }
 
@@ -479,7 +479,7 @@ DIFF,
         $processMock
             ->method('getCommandLine')
             ->willReturn(
-                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"'
+                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             )
         ;
         $processMock
@@ -526,9 +526,9 @@ DIFF,
                         new TestLocation(
                             'FooTest::test_it_can_instantiate',
                             '/path/to/acme/FooTest.php',
-                            0.01
+                            0.01,
                         ),
-                    ]
+                    ],
                 ),
                 'killed#0',
                 $mutantDiff = <<<'DIFF'
@@ -540,8 +540,8 @@ DIFF,
 + echo 'killed#0';
 
 DIFF,
-                '<?php $a = 1;'
-            )
+                '<?php $a = 1;',
+            ),
         );
 
         $this->assertResultStateIs(
@@ -552,7 +552,7 @@ DIFF,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,
-            $originalStartingLine
+            $originalStartingLine,
         );
     }
 }

@@ -78,7 +78,7 @@ TXT
 -     ['oof']
 - );
 + $x = ['foo', 'bar', 'baz'];
-DIFF
+DIFF,
         );
     }
 

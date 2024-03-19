@@ -53,7 +53,7 @@ final class CastArray extends AbstractCastMutator
             <<<'DIFF'
 - $a = (array) $object;
 + $a = $object;
-DIFF
+DIFF,
         );
     }
 

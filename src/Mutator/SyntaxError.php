@@ -60,7 +60,7 @@ class X {
 +        $->method();
     }
 }
-DIFF
+DIFF,
         );
     }
 

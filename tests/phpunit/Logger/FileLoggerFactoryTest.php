@@ -95,7 +95,7 @@ final class FileLoggerFactoryTest extends TestCase
         $factory = $this->createLoggerFactory(
             LogVerbosity::NONE,
             true,
-            true
+            true,
         );
 
         $logger = $factory->createFromLogEntries(
@@ -110,7 +110,7 @@ final class FileLoggerFactoryTest extends TestCase
                 true,
                 null,
                 '/a/file',
-            )
+            ),
         );
 
         $this->assertRegisteredLoggersAre([], $logger);
@@ -121,12 +121,12 @@ final class FileLoggerFactoryTest extends TestCase
      */
     public function test_it_creates_a_logger_for_log_type_on_normal_verbosity(
         Logs $logs,
-        array $expectedLoggerClasses
+        array $expectedLoggerClasses,
     ): void {
         $factory = $this->createLoggerFactory(
             LogVerbosity::NORMAL,
             true,
-            true
+            true,
         );
 
         $logger = $factory->createFromLogEntries($logs);
@@ -152,7 +152,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [TextFileLogger::class],
         ];
@@ -168,7 +168,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [HtmlFileLogger::class],
         ];
@@ -184,7 +184,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [SummaryFileLogger::class],
         ];
@@ -200,7 +200,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [DebugFileLogger::class],
         ];
@@ -216,7 +216,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [JsonLogger::class],
         ];
@@ -232,7 +232,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [GitLabCodeQualityLogger::class],
         ];
@@ -248,7 +248,7 @@ final class FileLoggerFactoryTest extends TestCase
                 'per_muator',
                 false,
                 null,
-                null
+                null,
             ),
             [PerMutatorLogger::class],
         ];
@@ -264,7 +264,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 true,
                 null,
-                null
+                null,
             ),
             [GitHubAnnotationsLogger::class],
         ];
@@ -280,7 +280,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                'summary-json'
+                'summary-json',
             ),
             [SummaryJsonLogger::class],
         ];
@@ -296,7 +296,7 @@ final class FileLoggerFactoryTest extends TestCase
                 'per_mutator',
                 true,
                 StrykerConfig::forBadge('branch'),
-                'summary-json'
+                'summary-json',
             ),
             [
                 TextFileLogger::class,
@@ -315,7 +315,7 @@ final class FileLoggerFactoryTest extends TestCase
     private function createLoggerFactory(
         string $logVerbosity,
         bool $debugMode,
-        bool $onlyCoveredCode
+        bool $onlyCoveredCode,
     ): FileLoggerFactory {
         return new FileLoggerFactory(
             $this->metricsCalculator,
@@ -325,13 +325,13 @@ final class FileLoggerFactoryTest extends TestCase
             $debugMode,
             $onlyCoveredCode,
             new FakeLogger(),
-            new StrykerHtmlReportBuilder($this->metricsCalculator, $this->resultsCollector)
+            new StrykerHtmlReportBuilder($this->metricsCalculator, $this->resultsCollector),
         );
     }
 
     private function assertRegisteredLoggersAre(
         array $expectedLoggerClasses,
-        MutationTestingResultsLogger $logger
+        MutationTestingResultsLogger $logger,
     ): void {
         $this->assertInstanceOf(FederatedLogger::class, $logger);
 
@@ -351,7 +351,7 @@ final class FileLoggerFactoryTest extends TestCase
 
                 return get_class($logger);
             },
-            $loggers
+            $loggers,
         );
 
         $this->assertSame($expectedLoggerClasses, $actualLoggerClasses);

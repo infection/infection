@@ -57,7 +57,7 @@ final class CalculatorTest extends TestCase
         int $notTestedCount,
         float $expectedMsi,
         float $expectedCoverageRate,
-        float $expectedCoveredMsi
+        float $expectedCoveredMsi,
     ): void {
         $calculator = new Calculator(
             $roundingPrecision,
@@ -71,7 +71,7 @@ final class CalculatorTest extends TestCase
                 $escapedCount,
                 $timedOutCount,
                 $notTestedCount,
-            ])
+            ]),
         );
 
         $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
@@ -91,7 +91,7 @@ final class CalculatorTest extends TestCase
         MetricsCalculator $metricsCalculator,
         float $expectedMsi,
         float $expectedCoverageRate,
-        float $expectedCoveredMsi
+        float $expectedCoveredMsi,
     ): void {
         $calculator = Calculator::fromMetrics($metricsCalculator);
 

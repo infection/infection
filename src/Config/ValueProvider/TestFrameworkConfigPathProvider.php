@@ -60,7 +60,7 @@ final class TestFrameworkConfigPathProvider
     public function __construct(
         private readonly TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator,
         private readonly ConsoleHelper $consoleHelper,
-        private readonly QuestionHelper $questionHelper
+        private readonly QuestionHelper $questionHelper,
     ) {
     }
 
@@ -127,11 +127,11 @@ final class TestFrameworkConfigPathProvider
         IO $io,
         array $dirsInCurrentDir,
         string $testFramework,
-        string $defaultValue
+        string $defaultValue,
     ): string {
         $question = sprintf(
             'Where is your <comment>%s.(xml|yml)(.dist)</comment> configuration located?',
-            $testFramework
+            $testFramework,
         );
         $questionText = $this->consoleHelper->getQuestion($question, $defaultValue);
 
@@ -142,7 +142,7 @@ final class TestFrameworkConfigPathProvider
         $testFrameworkConfigLocation = $this->questionHelper->ask(
             $io->getInput(),
             $io->getOutput(),
-            $question
+            $question,
         );
 
         return $testFrameworkConfigLocation;

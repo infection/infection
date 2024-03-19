@@ -52,7 +52,7 @@ final class TestFrameworkTypesTest extends TestCase
                 TestFrameworkTypes::PHPSPEC,
                 TestFrameworkTypes::CODECEPTION,
             ],
-            $types
+            $types,
         );
     }
 
@@ -65,7 +65,7 @@ final class TestFrameworkTypesTest extends TestCase
                         'extra' => ['class' => DummyTestFrameworkFactory::class],
                         'version' => '1.0.0',
                     ],
-            ]
+            ],
         );
 
         $this->assertSame(
@@ -76,7 +76,7 @@ final class TestFrameworkTypesTest extends TestCase
                 TestFrameworkTypes::CODECEPTION,
                 'dummy',
             ],
-            $types
+            $types,
         );
     }
 }

@@ -87,7 +87,7 @@ final class MutantFactoryTest extends TestCase
             '/path/to/tmp',
             $this->differMock,
             $this->printerMock,
-            $this->codeFactoryMock
+            $this->codeFactoryMock,
         );
     }
 
@@ -96,20 +96,20 @@ final class MutantFactoryTest extends TestCase
         $mutation = self::createMutation(
             $originalNodes = [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
+                [new Node\Scalar\LNumber(0)],
             )],
             $tests = [
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
-                    0.01
+                    0.01,
                 ),
-            ]
+            ],
         );
 
         $expectedMutantFilePath = sprintf(
             '/path/to/tmp/mutant.%s.infection.php',
-            $mutation->getHash()
+            $mutation->getHash(),
         );
 
         $this->codeFactoryMock
@@ -144,7 +144,7 @@ final class MutantFactoryTest extends TestCase
             'code diff',
             true,
             $tests,
-            $originalCode
+            $originalCode,
         );
     }
 
@@ -152,7 +152,7 @@ final class MutantFactoryTest extends TestCase
     {
         $mutation = self::createMutation(
             $originalNodes = [new Node\Stmt\Nop()],
-            []
+            [],
         );
 
         $this->printerMock
@@ -196,7 +196,7 @@ final class MutantFactoryTest extends TestCase
             Node\Scalar\LNumber::class,
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
-            $tests
+            $tests,
         );
     }
 }

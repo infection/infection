@@ -193,7 +193,7 @@ class Child extends ProtectedNonSameAbstract
     {
     }
 }
-PHP
+PHP,
         ];
 
         yield 'it mutates an anonymous class' => [
@@ -225,7 +225,7 @@ function something()
         }
     };
 }
-PHP
+PHP,
         ];
 
         yield 'It does not remove attributes' => [

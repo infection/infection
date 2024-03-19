@@ -153,7 +153,7 @@ PHP
 <?php
 
 $a = foo(3, bar());
-PHP
+PHP,
         ];
 
         yield 'It does not remove a method call' => [
@@ -162,7 +162,7 @@ PHP
 
 $this->foo();
 $a = 3;
-PHP
+PHP,
         ];
 
         yield 'It does not remove disallowed calls' => [
@@ -182,7 +182,7 @@ socket_close();
 openssl_free_key();
 
 $a = 3;
-PHP
+PHP,
         ];
     }
 }

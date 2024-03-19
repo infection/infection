@@ -137,7 +137,7 @@ try {
 } catch (\DomainException $e) {
     // DO nothing
 }
-PHP
+PHP,
         ];
     }
 }

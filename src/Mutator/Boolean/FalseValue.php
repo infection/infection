@@ -59,7 +59,7 @@ final class FalseValue implements Mutator
             <<<'DIFF'
 - $a = false;
 + $a = true;
-DIFF
+DIFF,
         );
     }
 

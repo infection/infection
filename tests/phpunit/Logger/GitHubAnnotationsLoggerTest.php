@@ -51,7 +51,7 @@ final class GitHubAnnotationsLoggerTest extends TestCase
      */
     public function test_it_logs_correctly_with_mutations(
         ResultsCollector $resultsCollector,
-        array $expectedLines
+        array $expectedLines,
     ): void {
         $logger = new GitHubAnnotationsLogger($resultsCollector);
 

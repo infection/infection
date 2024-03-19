@@ -77,7 +77,7 @@ final class IgnoreMutatorTest extends TestCase
         } catch (DomainException $exception) {
             $this->assertSame(
                 'The class "Infection\Mutator\IgnoreMutator" does not have a definition',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -135,11 +135,11 @@ final class IgnoreMutatorTest extends TestCase
             ->method('getAttribute')
             ->with(...self::withConsecutive(
                 [ReflectionVisitor::REFLECTION_CLASS_KEY, false],
-                [ReflectionVisitor::FUNCTION_NAME, '']
+                [ReflectionVisitor::FUNCTION_NAME, ''],
             ))
             ->willReturnOnConsecutiveCalls(
                 CoreClassReflection::fromClassName(self::class),
-                'foo'
+                'foo',
             )
         ;
 
@@ -191,7 +191,7 @@ final class IgnoreMutatorTest extends TestCase
 
         $this->assertSame(
             MutatorName::getName(Plus::class),
-            $ignoreMutator->getName()
+            $ignoreMutator->getName(),
         );
     }
 }

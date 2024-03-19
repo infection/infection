@@ -49,7 +49,7 @@ final class InvalidMutatorTest extends TestCase
         $exception = InvalidMutator::create(
             '/path/to/acme/Foo.php',
             MutatorName::getName(Plus::class),
-            $previous
+            $previous,
         );
 
         $this->assertSame(
@@ -58,7 +58,7 @@ Encountered an error with the "Plus" mutator in the "/path/to/acme/Foo.php" file
 Please consider reporting this this in our issue tracker: https://github.com/infection/infection/issues/new?template=Bug_report.md
 TXT
             ,
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertSame($previous, $exception->getPrevious());

@@ -67,7 +67,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
     {
         $this->configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(new Filesystem()),
-            ''
+            '',
         );
     }
 
@@ -106,7 +106,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
         <log type="coverage-html" target="/path/to/tmp"/>
     </logging>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -136,7 +136,7 @@ XML
     </testsuite>
   </testsuites>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -172,7 +172,7 @@ XML
         </whitelist>
     </filter>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -196,7 +196,7 @@ XML
     </whitelist>
   </filter>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -212,7 +212,7 @@ XML
                 $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes(
                     $xPath,
                     ['src/', 'examples/'],
-                    ['src/File1.php', 'example/File2.php']
+                    ['src/File1.php', 'example/File2.php'],
                 );
             },
             <<<'XML'
@@ -224,7 +224,7 @@ XML
     </whitelist>
   </filter>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -248,7 +248,7 @@ XML
     </include>
   </coverage>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -263,7 +263,7 @@ XML
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->addOrUpdateCoverageIncludeNodes($xPath,
                     ['src/', 'examples/'],
-                    ['src/File1.php', 'example/File2.php']
+                    ['src/File1.php', 'example/File2.php'],
                 );
             },
             <<<'XML'
@@ -275,7 +275,7 @@ XML
     </include>
   </coverage>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -299,7 +299,7 @@ XML
     </include>
   </source>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -321,7 +321,7 @@ XML
     </exclude>
   </coverage>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -361,7 +361,7 @@ XML
         <log type="coverage-html" target="/path/to/tmp"/>
     </logging>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -404,7 +404,7 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -443,7 +443,7 @@ XML
         <log type="coverage-html" target="/path/to/tmp"/>
     </logging>
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -485,7 +485,7 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -529,7 +529,7 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -571,7 +571,7 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -596,7 +596,7 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -620,7 +620,7 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -646,7 +646,7 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -669,7 +669,7 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -709,7 +709,7 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-XML
+XML,
         );
     }
 
@@ -740,7 +740,7 @@ XML
      */
     public function test_it_cannot_validates_xml_if_schema_file_is_invalid(
         string $xsdSchema,
-        string $errorMessage
+        string $errorMessage,
     ): void {
         $xPath = $this->createXPath(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -758,7 +758,7 @@ XML
             static function (int $type, string $message, string $file, string $line): void {
                 // Silence!
             },
-            E_ALL
+            E_ALL,
         );
 
         try {
@@ -768,7 +768,7 @@ XML
         } catch (InvalidArgumentException|InvalidPhpUnitConfiguration $exception) {
             $this->assertSame(
                 $errorMessage,
-                normalizeLineReturn($exception->getMessage())
+                normalizeLineReturn($exception->getMessage()),
             );
         } finally {
             restore_error_handler();
@@ -816,13 +816,13 @@ XML
             $infectionPath = sprintf(
                 '%s%s',
                 PHP_OS_FAMILY === 'Windows' ? 'file:/' : '',
-                Path::canonicalize(__DIR__ . '/../../../../../')
+                Path::canonicalize(__DIR__ . '/../../../../../'),
             );
 
             $errorMessage = str_replace(
                 $infectionPath,
                 '/path/to/infection',
-                normalizeLineReturn($exception->getMessage())
+                normalizeLineReturn($exception->getMessage()),
             );
 
             $this->assertSame(
@@ -835,7 +835,7 @@ The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
 
 EOF
                 ,
-                $errorMessage
+                $errorMessage,
             );
         }
     }
@@ -865,7 +865,7 @@ XML
     {
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(new Filesystem()),
-            __DIR__ . '/../../../../..'
+            __DIR__ . '/../../../../..',
         );
 
         $xPath = $this->createXPath(<<<XML
@@ -907,7 +907,7 @@ XML
 >
 </phpunit>
 
-XML
+XML,
         );
     }
 
@@ -986,7 +986,7 @@ EOF
 XML
             ,
             $changeXml,
-            $expectedXml
+            $expectedXml,
         );
     }
 
@@ -1026,7 +1026,7 @@ XML
 XML
             ,
             $changeXml,
-            $expectedXml
+            $expectedXml,
         );
     }
 

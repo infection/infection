@@ -263,7 +263,7 @@ class Child extends NonSameAbstract
     {
     }
 }
-PHP
+PHP,
         ];
 
         yield 'it mutates an anonymous class' => [
@@ -295,7 +295,7 @@ function something()
         }
     };
 }
-PHP
+PHP,
         ];
 
         yield 'It does mutate when the parents method is protected' => [
@@ -315,7 +315,7 @@ class Child extends SameAbstract
     {
     }
 }
-PHP
+PHP,
         ];
 
         yield 'It does mutate anonymous classes' => [

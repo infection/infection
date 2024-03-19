@@ -47,7 +47,7 @@ trait MutantExecutionResultAssertions
         string $expectedMutantDiff,
         string $expectedMutatorName,
         string $expectedOriginalFilePath,
-        int $expectedOriginalStartingLine
+        int $expectedOriginalStartingLine,
     ): void {
         $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());

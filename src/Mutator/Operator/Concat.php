@@ -73,7 +73,7 @@ TXT
             <<<'DIFF'
 - 'foo' . 'bar';
 + 'bar' . 'foo';
-DIFF
+DIFF,
         );
     }
 

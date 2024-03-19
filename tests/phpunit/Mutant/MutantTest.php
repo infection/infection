@@ -61,7 +61,7 @@ final class MutantTest extends TestCase
         string $diff,
         bool $expectedCoveredByTests,
         array $expectedTests,
-        string $originalCode
+        string $originalCode,
     ): void {
         $mutant = new Mutant($filePath, $mutation, now($mutatedCode), now($diff), now($originalCode));
 
@@ -73,7 +73,7 @@ final class MutantTest extends TestCase
             $diff,
             $expectedCoveredByTests,
             $expectedTests,
-            $originalCode
+            $originalCode,
         );
     }
 
@@ -92,7 +92,7 @@ final class MutantTest extends TestCase
             new TestLocation(
                 'FooTest::test_it_can_instantiate',
                 '/path/to/acme/FooTest.php',
-                0.01
+                0.01,
             ),
         ];
 
@@ -104,14 +104,14 @@ final class MutantTest extends TestCase
                 '/path/to/acme/Foo.php',
                 [new Node\Stmt\Namespace_(
                     new Node\Name('Acme'),
-                    [new Node\Scalar\LNumber(0)]
+                    [new Node\Scalar\LNumber(0)],
                 )],
                 MutatorName::getName(Plus::class),
                 $nominalAttributes,
                 Node\Scalar\LNumber::class,
                 MutatedNode::wrap(new Node\Scalar\LNumber(1)),
                 0,
-                $tests
+                $tests,
             ),
             'mutated code',
             'diff value',
@@ -126,14 +126,14 @@ final class MutantTest extends TestCase
                 '/path/to/acme/Foo.php',
                 [new Node\Stmt\Namespace_(
                     new Node\Name('Acme'),
-                    [new Node\Scalar\LNumber(0)]
+                    [new Node\Scalar\LNumber(0)],
                 )],
                 MutatorName::getName(Plus::class),
                 $nominalAttributes,
                 Node\Scalar\LNumber::class,
                 MutatedNode::wrap(new Node\Scalar\LNumber(1)),
                 0,
-                []
+                [],
             ),
             'mutated code',
             'diff value',

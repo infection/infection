@@ -130,7 +130,7 @@ final class EngineTest extends TestCase
             $minMsiChecker,
             $consoleOutput,
             $metricsCalculator,
-            $testFrameworkExtraOptionsFilter
+            $testFrameworkExtraOptionsFilter,
         );
 
         $this->expectException(InitialTestsFailed::class);
@@ -255,7 +255,7 @@ final class EngineTest extends TestCase
             $minMsiChecker,
             $consoleOutput,
             $metricsCalculator,
-            $testFrameworkExtraOptionsFilter
+            $testFrameworkExtraOptionsFilter,
         );
 
         $engine->execute();

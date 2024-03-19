@@ -51,7 +51,7 @@ final class DifferTest extends TestCase
     public function test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines(
         string $sourceA,
         string $sourceB,
-        string $expectedDiff
+        string $expectedDiff,
     ): void {
         $actualDiff = (new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())))->diff($sourceA, $sourceB);
 
@@ -67,7 +67,7 @@ final class DifferTest extends TestCase
 --- Original
 +++ New
 
-PHP
+PHP,
         ];
 
         yield 'nominal' => [
@@ -100,7 +100,7 @@ PHP
 +    echo 15;
  }
 
-PHP
+PHP,
         ];
 
         yield 'no change' => [
@@ -126,7 +126,7 @@ PHP
 --- Original
 +++ New
 
-PHP
+PHP,
         ];
 
         yield 'line excess' => [
@@ -181,7 +181,7 @@ PHP
  8
  9
 
-PHP
+PHP,
         ];
     }
 
@@ -189,7 +189,7 @@ PHP
     {
         return implode(
             "\n",
-            array_map('rtrim', explode("\n", $string))
+            array_map('rtrim', explode("\n", $string)),
         );
     }
 }

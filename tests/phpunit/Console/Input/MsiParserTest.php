@@ -48,7 +48,7 @@ final class MsiParserTest extends TestCase
      */
     public function test_it_can_detect_the_precision_of_the_given_values(
         array $values,
-        int $expected
+        int $expected,
     ): void {
         $actual = MsiParser::detectPrecision(...$values);
 
@@ -70,7 +70,7 @@ final class MsiParserTest extends TestCase
      */
     public function test_it_cannot_parse_invalid_values(
         string $value,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedErrorMessage);

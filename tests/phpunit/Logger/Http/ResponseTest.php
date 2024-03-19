@@ -61,7 +61,7 @@ final class ResponseTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected an HTTP status code. Got "102"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

@@ -47,7 +47,7 @@ final class IndexedProcessBearerTest extends TestCase
 
         $indexedProcessBearer = new IndexedProcessBearer(
             3,
-            $processBearer
+            $processBearer,
         );
 
         $this->assertSame(3, $indexedProcessBearer->threadIndex);

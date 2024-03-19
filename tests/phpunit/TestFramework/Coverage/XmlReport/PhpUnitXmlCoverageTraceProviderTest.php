@@ -88,7 +88,7 @@ final class PhpUnitXmlCoverageTraceProviderTest extends FileSystemTestCase
         $provider = new PhpUnitXmlCoverageTraceProvider(
             $indexLocatorMock,
             $indexXmlParserMock,
-            $coverageXmlParserMock
+            $coverageXmlParserMock,
         );
 
         $traces = $provider->provideTraces();

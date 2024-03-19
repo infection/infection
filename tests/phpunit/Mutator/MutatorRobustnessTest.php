@@ -76,7 +76,7 @@ final class MutatorRobustnessTest extends TestCase
                 'The mutator "%s" could not parse the file "%s": %s.',
                 $mutator->getName(),
                 $fileName,
-                $throwable->getMessage()
+                $throwable->getMessage(),
             ));
         }
     }

@@ -61,8 +61,8 @@ final class MutatorProviderTest extends TestCase
                 'The "%s" class was picked up by the mutator class finder, but it is not a ' .
                 '"%s".',
                 $className,
-                Mutator::class
-            )
+                Mutator::class,
+            ),
         );
     }
 
@@ -78,8 +78,8 @@ final class MutatorProviderTest extends TestCase
             sprintf(
                 'The "%s" mutator class was picked up by the concrete mutator class finder,'
                 . ' but it is not a concrete class',
-                $className
-            )
+                $className,
+            ),
         );
     }
 
@@ -95,8 +95,8 @@ final class MutatorProviderTest extends TestCase
             sprintf(
                 'The "%s" mutator class was picked up by the configurable mutator class finder,'
                 . ' but it is not a concrete class',
-                $className
-            )
+                $className,
+            ),
         );
         $this->assertTrue(
             $reflectionClass->implementsInterface(ConfigurableMutator::class),
@@ -104,8 +104,8 @@ final class MutatorProviderTest extends TestCase
                 'The "%s" mutator class was picked up by the configurable mutator class finder,'
                 . ' but it does not implement the "%s" interface',
                 $className,
-                ConfigurableMutator::class
-            )
+                ConfigurableMutator::class,
+            ),
         );
     }
 }

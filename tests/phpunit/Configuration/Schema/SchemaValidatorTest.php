@@ -52,7 +52,7 @@ final class SchemaValidatorTest extends TestCase
      */
     public function test_it_validates_the_given_raw_config(
         SchemaConfigurationFile $config,
-        ?string $expectedErrorMessage
+        ?string $expectedErrorMessage,
     ): void {
         try {
             (new SchemaValidator())->validate($config);
@@ -68,7 +68,7 @@ final class SchemaValidatorTest extends TestCase
             } else {
                 $this->assertSame(
                     $expectedErrorMessage,
-                    normalizeLineReturn($exception->getMessage())
+                    normalizeLineReturn($exception->getMessage()),
                 );
             }
         }
@@ -81,7 +81,7 @@ final class SchemaValidatorTest extends TestCase
         yield 'empty JSON' => [
             self::createConfigWithContents(
                 $path,
-                '{}'
+                '{}',
             ),
             <<<'ERROR'
 "/path/to/config" does not match the expected JSON schema:
@@ -93,7 +93,7 @@ ERROR
         yield 'invalid timeout' => [
             self::createConfigWithContents(
                 $path,
-                '{"timeout": "10"}'
+                '{"timeout": "10"}',
             ),
             <<<'ERROR'
 "/path/to/config" does not match the expected JSON schema:
@@ -112,7 +112,7 @@ ERROR
         "directories": ["src"]
     }
 }
-JSON
+JSON,
             ),
             null,
         ];
@@ -120,7 +120,7 @@ JSON
 
     private static function createConfigWithContents(
         string $path,
-        string $contents
+        string $contents,
     ): SchemaConfigurationFile {
         $config = new SchemaConfigurationFile($path);
 

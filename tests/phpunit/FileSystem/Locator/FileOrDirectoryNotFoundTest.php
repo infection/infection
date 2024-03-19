@@ -48,7 +48,7 @@ final class FileOrDirectoryNotFoundTest extends TestCase
     public function test_file_or_directory_does_not_exist(
         string $file,
         array $roots,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = FileOrDirectoryNotFound::fromFileName($file, $roots);
 
@@ -66,7 +66,7 @@ final class FileOrDirectoryNotFoundTest extends TestCase
     public function test_files_or_directories_does_not_exist(
         array $files,
         array $roots,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = FileOrDirectoryNotFound::fromFiles($files, $roots);
 
@@ -81,7 +81,7 @@ final class FileOrDirectoryNotFoundTest extends TestCase
 
         $this->assertSame(
             'The path "foo/bar/" does not contain any of the requested files: "file1", "file2"',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());

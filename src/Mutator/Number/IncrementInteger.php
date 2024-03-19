@@ -60,7 +60,7 @@ final class IncrementInteger extends AbstractNumberMutator
             <<<'DIFF'
 - $a = 20;
 + $a = 21;
-DIFF
+DIFF,
         );
     }
 

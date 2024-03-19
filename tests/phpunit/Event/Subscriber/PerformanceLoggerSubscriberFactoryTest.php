@@ -51,7 +51,7 @@ final class PerformanceLoggerSubscriberFactoryTest extends TestCase
             new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
-            1
+            1,
         );
 
         $subscriber = $factory->create(new FakeOutput());

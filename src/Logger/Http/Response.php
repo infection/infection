@@ -54,7 +54,7 @@ final class Response
             $statusCode,
             self::HTTP_OK,
             self::HTTP_MAX_ERROR_CODE,
-            'Expected an HTTP status code. Got "%s"'
+            'Expected an HTTP status code. Got "%s"',
         );
 
         $this->statusCode = $statusCode;

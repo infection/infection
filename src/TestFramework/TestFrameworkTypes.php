@@ -67,7 +67,7 @@ final class TestFrameworkTypes
      * @return string[]
      */
     public static function getTypes(
-        array $installedExtensions = GeneratedExtensionsConfig::EXTENSIONS
+        array $installedExtensions = GeneratedExtensionsConfig::EXTENSIONS,
     ): array {
         $types = self::$defaultTypes;
 

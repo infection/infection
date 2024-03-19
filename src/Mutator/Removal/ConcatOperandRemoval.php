@@ -81,7 +81,7 @@ TXT
 + $x = 'foo';
 # Mutation 2
 + $x = 'bar';
-DIFF
+DIFF,
         );
     }
 

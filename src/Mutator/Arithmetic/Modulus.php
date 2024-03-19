@@ -59,7 +59,7 @@ final class Modulus implements Mutator
             <<<'DIFF'
 - $a = $b % $c;
 + $a = $b * $c;
-DIFF
+DIFF,
         );
     }
 

@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = array_keys(['foo' => 'bar']);
 + $x = ['foo' => 'bar'];
-DIFF
+DIFF,
         );
     }
 

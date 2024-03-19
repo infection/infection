@@ -62,7 +62,7 @@ TXT
             <<<'DIFF'
 - $a = $b >= $c;
 + $a = $b <= $c;
-DIFF
+DIFF,
         );
     }
 

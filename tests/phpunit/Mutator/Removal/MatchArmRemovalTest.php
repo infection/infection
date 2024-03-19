@@ -110,7 +110,7 @@ PHP,
 match ($x) {
     0 => false,
 };
-PHP
+PHP,
         ];
 
         yield 'It removes match arm condition when more than one is defined' => [
@@ -167,7 +167,7 @@ match ($x) {
     'cond1', 'cond2', 'cond3' => false,
     2 => null,
 };
-PHP
+PHP,
             ],
         ];
     }

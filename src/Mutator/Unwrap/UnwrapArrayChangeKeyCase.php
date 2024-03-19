@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = array_change_key_case($array, CASE_UPPER);
 + $x = $array;
-DIFF
+DIFF,
         );
     }
 
