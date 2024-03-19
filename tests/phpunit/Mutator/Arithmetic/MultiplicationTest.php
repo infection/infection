@@ -56,8 +56,7 @@ final class MultiplicationTest extends BaseMutatorTestCase
 <?php
 
 $a = 10 * 3;
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 

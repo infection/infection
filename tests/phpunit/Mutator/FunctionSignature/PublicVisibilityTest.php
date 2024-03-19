@@ -96,8 +96,7 @@ class Test
         return false;
     }
 }
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate final flag' => [
@@ -115,8 +114,7 @@ class Test
         return false;
     }
 }
-PHP
-            ,
+PHP,
         ];
 
         yield 'It mutates non abstract public to protected in an abstract class' => [
@@ -134,8 +132,7 @@ abstract class Test
         return false;
     }
 }
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate static flag' => [
@@ -153,8 +150,7 @@ class Test
         return false;
     }
 }
-PHP
-            ,
+PHP,
         ];
 
         yield 'It replaces visibility if not set' => [
@@ -170,8 +166,7 @@ class Test
     {
     }
 }
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate an interface' => [
@@ -239,8 +234,7 @@ class Child extends SameParent
     {
     }
 }
-PHP
-            ,
+PHP,
         ];
 
         yield 'it does mutate non-inherited methods' => [
@@ -280,8 +274,7 @@ function something()
         }
     };
 }
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
@@ -376,8 +369,7 @@ class Test
         return false;
     }
 }
-PHP
-            ,
+PHP,
         ];
     }
 }

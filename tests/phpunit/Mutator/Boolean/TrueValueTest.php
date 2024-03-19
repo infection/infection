@@ -59,14 +59,12 @@ final class TrueValueTest extends BaseMutatorTestCase
 <?php
 
 return true;
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
 return false;
-PHP
-            ,
+PHP,
         ];
 
         yield 'It mutates inside function call when function is a variable' => [
@@ -75,15 +73,13 @@ PHP
 
 $a = 'foo';
 $a(true);
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
 $a = 'foo';
 $a(false);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It mutates inside function call when function is a string' => [
@@ -91,14 +87,12 @@ PHP
 <?php
 
 ('function_name')(true);
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
 ('function_name')(false);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate the string true to false' => [
@@ -106,8 +100,7 @@ PHP
 <?php
 
 return 'true';
-PHP
-            ,
+PHP,
         ];
 
         yield 'It mutates all caps true to false' => [
@@ -115,14 +108,12 @@ PHP
 <?php
 
 return TRUE;
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
 return false;
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate when used in "in_array" function by default' => [
@@ -130,8 +121,7 @@ PHP
 <?php
 
 in_array($a, $b, true);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate when used in "\in_array" function by default' => [
@@ -139,8 +129,7 @@ PHP
 <?php
 
 \in_array($a, $b, true);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It mutates when used in a method named "in_array"' => [
@@ -148,14 +137,12 @@ PHP
 <?php
 
 $a->in_array($b, $c, true);
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
 $a->in_array($b, $c, false);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It mutates when used in "\in_array" function and explicitly enabled in settings' => [
@@ -163,14 +150,12 @@ PHP
 <?php
 
 \in_array($a, $b, true);
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
 \in_array($a, $b, false);
-PHP
-            ,
+PHP,
             ['in_array' => true],
         ];
 
@@ -179,8 +164,7 @@ PHP
 <?php
 
 \in_array($a, $b, true);
-PHP
-            ,
+PHP,
             [],
             ['in_array' => false],
         ];
@@ -190,8 +174,7 @@ PHP
 <?php
 
 array_search($a, $b, true);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate when used in "\array_search" function by default' => [
@@ -199,8 +182,7 @@ PHP
 <?php
 
 \array_search($a, $b, true);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It mutates when used in a method named "array_search"' => [
@@ -208,14 +190,12 @@ PHP
 <?php
 
 $a->array_search($b, $c, true);
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
 $a->array_search($b, $c, false);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It mutates when used in "array_search" function and explicitly enabled in settings' => [
@@ -223,14 +203,12 @@ PHP
 <?php
 
 array_search($a, $b, true);
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
 array_search($a, $b, false);
-PHP
-            ,
+PHP,
             ['array_search' => true],
         ];
 
@@ -239,8 +217,7 @@ PHP
 <?php
 
 \array_search($a, $b, true);
-PHP
-            ,
+PHP,
             [],
             ['array_search' => false],
         ];
@@ -250,8 +227,7 @@ PHP
 <?php
 
 \aRrAy_SeArCh($a, $b, true);
-PHP
-            ,
+PHP,
             [],
             ['array_search' => false],
         ];

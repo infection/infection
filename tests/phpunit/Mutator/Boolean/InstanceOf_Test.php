@@ -56,21 +56,18 @@ final class InstanceOf_Test extends BaseMutatorTestCase
 <?php
 
 return $example instanceof Example;
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 return true;
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
 return false;
-PHP
-                ,
+PHP,
             ],
         ];
 
@@ -79,21 +76,18 @@ PHP
 <?php
 
 return $example instanceof $foo;
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 return true;
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
 return false;
-PHP
-                ,
+PHP,
             ],
         ];
 
@@ -102,8 +96,7 @@ PHP
 <?php
 
 return assert($example instanceof Example);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It does not mutate an instanceof comparison inside `assert()` function call with variable' => [
@@ -111,8 +104,7 @@ PHP
 <?php
 
 return assert($example instanceof $foo);
-PHP
-            ,
+PHP,
         ];
 
         yield 'It mutates an instanceof comparison inside other than `assert()` functions' => [
@@ -120,21 +112,18 @@ PHP
 <?php
 
 return someFunc($example instanceof $foo);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 return someFunc(true);
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
 return someFunc(false);
-PHP
-                ,
+PHP,
             ],
         ];
     }

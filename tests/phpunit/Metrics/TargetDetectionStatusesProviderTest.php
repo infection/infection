@@ -100,10 +100,11 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
 
-        $this->assertProvidesExcluding([
-            DetectionStatus::KILLED,
-            DetectionStatus::ERROR,
-        ],
+        $this->assertProvidesExcluding(
+            [
+                DetectionStatus::KILLED,
+                DetectionStatus::ERROR,
+            ],
             $provider->get(),
         );
     }
@@ -119,11 +120,12 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
 
-        $this->assertProvidesExcluding([
-            DetectionStatus::KILLED,
-            DetectionStatus::ERROR,
-            DetectionStatus::NOT_COVERED,
-        ],
+        $this->assertProvidesExcluding(
+            [
+                DetectionStatus::KILLED,
+                DetectionStatus::ERROR,
+                DetectionStatus::NOT_COVERED,
+            ],
             $provider->get(),
         );
     }

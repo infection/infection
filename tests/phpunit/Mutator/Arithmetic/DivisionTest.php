@@ -56,8 +56,7 @@ final class DivisionTest extends BaseMutatorTestCase
 <?php
 
 $a = 10 / 2;
-PHP
-            ,
+PHP,
             <<<'PHP'
 <?php
 
