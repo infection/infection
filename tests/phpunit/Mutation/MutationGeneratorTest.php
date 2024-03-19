@@ -49,6 +49,7 @@ use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
+use Infection\Tests\WithConsecutive;
 use function Later\now;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -135,19 +136,16 @@ final class MutationGeneratorTest extends TestCase
     public function test_it_dispatches_events(): void
     {
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
-        $matcher = $this->exactly(4);
         $eventDispatcherMock
-            ->expects($matcher)
+            ->expects($this->exactly(4))
             ->method('dispatch')
-            ->willReturnCallback(function (object $value) use ($matcher): void {
-                match ($matcher->numberOfInvocations()) {
-                    1 => $this->assertInstanceOf(MutationGenerationWasStarted::class, $value),
-                    2 => $this->assertInstanceOf(MutableFileWasProcessed::class, $value),
-                    3 => $this->assertInstanceOf(MutableFileWasProcessed::class, $value),
-                    4 => $this->assertInstanceOf(MutationGenerationWasFinished::class, $value),
-                    default => 'noop',
-                };
-            });
+            ->with(...WithConsecutive::create(
+                [new MutationGenerationWasStarted(2)],
+                [new MutableFileWasProcessed()],
+                [new MutableFileWasProcessed()],
+                [new MutationGenerationWasFinished()],
+            ))
+        ;
 
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
         $fileMutationGeneratorMock
@@ -197,19 +195,16 @@ final class MutationGeneratorTest extends TestCase
     public function test_it_does_not_count_files_in_concurrent_mode(): void
     {
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
-        $matcher = $this->exactly(4);
         $eventDispatcherMock
-            ->expects($matcher)
+            ->expects($this->exactly(4))
             ->method('dispatch')
-            ->willReturnCallback(function (object $value) use ($matcher): void {
-                match ($matcher->numberOfInvocations()) {
-                    1 => $this->assertInstanceOf(MutationGenerationWasStarted::class, $value),
-                    2 => $this->assertInstanceOf(MutableFileWasProcessed::class, $value),
-                    3 => $this->assertInstanceOf(MutableFileWasProcessed::class, $value),
-                    4 => $this->assertInstanceOf(MutationGenerationWasFinished::class, $value),
-                    default => 'noop',
-                };
-            });
+            ->with(...WithConsecutive::create(
+                [new MutationGenerationWasStarted(0)],
+                [new MutableFileWasProcessed()],
+                [new MutableFileWasProcessed()],
+                [new MutationGenerationWasFinished()],
+            ))
+        ;
 
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
         $fileMutationGeneratorMock

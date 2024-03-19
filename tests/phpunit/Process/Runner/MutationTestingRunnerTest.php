@@ -57,7 +57,7 @@ use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutator\MutatorName;
-use Infection\Tests\PHPUnitConvecutiveReplacement;
+use Infection\Tests\WithConsecutive;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -70,8 +70,6 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class MutationTestingRunnerTest extends TestCase
 {
-    use PHPUnitConvecutiveReplacement;
-
     /**
      * @var MutantProcessFactory|MockObject
      */
@@ -156,7 +154,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->mutantFactoryMock
             ->method('create')
-            ->with(...self::withConsecutive(
+            ->with(...WithConsecutive::create(
                 [$mutation0],
                 [$mutation1],
                 [$mutation2],
@@ -189,7 +187,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->fileSystemMock
             ->expects($this->exactly(2))
             ->method('dumpFile')
-            ->with(...self::withConsecutive(
+            ->with(...WithConsecutive::create(
                 ['/path/to/mutant0', 'mutated code 0'],
                 ['/path/to/mutant1', 'mutated code 1'],
             ))
@@ -197,7 +195,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->processFactoryMock
             ->method('createProcessForMutant')
-            ->with(...self::withConsecutive(
+            ->with(...WithConsecutive::create(
                 [$mutant0, $testFrameworkExtraOptions],
                 [$mutant1, $testFrameworkExtraOptions],
             ))
@@ -236,7 +234,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->mutantFactoryMock
             ->method('create')
-            ->with(...self::withConsecutive(
+            ->with(...WithConsecutive::create(
                 [$mutation0],
                 [$mutation1],
             ))
@@ -261,7 +259,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->fileSystemMock
             ->expects($this->exactly(2))
             ->method('dumpFile')
-            ->with(...self::withConsecutive(
+            ->with(...WithConsecutive::create(
                 ['/path/to/mutant0', 'mutated code 0'],
                 ['/path/to/mutant1', 'mutated code 1'],
             ))
@@ -269,7 +267,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->processFactoryMock
             ->method('createProcessForMutant')
-            ->with(...self::withConsecutive(
+            ->with(...WithConsecutive::create(
                 [$mutant0, $testFrameworkExtraOptions],
                 [$mutant1, $testFrameworkExtraOptions],
             ))
@@ -326,7 +324,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->mutantFactoryMock
             ->method('create')
-            ->with(...self::withConsecutive(
+            ->with(...WithConsecutive::create(
                 [$mutation0],
             ))
             ->willReturnOnConsecutiveCalls($mutant)
