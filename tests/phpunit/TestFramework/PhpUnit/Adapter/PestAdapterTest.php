@@ -278,7 +278,7 @@ final class PestAdapterTest extends TestCase
         );
     }
 
-    public function passOutputProvider(): iterable
+    public static function passOutputProvider(): iterable
     {
         yield ['Tests:  1 risked', true];
 
@@ -287,7 +287,7 @@ final class PestAdapterTest extends TestCase
         yield ['Tests:  1 failed, 8 passed', false];
     }
 
-    public function syntaxErrorOutputProvider(): iterable
+    public static function syntaxErrorOutputProvider(): iterable
     {
         yield ['Tests:  1 risked', false];
 
@@ -301,7 +301,7 @@ final class PestAdapterTest extends TestCase
         ];
     }
 
-    public function memoryReportProvider(): iterable
+    public static function memoryReportProvider(): iterable
     {
         yield ['Memory: 8.00MB', 8.0];
 

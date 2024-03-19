@@ -46,7 +46,7 @@ final class CoreClassReflectionTest extends ClassReflectionTestCase
         $this->assertSame($reflection->getName(), self::class);
     }
 
-    protected function createFromName(string $name): ClassReflection
+    protected static function createFromName(string $name): ClassReflection
     {
         return CoreClassReflection::fromClassName($name);
     }

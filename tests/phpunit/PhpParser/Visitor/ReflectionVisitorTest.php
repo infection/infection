@@ -68,7 +68,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
      */
     public function test_it_marks_nodes_which_are_part_of_the_function_signature(string $nodeClass, bool $expected): void
     {
-        $nodes = $this->parseCode(
+        $nodes = self::parseCode(
             $this->getFileContent('Reflection/rv-part-of-signature-flag.php')
         );
 
@@ -207,7 +207,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         $this->assertSame(Bug2::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass->getName());
     }
 
-    public function isPartOfSignatureFlagProvider(): iterable
+    public static function isPartOfSignatureFlagProvider(): iterable
     {
         yield [Node\Stmt\ClassMethod::class, true];
 
@@ -224,7 +224,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         yield [Node\Expr\Array_::class, false];             // []
     }
 
-    public function isPartOfSignatureFlagWithAttributesProvider(): iterable
+    public static function isPartOfSignatureFlagWithAttributesProvider(): iterable
     {
         yield [Node\Stmt\ClassMethod::class, true];
 
@@ -367,7 +367,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
 
     private function parseAndTraverse(string $code, ?NodeVisitor $nodeVisitor = null): void
     {
-        $nodes = $this->parseCode($code);
+        $nodes = self::parseCode($code);
 
         $this->traverse(
             $nodes,

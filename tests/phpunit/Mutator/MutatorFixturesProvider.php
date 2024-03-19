@@ -38,9 +38,7 @@ namespace Infection\Tests\Mutator;
 use function array_key_exists;
 use function end;
 use function explode;
-use function get_class;
 use Infection\CannotBeInstantiated;
-use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function sprintf;
 use function substr;
@@ -58,13 +56,13 @@ final class MutatorFixturesProvider
      */
     private static $testCaseFixtureDirMapping = [];
 
-    public static function getFixtureFileContent(TestCase $testCase, string $file): string
+    public static function getFixtureFileContent(string $class, string $file): string
     {
-        Assert::isInstanceOf($testCase, BaseMutatorTestCase::class);
+        Assert::isAOf($class, BaseMutatorTestCase::class);
 
         return file_get_contents(sprintf(
             '%s/%s',
-            self::getTestCaseFixtureDir(get_class($testCase)),
+            self::getTestCaseFixtureDir($class),
             $file
         ));
     }

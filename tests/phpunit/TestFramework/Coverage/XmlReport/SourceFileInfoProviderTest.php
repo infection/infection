@@ -127,7 +127,7 @@ final class SourceFileInfoProviderTest extends TestCase
         }
     }
 
-    public function fileFixturesProvider(): iterable
+    public static function fileFixturesProvider(): iterable
     {
         foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
             yield [

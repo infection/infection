@@ -98,7 +98,7 @@ final class TestLocatorTest extends TestCase
         $this->assertSame([], TestLocationsNormalizer::normalize($tests));
     }
 
-    public function rangeProvider(): iterable
+    public static function rangeProvider(): iterable
     {
         yield 'executed body' => [
             new NodeLineRangeData(34, 34),

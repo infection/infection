@@ -184,7 +184,7 @@ XML;
         );
     }
 
-    public function coverageProvider(): iterable
+    public static function coverageProvider(): iterable
     {
         yield 'nominal' => [self::getXml()];
 
@@ -197,7 +197,7 @@ XML;
         ];
     }
 
-    public function noCoveredLineReportProviders(): iterable
+    public static function noCoveredLineReportProviders(): iterable
     {
         yield 'zero lines executed' => [<<<'XML'
 <?xml version="1.0"?>

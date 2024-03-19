@@ -103,7 +103,7 @@ final class StopwatchTest extends TestCase
         }
     }
 
-    public function timeProvider(): iterable
+    public static function timeProvider(): iterable
     {
         yield 'no time' => [0, 0.];
 

@@ -54,7 +54,7 @@ final class TestLocationsNormalizerTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function locationsProvider(): iterable
+    public static function locationsProvider(): iterable
     {
         yield 'empty' => [[], []];
 
