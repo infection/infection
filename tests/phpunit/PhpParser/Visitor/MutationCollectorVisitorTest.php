@@ -43,7 +43,7 @@ use function iterator_to_array;
 /**
  * @group integration
  */
-final class MutationCollectorVisitorTest extends BaseVisitorTest
+final class MutationCollectorVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'
 <?php

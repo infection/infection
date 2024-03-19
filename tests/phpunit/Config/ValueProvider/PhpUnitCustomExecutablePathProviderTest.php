@@ -50,7 +50,7 @@ use Symfony\Component\Console\Input\StringInput;
 /**
  * @group integration
  */
-final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
+final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
 {
     /**
      * @var MockObject|TestFrameworkFinder

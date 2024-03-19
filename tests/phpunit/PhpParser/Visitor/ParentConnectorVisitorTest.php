@@ -43,7 +43,7 @@ use Infection\Tests\SingletonContainer;
 /**
  * @group integration
  */
-final class ParentConnectorVisitorTest extends BaseVisitorTest
+final class ParentConnectorVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'
 <?php

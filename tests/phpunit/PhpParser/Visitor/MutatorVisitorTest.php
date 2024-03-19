@@ -51,7 +51,7 @@ use PhpParser\ParserFactory;
 /**
  * @group integration
  */
-final class MutatorVisitorTest extends BaseVisitorTest
+final class MutatorVisitorTest extends BaseVisitorTestCase
 {
     /**
      * @dataProvider providesMutationCases

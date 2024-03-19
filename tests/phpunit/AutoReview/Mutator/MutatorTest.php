@@ -120,7 +120,7 @@ TXT
             return;
         }
 
-        $this->addWarning(sprintf(
+        $this->fail(sprintf(
             'The mutator "%s" does not have a definition.',
             $className
         ));

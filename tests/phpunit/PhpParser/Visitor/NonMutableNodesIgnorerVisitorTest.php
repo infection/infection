@@ -43,7 +43,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * @group integration
  */
-final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTest
+final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
 {
     private $spyVisitor;
 

@@ -33,45 +33,72 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\Config\ValueProvider;
 
-use Infection\Tests\SingletonContainer;
-use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function sprintf;
+use function Safe\exec;
+use function Safe\fopen;
+use function Safe\fwrite;
+use function Safe\rewind;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\StreamOutput;
+use Webmozart\Assert\Assert;
 
-abstract class BaseVisitorTest extends TestCase
+abstract class BaseProviderTestCase extends TestCase
 {
-    /**
-     * @return Node[]
-     */
-    final protected static function parseCode(string $code): array
+    protected static $stty;
+
+    final protected function getQuestionHelper(): QuestionHelper
     {
-        return (array) SingletonContainer::getContainer()->getParser()->parse($code);
+        return new QuestionHelper();
     }
 
     /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
-     *
-     * @return Node[]
+     * @return resource
      */
-    final protected function traverse(array $nodes, array $visitors): array
+    final protected function getInputStream(string $input)
     {
-        $traverser = new NodeTraverser();
+        $stream = fopen('php://memory', 'rb+', false);
+        fwrite($stream, $input);
+        rewind($stream);
 
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
+        return $stream;
+    }
+
+    final protected function createStreamOutput(): StreamOutput
+    {
+        return new StreamOutput(fopen('php://memory', 'rb+', false));
+    }
+
+    /**
+     * @param resource $stream
+     */
+    final protected function createStreamableInput(
+        $stream,
+        bool $interactive = true
+    ): InputInterface {
+        Assert::resource($stream);
+
+        $input = new StringInput('');
+        $input->setStream($stream);
+        $input->setInteractive($interactive);
+
+        return $input;
+    }
+
+    /**
+     * @see \Symfony\Component\Console\Terminal::hasSttyAvailable()
+     */
+    final protected function hasSttyAvailable(): bool
+    {
+        if (self::$stty !== null) {
+            return self::$stty;
         }
 
-        return $traverser->traverse($nodes);
-    }
+        exec('stty 2>&1', $output, $exitcode);
 
-    final protected function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../../../autoloaded/mutator-fixtures/%s', $file));
+        return self::$stty = $exitcode === 0;
     }
 }

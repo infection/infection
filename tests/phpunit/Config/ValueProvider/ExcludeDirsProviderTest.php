@@ -48,7 +48,7 @@ use function sys_get_temp_dir;
 /**
  * @group integration
  */
-final class ExcludeDirsProviderTest extends BaseProviderTest
+final class ExcludeDirsProviderTest extends BaseProviderTestCase
 {
     /**
      * @var string

@@ -131,7 +131,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         /** @var Node|MockObject $mockNode */
         $mockNode = $this->getMockBuilder(Node::class)
                          ->disableOriginalConstructor()
-                         ->setMethods(['getAttribute'])
+                         ->onlyMethods(['getAttribute'])
                          ->getMockForAbstractClass();
 
         $mockNode->method('getAttribute')
@@ -145,7 +145,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         /** @var Function_|MockObject $mockFunction */
         $mockFunction = $this->getMockBuilder(Function_::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getReturnType'])
+            ->onlyMethods(['getReturnType'])
             ->getMock();
 
         $mockFunction->method('getReturnType')

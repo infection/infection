@@ -65,6 +65,8 @@ use function Safe\json_encode;
 use function sprintf;
 use stdClass;
 use function str_starts_with;
+use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -102,7 +104,10 @@ final class ConfigureCommand extends BaseCommand
             $this->abort();
         }
 
-        $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
+        /** @var FormatterHelper $formatterHelper */
+        $formatterHelper = $this->getHelper('formatter');
+
+        $consoleHelper = new ConsoleHelper($formatterHelper);
         $consoleHelper->writeSection(
             $io->getOutput(),
             'Welcome to the Infection config generator'
@@ -115,6 +120,7 @@ final class ConfigureCommand extends BaseCommand
         $dirsInCurrentDir = glob('*', GLOB_ONLYDIR);
         $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
 
+        /** @var QuestionHelper $questionHelper */
         $questionHelper = $this->getHelper('question');
 
         if (file_exists('composer.json')) {

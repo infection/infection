@@ -44,7 +44,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * @group integration
  */
-final class CloneVisitorTest extends BaseVisitorTest
+final class CloneVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'
 <?php declare(strict_types=1);

@@ -54,7 +54,7 @@ use ReflectionClass;
 /**
  * @group integration
  */
-final class ReflectionVisitorTest extends BaseVisitorTest
+final class ReflectionVisitorTest extends BaseVisitorTestCase
 {
     private $spyVisitor;
 

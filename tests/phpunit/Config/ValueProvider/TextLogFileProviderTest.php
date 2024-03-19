@@ -42,7 +42,7 @@ use Infection\Console\IO;
 /**
  * @group integration
  */
-final class TextLogFileProviderTest extends BaseProviderTest
+final class TextLogFileProviderTest extends BaseProviderTestCase
 {
     /**
      * @var TextLogFileProvider

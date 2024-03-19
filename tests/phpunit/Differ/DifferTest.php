@@ -41,6 +41,7 @@ use function implode;
 use Infection\Differ\Differ;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 
 final class DifferTest extends TestCase
 {
@@ -52,7 +53,7 @@ final class DifferTest extends TestCase
         string $sourceB,
         string $expectedDiff
     ): void {
-        $actualDiff = (new Differ(new BaseDiffer()))->diff($sourceA, $sourceB);
+        $actualDiff = (new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())))->diff($sourceA, $sourceB);
 
         $this->assertSame($expectedDiff, self::normalizeString($actualDiff));
     }

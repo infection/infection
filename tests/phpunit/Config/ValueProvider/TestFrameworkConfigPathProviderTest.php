@@ -47,7 +47,7 @@ use Symfony\Component\Console\Input\StringInput;
 /**
  * @group integration
  */
-final class TestFrameworkConfigPathProviderTest extends BaseProviderTest
+final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
 {
     /**
      * @var TestFrameworkConfigPathProvider
