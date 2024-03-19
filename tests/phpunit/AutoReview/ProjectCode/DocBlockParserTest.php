@@ -49,7 +49,7 @@ final class DocBlockParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function docBlocksProvider(): iterable
+    public static function docBlocksProvider(): iterable
     {
         yield ['', ''];
 
@@ -66,7 +66,7 @@ PHP
 This is a
 multi-line
 doc-block
-TEXT
+TEXT,
         ];
 
         yield [
@@ -94,7 +94,7 @@ This is a
 multi-line
 doc-block
 with weird indentation
-TEXT
+TEXT,
         ];
 
         yield [

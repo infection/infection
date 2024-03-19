@@ -49,57 +49,57 @@ abstract class ClassReflectionTestCase extends TestCase
         ClassReflection $reflection,
         string $method,
         Visibility $visibility,
-        bool $hasParent
+        bool $hasParent,
     ): void {
         $this->assertSame($hasParent, $reflection->hasParentMethodWithVisibility($method, $visibility));
     }
 
-    public function provideParentMethodCases(): iterable
+    public static function provideParentMethodCases(): iterable
     {
         yield [
-            $this->createFromName(CloneVisitor::class),
+            static::createFromName(CloneVisitor::class),
             'enterNode',
             Visibility::asPublic(),
             true,
         ];
 
         yield [
-            $this->createFromName(CloneVisitor::class),
+            static::createFromName(CloneVisitor::class),
             'enterNode',
             Visibility::asProtected(),
             false,
         ];
 
         yield [
-            $this->createFromName(static::class),
+            static::createFromName(static::class),
             'foo',
             Visibility::asProtected(),
             false,
         ];
 
         yield [
-            $this->createFromName(static::class),
+            static::createFromName(static::class),
             'foo',
             Visibility::asPublic(),
             false,
         ];
 
         yield [
-            $this->createFromName(ProtChild::class),
+            static::createFromName(ProtChild::class),
             'foo',
             Visibility::asPublic(),
             false,
         ];
 
         yield [
-            $this->createFromName(ProtChild::class),
+            static::createFromName(ProtChild::class),
             'foo',
             Visibility::asProtected(),
             true,
         ];
     }
 
-    abstract protected function createFromName(string $name): ClassReflection;
+    abstract protected static function createFromName(string $name): ClassReflection;
 }
 
 class ProtParent

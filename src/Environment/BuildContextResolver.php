@@ -74,7 +74,7 @@ final class BuildContextResolver
 
         return new BuildContext(
             $ci->getRepositoryName(),
-            $ci->getBranch()
+            $ci->getBranch(),
         );
     }
 }

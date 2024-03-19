@@ -50,7 +50,7 @@ use Symfony\Component\Console\Input\StringInput;
 /**
  * @group integration
  */
-final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
+final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
 {
     /**
      * @var MockObject|TestFrameworkFinder
@@ -69,7 +69,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
         $this->provider = new PhpUnitCustomExecutablePathProvider(
             $this->finderMock,
             $this->createMock(ConsoleHelper::class),
-            $this->getQuestionHelper()
+            $this->getQuestionHelper(),
         );
     }
 
@@ -83,8 +83,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
         $this->assertNull(
             $this->provider->get(new IO(
                 new StringInput(''),
-                $this->createStreamOutput())
-            )
+                $this->createStreamOutput()),
+            ),
         );
     }
 
@@ -100,7 +100,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
 
         $path = $this->provider->get(new IO(
             $this->createStreamableInput($this->getInputStream("{$customExecutable}\n")),
-            $this->createStreamOutput()
+            $this->createStreamOutput(),
         ));
 
         $this->assertSame($customExecutable, $path);
@@ -122,7 +122,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
 
         $this->provider->get(new IO(
             $this->createStreamableInput($this->getInputStream("abc\n")),
-            $this->createStreamOutput()
+            $this->createStreamOutput(),
         ));
     }
 }

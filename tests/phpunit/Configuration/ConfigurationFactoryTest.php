@@ -177,7 +177,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputHtmlLogFilePath,
                 $inputUseNoopMutators,
                 $inputExecuteOnlyCoveringTestCases,
-                $mapSourceClassToTest
+                $mapSourceClassToTest,
             )
         ;
 
@@ -214,11 +214,11 @@ final class ConfigurationFactoryTest extends TestCase
             $inputExecuteOnlyCoveringTestCases,
             $inputIsForGitDiffLines,
             $inputGitDiffBase,
-            $mapSourceClassToTest
+            $mapSourceClassToTest,
         );
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         $expectedLogs = Logs::createEmpty();
         $expectedLogs->setUseGitHubAnnotationsLogger(true);
@@ -240,7 +240,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -299,7 +299,7 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'null html file log path with existing path from config file' => self::createValueForHtmlLogFilePath(
             '/from-config.html',
             null,
-            '/from-config.html'
+            '/from-config.html',
         );
 
         yield 'absolute html file log path' => self::createValueForHtmlLogFilePath(
@@ -311,154 +311,154 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'relative html file log path' => self::createValueForHtmlLogFilePath(
             'relative/path/to/from-config.html',
             null,
-            '/path/to/relative/path/to/from-config.html'
+            '/path/to/relative/path/to/from-config.html',
         );
 
         yield 'override html file log path from CLI option with existing path from config file' => self::createValueForHtmlLogFilePath(
             '/from-config.html',
             '/from-cli.html',
-            '/from-cli.html'
+            '/from-cli.html',
         );
 
         yield 'set html file log path from CLI option when config file has no setting' => self::createValueForHtmlLogFilePath(
             null,
             '/from-cli.html',
-            '/from-cli.html'
+            '/from-cli.html',
         );
 
         yield 'null html file log path in config and CLI' => self::createValueForHtmlLogFilePath(
             null,
             null,
-            null
+            null,
         );
 
         yield 'null timeout' => self::createValueForTimeout(
             null,
-            10
+            10,
         );
 
         yield 'config timeout' => self::createValueForTimeout(
             20,
-            20
+            20,
         );
 
         yield 'null tmp dir' => self::createValueForTmpDir(
             null,
-            sys_get_temp_dir() . '/infection'
+            sys_get_temp_dir() . '/infection',
         );
 
         yield 'empty tmp dir' => self::createValueForTmpDir(
             '',
-            sys_get_temp_dir() . '/infection'
+            sys_get_temp_dir() . '/infection',
         );
 
         yield 'relative tmp dir path' => self::createValueForTmpDir(
             'relative/path/to/tmp',
-            '/path/to/relative/path/to/tmp/infection'
+            '/path/to/relative/path/to/tmp/infection',
         );
 
         yield 'absolute tmp dir path' => self::createValueForTmpDir(
             '/absolute/path/to/tmp',
-            '/absolute/path/to/tmp/infection'
+            '/absolute/path/to/tmp/infection',
         );
 
         yield 'no existing base path for code coverage' => self::createValueForCoveragePath(
             null,
             false,
-            sys_get_temp_dir() . '/infection'
+            sys_get_temp_dir() . '/infection',
         );
 
         yield 'absolute base path for code coverage' => self::createValueForCoveragePath(
             '/path/to/coverage',
             true,
-            '/path/to/coverage'
+            '/path/to/coverage',
         );
 
         yield 'relative base path for code coverage' => self::createValueForCoveragePath(
             'relative/path/to/coverage',
             true,
-            '/path/to/relative/path/to/coverage'
+            '/path/to/relative/path/to/coverage',
         );
 
         yield 'no PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
             'relative/path/to/phpunit/config',
-            '/path/to/relative/path/to/phpunit/config'
+            '/path/to/relative/path/to/phpunit/config',
         );
 
         yield 'relative PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
             'relative/path/to/phpunit/config',
-            '/path/to/relative/path/to/phpunit/config'
+            '/path/to/relative/path/to/phpunit/config',
         );
 
         yield 'absolute PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
             '/path/to/phpunit/config',
-            '/path/to/phpunit/config'
+            '/path/to/phpunit/config',
         );
 
         yield 'progress in non-CI environment' => self::createValueForNoProgress(
             false,
             false,
-            false
+            false,
         );
 
         yield 'progress in CI environment' => self::createValueForNoProgress(
             true,
             false,
-            true
+            true,
         );
 
         yield 'no progress in non-CI environment' => self::createValueForNoProgress(
             false,
             true,
-            true
+            true,
         );
 
         yield 'no progress in CI environment' => self::createValueForNoProgress(
             true,
             true,
-            true
+            true,
         );
 
         yield 'Github Actions annotation disabled, not logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
             false,
             false,
-            false
+            false,
         );
 
         yield 'Github Actions annotation disabled, not logged in Github Actions environment' => self::createValueForGithubActionsDetected(
             false,
             true,
-            false
+            false,
         );
 
         yield 'Github Actions annotation not provided, not logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
             null,
             false,
-            false
+            false,
         );
 
         yield 'Github Actions annotation not provided, logged in Github Actions environment' => self::createValueForGithubActionsDetected(
             null,
             true,
-            true
+            true,
         );
 
         yield 'Github Actions annotation enabled, logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
             true,
             false,
-            true
+            true,
         );
 
         yield 'Github Actions annotation enabled, logged in Github Actions environment' => self::createValueForGithubActionsDetected(
             true,
             true,
-            true
+            true,
         );
 
         yield 'null GitLab file log path with existing path from config file' => self::createValueForGitlabLogger(
             '/from-config.json',
             null,
-            '/from-config.json'
+            '/from-config.json',
         );
 
         yield 'absolute GitLab file log path' => self::createValueForGitlabLogger(
@@ -470,214 +470,214 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'relative GitLab file log path' => self::createValueForGitlabLogger(
             'relative/path/to/from-config.json',
             null,
-            '/path/to/relative/path/to/from-config.json'
+            '/path/to/relative/path/to/from-config.json',
         );
 
         yield 'override GitLab file log path from CLI option with existing path from config file' => self::createValueForGitlabLogger(
             '/from-config.json',
             '/from-cli.json',
-            '/from-cli.json'
+            '/from-cli.json',
         );
 
         yield 'set GitLab file log path from CLI option when config file has no setting' => self::createValueForGitlabLogger(
             null,
             '/from-cli.json',
-            '/from-cli.json'
+            '/from-cli.json',
         );
 
         yield 'null GitLab file log path in config and CLI' => self::createValueForGitlabLogger(
             null,
             null,
-            null
+            null,
         );
 
         yield 'ignoreMsiWithNoMutations not specified in schema and true in input' => self::createValueForIgnoreMsiWithNoMutations(
             null,
             true,
-            true
+            true,
         );
 
         yield 'ignoreMsiWithNoMutations not specified in schema and false in input' => self::createValueForIgnoreMsiWithNoMutations(
             null,
             false,
-            false
+            false,
         );
 
         yield 'ignoreMsiWithNoMutations true in schema and not specified in input' => self::createValueForIgnoreMsiWithNoMutations(
             true,
             null,
-            true
+            true,
         );
 
         yield 'ignoreMsiWithNoMutations false in schema and not specified in input' => self::createValueForIgnoreMsiWithNoMutations(
             false,
             null,
-            false
+            false,
         );
 
         yield 'ignoreMsiWithNoMutations true in schema and false in input' => self::createValueForIgnoreMsiWithNoMutations(
             true,
             false,
-            false
+            false,
         );
 
         yield 'ignoreMsiWithNoMutations false in schema and true in input' => self::createValueForIgnoreMsiWithNoMutations(
             false,
             true,
-            true
+            true,
         );
 
         yield 'minMsi not specified in schema and not specified in input' => self::createValueForMinMsi(
             null,
             null,
-            null
+            null,
         );
 
         yield 'minMsi specified in schema and not specified in input' => self::createValueForMinMsi(
             33.3,
             null,
-            33.3
+            33.3,
         );
 
         yield 'minMsi not specified in schema and specified in input' => self::createValueForMinMsi(
             null,
             21.2,
-            21.2
+            21.2,
         );
 
         yield 'minMsi specified in schema and specified in input' => self::createValueForMinMsi(
             33.3,
             21.2,
-            21.2
+            21.2,
         );
 
         yield 'minCoveredMsi not specified in schema and not specified in input' => self::createValueForMinCoveredMsi(
             null,
             null,
-            null
+            null,
         );
 
         yield 'minCoveredMsi specified in schema and not specified in input' => self::createValueForMinCoveredMsi(
             33.3,
             null,
-            33.3
+            33.3,
         );
 
         yield 'minCoveredMsi not specified in schema and specified in input' => self::createValueForMinCoveredMsi(
             null,
             21.2,
-            21.2
+            21.2,
         );
 
         yield 'minCoveredMsi specified in schema and specified in input' => self::createValueForMinCoveredMsi(
             33.3,
             21.2,
-            21.2
+            21.2,
         );
 
         yield 'no test framework' => self::createValueForTestFramework(
             null,
             null,
             'phpunit',
-            ''
+            '',
         );
 
         yield 'test framework from config' => self::createValueForTestFramework(
             'phpspec',
             null,
             'phpspec',
-            ''
+            '',
         );
 
         yield 'test framework from input' => self::createValueForTestFramework(
             null,
             'phpspec',
             'phpspec',
-            ''
+            '',
         );
 
         yield 'test framework from config & input' => self::createValueForTestFramework(
             'phpunit',
             'phpspec',
             'phpspec',
-            ''
+            '',
         );
 
         yield 'test no test PHP options' => self::createValueForInitialTestsPhpOptions(
             null,
             null,
-            null
+            null,
         );
 
         yield 'test test PHP options from config' => self::createValueForInitialTestsPhpOptions(
             '-d zend_extension=xdebug.so',
             null,
-            '-d zend_extension=xdebug.so'
+            '-d zend_extension=xdebug.so',
         );
 
         yield 'test test PHP options from input' => self::createValueForInitialTestsPhpOptions(
             null,
             '-d zend_extension=xdebug.so',
-            '-d zend_extension=xdebug.so'
+            '-d zend_extension=xdebug.so',
         );
 
         yield 'test test PHP options from config & input' => self::createValueForInitialTestsPhpOptions(
             '-d zend_extension=another_xdebug.so',
             '-d zend_extension=xdebug.so',
-            '-d zend_extension=xdebug.so'
+            '-d zend_extension=xdebug.so',
         );
 
         yield 'test no framework PHP options' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             null,
             null,
-            ''
+            '',
         );
 
         yield 'test framework PHP options from config' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             '--debug',
             null,
-            '--debug'
+            '--debug',
         );
 
         yield 'test framework PHP options from input' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             null,
             '--debug',
-            '--debug'
+            '--debug',
         );
 
         yield 'test framework PHP options from config & input' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             '--stop-on-failure',
             '--debug',
-            '--debug'
+            '--debug',
         );
 
         yield 'test framework PHP options from config with phpspec framework' => self::createValueForTestFrameworkExtraOptions(
             'phpspec',
             '--debug',
             null,
-            '--debug'
+            '--debug',
         );
 
         yield 'PHPUnit test framework' => self::createValueForTestFrameworkKey(
             'phpunit',
             '--debug',
-            '--debug'
+            '--debug',
         );
 
         yield 'phpSpec test framework' => self::createValueForTestFrameworkKey(
             'phpspec',
             '--debug',
-            '--debug'
+            '--debug',
         );
 
         yield 'codeception test framework' => self::createValueForTestFrameworkKey(
             'codeception',
             '--debug',
-            '--debug'
+            '--debug',
         );
 
         yield 'no mutator' => self::createValueForMutators(
@@ -703,9 +703,9 @@ final class ConfigurationFactoryTest extends TestCase
                     new IgnoreConfig([
                         'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
                     ]),
-                    new MethodCallRemoval()
+                    new MethodCallRemoval(),
                 ),
-            ]
+            ],
         );
 
         yield 'noop mutators from config' => self::createValueForMutators(
@@ -724,9 +724,9 @@ final class ConfigurationFactoryTest extends TestCase
                     new IgnoreConfig([
                         'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
                     ]),
-                    new MethodCallRemoval()
+                    new MethodCallRemoval(),
                 )),
-            ]
+            ],
         );
 
         yield 'ignore source code by regex' => self::createValueForIgnoreSourceCodeByRegex(
@@ -736,7 +736,7 @@ final class ConfigurationFactoryTest extends TestCase
                     'ignoreSourceCodeByRegex' => ['Assert::.*'],
                 ],
             ],
-            ['MethodCallRemoval' => ['Assert::.*']]
+            ['MethodCallRemoval' => ['Assert::.*']],
         );
 
         yield 'ignore source code by regex with duplicates' => self::createValueForIgnoreSourceCodeByRegex(
@@ -751,7 +751,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ],
                 ],
             ],
-            ['MethodCallRemoval' => ['Assert::.*', 'Test::.*']]
+            ['MethodCallRemoval' => ['Assert::.*', 'Test::.*']],
         );
 
         yield 'mutators from config & input' => self::createValueForMutators(
@@ -770,7 +770,7 @@ final class ConfigurationFactoryTest extends TestCase
                     'AssignmentEqual' => new AssignmentEqual(),
                     'EqualIdentical' => new EqualIdentical(),
                 ];
-            })()
+            })(),
         );
 
         yield 'with source files' => [
@@ -790,7 +790,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -866,12 +866,12 @@ final class ConfigurationFactoryTest extends TestCase
                     '/mutator.log',
                     true,
                     StrykerConfig::forFullReport('master'),
-                    '/summary.json'
+                    '/summary.json',
                 ),
                 'config/tmp',
                 new PhpUnit(
                     'config/phpunit-dir',
-                    'config/phpunit'
+                    'config/phpunit',
                 ),
                 null,
                 null,
@@ -880,7 +880,7 @@ final class ConfigurationFactoryTest extends TestCase
                 'phpunit',
                 'config/bootstrap.php',
                 '-d zend_extension=wrong_xdebug.so',
-                '--debug'
+                '--debug',
             ),
             'dist/coverage',
             '-d zend_extension=xdebug.so',
@@ -925,13 +925,13 @@ final class ConfigurationFactoryTest extends TestCase
                 '/mutator.log',
                 true,
                 StrykerConfig::forFullReport('master'),
-                '/summary.json'
+                '/summary.json',
             ),
             'none',
             '/path/to/config/tmp/infection',
             new PhpUnit(
                 '/path/to/config/phpunit-dir',
-                'config/phpunit'
+                'config/phpunit',
             ),
             (static function (): array {
                 return [
@@ -960,7 +960,7 @@ final class ConfigurationFactoryTest extends TestCase
 
     private static function createValueForTimeout(
         ?int $schemaTimeout,
-        int $expectedTimeOut
+        int $expectedTimeOut,
     ): array {
         return [
             false,
@@ -979,7 +979,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -1038,7 +1038,7 @@ final class ConfigurationFactoryTest extends TestCase
 
     private static function createValueForTmpDir(
         ?string $configTmpDir,
-        ?string $expectedTmpDir
+        ?string $expectedTmpDir,
     ): array {
         return [
             false,
@@ -1057,7 +1057,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -1117,7 +1117,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForCoveragePath(
         ?string $existingCoveragePath,
         bool $expectedSkipCoverage,
-        string $expectedCoveragePath
+        string $expectedCoveragePath,
     ): array {
         return [
             false,
@@ -1136,7 +1136,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             $existingCoveragePath,
             null,
@@ -1195,7 +1195,7 @@ final class ConfigurationFactoryTest extends TestCase
 
     private static function createValueForPhpUnitConfigDir(
         ?string $phpUnitConfigDir,
-        ?string $expectedPhpUnitConfigDir
+        ?string $expectedPhpUnitConfigDir,
     ): array {
         return [
             false,
@@ -1214,7 +1214,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -1274,7 +1274,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForNoProgress(
         bool $ciDetected,
         bool $noProgress,
-        bool $expectedNoProgress
+        bool $expectedNoProgress,
     ): array {
         return [
             $ciDetected,
@@ -1293,7 +1293,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -1353,7 +1353,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForGithubActionsDetected(
         ?bool $inputUseGitHubAnnotationsLogger,
         bool $githubActionsDetected,
-        bool $useGitHubAnnotationsLogger
+        bool $useGitHubAnnotationsLogger,
     ): array {
         $expectedLogs = new Logs(
             null,
@@ -1385,7 +1385,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -1445,7 +1445,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForGitlabLogger(
         ?string $gitlabFileLogPathInConfig,
         ?string $gitlabFileLogPathFromCliOption,
-        ?string $expectedGitlabFileLogPath
+        ?string $expectedGitlabFileLogPath,
     ): array {
         $expectedLogs = new Logs(
             null,
@@ -1488,7 +1488,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -1548,7 +1548,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForIgnoreMsiWithNoMutations(
         ?bool $ignoreMsiWithNoMutationsFromSchemaConfiguration,
         ?bool $ignoreMsiWithNoMutationsFromInput,
-        ?bool $expectedIgnoreMsiWithNoMutations
+        ?bool $expectedIgnoreMsiWithNoMutations,
     ): array {
         return [
             false,
@@ -1567,7 +1567,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -1627,7 +1627,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForMinMsi(
         ?float $minMsiFromSchemaConfiguration,
         ?float $minMsiFromInput,
-        ?float $expectedMinMsi
+        ?float $expectedMinMsi,
     ): array {
         return [
             false,
@@ -1646,7 +1646,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -1706,7 +1706,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForMinCoveredMsi(
         ?float $minCoveredMsiFromSchemaConfiguration,
         ?float $minCoveredMsiFromInput,
-        ?float $expectedMinCoveredMsi
+        ?float $expectedMinCoveredMsi,
     ): array {
         return [
             false,
@@ -1725,7 +1725,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -1786,7 +1786,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $configTestFramework,
         ?string $inputTestFramework,
         string $expectedTestFramework,
-        string $expectedTestFrameworkExtraOptions
+        string $expectedTestFrameworkExtraOptions,
     ): array {
         return [
             false,
@@ -1805,7 +1805,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $configTestFramework,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -1865,7 +1865,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForInitialTestsPhpOptions(
         ?string $configInitialTestsPhpOptions,
         ?string $inputInitialTestsPhpOptions,
-        ?string $expectedInitialTestPhpOptions
+        ?string $expectedInitialTestPhpOptions,
     ): array {
         return [
             false,
@@ -1884,7 +1884,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 $configInitialTestsPhpOptions,
-                null
+                null,
             ),
             null,
             $inputInitialTestsPhpOptions,
@@ -1945,7 +1945,7 @@ final class ConfigurationFactoryTest extends TestCase
         string $configTestFramework,
         ?string $configTestFrameworkExtraOptions,
         ?string $inputTestFrameworkExtraOptions,
-        string $expectedTestFrameworkExtraOptions
+        string $expectedTestFrameworkExtraOptions,
     ): array {
         return [
             false,
@@ -1964,7 +1964,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $configTestFramework,
                 null,
                 null,
-                $configTestFrameworkExtraOptions
+                $configTestFrameworkExtraOptions,
             ),
             null,
             null,
@@ -2024,7 +2024,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForTestFrameworkKey(
         string $configTestFramework,
         string $inputTestFrameworkExtraOptions,
-        string $expectedTestFrameworkExtraOptions
+        string $expectedTestFrameworkExtraOptions,
     ): array {
         return [
             false,
@@ -2043,7 +2043,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $configTestFramework,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -2107,7 +2107,7 @@ final class ConfigurationFactoryTest extends TestCase
         array $configMutators,
         string $inputMutators,
         bool $useNoopMutatos,
-        array $expectedMutators
+        array $expectedMutators,
     ): array {
         return [
             false,
@@ -2126,7 +2126,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -2189,7 +2189,7 @@ final class ConfigurationFactoryTest extends TestCase
      */
     private static function createValueForIgnoreSourceCodeByRegex(
         array $configMutators,
-        array $expectedIgnoreSourceCodeMutatorsMap
+        array $expectedIgnoreSourceCodeMutatorsMap,
     ): array {
         return [
             false,
@@ -2208,7 +2208,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -2310,7 +2310,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null
+                null,
             ),
             null,
             null,
@@ -2379,7 +2379,7 @@ final class ConfigurationFactoryTest extends TestCase
                     SingletonContainer::getContainer()
                         ->getMutatorResolver()
                         ->resolve(['@default' => true]),
-                    false
+                    false,
                 )
             ;
         }
@@ -2414,7 +2414,7 @@ final class ConfigurationFactoryTest extends TestCase
             new MutatorParser(),
             $sourceFilesCollectorProphecy->reveal(),
             new DummyCiDetector($ciDetected, $githubActionsDetected),
-            $gitDiffFilesProviderMock
+            $gitDiffFilesProviderMock,
         );
     }
 }

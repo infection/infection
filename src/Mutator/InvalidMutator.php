@@ -61,10 +61,10 @@ TXT
                 ,
                 $mutatorName,
                 $filePath,
-                self::GITHUB_BUG_LINK
+                self::GITHUB_BUG_LINK,
             ),
             0,
-            $previous
+            $previous,
         );
     }
 }

@@ -104,7 +104,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
                 DetectionStatus::KILLED,
                 DetectionStatus::ERROR,
             ],
-            $provider->get()
+            $provider->get(),
         );
     }
 
@@ -124,7 +124,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
                 DetectionStatus::ERROR,
                 DetectionStatus::NOT_COVERED,
             ],
-            $provider->get()
+            $provider->get(),
         );
     }
 

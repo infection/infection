@@ -49,7 +49,7 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Spread assignment for a raw array' => [
             <<<'PHP'

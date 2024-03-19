@@ -61,12 +61,12 @@ final class ResponseTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected an HTTP status code. Got "102"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         yield 'empty' => [200, ''];
 

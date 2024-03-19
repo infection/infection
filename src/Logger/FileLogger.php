@@ -70,7 +70,7 @@ final class FileLogger implements MutationTestingResultsLogger
                 $this->logger->error(sprintf(
                     '<error>The only streams supported are "php://stdout" and "php://stderr"'
                     . '. Got "%s"</error>',
-                    $this->filePath
+                    $this->filePath,
                 ));
             }
 
@@ -82,7 +82,7 @@ final class FileLogger implements MutationTestingResultsLogger
         } catch (IOException $exception) {
             $this->logger->error(sprintf(
                 '<error>%s</error>',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
     }

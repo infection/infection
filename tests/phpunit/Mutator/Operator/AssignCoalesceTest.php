@@ -49,7 +49,7 @@ final class AssignCoalesceTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutate coalesce when right part is a scalar value' => [
             <<<'PHP'
@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a['value'] = 'otherValue';
-PHP
+PHP,
         ];
 
         yield 'Mutate coalesce when right part is an expression' => [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a['value'] = 'other' . ' Value';
-PHP
+PHP,
         ];
 
         yield 'Mutate coalesce when right part is a variable' => [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a['value'] = $var;
-PHP
+PHP,
         ];
 
         yield 'Does not mutate coalesce binary operator' => [

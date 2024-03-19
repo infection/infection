@@ -49,7 +49,7 @@ final class UnwrapArrayReplaceTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
@@ -216,7 +216,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['D']);
-PHP
+PHP,
             ],
         ];
 
@@ -231,7 +231,7 @@ PHP
 <?php
 
 $a = ['A', 1, 'C'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
@@ -258,7 +258,7 @@ PHP
 <?php
 
 $a = ['E', 'F'];
-PHP
+PHP,
             ],
         ];
 
@@ -267,7 +267,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_replace' => [
@@ -277,7 +277,7 @@ PHP
 function array_replace($array, $array1, $array2)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [

@@ -122,7 +122,7 @@ final class XmlConfigurationManipulator
         $this->setAttributeValue(
             $xPath,
             'stopOnFailure',
-            'true'
+            'true',
         );
     }
 
@@ -131,7 +131,7 @@ final class XmlConfigurationManipulator
         $this->setAttributeValue(
             $xPath,
             'colors',
-            'false'
+            'false',
         );
     }
 
@@ -139,7 +139,7 @@ final class XmlConfigurationManipulator
     {
         $this->removeAttribute(
             $xPath,
-            'printerClass'
+            'printerClass',
         );
     }
 
@@ -187,7 +187,7 @@ final class XmlConfigurationManipulator
         if ($schema->length > 0 && !$xPath->document->schemaValidate($this->buildSchemaPath($schema[0]->nodeValue))) {
             throw InvalidPhpUnitConfiguration::byXsdSchema(
                 $configPath,
-                $this->getXmlErrorsString()
+                $this->getXmlErrorsString(),
             );
         }
 
@@ -200,7 +200,7 @@ final class XmlConfigurationManipulator
     {
         $this->removeAttribute(
             $xPath,
-            'defaultTestSuite'
+            'defaultTestSuite',
         );
     }
 
@@ -239,7 +239,7 @@ final class XmlConfigurationManipulator
             foreach ($srcDirs as $srcDir) {
                 $directoryNode = $xPath->document->createElement(
                     'directory',
-                    $srcDir
+                    $srcDir,
                 );
 
                 $listNode->appendChild($directoryNode);
@@ -248,7 +248,7 @@ final class XmlConfigurationManipulator
             foreach ($filteredSourceFilesToMutate as $sourceFileRealPath) {
                 $directoryNode = $xPath->document->createElement(
                     'file',
-                    $sourceFileRealPath
+                    $sourceFileRealPath,
                 );
 
                 $listNode->appendChild($directoryNode);
@@ -314,7 +314,7 @@ final class XmlConfigurationManipulator
     {
         $nodeList = $xPath->query(sprintf(
             '/phpunit/@%s',
-            $name
+            $name,
         ));
 
         if ($nodeList->length > 0) {
@@ -328,7 +328,7 @@ final class XmlConfigurationManipulator
     {
         $nodeList = $xPath->query(sprintf(
             '/phpunit/@%s',
-            $name
+            $name,
         ));
 
         if ($nodeList->length > 0) {

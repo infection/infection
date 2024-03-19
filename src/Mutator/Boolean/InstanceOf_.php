@@ -63,7 +63,7 @@ final class InstanceOf_ implements Mutator
 + $a = true;
 # Mutation 2
 + $a = false;
-DIFF
+DIFF,
         );
     }
 

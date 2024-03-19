@@ -170,7 +170,7 @@ final class E2ETest extends TestCase
         $this->runOnE2EFixture($fullPath);
     }
 
-    public function e2eTestSuiteDataProvider(): iterable
+    public static function e2eTestSuiteDataProvider(): iterable
     {
         $directories = Finder::create()
             ->depth('== 0')
@@ -370,7 +370,7 @@ Unexpected exit code. Command output was:
 $outputText
 --- end of output
 
-EOF
+EOF,
         );
 
         return $outputText;

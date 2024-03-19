@@ -48,19 +48,19 @@ final class InvalidSchemaTest extends TestCase
     public function test_it_can_be_instantiated(
         SchemaConfigurationFile $config,
         array $errors,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = InvalidSchema::create($config, $errors);
 
         $this->assertSame(
             $expectedErrorMessage,
-            normalizeLineReturn($exception->getMessage())
+            normalizeLineReturn($exception->getMessage()),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
     }
 
-    public function configWithErrorsProvider(): iterable
+    public static function configWithErrorsProvider(): iterable
     {
         $path = '/path/to/config';
 

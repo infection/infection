@@ -63,20 +63,20 @@ final class XmlCoverageParserTest extends TestCase
      */
     public function test_it_reads_every_type_of_fixture(
         SourceFileInfoProvider $provider,
-        array $expectedTests
+        array $expectedTests,
     ): void {
         $fileData = $this->parser->parse($provider);
 
         $this->assertSame(
             $fileData->getSourceFileInfo()->getRealPath(),
-            $provider->provideFileInfo()->getRealPath()
+            $provider->provideFileInfo()->getRealPath(),
         );
 
         $coverageData = $fileData->getTests();
 
         $this->assertSame(
             $expectedTests,
-            TestLocationsNormalizer::normalize([$coverageData])[0]
+            TestLocationsNormalizer::normalize([$coverageData])[0],
         );
     }
 
@@ -156,7 +156,7 @@ XML;
         $this->assertArrayNotHasKey(11, $coverageData->getTestsLocationsBySourceLine());
     }
 
-    public function sourceFileInfoProviderProvider(): iterable
+    public static function sourceFileInfoProviderProvider(): iterable
     {
         foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
             yield [
@@ -164,7 +164,7 @@ XML;
                     '/path/to/index.xml',
                     $fixture->coverageDir,
                     $fixture->relativeCoverageFilePath,
-                    $fixture->projectSource
+                    $fixture->projectSource,
                 ),
                 $fixture->normalizedTests,
             ];

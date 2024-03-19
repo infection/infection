@@ -80,7 +80,7 @@ class ConfigurationFactory
         private readonly MutatorParser $mutatorParser,
         private readonly SourceFileCollector $sourceFileCollector,
         private readonly CiDetectorInterface $ciDetector,
-        private readonly GitDiffFileProvider $gitDiffFileProvider
+        private readonly GitDiffFileProvider $gitDiffFileProvider,
     ) {
     }
 
@@ -112,7 +112,7 @@ class ConfigurationFactory
         ?string $htmlLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
-        ?string $mapSourceClassToTestStrategy
+        ?string $mapSourceClassToTestStrategy,
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -125,7 +125,7 @@ class ConfigurationFactory
         $coverageBasePath = self::retrieveCoverageBasePath(
             $existingCoveragePath,
             $configDir,
-            $namespacedTmpDir
+            $namespacedTmpDir,
         );
 
         $resolvedMutatorsArray = $this->resolveMutators($schema->getMutators(), $mutatorsInput);
@@ -138,7 +138,7 @@ class ConfigurationFactory
             $schema->getSource()->getDirectories(),
             $this->sourceFileCollector->collectFiles(
                 $schema->getSource()->getDirectories(),
-                $schema->getSource()->getExcludes()
+                $schema->getSource()->getExcludes(),
             ),
             $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
             $schema->getSource()->getExcludes(),
@@ -168,7 +168,7 @@ class ConfigurationFactory
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
             $gitDiffBase,
-            $mapSourceClassToTestStrategy
+            $mapSourceClassToTestStrategy,
         );
     }
 
@@ -196,7 +196,7 @@ class ConfigurationFactory
 
     private function retrieveTmpDir(
         SchemaConfiguration $schema,
-        string $configDir
+        string $configDir,
     ): string {
         $tmpDir = (string) $schema->getTmpDir();
 
@@ -219,7 +219,7 @@ class ConfigurationFactory
             $phpUnit->setConfigDir($configDir);
         } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
             $phpUnit->setConfigDir(sprintf(
-                '%s/%s', $configDir, $phpUnitConfigDir
+                '%s/%s', $configDir, $phpUnitConfigDir,
             ));
         }
 
@@ -229,7 +229,7 @@ class ConfigurationFactory
     private static function retrieveCoverageBasePath(
         ?string $existingCoveragePath,
         string $configDir,
-        string $tmpDir
+        string $tmpDir,
     ): string {
         if ($existingCoveragePath === null) {
             return $tmpDir;
@@ -244,7 +244,7 @@ class ConfigurationFactory
 
     private static function retrieveTestFrameworkExtraOptions(
         ?string $testFrameworkExtraOptions,
-        SchemaConfiguration $schema
+        SchemaConfiguration $schema,
     ): string {
         return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
     }
@@ -256,7 +256,7 @@ class ConfigurationFactory
 
     private static function retrieveIgnoreMsiWithNoMutations(
         ?bool $ignoreMsiWithNoMutations,
-        SchemaConfiguration $schema
+        SchemaConfiguration $schema,
     ): bool {
         return $ignoreMsiWithNoMutations ?? $schema->getIgnoreMsiWithNoMutations() ?? false;
     }

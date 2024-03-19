@@ -49,7 +49,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It preserve if and else expression' => [
             <<<'PHP'
@@ -74,7 +74,7 @@ if ($this->fooBar()) {
 } else {
     return 3;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates array item fetch' => [
@@ -93,7 +93,7 @@ PHP
 if (true) {
 } elseif (!$array[0]) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -113,7 +113,7 @@ PHP
 if (true) {
 } elseif (!$foo) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -153,7 +153,7 @@ PHP
 if (true) {
 } elseif (!self::foo()) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -173,7 +173,7 @@ PHP
 if (true) {
 } elseif (!self::FOO) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -193,7 +193,7 @@ PHP
 if (true) {
 } elseif (!$foo()) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -213,7 +213,7 @@ PHP
 if (true) {
 } elseif (!($this->foo)()) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -233,7 +233,7 @@ PHP
 if (true) {
 } elseif (!a()) {
 }
-PHP
+PHP,
             ],
         ];
 
@@ -244,7 +244,7 @@ PHP
 if ($this->barFoo()) {
 } elseif (!$this->fooBar()) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate equal comparison' => [
@@ -254,7 +254,7 @@ PHP
 if ($this->barFoo()) {
 } elseif ($this->fooBar() == 1) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate not equal comparison' => [
@@ -264,7 +264,7 @@ PHP
 if ($this->barFoo()) {
 } elseif ($this->fooBar() != 1) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate identical comparison' => [
@@ -274,7 +274,7 @@ PHP
 if ($this->barFoo()) {
 } elseif ($this->fooBar() === true) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate not identical comparison' => [
@@ -284,7 +284,7 @@ PHP
 if ($this->barFoo()) {
 } elseif ($this->fooBar() !== true) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate and condition' => [
@@ -294,7 +294,7 @@ PHP
 if (c()) {
 } elseif (a() && b()) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate or condition' => [
@@ -304,7 +304,7 @@ PHP
 if (c()) {
 } elseif (a() || b()) {
 }
-PHP
+PHP,
         ];
     }
 }

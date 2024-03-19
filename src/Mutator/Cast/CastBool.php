@@ -53,7 +53,7 @@ final class CastBool extends AbstractCastMutator
             <<<'DIFF'
 - $a = (bool) $value;
 + $a = $value;
-DIFF
+DIFF,
         );
     }
 

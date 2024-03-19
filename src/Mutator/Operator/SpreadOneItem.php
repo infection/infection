@@ -72,7 +72,7 @@ TXT
             <<<'DIFF'
 - $x = [...$collection, 4, 5];
 + $x = [[...$collection][0], 4, 5];
-DIFF
+DIFF,
         );
     }
 
@@ -87,15 +87,15 @@ DIFF
             new Node\Expr\ArrayDimFetch(
                 new Node\Expr\Array_(
                     [$node],
-                    $node->getAttributes() + ['kind' => Node\Expr\Array_::KIND_SHORT]
+                    $node->getAttributes() + ['kind' => Node\Expr\Array_::KIND_SHORT],
                 ),
                 new Node\Scalar\LNumber(0),
-                $node->value->getAttributes()
+                $node->value->getAttributes(),
             ),
             null,
             false,
             $node->getAttributes(),
-            false
+            false,
         );
     }
 

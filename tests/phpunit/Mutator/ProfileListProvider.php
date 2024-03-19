@@ -140,7 +140,7 @@ final class ProfileListProvider
             static function (string $constantName): bool {
                 return substr($constantName, -8) === '_PROFILE';
             },
-            ARRAY_FILTER_USE_KEY
+            ARRAY_FILTER_USE_KEY,
         );
 
         return self::$profileConstants;
@@ -161,12 +161,12 @@ final class ProfileListProvider
         $cleanedRelativePath = substr(
             Path::makeRelative($path, __DIR__ . '/../../../src'),
             0,
-            -4
+            -4,
         );
 
         return sprintf(
             'Infection\%s',
-            str_replace('/', '\\', $cleanedRelativePath)
+            str_replace('/', '\\', $cleanedRelativePath),
         );
     }
 }

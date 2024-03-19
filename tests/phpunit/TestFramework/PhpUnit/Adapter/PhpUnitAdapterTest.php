@@ -76,7 +76,7 @@ final class PhpUnitAdapterTest extends TestCase
             $this->cliArgumentsBuilder,
             new VersionParser(),
             $this->commandLineBuilder,
-            '9.0'
+            '9.0',
         );
     }
 
@@ -95,7 +95,7 @@ final class PhpUnitAdapterTest extends TestCase
      */
     public function test_it_can_tell_if_tests_pass_from_the_output(
         string $output,
-        bool $expected
+        bool $expected,
     ): void {
         $actual = $this->adapter->testsPass($output);
 
@@ -107,7 +107,7 @@ final class PhpUnitAdapterTest extends TestCase
      */
     public function test_it_can_tell_if_there_is_a_syntax_error_from_the_output(
         string $output,
-        bool $expected
+        bool $expected,
     ): void {
         $actual = $this->adapter->isSyntaxError($output);
 
@@ -130,7 +130,7 @@ final class PhpUnitAdapterTest extends TestCase
 
         $this->assertSame(
             ['--configuration', '--filter', '--testsuite'],
-            $options
+            $options,
         );
     }
 
@@ -164,7 +164,7 @@ final class PhpUnitAdapterTest extends TestCase
                 '/path/to/phpunit',
                 '--dummy-argument',
             ],
-            $initialTestRunCommandLine
+            $initialTestRunCommandLine,
         );
     }
 
@@ -216,7 +216,7 @@ final class PhpUnitAdapterTest extends TestCase
                 '--coverage-xml=/tmp/coverage-xml',
                 '--log-junit=/tmp/infection/junit.xml',
             ],
-            $initialTestRunCommandLine
+            $initialTestRunCommandLine,
         );
     }
 
@@ -274,11 +274,11 @@ final class PhpUnitAdapterTest extends TestCase
                 '--coverage-xml=/tmp/coverage-xml',
                 '--log-junit=/tmp/infection/junit.xml',
             ],
-            $initialTestRunCommandLine
+            $initialTestRunCommandLine,
         );
     }
 
-    public function passOutputProvider(): iterable
+    public static function passOutputProvider(): iterable
     {
         yield ['OK, but incomplete, skipped, or risky tests!', true];
 
@@ -291,14 +291,14 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['No tests executed!', true];
     }
 
-    public function syntaxErrorOutputProvider(): iterable
+    public static function syntaxErrorOutputProvider(): iterable
     {
         yield ['OK, but incomplete, skipped, or risky tests!', false];
 
         yield ['ParseError: syntax error, unexpected ">"', true];
     }
 
-    public function memoryReportProvider(): iterable
+    public static function memoryReportProvider(): iterable
     {
         yield ['Memory: 8.00MB', 8.0];
 

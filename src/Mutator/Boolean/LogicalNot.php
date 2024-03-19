@@ -59,7 +59,7 @@ final class LogicalNot implements Mutator
             <<<'DIFF'
 - $a = !$b;
 + $a = $b;
-DIFF
+DIFF,
         );
     }
 

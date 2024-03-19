@@ -50,7 +50,7 @@ final class ArrayItemRemovalConfigTest extends TestCase
     public function test_it_can_create_a_config(
         array $settings,
         string $expectedRemove,
-        int $expectedLimit
+        int $expectedLimit,
     ): void {
         $config = new ArrayItemRemovalConfig($settings);
 
@@ -67,7 +67,7 @@ final class ArrayItemRemovalConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected one of: "first", "last", "all". Got: "unknown"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -96,12 +96,12 @@ final class ArrayItemRemovalConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the limit to be greater or equal than 1. Got "0" instead',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function settingsProvider(): iterable
+    public static function settingsProvider(): iterable
     {
         yield 'default' => [
             [],

@@ -42,7 +42,7 @@ use Infection\Console\IO;
 /**
  * @group integration
  */
-final class TextLogFileProviderTest extends BaseProviderTest
+final class TextLogFileProviderTest extends BaseProviderTestCase
 {
     /**
      * @var TextLogFileProvider
@@ -53,7 +53,7 @@ final class TextLogFileProviderTest extends BaseProviderTest
     {
         $this->provider = new TextLogFileProvider(
             $this->createMock(ConsoleHelper::class),
-            $this->getQuestionHelper()
+            $this->getQuestionHelper(),
         );
     }
 
@@ -62,9 +62,9 @@ final class TextLogFileProviderTest extends BaseProviderTest
         $textLogFilePath = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
-            []
+            [],
         );
 
         $this->assertNull($textLogFilePath);
@@ -77,9 +77,9 @@ final class TextLogFileProviderTest extends BaseProviderTest
         $textLogFilePath = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("{$inputValue}\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
-            []
+            [],
         );
 
         $this->assertSame($inputValue, $textLogFilePath);

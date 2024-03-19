@@ -49,7 +49,7 @@ final class UnwrapArrayFlipTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = ['A', 1, 'C'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_flip' => [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a = ['A', 1, 'C'];
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
@@ -98,7 +98,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_flip' => [
@@ -108,7 +108,7 @@ PHP
 function array_flip($text)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -128,7 +128,7 @@ $a = ['A', 1, 'C'];
 if ($a === $a) {
     return true;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when array_flip is wrongly capitalized' => [
@@ -142,7 +142,7 @@ PHP
 <?php
 
 $a = ['A', 1, 'C'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when array_flip uses another function as input' => [
@@ -156,7 +156,7 @@ PHP
 <?php
 
 $a = $foo->bar();
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -170,7 +170,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['A', 1, 'C']);
-PHP
+PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [

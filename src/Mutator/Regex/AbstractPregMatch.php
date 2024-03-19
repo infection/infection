@@ -110,7 +110,7 @@ abstract class AbstractPregMatch implements Mutator
     {
         return new Node\Arg(
             new Node\Scalar\String_($regex, $argument->value->getAttributes()),
-            $argument->byRef, $argument->unpack, $argument->getAttributes()
+            $argument->byRef, $argument->unpack, $argument->getAttributes(),
         );
     }
 }

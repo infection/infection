@@ -67,7 +67,7 @@ class CoverageChecker
         private readonly bool $jUnitReport,
         private readonly JUnitReportLocator $jUnitReportLocator,
         string $testFrameworkAdapterName,
-        private readonly IndexXmlCoverageLocator $indexXmlCoverageLocator
+        private readonly IndexXmlCoverageLocator $indexXmlCoverageLocator,
     ) {
         $this->frameworkAdapterName = strtolower($testFrameworkAdapterName);
     }
@@ -80,7 +80,7 @@ class CoverageChecker
                 . 'provided with the "--coverage" option',
                 $this->jUnitReport
                     ? 'and JUnit coverage '
-                    : ''
+                    : '',
             ));
         }
 
@@ -105,7 +105,7 @@ TXT
 
     public function checkCoverageHasBeenGenerated(
         string $initialTestSuiteCommandLine,
-        string $initialTestSuiteOutput
+        string $initialTestSuiteOutput,
     ): void {
         $errors = [];
 
@@ -114,7 +114,7 @@ TXT
         } catch (FileNotFound $exception) {
             $errors[] = sprintf(
                 '- The file "index.xml" could not be found: %s',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
 
@@ -124,7 +124,7 @@ TXT
             } catch (FileNotFound $exception) {
                 $errors[] = sprintf(
                     '- The JUnit file could not be found: %s',
-                    $exception->getMessage()
+                    $exception->getMessage(),
                 );
             }
         }
@@ -149,7 +149,7 @@ TXT
             'https://github.com/infection/infection',
             $initialTestSuiteCommandLine,
             $initialTestSuiteOutput,
-            implode(PHP_EOL, $errors)
+            implode(PHP_EOL, $errors),
         );
 
         throw new CoverageNotFound($message);
@@ -170,7 +170,7 @@ TXT
     {
         return (bool) preg_match(
             '/(zend_extension\s*=.*xdebug.*)/mi',
-            $this->initialTestPhpOptions
+            $this->initialTestPhpOptions,
         );
     }
 
@@ -178,7 +178,7 @@ TXT
     {
         return (bool) preg_match(
             '/(extension\s*=.*pcov.*)/mi',
-            $this->initialTestPhpOptions
+            $this->initialTestPhpOptions,
         );
     }
 
@@ -199,12 +199,12 @@ TXT
         if ($this->frameworkAdapterName === self::PHPUNIT) {
             $message .= sprintf(
                 ' The PHPUnit option for the path given is "--coverage-xml=%s"',
-                $this->coveragePath . '/coverage-xml'
+                $this->coveragePath . '/coverage-xml',
             );
         } elseif ($this->frameworkAdapterName === self::CODECEPTION) {
             $message .= sprintf(
                 ' The Codeception option for the path given is "--coverage-phpunit=%s"',
-                $this->coveragePath . '/coverage-xml'
+                $this->coveragePath . '/coverage-xml',
             );
         }
 
@@ -231,7 +231,7 @@ TXT
         if ($this->frameworkAdapterName === self::PHPUNIT) {
             $message .= sprintf(
                 ' The PHPUnit option for the path given is "--log-junit=%s/junit.xml"',
-                $this->coveragePath
+                $this->coveragePath,
             );
         } elseif ($this->frameworkAdapterName === self::CODECEPTION) {
             $message .= ' The Codeception option for the path given is "--xml"';

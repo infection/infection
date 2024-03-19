@@ -49,7 +49,7 @@ final class OneZeroFloatTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates float one to zero' => [
             <<<'PHP'
@@ -104,7 +104,7 @@ PHP
 <?php
 
 'a' . '0.0';
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other floats' => [
@@ -125,7 +125,7 @@ PHP
 if ($a < 0.0) {
     echo "small";
 }
-PHP
+PHP,
         ];
     }
 }

@@ -91,7 +91,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
      */
     public function test_it_can_create_a_config(
         string $json,
-        SchemaConfiguration $expected
+        SchemaConfiguration $expected,
     ): void {
         $rawConfig = json_decode($json);
 
@@ -103,16 +103,16 @@ final class SchemaConfigurationFactoryTest extends TestCase
 
         $actual = (new SchemaConfigurationFactory())->create(
             '/path/to/config',
-            $rawConfig
+            $rawConfig,
         );
 
         $this->assertSame(
             var_export($expected, true),
-            var_export($actual, true)
+            var_export($actual, true),
         );
     }
 
-    public function provideRawConfig(): iterable
+    public static function provideRawConfig(): iterable
     {
         // The schema is given as a JSON here to be closer to how the user configure the schema
         yield 'minimal' => [
@@ -141,7 +141,7 @@ JSON
             self::createConfig([
                 'source' => new Source(
                     ['src', 'lib'],
-                    []
+                    [],
                 ),
             ]),
         ];
@@ -159,7 +159,7 @@ JSON
             self::createConfig([
                 'source' => new Source(
                     ['src'],
-                    ['fixtures', 'tests']
+                    ['fixtures', 'tests'],
                 ),
             ]),
         ];
@@ -234,7 +234,7 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -263,7 +263,7 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -292,7 +292,7 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -321,7 +321,7 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -350,7 +350,7 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -379,7 +379,7 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -408,7 +408,7 @@ JSON
                     'perMutator.log',
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -439,7 +439,7 @@ JSON
                     null,
                     false,
                     StrykerConfig::forBadge('master'),
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -470,7 +470,7 @@ JSON
                     null,
                     false,
                     StrykerConfig::forFullReport('master'),
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -501,7 +501,7 @@ JSON
                     null,
                     false,
                     StrykerConfig::forBadge('/^foo$/'),
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -532,7 +532,7 @@ JSON
                     null,
                     false,
                     StrykerConfig::forFullReport('/^foo$/'),
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -561,7 +561,7 @@ JSON
                     null,
                     false,
                     null,
-                    'summary.json'
+                    'summary.json',
                 ),
             ]),
         ];
@@ -601,7 +601,7 @@ JSON
                     'perMutator.log',
                     true,
                     StrykerConfig::forBadge('master'),
-                    'summary.json'
+                    'summary.json',
                 ),
             ]),
         ];
@@ -689,7 +689,7 @@ JSON
                     'perMutator.log',
                     true,
                     StrykerConfig::forBadge('master'),
-                    'summary.json'
+                    'summary.json',
                 ),
             ]),
         ];
@@ -774,7 +774,7 @@ JSON
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
                     'phpunit.xml',
-                    null
+                    null,
                 ),
             ]),
         ];
@@ -795,7 +795,7 @@ JSON
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
                     null,
-                    'bin/phpunit'
+                    'bin/phpunit',
                 ),
             ]),
         ];
@@ -817,7 +817,7 @@ JSON
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
                     'phpunit.xml',
-                    'bin/phpunit'
+                    'bin/phpunit',
                 ),
             ]),
         ];
@@ -839,7 +839,7 @@ JSON
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
                     null,
-                    'bin/phpunit'
+                    'bin/phpunit',
                 ),
             ]),
         ];
@@ -2054,8 +2054,8 @@ JSON
                     'BCMath',
                     'MBString',
                 ],
-                null
-            )
+                null,
+            ),
         ));
 
         foreach ($genericMutatorNamesList as $mutator) {
@@ -2553,7 +2553,7 @@ JSON
                 'timeout' => 5,
                 'source' => new Source(
                     ['src', 'lib'],
-                    ['fixtures', 'tests']
+                    ['fixtures', 'tests'],
                 ),
                 'logs' => new Logs(
                     'text.log',
@@ -2565,12 +2565,12 @@ JSON
                     'perMutator.log',
                     true,
                     StrykerConfig::forBadge('master'),
-                    'summary.json'
+                    'summary.json',
                 ),
                 'tmpDir' => 'custom-tmp',
                 'phpunit' => new PhpUnit(
                     'phpunit.xml',
-                    'bin/phpunit'
+                    'bin/phpunit',
                 ),
                 'testFramework' => 'phpunit',
                 'bootstrap' => 'src/bootstrap.php',
@@ -2800,7 +2800,7 @@ JSON
             static function (array $error): string {
                 return sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL);
             },
-            $validator->getErrors()
+            $validator->getErrors(),
         );
 
         $this->assertTrue(
@@ -2809,8 +2809,8 @@ JSON
                 'Expected the given JSON to be valid but is violating the following rules of'
                 . ' the schema: %s- %s',
                 PHP_EOL,
-                implode('- ', $normalizedErrors)
-            )
+                implode('- ', $normalizedErrors),
+            ),
         );
     }
 }

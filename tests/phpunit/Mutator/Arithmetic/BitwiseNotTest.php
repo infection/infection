@@ -49,7 +49,7 @@ final class BitwiseNotTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield [
             <<<'PHP'

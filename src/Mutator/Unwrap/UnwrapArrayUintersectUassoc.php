@@ -91,7 +91,7 @@ TXT
 + $x = ['foo' => 'bar'];
 # Mutation 2
 + $x = ['baz' => 'bar'];
-DIFF
+DIFF,
         );
     }
 

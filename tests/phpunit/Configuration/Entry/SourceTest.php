@@ -52,11 +52,11 @@ final class SourceTest extends TestCase
         $this->assertSourceStateIs(
             $source,
             $directories,
-            $excludes
+            $excludes,
         );
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         yield 'minimal' => [
             [],

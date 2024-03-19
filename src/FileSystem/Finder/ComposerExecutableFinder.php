@@ -85,7 +85,7 @@ final class ComposerExecutableFinder
         return sprintf(
             '%s %s',
             (new PhpExecutableFinder())->find(),
-            $path
+            $path,
         );
     }
 }

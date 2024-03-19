@@ -49,7 +49,7 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates or with two expressions' => [
             <<<'PHP'
@@ -63,7 +63,7 @@ PHP
 <?php
 
 $var = !a() || !b();
-PHP
+PHP,
             ],
         ];
 
@@ -79,7 +79,7 @@ PHP
 <?php
 
 $var = !a() || !b() || !c() || !d();
-PHP
+PHP,
             ],
         ];
 
@@ -112,7 +112,7 @@ PHP
 <?php
 
 $var = !($a = 1) || !$b;
-PHP
+PHP,
             ],
         ];
 

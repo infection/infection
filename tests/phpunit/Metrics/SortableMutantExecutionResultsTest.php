@@ -66,20 +66,20 @@ final class SortableMutantExecutionResultsTest extends TestCase
     {
         $sortableResults = new SortableMutantExecutionResults();
 
-        $result0 = $this->createExecutionResult(
+        $result0 = self::createExecutionResult(
             0,
             '/path/to/Foo.php',
-            10
+            10,
         );
-        $result1 = $this->createExecutionResult(
+        $result1 = self::createExecutionResult(
             1,
             '/path/to/Bar.php',
-            10
+            10,
         );
-        $result2 = $this->createExecutionResult(
+        $result2 = self::createExecutionResult(
             2,
             '/path/to/Bar.php',
-            13
+            13,
         );
 
         $sortableResults->add($result0);
@@ -87,106 +87,106 @@ final class SortableMutantExecutionResultsTest extends TestCase
 
         $this->assertSame(
             [$result1, $result0],
-            $sortableResults->getSortedExecutionResults()
+            $sortableResults->getSortedExecutionResults(),
         );
 
         $sortableResults->add($result2);
 
         $this->assertSame(
             [$result1, $result2, $result0],
-            $sortableResults->getSortedExecutionResults()
+            $sortableResults->getSortedExecutionResults(),
         );
     }
 
-    public function resultsProvider(): iterable
+    public static function resultsProvider(): iterable
     {
         yield 'empty' => [[], []];
 
-        yield 'single result' => (function (): array {
-            $results = [$this->createExecutionResult(
+        yield 'single result' => (static function (): array {
+            $results = [self::createExecutionResult(
                 0,
                 '/path/to/Foo.php',
-                10
+                10,
             )];
 
             return [$results, $results];
         })();
 
-        yield 'two identical results' => (function (): array {
-            $result0 = $this->createExecutionResult(
+        yield 'two identical results' => (static function (): array {
+            $result0 = self::createExecutionResult(
                 0,
                 '/path/to/Foo.php',
-                10
+                10,
             );
 
             return [[$result0, $result0], [$result0, $result0]];
         })();
 
-        yield 'two different unordered results - sort by file path' => (function (): array {
-            $result0 = $this->createExecutionResult(
+        yield 'two different unordered results - sort by file path' => (static function (): array {
+            $result0 = self::createExecutionResult(
                 0,
                 '/path/to/Foo.php',
-                10
+                10,
             );
-            $result1 = $this->createExecutionResult(
+            $result1 = self::createExecutionResult(
                 1,
                 '/path/to/Bar.php',
-                10
+                10,
             );
 
             return [[$result0, $result1], [$result1, $result0]];
         })();
 
-        yield 'two different ordered results - sort by file path' => (function (): array {
-            $result0 = $this->createExecutionResult(
+        yield 'two different ordered results - sort by file path' => (static function (): array {
+            $result0 = self::createExecutionResult(
                 0,
                 '/path/to/Foo.php',
-                10
+                10,
             );
-            $result1 = $this->createExecutionResult(
+            $result1 = self::createExecutionResult(
                 1,
                 '/path/to/Bar.php',
-                10
+                10,
             );
 
             return [[$result1, $result0], [$result1, $result0]];
         })();
 
-        yield 'two different unordered results with same file path - sort by original starting line' => (function (): array {
-            $result0 = $this->createExecutionResult(
+        yield 'two different unordered results with same file path - sort by original starting line' => (static function (): array {
+            $result0 = self::createExecutionResult(
                 0,
                 '/path/to/Foo.php',
-                15
+                15,
             );
-            $result1 = $this->createExecutionResult(
+            $result1 = self::createExecutionResult(
                 1,
                 '/path/to/Foo.php',
-                10
+                10,
             );
 
             return [[$result0, $result1], [$result1, $result0]];
         })();
 
-        yield 'two different ordered results with same file path - sort by original starting line' => (function (): array {
-            $result0 = $this->createExecutionResult(
+        yield 'two different ordered results with same file path - sort by original starting line' => (static function (): array {
+            $result0 = self::createExecutionResult(
                 0,
                 '/path/to/Foo.php',
-                15
+                15,
             );
-            $result1 = $this->createExecutionResult(
+            $result1 = self::createExecutionResult(
                 1,
                 '/path/to/Foo.php',
-                10
+                10,
             );
 
             return [[$result1, $result0], [$result1, $result0]];
         })();
     }
 
-    private function createExecutionResult(
+    private static function createExecutionResult(
         int $id,
         string $originalFilePath,
-        int $originalStartingLine
+        int $originalStartingLine,
     ): MutantExecutionResult {
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
@@ -202,7 +202,7 @@ final class SortableMutantExecutionResultsTest extends TestCase
             5,
             now('<?php $a = 1;'),
             now('<?php $a = 1;'),
-            []
+            [],
         );
     }
 }

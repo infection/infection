@@ -53,10 +53,10 @@ final class ArrayOneItemTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates when return typehint is not nullable array' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'mutates-not-nullable-array.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'mutates-not-nullable-array.php'),
             <<<'PHP'
 <?php
 
@@ -70,31 +70,31 @@ class Test
         return count($collection) > 1 ? array_slice($collection, 0, 1, true) : $collection;
     }
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate the method call' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'does-not-mutate-method-call.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'does-not-mutate-method-call.php'),
         ];
 
         yield 'It does not mutate the function call' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'does-not-mutate-function-call.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'does-not-mutate-function-call.php'),
         ];
 
         yield 'It does not mutate the function variable call' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'does-not-mutate-function-variable-call.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'does-not-mutate-function-variable-call.php'),
         ];
 
         yield 'It does not mutate when raw array is returned' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'does-not-mutate-raw-array.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'does-not-mutate-raw-array.php'),
         ];
 
         yield 'It does not mutate when return typehint is nullable array' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'does-not-mutate-nullable-array.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'does-not-mutate-nullable-array.php'),
         ];
 
         yield 'It does not mutate when return typehint is not an array' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'does-not-mutate-not-array.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'does-not-mutate-not-array.php'),
         ];
     }
 }

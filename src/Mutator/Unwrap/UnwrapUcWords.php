@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = ucwords('Hello!');
 + $x = 'Hello!';
-DIFF
+DIFF,
         );
     }
 

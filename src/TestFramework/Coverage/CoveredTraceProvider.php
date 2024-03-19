@@ -61,7 +61,7 @@ final class CoveredTraceProvider implements TraceProvider
     {
         /** @var iterable<Trace> $filteredTraces */
         $filteredTraces = $this->bufferedFilter->filter(
-            $this->primaryTraceProvider->provideTraces()
+            $this->primaryTraceProvider->provideTraces(),
         );
 
         /*
@@ -70,7 +70,7 @@ final class CoveredTraceProvider implements TraceProvider
          * filter will negatively affect performance. The greater the junit.xml report size, the more.
          */
         return $this->testFileDataAdder->addTestExecutionInfo(
-            $filteredTraces
+            $filteredTraces,
         );
     }
 }

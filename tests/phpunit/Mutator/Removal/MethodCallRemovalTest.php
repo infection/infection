@@ -49,7 +49,7 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes a method call without parameters' => [
             <<<'PHP'
@@ -95,7 +95,7 @@ PHP
 <?php
 
 $a = 3;
-PHP
+PHP,
         ];
 
         yield 'It remove a static method call with parameters' => [
@@ -110,7 +110,7 @@ PHP
 <?php
 
 $a = 3;
-PHP
+PHP,
         ];
 
         yield 'It does not remove a method call that is assigned to something' => [
@@ -143,7 +143,7 @@ PHP
 <?php
 
 $a = $this->foo(3, $a->bar());
-PHP
+PHP,
         ];
 
         yield 'It does not remove a function call' => [
@@ -152,7 +152,7 @@ PHP
 
 foo();
 $a = 3;
-PHP
+PHP,
         ];
     }
 }

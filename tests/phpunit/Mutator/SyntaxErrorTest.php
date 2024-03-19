@@ -47,7 +47,7 @@ final class SyntaxErrorTest extends BaseMutatorTestCase
         $this->doTest($input, $expected, [], true);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates method call to invalid syntax' => [
             <<<'PHP'
@@ -60,7 +60,7 @@ PHP
 <?php
 
 $->methodCall();
-PHP
+PHP,
         ];
     }
 }

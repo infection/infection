@@ -49,7 +49,7 @@ final class While_Test extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates expression part from variable to false' => [
             <<<'PHP'
@@ -68,7 +68,7 @@ PHP
 $condition = true;
 while (false) {
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates expression part from boolean true to false' => [
@@ -85,7 +85,7 @@ PHP
 
 while (false) {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate expression part in do-while loop to false' => [
@@ -96,7 +96,7 @@ do {
 
 } while (true);
 
-PHP
+PHP,
         ];
     }
 }

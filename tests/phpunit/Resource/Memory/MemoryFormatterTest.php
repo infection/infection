@@ -70,12 +70,12 @@ final class MemoryFormatterTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected a positive or null amount of bytes. Got: -1',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function bytesProvider(): iterable
+    public static function bytesProvider(): iterable
     {
         yield [0., '0.00B'];
 

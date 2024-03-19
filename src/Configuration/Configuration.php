@@ -103,7 +103,7 @@ class Configuration
         private readonly bool $executeOnlyCoveringTestCases,
         private readonly bool $isForGitDiffLines,
         private readonly ?string $gitDiffBase,
-        private readonly ?string $mapSourceClassToTestStrategy
+        private readonly ?string $mapSourceClassToTestStrategy,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);

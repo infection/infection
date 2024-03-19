@@ -44,7 +44,7 @@ use PhpParser\Node;
 /**
  * @group integration
  */
-final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
+final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTestCase
 {
     /**
      * @dataProvider codeProvider
@@ -56,11 +56,11 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
         $spyVisitor = new FullyQualifiedClassNameSpyVisitor();
 
         $this->traverse(
-            $this->parseCode($code),
+            self::parseCode($code),
             [
                 new FullyQualifiedClassNameVisitor(),
                 $spyVisitor,
-            ]
+            ],
         );
 
         $actual = array_map(
@@ -70,13 +70,13 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
                     (string) FullyQualifiedClassNameManipulator::getFqcn($node),
                 ];
             },
-            $spyVisitor->getCollectedNodes()
+            $spyVisitor->getCollectedNodes(),
         );
 
         $this->assertSame($expected, $actual);
     }
 
-    public function codeProvider(): iterable
+    public static function codeProvider(): iterable
     {
         yield 'global class' => [
             <<<'PHP'

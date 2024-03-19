@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = array_column($array, 'id');
 + $x = $array;
-DIFF
+DIFF,
         );
     }
 

@@ -100,7 +100,7 @@ abstract class AbstractAllSubExprNegation implements Mutator
             return new $supportedNodeClass(
                 $this->negateEverySubExpression($node->left),
                 $this->negateEverySubExpression($node->right),
-                $node->getAttributes()
+                $node->getAttributes(),
             );
         }
 

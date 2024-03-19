@@ -89,7 +89,7 @@ final class MsiParser
 
         Assert::numeric(
             $value,
-            sprintf('Expected %s to be a float. Got "%s"', $optionName, $value)
+            sprintf('Expected %s to be a float. Got "%s"', $optionName, $value),
         );
 
         $roundedValue = round((float) $value, $precision, PHP_ROUND_HALF_UP);
@@ -98,7 +98,7 @@ final class MsiParser
             $roundedValue,
             0,
             100,
-            sprintf('Expected %s to be an element of [0;100]. Got %%s', $optionName)
+            sprintf('Expected %s to be an element of [0;100]. Got %%s', $optionName),
         );
 
         return $roundedValue;

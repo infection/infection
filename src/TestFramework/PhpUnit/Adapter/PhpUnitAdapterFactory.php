@@ -82,9 +82,9 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(
                 new Filesystem(),
-                $testFrameworkConfigDir
+                $testFrameworkConfigDir,
             ),
-            $testFrameworkConfigDir
+            $testFrameworkConfigDir,
         );
 
         return new PhpUnitAdapter(
@@ -100,23 +100,23 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $sourceDirectories,
                 array_map(
                     static fn (SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
-                    $filteredSourceFilesToMutate
-                )
+                    $filteredSourceFilesToMutate,
+                ),
             ),
             new MutationConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
                 $projectDir,
-                new JUnitTestCaseSorter()
+                new JUnitTestCaseSorter(),
             ),
             new ArgumentsAndOptionsBuilder(
                 $executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
-                $mapSourceClassToTestStrategy
+                $mapSourceClassToTestStrategy,
             ),
             new VersionParser(),
-            new CommandLineBuilder()
+            new CommandLineBuilder(),
         );
     }
 

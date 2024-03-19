@@ -56,7 +56,7 @@ class FilteringResultsCollector implements Collector
     {
         $executionResults = array_filter(
             $executionResults,
-            fn (MutantExecutionResult $executionResults): bool => array_key_exists($executionResults->getDetectionStatus(), $this->targetDetectionStatuses)
+            fn (MutantExecutionResult $executionResults): bool => array_key_exists($executionResults->getDetectionStatus(), $this->targetDetectionStatuses),
         );
 
         if ($executionResults !== []) {

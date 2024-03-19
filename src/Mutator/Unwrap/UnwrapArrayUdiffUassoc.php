@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
 + $x = ['foo => 'bar'];
-DIFF
+DIFF,
         );
     }
 

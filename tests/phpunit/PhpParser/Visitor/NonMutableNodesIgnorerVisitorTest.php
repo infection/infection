@@ -43,7 +43,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * @group integration
  */
-final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTest
+final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
 {
     private $spyVisitor;
 
@@ -87,7 +87,7 @@ PHP
 
     private function parseAndTraverse(string $code): void
     {
-        $nodes = $this->parseCode($code);
+        $nodes = self::parseCode($code);
 
         $this->traverse(
             $nodes,
@@ -99,7 +99,7 @@ PHP
                     }
                 }]),
                 $this->spyVisitor,
-            ]
+            ],
         );
     }
 }

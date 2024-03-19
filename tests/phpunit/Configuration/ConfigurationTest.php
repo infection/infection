@@ -126,7 +126,7 @@ final class ConfigurationTest extends TestCase
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
             $gitDiffBase,
-            $mapSourceClassToTest
+            $mapSourceClassToTest,
         );
 
         $this->assertConfigurationStateIs(
@@ -162,11 +162,11 @@ final class ConfigurationTest extends TestCase
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
             $gitDiffBase,
-            $mapSourceClassToTest
+            $mapSourceClassToTest,
         );
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         yield 'empty' => [
             10.,
@@ -222,7 +222,7 @@ final class ConfigurationTest extends TestCase
                 'mutator.log',
                 true,
                 StrykerConfig::forBadge('master'),
-                'summary.json'
+                'summary.json',
             ),
             'default',
             'custom-dir',

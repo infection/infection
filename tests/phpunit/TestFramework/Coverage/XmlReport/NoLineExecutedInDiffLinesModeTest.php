@@ -47,7 +47,7 @@ final class NoLineExecutedInDiffLinesModeTest extends TestCase
         $this->assertInstanceOf(NoLineExecutedInDiffLinesMode::class, $exception);
         $this->assertSame(
             'No covered lines in diff found, skipping mutation analysis.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 }

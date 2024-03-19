@@ -96,7 +96,7 @@ match ($x) {
     2 => null,
     default => throw new \Exception(),
 };
-DIFF
+DIFF,
         );
     }
 

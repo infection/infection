@@ -52,7 +52,7 @@ final class PlusTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates normal plus' => [
             <<<'PHP'
@@ -129,7 +129,7 @@ PHP
     {
         $plusExpression = new Node\Expr\BinaryOp\Plus(
             new Array_([new LNumber(1)]),
-            new Array_([new LNumber(1)])
+            new Array_([new LNumber(1)]),
         );
 
         $this->assertFalse($this->mutator->canMutate($plusExpression));

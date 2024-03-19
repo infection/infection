@@ -55,7 +55,7 @@ final class Str
     {
         $lines = explode(
             "\n",
-            str_replace("\r\n", "\n", $string)
+            str_replace("\r\n", "\n", $string),
         );
         $linesCount = count($lines);
 

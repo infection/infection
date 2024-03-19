@@ -54,7 +54,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--configuration',
                 $configPath,
             ],
-            $builder->buildForInitialTestsRun($configPath, '')
+            $builder->buildForInitialTestsRun($configPath, ''),
         );
     }
 
@@ -70,7 +70,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--verbose',
                 '--debug',
             ],
-            $builder->buildForInitialTestsRun($configPath, '--verbose --debug')
+            $builder->buildForInitialTestsRun($configPath, '--verbose --debug'),
         );
     }
 
@@ -81,7 +81,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                 new SplFileInfo('src/bar/Baz.php', 'src/bar/Baz.php', 'src/bar/Baz.php'),
             ],
-            'simple'
+            'simple',
         );
         $configPath = '/config/path';
 
@@ -94,7 +94,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--filter',
                 'FooTest|BazTest',
             ],
-            $builder->buildForInitialTestsRun($configPath, '--verbose --debug')
+            $builder->buildForInitialTestsRun($configPath, '--verbose --debug'),
         );
     }
 
@@ -109,7 +109,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 $configPath,
                 '--path=/a path/with spaces',
             ],
-            $builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces')
+            $builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces'),
         );
     }
 
@@ -140,14 +140,14 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--path=/a path/with spaces',
                 array_map(
                     static fn (string $testCase): TestLocation => TestLocation::forTestMethod($testCase),
-                    $testCases
+                    $testCases,
                 ),
-                $phpUnitVersion
-            )
+                $phpUnitVersion,
+            ),
         );
     }
 
-    public function provideTestCases(): Generator
+    public static function provideTestCases(): Generator
     {
         yield '--only-covering-test-cases is disabled' => [
             false,

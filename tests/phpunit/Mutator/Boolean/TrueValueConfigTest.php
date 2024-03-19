@@ -60,7 +60,7 @@ final class TrueValueConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the value for "foo" to be a boolean. Got "string" instead',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -74,12 +74,12 @@ final class TrueValueConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected one of: "array_search", "in_array". Got: "foo"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function settingsProvider(): iterable
+    public static function settingsProvider(): iterable
     {
         yield 'default' => [
             [],

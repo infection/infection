@@ -49,7 +49,7 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates array item fetch' => [
             <<<'PHP'
@@ -68,7 +68,7 @@ PHP,
 <?php
 
 $var = $array[0] || !$array[1];
-PHP
+PHP,
             ],
         ];
 
@@ -89,7 +89,7 @@ PHP,
 <?php
 
 $var = $foo || !$bar;
-PHP
+PHP,
             ],
         ];
 
@@ -110,7 +110,7 @@ PHP,
 <?php
 
 $var = $this->foo() || !$bar->baz();
-PHP
+PHP,
             ],
         ];
 
@@ -138,7 +138,7 @@ PHP
 <?php
 
 $var = self::foo() || static::bar() || !Test::baz();
-PHP
+PHP,
             ],
         ];
 
@@ -160,7 +160,7 @@ PHP
 <?php
 
 $var = self::FOO || !self::BAR;
-PHP
+PHP,
             ],
         ];
 
@@ -182,7 +182,7 @@ PHP
 <?php
 
 $var = $foo() || !$bar();
-PHP
+PHP,
             ],
         ];
 
@@ -204,7 +204,7 @@ PHP
 <?php
 
 $var = ($this->foo)() || !($this->bar)();
-PHP
+PHP,
             ],
         ];
 
@@ -225,7 +225,7 @@ PHP,
 <?php
 
 $var = a() || !b();
-PHP
+PHP,
             ],
         ];
 
@@ -259,7 +259,7 @@ PHP
 <?php
 
 $var = a() || b() || c() || !d();
-PHP
+PHP,
             ],
         ];
 
@@ -268,7 +268,7 @@ PHP
 <?php
 
 $var = a() != 1 || b() == 1;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate identical\'s expressions' => [
@@ -276,7 +276,7 @@ PHP
 <?php
 
 $var = a() !== 1 || b() === 1;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate already negated expressions' => [
@@ -308,7 +308,7 @@ PHP
 <?php
 
 $var = !a() || b() && c();
-PHP
+PHP,
             ],
         ];
     }

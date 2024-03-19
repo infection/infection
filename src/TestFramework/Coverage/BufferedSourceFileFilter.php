@@ -69,7 +69,7 @@ class BufferedSourceFileFilter implements FileFilter
      */
     public function __construct(
         private readonly FileFilter $filter,
-        iterable $sourceFiles
+        iterable $sourceFiles,
     ) {
         // Make a map of source files so we can check covered files against it.
         // We don't filter here on the assumption that hash table lookups are faster.

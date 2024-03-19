@@ -32,6 +32,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+declare(strict_types=1);
+
 // Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
 
 use Infection\Console\Application;
@@ -67,7 +69,7 @@ You need to set up the project dependencies using Composer:
     $ composer install
 You can learn all about Composer on https://getcomposer.org/.
 
-ERROR
+ERROR,
     );
 
     throw new RuntimeException('Unable to find the Composer autoloader.');

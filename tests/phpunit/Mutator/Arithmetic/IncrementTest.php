@@ -49,7 +49,7 @@ final class IncrementTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It replaces post increment' => [
             <<<'PHP'

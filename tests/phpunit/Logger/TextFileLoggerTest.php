@@ -51,13 +51,13 @@ final class TextFileLoggerTest extends TestCase
         bool $debugVerbosity,
         bool $onlyCoveredMode,
         bool $debugMode,
-        string $expectedContents
+        string $expectedContents,
     ): void {
         $logger = new TextFileLogger(
             new ResultsCollector(),
             $debugVerbosity,
             $onlyCoveredMode,
-            $debugMode
+            $debugMode,
         );
 
         $this->assertLoggedContentIs($expectedContents, $logger);
@@ -70,19 +70,19 @@ final class TextFileLoggerTest extends TestCase
         bool $debugVerbosity,
         bool $onlyCoveredMode,
         bool $debugMode,
-        string $expectedContents
+        string $expectedContents,
     ): void {
         $logger = new TextFileLogger(
-            $this->createCompleteResultsCollector(),
+            self::createCompleteResultsCollector(),
             $debugVerbosity,
             $onlyCoveredMode,
-            $debugMode
+            $debugMode,
         );
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function emptyMetricsProvider(): iterable
+    public static function emptyMetricsProvider(): iterable
     {
         yield 'no debug verbosity; no debug mode' => [
             false,
@@ -101,7 +101,7 @@ Skipped mutants:
 Not Covered mutants:
 ====================
 
-TXT
+TXT,
         ];
 
         yield 'debug verbosity; no debug mode' => [
@@ -130,7 +130,7 @@ Syntax Errors mutants:
 Not Covered mutants:
 ====================
 
-TXT
+TXT,
         ];
 
         yield 'no debug verbosity; debug mode' => [
@@ -150,7 +150,7 @@ Skipped mutants:
 Not Covered mutants:
 ====================
 
-TXT
+TXT,
         ];
 
         yield 'debug verbosity; debug mode' => [
@@ -179,7 +179,7 @@ Syntax Errors mutants:
 Not Covered mutants:
 ====================
 
-TXT
+TXT,
         ];
 
         yield 'no debug verbosity; no debug mode; only covered' => [
@@ -196,7 +196,7 @@ Timed Out mutants:
 Skipped mutants:
 ================
 
-TXT
+TXT,
         ];
 
         yield 'debug verbosity; no debug mode; only covered' => [
@@ -222,7 +222,7 @@ Errors mutants:
 Syntax Errors mutants:
 ======================
 
-TXT
+TXT,
         ];
 
         yield 'no debug verbosity; debug mode; only covered' => [
@@ -239,7 +239,7 @@ Timed Out mutants:
 Skipped mutants:
 ================
 
-TXT
+TXT,
         ];
 
         yield 'debug verbosity; debug mode; only covered' => [
@@ -265,11 +265,11 @@ Errors mutants:
 Syntax Errors mutants:
 ======================
 
-TXT
+TXT,
         ];
     }
 
-    public function completeMetricsProvider(): iterable
+    public static function completeMetricsProvider(): iterable
     {
         yield 'no debug verbosity; no debug mode' => [
             false,
@@ -367,7 +367,7 @@ Not Covered mutants:
 - echo 'original';
 + echo 'notCovered#0';
 
-TXT
+TXT,
         ];
 
         yield 'debug verbosity; no debug mode' => [
@@ -563,7 +563,7 @@ Not Covered mutants:
 
   process output
 
-TXT
+TXT,
         ];
 
         yield 'no debug verbosity; debug mode' => [
@@ -678,7 +678,7 @@ $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/Foo
 
 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
-TXT
+TXT,
         ];
 
         yield 'debug verbosity; debug mode' => [
@@ -888,7 +888,7 @@ $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/Foo
 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
   process output
 
-TXT
+TXT,
         ];
 
         yield 'no debug verbosity; no debug mode; only covered' => [
@@ -964,7 +964,7 @@ Skipped mutants:
 - echo 'original';
 + echo 'skipped#1';
 
-TXT
+TXT,
         ];
 
         yield 'debug verbosity; no debug mode; only covered' => [
@@ -1133,7 +1133,7 @@ Syntax Errors mutants:
 
   process output
 
-TXT
+TXT,
         ];
 
         yield 'no debug verbosity; debug mode; only covered' => [
@@ -1221,7 +1221,7 @@ $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/Foo
 
 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
-TXT
+TXT,
         ];
 
         yield 'debug verbosity; debug mode; only covered' => [
@@ -1402,7 +1402,7 @@ $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/Foo
 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
   process output
 
-TXT
+TXT,
         ];
     }
 }

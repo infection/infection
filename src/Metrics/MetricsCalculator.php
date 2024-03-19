@@ -75,7 +75,7 @@ class MetricsCalculator implements Collector
             if (!array_key_exists($detectionStatus, $this->countByStatus)) {
                 throw new InvalidArgumentException(sprintf(
                     'Unknown execution result process result code "%s"',
-                    $executionResult->getDetectionStatus()
+                    $executionResult->getDetectionStatus(),
                 ));
             }
 

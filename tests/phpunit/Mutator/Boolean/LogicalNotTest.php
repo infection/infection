@@ -52,7 +52,7 @@ final class LogicalNotTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes logical not' => [
             <<<'PHP'
@@ -89,7 +89,7 @@ PHP
     public function test_it_does_not_mutates_doubled_logical_not(): void
     {
         $expr = new BooleanNot(
-            new BooleanNot(new ConstFetch(new Name('false')))
+            new BooleanNot(new ConstFetch(new Name('false'))),
         );
 
         $this->assertFalse($this->mutator->canMutate($expr));

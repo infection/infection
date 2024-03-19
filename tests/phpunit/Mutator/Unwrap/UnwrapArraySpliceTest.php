@@ -49,7 +49,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = ['foo', 'bar', 'baz'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_splice' => [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a = ['foo', 'bar', 'baz'];
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
@@ -98,7 +98,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['foo', 'bar', 'baz']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_splice' => [
@@ -108,7 +108,7 @@ PHP
 function array_splice($array, $offset, $length = null, $preserveKeys = null)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -128,7 +128,7 @@ $a = ['foo', 'bar', 'baz'];
 if ($a === $a) {
     return true;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when array_splice is wrongly capitalized' => [
@@ -142,7 +142,7 @@ PHP
 <?php
 
 $a = ['foo', 'bar', 'baz'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when array_splice uses another function as input' => [
@@ -156,7 +156,7 @@ PHP
 <?php
 
 $a = $foo->bar();
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -170,7 +170,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['foo', 'bar', 'baz']);
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when the $length parameter is present' => [
@@ -184,7 +184,7 @@ PHP
 <?php
 
 $a = ['foo', 'bar', 'baz'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when the $replacement parameter is present' => [
@@ -198,7 +198,7 @@ PHP
 <?php
 
 $a = ['foo', 'bar', 'baz'];
-PHP
+PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [

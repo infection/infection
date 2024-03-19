@@ -49,7 +49,7 @@ final class SpreadRemovalTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Spread removal for a raw array' => [
             <<<'PHP'

@@ -68,7 +68,7 @@ TXT,
             <<<'DIFF'
 - $a = [$key => $value];
 + $a = [$key > $value]
-DIFF
+DIFF,
         );
     }
 

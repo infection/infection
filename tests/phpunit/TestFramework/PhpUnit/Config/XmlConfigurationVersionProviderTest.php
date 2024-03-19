@@ -53,9 +53,9 @@ final class XmlConfigurationVersionProviderTest extends TestCase
         $this->versionProvider = new XmlConfigurationVersionProvider();
     }
 
-    public function configurationsProvider()
+    public static function configurationsProvider()
     {
-        yield from take($this->legacyConfigurationsProvider())
+        yield from take(self::legacyConfigurationsProvider())
             ->map(static function (string $xml): iterable {
                 yield $xml => [
                     SafeDOMXPath::fromString($xml),
@@ -63,7 +63,7 @@ final class XmlConfigurationVersionProviderTest extends TestCase
                 ];
             });
 
-        yield from take($this->mainlineConfigurationsProvider())
+        yield from take(self::mainlineConfigurationsProvider())
             ->map(static function (string $xml): iterable {
                 yield $xml => [
                     SafeDOMXPath::fromString($xml),
@@ -82,7 +82,7 @@ final class XmlConfigurationVersionProviderTest extends TestCase
         $this->assertSame($mainline, version_compare($version, '9.3', '>='));
     }
 
-    protected function legacyConfigurationsProvider()
+    protected static function legacyConfigurationsProvider()
     {
         yield <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -177,7 +177,7 @@ XML;
 XML;
     }
 
-    protected function mainlineConfigurationsProvider()
+    protected static function mainlineConfigurationsProvider()
     {
         yield <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>

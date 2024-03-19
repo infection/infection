@@ -49,7 +49,7 @@ final class Foreach_Test extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates to new array in foreach' => [
             <<<'PHP'
@@ -87,7 +87,7 @@ $array = [1, 2];
 foreach (array() as $key => &$value) {
     echo $value;
 }
-PHP
+PHP,
         ];
     }
 }

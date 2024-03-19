@@ -68,7 +68,7 @@ TXT,
             <<<'DIFF'
 - yield $key => $value;
 + yield $key > $value;
-DIFF
+DIFF,
         );
     }
 

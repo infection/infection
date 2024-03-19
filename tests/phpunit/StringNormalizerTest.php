@@ -49,7 +49,7 @@ final class StringNormalizerTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function stringValuesProvider(): iterable
+    public static function stringValuesProvider(): iterable
     {
         yield 'empty' => ['', ''];
 
@@ -64,7 +64,7 @@ TXT
             <<<'TXT'
 
 
-TXT
+TXT,
         ];
 
         yield 'text' => ['foo', 'foo'];
@@ -84,7 +84,7 @@ TXT
  foo
  bar
 
-TXT
+TXT,
         ];
     }
 }

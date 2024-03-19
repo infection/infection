@@ -88,7 +88,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
                 array_map(
                     $this->mapSourceClassToTestClass(...),
                     $this->filteredSourceFilesToMutate,
-                )
+                ),
             );
         }
 
@@ -161,8 +161,8 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
                 $options,
                 array_map(
                     static fn ($option): string => '--' . $option,
-                    explode(' --', ltrim($extraOptions, '-'))
-                )
+                    explode(' --', ltrim($extraOptions, '-')),
+                ),
             );
         }
 

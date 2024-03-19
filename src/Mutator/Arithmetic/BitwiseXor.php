@@ -59,7 +59,7 @@ final class BitwiseXor implements Mutator
             <<<'DIFF'
 - $a = $b ^ $c;
 + $a = $b & $c;
-DIFF
+DIFF,
         );
     }
 

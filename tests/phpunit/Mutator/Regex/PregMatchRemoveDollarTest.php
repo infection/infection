@@ -51,7 +51,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public static function provideMutationCases(): Generator
     {
         yield 'It mutates correctly removing dollar when provided with a string and flags' => [
             <<<'PHP'
@@ -64,7 +64,7 @@ PHP
 <?php
 
 preg_match('~some-regexp~ig', 'irrelevant');
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly removing dollar when preg_match function is wrongly capitalized' => [
@@ -78,7 +78,7 @@ PHP
 <?php
 
 pReG_MaTcH('~some-regexp~ig', 'irrelevant');
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly removing dollar when provided with a string and without flags' => [
@@ -92,7 +92,7 @@ PHP
 <?php
 
 preg_match('~some-regexp~', 'irrelevant');
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly removing dollar when delimiter is not standard' => [
@@ -106,7 +106,7 @@ PHP
 <?php
 
 preg_match('^some-regexp^i', 'irrelevant');
-PHP
+PHP,
         ];
 
         yield 'It does not mutate regular expression with an encapsed variable' => [

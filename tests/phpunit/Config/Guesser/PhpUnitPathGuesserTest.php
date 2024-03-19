@@ -51,7 +51,7 @@ final class PhpUnitPathGuesserTest extends TestCase
         $this->assertSame($directory, $guesser->guess());
     }
 
-    public function providesJsonComposerAndLocations(): iterable
+    public static function providesJsonComposerAndLocations(): iterable
     {
         yield [
             <<<'JSON'

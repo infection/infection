@@ -49,7 +49,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'
@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = 'bbbb';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a variable' => [
@@ -78,7 +78,7 @@ PHP
 
 $a = 'to_quote';
 $a = $a;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -93,7 +93,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of the preg_quote' => [
@@ -107,7 +107,7 @@ PHP
 <?php
 
 $a = 'bbbb';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when preg_quote has a second parameter' => [
@@ -121,7 +121,7 @@ PHP
 <?php
 
 $a = 'bbbb';
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other regex calls' => [
@@ -129,7 +129,7 @@ PHP
 <?php
 
 $a = preg_match('bbbb', '/');
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named preg_quote' => [
@@ -139,7 +139,7 @@ PHP
 function preg_quote($text, $other)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -159,7 +159,7 @@ $a = 'string';
 if ($a === $a) {
     return true;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when preg_quote is wrongly capitalized' => [
@@ -173,7 +173,7 @@ PHP
 <?php
 
 $a = 'bbbb';
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when preg_quote uses another function as input' => [
@@ -187,7 +187,7 @@ PHP
 <?php
 
 $a = $foo->bar();
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within a more complex situation' => [
@@ -209,7 +209,7 @@ $bar = function ($input) {
         return strtolower($key . (ctype_alnum($value) ? '' : $value));
     }, $input);
 };
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when the function name can\'t be determined' => [
@@ -223,7 +223,7 @@ $d = Foo::{'foo'}('/asdf/');
 $e = Foo::$bar('/asdf/');
 $f = ($foo->bar)('/asdf/');
 
-PHP
+PHP,
         ];
     }
 }

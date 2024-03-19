@@ -72,7 +72,7 @@ TXT
             <<<'DIFF'
 - $x = [...$collection, 4, 5];
 + $x = [$collection, 4, 5];
-DIFF
+DIFF,
         );
     }
 
@@ -88,7 +88,7 @@ DIFF
             null,
             false,
             $node->getAttributes(),
-            false
+            false,
         );
     }
 

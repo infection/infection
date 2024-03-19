@@ -100,7 +100,7 @@ final class ConsoleLogger extends AbstractLogger
         Assert::keyExists(
             self::VERBOSITY_LEVEL_MAP,
             $level,
-            'The log level %s does not exist'
+            'The log level %s does not exist',
         );
 
         $output = $this->io->getOutput();
@@ -120,9 +120,9 @@ final class ConsoleLogger extends AbstractLogger
                     '<%1$s>[%2$s] %3$s</%1$s>',
                     self::FORMAT_LEVEL_MAP[$level],
                     $level,
-                    $interpolatedMessage
+                    $interpolatedMessage,
                 ),
-                self::VERBOSITY_LEVEL_MAP[$level]
+                self::VERBOSITY_LEVEL_MAP[$level],
             );
 
             return;
@@ -131,7 +131,7 @@ final class ConsoleLogger extends AbstractLogger
         Assert::keyExists(
             self::IO_MAP,
             $level,
-            'The log level "%s" does not exist for the IO mapping'
+            'The log level "%s" does not exist for the IO mapping',
         );
 
         $this->io->{self::IO_MAP[$level]}($interpolatedMessage);

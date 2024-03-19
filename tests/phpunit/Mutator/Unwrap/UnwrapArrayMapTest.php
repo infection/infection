@@ -49,7 +49,7 @@ final class UnwrapArrayMapTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = ['A', 'B', 'C'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_map' => [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a = ['A', 'B', 'C'];
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
@@ -98,7 +98,7 @@ PHP
 <?php
 
 $a = array_filter([1, 2, 3], 'is_int');
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_map' => [
@@ -108,7 +108,7 @@ PHP
 function array_map($text, $other)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -128,7 +128,7 @@ $a = ['A', 'B', 'C'];
 if ($a === $a) {
     return true;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when array_map is wrongly capitalized' => [
@@ -142,7 +142,7 @@ PHP
 <?php
 
 $a = ['A', 'B', 'C'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when array_map uses another function as input' => [
@@ -156,7 +156,7 @@ PHP
 <?php
 
 $a = $foo->bar();
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -172,7 +172,7 @@ PHP
 <?php
 
 $a = array_filter(['A', 'B', 'C'], 'is_int');
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with more than two parameters' => [

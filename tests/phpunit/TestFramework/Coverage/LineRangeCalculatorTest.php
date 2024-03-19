@@ -66,7 +66,7 @@ final class LineRangeCalculatorTest extends TestCase
         $this->assertSame($nodeRange, $range);
     }
 
-    public function provideCodeAndRangeCases(): iterable
+    public static function provideCodeAndRangeCases(): iterable
     {
         /* @see https://github.com/infection/infection/issues/815 */
         yield 'Code from original issue 815' => [

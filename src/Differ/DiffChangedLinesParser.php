@@ -79,7 +79,7 @@ class DiffChangedLinesParser
                 Assert::keyExists(
                     $matches,
                     self::MATCH_INDEX,
-                    sprintf('Source file can not be found in the following diff line: "%s"', $line)
+                    sprintf('Source file can not be found in the following diff line: "%s"', $line),
                 );
 
                 $filePath = realpath($matches[self::MATCH_INDEX]);
@@ -91,7 +91,7 @@ class DiffChangedLinesParser
                 Assert::keyExists(
                     $matches,
                     self::MATCH_INDEX,
-                    sprintf('Added/modified lines can not be found in the following diff line: "%s"', $line)
+                    sprintf('Added/modified lines can not be found in the following diff line: "%s"', $line),
                 );
 
                 // can be "523,12", meaning from 523 lines new 12 are added; or just "532"

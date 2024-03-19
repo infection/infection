@@ -47,12 +47,12 @@ final class StrykerConfigTest extends TestCase
         $this->assertSame(
             $willMatch,
             StrykerConfig::forBadge($branchMatch)
-                ->applicableForBranch($branchName)
+                ->applicableForBranch($branchName),
         );
     }
 
     /** @return non-empty-list<array{string, non-empty-string, bool}> */
-    public function branch_names_to_be_matched(): array
+    public static function branch_names_to_be_matched(): array
     {
         return [
             ['master', 'master', true],

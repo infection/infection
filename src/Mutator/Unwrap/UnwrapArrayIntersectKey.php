@@ -77,7 +77,7 @@ TXT
 + $x = $array1;
 # Mutation 2
 + $x = $array2;
-DIFF
+DIFF,
         );
     }
 

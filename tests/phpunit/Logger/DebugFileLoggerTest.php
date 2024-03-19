@@ -52,14 +52,14 @@ final class DebugFileLoggerTest extends TestCase
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,
         bool $onlyCoveredMode,
-        string $expectedContents
+        string $expectedContents,
     ): void {
         $logger = new DebugFileLogger($metricsCalculator, $resultsCollector, $onlyCoveredMode);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
@@ -92,12 +92,12 @@ Ignored mutants:
 Not Covered mutants:
 ====================
 
-TXT
+TXT,
         ];
 
         yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
-            $this->createCompleteResultsCollector(),
+            self::createCompleteMetricsCalculator(),
+            self::createCompleteResultsCollector(),
             false,
             <<<'TXT'
 Total: 16
@@ -181,12 +181,12 @@ Line 9
 Mutator: For_
 Line 10
 
-TXT
+TXT,
         ];
 
         yield 'all mutations only covered' => [
-            $this->createCompleteMetricsCalculator(),
-            $this->createCompleteResultsCollector(),
+            self::createCompleteMetricsCalculator(),
+            self::createCompleteResultsCollector(),
             true,
             <<<'TXT'
 Total: 16
@@ -260,7 +260,7 @@ Line 9
 Mutator: For_
 Line 10
 
-TXT
+TXT,
         ];
     }
 }

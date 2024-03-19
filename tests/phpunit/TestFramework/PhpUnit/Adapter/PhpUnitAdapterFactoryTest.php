@@ -53,7 +53,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '/path/to/junit.xml',
             '/path/to/project',
             [],
-            true
+            true,
         );
 
         $this->assertSame('PHPUnit', $adapter->getName());

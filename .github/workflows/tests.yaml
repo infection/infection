@@ -66,10 +66,6 @@ jobs:
         if: matrix.dependencies != 'locked'
         run: composer config extra.symfony.require ${{ matrix.symfony-version }}
 
-      - name: Disable deprecations for non-locked dependencies
-        if: matrix.dependencies != 'locked'
-        run: echo "SYMFONY_DEPRECATIONS_HELPER=max[self]=0" >> $GITHUB_ENV
-
       # See https://symfony.com/doc/current/bundles/best_practices.html#require-a-specific-symfony-version
       - name: Install Flex
         if: matrix.dependencies != 'locked'
@@ -104,10 +100,6 @@ jobs:
       - name: Install lowest dependencies
         if: ${{ matrix.dependencies == 'lowest' }}
         run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
-
-      - name: Configure the Symfony deprecations helper
-        if: ${{ matrix.php-version }} == '8.2'
-        run: echo "{SYMFONY_DEPRECATIONS_HELPER}={max[self]=0}" >> $GITHUB_ENV
 
       - name: Run unit tests
         shell: bash

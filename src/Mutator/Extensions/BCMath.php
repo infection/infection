@@ -88,7 +88,7 @@ TXT
             <<<'DIFF'
 - $x = bcadd($a, $b);
 + $x = (string) ($a + $b);
-DIFF
+DIFF,
         );
     }
 
@@ -127,57 +127,57 @@ DIFF
                 'bcadd' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Plus::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Plus::class),
+                    ),
                 ),
                 'bcdiv' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Div::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Div::class),
+                    ),
                 ),
                 'bcmod' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mod::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mod::class),
+                    ),
                 ),
                 'bcmul' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mul::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mul::class),
+                    ),
                 ),
                 'bcpow' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Pow::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Pow::class),
+                    ),
                 ),
                 'bcsub' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Minus::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Minus::class),
+                    ),
                 ),
                 'bcsqrt' => self::makeCheckingMinArgsMapper(
                     1,
                     self::makeCastToStringMapper(
-                        self::makeSquareRootsMapper()
-                    )
+                        self::makeSquareRootsMapper(),
+                    ),
                 ),
                 'bcpowmod' => self::makeCheckingMinArgsMapper(
                     3,
                     self::makeCastToStringMapper(
-                        self::makePowerModuloMapper()
-                    )
+                        self::makePowerModuloMapper(),
+                    ),
                 ),
                 'bccomp' => self::makeCheckingMinArgsMapper(
                     2,
-                    self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Spaceship::class)
+                    self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Spaceship::class),
                 ),
             ],
-            array_fill_keys($functionsMap, null)
+            array_fill_keys($functionsMap, null),
         );
     }
 
@@ -248,9 +248,9 @@ DIFF
             yield new Node\Expr\BinaryOp\Mod(
                 new Node\Expr\FuncCall(
                     new Node\Name('\pow'),
-                    [$node->args[0], $node->args[1]]
+                    [$node->args[0], $node->args[1]],
                 ),
-                $node->args[2]->value
+                $node->args[2]->value,
             );
         };
     }

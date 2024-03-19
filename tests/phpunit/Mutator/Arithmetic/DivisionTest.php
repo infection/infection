@@ -49,7 +49,7 @@ final class DivisionTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It changes regular divison' => [
                 <<<'PHP'
@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = 10 * 2;
-PHP
+PHP,
         ];
 
         yield 'It does not change division equals' => [
@@ -71,7 +71,7 @@ PHP
 
 $a = 10;
 $a /= 5;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when the left side is 1 to avoid an equivalent mutation' => [
@@ -79,7 +79,7 @@ PHP
 <?php
 
 $a = 1 / $b;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when the right side is 1 to avoid an equivalent mutation' => [
@@ -87,7 +87,7 @@ PHP
 <?php
 
 $a = $b / 1;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when the left side is -1 to avoid an equivalent mutation' => [
@@ -95,7 +95,7 @@ PHP
 <?php
 
 $a = -1 / $b;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when the right side is -1 to avoid an equivalent mutation' => [
@@ -103,7 +103,7 @@ PHP
 <?php
 
 $a = $b / -1;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when the left side is 1.0 to avoid an equivalent mutation' => [
@@ -111,7 +111,7 @@ PHP
 <?php
 
 $a = 1.0 / $b;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when the right side is 1.0 to avoid an equivalent mutation' => [
@@ -119,7 +119,7 @@ PHP
 <?php
 
 $a = $b / 1.0;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when the left side is -1.0 to avoid an equivalent mutation' => [
@@ -127,7 +127,7 @@ PHP
 <?php
 
 $a = -1.0 / $b;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when the right side is -1.0 to avoid an equivalent mutation' => [
@@ -135,7 +135,7 @@ PHP
 <?php
 
 $a = $b / -1.0;
-PHP
+PHP,
         ];
     }
 }

@@ -51,14 +51,14 @@ final class GitHubAnnotationsLoggerTest extends TestCase
      */
     public function test_it_logs_correctly_with_mutations(
         ResultsCollector $resultsCollector,
-        array $expectedLines
+        array $expectedLines,
     ): void {
         $logger = new GitHubAnnotationsLogger($resultsCollector);
 
         $this->assertSame($expectedLines, $logger->getLogLines());
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new ResultsCollector(),
@@ -66,7 +66,7 @@ final class GitHubAnnotationsLoggerTest extends TestCase
         ];
 
         yield 'all mutations' => [
-            $this->createCompleteResultsCollector(),
+            self::createCompleteResultsCollector(),
             [
                 "::warning file=foo/bar,line=9::Escaped Mutant for Mutator \"PregQuote\":%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#1';%0A\n",
                 "::warning file=foo/bar,line=10::Escaped Mutant for Mutator \"For_\":%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A\n",

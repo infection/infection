@@ -57,7 +57,7 @@ final class FileNotFound extends RuntimeException
             $file,
             $roots === []
                 ? ''
-                : sprintf(' in "%s"', implode('", "', $roots))
+                : sprintf(' in "%s"', implode('", "', $roots)),
         ));
     }
 
@@ -78,8 +78,8 @@ final class FileNotFound extends RuntimeException
                     implode('", "', $files),
                     $roots === []
                         ? ''
-                        : sprintf(' in "%s"', implode('", "', $roots))
-                )
+                        : sprintf(' in "%s"', implode('", "', $roots)),
+                ),
         );
     }
 }

@@ -49,10 +49,10 @@ final class UnparsableFile extends RuntimeException
         return new self(
             sprintf(
                 'Could not parse the file "%s". Check if it is a valid PHP file',
-                $filePath
+                $filePath,
             ),
             0,
-            $original
+            $original,
         );
     }
 }

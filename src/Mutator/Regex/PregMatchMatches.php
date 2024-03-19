@@ -80,7 +80,7 @@ TXT
             <<<'DIFF'
 - preg_match('/pattern/', $subject, $matches, $flags);
 + (int) $matches = [];
-DIFF
+DIFF,
         );
     }
 

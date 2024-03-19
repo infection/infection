@@ -97,10 +97,10 @@ TXT
                 $className,
                 implode(
                     ', ',
-                    array_diff($publicMethods, $knownMutatorPublicMethodNames)
+                    array_diff($publicMethods, $knownMutatorPublicMethodNames),
                 ),
-                self::class
-            )
+                self::class,
+            ),
         );
     }
 
@@ -120,9 +120,9 @@ TXT
             return;
         }
 
-        $this->addWarning(sprintf(
+        $this->fail(sprintf(
             'The mutator "%s" does not have a definition.',
-            $className
+            $className,
         ));
     }
 
@@ -136,7 +136,7 @@ TXT
         $isConfigurable = in_array(
             ConfigurableMutator::class,
             class_implements($className),
-            true
+            true,
         );
         $configClassName = $isConfigurable ? $className::getConfigClassName() : null;
 
@@ -154,8 +154,8 @@ TXT
                     ,
                     $className,
                     $configClassName ?: MutatorConfig::class,
-                    ConfigurableMutator::class
-                )
+                    ConfigurableMutator::class,
+                ),
             );
         } else {
             $constructorParameters = $constructorReflection->getParameters();
@@ -166,27 +166,27 @@ Expected the mutator "%s" to have the constructor signature "__construct(%s $con
 TXT
                 ,
                 $className,
-                $configClassName
+                $configClassName,
             );
 
             $this->assertCount(
                 1,
                 $constructorParameters,
-                $assertionErrorMessage . ' The constructor parameter count does not match.'
+                $assertionErrorMessage . ' The constructor parameter count does not match.',
             );
 
             $configParameterType = $constructorParameters[0]->getType();
 
             $this->assertNotNull(
                 $configParameterType,
-                $assertionErrorMessage . ' The constructor parameter type does not match.'
+                $assertionErrorMessage . ' The constructor parameter type does not match.',
             );
             $this->assertInstanceOf(ReflectionNamedType::class, $configParameterType);
 
             $this->assertSame(
                 $configClassName,
                 $configParameterType->getName(),
-                $assertionErrorMessage . ' The constructor parameter type does not match.'
+                $assertionErrorMessage . ' The constructor parameter type does not match.',
             );
         }
     }
@@ -208,8 +208,8 @@ TXT
                 ,
                 $configClassName,
                 $className,
-                MutatorConfig::class
-            )
+                MutatorConfig::class,
+            ),
         );
     }
 
@@ -226,8 +226,8 @@ TXT
                 $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC),
                 static function (ReflectionMethod $reflectionMethod): bool {
                     return !$reflectionMethod->isConstructor();
-                }
-            )
+                },
+            ),
         );
 
         sort($publicMethods, SORT_STRING);

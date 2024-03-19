@@ -92,7 +92,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
             ->with('Acme\FooTest')
             ->willReturn(new TestFileTimeData(
                 '/path/to/acme/FooTest.php',
-                0.000234
+                0.000234,
             ))
         ;
 
@@ -104,12 +104,12 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
                     TestLocation::forTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
                 ],
             ],
-            []
+            [],
         );
 
         $proxyTrace = new ProxyTrace(
             new SplFileInfo('/path/to/Foo.php', 'Foo.php', 'Foo.php'),
-            now($tests)
+            now($tests),
         );
 
         $expected = [$proxyTrace];
@@ -134,7 +134,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
                     'byMethod' => [],
                 ],
             ],
-            TestLocationsNormalizer::normalize([$proxyTrace->getTests()])
+            TestLocationsNormalizer::normalize([$proxyTrace->getTests()]),
         );
     }
 }

@@ -134,7 +134,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertSame(
             normalizePath($expected),
             normalizePath($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
-            'Should return the phpunit path'
+            'Should return the phpunit path',
         );
 
         $pathAfterTest = getenv(self::$pathName);
@@ -148,7 +148,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertGreaterThan(
             strlen($path),
             strlen($pathAfterTest),
-            'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.'
+            'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.',
         );
     }
 
@@ -173,7 +173,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertSame(
             normalizePath(realpath($expected)),
             normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
-            'should return the vendor bin link or .bat'
+            'should return the vendor bin link or .bat',
         );
     }
 
@@ -194,11 +194,11 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertSame(
             normalizePath(realpath($mock->getPackageScript())),
             normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
-            'should return the package script from .bat'
+            'should return the package script from .bat',
         );
     }
 
-    public function providesMockSetup(): array
+    public static function providesMockSetup(): array
     {
         return [
             'composer-bat' => ['setUpComposerBatchTest'],

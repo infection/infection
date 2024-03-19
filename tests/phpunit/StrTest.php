@@ -47,11 +47,11 @@ final class StrTest extends TestCase
     {
         $this->assertSame(
             $expected,
-            normalizeLineReturn(Str::trimLineReturns($value))
+            normalizeLineReturn(Str::trimLineReturns($value)),
         );
     }
 
-    public function stringProvider(): iterable
+    public static function stringProvider(): iterable
     {
         yield 'empty' => [
             '',
@@ -115,7 +115,7 @@ TXT
 Hello...
 
 ...World!
-TXT
+TXT,
         ];
 
         yield 'string with leading, trailing & in-between line returns & dirty empty strings' => [
@@ -133,7 +133,7 @@ TXT
   Hello...
     
  ...World!
-TXT
+TXT,
         ];
     }
 }

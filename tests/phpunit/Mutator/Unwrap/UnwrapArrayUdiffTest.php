@@ -49,7 +49,7 @@ final class UnwrapArrayUdiffTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = ['foo' => 'bar'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_udiff' => [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a = ['foo' => 'bar'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -110,7 +110,7 @@ $a = ['foo' => 'bar'];
 if ($a === $a) {
     return true;
 }
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when array_udiff is wrongly capitalized' => [
@@ -124,7 +124,7 @@ PHP
 <?php
 
 $a = ['foo' => 'bar'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when array_udiff uses functions as input' => [
@@ -138,7 +138,7 @@ PHP
 <?php
 
 $a = $foo->bar();
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -152,7 +152,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
@@ -166,7 +166,7 @@ PHP
 <?php
 
 $a = ['foo' => 'bar'];
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
@@ -174,7 +174,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_udiff' => [
@@ -184,7 +184,7 @@ PHP
 function array_udiff($array, $array1, $array2)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
@@ -194,7 +194,7 @@ PHP
 $a = 'array_udiff';
 
 $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-PHP
+PHP,
         ];
     }
 }

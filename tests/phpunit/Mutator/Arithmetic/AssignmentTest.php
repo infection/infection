@@ -49,7 +49,7 @@ final class AssignmentTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield [
             <<<'PHP'
@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -104,7 +104,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -118,7 +118,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -132,7 +132,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -146,7 +146,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -160,7 +160,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -174,7 +174,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -188,7 +188,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -202,7 +202,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield [
@@ -216,7 +216,7 @@ PHP
 <?php
 
 $a = $b;
-PHP
+PHP,
         ];
 
         yield 'It does not mutate Coalesce operator' => [

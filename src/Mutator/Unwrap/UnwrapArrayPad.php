@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = array_pad(['foo'], 2, ' ');
 + $x = ['foo'];
-DIFF
+DIFF,
         );
     }
 

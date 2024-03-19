@@ -67,7 +67,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 true,
                 null,
                 '/a/file',
-            )
+            ),
         );
 
         $this->assertNull($logger);
@@ -88,8 +88,8 @@ final class StrykerLoggerFactoryTest extends TestCase
                 null,
                 false,
                 StrykerConfig::forBadge('master'),
-                null
-            )
+                null,
+            ),
         );
 
         $this->assertInstanceOf(StrykerLogger::class, $logger);
@@ -100,7 +100,7 @@ final class StrykerLoggerFactoryTest extends TestCase
      */
     public function test_it_creates_a_logger_for_log_type_on_normal_verbosity(
         Logs $logs,
-        ?string $expectedLogger
+        ?string $expectedLogger,
     ): void {
         $factory = $this->createLoggerFactory();
 
@@ -115,7 +115,7 @@ final class StrykerLoggerFactoryTest extends TestCase
         $this->assertInstanceOf($expectedLogger, $logger);
     }
 
-    public function logsProvider(): iterable
+    public static function logsProvider(): iterable
     {
         yield 'no logger' => [
             Logs::createEmpty(),
@@ -133,7 +133,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 null,
                 false,
                 StrykerConfig::forBadge('foo'),
-                null
+                null,
             ),
             StrykerLogger::class,
         ];
@@ -149,7 +149,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 null,
                 false,
                 StrykerConfig::forFullReport('foo'),
-                null
+                null,
             ),
             StrykerLogger::class,
         ];
@@ -165,7 +165,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 'per_mutator',
                 true,
                 StrykerConfig::forBadge('branch'),
-                'summary_json'
+                'summary_json',
             ),
             StrykerLogger::class,
         ];

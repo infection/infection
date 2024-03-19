@@ -86,7 +86,7 @@ final class FileParserTest extends TestCase
 
         $this->assertSame(
             $expectedPrintedParsedContents,
-            StringNormalizer::normalizeString($actualPrintedParsedContents)
+            StringNormalizer::normalizeString($actualPrintedParsedContents),
         );
     }
 
@@ -101,7 +101,7 @@ final class FileParserTest extends TestCase
         } catch (UnparsableFile $exception) {
             $this->assertSame(
                 'Could not parse the file "/unknown". Check if it is a valid PHP file',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(Error::class, $exception->getPrevious());
@@ -119,16 +119,16 @@ final class FileParserTest extends TestCase
             $this->assertSame(
                 sprintf(
                     'Could not parse the file "%s". Check if it is a valid PHP file',
-                    $fileRealPath
+                    $fileRealPath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(Error::class, $exception->getPrevious());
         }
     }
 
-    public function fileToParserProvider(): iterable
+    public static function fileToParserProvider(): iterable
     {
         yield 'empty file' => [
             self::createFileInfo('/unknown', ''),
@@ -145,12 +145,12 @@ AST
                 <<<'PHP'
 <?php
 
-PHP
+PHP,
             ),
             <<<'AST'
 array(
 )
-AST
+AST,
         ];
 
         yield 'nominal' => [
@@ -173,7 +173,7 @@ use Infection\Console\InfectionContainer;
 
 (new Application(InfectionContainer::create()))->run();
 
-PHP
+PHP,
             ),
             <<<'AST'
 array(
@@ -283,7 +283,7 @@ array(
         )
     )
 )
-AST
+AST,
         ];
     }
 

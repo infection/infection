@@ -44,7 +44,7 @@ use SplObjectStorage;
 /**
  * @group integration
  */
-final class IgnoreAllMutationsAnnotationReaderVisitorTest extends BaseVisitorTest
+final class IgnoreAllMutationsAnnotationReaderVisitorTest extends BaseVisitorTestCase
 {
     public function test_it_does_not_toggle_ignorer_for_nodes_without_comments(): void
     {

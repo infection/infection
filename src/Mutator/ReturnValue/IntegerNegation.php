@@ -62,7 +62,7 @@ TXT
             <<<'DIFF'
 - $a = -5;
 + $a = 5;
-DIFF
+DIFF,
         );
     }
 
@@ -74,7 +74,7 @@ DIFF
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Return_(
-            new Node\Scalar\LNumber(-1 * $this->getIntegerValueOfNode($node), $node->getAttributes())
+            new Node\Scalar\LNumber(-1 * $this->getIntegerValueOfNode($node), $node->getAttributes()),
         );
     }
 

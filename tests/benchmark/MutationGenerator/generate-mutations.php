@@ -50,9 +50,9 @@ $input = new ArgvInput(
             MAX_MUTATIONS_COUNT_ARG,
             InputArgument::OPTIONAL,
             'Maximum number of mutations retrieved. Use -1 for no maximum',
-            50
+            50,
         ),
-    ])
+    ]),
 );
 
 (require __DIR__ . '/generate-mutations-closure.php')((int) $input->getArgument(MAX_MUTATIONS_COUNT_ARG));

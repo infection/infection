@@ -59,7 +59,7 @@ final class LogicalLowerAnd implements Mutator
             <<<'DIFF'
 - $a = $b and $c;
 + $a = $b or $c;
-DIFF
+DIFF,
         );
     }
 

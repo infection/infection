@@ -60,7 +60,7 @@ class XmlCoverageParser
     {
         return new ProxyTrace(
             $provider->provideFileInfo(),
-            lazy(self::createTestLocationsGenerator($provider->provideXPath()))
+            lazy(self::createTestLocationsGenerator($provider->provideXPath())),
         );
     }
 
@@ -96,7 +96,7 @@ class XmlCoverageParser
 
         return new TestLocations(
             self::collectCoveredLinesData($coveredLineNodes),
-            self::collectMethodsCoverageData($coveredMethodNodes)
+            self::collectMethodsCoverageData($coveredMethodNodes),
         );
     }
 
@@ -135,7 +135,7 @@ class XmlCoverageParser
                 }
 
                 $data[$lineNumber][] = TestLocation::forTestMethod(
-                    $coveredNode->getAttribute('by')
+                    $coveredNode->getAttribute('by'),
                 );
             }
         }
@@ -167,7 +167,7 @@ class XmlCoverageParser
 
             $methodsCoverage[$methodName] = new SourceMethodLineRange(
                 (int) $start,
-                (int) $end
+                (int) $end,
             );
         }
 

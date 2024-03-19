@@ -61,7 +61,7 @@ class X {
 +        return null;
     }
 }
-DIFF
+DIFF,
         );
     }
 
@@ -75,7 +75,7 @@ DIFF
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Return_(
-            new Node\Expr\ConstFetch(new Node\Name('null'))
+            new Node\Expr\ConstFetch(new Node\Name('null')),
         );
     }
 

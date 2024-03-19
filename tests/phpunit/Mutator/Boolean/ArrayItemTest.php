@@ -49,7 +49,7 @@ final class ArrayItemTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is property' => [
             <<<'PHP'

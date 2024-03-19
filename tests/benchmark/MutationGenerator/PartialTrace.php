@@ -76,7 +76,7 @@ final class PartialTrace implements Trace
 
     public function getAllTestsForMutation(
         NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature
+        bool $isOnFunctionSignature,
     ): iterable {
         return [];
     }

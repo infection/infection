@@ -52,7 +52,7 @@ final class IoCodeDetectorTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function codeProvider(): iterable
+    public static function codeProvider(): iterable
     {
         yield 'empty' => [
             '',

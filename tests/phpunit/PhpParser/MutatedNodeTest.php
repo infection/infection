@@ -53,7 +53,7 @@ final class MutatedNodeTest extends TestCase
         $this->assertSame($node, $mutatedNode->unwrap());
     }
 
-    public function nodeProvider(): iterable
+    public static function nodeProvider(): iterable
     {
         yield 'single node' => [new Node\Scalar\LNumber(1)];
 

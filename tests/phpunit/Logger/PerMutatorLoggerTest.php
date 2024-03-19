@@ -51,14 +51,14 @@ final class PerMutatorLoggerTest extends TestCase
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,
-        string $expectedContents
+        string $expectedContents,
     ): void {
         $logger = new PerMutatorLogger($metricsCalculator, $resultsCollector);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
@@ -69,12 +69,12 @@ final class PerMutatorLoggerTest extends TestCase
 | Mutator | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
 | ------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
 
-TXT
+TXT,
         ];
 
         yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
-            $this->createCompleteResultsCollector(),
+            self::createCompleteMetricsCalculator(),
+            self::createCompleteResultsCollector(),
             <<<'TXT'
 # Effects per Mutator
 
@@ -83,7 +83,7 @@ TXT
 | For_      |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
 | PregQuote |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
 
-TXT
+TXT,
         ];
     }
 }

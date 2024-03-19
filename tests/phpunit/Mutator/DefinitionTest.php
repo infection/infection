@@ -48,7 +48,7 @@ final class DefinitionTest extends TestCase
         string $description,
         string $category,
         ?string $remedies,
-        ?string $diff
+        ?string $diff,
     ): void {
         $definition = new Definition($description, $category, $remedies, $diff);
 
@@ -58,7 +58,7 @@ final class DefinitionTest extends TestCase
         $this->assertSame($diff, $definition->getDiff());
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         yield 'empty' => [
             '',

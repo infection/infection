@@ -52,7 +52,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
         $filesDiffChangedLines = new FilesDiffChangedLines(
             $parser,
-            $diffProvider
+            $diffProvider,
         );
 
         $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
@@ -68,13 +68,13 @@ final class FilesDiffChangedLinesTest extends TestCase
         bool $expectedIsFound,
         array $returnedFilesDiffChangedLinesMap,
         int $mutationStartLine,
-        int $mutationEndLine
+        int $mutationEndLine,
     ): void {
         [$parser, $diffProvider] = $this->prepareServices($returnedFilesDiffChangedLinesMap);
 
         $filesDiffChangedLines = new FilesDiffChangedLines(
             $parser,
-            $diffProvider
+            $diffProvider,
         );
 
         $isLineFoundInDiff = $filesDiffChangedLines->contains('/path/to/File.php', $mutationStartLine, $mutationEndLine, 'master');
@@ -82,7 +82,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         $this->assertSame($expectedIsFound, $isLineFoundInDiff, sprintf('Line %d was not found in diff', $mutationStartLine));
     }
 
-    public function provideLines(): Generator
+    public static function provideLines(): Generator
     {
         yield 'not found line in one-line range before' => [
             false,

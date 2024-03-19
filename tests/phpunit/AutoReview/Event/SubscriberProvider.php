@@ -67,7 +67,7 @@ final class SubscriberProvider
                 return $class !== EventSubscriber::class
                     && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class)
                 ;
-            }
+            },
         ));
 
         yield from self::$subscriberClasses;

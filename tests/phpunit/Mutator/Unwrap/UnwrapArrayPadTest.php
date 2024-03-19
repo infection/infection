@@ -49,7 +49,7 @@ final class UnwrapArrayPadTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
@@ -62,7 +62,7 @@ PHP
 <?php
 
 $a = ['a'];
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -76,7 +76,7 @@ PHP
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
+PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_pad' => [
@@ -90,7 +90,7 @@ PHP
 <?php
 
 $a = ['a'];
-PHP
+PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
@@ -98,7 +98,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_pad' => [
@@ -108,7 +108,7 @@ PHP
 function array_pad($array, $size, $value)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [

@@ -63,13 +63,13 @@ final class BuildConfigYmlTest extends TestCase
                 sprintf(
                     'Yaml file "%s" contains invalid yaml, and is used by our CI, please fix it. Original error message: "%s"',
                     realpath($filePath),
-                    $e->getMessage()
-                )
+                    $e->getMessage(),
+                ),
             );
         }
     }
 
-    public function providesYamlFilesForTesting(): iterable
+    public static function providesYamlFilesForTesting(): iterable
     {
         $rootPath = __DIR__ . '/../../../';
 

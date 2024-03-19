@@ -59,7 +59,7 @@ final class BitwiseAnd implements Mutator
             <<<'DIFF'
 - $a = $b & $c;
 + $a = $b | $c;
-DIFF
+DIFF,
         );
     }
 

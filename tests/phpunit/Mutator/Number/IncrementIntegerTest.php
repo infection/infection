@@ -51,7 +51,7 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It increments an integer' => [
             <<<'PHP'
@@ -88,7 +88,7 @@ PHP
 if ($foo > 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not increment 0 in greater or equal comparison' => [
@@ -98,7 +98,7 @@ PHP
 if ($foo >= 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not increment 0 in smaller comparison' => [
@@ -108,7 +108,7 @@ PHP
 if ($foo < 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not increment 0 in smaller or equal comparison' => [
@@ -118,7 +118,7 @@ PHP
 if ($foo <= 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not increment 0 in equal comparison' => [
@@ -128,7 +128,7 @@ PHP
 if ($foo == 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not increment 0 in not equal comparison' => [
@@ -138,7 +138,7 @@ PHP
 if ($foo != 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not increment 0 in identical comparison' => [
@@ -148,7 +148,7 @@ PHP
 if ($foo === 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It does not increment 0 in not identical comparison' => [
@@ -158,7 +158,7 @@ PHP
 if ($foo !== 0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It increments one' => [
@@ -187,7 +187,7 @@ PHP
 if ($foo === 1.0) {
     echo 'bar';
 }
-PHP
+PHP,
         ];
 
         yield 'It increments a negative integer' => [
@@ -213,7 +213,7 @@ PHP
             <<<'PHP'
 <?php
 preg_split('//', 'string', -1);
-PHP
+PHP,
         ];
 
         yield 'It does increment limit argument of preg_split function when it equals to 0' => [
@@ -227,7 +227,7 @@ PHP
 <?php
 
 preg_split('//', 'string', 1);
-PHP
+PHP,
         ];
 
         yield 'It does increment limit argument of preg_split function when it equals to -2' => [
@@ -241,7 +241,7 @@ PHP
 <?php
 
 preg_split('//', 'string', -1);
-PHP
+PHP,
         ];
 
         $maxInt = PHP_INT_MAX;
@@ -257,7 +257,7 @@ PHP
 <?php
 
 random_int(10000001, {$maxInt});
-PHP
+PHP,
         ];
 
         $minIntPlus1 = PHP_INT_MIN + 1;

@@ -49,7 +49,7 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
@@ -69,7 +69,7 @@ PHP
 <?php
 
 $a = ['baz' => 'bar'];
-PHP
+PHP,
                 ],
             ];
 
@@ -254,7 +254,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_uintersect_assoc' => [
@@ -264,7 +264,7 @@ PHP
 function array_uintersect_assoc($array, $array1, $array2)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
@@ -274,7 +274,7 @@ PHP
 $a = 'array_uintersect_assoc';
 
 $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-PHP
+PHP,
         ];
     }
 }
