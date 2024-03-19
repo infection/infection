@@ -173,26 +173,25 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_outputs_escaped_mutants_when_mutation_testing_is_finished(): void
     {
-        $matcher = $this->atLeastOnce();
         $this->output
-            ->expects($matcher)
+            ->expects($this->atLeastOnce())
             ->method('writeln')
-            ->willReturnCallback(function ($param) use ($matcher): void {
-                match ($matcher->numberOfInvocations()) {
-                    1 => $this->assertSame($param, [
+            ->withConsecutive(
+                [
+                    [
                         '',
                         'Escaped mutants:',
                         '================',
                         '',
-                    ]),
-                    2 => $this->assertSame($param, [
+                    ],
+                ],
+                [
+                    [
                         '',
                         '1) /original/filePath:10    [M] Plus',
-                    ]),
-                    default => 'noop'
-                };
-            })
-        ;
+                    ],
+                ]
+            );
 
         $executionResult = $this->createMock(MutantExecutionResult::class);
         $executionResult->expects($this->once())
@@ -227,20 +226,20 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_does_not_output_escaped_mutants_when_mutation_testing_is_finished_with_no_escaped_mutants(): void
     {
-        $matcher = $this->atLeastOnce();
         $this->output
-            ->expects($matcher)
+            ->expects($this->atLeastOnce())
             ->method('writeln')
-            ->willReturnCallback(function (mixed $value) use ($matcher): void {
-                match ($matcher->numberOfInvocations()) {
-                    1 => $this->assertSame([
+            ->withConsecutive(
+                [
+                    [
                         '',
                         '',
-                    ], $value),
-                    2 => $this->assertSame('<options=bold>0</options=bold> mutations were generated:', $value),
-                    default => 'noop'
-                };
-            });
+                    ],
+                ],
+                [
+                    '<options=bold>0</options=bold> mutations were generated:',
+                ]
+            );
 
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
