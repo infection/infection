@@ -47,6 +47,7 @@ $header = \trim(\sprintf(
 $finder = Finder::create()
     ->in(__DIR__)
     ->exclude([
+        '.box_dump',
         '.ci',
         '.composer',
         '.github',
