@@ -62,7 +62,7 @@ final class ProtectedVisibility implements Mutator
             <<<'DIFF'
 - protected function foo() {
 + private function foo() {
-DIFF
+DIFF,
         );
     }
 
@@ -84,7 +84,7 @@ DIFF
                 'stmts' => $node->getStmts(),
                 'attrGroups' => $node->getAttrGroups(),
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

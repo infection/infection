@@ -53,7 +53,7 @@ final class CastFloat extends AbstractCastMutator
             <<<'DIFF'
 - $a = (float) $value;
 + $a = $value;
-DIFF
+DIFF,
         );
     }
 

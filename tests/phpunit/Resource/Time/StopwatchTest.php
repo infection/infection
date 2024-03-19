@@ -84,7 +84,7 @@ final class StopwatchTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Timer can not be started again without stopping.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -98,7 +98,7 @@ final class StopwatchTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Timer must be started before stopping.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

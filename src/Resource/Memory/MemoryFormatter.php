@@ -68,7 +68,7 @@ class MemoryFormatter
         Assert::greaterThanEq(
             $bytes,
             0.,
-            'Expected a positive or null amount of bytes. Got: %s'
+            'Expected a positive or null amount of bytes. Got: %s',
         );
 
         $power = $bytes > 0 ? (int) round(log($bytes, self::BYTES_IN_KB - 1)) : 0;
@@ -79,9 +79,9 @@ class MemoryFormatter
                 $bytes / (self::BYTES_IN_KB ** $power),
                 self::DECIMALS_TO_SHOW,
                 '.',
-                ','
+                ',',
             ),
-            self::UNITS[$power]
+            self::UNITS[$power],
         );
     }
 }

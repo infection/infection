@@ -63,7 +63,7 @@ final class ContainerTest extends TestCase
 
         $this->assertNotFalse(
             $classFile,
-            sprintf('Expected the class "%s" to have a file', $className)
+            sprintf('Expected the class "%s" to have a file', $className),
         );
 
         if (in_array($classFile, $this->getContainerFiles(), true)) {
@@ -76,8 +76,8 @@ final class ContainerTest extends TestCase
                 'Did not expect to find a usage of the Infection container in "%s". Please use'
                 . ' "%s::getContainer() instead',
                 $classFile,
-                SingletonContainer::class
-            )
+                SingletonContainer::class,
+            ),
         );
     }
 
@@ -98,7 +98,7 @@ final class ContainerTest extends TestCase
                 __DIR__ . '/ContainerTest.php',
                 __DIR__ . '/../ContainerTest.php',
                 __DIR__ . '/../SingletonContainer.php',
-            ]
+            ],
         );
 
         return self::$containerFiles;

@@ -82,7 +82,7 @@ final class SortableMutantExecutionResults
                 }
 
                 return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
-            }
+            },
         );
     }
 }

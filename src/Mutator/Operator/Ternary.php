@@ -62,7 +62,7 @@ TXT
             <<<'DIFF'
 - $x = true ? true : false;
 + $x = true ? false : true;
-DIFF
+DIFF,
         );
     }
 

@@ -69,7 +69,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
     public function test_it_marks_nodes_which_are_part_of_the_function_signature(string $nodeClass, bool $expected): void
     {
         $nodes = self::parseCode(
-            $this->getFileContent('Reflection/rv-part-of-signature-flag.php')
+            $this->getFileContent('Reflection/rv-part-of-signature-flag.php'),
         );
 
         $this->traverse(
@@ -80,7 +80,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
                 new FullyQualifiedClassNameVisitor(),
                 new ReflectionVisitor(),
                 $spyVisitor = $this->getPartOfSignatureSpyVisitor($nodeClass),
-            ]
+            ],
         );
 
         $this->assertSame($expected, $spyVisitor->isPartOfSignature());
@@ -377,7 +377,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
                 new FullyQualifiedClassNameVisitor(),
                 new ReflectionVisitor(),
                 $nodeVisitor ?: $this->spyVisitor,
-            ]
+            ],
         );
     }
 

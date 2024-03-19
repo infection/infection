@@ -62,7 +62,7 @@ final class PublicVisibility implements Mutator
             <<<'DIFF'
 - public function foo() {
 + protected function foo() {
-DIFF
+DIFF,
         );
     }
 
@@ -83,7 +83,7 @@ DIFF
                 'stmts' => $node->getStmts(),
                 'attrGroups' => $node->getAttrGroups(),
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

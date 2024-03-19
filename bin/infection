@@ -67,7 +67,7 @@ You need to set up the project dependencies using Composer:
     $ composer install
 You can learn all about Composer on https://getcomposer.org/.
 
-ERROR
+ERROR,
     );
 
     throw new RuntimeException('Unable to find the Composer autoloader.');

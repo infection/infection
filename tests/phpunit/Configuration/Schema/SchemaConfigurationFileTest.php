@@ -104,7 +104,7 @@ final class SchemaConfigurationFileTest extends TestCase
      */
     public function test_it_cannot_retrieve_or_decode_invalid_contents(
         string $path,
-        Exception $expectedException
+        Exception $expectedException,
     ): void {
         $config = new SchemaConfigurationFile($path);
 
@@ -115,11 +115,11 @@ final class SchemaConfigurationFileTest extends TestCase
         } catch (Exception $exception) {
             $this->assertSame(
                 $expectedException->getMessage(),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(
                 $expectedException->getCode(),
-                $exception->getCode()
+                $exception->getCode(),
             );
 
             if ($expectedException->getPrevious() === null) {
@@ -148,7 +148,7 @@ final class SchemaConfigurationFileTest extends TestCase
             self::FIXTURES_DIR,
             new InvalidFile(sprintf(
                 'The file "%s" could not be found or is not a file.',
-                self::FIXTURES_DIR
+                self::FIXTURES_DIR,
             )),
         ];
 
@@ -157,7 +157,7 @@ final class SchemaConfigurationFileTest extends TestCase
             new InvalidFile(
                 sprintf(
                     'Could not parse the JSON file "%s": Unexpected EOF at line 1 column 1 of the JSON5 data',
-                    self::FIXTURES_DIR . '/invalid-json'
+                    self::FIXTURES_DIR . '/invalid-json',
                 ),
                 0,
                 new SyntaxError('Unexpected EOF', 1, 1),

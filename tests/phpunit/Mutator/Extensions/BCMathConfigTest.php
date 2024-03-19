@@ -60,7 +60,7 @@ final class BCMathConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the value for "foo" to be a boolean. Got "string" instead',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -74,7 +74,7 @@ final class BCMathConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected one of: "bcadd", "bccomp", "bcdiv", "bcmod", "bcmul", "bcpow", "bcsub", "bcsqrt", "bcpowmod". Got: "foo"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

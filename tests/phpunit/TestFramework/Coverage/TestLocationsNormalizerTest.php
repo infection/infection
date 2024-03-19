@@ -47,7 +47,7 @@ final class TestLocationsNormalizerTest extends TestCase
      */
     public function test_it_can_convert_an_associative_array_of_test_locations_into_an_associative_array_of_scalar_values(
         array $value,
-        array $expected
+        array $expected,
     ): void {
         $actual = TestLocationsNormalizer::normalize($value);
 
@@ -78,10 +78,10 @@ final class TestLocationsNormalizerTest extends TestCase
                             new TestLocation(
                                 'Acme\FooTest::test_it_can_be_instantiated',
                                 '/path/to/acme/FooTest.php',
-                                0.000234
+                                0.000234,
                             ),
                         ],
-                    ]
+                    ],
                 ),
             ],
             [
@@ -107,9 +107,9 @@ final class TestLocationsNormalizerTest extends TestCase
                     [
                         '__construct' => new SourceMethodLineRange(
                             19,
-                            22
+                            22,
                         ),
-                    ]
+                    ],
                 ),
             ],
             [
@@ -133,16 +133,16 @@ final class TestLocationsNormalizerTest extends TestCase
                             new TestLocation(
                                 'Acme\FooTest::test_it_can_be_instantiated',
                                 '/path/to/acme/FooTest.php',
-                                0.000234
+                                0.000234,
                             ),
                         ],
                     ],
                     [
                         '__construct' => new SourceMethodLineRange(
                             19,
-                            22
+                            22,
                         ),
-                    ]
+                    ],
                 ),
             ],
             [

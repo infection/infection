@@ -55,7 +55,7 @@ final class ProfileListProviderTest extends TestCase
     public function test_implemented_mutator_provider_is_valid(
         string $mutatorFilePath,
         string $mutatorClassName,
-        string $mutatorShortClassName
+        string $mutatorShortClassName,
     ): void {
         $this->assertFileExists($mutatorFilePath);
         $this->assertNotSame($mutatorClassName, $mutatorShortClassName);

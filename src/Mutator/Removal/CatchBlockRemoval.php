@@ -67,7 +67,7 @@ try {
 } catch (\LogicException $e) {
     throw $e;
 }
-DIFF
+DIFF,
         );
     }
 

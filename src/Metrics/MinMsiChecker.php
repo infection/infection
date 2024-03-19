@@ -56,7 +56,7 @@ class MinMsiChecker
         int $totalMutantCount,
         float $msi,
         float $coveredCodeMsi,
-        ConsoleOutput $consoleOutput
+        ConsoleOutput $consoleOutput,
     ): void {
         $this->checkMinMsi($totalMutantCount, $msi, $coveredCodeMsi);
         $this->checkIfMinMsiCanBeIncreased($msi, $coveredCodeMsi, $consoleOutput);
@@ -73,14 +73,14 @@ class MinMsiChecker
         if ($this->isMsiInsufficient($msi)) {
             throw MinMsiCheckFailed::createForMsi(
                 $this->minMsi,
-                $msi
+                $msi,
             );
         }
 
         if ($this->isCoveredCodeMsiInsufficient($coveredCodeMsi)) {
             throw MinMsiCheckFailed::createCoveredMsi(
                 $this->minCoveredCodeMsi,
-                $coveredCodeMsi
+                $coveredCodeMsi,
             );
         }
     }
@@ -90,14 +90,14 @@ class MinMsiChecker
         if ($this->canIncreaseMsi($msi)) {
             $output->logMinMsiCanGetIncreasedNotice(
                 $this->minMsi,
-                $msi
+                $msi,
             );
         }
 
         if ($this->canIncreaseCoveredCodeMsi($coveredCodeMsi)) {
             $output->logMinCoveredCodeMsiCanGetIncreasedNotice(
                 $this->minCoveredCodeMsi,
-                $coveredCodeMsi
+                $coveredCodeMsi,
             );
         }
     }

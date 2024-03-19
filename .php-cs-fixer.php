@@ -40,8 +40,8 @@ $header = \trim(\sprintf(
     'This code is licensed under the BSD 3-Clause License.%s',
     \substr(
         \file_get_contents('LICENSE'),
-        \strlen('BSD 3-Clause License')
-    )
+        \strlen('BSD 3-Clause License'),
+    ),
 ));
 
 $finder = Finder::create()
@@ -160,6 +160,10 @@ return (new Config())
         'static_lambda' => true,
         'strict_comparison' => true,
         'strict_param' => true,
+        'trailing_comma_in_multiline' => [
+            'after_heredoc' => true,
+            'elements' => ['arguments', 'arrays', 'match', 'parameters'],
+        ],
         'yoda_style' => [
             'equal' => false,
             'identical' => false,

@@ -129,7 +129,7 @@ PHP
     {
         $plusExpression = new Node\Expr\BinaryOp\Plus(
             new Array_([new LNumber(1)]),
-            new Array_([new LNumber(1)])
+            new Array_([new LNumber(1)]),
         );
 
         $this->assertFalse($this->mutator->canMutate($plusExpression));

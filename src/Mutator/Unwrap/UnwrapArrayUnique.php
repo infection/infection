@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = array_unique(['a', 'a', 'b']);
 + $x = ['a', 'a', 'b'];
-DIFF
+DIFF,
         );
     }
 

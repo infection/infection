@@ -80,7 +80,7 @@ final class IndexXmlCoverageParserTest extends TestCase
         $sourceFilesData = $this->parser->parse(
             '/path/to/index.xml',
             $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
 
         // zeroLevel + noPercentage + firstLevel + secondLevel
@@ -94,14 +94,14 @@ final class IndexXmlCoverageParserTest extends TestCase
             preg_replace(
                 '/percent=".*"/',
                 '',
-                self::getXml()
+                self::getXml(),
             ),
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
 
         $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::provideFixtures(),
-            $sourceFilesData
+            $sourceFilesData,
         );
     }
 
@@ -132,7 +132,7 @@ XML;
         $sourceFilesData = $this->parser->parse(
             '/path/to/index.xml',
             $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
 
         $this->assertCoverageFixtureSame([], $sourceFilesData);
@@ -145,14 +145,14 @@ XML;
             str_replace(
                 '/path/to/src',
                 realpath(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
-                file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml')
+                file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml'),
             ),
-            XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
         );
 
         $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::providePhpUnit6Fixtures(),
-            $sourceFilesData
+            $sourceFilesData,
         );
     }
 
@@ -166,7 +166,7 @@ XML;
         $this->parser->parse(
             '/path/to/index.xml',
             $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
     }
 
@@ -180,7 +180,7 @@ XML;
         (new IndexXmlCoverageParser(true))->parse(
             '/path/to/index.xml',
             $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
     }
 
@@ -192,7 +192,7 @@ XML;
             preg_replace(
                 '/(source)(=\".*?\")/',
                 'name$2',
-                self::getXml()
+                self::getXml(),
             ),
         ];
     }
@@ -257,7 +257,7 @@ XML
         self::$xml = preg_replace(
             '/(source=\").*?(\")/',
             sprintf('$1%s$2', realpath(XmlCoverageFixtures::FIXTURES_SRC_DIR)),
-            $xml
+            $xml,
         );
 
         return self::$xml;
@@ -269,7 +269,7 @@ XML
      */
     private function assertCoverageFixtureSame(
         iterable $coverageFixtures,
-        iterable $sourceFilesData
+        iterable $sourceFilesData,
     ): void {
         $this->assertSame([], array_diff(
             // Fixtures are not expected to be in any particular order

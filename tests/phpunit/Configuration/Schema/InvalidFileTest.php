@@ -51,7 +51,7 @@ final class InvalidFileTest extends TestCase
 
         $this->assertSame(
             'The file "/path/to/config" could not be found or is not a file.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
@@ -65,7 +65,7 @@ final class InvalidFileTest extends TestCase
 
         $this->assertSame(
             'The file "/path/to/config" is not readable.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
@@ -79,7 +79,7 @@ final class InvalidFileTest extends TestCase
 
         $this->assertSame(
             'Could not retrieve the contents of the file "/path/to/config".',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
@@ -92,7 +92,7 @@ final class InvalidFileTest extends TestCase
         SchemaConfigurationFile $config,
         string $error,
         Throwable $previous,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = InvalidFile::createForInvalidJson($config, $error, $previous);
 

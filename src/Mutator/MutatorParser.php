@@ -62,7 +62,7 @@ final class MutatorParser
 
         $parsedMutators = array_filter(array_map(
             'trim',
-            explode(',', $unparsedMutators)
+            explode(',', $unparsedMutators),
         ));
 
         foreach ($parsedMutators as $index => $profileOrMutator) {
@@ -77,7 +77,7 @@ final class MutatorParser
             $mutatorShortName = array_search(
                 $profileOrMutator,
                 ProfileList::ALL_MUTATORS,
-                true
+                true,
             );
 
             if ($mutatorShortName !== false) {
@@ -92,8 +92,8 @@ final class MutatorParser
                     . 'the list of available mutants and profiles.',
                     $profileOrMutator,
                     'https://infection.github.io/guide/mutators.html',
-                    'https://infection.github.io/guide/profiles.html'
-                )
+                    'https://infection.github.io/guide/profiles.html',
+                ),
             );
         }
 

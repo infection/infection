@@ -63,7 +63,7 @@ final class AdapterInstallationDeciderTest extends BaseProviderTestCase
     {
         $result = $this->installationDecider->shouldBeInstalled(
             TestFrameworkTypes::PHPUNIT,
-            IO::createNull()
+            IO::createNull(),
         );
 
         $this->assertFalse($result, 'PHPUnit adapter should not be installed');
@@ -75,8 +75,8 @@ final class AdapterInstallationDeciderTest extends BaseProviderTestCase
             TestFrameworkTypes::PHPSPEC,
             new IO(
                 $this->createStreamableInput($this->getInputStream("no\n")),
-                $this->createStreamOutput()
-            )
+                $this->createStreamOutput(),
+            ),
         );
 
         $this->assertFalse($result, 'Adapter should not be installed since user answered "no"');
@@ -88,8 +88,8 @@ final class AdapterInstallationDeciderTest extends BaseProviderTestCase
             TestFrameworkTypes::PHPSPEC,
             new IO(
                 $this->createStreamableInput($this->getInputStream("no\n"), false),
-                $this->createStreamOutput()
-            )
+                $this->createStreamOutput(),
+            ),
         );
 
         $this->assertTrue($result, 'Adapter should be installed in non-interactive mode');
@@ -103,8 +103,8 @@ final class AdapterInstallationDeciderTest extends BaseProviderTestCase
             TestFrameworkTypes::PHPSPEC,
             new IO(
                 $this->createStreamableInput($this->getInputStream("yes\n")),
-                $streamOutput
-            )
+                $streamOutput,
+            ),
         );
 
         $stream = $streamOutput->getStream();
@@ -114,11 +114,11 @@ final class AdapterInstallationDeciderTest extends BaseProviderTestCase
         $this->assertTrue($result, 'Adapter should be installed since user answered "yes"');
         $this->assertStringContainsString(
             'Would you like to install',
-            $output
+            $output,
         );
         $this->assertStringContainsString(
             'infection/phpspec-adapter',
-            $output
+            $output,
         );
     }
 }

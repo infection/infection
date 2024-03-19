@@ -55,7 +55,7 @@ final class ChainSubscriberFactoryTest extends TestCase
             0,
             $subscribers instanceof Traversable
                 ? iterator_to_array($subscribers, false)
-                : $subscribers
+                : $subscribers,
         );
     }
 
@@ -70,7 +70,7 @@ final class ChainSubscriberFactoryTest extends TestCase
         $factory = new ChainSubscriberFactory(
             new DummySubscriberFactory($subscriber1),
             new DummySubscriberFactory($subscriber2),
-            new DummySubscriberFactory($subscriber3)
+            new DummySubscriberFactory($subscriber3),
         );
 
         $subscribers = $factory->create($output);
@@ -85,7 +85,7 @@ final class ChainSubscriberFactoryTest extends TestCase
                 $subscriber2,
                 $subscriber3,
             ],
-            $subscribers
+            $subscribers,
         );
     }
 }

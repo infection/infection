@@ -74,7 +74,7 @@ final class VersionParserTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 sprintf('Expected "%s" to be contain a valid SemVer (sub)string value.', $content),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

@@ -74,7 +74,7 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
 
         $this->loader = new SchemaConfigurationFileLoader(
             $this->schemaValidatorStub,
-            $this->configFactoryStub
+            $this->configFactoryStub,
         );
     }
 

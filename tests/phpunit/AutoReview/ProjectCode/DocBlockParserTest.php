@@ -66,7 +66,7 @@ PHP
 This is a
 multi-line
 doc-block
-TEXT
+TEXT,
         ];
 
         yield [
@@ -94,7 +94,7 @@ This is a
 multi-line
 doc-block
 with weird indentation
-TEXT
+TEXT,
         ];
 
         yield [

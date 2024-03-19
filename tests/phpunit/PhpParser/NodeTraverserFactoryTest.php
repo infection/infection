@@ -66,7 +66,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $visitors = array_map(
             'get_class',
-            self::getVisitorReflection()->getValue($traverser)
+            self::getVisitorReflection()->getValue($traverser),
         );
 
         $this->assertSame(
@@ -79,7 +79,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 ReflectionVisitor::class,
                 FakeVisitor::class,
             ],
-            $visitors
+            $visitors,
         );
     }
 
@@ -90,7 +90,7 @@ final class NodeTraverserFactoryTest extends TestCase
             [
                 new FakeIgnorer(),
                 new FakeIgnorer(),
-            ]
+            ],
         );
 
         $visitors = self::getVisitorReflection()->getValue($traverser);
@@ -107,7 +107,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 ReflectionVisitor::class,
                 FakeVisitor::class,
             ],
-            $visitorClasses
+            $visitorClasses,
         );
 
         $nodeIgnorersReflection = (new ReflectionClass(NonMutableNodesIgnorerVisitor::class))->getProperty('nodeIgnorers');
@@ -115,7 +115,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $actualNodeIgnorers = array_map(
             'get_class',
-            $nodeIgnorersReflection->getValue($visitors[1])
+            $nodeIgnorersReflection->getValue($visitors[1]),
         );
 
         $this->assertSame(
@@ -126,7 +126,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 InterfaceIgnorer::class,
                 AbstractMethodIgnorer::class,
             ],
-            $actualNodeIgnorers
+            $actualNodeIgnorers,
         );
     }
 

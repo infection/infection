@@ -48,7 +48,7 @@ final class InvalidFile extends UnexpectedValueException
     {
         return new self(sprintf(
             'The file "%s" could not be found or is not a file.',
-            $config->getPath()
+            $config->getPath(),
         ));
     }
 
@@ -56,7 +56,7 @@ final class InvalidFile extends UnexpectedValueException
     {
         return new self(sprintf(
             'The file "%s" is not readable.',
-            $config->getPath()
+            $config->getPath(),
         ));
     }
 
@@ -64,23 +64,23 @@ final class InvalidFile extends UnexpectedValueException
     {
         return new self(sprintf(
             'Could not retrieve the contents of the file "%s".',
-            $config->getPath()
+            $config->getPath(),
         ));
     }
 
     public static function createForInvalidJson(
         SchemaConfigurationFile $config,
         string $error,
-        Throwable $previous
+        Throwable $previous,
     ): self {
         return new self(
             sprintf(
                 'Could not parse the JSON file "%s": %s',
                 $config->getPath(),
-                $error
+                $error,
             ),
             0,
-            $previous
+            $previous,
         );
     }
 }

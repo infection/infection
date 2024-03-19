@@ -48,7 +48,7 @@ final class FileNotFoundTest extends TestCase
     public function test_file_or_directory_does_not_exist(
         string $file,
         array $roots,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = FileNotFound::fromFileName($file, $roots);
 
@@ -66,7 +66,7 @@ final class FileNotFoundTest extends TestCase
     public function test_files_or_directories_does_not_exist(
         array $files,
         array $roots,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = FileNotFound::fromFiles($files, $roots);
 

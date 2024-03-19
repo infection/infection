@@ -53,7 +53,7 @@ final class CastObject extends AbstractCastMutator
             <<<'DIFF'
 - $a = (object) $value;
 + $a = $value;
-DIFF
+DIFF,
         );
     }
 

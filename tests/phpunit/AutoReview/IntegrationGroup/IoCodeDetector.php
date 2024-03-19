@@ -193,7 +193,7 @@ final class IoCodeDetector
             preg_match_all(
                 '/function (?<function_name>[_\p{L}]+)\(/u',
                 file_get_contents($filePath),
-                $matches
+                $matches,
             );
 
             foreach ($matches['function_name'] as $functionName) {

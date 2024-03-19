@@ -138,7 +138,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
                     $index + 1,
                     $executionResult->getOriginalFilePath(),
                     $executionResult->getOriginalStartingLine(),
-                    $executionResult->getMutatorName()
+                    $executionResult->getMutatorName(),
                 ),
             ]);
 
@@ -171,15 +171,15 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->output->writeln(['', 'Metrics:']);
 
         $this->output->writeln(
-            $this->addIndentation("Mutation Score Indicator (MSI): <{$msiTag}>{$mutationScoreIndicator}%</{$msiTag}>")
+            $this->addIndentation("Mutation Score Indicator (MSI): <{$msiTag}>{$mutationScoreIndicator}%</{$msiTag}>"),
         );
 
         $this->output->writeln(
-            $this->addIndentation("Mutation Code Coverage: <{$mutationCoverageTag}>{$coverageRate}%</{$mutationCoverageTag}>")
+            $this->addIndentation("Mutation Code Coverage: <{$mutationCoverageTag}>{$coverageRate}%</{$mutationCoverageTag}>"),
         );
 
         $this->output->writeln(
-            $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$coveredMsi}%</{$coveredMsiTag}>")
+            $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$coveredMsi}%</{$coveredMsiTag}>"),
         );
     }
 
@@ -193,7 +193,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
             foreach ($fileLoggers as $fileLogger) {
                 $this->output->writeln(
-                    $this->addIndentation(sprintf('- %s', $fileLogger->getFilePath()))
+                    $this->addIndentation(sprintf('- %s', $fileLogger->getFilePath())),
                 );
             }
 

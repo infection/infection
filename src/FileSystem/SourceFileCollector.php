@@ -53,7 +53,7 @@ class SourceFileCollector
      */
     public function collectFiles(
         array $sourceDirectories,
-        array $excludeDirectories
+        array $excludeDirectories,
     ): iterable {
         if ($sourceDirectories === []) {
             return [];

@@ -66,7 +66,7 @@ PHP;
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
                 [$mutation2],
-                [$mutation3, $mutation4]
+                [$mutation3, $mutation4],
             )
         ;
 
@@ -74,7 +74,7 @@ PHP;
 
         $this->traverse(
             self::parseCode(self::CODE),
-            [$visitor]
+            [$visitor],
         );
 
         $this->assertSame(
@@ -86,7 +86,7 @@ PHP;
                 // generator can produce _more_ mutations, we only call it as many times as we need
                 // it, not as many times it can create mutations
             ],
-            iterator_to_array($visitor->getMutations(), false)
+            iterator_to_array($visitor->getMutations(), false),
         );
     }
 
@@ -105,7 +105,7 @@ PHP;
                 [$mutation0, $mutation1],
                 [$mutation2],
                 [$mutation3, $mutation4],
-                []
+                [],
             )
         ;
 
@@ -113,7 +113,7 @@ PHP;
 
         $this->traverse(
             self::parseCode(self::CODE),
-            [$visitor]
+            [$visitor],
         );
 
         // Sanity check
@@ -123,12 +123,12 @@ PHP;
                 $mutation1,
                 $mutation2,
             ],
-            iterator_to_array($visitor->getMutations(), false)
+            iterator_to_array($visitor->getMutations(), false),
         );
 
         $this->traverse(
             self::parseCode(self::CODE),
-            [$visitor]
+            [$visitor],
         );
 
         $this->assertSame(
@@ -136,7 +136,7 @@ PHP;
                 $mutation3,
                 $mutation4,
             ],
-            iterator_to_array($visitor->getMutations(), false)
+            iterator_to_array($visitor->getMutations(), false),
         );
     }
 }

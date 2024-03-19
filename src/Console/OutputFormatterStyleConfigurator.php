@@ -79,15 +79,15 @@ final class OutputFormatterStyleConfigurator
     {
         $formatter->setStyle(
             'low',
-            new OutputFormatterStyle('red', null, ['bold'])
+            new OutputFormatterStyle('red', null, ['bold']),
         );
         $formatter->setStyle(
             'medium',
-            new OutputFormatterStyle('yellow', null, ['bold'])
+            new OutputFormatterStyle('yellow', null, ['bold']),
         );
         $formatter->setStyle(
             'high',
-            new OutputFormatterStyle('green', null, ['bold'])
+            new OutputFormatterStyle('green', null, ['bold']),
         );
     }
 }

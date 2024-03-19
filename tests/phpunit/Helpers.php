@@ -67,8 +67,8 @@ function normalize_trailing_spaces(string $value): string
         "\n",
         array_map(
             'rtrim',
-            explode("\n", normalizeLineReturn($value))
-        )
+            explode("\n", normalizeLineReturn($value)),
+        ),
     );
 }
 

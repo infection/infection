@@ -83,7 +83,7 @@ class SourceFileInfoProvider
                 'Could not find the XML coverage file "%s" listed in "%s". Make sure the '
                 . 'coverage used is up to date',
                 $coverageFile,
-                $this->coverageIndexPath
+                $this->coverageIndexPath,
             ));
         }
 
@@ -105,7 +105,7 @@ class SourceFileInfoProvider
             $relativeFilePath = str_replace(
                 sprintf('%s.xml', $fileName),
                 '',
-                $this->relativeCoverageFilePath
+                $this->relativeCoverageFilePath,
             );
         }
 
@@ -115,21 +115,21 @@ class SourceFileInfoProvider
                 $this->projectSource,
                 trim((string) $relativeFilePath, '/'),
                 $fileName,
-            ])
+            ]),
         );
 
         try {
             $realPath = realpath($path);
         } catch (FilesystemException) {
             $coverageFilePath = Path::canonicalize(
-                $this->coverageDir . DIRECTORY_SEPARATOR . $this->relativeCoverageFilePath
+                $this->coverageDir . DIRECTORY_SEPARATOR . $this->relativeCoverageFilePath,
             );
 
             throw new InvalidCoverage(sprintf(
                 'Could not find the source file "%s" referred by "%s". Make sure the '
                 . 'coverage used is up to date',
                 $path,
-                $coverageFilePath
+                $coverageFilePath,
             ));
         }
 

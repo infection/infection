@@ -216,7 +216,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['foo', 'bar', 'baz']);
-PHP
+PHP,
             ],
         ];
 
@@ -225,7 +225,7 @@ PHP
 <?php
 
 $a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+PHP,
         ];
 
         yield 'It does not mutate functions named array_combine' => [
@@ -235,7 +235,7 @@ PHP
 function array_combine($array, $array1, $array2)
 {
 }
-PHP
+PHP,
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
@@ -245,7 +245,7 @@ PHP
 $a = 'array_combine';
 
 $b = $a(['A', 'B', 'C'], ['foo', 'bar', 'baz']);
-PHP
+PHP,
         ];
     }
 }

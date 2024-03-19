@@ -73,7 +73,7 @@ TXT
             <<<'DIFF'
 - throw new Exception();
 + new Exception();
-DIFF
+DIFF,
         );
     }
 

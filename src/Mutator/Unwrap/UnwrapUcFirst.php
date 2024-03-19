@@ -65,7 +65,7 @@ TXT
             <<<'DIFF'
 - $x = ucfirst('Hello!');
 + $x = 'Hello!';
-DIFF
+DIFF,
         );
     }
 

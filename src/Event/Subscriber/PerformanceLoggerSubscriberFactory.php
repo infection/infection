@@ -61,7 +61,7 @@ final class PerformanceLoggerSubscriberFactory implements SubscriberFactory
             $this->timeFormatter,
             $this->memoryFormatter,
             $this->threadCount,
-            $output
+            $output,
         );
     }
 }

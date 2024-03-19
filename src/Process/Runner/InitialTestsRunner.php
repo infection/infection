@@ -58,12 +58,12 @@ class InitialTestsRunner
     public function run(
         string $testFrameworkExtraOptions,
         array $phpExtraOptions,
-        bool $skipCoverage
+        bool $skipCoverage,
     ): Process {
         $process = $this->processBuilder->createProcess(
             $testFrameworkExtraOptions,
             $phpExtraOptions,
-            $skipCoverage
+            $skipCoverage,
         );
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());

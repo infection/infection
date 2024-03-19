@@ -81,7 +81,7 @@ final class AnonymousClassReflection implements ClassReflection
     private static function hasMethodRecursively(
         ReflectionClass $reflectionClass,
         string $methodName,
-        Visibility $visibility
+        Visibility $visibility,
     ): bool {
         if (self::hasMethod($reflectionClass, $methodName, $visibility)) {
             return true;
@@ -98,7 +98,7 @@ final class AnonymousClassReflection implements ClassReflection
     private static function hasMethod(
         ReflectionClass $reflectionClass,
         string $methodName,
-        Visibility $visibility
+        Visibility $visibility,
     ): bool {
         if (!$reflectionClass->hasMethod($methodName)) {
             return false;

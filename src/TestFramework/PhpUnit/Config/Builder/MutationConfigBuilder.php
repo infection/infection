@@ -69,7 +69,7 @@ class MutationConfigBuilder extends ConfigBuilder
         string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath,
-        string $version
+        string $version,
     ): string {
         $dom = $this->getDom();
         $xPath = new SafeDOMXPath($dom);
@@ -95,7 +95,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->tmpDir,
-            $mutationHash
+            $mutationHash,
         );
 
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
@@ -106,8 +106,8 @@ class MutationConfigBuilder extends ConfigBuilder
             $this->createCustomAutoloadWithInterceptor(
                 $mutationOriginalFilePath,
                 $mutantFilePath,
-                $originalBootstrapFile
-            )
+                $originalBootstrapFile,
+            ),
         );
 
         $path = $this->buildPath($mutationHash);
@@ -136,7 +136,7 @@ class MutationConfigBuilder extends ConfigBuilder
     private function createCustomAutoloadWithInterceptor(
         string $originalFilePath,
         string $mutantFilePath,
-        string $originalAutoloadFile
+        string $originalAutoloadFile,
     ): string {
         $interceptorPath = IncludeInterceptor::LOCATION;
 
@@ -153,7 +153,7 @@ require_once '%s';
 PHP
             ,
             $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath),
-            $originalAutoloadFile
+            $originalAutoloadFile,
         );
     }
 
@@ -162,7 +162,7 @@ PHP
         return sprintf(
             '%s/phpunitConfiguration.%s.infection.xml',
             $this->tmpDir,
-            $mutationHash
+            $mutationHash,
         );
     }
 
@@ -191,12 +191,12 @@ PHP
     private function removeExistingTestSuite(SafeDOMXPath $xPath): void
     {
         $this->removeExistingTestSuiteNodes(
-            $xPath->query('/phpunit/testsuites/testsuite')
+            $xPath->query('/phpunit/testsuites/testsuite'),
         );
 
         // Handle situation when test suite is directly inside root node
         $this->removeExistingTestSuiteNodes(
-            $xPath->query('/phpunit/testsuite')
+            $xPath->query('/phpunit/testsuite'),
         );
     }
 
@@ -220,7 +220,7 @@ PHP
     private function addTestSuiteWithFilteredTestFiles(
         array $tests,
         DOMDocument $dom,
-        SafeDOMXPath $xPath
+        SafeDOMXPath $xPath,
     ): void {
         $testSuites = $xPath->query('/phpunit/testsuites');
 

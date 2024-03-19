@@ -81,7 +81,7 @@ class JUnitReportLocator
         if (!file_exists($this->coveragePath)) {
             throw new FileNotFound(sprintf(
                 'Could not find any file with the pattern "*.junit.xml" in "%s"',
-                $this->coveragePath
+                $this->coveragePath,
             ));
         }
 
@@ -91,7 +91,7 @@ class JUnitReportLocator
                 ->in($this->coveragePath)
                 ->name('/^(.+\.)?junit\.xml$/i')
                 ->sortByName(),
-            false
+            false,
         );
 
         if (count($files) > 1) {
@@ -102,9 +102,9 @@ class JUnitReportLocator
                     '", "',
                     array_map(
                         static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
-                        $files
-                    )
-                )
+                        $files,
+                    ),
+                ),
             ));
         }
 
@@ -116,7 +116,7 @@ class JUnitReportLocator
 
         throw new FileNotFound(sprintf(
             'Could not find any file with the pattern "*.junit.xml" in "%s"',
-            $this->coveragePath
+            $this->coveragePath,
         ));
     }
 }

@@ -57,7 +57,7 @@ final class MutatorParserTest extends TestCase
      */
     public function test_it_can_parse_the_provided_input(
         string $mutatorInput,
-        array $expectedMutators
+        array $expectedMutators,
     ): void {
         $parsedMutators = $this->mutatorParser->parse($mutatorInput);
 

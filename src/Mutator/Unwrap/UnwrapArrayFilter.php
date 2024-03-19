@@ -66,7 +66,7 @@ TXT
             <<<'DIFF'
 - $x = array_filter($array, $callback);
 + $x = $array;
-DIFF
+DIFF,
         );
     }
 

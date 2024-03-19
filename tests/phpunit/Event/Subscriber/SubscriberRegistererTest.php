@@ -64,7 +64,7 @@ final class SubscriberRegistererTest extends TestCase
         $factory = new ChainSubscriberFactory(
             new DummySubscriberFactory($subscriber0),
             new DummySubscriberFactory($subscriber1),
-            new DummySubscriberFactory($subscriber2)
+            new DummySubscriberFactory($subscriber2),
         );
 
         $registerer = new SubscriberRegisterer($this->eventDispatcher, $factory);
@@ -80,7 +80,7 @@ final class SubscriberRegistererTest extends TestCase
                 $subscriber1,
                 $subscriber2,
             ],
-            $this->eventDispatcher->getSubscribers()
+            $this->eventDispatcher->getSubscribers(),
         );
     }
 
@@ -88,7 +88,7 @@ final class SubscriberRegistererTest extends TestCase
     {
         $registerer = new SubscriberRegisterer(
             $this->eventDispatcher,
-            new ChainSubscriberFactory()
+            new ChainSubscriberFactory(),
         );
 
         // Sanity check

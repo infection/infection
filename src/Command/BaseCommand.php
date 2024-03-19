@@ -57,7 +57,7 @@ abstract class BaseCommand extends Command
             $application,
             Application::class,
             'Cannot access to the command application if the command has not been '
-            . 'registered to the application yet'
+            . 'registered to the application yet',
         );
 
         return $application;
@@ -81,7 +81,7 @@ abstract class BaseCommand extends Command
     {
         Assert::notNull(
             $this->io,
-            'Cannot retrieve the IO object before the command was initialized'
+            'Cannot retrieve the IO object before the command was initialized',
         );
 
         return $this->io;

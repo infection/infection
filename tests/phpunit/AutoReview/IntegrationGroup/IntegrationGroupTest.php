@@ -49,7 +49,7 @@ final class IntegrationGroupTest extends TestCase
      */
     public function test_the_test_cases_requiring_io_operations_belongs_to_the_integration_group(
         string $testCaseClassName,
-        string $fileWithIoOperations
+        string $fileWithIoOperations,
     ): void {
         $reflectionClass = new ReflectionClass($testCaseClassName);
 
@@ -65,8 +65,8 @@ found in the file "%s".
 TXT
                 ,
                 $testCaseClassName,
-                $fileWithIoOperations
-            )
+                $fileWithIoOperations,
+            ),
         );
 
         if (strpos($phpDoc, '@group integration') === false) {
@@ -77,7 +77,7 @@ found in the file "%s".
 TXT
                 ,
                 $testCaseClassName,
-                $fileWithIoOperations
+                $fileWithIoOperations,
             ));
         }
     }

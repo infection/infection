@@ -90,7 +90,7 @@ final class ConfigurationTest extends TestCase
         array $ignoreSourceCodeMutatorsMap,
         bool $executeOnlyCoveringTestCases,
         bool $isForGitDiffLines,
-        ?string $gitDiffBase
+        ?string $gitDiffBase,
     ): void {
         $config = new Configuration(
             $timeout,
@@ -123,7 +123,7 @@ final class ConfigurationTest extends TestCase
             $ignoreSourceCodeMutatorsMap,
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
-            $gitDiffBase
+            $gitDiffBase,
         );
 
         $this->assertConfigurationStateIs(
@@ -158,7 +158,7 @@ final class ConfigurationTest extends TestCase
             $ignoreSourceCodeMutatorsMap,
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
-            $gitDiffBase
+            $gitDiffBase,
         );
     }
 
@@ -217,7 +217,7 @@ final class ConfigurationTest extends TestCase
                 'mutator.log',
                 true,
                 StrykerConfig::forBadge('master'),
-                'summary.json'
+                'summary.json',
             ),
             'default',
             'custom-dir',

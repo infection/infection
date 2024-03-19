@@ -68,7 +68,7 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
         $factory = new InitialTestsConsoleLoggerSubscriberFactory(
             true,
             $this->testFrameworkAdapterMock,
-            $debug
+            $debug,
         );
 
         $subscriber = $factory->create(new FakeOutput());
@@ -84,7 +84,7 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
         $factory = new InitialTestsConsoleLoggerSubscriberFactory(
             false,
             $this->testFrameworkAdapterMock,
-            $debug
+            $debug,
         );
 
         $outputMock = $this->createMock(OutputInterface::class);

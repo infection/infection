@@ -75,7 +75,7 @@ final class PerformanceLoggerSubscriberTest extends TestCase
             new FakeTimeFormatter(5),
             new FakeMemoryFormatter(2048),
             1,
-            $this->output
+            $this->output,
         ));
 
         $dispatcher->dispatch(new ApplicationExecutionWasStarted());

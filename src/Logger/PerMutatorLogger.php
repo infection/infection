@@ -101,7 +101,7 @@ final class PerMutatorLogger implements LineMutationTestingResultsLogger
     {
         return sprintf(
             '%0.2f',
-            round($score, self::ROUND_PRECISION, PHP_ROUND_HALF_UP)
+            round($score, self::ROUND_PRECISION, PHP_ROUND_HALF_UP),
         );
     }
 

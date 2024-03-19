@@ -67,8 +67,8 @@ final class ConsoleOutputTest extends TestCase
 
         $this->consoleOutput = new ConsoleOutput(
             new ConsoleLogger(
-                new IO(new StringInput(''), $this->output)
-            )
+                new IO(new StringInput(''), $this->output),
+            ),
         );
     }
 
@@ -85,7 +85,7 @@ final class ConsoleOutputTest extends TestCase
 
 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -101,7 +101,7 @@ TXT
 
 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -115,7 +115,7 @@ TXT
 
 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -132,7 +132,7 @@ TXT
 
 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -140,7 +140,7 @@ TXT
     {
         $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
             5.0,
-            10.0
+            10.0,
         );
 
         $this->assertSame(
@@ -152,7 +152,7 @@ TXT
 
 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -160,7 +160,7 @@ TXT
     {
         $this->consoleOutput->logMinCoveredCodeMsiCanGetIncreasedNotice(
             5.0,
-            10.0
+            10.0,
         );
 
         $this->assertSame(
@@ -172,7 +172,7 @@ TXT
 
 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 }
