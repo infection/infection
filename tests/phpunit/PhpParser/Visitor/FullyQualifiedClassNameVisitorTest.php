@@ -44,7 +44,7 @@ use PhpParser\Node;
 /**
  * @group integration
  */
-final class FullyQualifiedClassNameVisitorTest extends \Infection\Tests\PhpParser\Visitor\BaseVisitorTestCase
+final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTestCase
 {
     /**
      * @dataProvider codeProvider
