@@ -128,13 +128,13 @@ PHP
 
 return someFunc(true);
 PHP
-            ,
+                ,
                 <<<'PHP'
 <?php
 
 return someFunc(false);
 PHP
-            ,
+                ,
             ],
         ];
     }

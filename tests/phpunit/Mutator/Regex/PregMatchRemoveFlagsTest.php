@@ -66,13 +66,13 @@ PHP
 
 preg_match('~some-regexp$~gu', 'irrelevant');
 PHP
-            ,
+                ,
                 <<<'PHP'
 <?php
 
 preg_match('~some-regexp$~iu', 'irrelevant');
 PHP
-            ,
+                ,
                 <<<'PHP'
 <?php
 

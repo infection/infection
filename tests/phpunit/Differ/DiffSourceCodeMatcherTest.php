@@ -181,12 +181,12 @@ DIFF
 + $a - 2 + $this->getString(); # comment
 DIFF
             ,
-                true,
+            true,
         ];
 
         yield 'Regex containing less common delimiters should not lead to syntax error' => [
             '.*%.*',
-                <<<'DIFF'
+            <<<'DIFF'
 --- Original
 +++ New
 @@ @@
@@ -194,8 +194,8 @@ DIFF
 - $a % 2;
 + $a % 3;
 DIFF
-                ,
-                true,
+            ,
+            true,
         ];
     }
 }

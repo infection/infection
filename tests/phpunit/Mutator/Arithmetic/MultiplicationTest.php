@@ -52,13 +52,13 @@ final class MultiplicationTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates normal multiplication' => [
-                <<<'PHP'
+            <<<'PHP'
 <?php
 
 $a = 10 * 3;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $a = 10 / 3;
@@ -66,7 +66,7 @@ PHP,
         ];
 
         yield 'It does not mutate multiplication equals' => [
-                <<<'PHP'
+            <<<'PHP'
 <?php
 
 $a = 1;

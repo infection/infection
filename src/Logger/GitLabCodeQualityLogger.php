@@ -68,7 +68,7 @@ final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
                 'location' => [
                     'path' => Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $projectRootDirectory),
                     'lines' => [
-                      'begin' => $escapedExecutionResult->getOriginalStartingLine(),
+                        'begin' => $escapedExecutionResult->getOriginalStartingLine(),
                     ],
                 ],
                 'severity' => 'major',
