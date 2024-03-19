@@ -56,8 +56,8 @@ final class SubscriberProviderTest extends TestCase
             class_exists($className, true)
             && in_array(EventSubscriber::class, class_implements($className), true),
             sprintf(
-                'The "%s" class was expected to be an event subscriber, but it is not a ' .
-                '"%s".',
+                'The "%s" class was expected to be an event subscriber, but it is not a '
+                . '"%s".',
                 $className,
                 EventSubscriber::class,
             ),

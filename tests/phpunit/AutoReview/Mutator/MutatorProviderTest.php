@@ -58,8 +58,8 @@ final class MutatorProviderTest extends TestCase
             class_exists($className, true)
             && in_array(Mutator::class, class_implements($className), true),
             sprintf(
-                'The "%s" class was picked up by the mutator class finder, but it is not a ' .
-                '"%s".',
+                'The "%s" class was picked up by the mutator class finder, but it is not a '
+                . '"%s".',
                 $className,
                 Mutator::class,
             ),

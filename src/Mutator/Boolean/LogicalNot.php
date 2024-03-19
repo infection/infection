@@ -80,8 +80,8 @@ DIFF,
         }
 
         // e.g. "!!someFunc()"
-        $isDoubledLogicalNot = ($node->expr instanceof Node\Expr\BooleanNot) ||
-            $node->getAttribute('parent') instanceof Node\Expr\BooleanNot;
+        $isDoubledLogicalNot = ($node->expr instanceof Node\Expr\BooleanNot)
+            || $node->getAttribute('parent') instanceof Node\Expr\BooleanNot;
 
         return !$isDoubledLogicalNot;
     }

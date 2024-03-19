@@ -204,9 +204,9 @@ final class MutatorFactoryTest extends TestCase
 
             $expectedMutatorClass = $expectedMutatorClassNames[$index];
             $actualMutatorClass = get_class(
-                $mutator instanceof IgnoreMutator ?
-                    $decoratedMutatorReflection->getValue($mutator) :
-                    $mutator,
+                $mutator instanceof IgnoreMutator
+                    ? $decoratedMutatorReflection->getValue($mutator)
+                    : $mutator,
             );
 
             $this->assertSame(

@@ -104,8 +104,8 @@ DIFF,
             return false;
         }
 
-        if (!$node->name instanceof Node\Name ||
-            $node->name->toLowerString() !== 'preg_match') {
+        if (!$node->name instanceof Node\Name
+            || $node->name->toLowerString() !== 'preg_match') {
             return false;
         }
 
