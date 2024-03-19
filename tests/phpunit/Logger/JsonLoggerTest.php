@@ -69,7 +69,7 @@ final class JsonLoggerTest extends TestCase
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations; only covered' => [
             true,
@@ -102,8 +102,8 @@ final class JsonLoggerTest extends TestCase
 
         yield 'all mutations; only covered' => [
             true,
-            $this->createCompleteMetricsCalculator(),
-            $this->createCompleteResultsCollector(),
+            self::createCompleteMetricsCalculator(),
+            self::createCompleteResultsCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 16,
@@ -269,8 +269,8 @@ final class JsonLoggerTest extends TestCase
 
         yield 'uncovered mutations' => [
             false,
-            $this->createUncoveredMetricsCalculator(),
-            $this->createUncoveredResultsCollector(),
+            self::createUncoveredMetricsCalculator(),
+            self::createUncoveredResultsCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 1,
@@ -310,8 +310,8 @@ final class JsonLoggerTest extends TestCase
 
         yield 'Ignored mutations' => [
             true,
-            $this->createIgnoredMetricsCalculator(),
-            $this->createIgnoredResultsCollector(),
+            self::createIgnoredMetricsCalculator(),
+            self::createIgnoredResultsCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 1,
@@ -352,7 +352,7 @@ final class JsonLoggerTest extends TestCase
         yield 'Non UTF-8 characters' => [
             false,
             new MetricsCalculator(2),
-            $this->createNonUtf8CharactersCollector(),
+            self::createNonUtf8CharactersCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 0,
@@ -396,28 +396,28 @@ final class JsonLoggerTest extends TestCase
         $this->assertSame($expectedJson, json_decode($logger->getLogLines()[0], true, JSON_THROW_ON_ERROR));
     }
 
-    private function createUncoveredMetricsCalculator(): MetricsCalculator
+    private static function createUncoveredMetricsCalculator(): MetricsCalculator
     {
         $collector = new MetricsCalculator(2);
 
-        $this->initUncoveredCollector($collector);
+        self::initUncoveredCollector($collector);
 
         return $collector;
     }
 
-    private function createUncoveredResultsCollector(): ResultsCollector
+    private static function createUncoveredResultsCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
-        $this->initUncoveredCollector($collector);
+        self::initUncoveredCollector($collector);
 
         return $collector;
     }
 
-    private function initUncoveredCollector(Collector $collector): void
+    private static function initUncoveredCollector(Collector $collector): void
     {
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,
@@ -426,28 +426,28 @@ final class JsonLoggerTest extends TestCase
         );
     }
 
-    private function createIgnoredMetricsCalculator(): MetricsCalculator
+    private static function createIgnoredMetricsCalculator(): MetricsCalculator
     {
         $collector = new MetricsCalculator(2);
 
-        $this->initIgnoredCollector($collector);
+        self::initIgnoredCollector($collector);
 
         return $collector;
     }
 
-    private function createIgnoredResultsCollector(): ResultsCollector
+    private static function createIgnoredResultsCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
-        $this->initIgnoredCollector($collector);
+        self::initIgnoredCollector($collector);
 
         return $collector;
     }
 
-    private function initIgnoredCollector(Collector $collector): void
+    private static function initIgnoredCollector(Collector $collector): void
     {
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::IGNORED,
@@ -456,12 +456,12 @@ final class JsonLoggerTest extends TestCase
         );
     }
 
-    private function createNonUtf8CharactersCollector(): ResultsCollector
+    private static function createNonUtf8CharactersCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,

@@ -49,7 +49,7 @@ final class ShiftLeftTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates shift left' => [
             <<<'PHP'

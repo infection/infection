@@ -69,7 +69,7 @@ final class BuildConfigYmlTest extends TestCase
         }
     }
 
-    public function providesYamlFilesForTesting(): iterable
+    public static function providesYamlFilesForTesting(): iterable
     {
         $rootPath = __DIR__ . '/../../../';
 

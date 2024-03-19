@@ -60,7 +60,7 @@ final class InvalidSchemaTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function configWithErrorsProvider(): iterable
+    public static function configWithErrorsProvider(): iterable
     {
         $path = '/path/to/config';
 

@@ -170,7 +170,7 @@ final class E2ETest extends TestCase
         $this->runOnE2EFixture($fullPath);
     }
 
-    public function e2eTestSuiteDataProvider(): iterable
+    public static function e2eTestSuiteDataProvider(): iterable
     {
         $directories = Finder::create()
             ->depth('== 0')

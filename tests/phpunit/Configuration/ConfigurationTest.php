@@ -162,7 +162,7 @@ final class ConfigurationTest extends TestCase
         );
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         yield 'empty' => [
             10.,

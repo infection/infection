@@ -57,7 +57,7 @@ final class DifferTest extends TestCase
         $this->assertSame($expectedDiff, self::normalizeString($actualDiff));
     }
 
-    public function diffProvider(): iterable
+    public static function diffProvider(): iterable
     {
         yield 'empty' => [
             '',

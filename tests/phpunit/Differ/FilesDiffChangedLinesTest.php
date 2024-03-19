@@ -82,7 +82,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         $this->assertSame($expectedIsFound, $isLineFoundInDiff, sprintf('Line %d was not found in diff', $mutationStartLine));
     }
 
-    public function provideLines(): Generator
+    public static function provideLines(): Generator
     {
         yield 'not found line in one-line range before' => [
             false,

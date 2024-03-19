@@ -87,7 +87,7 @@ final class FileOrDirectoryNotFoundTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function nonExistentPathsProvider(): iterable
+    public static function nonExistentPathsProvider(): iterable
     {
         yield [
             'unknown',
@@ -114,7 +114,7 @@ final class FileOrDirectoryNotFoundTest extends TestCase
         ];
     }
 
-    public function multipleNonExistentPathsProvider(): iterable
+    public static function multipleNonExistentPathsProvider(): iterable
     {
         yield [
             [],

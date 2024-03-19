@@ -48,118 +48,118 @@ use function Later\now;
 
 trait CreateMetricsCalculator
 {
-    private function createCompleteMetricsCalculator(): MetricsCalculator
+    private static function createCompleteMetricsCalculator(): MetricsCalculator
     {
         $calculator = new MetricsCalculator(2);
 
-        $this->feedCollector($calculator);
+        self::feedCollector($calculator);
 
         return $calculator;
     }
 
-    private function createCompleteResultsCollector(): ResultsCollector
+    private static function createCompleteResultsCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
-        $this->feedCollector($collector);
+        self::feedCollector($collector);
 
         return $collector;
     }
 
-    private function feedCollector(Collector $collector): void
+    private static function feedCollector(Collector $collector): void
     {
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::KILLED,
                 'killed#0'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::KILLED,
                 'killed#1'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::ERROR,
                 'error#0'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::ERROR,
                 'error#1'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::SYNTAX_ERROR,
                 'syntaxError#0'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::SYNTAX_ERROR,
                 'syntaxError#1'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::ESCAPED,
                 'escaped#0'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::ESCAPED,
                 'escaped#1'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::TIMED_OUT,
                 'timedOut#0'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::TIMED_OUT,
                 'timedOut#1'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::SKIPPED,
                 'skipped#0'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 PregQuote::class,
                 DetectionStatus::SKIPPED,
                 'skipped#1'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,
                 'notCovered#0'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::NOT_COVERED,
                 'notCovered#1'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::IGNORED,
                 'ignored#0'
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::IGNORED,
@@ -168,7 +168,7 @@ trait CreateMetricsCalculator
         );
     }
 
-    private function createMutantExecutionResult(
+    private static function createMutantExecutionResult(
         int $i,
         string $mutatorClassName,
         string $detectionStatus,

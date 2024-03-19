@@ -89,7 +89,7 @@ final class BenchmarkTest extends TestCase
         }
     }
 
-    public function provideBenchmarks(): iterable
+    public static function provideBenchmarks(): iterable
     {
         yield 'MutationGenerator' => [
             realpath(self::BENCHMARK_DIR . '/MutationGenerator/generate-mutations.php'),

@@ -98,7 +98,7 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
         $this->assertInstanceOf(InitialTestsConsoleLoggerSubscriber::class, $subscriber);
     }
 
-    public function debugProvider(): iterable
+    public static function debugProvider(): iterable
     {
         yield 'debug enabled' => [true];
 

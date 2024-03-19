@@ -77,7 +77,7 @@ final class MutantTest extends TestCase
         );
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         $nominalAttributes = [
             'startLine' => 3,

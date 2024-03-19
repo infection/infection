@@ -49,7 +49,7 @@ final class InstanceOf_Test extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates an instanceof comparison with a class literal to true and false' => [
             <<<'PHP'

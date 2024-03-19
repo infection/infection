@@ -59,7 +59,7 @@ final class DiffChangedLinesParserTest extends TestCase
         $this->assertSame($this->convertToArray($expectedMap), $this->convertToArray($resultMap));
     }
 
-    public function provideDiffs(): Generator
+    public static function provideDiffs(): Generator
     {
         yield 'one file with added lines in different places' => [
             <<<'DIFF'

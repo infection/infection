@@ -49,7 +49,7 @@ final class PHPDocParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function phpDocProvider(): iterable
+    public static function phpDocProvider(): iterable
     {
         yield 'empty' => [
             '',
