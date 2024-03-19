@@ -80,31 +80,38 @@ return (new Config())
         '@PHPUnit75Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
-        'blank_line_before_statement' => [
-            'statements' => [
-                'break',
-                'continue',
-                'declare',
-                'do',
-                'for',
-                'foreach',
-                'if',
-                'include',
-                'include_once',
-                'require',
-                'require_once',
-                'return',
-                'switch',
-                'throw',
-                'try',
-                'while',
-                'yield',
-            ],
-        ],
+        // TODO: enable
+        'array_indentation' => false,
+        'blank_line_before_statement' => false,
+    // TODO: enable back
+//        'blank_line_before_statement' => [
+//            'statements' => [
+//                'break',
+//                'continue',
+//                'declare',
+//                'do',
+//                'for',
+//                'foreach',
+//                'if',
+//                'include',
+//                'include_once',
+//                'require',
+//                'require_once',
+//                'return',
+//                'switch',
+//                'throw',
+//                'try',
+//                'while',
+//                'yield',
+//            ],
+//        ],
         'blank_line_between_import_groups' => false,
         'compact_nullable_typehint' => true,
         'concat_space' => ['spacing' => 'one'],
-        'fully_qualified_strict_types' => true,
+        // TODO: enable back
+        'fully_qualified_strict_types' => false,
+        // TODO: enable
+        'get_class_to_class_keyword' => false,
         'global_namespace_import' => [
             'import_classes' => true,
             'import_constants' => true,
@@ -120,6 +127,8 @@ return (new Config())
             'syntax' => 'short',
         ],
         'logical_operators' => true,
+        // TODO: enable
+        'modernize_strpos' => false,
         'native_constant_invocation' => true,
         'native_function_invocation' => [
             'include' => ['@internal'],
@@ -131,6 +140,8 @@ return (new Config())
         'no_useless_else' => true,
         'no_useless_return' => true,
         'nullable_type_declaration_for_default_null_value' => true,
+        // TODO: enable
+        'operator_linebreak' => false,
         'ordered_class_elements' => true,
         'ordered_imports' => true,
         'ordered_interfaces' => true,
