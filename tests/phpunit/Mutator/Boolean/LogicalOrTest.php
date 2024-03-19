@@ -76,8 +76,11 @@ PHP
         ];
 
         yield from self::equalityMutationsProvider();
+
         yield from self::nonMutableSmallerAndGreaterMatrixMutationsProvider();
+
         yield from self::mutableSmallerAndGreaterMatrixMutationsProvider();
+
         yield from self::smallerAndGreaterMatrixWithSameValueMutationsProvider();
     }
 
