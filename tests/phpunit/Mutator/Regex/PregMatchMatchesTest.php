@@ -49,7 +49,7 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
         $this->doTest($input, $output);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates ' => [
             <<<'PHP'

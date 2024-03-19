@@ -49,7 +49,7 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Removes both operands' => [
             <<<'PHP'

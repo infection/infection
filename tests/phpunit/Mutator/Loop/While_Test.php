@@ -49,7 +49,7 @@ final class While_Test extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates expression part from variable to false' => [
             <<<'PHP'

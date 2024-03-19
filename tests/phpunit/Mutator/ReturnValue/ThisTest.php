@@ -53,10 +53,10 @@ final class ThisTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It does mutate with no typehint' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'this_return-this.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'this_return-this.php'),
             <<<'PHP'
 <?php
 
@@ -73,7 +73,7 @@ PHP
         ];
 
         yield 'It does not mutate non \'this\' return statements' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'this-return-types.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'this-return-types.php'),
         ];
     }
 }

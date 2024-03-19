@@ -49,7 +49,7 @@ final class YieldValueTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates a yield with key and value to a yield with a value only' => [
             <<<'PHP'

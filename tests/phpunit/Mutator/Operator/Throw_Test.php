@@ -49,7 +49,7 @@ final class Throw_Test extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes the throw statement' => [
             <<<'PHP'

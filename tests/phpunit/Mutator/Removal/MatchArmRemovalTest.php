@@ -49,7 +49,7 @@ final class MatchArmRemovalTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes match arm when more than one is defined' => [
             <<<'PHP'

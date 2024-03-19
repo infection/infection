@@ -53,10 +53,10 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates protected to private' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-one-class.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-one-class.php'),
             <<<'PHP'
 <?php
 
@@ -75,15 +75,15 @@ PHP
         ];
 
         yield 'It does not mutate final flag' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-final.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-final.php'),
         ];
 
         yield 'It does not mutate abstract protected to private' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-abstract.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-abstract.php'),
         ];
 
         yield 'It does mutate not abstract protected to private in an abstract class' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-abstract-class-protected-method.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-abstract-class-protected-method.php'),
             <<<'PHP'
 <?php
 
@@ -102,7 +102,7 @@ PHP
         ];
 
         yield 'It does not mutate static flag' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-static.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-static.php'),
             <<<'PHP'
 <?php
 
@@ -121,11 +121,11 @@ PHP
         ];
 
         yield 'It does not mutate if parent abstract has same protected method' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-abstract.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-same-method-abstract.php'),
         ];
 
         yield 'It does not mutate if parent class has same protected method' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-parent.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-same-method-parent.php'),
             <<<'PHP'
 <?php
 
@@ -148,7 +148,7 @@ PHP
         ];
 
         yield 'It does not mutate if grand parent class has same protected method' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-grandparent.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-same-method-grandparent.php'),
             <<<'PHP'
 <?php
 
@@ -174,7 +174,7 @@ PHP
         ];
 
         yield 'it does mutate non-inherited methods' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-non-same-method-parent.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-non-same-method-parent.php'),
             <<<'PHP'
 <?php
 

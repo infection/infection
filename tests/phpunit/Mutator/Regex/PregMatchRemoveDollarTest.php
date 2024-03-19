@@ -51,7 +51,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public static function provideMutationCases(): Generator
     {
         yield 'It mutates correctly removing dollar when provided with a string and flags' => [
             <<<'PHP'

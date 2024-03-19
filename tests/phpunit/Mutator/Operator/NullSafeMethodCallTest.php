@@ -54,7 +54,7 @@ final class NullSafeMethodCallTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutate nullsafe method call' => [
             <<<'PHP'

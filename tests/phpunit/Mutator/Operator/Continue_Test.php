@@ -49,7 +49,7 @@ final class Continue_Test extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It replaces continue with break in while' => [
             <<<'PHP'

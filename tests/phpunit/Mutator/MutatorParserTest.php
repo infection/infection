@@ -64,7 +64,7 @@ final class MutatorParserTest extends TestCase
         $this->assertSame($expectedMutators, $parsedMutators);
     }
 
-    public function mutatorInputProvider(): iterable
+    public static function mutatorInputProvider(): iterable
     {
         yield 'empty string' => ['', []];
 

@@ -51,7 +51,7 @@ final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public static function provideMutationCases(): Generator
     {
         yield 'It removes flags one by one' => [
             <<<'PHP'

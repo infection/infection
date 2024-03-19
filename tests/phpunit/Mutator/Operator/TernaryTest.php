@@ -50,7 +50,7 @@ final class TernaryTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutates ternary and flip conditions' => [
             <<<'PHP'

@@ -49,7 +49,7 @@ final class UnwrapArrayReduceTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when the $initial parameter is provided as an array' => [
             <<<'PHP'

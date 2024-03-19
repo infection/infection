@@ -54,7 +54,7 @@ final class NullSafePropertyCallTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutate nullsafe property call' => [
             <<<'PHP'

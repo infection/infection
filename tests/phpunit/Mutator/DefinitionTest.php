@@ -58,7 +58,7 @@ final class DefinitionTest extends TestCase
         $this->assertSame($diff, $definition->getDiff());
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         yield 'empty' => [
             '',
