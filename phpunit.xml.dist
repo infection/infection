@@ -10,7 +10,6 @@
 >
 
     <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
         <env name="COLUMNS" value="100" force="true" />
     </php>
 
@@ -34,10 +33,5 @@
             <group>e2e</group>
         </exclude>
     </groups>
-
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
-        <listener class="Symfony\Bridge\PhpUnit\CoverageListener" />
-    </listeners>
 
 </phpunit>
