@@ -1,7 +1,7 @@
 !/.tools/.gitkeep
 !/build/.gitkeep
 !/build/cache/.gitkeep
-.phpunit.*
+.phpunit.result.cache
 /*.phar
 /.box_dump/
 /.ci/keys.asc
