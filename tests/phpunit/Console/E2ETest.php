@@ -106,9 +106,10 @@ final class E2ETest extends TestCase
         }
 
         // Without overcommit this test fails with `proc_open(): fork failed - Cannot allocate memory`
-        if (str_starts_with(PHP_OS, 'Linux') &&
-            is_readable('/proc/sys/vm/overcommit_memory') &&
-            (int) file_get_contents('/proc/sys/vm/overcommit_memory') === 2) {
+        if (str_starts_with(PHP_OS, 'Linux')
+            && is_readable('/proc/sys/vm/overcommit_memory')
+            && (int) file_get_contents('/proc/sys/vm/overcommit_memory') === 2
+        ) {
             $this->markTestSkipped('This test needs copious amounts of virtual memory. It will fail unless it is allowed to overcommit memory.');
         }
 

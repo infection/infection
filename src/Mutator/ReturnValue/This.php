@@ -81,9 +81,9 @@ final class This extends AbstractValueToNullReturnValue
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Return_ &&
-            $node->expr instanceof Node\Expr\Variable &&
-            $node->expr->name === 'this'
+        return $node instanceof Node\Stmt\Return_
+            && $node->expr instanceof Node\Expr\Variable
+            && $node->expr->name === 'this'
             && $this->isNullReturnValueAllowed($node);
     }
 }

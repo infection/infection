@@ -111,8 +111,8 @@ class ConsoleOutput
     public function logNotInControlOfExitCodes(): void
     {
         $this->logger->warning(
-            'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
-            'It is your responsibility to disable xdebug/phpdbg unless needed.',
+            'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL
+            . 'It is your responsibility to disable xdebug/phpdbg unless needed.',
             ['block' => true],
         );
     }

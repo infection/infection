@@ -139,8 +139,7 @@ return (new Config())
         'no_useless_else' => true,
         'no_useless_return' => true,
         'nullable_type_declaration_for_default_null_value' => true,
-        // TODO: enable
-        'operator_linebreak' => false,
+        'operator_linebreak' => true,
         'ordered_class_elements' => true,
         'ordered_imports' => true,
         'ordered_interfaces' => true,
