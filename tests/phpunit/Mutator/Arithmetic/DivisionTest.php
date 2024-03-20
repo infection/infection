@@ -53,88 +53,88 @@ final class DivisionTest extends BaseMutatorTestCase
     {
         yield 'It changes regular divison' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 / 2;
-PHP,
+                $a = 10 / 2;
+                PHP,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 * 2;
-PHP,
+                $a = 10 * 2;
+                PHP,
         ];
 
         yield 'It does not change division equals' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10;
-$a /= 5;
-PHP,
+                $a = 10;
+                $a /= 5;
+                PHP,
         ];
 
         yield 'It does not mutate when the left side is 1 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1 / $b;
-PHP,
+                $a = 1 / $b;
+                PHP,
         ];
 
         yield 'It does not mutate when the right side is 1 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b / 1;
-PHP,
+                $a = $b / 1;
+                PHP,
         ];
 
         yield 'It does not mutate when the left side is -1 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = -1 / $b;
-PHP,
+                $a = -1 / $b;
+                PHP,
         ];
 
         yield 'It does not mutate when the right side is -1 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b / -1;
-PHP,
+                $a = $b / -1;
+                PHP,
         ];
 
         yield 'It does not mutate when the left side is 1.0 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1.0 / $b;
-PHP,
+                $a = 1.0 / $b;
+                PHP,
         ];
 
         yield 'It does not mutate when the right side is 1.0 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b / 1.0;
-PHP,
+                $a = $b / 1.0;
+                PHP,
         ];
 
         yield 'It does not mutate when the left side is -1.0 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = -1.0 / $b;
-PHP,
+                $a = -1.0 / $b;
+                PHP,
         ];
 
         yield 'It does not mutate when the right side is -1.0 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b / -1.0;
-PHP,
+                $a = $b / -1.0;
+                PHP,
         ];
     }
 }

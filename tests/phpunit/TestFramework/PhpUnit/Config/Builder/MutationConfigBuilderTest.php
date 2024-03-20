@@ -129,29 +129,29 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
         $this->assertSame(
             <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright © 2017 Maks Rafalko
-  ~
-  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-  -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
-  <testsuites>
-    <testsuite name="Infection testsuite with filtered tests"/>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>$projectPath/src/</directory>
-      <!--<exclude>-->
-      <!--<directory>src/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-      <!--</exclude>-->
-    </whitelist>
-  </filter>
-</phpunit>
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!--
+                  ~ Copyright © 2017 Maks Rafalko
+                  ~
+                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+                  -->
+                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
+                  <testsuites>
+                    <testsuite name="Infection testsuite with filtered tests"/>
+                  </testsuites>
+                  <filter>
+                    <whitelist>
+                      <directory>$projectPath/src/</directory>
+                      <!--<exclude>-->
+                      <!--<directory>src/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                      <!--</exclude>-->
+                    </whitelist>
+                  </filter>
+                </phpunit>
 
-XML
+                XML
             ,
             file_get_contents($configurationPath),
         );
@@ -165,31 +165,31 @@ XML
 
         $this->assertSame(
             <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright © 2017 Maks Rafalko
-  ~
-  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-  -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
-  <testsuites>
-    <testsuite name="Infection testsuite with filtered tests">
-      <file>/path/to/FooTest.php</file>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>$projectPath/src/</directory>
-      <!--<exclude>-->
-      <!--<directory>src/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-      <!--</exclude>-->
-    </whitelist>
-  </filter>
-</phpunit>
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!--
+                  ~ Copyright © 2017 Maks Rafalko
+                  ~
+                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+                  -->
+                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
+                  <testsuites>
+                    <testsuite name="Infection testsuite with filtered tests">
+                      <file>/path/to/FooTest.php</file>
+                    </testsuite>
+                  </testsuites>
+                  <filter>
+                    <whitelist>
+                      <directory>$projectPath/src/</directory>
+                      <!--<exclude>-->
+                      <!--<directory>src/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                      <!--</exclude>-->
+                    </whitelist>
+                  </filter>
+                </phpunit>
 
-XML
+                XML
             ,
             file_get_contents(
                 $this->builder->build(
@@ -212,21 +212,21 @@ XML
 
         $this->assertSame(
             <<<PHP
-<?php
+                <?php
 
-if (function_exists('proc_nice')) {
-    proc_nice(1);
-}
+                if (function_exists('proc_nice')) {
+                    proc_nice(1);
+                }
 
-require_once '$interceptorPath';
+                require_once '$interceptorPath';
 
-use Infection\StreamWrapper\IncludeInterceptor;
+                use Infection\StreamWrapper\IncludeInterceptor;
 
-IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
-IncludeInterceptor::enable();
-require_once '$projectPath/app/autoload2.php';
+                IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
+                IncludeInterceptor::enable();
+                require_once '$projectPath/app/autoload2.php';
 
-PHP
+                PHP
             ,
             $phpCode,
         );
@@ -235,31 +235,31 @@ PHP
 
         $this->assertSame(
             <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright © 2017 Maks Rafalko
-  ~
-  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-  -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
-  <testsuites>
-    <testsuite name="Infection testsuite with filtered tests">
-      <file>/path/to/BarTest.php</file>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>$projectPath/src/</directory>
-      <!--<exclude>-->
-      <!--<directory>src/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-      <!--</exclude>-->
-    </whitelist>
-  </filter>
-</phpunit>
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!--
+                  ~ Copyright © 2017 Maks Rafalko
+                  ~
+                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+                  -->
+                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
+                  <testsuites>
+                    <testsuite name="Infection testsuite with filtered tests">
+                      <file>/path/to/BarTest.php</file>
+                    </testsuite>
+                  </testsuites>
+                  <filter>
+                    <whitelist>
+                      <directory>$projectPath/src/</directory>
+                      <!--<exclude>-->
+                      <!--<directory>src/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                      <!--</exclude>-->
+                    </whitelist>
+                  </filter>
+                </phpunit>
 
-XML
+                XML
             ,
             file_get_contents(
                 $this->builder->build(
@@ -282,21 +282,21 @@ XML
 
         $this->assertSame(
             <<<PHP
-<?php
+                <?php
 
-if (function_exists('proc_nice')) {
-    proc_nice(1);
-}
+                if (function_exists('proc_nice')) {
+                    proc_nice(1);
+                }
 
-require_once '$interceptorPath';
+                require_once '$interceptorPath';
 
-use Infection\StreamWrapper\IncludeInterceptor;
+                use Infection\StreamWrapper\IncludeInterceptor;
 
-IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
-IncludeInterceptor::enable();
-require_once '$projectPath/app/autoload2.php';
+                IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
+                IncludeInterceptor::enable();
+                require_once '$projectPath/app/autoload2.php';
 
-PHP
+                PHP
             ,
             $phpCode,
         );

@@ -53,16 +53,16 @@ final class BitwiseNotTest extends BaseMutatorTestCase
     {
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-~2;
-PHP
+                ~2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-2;
-PHP
+                2;
+                PHP
             ,
         ];
     }

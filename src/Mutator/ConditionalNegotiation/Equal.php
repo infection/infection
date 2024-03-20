@@ -54,15 +54,15 @@ final class Equal implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an equal operator (`==`) with its counterpart the not equal operator (`!=`).
-TXT
+                Replaces an equal operator (`==`) with its counterpart the not equal operator (`!=`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b == $c;
-+ $a = $b != $c;
-DIFF,
+                - $a = $b == $c;
+                + $a = $b != $c;
+                DIFF,
         );
     }
 

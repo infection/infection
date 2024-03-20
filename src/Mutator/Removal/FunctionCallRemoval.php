@@ -71,8 +71,8 @@ final class FunctionCallRemoval implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- fooBar();
-DIFF,
+                - fooBar();
+                DIFF,
         );
     }
 

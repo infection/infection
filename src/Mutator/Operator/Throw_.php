@@ -54,26 +54,26 @@ final class Throw_ implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Removes a throw statement (`throw`). For example:
+                Removes a throw statement (`throw`). For example:
 
-```php
-throw new Exception();
-```
+                ```php
+                throw new Exception();
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-new Exception();
-```
+                ```php
+                new Exception();
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- throw new Exception();
-+ new Exception();
-DIFF,
+                - throw new Exception();
+                + new Exception();
+                DIFF,
         );
     }
 

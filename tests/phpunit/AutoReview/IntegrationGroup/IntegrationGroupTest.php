@@ -60,9 +60,9 @@ final class IntegrationGroupTest extends TestCase
             array_flip(SingletonContainer::getPHPDocParser()->parse($phpDoc)),
             sprintf(
                 <<<'TXT'
-Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been
-found in the file "%s".
-TXT
+                    Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been
+                    found in the file "%s".
+                    TXT
                 ,
                 $testCaseClassName,
                 $fileWithIoOperations,
@@ -72,9 +72,9 @@ TXT
         if (strpos($phpDoc, '@group integration') === false) {
             $this->fail(sprintf(
                 <<<'TXT'
-Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been
-found in the file "%s".
-TXT
+                    Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been
+                    found in the file "%s".
+                    TXT
                 ,
                 $testCaseClassName,
                 $fileWithIoOperations,

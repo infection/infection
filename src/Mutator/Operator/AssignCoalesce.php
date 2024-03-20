@@ -54,15 +54,15 @@ final class AssignCoalesce implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces the null coalescing assignment operator (`??=`) with a plain assignment (`=`).
-TXT
+                Replaces the null coalescing assignment operator (`??=`) with a plain assignment (`=`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $this->request->data['comments']['user_id'] ??= 'value';
-+ $this->request->data['comments']['user_id'] = 'value';
-DIFF,
+                - $this->request->data['comments']['user_id'] ??= 'value';
+                + $this->request->data['comments']['user_id'] = 'value';
+                DIFF,
         );
     }
 

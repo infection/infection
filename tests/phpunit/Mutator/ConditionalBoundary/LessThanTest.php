@@ -53,16 +53,16 @@ final class LessThanTest extends BaseMutatorTestCase
     {
         yield 'It mutates less than' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 < 2;
-PHP
+                1 < 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1 <= 2;
-PHP
+                1 <= 2;
+                PHP
             ,
         ];
     }

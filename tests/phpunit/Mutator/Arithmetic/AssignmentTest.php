@@ -53,178 +53,178 @@ final class AssignmentTest extends BaseMutatorTestCase
     {
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a += $b;
-PHP
+                $a += $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a -= $b;
-PHP
+                $a -= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a *= $b;
-PHP
+                $a *= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a **= $b;
-PHP
+                $a **= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a /= $b;
-PHP
+                $a /= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a %= $b;
-PHP
+                $a %= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a .= $b;
-PHP
+                $a .= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a &= $b;
-PHP
+                $a &= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a |= $b;
-PHP
+                $a |= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a ^= $b;
-PHP
+                $a ^= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a <<= $b;
-PHP
+                $a <<= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-$a >>= $b;
-PHP
+                $a >>= $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b;
-PHP,
+                $a = $b;
+                PHP,
         ];
 
         yield 'It does not mutate Coalesce operator' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a ??= $b;
-PHP
+                $a ??= $b;
+                PHP
             ,
         ];
     }

@@ -55,15 +55,15 @@ final class LogicalOrNegation implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Negates a whole OR expression (`||`).
-TXT
+                Negates a whole OR expression (`||`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b || $c;
-+ $a = !($b || $c);
-DIFF,
+                - $a = $b || $c;
+                + $a = !($b || $c);
+                DIFF,
         );
     }
 

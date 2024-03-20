@@ -74,14 +74,14 @@ abstract class MutationConfigBuilder
         $namespacePrefix = $this->getInterceptorNamespacePrefix();
 
         return <<<CONTENT
-{$infectionPhar}
-require_once '{$interceptorPath}';
+            {$infectionPhar}
+            require_once '{$interceptorPath}';
 
-use {$namespacePrefix}Infection\StreamWrapper\IncludeInterceptor;
+            use {$namespacePrefix}Infection\StreamWrapper\IncludeInterceptor;
 
-IncludeInterceptor::intercept('{$originalFilePath}', '{$mutantFilePath}');
-IncludeInterceptor::enable();
-CONTENT;
+            IncludeInterceptor::intercept('{$originalFilePath}', '{$mutantFilePath}');
+            IncludeInterceptor::enable();
+            CONTENT;
     }
 
     private function getInterceptorNamespacePrefix(): string

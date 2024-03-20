@@ -56,25 +56,25 @@ final class LogicalNotTest extends BaseMutatorTestCase
     {
         yield 'It removes logical not' => [
             <<<'PHP'
-<?php
+                <?php
 
-return !false;
-PHP
+                return !false;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return false;
-PHP
+                return false;
+                PHP
             ,
         ];
 
         yield 'It does not remove double logical not' => [
             <<<'PHP'
-<?php
+                <?php
 
-return !!false;
-PHP
+                return !!false;
+                PHP
             ,
         ];
     }

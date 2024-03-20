@@ -51,44 +51,44 @@ final class NewObject extends AbstractValueToNullReturnValue
     {
         return new Definition(
             <<<'TXT'
-Replaces a newly instantiated object with `null` instead. The instantiation statement is kept in order
-to preserve potential side effects. Example:
+                Replaces a newly instantiated object with `null` instead. The instantiation statement is kept in order
+                to preserve potential side effects. Example:
 
-```php
-class X {
-    function foo(): ?stdClass
-    {
-        return new stdClass();
-    }
-}
-```
+                ```php
+                class X {
+                    function foo(): ?stdClass
+                    {
+                        return new stdClass();
+                    }
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-class X {
-    function foo(): ?stdClass
-    {
-        new stdClass();
-        return null;
-    }
-}
-```
+                ```php
+                class X {
+                    function foo(): ?stdClass
+                    {
+                        new stdClass();
+                        return null;
+                    }
+                }
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-class X {
-    function foo(): ?stdClass
-    {
--        return new stdClass();
-+        new stdClass();
-+        return null;
-    }
-}
-DIFF,
+                class X {
+                    function foo(): ?stdClass
+                    {
+                -        return new stdClass();
+                +        new stdClass();
+                +        return null;
+                    }
+                }
+                DIFF,
         );
     }
 

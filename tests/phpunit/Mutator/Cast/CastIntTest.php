@@ -53,31 +53,31 @@ final class CastIntTest extends BaseMutatorTestCase
     {
         yield 'It removes casting to int' => [
             <<<'PHP'
-<?php
+                <?php
 
-(int) 1.0;
-PHP
+                (int) 1.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1.0;
-PHP
+                1.0;
+                PHP
             ,
         ];
 
         yield 'It removes casting to integer' => [
             <<<'PHP'
-<?php
+                <?php
 
-(integer) 1.0;
-PHP
+                (integer) 1.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1.0;
-PHP
+                1.0;
+                PHP
             ,
         ];
     }

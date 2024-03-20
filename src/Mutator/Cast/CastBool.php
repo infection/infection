@@ -51,9 +51,9 @@ final class CastBool extends AbstractCastMutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a = (bool) $value;
-+ $a = $value;
-DIFF,
+                - $a = (bool) $value;
+                + $a = $value;
+                DIFF,
         );
     }
 

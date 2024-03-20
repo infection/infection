@@ -56,16 +56,16 @@ final class IdenticalEqual implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a strict comparison (using the identical operator (`===`)) with a loose comparison (using
-the loose operator (`==`)).
-TXT
+                Replaces a strict comparison (using the identical operator (`===`)) with a loose comparison (using
+                the loose operator (`==`)).
+                TXT
             ,
             MutatorCategory::SEMANTIC_ADDITION,
             null,
             <<<'DIFF'
-- $a = $b === $c;
-+ $a = $b == $c;
-DIFF,
+                - $a = $b === $c;
+                + $a = $b == $c;
+                DIFF,
         );
     }
 
