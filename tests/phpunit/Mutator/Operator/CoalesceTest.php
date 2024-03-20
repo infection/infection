@@ -53,143 +53,143 @@ final class CoalesceTest extends BaseMutatorTestCase
     {
         yield 'Mutate coalesce and flip operands' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$foo ?? $bar;
-PHP
+                $foo = 'foo';
+                $bar = 'bar';
+                $foo ?? $bar;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$bar ?? $foo;
-PHP,
+                $foo = 'foo';
+                $bar = 'bar';
+                $bar ?? $foo;
+                PHP,
         ];
 
         yield 'Mutate more than one coalesce operators and flip operands' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$foo ?? $bar ?? $baz;
-PHP
+                $foo = 'foo';
+                $bar = 'bar';
+                $baz = 'baz';
+                $foo ?? $bar ?? $baz;
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$foo ?? $baz ?? $bar;
-PHP
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $baz = 'baz';
+                    $foo ?? $baz ?? $bar;
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$bar ?? $foo ?? $baz;
-PHP,
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $baz = 'baz';
+                    $bar ?? $foo ?? $baz;
+                    PHP,
             ],
         ];
 
         yield 'Mutate more than two coalesce operators and flip operands' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$foo ?? $bar ?? $baz ?? 'oof';
-PHP
+                $foo = 'foo';
+                $bar = 'bar';
+                $baz = 'baz';
+                $foo ?? $bar ?? $baz ?? 'oof';
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$foo ?? $bar ?? 'oof' ?? $baz;
-PHP
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $baz = 'baz';
+                    $foo ?? $bar ?? 'oof' ?? $baz;
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$foo ?? $baz ?? $bar ?? 'oof';
-PHP
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $baz = 'baz';
+                    $foo ?? $baz ?? $bar ?? 'oof';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$bar ?? $foo ?? $baz ?? 'oof';
-PHP,
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $baz = 'baz';
+                    $bar ?? $foo ?? $baz ?? 'oof';
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate when left operator is constant defined through `define` function' => [
             <<<'PHP'
-<?php
+                <?php
 
-define('FOO', 'foo');
-FOO ?? 'bar';
-PHP,
+                define('FOO', 'foo');
+                FOO ?? 'bar';
+                PHP,
         ];
 
         yield 'It does not mutate when left operator is constant defined in class' => [
             <<<'PHP'
-<?php
+                <?php
 
-new class {
-    private const FOO = 'foo';
+                new class {
+                    private const FOO = 'foo';
 
-    public function getFoo(): string
-    {
-        return self::FOO ?? 'bar';
-    }
-};
-PHP,
+                    public function getFoo(): string
+                    {
+                        return self::FOO ?? 'bar';
+                    }
+                };
+                PHP,
         ];
 
         yield 'It does not mutate when null is used with one coalesce' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'foo';
-$foo ?? null;
-PHP
+                $foo = 'foo';
+                $foo ?? null;
+                PHP
             ,
         ];
 
         yield 'It does not move null from the last position with 2 coalesce' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$foo ?? $bar ?? null;
-PHP
+                $foo = 'foo';
+                $bar = 'bar';
+                $foo ?? $bar ?? null;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'foo';
-$bar = 'bar';
-$bar ?? $foo ?? null;
-PHP,
+                $foo = 'foo';
+                $bar = 'bar';
+                $bar ?? $foo ?? null;
+                PHP,
         ];
     }
 }

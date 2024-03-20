@@ -57,9 +57,9 @@ final class Modulus implements Mutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b % $c;
-+ $a = $b * $c;
-DIFF,
+                - $a = $b % $c;
+                + $a = $b * $c;
+                DIFF,
         );
     }
 

@@ -51,26 +51,26 @@ final class PregMatchRemoveCaret extends AbstractPregMatch
     {
         return new Definition(
             <<<'TXT'
-Removes a "^" character from a regular expression in `preg_match()`. For example:
+                Removes a "^" character from a regular expression in `preg_match()`. For example:
 
-```php
-preg_match('/^test/', $string);
-```
+                ```php
+                preg_match('/^test/', $string);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-preg_match('/test/', $string);
-```
+                ```php
+                preg_match('/test/', $string);
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- preg_match('/^test/', $string);
-+ preg_match('/test/', $string);
-DIFF,
+                - preg_match('/^test/', $string);
+                + preg_match('/test/', $string);
+                DIFF,
         );
     }
 

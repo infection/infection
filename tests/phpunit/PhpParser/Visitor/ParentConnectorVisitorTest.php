@@ -46,16 +46,16 @@ use Infection\Tests\SingletonContainer;
 final class ParentConnectorVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'
-<?php
+        <?php
 
-namespace Foo;
+        namespace Foo;
 
-echo 'Hello';
-echo ' World!';
+        echo 'Hello';
+        echo ' World!';
 
-namespace Bar;
+        namespace Bar;
 
-PHP;
+        PHP;
 
     public function test_it_attaches_the_parent_nodes_to_each_node(): void
     {
@@ -82,41 +82,41 @@ PHP;
         // - A case where two children nodes points to the same parent
         $this->assertSame(
             <<<'STR'
-array(
-    0: Stmt_Namespace(
-        name: Name(
-            parts: array(
-                0: Foo
-            )
-        )
-        stmts: array(
-            0: Stmt_Echo(
-                exprs: array(
-                    0: Scalar_String(
-                        value: Hello
+                array(
+                    0: Stmt_Namespace(
+                        name: Name(
+                            parts: array(
+                                0: Foo
+                            )
+                        )
+                        stmts: array(
+                            0: Stmt_Echo(
+                                exprs: array(
+                                    0: Scalar_String(
+                                        value: Hello
+                                    )
+                                )
+                            )
+                            1: Stmt_Echo(
+                                exprs: array(
+                                    0: Scalar_String(
+                                        value:  World!
+                                    )
+                                )
+                            )
+                        )
+                    )
+                    1: Stmt_Namespace(
+                        name: Name(
+                            parts: array(
+                                0: Bar
+                            )
+                        )
+                        stmts: array(
+                        )
                     )
                 )
-            )
-            1: Stmt_Echo(
-                exprs: array(
-                    0: Scalar_String(
-                        value:  World!
-                    )
-                )
-            )
-        )
-    )
-    1: Stmt_Namespace(
-        name: Name(
-            parts: array(
-                0: Bar
-            )
-        )
-        stmts: array(
-        )
-    )
-)
-STR
+                STR
             ,
             $dumper->dump($nodes),
         );
@@ -124,174 +124,174 @@ STR
         // Sanity check: display the whole stack flattened out.
         $this->assertSame(
             <<<'STR'
-array(
-    0: Stmt_Namespace(
-        name: Name(
-            parts: array(
-                0: Foo
-            )
-        )
-        stmts: array(
-            0: Stmt_Echo(
-                exprs: array(
-                    0: Scalar_String(
+                array(
+                    0: Stmt_Namespace(
+                        name: Name(
+                            parts: array(
+                                0: Foo
+                            )
+                        )
+                        stmts: array(
+                            0: Stmt_Echo(
+                                exprs: array(
+                                    0: Scalar_String(
+                                        value: Hello
+                                    )
+                                )
+                            )
+                            1: Stmt_Echo(
+                                exprs: array(
+                                    0: Scalar_String(
+                                        value:  World!
+                                    )
+                                )
+                            )
+                        )
+                    )
+                    1: Name(
+                        parts: array(
+                            0: Foo
+                        )
+                    )
+                    2: Stmt_Echo(
+                        exprs: array(
+                            0: Scalar_String(
+                                value: Hello
+                            )
+                        )
+                    )
+                    3: Scalar_String(
                         value: Hello
                     )
-                )
-            )
-            1: Stmt_Echo(
-                exprs: array(
-                    0: Scalar_String(
+                    4: Stmt_Echo(
+                        exprs: array(
+                            0: Scalar_String(
+                                value:  World!
+                            )
+                        )
+                    )
+                    5: Scalar_String(
                         value:  World!
                     )
+                    6: Stmt_Namespace(
+                        name: Name(
+                            parts: array(
+                                0: Bar
+                            )
+                        )
+                        stmts: array(
+                        )
+                    )
+                    7: Name(
+                        parts: array(
+                            0: Bar
+                        )
+                    )
                 )
-            )
-        )
-    )
-    1: Name(
-        parts: array(
-            0: Foo
-        )
-    )
-    2: Stmt_Echo(
-        exprs: array(
-            0: Scalar_String(
-                value: Hello
-            )
-        )
-    )
-    3: Scalar_String(
-        value: Hello
-    )
-    4: Stmt_Echo(
-        exprs: array(
-            0: Scalar_String(
-                value:  World!
-            )
-        )
-    )
-    5: Scalar_String(
-        value:  World!
-    )
-    6: Stmt_Namespace(
-        name: Name(
-            parts: array(
-                0: Bar
-            )
-        )
-        stmts: array(
-        )
-    )
-    7: Name(
-        parts: array(
-            0: Bar
-        )
-    )
-)
-STR
+                STR
             ,
             $dumper->dump($stackSpyVisitor->getCollectedNodes()),
         );
 
         $this->assertSame(
             <<<'STR'
-array(
-    0: null
-    1: Stmt_Namespace(
-        name: Name(
-            parts: array(
-                0: Foo
-            )
-        )
-        stmts: array(
-            0: Stmt_Echo(
-                exprs: array(
-                    0: Scalar_String(
-                        value: Hello
+                array(
+                    0: null
+                    1: Stmt_Namespace(
+                        name: Name(
+                            parts: array(
+                                0: Foo
+                            )
+                        )
+                        stmts: array(
+                            0: Stmt_Echo(
+                                exprs: array(
+                                    0: Scalar_String(
+                                        value: Hello
+                                    )
+                                )
+                            )
+                            1: Stmt_Echo(
+                                exprs: array(
+                                    0: Scalar_String(
+                                        value:  World!
+                                    )
+                                )
+                            )
+                        )
+                    )
+                    2: Stmt_Namespace(
+                        name: Name(
+                            parts: array(
+                                0: Foo
+                            )
+                        )
+                        stmts: array(
+                            0: Stmt_Echo(
+                                exprs: array(
+                                    0: Scalar_String(
+                                        value: Hello
+                                    )
+                                )
+                            )
+                            1: Stmt_Echo(
+                                exprs: array(
+                                    0: Scalar_String(
+                                        value:  World!
+                                    )
+                                )
+                            )
+                        )
+                    )
+                    3: Stmt_Echo(
+                        exprs: array(
+                            0: Scalar_String(
+                                value: Hello
+                            )
+                        )
+                    )
+                    4: Stmt_Namespace(
+                        name: Name(
+                            parts: array(
+                                0: Foo
+                            )
+                        )
+                        stmts: array(
+                            0: Stmt_Echo(
+                                exprs: array(
+                                    0: Scalar_String(
+                                        value: Hello
+                                    )
+                                )
+                            )
+                            1: Stmt_Echo(
+                                exprs: array(
+                                    0: Scalar_String(
+                                        value:  World!
+                                    )
+                                )
+                            )
+                        )
+                    )
+                    5: Stmt_Echo(
+                        exprs: array(
+                            0: Scalar_String(
+                                value:  World!
+                            )
+                        )
+                    )
+                    6: null
+                    7: Stmt_Namespace(
+                        name: Name(
+                            parts: array(
+                                0: Bar
+                            )
+                        )
+                        stmts: array(
+                        )
                     )
                 )
-            )
-            1: Stmt_Echo(
-                exprs: array(
-                    0: Scalar_String(
-                        value:  World!
-                    )
-                )
-            )
-        )
-    )
-    2: Stmt_Namespace(
-        name: Name(
-            parts: array(
-                0: Foo
-            )
-        )
-        stmts: array(
-            0: Stmt_Echo(
-                exprs: array(
-                    0: Scalar_String(
-                        value: Hello
-                    )
-                )
-            )
-            1: Stmt_Echo(
-                exprs: array(
-                    0: Scalar_String(
-                        value:  World!
-                    )
-                )
-            )
-        )
-    )
-    3: Stmt_Echo(
-        exprs: array(
-            0: Scalar_String(
-                value: Hello
-            )
-        )
-    )
-    4: Stmt_Namespace(
-        name: Name(
-            parts: array(
-                0: Foo
-            )
-        )
-        stmts: array(
-            0: Stmt_Echo(
-                exprs: array(
-                    0: Scalar_String(
-                        value: Hello
-                    )
-                )
-            )
-            1: Stmt_Echo(
-                exprs: array(
-                    0: Scalar_String(
-                        value:  World!
-                    )
-                )
-            )
-        )
-    )
-    5: Stmt_Echo(
-        exprs: array(
-            0: Scalar_String(
-                value:  World!
-            )
-        )
-    )
-    6: null
-    7: Stmt_Namespace(
-        name: Name(
-            parts: array(
-                0: Bar
-            )
-        )
-        stmts: array(
-        )
-    )
-)
-STR
+                STR
             ,
             $dumper->dump($parentSpyVisitor->getCollectedNodes()),
         );

@@ -53,44 +53,44 @@ final class DecrementTest extends BaseMutatorTestCase
     {
         yield 'It replaces post decrement' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a--;
-PHP
+                $a = 1;
+                $a--;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a++;
-PHP
+                $a = 1;
+                $a++;
+                PHP
             ,
         ];
 
         yield 'It replaces pre decrement' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
---$a;
-PHP
+                $a = 1;
+                --$a;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-++$a;
-PHP
+                $a = 1;
+                ++$a;
+                PHP
             ,
         ];
 
         yield 'It does not change when its not a real decrement' => [
             <<<'PHP'
-<?php
+                <?php
 
-$b - -$a;
-PHP
+                $b - -$a;
+                PHP
             ,
         ];
     }

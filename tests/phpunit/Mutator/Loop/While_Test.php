@@ -53,50 +53,50 @@ final class While_Test extends BaseMutatorTestCase
     {
         yield 'It mutates expression part from variable to false' => [
             <<<'PHP'
-<?php
+                <?php
 
-$condition = true;
+                $condition = true;
 
-while ($condition) {
-}
+                while ($condition) {
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$condition = true;
-while (false) {
-}
-PHP,
+                $condition = true;
+                while (false) {
+                }
+                PHP,
         ];
 
         yield 'It mutates expression part from boolean true to false' => [
             <<<'PHP'
-<?php
+                <?php
 
-while (true) {
-}
+                while (true) {
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-while (false) {
-}
-PHP,
+                while (false) {
+                }
+                PHP,
         ];
 
         yield 'It does not mutate expression part in do-while loop to false' => [
             <<<'PHP'
-<?php
+                <?php
 
-do {
+                do {
 
-} while (true);
+                } while (true);
 
-PHP,
+                PHP,
         ];
     }
 }

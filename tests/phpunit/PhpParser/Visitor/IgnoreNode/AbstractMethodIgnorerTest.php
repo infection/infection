@@ -43,17 +43,17 @@ final class AbstractMethodIgnorerTest extends BaseNodeIgnorerTestCase
     public function test_it_ignores_abstract_methods(): void
     {
         $this->parseAndTraverse(<<<'PHP'
-<?php
+            <?php
 
-abstract class Foo
-{
-    public function bar(string $counted)
-    {
-    }
-    abstract public function shouldBeIgnored($ignored);
-}
+            abstract class Foo
+            {
+                public function bar(string $counted)
+                {
+                }
+                abstract public function shouldBeIgnored($ignored);
+            }
 
-PHP
+            PHP
             ,
             $spy = $this->createSpy(),
         );

@@ -79,14 +79,14 @@ trait CreateMutantExecutionResult
                 "\n",
                 PHP_EOL,
                 <<<DIFF
---- Original
-+++ New
-@@ @@
+                    --- Original
+                    +++ New
+                    @@ @@
 
-- echo 'original';
-+ echo 'mutated';
+                    - echo 'original';
+                    + echo 'mutated';
 
-DIFF,
+                    DIFF,
             )),
             'a1b2c3',
             MutatorName::getName(For_::class),

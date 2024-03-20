@@ -52,51 +52,51 @@ final class CloneRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes clone from expression clone-new' => [
-          <<<'PHP'
-<?php
+            <<<'PHP'
+                <?php
 
-$class = clone (new stdClass());
-PHP
+                $class = clone (new stdClass());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$class = new stdClass();
-PHP
+                $class = new stdClass();
+                PHP
             ,
         ];
 
         yield 'It removes clone from clone variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$class = new stdClass();
-$clonedClass = clone $class;
-PHP
+                $class = new stdClass();
+                $clonedClass = clone $class;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$class = new stdClass();
-$clonedClass = $class;
-PHP
+                $class = new stdClass();
+                $clonedClass = $class;
+                PHP
             ,
         ];
 
         yield 'It removes cloe from direct call object function right after cloning' => [
             <<<'PHP'
-<?php
+                <?php
 
-$datetime = new DateTime();
-$clonedClass = (clone $datetime)->format('Y');
-PHP
+                $datetime = new DateTime();
+                $clonedClass = (clone $datetime)->format('Y');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$datetime = new DateTime();
-$clonedClass = $datetime->format('Y');
-PHP
+                $datetime = new DateTime();
+                $clonedClass = $datetime->format('Y');
+                PHP
             ,
         ];
     }

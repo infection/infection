@@ -56,29 +56,29 @@ final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
     {
         yield 'interfaces are ignored' => [
             <<<'PHP'
-<?php
+                <?php
 
-interface Bar
-{
-    public function nope(Bar $ignored): void;
-}
-PHP
+                interface Bar
+                {
+                    public function nope(Bar $ignored): void;
+                }
+                PHP
             ,
             0,
         ];
 
         yield 'classes arent ignored' => [
             <<<'PHP'
-<?php
+                <?php
 
-class Bar
-{
-    public function nope(Bar $counted)
-    {
-        $counted = true;
-    }
-}
-PHP
+                class Bar
+                {
+                    public function nope(Bar $counted)
+                    {
+                        $counted = true;
+                    }
+                }
+                PHP
             ,
             2,
         ];

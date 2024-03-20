@@ -53,34 +53,34 @@ final class IdenticalTest extends BaseMutatorTestCase
     {
         yield 'It mutates strict comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 === 1;
-PHP
+                1 === 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1 !== 1;
-PHP
+                1 !== 1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate not strict comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 == 1;
-PHP
+                1 == 1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate not comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-    1 !== 1;
-PHP
+                    1 !== 1;
+                PHP
             ,
         ];
     }

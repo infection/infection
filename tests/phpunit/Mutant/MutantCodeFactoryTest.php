@@ -161,12 +161,12 @@ final class MutantCodeFactoryTest extends TestCase
                 [],
             ),
             <<<'PHP'
-<?php
+                <?php
 
-namespace Acme;
+                namespace Acme;
 
-echo 15;
-PHP,
+                echo 15;
+                PHP,
         ];
     }
 }

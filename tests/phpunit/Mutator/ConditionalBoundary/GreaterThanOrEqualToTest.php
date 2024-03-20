@@ -53,34 +53,34 @@ final class GreaterThanOrEqualToTest extends BaseMutatorTestCase
     {
         yield 'It mutates greater than or equal to' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 >= 2;
-PHP
+                1 >= 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1 > 2;
-PHP
+                1 > 2;
+                PHP
             ,
         ];
 
         yield 'It does not mutate an arrow' => [
             <<<'PHP'
-<?php
+                <?php
 
-[1 => 2];
-PHP
+                [1 => 2];
+                PHP
             ,
         ];
 
         yield 'It does not mutate a spaceship' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 <=> 2;
-PHP
+                1 <=> 2;
+                PHP
             ,
         ];
     }
