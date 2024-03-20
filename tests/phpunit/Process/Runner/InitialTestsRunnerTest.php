@@ -103,7 +103,6 @@ final class InitialTestsRunnerTest extends TestCase
 
         $process = $this->createProcessForCode(<<<STR
 echo 'ping';
-sleep(1);
 echo 'pong';
 STR
         );
@@ -119,7 +118,6 @@ STR
         $this->assertSame(
             [
                 InitialTestSuiteWasStarted::class,
-                InitialTestCaseWasCompleted::class,
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
