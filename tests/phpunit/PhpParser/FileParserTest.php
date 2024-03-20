@@ -133,9 +133,9 @@ final class FileParserTest extends TestCase
         yield 'empty file' => [
             self::createFileInfo('/unknown', ''),
             <<<'AST'
-array(
-)
-AST
+                array(
+                )
+                AST
             ,
         ];
 
@@ -143,147 +143,147 @@ AST
             self::createFileInfo(
                 '/unknown',
                 <<<'PHP'
-<?php
+                    <?php
 
-PHP,
+                    PHP,
             ),
             <<<'AST'
-array(
-)
-AST,
+                array(
+                )
+                AST,
         ];
 
         yield 'nominal' => [
             self::createFileInfo(
                 '/unknown',
                 <<<'PHP'
-#!/usr/bin/env php
-<?php declare(strict_types=1);
+                    #!/usr/bin/env php
+                    <?php declare(strict_types=1);
 
-/**
- * ...
- */
+                    /**
+                     * ...
+                     */
 
-// Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
+                    // Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
 
-$autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
+                    $autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
 
-use Infection\Console\Application;
-use Infection\Console\InfectionContainer;
+                    use Infection\Console\Application;
+                    use Infection\Console\InfectionContainer;
 
-(new Application(InfectionContainer::create()))->run();
+                    (new Application(InfectionContainer::create()))->run();
 
-PHP,
+                    PHP,
             ),
             <<<'AST'
-array(
-    0: Stmt_InlineHTML(
-        value: #!/usr/bin/env php
+                array(
+                    0: Stmt_InlineHTML(
+                        value: #!/usr/bin/env php
 
-    )
-    1: Stmt_Declare(
-        declares: array(
-            0: Stmt_DeclareDeclare(
-                key: Identifier(
-                    name: strict_types
-                )
-                value: Scalar_LNumber(
-                    value: 1
-                )
-            )
-        )
-        stmts: null
-    )
-    2: Stmt_Expression(
-        expr: Expr_Assign(
-            var: Expr_Variable(
-                name: autoloaderInWorkingDirectory
-            )
-            expr: Expr_BinaryOp_Concat(
-                left: Expr_FuncCall(
-                    name: Name(
-                        parts: array(
-                            0: getcwd
+                    )
+                    1: Stmt_Declare(
+                        declares: array(
+                            0: Stmt_DeclareDeclare(
+                                key: Identifier(
+                                    name: strict_types
+                                )
+                                value: Scalar_LNumber(
+                                    value: 1
+                                )
+                            )
+                        )
+                        stmts: null
+                    )
+                    2: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                name: autoloaderInWorkingDirectory
+                            )
+                            expr: Expr_BinaryOp_Concat(
+                                left: Expr_FuncCall(
+                                    name: Name(
+                                        parts: array(
+                                            0: getcwd
+                                        )
+                                    )
+                                    args: array(
+                                    )
+                                )
+                                right: Scalar_String(
+                                    value: /vendor/autoload.php
+                                )
+                            )
                         )
                     )
-                    args: array(
+                    3: Stmt_Use(
+                        type: TYPE_NORMAL (1)
+                        uses: array(
+                            0: Stmt_UseUse(
+                                type: TYPE_UNKNOWN (0)
+                                name: Name(
+                                    parts: array(
+                                        0: Infection
+                                        1: Console
+                                        2: Application
+                                    )
+                                )
+                                alias: null
+                            )
+                        )
                     )
-                )
-                right: Scalar_String(
-                    value: /vendor/autoload.php
-                )
-            )
-        )
-    )
-    3: Stmt_Use(
-        type: TYPE_NORMAL (1)
-        uses: array(
-            0: Stmt_UseUse(
-                type: TYPE_UNKNOWN (0)
-                name: Name(
-                    parts: array(
-                        0: Infection
-                        1: Console
-                        2: Application
+                    4: Stmt_Use(
+                        type: TYPE_NORMAL (1)
+                        uses: array(
+                            0: Stmt_UseUse(
+                                type: TYPE_UNKNOWN (0)
+                                name: Name(
+                                    parts: array(
+                                        0: Infection
+                                        1: Console
+                                        2: InfectionContainer
+                                    )
+                                )
+                                alias: null
+                            )
+                        )
                     )
-                )
-                alias: null
-            )
-        )
-    )
-    4: Stmt_Use(
-        type: TYPE_NORMAL (1)
-        uses: array(
-            0: Stmt_UseUse(
-                type: TYPE_UNKNOWN (0)
-                name: Name(
-                    parts: array(
-                        0: Infection
-                        1: Console
-                        2: InfectionContainer
-                    )
-                )
-                alias: null
-            )
-        )
-    )
-    5: Stmt_Expression(
-        expr: Expr_MethodCall(
-            var: Expr_New(
-                class: Name(
-                    parts: array(
-                        0: Application
-                    )
-                )
-                args: array(
-                    0: Arg(
-                        name: null
-                        value: Expr_StaticCall(
-                            class: Name(
-                                parts: array(
-                                    0: InfectionContainer
+                    5: Stmt_Expression(
+                        expr: Expr_MethodCall(
+                            var: Expr_New(
+                                class: Name(
+                                    parts: array(
+                                        0: Application
+                                    )
+                                )
+                                args: array(
+                                    0: Arg(
+                                        name: null
+                                        value: Expr_StaticCall(
+                                            class: Name(
+                                                parts: array(
+                                                    0: InfectionContainer
+                                                )
+                                            )
+                                            name: Identifier(
+                                                name: create
+                                            )
+                                            args: array(
+                                            )
+                                        )
+                                        byRef: false
+                                        unpack: false
+                                    )
                                 )
                             )
                             name: Identifier(
-                                name: create
+                                name: run
                             )
                             args: array(
                             )
                         )
-                        byRef: false
-                        unpack: false
                     )
                 )
-            )
-            name: Identifier(
-                name: run
-            )
-            args: array(
-            )
-        )
-    )
-)
-AST,
+                AST,
         ];
     }
 

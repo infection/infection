@@ -53,118 +53,118 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
     {
         yield 'Removes both operands' => [
             <<<'PHP'
-<?php
-'foo' . 'bar';
-PHP
+                <?php
+                'foo' . 'bar';
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-'bar';
-PHP
+                    'bar';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-'foo';
-PHP
+                    'foo';
+                    PHP
                 ,
             ],
         ];
 
         yield 'Removes each part of a 3-string concatenation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'a';
-$b = 'b';
-$a . $b . 'c';
-PHP
+                $a = 'a';
+                $b = 'b';
+                $a . $b . 'c';
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$b . 'c';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $b . 'c';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$a . 'c';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $a . 'c';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$a . $b;
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $a . $b;
+                    PHP
                 ,
             ],
         ];
 
         yield 'Removes each part of multiple concatenations' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$a . $b . 'c' . $d . 'e';
-PHP
+                $a = 'a';
+                $b = 'b';
+                $d = 'd';
+                $a . $b . 'c' . $d . 'e';
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$b . 'c' . $d . 'e';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $b . 'c' . $d . 'e';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$a . 'c' . $d . 'e';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $a . 'c' . $d . 'e';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$a . $b . $d . 'e';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $a . $b . $d . 'e';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$a . $b . 'c' . 'e';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $a . $b . 'c' . 'e';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$a . $b . 'c' . $d;
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $a . $b . 'c' . $d;
+                    PHP
                 ,
             ],
         ];

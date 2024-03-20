@@ -89,10 +89,10 @@ final class MutatorTest extends TestCase
             $publicMethods,
             sprintf(
                 <<<'TXT'
-The mutator class "%s" has the following non-allowed public method(s) declared: "%s". Either
-reconsider if it is necessary for it to be public and make it protected/private instead or add it
-to "%s::KNOWN_MUTATOR_PUBLIC_METHODS".
-TXT
+                    The mutator class "%s" has the following non-allowed public method(s) declared: "%s". Either
+                    reconsider if it is necessary for it to be public and make it protected/private instead or add it
+                    to "%s::KNOWN_MUTATOR_PUBLIC_METHODS".
+                    TXT
                 ,
                 $className,
                 implode(
@@ -147,10 +147,10 @@ TXT
                 $isConfigurable,
                 sprintf(
                     <<<'TXT'
-The mutator "%s" is a configurable mutator but its constructor does not require a configuration.
-The constructor should either require a "%s" parameter or the mutator should not
-implement "%s".
-TXT
+                        The mutator "%s" is a configurable mutator but its constructor does not require a configuration.
+                        The constructor should either require a "%s" parameter or the mutator should not
+                        implement "%s".
+                        TXT
                     ,
                     $className,
                     $configClassName ?: MutatorConfig::class,
@@ -162,8 +162,8 @@ TXT
 
             $assertionErrorMessage = sprintf(
                 <<<'TXT'
-Expected the mutator "%s" to have the constructor signature "__construct(%s $config)".
-TXT
+                    Expected the mutator "%s" to have the constructor signature "__construct(%s $config)".
+                    TXT
                 ,
                 $className,
                 $configClassName,
@@ -203,8 +203,8 @@ TXT
             class_implements($configClassName),
             sprintf(
                 <<<'TXT'
-Expected the mutator configuration class "%s" for the mutator "%s" to be a "%s".
-TXT
+                    Expected the mutator configuration class "%s" for the mutator "%s" to be a "%s".
+                    TXT
                 ,
                 $configClassName,
                 $className,

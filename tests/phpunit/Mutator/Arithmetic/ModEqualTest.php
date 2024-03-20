@@ -53,27 +53,27 @@ final class ModEqualTest extends BaseMutatorTestCase
     {
         yield 'It mutates mod equal' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a %= 2;
-PHP
+                $a = 1;
+                $a %= 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a *= 2;
-PHP
+                $a = 1;
+                $a *= 2;
+                PHP
             ,
         ];
 
         yield 'It does not mutate normal mod' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 % 3;
-PHP
+                $a = 10 % 3;
+                PHP
             ,
         ];
     }

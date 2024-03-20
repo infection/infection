@@ -54,34 +54,34 @@ final class ConcatOperandRemoval implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Removes an operand from a string concatenation.
+                Removes an operand from a string concatenation.
 
-```php
-$x = 'foo' . 'bar';
-```
+                ```php
+                $x = 'foo' . 'bar';
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = 'foo';
-```
+                ```php
+                $x = 'foo';
+                ```
 
-And:
+                And:
 
-```php
-$x = 'bar';
+                ```php
+                $x = 'bar';
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = 'foo' . 'bar';
-# Mutation 1
-+ $x = 'foo';
-# Mutation 2
-+ $x = 'bar';
-DIFF,
+                - $x = 'foo' . 'bar';
+                # Mutation 1
+                + $x = 'foo';
+                # Mutation 2
+                + $x = 'bar';
+                DIFF,
         );
     }
 

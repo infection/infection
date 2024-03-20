@@ -53,49 +53,49 @@ final class FloatNegationTest extends BaseMutatorTestCase
     {
         yield 'It mutates negative float return to positive' => [
             <<<'PHP'
-<?php
+                <?php
 
-return -2.0;
-PHP
+                return -2.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return 2.0;
-PHP
+                return 2.0;
+                PHP
             ,
         ];
 
         yield 'It mutates positive float return to negative' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 2.0;
-PHP
+                return 2.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return -2.0;
-PHP
+                return -2.0;
+                PHP
             ,
         ];
 
         yield 'It does not mutate float zero' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 0.0;
-PHP
+                return 0.0;
+                PHP
             ,
         ];
 
         yield 'It does not mutate integers' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 1;
-PHP
+                return 1;
+                PHP
             ,
         ];
     }

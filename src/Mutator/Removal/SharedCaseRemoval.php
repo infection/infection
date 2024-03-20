@@ -57,15 +57,15 @@ final class SharedCaseRemoval implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-switch ($x) {
--   case 1:
-    case 2:
-        fooBar();
-        break;
-    default:
-        baz();
-}
-DIFF,
+                switch ($x) {
+                -   case 1:
+                    case 2:
+                        fooBar();
+                        break;
+                    default:
+                        baz();
+                }
+                DIFF,
         );
     }
 

@@ -66,19 +66,19 @@ final class FunctionCallTest extends BaseMutatorTestCase
         yield 'It mutates without typehint' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'fc-mutates-without-typehint.php'),
             <<<"PHP"
-<?php
+                <?php
 
-namespace FunctionCall_MutatesWithoutTypehint;
+                namespace FunctionCall_MutatesWithoutTypehint;
 
-class Test
-{
-    function test()
-    {
-        count([]);
-        return null;
-    }
-}
-PHP,
+                class Test
+                {
+                    function test()
+                    {
+                        count([]);
+                        return null;
+                    }
+                }
+                PHP,
         ];
 
         yield 'It does not mutate when scalar return typehint does not allow null' => [
@@ -101,19 +101,19 @@ PHP,
         $mutations = $this->mutate($code);
 
         $expectedMutatedCode = <<<"PHP"
-<?php
+            <?php
 
-namespace FunctionCall_ReturnTypehintFqcnAllowsNull;
+            namespace FunctionCall_ReturnTypehintFqcnAllowsNull;
 
-class Test
-{
-    function test() : ?\DateTime
-    {
-        count([]);
-        return null;
-    }
-}
-PHP;
+            class Test
+            {
+                function test() : ?\DateTime
+                {
+                    count([]);
+                    return null;
+                }
+            }
+            PHP;
 
         $this->assertSame($expectedMutatedCode, $mutations[0]);
         $this->assertCount(1, $mutations);
@@ -125,19 +125,19 @@ PHP;
         $mutations = $this->mutate($code);
 
         $expectedMutatedCode = <<<"PHP"
-<?php
+            <?php
 
-namespace FunctionCall_ScalarReturnTypehintAllowsNull;
+            namespace FunctionCall_ScalarReturnTypehintAllowsNull;
 
-class Test
-{
-    function test() : ?int
-    {
-        count([]);
-        return null;
-    }
-}
-PHP;
+            class Test
+            {
+                function test() : ?int
+                {
+                    count([]);
+                    return null;
+                }
+            }
+            PHP;
 
         $this->assertSame($expectedMutatedCode, $mutations[0]);
         $this->assertCount(1, $mutations);
@@ -149,22 +149,22 @@ PHP;
         $mutations = $this->mutate($code);
 
         $expectedMutatedCode = <<<"PHP"
-<?php
+            <?php
 
-namespace FunctionCall_ContainsAnotherFunctionAndNullAllowed;
+            namespace FunctionCall_ContainsAnotherFunctionAndNullAllowed;
 
-class Test
-{
-    function test()
-    {
-        \$a = function (\$element) : ?int {
-            return \$element;
-        };
-        count([]);
-        return null;
-    }
-}
-PHP;
+            class Test
+            {
+                function test()
+                {
+                    \$a = function (\$element) : ?int {
+                        return \$element;
+                    };
+                    count([]);
+                    return null;
+                }
+            }
+            PHP;
 
         $this->assertSame($expectedMutatedCode, $mutations[0]);
         $this->assertCount(1, $mutations);

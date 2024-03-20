@@ -55,25 +55,25 @@ final class Concat implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Flips the operands of the string concatenation operator `.`. For example:
+                Flips the operands of the string concatenation operator `.`. For example:
 
-```php
-'foo' . 'bar';
-```
+                ```php
+                'foo' . 'bar';
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-'bar' . 'foo';
-```
-TXT
+                ```php
+                'bar' . 'foo';
+                ```
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- 'foo' . 'bar';
-+ 'bar' . 'foo';
-DIFF,
+                - 'foo' . 'bar';
+                + 'bar' . 'foo';
+                DIFF,
         );
     }
 

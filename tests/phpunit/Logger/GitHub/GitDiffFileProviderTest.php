@@ -92,36 +92,36 @@ final class GitDiffFileProviderTest extends TestCase
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
 
         $gitUnifiedOutput = <<<'EOF'
-diff --git a/tests/FooTest.php b/tests/FooTest.php
-index 2a9e281..01cbf04 100644
---- a/tests/FooTest.php
-+++ b/tests/FooTest.php
-@@ -73 +73 @@ final class FooTest
--            return false === \strpos($sql, 'doctrine_migrations');
-+            return ! \str_contains($sql, 'doctrine_migrations');
-diff --git a/Bar.php b/Bar.php
-index f97971a..1ef35a5 100644
---- a/Bar.php
-+++ b/Bar.php
-@@ -10,0 +11,3 @@ final class Bar
-+    /**
-+     * @var null|non-empty-string
-+     */
-@@ -21 +31,4 @@ final class Bar
--        return $this->foo = \strrev($encryptedMessage);
-+        $strrev = \strrev($encryptedMessage);
+            diff --git a/tests/FooTest.php b/tests/FooTest.php
+            index 2a9e281..01cbf04 100644
+            --- a/tests/FooTest.php
+            +++ b/tests/FooTest.php
+            @@ -73 +73 @@ final class FooTest
+            -            return false === \strpos($sql, 'doctrine_migrations');
+            +            return ! \str_contains($sql, 'doctrine_migrations');
+            diff --git a/Bar.php b/Bar.php
+            index f97971a..1ef35a5 100644
+            --- a/Bar.php
+            +++ b/Bar.php
+            @@ -10,0 +11,3 @@ final class Bar
+            +    /**
+            +     * @var null|non-empty-string
+            +     */
+            @@ -21 +31,4 @@ final class Bar
+            -        return $this->foo = \strrev($encryptedMessage);
+            +        $strrev = \strrev($encryptedMessage);
 
-EOF;
+            EOF;
         $gitUnifiedOutput = str_replace("\n", PHP_EOL, $gitUnifiedOutput);
 
         $expectedUnifiedReturn = <<<'EOF'
-diff --git a/tests/FooTest.php b/tests/FooTest.php
-@@ -73 +73 @@ final class FooTest
-diff --git a/Bar.php b/Bar.php
-@@ -10,0 +11,3 @@ final class Bar
-@@ -21 +31,4 @@ final class Bar
+            diff --git a/tests/FooTest.php b/tests/FooTest.php
+            @@ -73 +73 @@ final class FooTest
+            diff --git a/Bar.php b/Bar.php
+            @@ -10,0 +11,3 @@ final class Bar
+            @@ -21 +31,4 @@ final class Bar
 
-EOF;
+            EOF;
         $expectedUnifiedReturn = str_replace("\n", PHP_EOL, $expectedUnifiedReturn);
 
         $shellCommandLineExecutor->expects($this->any())

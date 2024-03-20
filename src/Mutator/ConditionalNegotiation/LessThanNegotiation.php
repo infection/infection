@@ -54,15 +54,15 @@ final class LessThanNegotiation implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a less-than operator (`<`) with  the greater-than-or-equal-to operator (`>=`).
-TXT
+                Replaces a less-than operator (`<`) with  the greater-than-or-equal-to operator (`>=`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b < $c;
-+ $a = $b >= $c;
-DIFF,
+                - $a = $b < $c;
+                + $a = $b >= $c;
+                DIFF,
         );
     }
 

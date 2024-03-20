@@ -47,25 +47,25 @@ final class UnwrapLtrim extends AbstractFunctionUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `ltrim` function call with its first operand. For example:
+                Replaces a `ltrim` function call with its first operand. For example:
 
-```php
-$x = ltrim(' Hello!');
-```
+                ```php
+                $x = ltrim(' Hello!');
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ' Hello!';
-```
-TXT
+                ```php
+                $x = ' Hello!';
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = ltrim(' Hello!');
-+ $x = ' Hello!';
-DIFF,
+                - $x = ltrim(' Hello!');
+                + $x = ' Hello!';
+                DIFF,
         );
     }
 

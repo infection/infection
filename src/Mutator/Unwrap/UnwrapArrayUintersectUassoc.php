@@ -53,45 +53,45 @@ final class UnwrapArrayUintersectUassoc extends AbstractFunctionUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_uintersect_uassoc` function call with each of its operands. For example:
+                Replaces an `array_uintersect_uassoc` function call with each of its operands. For example:
 
-```php
-$x = array_uintersect_uassoc(
-    ['foo' => 'bar'],
-    ['baz' => 'bar'],
-    $value_compare_func,
-    $key_compare_func
-);
-```
+                ```php
+                $x = array_uintersect_uassoc(
+                    ['foo' => 'bar'],
+                    ['baz' => 'bar'],
+                    $value_compare_func,
+                    $key_compare_func
+                );
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo' => 'bar'];
-```
+                ```php
+                $x = ['foo' => 'bar'];
+                ```
 
-And into:
+                And into:
 
-```php
-$x = ['baz' => 'bar'];
-```
+                ```php
+                $x = ['baz' => 'bar'];
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_uintersect_uassoc(
--     ['foo' => 'bar'],
--     ['baz' => 'bar'],
--     $value_compare_func,
--     $key_compare_func
-- );
-# Mutation 1
-+ $x = ['foo' => 'bar'];
-# Mutation 2
-+ $x = ['baz' => 'bar'];
-DIFF,
+                - $x = array_uintersect_uassoc(
+                -     ['foo' => 'bar'],
+                -     ['baz' => 'bar'],
+                -     $value_compare_func,
+                -     $key_compare_func
+                - );
+                # Mutation 1
+                + $x = ['foo' => 'bar'];
+                # Mutation 2
+                + $x = ['baz' => 'bar'];
+                DIFF,
         );
     }
 

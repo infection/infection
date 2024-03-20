@@ -54,15 +54,15 @@ final class NullSafeMethodCall implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces the nullsafe method call operator (`?->`) with (`->`).
-TXT
+                Replaces the nullsafe method call operator (`?->`) with (`->`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $object?->getObject();
-+ $object->getObject();
-DIFF,
+                - $object?->getObject();
+                + $object->getObject();
+                DIFF,
         );
     }
 

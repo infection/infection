@@ -56,14 +56,14 @@ final class MutantExecutionResultTest extends TestCase
         $processOutput = 'Passed!';
         $processResultCode = DetectionStatus::ESCAPED;
         $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+            --- Original
+            +++ New
+            @@ @@
 
-- echo 'original';
-+ echo 'notCovered#0';
+            - echo 'original';
+            + echo 'notCovered#0';
 
-DIFF;
+            DIFF;
 
         $mutantHash = 'a1b2c3';
         $mutatorName = MutatorName::getName(For_::class);
@@ -138,14 +138,14 @@ DIFF;
             ),
             $mutatedCode,
             $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                --- Original
+                +++ New
+                @@ @@
 
-- echo 'original';
-+ echo 'notCovered#0';
+                - echo 'original';
+                + echo 'notCovered#0';
 
-DIFF,
+                DIFF,
             $originalCode,
         );
 

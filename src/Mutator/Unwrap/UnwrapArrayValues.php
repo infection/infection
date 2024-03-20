@@ -47,25 +47,25 @@ final class UnwrapArrayValues extends AbstractFunctionUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `array_values` function call with its array operand. For example:
+                Replaces a `array_values` function call with its array operand. For example:
 
-```php
-$x = array_values([10 => 'Hello!']);
-```
+                ```php
+                $x = array_values([10 => 'Hello!']);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = [10 => 'Hello!'];
-```
-TXT
+                ```php
+                $x = [10 => 'Hello!'];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_values([10 => 'Hello!']);
-+ $x = [10 => 'Hello!'];
-DIFF,
+                - $x = array_values([10 => 'Hello!']);
+                + $x = [10 => 'Hello!'];
+                DIFF,
         );
     }
 

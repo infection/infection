@@ -55,40 +55,40 @@ final class FalseValueTest extends BaseMutatorTestCase
     {
         yield 'It mutates false to true' => [
             <<<'PHP'
-<?php
+                <?php
 
-return false;
-PHP
+                return false;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return true;
-PHP
+                return true;
+                PHP
             ,
         ];
 
         yield 'It does not mutate the string false to true' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 'false';
-PHP
+                return 'false';
+                PHP
             ,
         ];
 
         yield 'It mutates all caps false to true' => [
             <<<'PHP'
-<?php
+                <?php
 
-return FALSE;
-PHP
+                return FALSE;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return true;
-PHP
+                return true;
+                PHP
             ,
         ];
     }

@@ -55,9 +55,9 @@ final class InvalidMutator extends RuntimeException
         return new self(
             sprintf(
                 <<<'TXT'
-Encountered an error with the "%s" mutator in the "%s" file. This is most likely a bug in Infection.
-Please consider reporting this this in our issue tracker: %s
-TXT
+                    Encountered an error with the "%s" mutator in the "%s" file. This is most likely a bug in Infection.
+                    Please consider reporting this this in our issue tracker: %s
+                    TXT
                 ,
                 $mutatorName,
                 $filePath,

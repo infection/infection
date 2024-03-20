@@ -60,13 +60,13 @@ final class Finally_ implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-try {
-    // do smth
-+ }
-- } finally {
--
-- }
-DIFF,
+                try {
+                    // do smth
+                + }
+                - } finally {
+                -
+                - }
+                DIFF,
         );
     }
 

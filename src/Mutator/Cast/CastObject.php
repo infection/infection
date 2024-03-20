@@ -51,9 +51,9 @@ final class CastObject extends AbstractCastMutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a = (object) $value;
-+ $a = $value;
-DIFF,
+                - $a = (object) $value;
+                + $a = $value;
+                DIFF,
         );
     }
 

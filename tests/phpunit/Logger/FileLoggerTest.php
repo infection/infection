@@ -73,9 +73,9 @@ final class FileLoggerTest extends FileSystemTestCase
     public function test_it_logs_the_correct_lines_with_no_mutations(): void
     {
         $expectedContent = <<<'TXT'
-foo
-bar
-TXT;
+            foo
+            bar
+            TXT;
 
         $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
 

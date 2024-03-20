@@ -46,11 +46,11 @@ use function iterator_to_array;
 final class MutationCollectorVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'
-<?php
+        <?php
 
-class Foo {}
+        class Foo {}
 
-PHP;
+        PHP;
 
     public function test_it_collects_the_generated_mutations(): void
     {

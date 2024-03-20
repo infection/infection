@@ -54,15 +54,15 @@ final class Exponentiation implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an exponentiation operator (`**`) with a division assignment operator (`/`).
-TXT
+                Replaces an exponentiation operator (`**`) with a division assignment operator (`/`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b ** $c;
-+ $a = $b / $c;
-DIFF,
+                - $a = $b ** $c;
+                + $a = $b / $c;
+                DIFF,
         );
     }
 

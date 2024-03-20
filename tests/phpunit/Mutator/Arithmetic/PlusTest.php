@@ -56,64 +56,64 @@ final class PlusTest extends BaseMutatorTestCase
     {
         yield 'It mutates normal plus' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 + 3;
-PHP
+                $a = 10 + 3;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 - 3;
-PHP
+                $a = 10 - 3;
+                PHP
             ,
         ];
 
         yield 'It does not mutate plus equals' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a += 2;
-PHP
+                $a = 1;
+                $a += 2;
+                PHP
             ,
         ];
 
         yield 'It does not mutate increment' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a++;
-PHP
+                $a = 1;
+                $a++;
+                PHP
             ,
         ];
 
         yield 'It does mutate a fake increment' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a + +1;
-PHP
+                $a = 1;
+                $a + +1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a - +1;
-PHP
+                $a = 1;
+                $a - +1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate additon of arrays' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [0 => 1] + [1 => 3];
-$b = 1 + [1 => 3];
-$c = [1 => 1] + 3;
-PHP
+                $a = [0 => 1] + [1 => 3];
+                $b = 1 + [1 => 3];
+                $c = [1 => 1] + 3;
+                PHP
             ,
         ];
     }

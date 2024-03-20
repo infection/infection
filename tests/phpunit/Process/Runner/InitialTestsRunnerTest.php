@@ -102,9 +102,9 @@ final class InitialTestsRunnerTest extends TestCase
         $skipCoverage = false;
 
         $process = $this->createProcessForCode(<<<STR
-echo 'ping';
-echo 'pong';
-STR
+            echo 'ping';
+            echo 'pong';
+            STR
         );
 
         $this->processFactoryMock
@@ -134,11 +134,11 @@ STR
         $input = new InputStream();
 
         $process = $this->createProcessForCode(<<<STR
-fwrite(STDOUT, 123);
-fwrite(STDERR, 321);
-fwrite(STDOUT, 123);
-fwrite(STDERR, 321);
-STR
+            fwrite(STDOUT, 123);
+            fwrite(STDERR, 321);
+            fwrite(STDOUT, 123);
+            fwrite(STDERR, 321);
+            STR
         );
         $process->setInput($input);
 

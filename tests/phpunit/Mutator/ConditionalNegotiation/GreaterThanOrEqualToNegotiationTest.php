@@ -53,16 +53,16 @@ final class GreaterThanOrEqualToNegotiationTest extends BaseMutatorTestCase
     {
         yield 'It mutates greater than or equal to' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 >= 1;
-PHP
+                1 >= 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1 < 1;
-PHP
+                1 < 1;
+                PHP
             ,
         ];
     }

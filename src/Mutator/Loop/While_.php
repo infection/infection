@@ -54,36 +54,36 @@ final class While_ implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces the iterable being iterated over with a `while` expression with false, preventing
-any iteration within the block to be executed. For example:
+                Replaces the iterable being iterated over with a `while` expression with false, preventing
+                any iteration within the block to be executed. For example:
 
-```php`
+                ```php`
 
-$condition = true;
-while ($condition) {
-    // ...
-}
-```
+                $condition = true;
+                while ($condition) {
+                    // ...
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
+                ```php
 
-$condition = true;
-while (false) {
-    // ...
-}
-```
-TXT
+                $condition = true;
+                while (false) {
+                    // ...
+                }
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- while ($condition) {
-+ while (false) {
-      // ...
-}
-DIFF,
+                - while ($condition) {
+                + while (false) {
+                      // ...
+                }
+                DIFF,
         );
     }
 

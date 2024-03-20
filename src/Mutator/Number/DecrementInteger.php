@@ -68,9 +68,9 @@ final class DecrementInteger extends AbstractNumberMutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = 20;
-+ $a = 19;
-DIFF,
+                - $a = 20;
+                + $a = 19;
+                DIFF,
         );
     }
 

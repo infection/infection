@@ -80,9 +80,9 @@ final class InvalidSchemaTest extends TestCase
             new SchemaConfigurationFile($path),
             ['Error message'],
             <<<'ERROR'
-"/path/to/config" does not match the expected JSON schema:
- - Error message
-ERROR
+                "/path/to/config" does not match the expected JSON schema:
+                 - Error message
+                ERROR
             ,
         ];
 
@@ -93,10 +93,10 @@ ERROR
                 'Second error message',
             ],
             <<<'ERROR'
-"/path/to/config" does not match the expected JSON schema:
- - First error message
- - Second error message
-ERROR
+                "/path/to/config" does not match the expected JSON schema:
+                 - First error message
+                 - Second error message
+                ERROR
             ,
         ];
 
@@ -108,10 +108,10 @@ ERROR
                 'Second error message' . "\n",
             ],
             <<<'ERROR'
-"/path/to/config" does not match the expected JSON schema:
- - First error message
- - Second error message
-ERROR
+                "/path/to/config" does not match the expected JSON schema:
+                 - First error message
+                 - Second error message
+                ERROR
             ,
         ];
     }

@@ -51,9 +51,9 @@ final class CastString extends AbstractCastMutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a = (string) $value;
-+ $a = $value;
-DIFF,
+                - $a = (string) $value;
+                + $a = $value;
+                DIFF,
         );
     }
 

@@ -253,31 +253,31 @@ final class MakefileTest extends BaseMakefileTestCase
     protected function getExpectedHelpOutput(): string
     {
         return <<<'EOF'
-[33mUsage:[0m
-  make TARGET
+            [33mUsage:[0m
+              make TARGET
 
-[32m#
-# Commands
-#---------------------------------------------------------------------------[0m
+            [32m#
+            # Commands
+            #---------------------------------------------------------------------------[0m
 
-[33mcompile:[0m	 	 Bundles Infection into a PHAR
-[33mcompile-docker:[0m	 	 Bundles Infection into a PHAR using docker
-[33mcs:[0m	  	 	 Runs PHP-CS-Fixer
-[33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
-[33mprofile:[0m 	 	 Runs Blackfire
-[33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)
-[33mtest:[0m		 	 Runs all the tests
-[33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
-[33mtest-unit:[0m	 	 Runs the unit tests
-[33mtest-unit-parallel:[0m	 Runs the unit tests in parallel
-[33mtest-unit-docker:[0m	 Runs the unit tests on the different Docker platforms
-[33mtest-e2e:[0m 	 	 Runs the end-to-end tests
-[33mtest-e2e-phpunit:[0m	 Runs PHPUnit-enabled subset of end-to-end tests
-[33mtest-e2e-docker:[0m 	 Runs the end-to-end tests on the different Docker platforms
-[33mtest-infection:[0m		 Runs Infection against itself
-[33mtest-infection-docker:[0m	 Runs Infection against itself on the different Docker platforms
+            [33mcompile:[0m	 	 Bundles Infection into a PHAR
+            [33mcompile-docker:[0m	 	 Bundles Infection into a PHAR using docker
+            [33mcs:[0m	  	 	 Runs PHP-CS-Fixer
+            [33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
+            [33mprofile:[0m 	 	 Runs Blackfire
+            [33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)
+            [33mtest:[0m		 	 Runs all the tests
+            [33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
+            [33mtest-unit:[0m	 	 Runs the unit tests
+            [33mtest-unit-parallel:[0m	 Runs the unit tests in parallel
+            [33mtest-unit-docker:[0m	 Runs the unit tests on the different Docker platforms
+            [33mtest-e2e:[0m 	 	 Runs the end-to-end tests
+            [33mtest-e2e-phpunit:[0m	 Runs PHPUnit-enabled subset of end-to-end tests
+            [33mtest-e2e-docker:[0m 	 Runs the end-to-end tests on the different Docker platforms
+            [33mtest-infection:[0m		 Runs Infection against itself
+            [33mtest-infection-docker:[0m	 Runs Infection against itself on the different Docker platforms
 
-EOF;
+            EOF;
     }
 
     /**

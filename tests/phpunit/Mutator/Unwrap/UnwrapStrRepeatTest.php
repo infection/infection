@@ -53,141 +53,141 @@ final class UnwrapStrRepeatTest extends BaseMutatorTestCase
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = str_repeat('Hello!', 3);
-PHP
+                $a = str_repeat('Hello!', 3);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Hello!';
-PHP,
+                $a = 'Hello!';
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = str_repeat(\Class_With_Const::Const, 3);
-PHP
+                $a = str_repeat(\Class_With_Const::Const, 3);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP,
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of str_repeat' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \str_repeat('Hello!');
-PHP
+                $a = \str_repeat('Hello!');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Hello!';
-PHP,
+                $a = 'Hello!';
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Hello!';
-if (str_repeat($a, 3) === $b) {
-    return true;
-}
-PHP
+                $a = 'Hello!';
+                if (str_repeat($a, 3) === $b) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Hello!';
-if ($a === $b) {
-    return true;
-}
-PHP,
+                $a = 'Hello!';
+                if ($a === $b) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when str_repeat is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = sTr_RePeAt('Hello!', 3);
-PHP
+                $a = sTr_RePeAt('Hello!', 3);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Hello!';
-PHP,
+                $a = 'Hello!';
+                PHP,
         ];
 
         yield 'It mutates correctly when str_repeat uses other functions as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = str_repeat(
-    $foo->bar(),
-    $foo->baz()
-);
-PHP
+                $a = str_repeat(
+                    $foo->bar(),
+                    $foo->baz()
+                );
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP,
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map(function ($b) {
-    return str_repeat($b, 3);
-}, ['A', 'B']);
-PHP
+                $a = array_map(function ($b) {
+                    return str_repeat($b, 3);
+                }, ['A', 'B']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map(function ($b) {
-    return $b;
-}, ['A', 'B']);
-PHP,
+                $a = array_map(function ($b) {
+                    return $b;
+                }, ['A', 'B']);
+                PHP,
         ];
 
         yield 'It does not mutate other str_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = str_pad('Hello!', 8, '!');
-PHP,
+                $a = str_pad('Hello!', 8, '!');
+                PHP,
         ];
 
         yield 'It does not mutate functions named str_repeat' => [
             <<<'PHP'
-<?php
+                <?php
 
-function str_repeat($input, $multiplier)
-{
-}
-PHP,
+                function str_repeat($input, $multiplier)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'str_repeat';
+                $a = 'str_repeat';
 
-$b = $a('foo', 3);
-PHP
+                $b = $a('foo', 3);
+                PHP
             ,
         ];
     }

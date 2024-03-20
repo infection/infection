@@ -47,15 +47,15 @@ use PhpParser\NodeVisitorAbstract;
 final class CloneVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'
-<?php declare(strict_types=1);
+        <?php declare(strict_types=1);
 
-namespace Acme;
+        namespace Acme;
 
-function hello()
-{
-    return 'hello';
-}
-PHP;
+        function hello()
+        {
+            return 'hello';
+        }
+        PHP;
 
     public function test_mutating_nodes_during_traverse_mutates_the_original_nodes(): void
     {

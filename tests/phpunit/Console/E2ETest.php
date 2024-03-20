@@ -365,12 +365,12 @@ final class E2ETest extends TestCase
             $expectedExitCode,
             $exitCode,
             <<<EOF
-Unexpected exit code. Command output was:
----
-$outputText
---- end of output
+                Unexpected exit code. Command output was:
+                ---
+                $outputText
+                --- end of output
 
-EOF,
+                EOF,
         );
 
         return $outputText;
