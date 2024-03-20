@@ -100,6 +100,7 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_HTML_LOGGER_PATH,
             Container::DEFAULT_USE_NOOP_MUTATORS,
             Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
+            Container::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
         );
 
         $traces = $newContainer->getUnionTraceProvider()->provideTraces();
@@ -151,6 +152,7 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_HTML_LOGGER_PATH,
             Container::DEFAULT_USE_NOOP_MUTATORS,
             Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
+            Container::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
         );
     }
 }
