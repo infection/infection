@@ -641,6 +641,7 @@ final class RunCommand extends BaseCommand
         }
 
         $useGitHubLogger = $input->getOption(self::OPTION_LOGGER_GITHUB);
+
         // `false` means the option was not provided at all -> user does not care and it will be auto-detected
         // `null` means the option was provided without any argument -> user wants to enable it
         // any string: the argument provided, but only `'true'` and `'false` are supported
