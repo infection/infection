@@ -76,8 +76,7 @@ final class DiffSourceCodeMatcherTest extends TestCase
          return 'string';
      }
  }
-DIFF
-            ,
+DIFF,
             true,
         ];
 
@@ -95,8 +94,7 @@ DIFF
          return 'hello';
      }
      public function getString()
-DIFF
-            ,
+DIFF,
             true,
         ];
 
@@ -114,8 +112,7 @@ DIFF
      {
          Assert::numeric('1');
          $this->getString();
-DIFF
-            ,
+DIFF,
             false,
         ];
 
@@ -133,8 +130,7 @@ DIFF
          return 'hello';
      }
      public function getString()
-DIFF
-            ,
+DIFF,
             true,
         ];
 
@@ -152,8 +148,7 @@ DIFF
          $this->getString();
          return 'hello';
      }
-DIFF
-            ,
+DIFF,
             true,
         ];
 
@@ -165,8 +160,7 @@ DIFF
 @@ @@
 
 + $a - 2 + $this->getString();
-DIFF
-            ,
+DIFF,
             false,
         ];
 
@@ -179,23 +173,21 @@ DIFF
 
 - $a - 2 + $this->getString() / 2; # comment
 + $a - 2 + $this->getString(); # comment
-DIFF
-            ,
-                true,
+DIFF,
+            true,
         ];
 
         yield 'Regex containing less common delimiters should not lead to syntax error' => [
             '.*%.*',
-                <<<'DIFF'
+            <<<'DIFF'
 --- Original
 +++ New
 @@ @@
 
 - $a % 2;
 + $a % 3;
-DIFF
-                ,
-                true,
+DIFF,
+            true,
         ];
     }
 }

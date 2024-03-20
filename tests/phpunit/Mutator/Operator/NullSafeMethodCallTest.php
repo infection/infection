@@ -102,7 +102,7 @@ PHP,
 
 $class?->getObject()->getName();
 PHP,
-                ],
+            ],
         ];
 
         yield 'Mutate nullsafe applied right when class has been instantiated' => [

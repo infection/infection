@@ -69,12 +69,12 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $output->expects($this->once())
             ->method('writeln')
             ->with([
-            '',
-            'Running initial test suite...',
-            '',
-            'PHPUnit version: unknown',
-            '',
-        ]);
+                '',
+                'Running initial test suite...',
+                '',
+                'PHPUnit version: unknown',
+                '',
+            ]);
         $output->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
