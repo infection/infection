@@ -35,9 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use function array_fill_keys;
 use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\ProfileList;
+use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 
 final class DefinitionTest extends TestCase
 {
@@ -73,5 +78,38 @@ final class DefinitionTest extends TestCase
             'This text is for providing guidelines on how to kill the mutant.',
             'The diff',
         ];
+    }
+
+    /**
+     * @dataProvider mutatorsProvider
+     */
+    public function test_it_must_define_remedies(
+        Mutator $mutator
+    ): void {
+        $this->assertNotNull(
+            $mutator::getDefinition()->getRemedies(),
+            sprintf(
+                'Definition of [%s] must provide remedies.',
+                $mutator->getName(),
+            ),
+        );
+    }
+
+    public function mutatorsProvider(): iterable
+    {
+        $mutatorFactory = SingletonContainer::getContainer()->getMutatorFactory();
+
+        $mutators = $mutatorFactory->create(array_fill_keys(
+            ProfileList::ALL_MUTATORS,
+            []
+        ), false);
+
+        foreach ($mutators as $name => $mutator) {
+            $this->assertInstanceOf(Mutator::class, $mutator);
+
+            yield $name => [
+                $mutator,
+            ];
+        }
     }
 }
