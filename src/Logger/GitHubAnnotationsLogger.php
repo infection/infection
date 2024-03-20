@@ -65,7 +65,7 @@ Escaped Mutant for Mutator "{$escapedExecutionResult->getMutatorName()}":
 
 {$escapedExecutionResult->getMutantDiff()}
 TEXT
-            ,
+                ,
             ];
 
             $lines[] = $this->buildAnnotation(

@@ -75,7 +75,7 @@ PHP,
         ];
 
         yield 'It mutates if preg_match is incorrectly cased' => [
-          <<<'PHP'
+            <<<'PHP'
 <?php
 
 PreG_maTch('/a/', 'b', $foo);

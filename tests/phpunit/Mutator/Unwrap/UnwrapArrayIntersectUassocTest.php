@@ -56,15 +56,13 @@ final class UnwrapArrayIntersectUassocTest extends BaseMutatorTestCase
 <?php
 
 $a = array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
-PHP
-            ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -78,21 +76,18 @@ PHP,
 <?php
 
 $a = array_intersect_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $keyCompareFunc);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $a = \Class_With_Const::Const;
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
 $a = ['baz' => 'bar'];
-PHP
-                ,
+PHP,
             ],
         ];
 
@@ -101,21 +96,18 @@ PHP
 <?php
 
 $a = \array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
-            ,
+PHP,
             [
-               <<<'PHP'
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
 $a = ['baz' => 'bar'];
-PHP
-                ,
+PHP,
             ],
         ];
 
@@ -127,8 +119,7 @@ $a = ['foo' => 'bar'];
 if (array_intersect_uassoc($a, ['baz' => 'bar'], $keyCompareFunc) === $a) {
     return true;
 }
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
@@ -137,8 +128,7 @@ $a = ['foo' => 'bar'];
 if ($a === $a) {
     return true;
 }
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
@@ -146,8 +136,7 @@ $a = ['foo' => 'bar'];
 if (['baz' => 'bar'] === $a) {
     return true;
 }
-PHP
-                ,
+PHP,
             ],
         ];
 
@@ -156,21 +145,18 @@ PHP
 <?php
 
 $a = aRrAy_InTeRsEcT_uAsSoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
 $a = ['baz' => 'bar'];
-PHP
-                ,
+PHP,
             ],
         ];
 
@@ -179,21 +165,18 @@ PHP
 <?php
 
 $a = array_intersect_uassoc($foo->bar(), $foo->baz(), $keyCompareFunc);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $a = $foo->bar();
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
 $a = $foo->baz();
-PHP
-                ,
+PHP,
             ],
         ];
 
@@ -202,21 +185,18 @@ PHP
 <?php
 
 $a = array_map('strtolower', array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc));
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $a = array_map('strtolower', ['foo' => 'bar']);
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
 $a = array_map('strtolower', ['baz' => 'bar']);
-PHP
-                ,
+PHP,
             ],
         ];
 
@@ -225,27 +205,23 @@ PHP
 <?php
 
 $a = array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $keyCompareFunc);
-PHP
-            ,
+PHP,
             [
                 <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
 $a = ['baz' => 'bar'];
-PHP
-                ,
+PHP,
                 <<<'PHP'
 <?php
 
 $a = ['qux' => 'bar'];
-PHP
-                ,
+PHP,
             ],
         ];
 

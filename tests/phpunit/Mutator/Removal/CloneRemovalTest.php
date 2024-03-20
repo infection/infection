@@ -52,7 +52,7 @@ final class CloneRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes clone from expression clone-new' => [
-          <<<'PHP'
+            <<<'PHP'
 <?php
 
 $class = clone (new stdClass());

@@ -52,13 +52,12 @@ final class DivisionTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It changes regular divison' => [
-                <<<'PHP'
+            <<<'PHP'
 <?php
 
 $a = 10 / 2;
-PHP
-                ,
-                <<<'PHP'
+PHP,
+            <<<'PHP'
 <?php
 
 $a = 10 * 2;
@@ -66,7 +65,7 @@ PHP,
         ];
 
         yield 'It does not change division equals' => [
-                <<<'PHP'
+            <<<'PHP'
 <?php
 
 $a = 10;

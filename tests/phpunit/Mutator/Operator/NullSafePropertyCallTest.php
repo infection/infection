@@ -92,12 +92,12 @@ $class?->property?->nextProperty;
 PHP
             ,
             [
-            <<<'PHP'
+                <<<'PHP'
 <?php
 
 $class->property?->nextProperty;
 PHP,
-            <<<'PHP'
+                <<<'PHP'
 <?php
 
 $class?->property->nextProperty;
