@@ -51,9 +51,9 @@ final class CastInt extends AbstractCastMutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a = (int) $value;
-+ $a = $value;
-DIFF,
+                - $a = (int) $value;
+                + $a = $value;
+                DIFF,
         );
     }
 

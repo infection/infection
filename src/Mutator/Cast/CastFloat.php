@@ -51,9 +51,9 @@ final class CastFloat extends AbstractCastMutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a = (float) $value;
-+ $a = $value;
-DIFF,
+                - $a = (float) $value;
+                + $a = $value;
+                DIFF,
         );
     }
 

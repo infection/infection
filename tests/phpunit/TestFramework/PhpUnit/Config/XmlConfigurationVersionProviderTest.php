@@ -85,125 +85,125 @@ final class XmlConfigurationVersionProviderTest extends TestCase
     protected static function legacyConfigurationsProvider()
     {
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit
-    backupGlobals="false"
-    backupStaticAttributes="false"
-    bootstrap="/app/autoload2.php"
-    colors="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
-    printerClass="Fake\Printer\Class"
-    processIsolation="false"
-    syntaxCheck="false"
->
-    <testsuites>
-        <testsuite name="Application Test Suite">
-            <directory>/*Bundle</directory>
-            <exclude>/*Bundle/Fixtures</exclude>
-        </testsuite>
-    </testsuites>
-    <filter>
-        <whitelist>
-            <directory>/src/</directory>
-        </whitelist>
-    </filter>
-    <logging>
-        <log type="coverage-html" target="/path/to/tmp"/>
-    </logging>
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit
+                backupGlobals="false"
+                backupStaticAttributes="false"
+                bootstrap="/app/autoload2.php"
+                colors="true"
+                convertErrorsToExceptions="true"
+                convertNoticesToExceptions="true"
+                convertWarningsToExceptions="true"
+                printerClass="Fake\Printer\Class"
+                processIsolation="false"
+                syntaxCheck="false"
+            >
+                <testsuites>
+                    <testsuite name="Application Test Suite">
+                        <directory>/*Bundle</directory>
+                        <exclude>/*Bundle/Fixtures</exclude>
+                    </testsuite>
+                </testsuites>
+                <filter>
+                    <whitelist>
+                        <directory>/src/</directory>
+                    </whitelist>
+                </filter>
+                <logging>
+                    <log type="coverage-html" target="/path/to/tmp"/>
+                </logging>
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit>
-    <logging>
-        <log type="coverage-html" target="/path/to/tmp"/>
-    </logging>
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit>
+                <logging>
+                    <log type="coverage-html" target="/path/to/tmp"/>
+                </logging>
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit>
-    <filter>
-        <whitelist>
-            <directory>/src/</directory>
-        </whitelist>
-    </filter>
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit>
+                <filter>
+                    <whitelist>
+                        <directory>/src/</directory>
+                    </whitelist>
+                </filter>
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit disableCodeCoverageIgnore="true"></phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit disableCodeCoverageIgnore="true"></phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit ignoreDeprecatedCodeUnitsFromCodeCoverage="true"></phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit ignoreDeprecatedCodeUnitsFromCodeCoverage="true"></phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit></phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit></phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.0/phpunit.xsd">
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.0/phpunit.xsd">
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/9.2.xsd">
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/9.2.xsd">
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./phpunit.xsd">
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="./phpunit.xsd">
+            </phpunit>
+            XML;
     }
 
     protected static function mainlineConfigurationsProvider()
     {
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit>
-    <coverage>
-        <include>
-            <directory suffix=".php">src</directory>
-        </include>
-    </coverage>
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit>
+                <coverage>
+                    <include>
+                        <directory suffix=".php">src</directory>
+                    </include>
+                </coverage>
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit>
-    <logging>
-        <text outputFile="logfile.txt"/>
-    </logging>
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit>
+                <logging>
+                    <text outputFile="logfile.txt"/>
+                </logging>
+            </phpunit>
+            XML;
     }
 }

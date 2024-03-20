@@ -53,61 +53,61 @@ final class NotIdenticalNotEqualTest extends BaseMutatorTestCase
     {
         yield 'It mutates not identical operator into not equal operator with two variables' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a !== $b;
-PHP
+                $a !== $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a != $b;
-PHP
+                $a != $b;
+                PHP
             ,
         ];
 
         yield 'It mutates not identical operator into not equal operator with type casting' => [
             <<<'PHP'
-<?php
+                <?php
 
-(int) $c !== 2;
-PHP
+                (int) $c !== 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-(int) $c != 2;
-PHP
+                (int) $c != 2;
+                PHP
             ,
         ];
 
         yield 'It mutates not identical operator into not equal operator with variable and null' => [
             <<<'PHP'
-<?php
+                <?php
 
-$d !== null;
-PHP
+                $d !== null;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$d != null;
-PHP
+                $d != null;
+                PHP
             ,
         ];
 
         yield 'It mutates not identical operator into not equal operator with boolean and function call' => [
             <<<'PHP'
-<?php
+                <?php
 
-false !== strpos();
-PHP
+                false !== strpos();
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-false != strpos();
-PHP
+                false != strpos();
+                PHP
             ,
         ];
     }

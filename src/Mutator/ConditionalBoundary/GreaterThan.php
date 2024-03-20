@@ -54,17 +54,17 @@ final class GreaterThan implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a greater-than operator (`>`) with the greater-than-or-equal-to operator (`>=`).
-TXT
+                Replaces a greater-than operator (`>`) with the greater-than-or-equal-to operator (`>=`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_ADDITION,
             <<<'TXT'
-This mutator shifts the compared values highlighting an untested boundary.
-TXT,
+                This mutator shifts the compared values highlighting an untested boundary.
+                TXT,
             <<<'DIFF'
-- $a = $b > $c;
-+ $a = $b >= $c;
-DIFF,
+                - $a = $b > $c;
+                + $a = $b >= $c;
+                DIFF,
         );
     }
 

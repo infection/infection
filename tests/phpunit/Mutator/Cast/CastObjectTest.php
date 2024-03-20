@@ -53,16 +53,16 @@ final class CastObjectTest extends BaseMutatorTestCase
     {
         yield 'It removes casting to object' => [
             <<<'PHP'
-<?php
+                <?php
 
-(object) ['test' => 1];
-PHP
+                (object) ['test' => 1];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-['test' => 1];
-PHP
+                ['test' => 1];
+                PHP
             ,
         ];
     }

@@ -53,16 +53,16 @@ final class CastArrayTest extends BaseMutatorTestCase
     {
         yield 'It removes casting to array' => [
             <<<'PHP'
-<?php
+                <?php
 
-(array) 1.0;
-PHP
+                (array) 1.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1.0;
-PHP
+                1.0;
+                PHP
             ,
         ];
     }

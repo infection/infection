@@ -290,18 +290,18 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                 use function array_fill_keys;
-                 final class ForHtmlReport
-                 {
-                -    public function add(int $a, int $b) : int
-                +    protected function add(int $a, int $b) : int
+                    --- Original
+                    +++ New
+                    @@ @@
+                     use function array_fill_keys;
+                     final class ForHtmlReport
                      {
-                         $this->inner('3');
-                         $this->inner('3');
-                DIFF,
+                    -    public function add(int $a, int $b) : int
+                    +    protected function add(int $a, int $b) : int
+                         {
+                             $this->inner('3');
+                             $this->inner('3');
+                    DIFF,
                 '32f68ca331c9262cc97322271d88d06d',
                 PublicVisibility::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
@@ -319,18 +319,18 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                 {
-                     public function add(int $a, int $b) : int
+                    --- Original
+                    +++ New
+                    @@ @@
                      {
-                -        $this->inner('3');
-                +
-                         $this->inner('3');
-                         switch (true) {
-                             case 1 !== 1:
-                DIFF,
+                         public function add(int $a, int $b) : int
+                         {
+                    -        $this->inner('3');
+                    +
+                             $this->inner('3');
+                             switch (true) {
+                                 case 1 !== 1:
+                    DIFF,
                 'fd66aff56e903645c21271264b062b4f',
                 MethodCallRemoval::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
@@ -347,18 +347,18 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                     public function add(int $a, int $b) : int
-                     {
-                         $this->inner('3');
-                -        $this->inner('3');
-                +
-                         switch (true) {
-                             case 0 !== 1:
-                                 break;
-                DIFF,
+                    --- Original
+                    +++ New
+                    @@ @@
+                         public function add(int $a, int $b) : int
+                         {
+                             $this->inner('3');
+                    -        $this->inner('3');
+                    +
+                             switch (true) {
+                                 case 0 !== 1:
+                                     break;
+                    DIFF,
                 '746519c01522ddc7da799a9b7927e4c2',
                 MethodCallRemoval::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
@@ -375,18 +375,18 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                             default:
-                                 break;
-                         }
-                -        $this->innerArray(array_keys(['a' => '1', 'b' => '2']));
-                +        $this->innerArray(array_keys(['b' => '2']));
-                         if ($this instanceof ForHtmlReport) {
-                             // ...
-                         }
-                DIFF,
+                    --- Original
+                    +++ New
+                    @@ @@
+                                 default:
+                                     break;
+                             }
+                    -        $this->innerArray(array_keys(['a' => '1', 'b' => '2']));
+                    +        $this->innerArray(array_keys(['b' => '2']));
+                             if ($this instanceof ForHtmlReport) {
+                                 // ...
+                             }
+                    DIFF,
                 '633b144fb6d55bbc60430df68a952388',
                 ArrayItemRemoval::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
@@ -405,17 +405,17 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                 use function array_fill_keys;
-                 final class ForHtmlReport2
-                 {
-                -    public function add(int $a, int $b) : int
-                +    protected function add(int $a, int $b) : int
+                    --- Original
+                    +++ New
+                    @@ @@
+                     use function array_fill_keys;
+                     final class ForHtmlReport2
                      {
-                         return 0;
-                DIFF,
+                    -    public function add(int $a, int $b) : int
+                    +    protected function add(int $a, int $b) : int
+                         {
+                             return 0;
+                    DIFF,
                 '12f68ca331c9262cc97322271d88d06d',
                 PublicVisibility::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport2.php'),
@@ -433,17 +433,17 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                 use function array_fill_keys;
-                 final class ForHtmlReport2
-                 {
-                -    public function add(int $a, int $b) : int
-                +    protected function add(int $a, int $b) : int
+                    --- Original
+                    +++ New
+                    @@ @@
+                     use function array_fill_keys;
+                     final class ForHtmlReport2
                      {
-                         return 0;
-                DIFF,
+                    -    public function add(int $a, int $b) : int
+                    +    protected function add(int $a, int $b) : int
+                         {
+                             return 0;
+                    DIFF,
                 '22f68ca331c9262cc97322271d88d06d',
                 PublicVisibility::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport2.php'),

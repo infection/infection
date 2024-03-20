@@ -116,14 +116,14 @@ final class MutantExecutionResultFactoryTest extends TestCase
                 ),
                 'notCovered#0',
                 $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                    --- Original
+                    +++ New
+                    @@ @@
 
-- echo 'original';
-+ echo 'notCovered#0';
+                    - echo 'original';
+                    + echo 'notCovered#0';
 
-DIFF,
+                    DIFF,
                 '<?php $a = 1;',
             ),
         );
@@ -192,14 +192,14 @@ DIFF,
                 ),
                 'timedOut#0',
                 $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                    --- Original
+                    +++ New
+                    @@ @@
 
-- echo 'original';
-+ echo 'timedOut#0';
+                    - echo 'original';
+                    + echo 'timedOut#0';
 
-DIFF,
+                    DIFF,
                 '<?php $a = 1;',
             ),
         );
@@ -274,14 +274,14 @@ DIFF,
                 ),
                 'errored#0',
                 $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                    --- Original
+                    +++ New
+                    @@ @@
 
-- echo 'original';
-+ echo 'errored#0';
+                    - echo 'original';
+                    + echo 'errored#0';
 
-DIFF,
+                    DIFF,
                 '<?php $a = 1;',
             ),
         );
@@ -357,14 +357,14 @@ DIFF,
                 ),
                 'escaped#0',
                 $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                    --- Original
+                    +++ New
+                    @@ @@
 
-- echo 'original';
-+ echo 'escaped#0';
+                    - echo 'original';
+                    + echo 'escaped#0';
 
-DIFF,
+                    DIFF,
                 '<?php $a = 1;',
             ),
         );
@@ -440,14 +440,14 @@ DIFF,
                 ),
                 'killed#0',
                 $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                    --- Original
+                    +++ New
+                    @@ @@
 
-- echo 'original';
-+ echo 'killed#0';
+                    - echo 'original';
+                    + echo 'killed#0';
 
-DIFF,
+                    DIFF,
                 '<?php $a = 1;',
             ),
         );
@@ -532,14 +532,14 @@ DIFF,
                 ),
                 'killed#0',
                 $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                    --- Original
+                    +++ New
+                    @@ @@
 
-- echo 'original';
-+ echo 'killed#0';
+                    - echo 'original';
+                    + echo 'killed#0';
 
-DIFF,
+                    DIFF,
                 '<?php $a = 1;',
             ),
         );

@@ -64,26 +64,26 @@ final class PerMutatorLoggerTest extends TestCase
             new MetricsCalculator(2),
             new ResultsCollector(),
             <<<'TXT'
-# Effects per Mutator
+                # Effects per Mutator
 
-| Mutator | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
-| ------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
+                | Mutator | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+                | ------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
 
-TXT,
+                TXT,
         ];
 
         yield 'all mutations' => [
             self::createCompleteMetricsCalculator(),
             self::createCompleteResultsCollector(),
             <<<'TXT'
-# Effects per Mutator
+                # Effects per Mutator
 
-| Mutator   | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
-| --------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
-| For_      |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
-| PregQuote |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
+                | Mutator   | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+                | --------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
+                | For_      |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
+                | PregQuote |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
 
-TXT,
+                TXT,
         ];
     }
 }

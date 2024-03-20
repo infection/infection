@@ -180,14 +180,14 @@ trait CreateMetricsCalculator
             $detectionStatus,
             now(normalize_trailing_spaces(
                 <<<DIFF
---- Original
-+++ New
-@@ @@
+                    --- Original
+                    +++ New
+                    @@ @@
 
-- echo 'original';
-+ echo '$echoMutatedMessage';
+                    - echo 'original';
+                    + echo '$echoMutatedMessage';
 
-DIFF,
+                    DIFF,
             )),
             'a1b2c3',
             MutatorName::getName($mutatorClassName),

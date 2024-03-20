@@ -137,10 +137,10 @@ final class ConsoleLoggerTest extends TestCase
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] message
+                 ! [NOTE] message
 
 
-TXT
+                TXT
             ,
             normalize_trailing_spaces($output->fetch()),
         );
@@ -149,10 +149,10 @@ TXT
 
         $this->assertSame(
             <<<'TXT'
- [WARNING] message
+                 [WARNING] message
 
 
-TXT
+                TXT
             ,
             normalize_trailing_spaces($output->fetch()),
         );
@@ -161,10 +161,10 @@ TXT
 
         $this->assertSame(
             <<<'TXT'
- [ERROR] message
+                 [ERROR] message
 
 
-TXT
+                TXT
             ,
             normalize_trailing_spaces($output->fetch()),
         );

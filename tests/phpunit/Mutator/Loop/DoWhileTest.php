@@ -53,45 +53,45 @@ final class DoWhileTest extends BaseMutatorTestCase
     {
         yield 'It mutates expression part from boolean true to false' => [
             <<<'PHP'
-<?php
+                <?php
 
-do {
-} while (true);
-PHP
+                do {
+                } while (true);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-do {
-} while (false);
-PHP,
+                do {
+                } while (false);
+                PHP,
         ];
 
         yield 'It mutates expression part from variable to false' => [
             <<<'PHP'
-<?php
+                <?php
 
-do {
-    $condition = true;
-} while ($condition);
-PHP
+                do {
+                    $condition = true;
+                } while ($condition);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-do {
-    $condition = true;
-} while (false);
-PHP,
+                do {
+                    $condition = true;
+                } while (false);
+                PHP,
         ];
 
         yield 'It does not mutate expression part in while loop to false' => [
             <<<'PHP'
-<?php
+                <?php
 
-while (true) {
-}
-PHP,
+                while (true) {
+                }
+                PHP,
         ];
     }
 }

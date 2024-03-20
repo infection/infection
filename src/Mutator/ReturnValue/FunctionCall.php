@@ -51,44 +51,44 @@ final class FunctionCall extends AbstractValueToNullReturnValue
     {
         return new Definition(
             <<<'TXT'
-Replaces a returned evaluated function with `null` instead. The function evaluation statement is kept
-in order to preserve potential side effects. For example:
+                Replaces a returned evaluated function with `null` instead. The function evaluation statement is kept
+                in order to preserve potential side effects. For example:
 
-```php
-class X {
-    function foo()
-    {
-        return bar();
-    }
-}
-```
+                ```php
+                class X {
+                    function foo()
+                    {
+                        return bar();
+                    }
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-class X {
-    function foo()
-    {
-        bar();
-        return null;
-    }
-}
-```
+                ```php
+                class X {
+                    function foo()
+                    {
+                        bar();
+                        return null;
+                    }
+                }
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-class X {
-    function foo()
-    {
--        return bar();
-+        bar();
-+        return null;
-    }
-}
-DIFF,
+                class X {
+                    function foo()
+                    {
+                -        return bar();
+                +        bar();
+                +        return null;
+                    }
+                }
+                DIFF,
         );
     }
 

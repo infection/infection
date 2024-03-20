@@ -56,25 +56,25 @@ final class SpreadAssignment implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Removes a spread operator in an array expression and turns it into an assignment. For example:
+                Removes a spread operator in an array expression and turns it into an assignment. For example:
 
-```php
-$x = [...$collection];
-```
+                ```php
+                $x = [...$collection];
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = $collection;
-```
-TXT
+                ```php
+                $x = $collection;
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = [...$collection];
-+ $x = $collection;
-DIFF,
+                - $x = [...$collection];
+                + $x = $collection;
+                DIFF,
         );
     }
 

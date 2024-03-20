@@ -53,31 +53,31 @@ final class Yield_Test extends BaseMutatorTestCase
     {
         yield 'It mutates a yield with a double arrow to a yield with a greater than comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = function () {
-    (yield $a => $b);
-};
-PHP
+                $a = function () {
+                    (yield $a => $b);
+                };
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = function () {
-    (yield $a > $b);
-};
-PHP
+                $a = function () {
+                    (yield $a > $b);
+                };
+                PHP
             ,
         ];
 
         yield 'It does not mutate yields without a double arrow operator' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = function () {
-    (yield $b);
-};
-PHP
+                $a = function () {
+                    (yield $b);
+                };
+                PHP
             ,
         ];
     }

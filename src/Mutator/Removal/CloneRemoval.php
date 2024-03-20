@@ -57,9 +57,9 @@ final class CloneRemoval implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a = clone $x;
-+ $a = $x;
-DIFF,
+                - $a = clone $x;
+                + $a = $x;
+                DIFF,
         );
     }
 

@@ -53,52 +53,52 @@ final class AssignCoalesceTest extends BaseMutatorTestCase
     {
         yield 'Mutate coalesce when right part is a scalar value' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] ??= 'otherValue';
-PHP
+                $a['value'] ??= 'otherValue';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] = 'otherValue';
-PHP,
+                $a['value'] = 'otherValue';
+                PHP,
         ];
 
         yield 'Mutate coalesce when right part is an expression' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] ??= 'other' . ' Value';
-PHP
+                $a['value'] ??= 'other' . ' Value';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] = 'other' . ' Value';
-PHP,
+                $a['value'] = 'other' . ' Value';
+                PHP,
         ];
 
         yield 'Mutate coalesce when right part is a variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] ??= $var;
-PHP
+                $a['value'] ??= $var;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] = $var;
-PHP,
+                $a['value'] = $var;
+                PHP,
         ];
 
         yield 'Does not mutate coalesce binary operator' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] = $foo ?? $bar;
-PHP
+                $a['value'] = $foo ?? $bar;
+                PHP
             ,
         ];
     }

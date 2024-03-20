@@ -449,31 +449,31 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $this->assertSame(
             <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright © 2017 Maks Rafalko
-  ~
-  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-  -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
-  <testsuites>
-    <testsuite name="Application Test Suite">
-      <directory>$projectPath/*Bundle</directory>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>$projectPath/src/</directory>
-      <!--<exclude>-->
-      <!--<directory>src/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-      <!--</exclude>-->
-    </whitelist>
-  </filter>
-</phpunit>
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!--
+                  ~ Copyright © 2017 Maks Rafalko
+                  ~
+                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+                  -->
+                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+                  <testsuites>
+                    <testsuite name="Application Test Suite">
+                      <directory>$projectPath/*Bundle</directory>
+                    </testsuite>
+                  </testsuites>
+                  <filter>
+                    <whitelist>
+                      <directory>$projectPath/src/</directory>
+                      <!--<exclude>-->
+                      <!--<directory>src/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                      <!--</exclude>-->
+                    </whitelist>
+                  </filter>
+                </phpunit>
 
-XML
+                XML
             ,
             file_get_contents($configurationPath),
         );

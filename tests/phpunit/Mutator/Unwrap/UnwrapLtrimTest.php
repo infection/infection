@@ -53,138 +53,138 @@ final class UnwrapLtrimTest extends BaseMutatorTestCase
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ltrim(' Good Afternoon! ');
-PHP
+                $a = ltrim(' Good Afternoon! ');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ' Good Afternoon! ';
-PHP,
+                $a = ' Good Afternoon! ';
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ltrim(\Class_With_Const::Const);
-PHP
+                $a = ltrim(\Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP,
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of trim' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \ltrim(' Good Afternoon! ');
-PHP
+                $a = \ltrim(' Good Afternoon! ');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ' Good Afternoon! ';
-PHP,
+                $a = ' Good Afternoon! ';
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ' Good Afternoon! ';
-if (ltrim($a) === $a) {
-    return true;
-}
-PHP
+                $a = ' Good Afternoon! ';
+                if (ltrim($a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ' Good Afternoon! ';
-if ($a === $a) {
-    return true;
-}
-PHP,
+                $a = ' Good Afternoon! ';
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when trim is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = LtRiM(' Good Afternoon! ');
-PHP
+                $a = LtRiM(' Good Afternoon! ');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ' Good Afternoon! ';
-PHP,
+                $a = ' Good Afternoon! ';
+                PHP,
         ];
 
         yield 'It mutates correctly when trim uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ltrim($foo->bar());
-PHP
+                $a = ltrim($foo->bar());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP,
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ltrim(array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-}));
-PHP
+                $a = ltrim(array_reduce($words, function (string $carry, string $item) {
+                    return $carry . substr($item, 0, 1);
+                }));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-});
-PHP,
+                $a = array_reduce($words, function (string $carry, string $item) {
+                    return $carry . substr($item, 0, 1);
+                });
+                PHP,
         ];
 
         yield 'It does not mutate other *trim calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = rtrim(' Good Afternoon! ');
-PHP,
+                $a = rtrim(' Good Afternoon! ');
+                PHP,
         ];
 
         yield 'It does not mutate functions named ltrim' => [
             <<<'PHP'
-<?php
+                <?php
 
-function ltrim($string)
-{
-}
-PHP,
+                function ltrim($string)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'ltrim';
+                $a = 'ltrim';
 
-$b = $a(' FooBar ');
-PHP
+                $b = $a(' FooBar ');
+                PHP
             ,
         ];
     }
