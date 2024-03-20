@@ -165,6 +165,7 @@ return (new Config())
         'phpdoc_order' => true,
         'phpdoc_summary' => false,
         'phpdoc_separation' => false,
+        'heredoc_indentation' => true,
         'self_static_accessor' => true,
         'single_line_throw' => false,
         'static_lambda' => true,
