@@ -127,8 +127,7 @@ return (new Config())
             'syntax' => 'short',
         ],
         'logical_operators' => true,
-        // TODO: enable
-        'modernize_strpos' => false,
+        'modernize_strpos' => true,
         'native_constant_invocation' => true,
         'native_function_invocation' => [
             'include' => ['@internal'],
