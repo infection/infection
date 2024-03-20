@@ -104,9 +104,9 @@ final class StrykerDashboardClientTest extends TestCase
                 [
                     LogLevel::NOTICE,
                     normalizeLineReturn(<<<'EOF'
-Dashboard response:
-Report received!
-EOF
+                        Dashboard response:
+                        Report received!
+                        EOF
                     ),
                     [],
                 ],
@@ -153,9 +153,9 @@ EOF
                 [
                     LogLevel::NOTICE,
                     <<<'EOF'
-Dashboard response:
-Report invalid!
-EOF
+                        Dashboard response:
+                        Report invalid!
+                        EOF
                     ,
                     [],
                 ],

@@ -49,35 +49,35 @@ final class UnwrapArrayIntersectAssoc extends AbstractFunctionUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_intersect_assoc` function call with its operands. For example:
+                Replaces an `array_intersect_assoc` function call with its operands. For example:
 
-```php
-$x = array_intersect_assoc($array1, $array2);
-```
+                ```php
+                $x = array_intersect_assoc($array1, $array2);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = $array1;
-```
+                ```php
+                $x = $array1;
+                ```
 
-And:
+                And:
 
-```php
-$x = $array2;
-```
+                ```php
+                $x = $array2;
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_intersect_assoc($array1, $array2);
-# Mutation 1
-+ $x = $array1;
-# Mutation 2
-+ $x = $array2;
-DIFF,
+                - $x = array_intersect_assoc($array1, $array2);
+                # Mutation 1
+                + $x = $array1;
+                # Mutation 2
+                + $x = $array2;
+                DIFF,
         );
     }
 

@@ -54,26 +54,26 @@ final class PregQuote implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Removes a `preg_quote` function call with its operand. For example:
+                Removes a `preg_quote` function call with its operand. For example:
 
-```php
-$x = preg_quote($string, $delimiter);
-```
+                ```php
+                $x = preg_quote($string, $delimiter);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = $string;
-```
+                ```php
+                $x = $string;
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = preg_quote($string, $delimiter);
-+ $x = $string;
-DIFF,
+                - $x = preg_quote($string, $delimiter);
+                + $x = $string;
+                DIFF,
         );
     }
 

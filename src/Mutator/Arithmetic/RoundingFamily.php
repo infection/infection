@@ -62,18 +62,18 @@ final class RoundingFamily implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces rounding operations. For example `floor()` will be replaced with `ceil()` and `round()`.
-TXT
+                Replaces rounding operations. For example `floor()` will be replaced with `ceil()` and `round()`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = floor($b);
-# Mutation 1
-+ $a = ceil($b);
-# Mutation 2
-+ $a = round($b);
-DIFF,
+                - $a = floor($b);
+                # Mutation 1
+                + $a = ceil($b);
+                # Mutation 2
+                + $a = round($b);
+                DIFF,
         );
     }
 

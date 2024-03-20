@@ -54,15 +54,15 @@ final class ShiftLeft implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a bitwise shift left operator (`<<`) with a bitwise shift right operator (`>>`).
-TXT
+                Replaces a bitwise shift left operator (`<<`) with a bitwise shift right operator (`>>`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b << 1;
-+ $a = $b >> 1;
-DIFF,
+                - $a = $b << 1;
+                + $a = $b >> 1;
+                DIFF,
         );
     }
 

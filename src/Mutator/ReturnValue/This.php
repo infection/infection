@@ -54,14 +54,14 @@ final class This extends AbstractValueToNullReturnValue
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-class X {
-    function foo()
-    {
--        return $this;
-+        return null;
-    }
-}
-DIFF,
+                class X {
+                    function foo()
+                    {
+                -        return $this;
+                +        return null;
+                    }
+                }
+                DIFF,
         );
     }
 

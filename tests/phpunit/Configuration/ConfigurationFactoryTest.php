@@ -54,6 +54,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\NoopMutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use function Infection\Tests\normalizePath;
 use Infection\Tests\SingletonContainer;
@@ -144,6 +145,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?float $expectedMinCoveredMsi,
         array $expectedIgnoreSourceCodeMutatorsMap,
         bool $inputExecuteOnlyCoveringTestCases,
+        ?string $mapSourceClassToTest,
     ): void {
         $config = $this
             ->createConfigurationFactory($ciDetected, $githubActionsDetected)
@@ -175,6 +177,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputHtmlLogFilePath,
                 $inputUseNoopMutators,
                 $inputExecuteOnlyCoveringTestCases,
+                $mapSourceClassToTest,
             )
         ;
 
@@ -211,6 +214,7 @@ final class ConfigurationFactoryTest extends TestCase
             $inputExecuteOnlyCoveringTestCases,
             $inputIsForGitDiffLines,
             $inputGitDiffBase,
+            $mapSourceClassToTest,
         );
     }
 
@@ -289,6 +293,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             true,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
 
         yield 'null html file log path with existing path from config file' => self::createValueForHtmlLogFilePath(
@@ -841,6 +846,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
 
         yield 'complete' => [
@@ -948,6 +954,7 @@ final class ConfigurationFactoryTest extends TestCase
             81.5,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1025,6 +1032,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1102,6 +1110,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1180,6 +1189,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1257,6 +1267,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1335,6 +1346,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1426,6 +1438,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1528,6 +1541,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             true,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1606,6 +1620,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1684,6 +1699,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1762,6 +1778,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedMinCoveredMsi,
             [],
             false,
+            null, // MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1841,6 +1858,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1919,6 +1937,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -1998,6 +2017,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -2076,6 +2096,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -2158,6 +2179,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -2241,6 +2263,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             $expectedIgnoreSourceCodeMutatorsMap,
             false,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 
@@ -2340,6 +2363,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             [],
             true,
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 

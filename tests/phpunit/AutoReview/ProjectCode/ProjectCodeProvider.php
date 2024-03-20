@@ -73,6 +73,7 @@ use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
@@ -115,6 +116,7 @@ final class ProjectCodeProvider
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
         StopInfectionOnSigintSignalSubscriber::class,
+        MapSourceClassToTestStrategy::class, // no need to test 1 const for now
     ];
 
     /**

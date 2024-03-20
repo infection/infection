@@ -79,10 +79,10 @@ final class FactoryTest extends TestCase
             $this->createMock(SourceFileFilter::class),
             [
                 'infection/codeception-adapter' => [
-                        'install_path' => '/path/to/dummy/adapter/factory.php',
-                        'extra' => ['class' => DummyTestFrameworkFactory::class],
-                        'version' => '1.0.0',
-                    ],
+                    'install_path' => '/path/to/dummy/adapter/factory.php',
+                    'extra' => ['class' => DummyTestFrameworkFactory::class],
+                    'version' => '1.0.0',
+                ],
             ],
         );
 

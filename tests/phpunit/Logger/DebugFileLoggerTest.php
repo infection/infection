@@ -66,33 +66,33 @@ final class DebugFileLoggerTest extends TestCase
             new ResultsCollector(),
             false,
             <<<'TXT'
-Total: 0
+                Total: 0
 
-Killed mutants:
-===============
+                Killed mutants:
+                ===============
 
-Errors mutants:
-===============
+                Errors mutants:
+                ===============
 
-Syntax Errors mutants:
-======================
+                Syntax Errors mutants:
+                ======================
 
-Escaped mutants:
-================
+                Escaped mutants:
+                ================
 
-Timed Out mutants:
-==================
+                Timed Out mutants:
+                ==================
 
-Skipped mutants:
-================
+                Skipped mutants:
+                ================
 
-Ignored mutants:
-================
+                Ignored mutants:
+                ================
 
-Not Covered mutants:
-====================
+                Not Covered mutants:
+                ====================
 
-TXT,
+                TXT,
         ];
 
         yield 'all mutations' => [
@@ -100,88 +100,88 @@ TXT,
             self::createCompleteResultsCollector(),
             false,
             <<<'TXT'
-Total: 16
+                Total: 16
 
-Killed mutants:
-===============
+                Killed mutants:
+                ===============
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
-
-
-Errors mutants:
-===============
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Syntax Errors mutants:
-======================
+                Errors mutants:
+                ===============
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
-
-
-Escaped mutants:
-================
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Timed Out mutants:
-==================
+                Syntax Errors mutants:
+                ======================
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
-
-
-Skipped mutants:
-================
-
-Mutator: For_
-Line 10
-
-Mutator: PregQuote
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Ignored mutants:
-================
+                Escaped mutants:
+                ================
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Not Covered mutants:
-====================
+                Timed Out mutants:
+                ==================
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
-TXT,
+
+                Skipped mutants:
+                ================
+
+                Mutator: For_
+                Line 10
+
+                Mutator: PregQuote
+                Line 10
+
+
+                Ignored mutants:
+                ================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+
+                Not Covered mutants:
+                ====================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+                TXT,
         ];
 
         yield 'all mutations only covered' => [
@@ -189,78 +189,78 @@ TXT,
             self::createCompleteResultsCollector(),
             true,
             <<<'TXT'
-Total: 16
+                Total: 16
 
-Killed mutants:
-===============
+                Killed mutants:
+                ===============
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
-
-
-Errors mutants:
-===============
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Syntax Errors mutants:
-======================
+                Errors mutants:
+                ===============
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
-
-
-Escaped mutants:
-================
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Timed Out mutants:
-==================
+                Syntax Errors mutants:
+                ======================
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
-
-
-Skipped mutants:
-================
-
-Mutator: For_
-Line 10
-
-Mutator: PregQuote
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Ignored mutants:
-================
+                Escaped mutants:
+                ================
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
-TXT,
+
+                Timed Out mutants:
+                ==================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+
+                Skipped mutants:
+                ================
+
+                Mutator: For_
+                Line 10
+
+                Mutator: PregQuote
+                Line 10
+
+
+                Ignored mutants:
+                ================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+                TXT,
         ];
     }
 }

@@ -53,46 +53,46 @@ final class For_Test extends BaseMutatorTestCase
     {
         yield 'It mutates to false in for loop condition' => [
             <<<'PHP'
-<?php
+                <?php
 
-$array = [1, 2];
+                $array = [1, 2];
 
-for($i = 0; $i < count($array); $i++) {
-}
-PHP
+                for($i = 0; $i < count($array); $i++) {
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$array = [1, 2];
-for ($i = 0; false; $i++) {
-}
-PHP
+                $array = [1, 2];
+                for ($i = 0; false; $i++) {
+                }
+                PHP
             ,
         ];
 
         yield 'It does not mutate the body of the for loop' => [
             <<<'PHP'
-<?php
+                <?php
 
-$array = [1, 2];
-for($i = 0; $i < count($array); $i++) {
-    if ($i == 1) {
-        echo '$i is one';
-    }
-}
-PHP
+                $array = [1, 2];
+                for($i = 0; $i < count($array); $i++) {
+                    if ($i == 1) {
+                        echo '$i is one';
+                    }
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$array = [1, 2];
-for ($i = 0; false; $i++) {
-    if ($i == 1) {
-        echo '$i is one';
-    }
-}
-PHP
+                $array = [1, 2];
+                for ($i = 0; false; $i++) {
+                    if ($i == 1) {
+                        echo '$i is one';
+                    }
+                }
+                PHP
             ,
         ];
     }

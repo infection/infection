@@ -60,8 +60,9 @@ use function Safe\file_get_contents;
 use function Safe\getcwd;
 use function Safe\ini_get;
 use function sprintf;
+use function str_contains;
 use function str_replace;
-use function strpos;
+use function str_starts_with;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Finder\Finder;
@@ -105,9 +106,9 @@ final class E2ETest extends TestCase
         }
 
         // Without overcommit this test fails with `proc_open(): fork failed - Cannot allocate memory`
-        if (strpos(PHP_OS, 'Linux') === 0
-            && is_readable('/proc/sys/vm/overcommit_memory')
-            && (int) file_get_contents('/proc/sys/vm/overcommit_memory') === 2) {
+        if (str_starts_with(PHP_OS, 'Linux') &&
+            is_readable('/proc/sys/vm/overcommit_memory') &&
+            (int) file_get_contents('/proc/sys/vm/overcommit_memory') === 2) {
             $this->markTestSkipped('This test needs copious amounts of virtual memory. It will fail unless it is allowed to overcommit memory.');
         }
 
@@ -281,7 +282,7 @@ final class E2ETest extends TestCase
 
         foreach ($map as $namespace => $paths) {
             foreach ($paths as $path) {
-                if (strpos($path, $vendorDir) !== false) {
+                if (str_contains($path, $vendorDir)) {
                     // Skip known dependency from autoloading
                     continue 2;
                 }
@@ -294,7 +295,7 @@ final class E2ETest extends TestCase
 
         foreach ($mapPsr0 as $namespace => $paths) {
             foreach ($paths as $path) {
-                if (strpos($path, $vendorDir) !== false) {
+                if (str_contains($path, $vendorDir)) {
                     // Skip known dependency from autoloading
                     continue 2;
                 }
@@ -365,12 +366,12 @@ final class E2ETest extends TestCase
             $expectedExitCode,
             $exitCode,
             <<<EOF
-Unexpected exit code. Command output was:
----
-$outputText
---- end of output
+                Unexpected exit code. Command output was:
+                ---
+                $outputText
+                --- end of output
 
-EOF,
+                EOF,
         );
 
         return $outputText;

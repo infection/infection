@@ -54,21 +54,21 @@ final class ArrayItem implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
-(`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
-For example `[foo() => $b->bar]`.
-TXT
+                Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
+                (`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
+                For example `[foo() => $b->bar]`.
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
-This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
-- completely disregarding the actual values of the array. The array content should either be
-checked or the impure calls should be made outside of the scope of the array.
-TXT,
+                This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
+                - completely disregarding the actual values of the array. The array content should either be
+                checked or the impure calls should be made outside of the scope of the array.
+                TXT,
             <<<'DIFF'
-- $a = [$key => $value];
-+ $a = [$key > $value]
-DIFF,
+                - $a = [$key => $value];
+                + $a = [$key > $value]
+                DIFF,
         );
     }
 

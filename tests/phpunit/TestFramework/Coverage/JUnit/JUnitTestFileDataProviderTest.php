@@ -178,27 +178,27 @@ final class JUnitTestFileDataProviderTest extends TestCase
     public static function xmlProvider(): iterable
     {
         yield [<<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-    <testsuite name="ExampleTest"/>
-    <testsuite name="ExampleTest"/>
-</testsuites>
-XML];
+            <?xml version="1.0" encoding="UTF-8"?>
+            <testsuites>
+                <testsuite name="ExampleTest"/>
+                <testsuite name="ExampleTest"/>
+            </testsuites>
+            XML];
 
         yield [<<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-    <testcase class="ExampleTest"/>
-    <testcase class="ExampleTest"/>
-</testsuites>
-XML];
+            <?xml version="1.0" encoding="UTF-8"?>
+            <testsuites>
+                <testcase class="ExampleTest"/>
+                <testcase class="ExampleTest"/>
+            </testsuites>
+            XML];
 
         yield [<<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-    <testcase file="foo/ExampleTest.feature"/>
-    <testcase file="foo/ExampleTest.feature"/>
-</testsuites>
-XML];
+            <?xml version="1.0" encoding="UTF-8"?>
+            <testsuites>
+                <testcase file="foo/ExampleTest.feature"/>
+                <testcase file="foo/ExampleTest.feature"/>
+            </testsuites>
+            XML];
     }
 }

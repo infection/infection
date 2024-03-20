@@ -53,44 +53,44 @@ final class LogicalOrNegationTest extends BaseMutatorTestCase
     {
         yield 'It mutates or with two expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() || b();
-PHP
+                $var = a() || b();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !(a() || b());
-PHP
+                    $var = !(a() || b());
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates or with more expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() || b() || c() || d();
-PHP
+                $var = a() || b() || c() || d();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !(a() || b() || c() || d());
-PHP
+                    $var = !(a() || b() || c() || d());
+                    PHP
                 ,
             ],
         ];
 
         yield 'It does not mutate already negated expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = !(a() || !b());
-PHP
+                $var = !(a() || !b());
+                PHP
             ,
         ];
     }

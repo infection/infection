@@ -53,39 +53,39 @@ final class Finally_Test extends BaseMutatorTestCase
     {
         yield 'It removes the finally statement' => [
             <<<'PHP'
-<?php
+                <?php
 
-try {
-    $a = 1;
-} catch (\Exception $e) {
-    $a = 2;
-} finally {
-    $a = 3;
-}
-PHP
+                try {
+                    $a = 1;
+                } catch (\Exception $e) {
+                    $a = 2;
+                } finally {
+                    $a = 3;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-try {
-    $a = 1;
-} catch (\Exception $e) {
-    $a = 2;
-}
-PHP
+                try {
+                    $a = 1;
+                } catch (\Exception $e) {
+                    $a = 2;
+                }
+                PHP
             ,
         ];
 
         yield 'It does not mutate when no catch() blocks are present' => [
             <<<'PHP'
-<?php
+                <?php
 
-try {
-    $a = 1;
-} finally {
-    $a = 2;
-}
-PHP
+                try {
+                    $a = 1;
+                } finally {
+                    $a = 2;
+                }
+                PHP
             ,
         ];
     }

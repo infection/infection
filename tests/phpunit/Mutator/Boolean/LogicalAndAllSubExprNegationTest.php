@@ -53,168 +53,168 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
     {
         yield 'It mutates and with two expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() && b();
-PHP
+                $var = a() && b();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !a() && !b();
-PHP,
+                    $var = !a() && !b();
+                    PHP,
             ],
         ];
 
         yield 'It mutates and with more expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() && b() && c() && d();
-PHP
+                $var = a() && b() && c() && d();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !a() && !b() && !c() && !d();
-PHP,
+                    $var = !a() && !b() && !c() && !d();
+                    PHP,
             ],
         ];
 
         yield 'It mutates already negated expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = !(a() && !b());
-PHP
+                $var = !(a() && !b());
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !(!a() && b());
-PHP,
+                    $var = !(!a() && b());
+                    PHP,
             ],
         ];
 
         yield 'It mutates assignments in boolean expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = ($a = 1) && $b;
-PHP
+                $var = ($a = 1) && $b;
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !($a = 1) && !$b;
-PHP,
+                    $var = !($a = 1) && !$b;
+                    PHP,
             ],
         ];
 
         yield 'It mutates more complex expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $A > 1 && $this->foo() === false && self::bar() >= 10;
-PHP
+                $var = $A > 1 && $this->foo() === false && self::bar() >= 10;
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !($A > 1) && $this->foo() === false && !(self::bar() >= 10);
-PHP
+                    $var = !($A > 1) && $this->foo() === false && !(self::bar() >= 10);
+                    PHP
                 ,
             ],
         ];
 
         yield 'It does not mutate if all are identical comparisons' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $a === false && b() === false && $c !== false && d() !== true;
-PHP
+                $var = $a === false && b() === false && $c !== false && d() !== true;
+                PHP
             ,
         ];
 
         yield 'It does not mutate if all are identical comparisons - with first OR' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $a === false || b() === false && $c !== false && d() !== true;
-PHP
+                $var = $a === false || b() === false && $c !== false && d() !== true;
+                PHP
             ,
         ];
 
         yield 'It does not mutate if all are identical comparisons - with second OR' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $a === false && b() === false || $c !== false && d() !== true;
-PHP
+                $var = $a === false && b() === false || $c !== false && d() !== true;
+                PHP
             ,
         ];
 
         yield 'It does not mutate if all are identical comparisons - with third OR' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $a === false && b() === false && $c !== false || d() !== true;
-PHP
+                $var = $a === false && b() === false && $c !== false || d() !== true;
+                PHP
             ,
         ];
 
         yield 'It mutates the only one mutable expression on the left when others are not mutable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $a && b() === false && $c !== false;
-PHP
+                $var = $a && b() === false && $c !== false;
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !$a && b() === false && $c !== false;
-PHP
+                    $var = !$a && b() === false && $c !== false;
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates the only one mutable expression in the middle when others are not mutable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $a === false && b() && $c !== false;
-PHP
+                $var = $a === false && b() && $c !== false;
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = $a === false && !b() && $c !== false;
-PHP
+                    $var = $a === false && !b() && $c !== false;
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates the only one mutable expression on the right when others are not mutable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $a === false && b() === false && $c;
-PHP
+                $var = $a === false && b() === false && $c;
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = $a === false && b() === false && !$c;
-PHP
+                    $var = $a === false && b() === false && !$c;
+                    PHP
                 ,
             ],
         ];

@@ -296,10 +296,10 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $output = $this->getDisplay($output);
         $this->assertStringContainsString(
             <<<TEXT
-            Generated Reports:
-                     - relative/path.log
-                     - /absolute/path.html
-            TEXT
+                Generated Reports:
+                         - relative/path.log
+                         - /absolute/path.html
+                TEXT
             ,
             $output,
         );

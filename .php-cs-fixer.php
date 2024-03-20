@@ -80,36 +80,36 @@ return (new Config())
         '@PHPUnit75Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
-        // TODO: enable
-        'array_indentation' => false,
+        'array_indentation' => true,
         'blank_line_before_statement' => false,
-    // TODO: enable back
-//        'blank_line_before_statement' => [
-//            'statements' => [
-//                'break',
-//                'continue',
-//                'declare',
-//                'do',
-//                'for',
-//                'foreach',
-//                'if',
-//                'include',
-//                'include_once',
-//                'require',
-//                'require_once',
-//                'return',
-//                'switch',
-//                'throw',
-//                'try',
-//                'while',
-//                'yield',
-//            ],
-//        ],
+        // TODO: enable back
+        //        'blank_line_before_statement' => [
+        //            'statements' => [
+        //                'break',
+        //                'continue',
+        //                'declare',
+        //                'do',
+        //                'for',
+        //                'foreach',
+        //                'if',
+        //                'include',
+        //                'include_once',
+        //                'require',
+        //                'require_once',
+        //                'return',
+        //                'switch',
+        //                'throw',
+        //                'try',
+        //                'while',
+        //                'yield',
+        //            ],
+        //        ],
         'blank_line_between_import_groups' => false,
         'compact_nullable_typehint' => true,
         'concat_space' => ['spacing' => 'one'],
-        // TODO: enable back
-        'fully_qualified_strict_types' => false,
+        'fully_qualified_strict_types' => [
+            'import_symbols' => true,
+        ],
         // TODO: enable
         'get_class_to_class_keyword' => false,
         'global_namespace_import' => [
@@ -127,8 +127,7 @@ return (new Config())
             'syntax' => 'short',
         ],
         'logical_operators' => true,
-        // TODO: enable
-        'modernize_strpos' => false,
+        'modernize_strpos' => true,
         'native_constant_invocation' => true,
         'native_function_invocation' => [
             'include' => ['@internal'],
@@ -166,6 +165,7 @@ return (new Config())
         'phpdoc_order' => true,
         'phpdoc_summary' => false,
         'phpdoc_separation' => false,
+        'heredoc_indentation' => true,
         'self_static_accessor' => true,
         'single_line_throw' => false,
         'static_lambda' => true,

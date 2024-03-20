@@ -53,61 +53,61 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
     {
         yield 'It mutates with two variables' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a == $b;
-PHP
+                $a == $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a === $b;
-PHP
+                $a === $b;
+                PHP
             ,
         ];
 
         yield 'It mutates with a cast' => [
             <<<'PHP'
-<?php
+                <?php
 
-(int) $c == 2;
-PHP
+                (int) $c == 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-(int) $c === 2;
-PHP
+                (int) $c === 2;
+                PHP
             ,
         ];
 
         yield 'It mutates with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$d == null;
-PHP
+                $d == null;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$d === null;
-PHP
+                $d === null;
+                PHP
             ,
         ];
 
         yield 'It mutates with a function' => [
             <<<'PHP'
-<?php
+                <?php
 
-false == strpos();
-PHP
+                false == strpos();
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-false === strpos();
-PHP
+                false === strpos();
+                PHP
             ,
         ];
     }

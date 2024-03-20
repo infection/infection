@@ -53,16 +53,16 @@ final class LessThanNegotiationTest extends BaseMutatorTestCase
     {
         yield 'It mutates less than' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 < 1;
-PHP
+                1 < 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1 >= 1;
-PHP
+                1 >= 1;
+                PHP
             ,
         ];
     }

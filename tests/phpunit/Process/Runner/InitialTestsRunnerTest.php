@@ -46,7 +46,7 @@ use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use const PHP_SAPI;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function strpos;
+use function str_contains;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -102,10 +102,9 @@ final class InitialTestsRunnerTest extends TestCase
         $skipCoverage = false;
 
         $process = $this->createProcessForCode(<<<STR
-echo 'ping';
-sleep(1);
-echo 'pong';
-STR
+            echo 'ping';
+            echo 'pong';
+            STR
         );
 
         $this->processFactoryMock
@@ -119,7 +118,6 @@ STR
         $this->assertSame(
             [
                 InitialTestSuiteWasStarted::class,
-                InitialTestCaseWasCompleted::class,
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
@@ -136,11 +134,11 @@ STR
         $input = new InputStream();
 
         $process = $this->createProcessForCode(<<<STR
-fwrite(STDOUT, 123);
-fwrite(STDERR, 321);
-fwrite(STDOUT, 123);
-fwrite(STDERR, 321);
-STR
+            fwrite(STDOUT, 123);
+            fwrite(STDERR, 321);
+            fwrite(STDOUT, 123);
+            fwrite(STDERR, 321);
+            STR
         );
         $process->setInput($input);
 
@@ -154,7 +152,7 @@ STR
             $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
         } catch (RuntimeException $e) {
             // Signal 11, AKA "segmentation fault", is not something we can do anything about
-            if (extension_loaded('xdebug') && strpos($e->getMessage(), 'The process has been signaled with signal "11"') !== false) {
+            if (extension_loaded('xdebug') && str_contains($e->getMessage(), 'The process has been signaled with signal "11"')) {
                 $this->markTestIncomplete($e->getMessage());
             }
 

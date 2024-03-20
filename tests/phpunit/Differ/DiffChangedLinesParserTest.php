@@ -63,12 +63,12 @@ final class DiffChangedLinesParserTest extends TestCase
     {
         yield 'one file with added lines in different places' => [
             <<<'DIFF'
-            diff --git a/src/Container.php b/src/Container.php
-            @@ -37,0 +38 @@ namespace Infection;
-            @@ -533 +534,2 @@ final class Container
-            @@ -535,0 +538,3 @@ final class Container
-            @@ -1207,0 +1213,5 @@ final class Container
-            DIFF,
+                diff --git a/src/Container.php b/src/Container.php
+                @@ -37,0 +38 @@ namespace Infection;
+                @@ -533 +534,2 @@ final class Container
+                @@ -535,0 +538,3 @@ final class Container
+                @@ -1207,0 +1213,5 @@ final class Container
+                DIFF,
             [
                 realpath('src/Container.php') => [
                     new ChangedLinesRange(38, 38),
@@ -81,15 +81,15 @@ final class DiffChangedLinesParserTest extends TestCase
 
         yield 'two files, second one is new created' => [
             <<<'DIFF'
-            diff --git a/src/Container.php b/src/Container.php
-            @@ -37,0 +38 @@ namespace Infection;
-            @@ -533 +534,2 @@ final class Container
-            @@ -535,0 +538,3 @@ final class Container
-            @@ -1207,0 +1213,5 @@ final class Container
-            diff --git a/src/Differ/FilesDiffChangedLines.php b/src/Differ/FilesDiffChangedLines.php
-            new file mode 100644
-            @@ -0,0 +1,18 @@
-            DIFF,
+                diff --git a/src/Container.php b/src/Container.php
+                @@ -37,0 +38 @@ namespace Infection;
+                @@ -533 +534,2 @@ final class Container
+                @@ -535,0 +538,3 @@ final class Container
+                @@ -1207,0 +1213,5 @@ final class Container
+                diff --git a/src/Differ/FilesDiffChangedLines.php b/src/Differ/FilesDiffChangedLines.php
+                new file mode 100644
+                @@ -0,0 +1,18 @@
+                DIFF,
             [
                 realpath('src/Container.php') => [
                     new ChangedLinesRange(38, 38),

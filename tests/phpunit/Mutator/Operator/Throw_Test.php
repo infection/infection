@@ -53,16 +53,16 @@ final class Throw_Test extends BaseMutatorTestCase
     {
         yield 'It removes the throw statement' => [
             <<<'PHP'
-<?php
+                <?php
 
-throw new \Exception();
-PHP
+                throw new \Exception();
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-new \Exception();
-PHP
+                new \Exception();
+                PHP
             ,
         ];
     }

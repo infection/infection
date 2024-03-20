@@ -55,99 +55,99 @@ final class PhpUnitPathGuesserTest extends TestCase
     {
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "": "src"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-0": {
+                            "": "src"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "": "src/",
-            "SymfonyStandard": "app/"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-0": {
+                            "": "src/",
+                            "SymfonyStandard": "app/"
+                        }
+                    }
+                }
+                JSON
             ,
             'app',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "SymfonyStandard": "src/"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-0": {
+                            "SymfonyStandard": "src/"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "psr-4": {
-            "App": "src/"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-4": {
+                            "App": "src/"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload-dev": {
-        "psr-4": {
-            "App": "src/"
-        }
-    }
-}
-JSON
+                {
+                    "autoload-dev": {
+                        "psr-4": {
+                            "App": "src/"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "files": {
-            "": "src"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "files": {
+                            "": "src"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "App": "app/"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-0": {
+                            "App": "app/"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];

@@ -60,14 +60,14 @@ final class CatchBlockRemoval implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-try {
-    $callback();
-- } catch (\DomainException $ex) {
--     $logger->log($ex);
-} catch (\LogicException $e) {
-    throw $e;
-}
-DIFF,
+                try {
+                    $callback();
+                - } catch (\DomainException $ex) {
+                -     $logger->log($ex);
+                } catch (\LogicException $e) {
+                    throw $e;
+                }
+                DIFF,
         );
     }
 

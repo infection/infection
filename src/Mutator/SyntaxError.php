@@ -53,14 +53,14 @@ final class SyntaxError implements Mutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-class X {
-    function foo()
-    {
--        $this->method();
-+        $->method();
-    }
-}
-DIFF,
+                class X {
+                    function foo()
+                    {
+                -        $this->method();
+                +        $->method();
+                    }
+                }
+                DIFF,
         );
     }
 

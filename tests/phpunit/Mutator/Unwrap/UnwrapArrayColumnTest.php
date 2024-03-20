@@ -53,148 +53,148 @@ final class UnwrapArrayColumnTest extends BaseMutatorTestCase
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_column([['foo' => 'bar']], 'foo');
-PHP
+                $a = array_column([['foo' => 'bar']], 'foo');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [['foo' => 'bar']];
-PHP,
+                $a = [['foo' => 'bar']];
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_column(\Class_With_Const::Const, 'foo');
-PHP
+                $a = array_column(\Class_With_Const::Const, 'foo');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP,
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_column' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_column([['foo' => 'bar']], 'foo');
-PHP
+                $a = \array_column([['foo' => 'bar']], 'foo');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [['foo' => 'bar']];
-PHP,
+                $a = [['foo' => 'bar']];
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo' => 'bar']);
-PHP,
+                $a = array_map('strtolower', ['foo' => 'bar']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_column' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_column($array, $columnKey, $indexKey = null)
-{
-}
-PHP,
+                function array_column($array, $columnKey, $indexKey = null)
+                {
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [['foo' => 'bar']];
-if (array_column($a) === $a) {
-    return true;
-}
-PHP
+                $a = [['foo' => 'bar']];
+                if (array_column($a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [['foo' => 'bar']];
-if ($a === $a) {
-    return true;
-}
-PHP,
+                $a = [['foo' => 'bar']];
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when array_column is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_CoLuMn([['foo' => 'bar']], 'foo');
-PHP
+                $a = aRrAy_CoLuMn([['foo' => 'bar']], 'foo');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [['foo' => 'bar']];
-PHP,
+                $a = [['foo' => 'bar']];
+                PHP,
         ];
 
         yield 'It mutates correctly when array_column uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_column($foo->bar(), 'foo');
-PHP
+                $a = array_column($foo->bar(), 'foo');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP,
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_column([['foo' => 'bar']], 'foo'));
-PHP
+                $a = array_map('strtolower', array_column([['foo' => 'bar']], 'foo'));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', [['foo' => 'bar']]);
-PHP,
+                $a = array_map('strtolower', [['foo' => 'bar']]);
+                PHP,
         ];
 
         yield 'It mutates correctly when the $indexKey parameter is present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_column([['foo' => 'bar']], 'foo', $indexKey);
-PHP
+                $a = array_column([['foo' => 'bar']], 'foo', $indexKey);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [['foo' => 'bar']];
-PHP,
+                $a = [['foo' => 'bar']];
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_column';
+                $a = 'array_column';
 
-$b = $a([['foo' => 'bar']], 'foo');
-PHP
+                $b = $a([['foo' => 'bar']], 'foo');
+                PHP
             ,
         ];
     }

@@ -53,42 +53,42 @@ final class LogicalAndNegationTest extends BaseMutatorTestCase
     {
         yield 'It mutates and with two expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() && b();
-PHP
+                $var = a() && b();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !(a() && b());
-PHP,
+                    $var = !(a() && b());
+                    PHP,
             ],
         ];
 
         yield 'It mutates and with more expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() && b() && c() && d();
-PHP
+                $var = a() && b() && c() && d();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !(a() && b() && c() && d());
-PHP,
+                    $var = !(a() && b() && c() && d());
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate already negated expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = !(a() && !b());
-PHP,
+                $var = !(a() && !b());
+                PHP,
         ];
     }
 }

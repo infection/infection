@@ -54,32 +54,32 @@ final class For_ implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces the looping condition of a `for` block statement preventing any statement within the block
-to be executed. For example:
+                Replaces the looping condition of a `for` block statement preventing any statement within the block
+                to be executed. For example:
 
-```php`
-for ($i=0; $i<10; $i++) {
-    // ...
-}
-```
+                ```php`
+                for ($i=0; $i<10; $i++) {
+                    // ...
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-for ($i=0; false; $i++) {
-    // ...
-}
-```
-TXT
+                ```php
+                for ($i=0; false; $i++) {
+                    // ...
+                }
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- for ($i=0; $i<10; $i++) {
-+ for ($i=0; false; $i++) {
-      // ...
-}
-DIFF,
+                - for ($i=0; $i<10; $i++) {
+                + for ($i=0; false; $i++) {
+                      // ...
+                }
+                DIFF,
         );
     }
 

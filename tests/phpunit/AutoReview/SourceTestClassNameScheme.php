@@ -38,8 +38,8 @@ namespace Infection\Tests\AutoReview;
 use Infection\CannotBeInstantiated;
 use function Safe\preg_match;
 use function Safe\preg_replace;
+use function str_contains;
 use function str_replace;
-use function strpos;
 
 final class SourceTestClassNameScheme
 {
@@ -56,7 +56,7 @@ final class SourceTestClassNameScheme
 
     public static function getTestClassName(string $sourceClassName): string
     {
-        if (strpos($sourceClassName, 'Infection\\Tests') !== false) {
+        if (str_contains($sourceClassName, 'Infection\\Tests')) {
             return $sourceClassName . 'Test';
         }
 

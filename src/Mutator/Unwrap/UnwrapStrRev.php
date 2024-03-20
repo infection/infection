@@ -47,25 +47,25 @@ final class UnwrapStrRev extends AbstractFunctionUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `strtolower` function call with its first operand. For example:
+                Replaces a `strtolower` function call with its first operand. For example:
 
-```php
-$x = strrev('Hello!');
-```
+                ```php
+                $x = strrev('Hello!');
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = 'Hello!';
-```
-TXT
+                ```php
+                $x = 'Hello!';
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = strrev('Hello!');
-+ $x = 'Hello!';
-DIFF,
+                - $x = strrev('Hello!');
+                + $x = 'Hello!';
+                DIFF,
         );
     }
 

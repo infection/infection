@@ -84,9 +84,9 @@ final class SchemaValidatorTest extends TestCase
                 '{}',
             ),
             <<<'ERROR'
-"/path/to/config" does not match the expected JSON schema:
- - [source] The property source is required
-ERROR
+                "/path/to/config" does not match the expected JSON schema:
+                 - [source] The property source is required
+                ERROR
             ,
         ];
 
@@ -96,10 +96,10 @@ ERROR
                 '{"timeout": "10"}',
             ),
             <<<'ERROR'
-"/path/to/config" does not match the expected JSON schema:
- - [source] The property source is required
- - [timeout] String value found, but a number is required
-ERROR
+                "/path/to/config" does not match the expected JSON schema:
+                 - [source] The property source is required
+                 - [timeout] String value found, but a number is required
+                ERROR
             ,
         ];
 
@@ -107,12 +107,12 @@ ERROR
             self::createConfigWithContents(
                 $path,
                 <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    }
-}
-JSON,
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        }
+                    }
+                    JSON,
             ),
             null,
         ];
