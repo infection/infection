@@ -75,26 +75,26 @@ final class MBString implements ConfigurableMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a statement making use of the mbstring extension with its vanilla code equivalent. For
-example:
+                Replaces a statement making use of the mbstring extension with its vanilla code equivalent. For
+                example:
 
-```php
-$x = mb_strlen($str) < 10;
-```
+                ```php
+                $x = mb_strlen($str) < 10;
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = strlen($str) < 10;
-```
-TXT
+                ```php
+                $x = strlen($str) < 10;
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = mb_strlen($str) < 10;
-+ $x = strlen($str) < 10;
-DIFF,
+                - $x = mb_strlen($str) < 10;
+                + $x = strlen($str) < 10;
+                DIFF,
         );
     }
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function array_map;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
@@ -48,6 +49,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
+use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
@@ -58,7 +60,7 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
      * @param string[] $sourceDirectories
-     * @param list<string> $filteredSourceFilesToMutate
+     * @param list<SplFileInfo> $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -71,6 +73,7 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
         bool $skipCoverage,
         bool $executeOnlyCoveringTestCases = false,
         array $filteredSourceFilesToMutate = [],
+        ?string $mapSourceClassToTestStrategy = null,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
 
@@ -95,7 +98,10 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
                 $sourceDirectories,
-                $filteredSourceFilesToMutate,
+                array_map(
+                    static fn (SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
+                    $filteredSourceFilesToMutate,
+                ),
             ),
             new MutationConfigBuilder(
                 $tmpDir,
@@ -104,7 +110,11 @@ final class PestAdapterFactory implements TestFrameworkAdapterFactory
                 $projectDir,
                 new JUnitTestCaseSorter(),
             ),
-            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases),
+            new ArgumentsAndOptionsBuilder(
+                $executeOnlyCoveringTestCases,
+                $filteredSourceFilesToMutate,
+                $mapSourceClassToTestStrategy,
+            ),
             new VersionParser(),
             new CommandLineBuilder(),
         );

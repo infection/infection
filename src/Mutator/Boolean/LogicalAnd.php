@@ -57,9 +57,9 @@ final class LogicalAnd implements Mutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b && User;
-+ $a = $b || $c;
-DIFF,
+                - $a = $b && User;
+                + $a = $b || $c;
+                DIFF,
         );
     }
 

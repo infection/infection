@@ -53,148 +53,148 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_change_key_case(['foo' => 'bar']);
-PHP
+                $a = array_change_key_case(['foo' => 'bar']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP,
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_change_key_case(\Class_With_Const::Const);
-PHP
+                $a = array_change_key_case(\Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP,
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_change_key_case' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_change_key_case(['foo' => 'bar']);
-PHP
+                $a = \array_change_key_case(['foo' => 'bar']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP,
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['A', 'B', 'C'], 2);
-PHP,
+                $a = array_map('strtolower', ['A', 'B', 'C'], 2);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_change_key_case' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_change_key_case($array, $case)
-{
-}
-PHP,
+                function array_change_key_case($array, $case)
+                {
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-if (array_change_key_case($a) === $a) {
-    return true;
-}
-PHP
+                $a = ['foo' => 'bar'];
+                if (array_change_key_case($a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-if ($a === $a) {
-    return true;
-}
-PHP,
+                $a = ['foo' => 'bar'];
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when array_change_key_case is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_ChAnGe_KeY_cAsE(['foo' => 'bar']);
-PHP
+                $a = aRrAy_ChAnGe_KeY_cAsE(['foo' => 'bar']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP,
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when array_change_key_case uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_change_key_case($foo->bar());
-PHP
+                $a = array_change_key_case($foo->bar());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP,
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_change_key_case(['foo' => 'bar']));
-PHP
+                $a = array_map('strtolower', array_change_key_case(['foo' => 'bar']));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo' => 'bar']);
-PHP,
+                $a = array_map('strtolower', ['foo' => 'bar']);
+                PHP,
         ];
 
         yield 'It mutates correctly when the $case parameter is present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_change_key_case(['foo' => 'bar'], $case);
-PHP
+                $a = array_change_key_case(['foo' => 'bar'], $case);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP,
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_change_key_case';
+                $a = 'array_change_key_case';
 
-$b = $a(['foo' => 'bar']);
-PHP
+                $b = $a(['foo' => 'bar']);
+                PHP
             ,
         ];
     }

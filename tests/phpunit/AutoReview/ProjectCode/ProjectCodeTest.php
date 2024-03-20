@@ -218,8 +218,8 @@ final class ProjectCodeTest extends TestCase
                 1,
                 $properties,
                 sprintf(
-                    'The "%s" class must have exactly 1 public property as it is a streamwrapper. ' .
-                    'If this has changed due to recent PHP developments, consider updating this test.',
+                    'The "%s" class must have exactly 1 public property as it is a streamwrapper. '
+                    . 'If this has changed due to recent PHP developments, consider updating this test.',
                     $className,
                 ),
             );
@@ -228,8 +228,8 @@ final class ProjectCodeTest extends TestCase
                 'context',
                 $properties[0]->getName(),
                 sprintf(
-                    'The "%s" class must have exactly 1 public property named "context". ' .
-                    'If this has changed due to recent PHP developments, consider updating this test.',
+                    'The "%s" class must have exactly 1 public property named "context". '
+                    . 'If this has changed due to recent PHP developments, consider updating this test.',
                     $className,
                 ),
             );

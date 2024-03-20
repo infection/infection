@@ -58,9 +58,9 @@ final class IncrementInteger extends AbstractNumberMutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = 20;
-+ $a = 21;
-DIFF,
+                - $a = 20;
+                + $a = 21;
+                DIFF,
         );
     }
 

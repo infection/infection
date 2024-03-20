@@ -203,12 +203,12 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-.: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
-..................................................   ( 50 / 127)
-..................................................   (100 / 127)
-...........................                          (127 / 127)
-TXT,
+                ..................................................   ( 50 / 127)
+                ..................................................   (100 / 127)
+                ...........................                          (127 / 127)
+                TXT,
         ),
             strip_tags($buffer->fetch()),
         );
@@ -232,12 +232,12 @@ TXT,
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-.: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
-..................................................   (   50)
-..................................................   (  100)
-...........................
-TXT,
+                ..................................................   (   50)
+                ..................................................   (  100)
+                ...........................
+                TXT,
         ),
             strip_tags($buffer->fetch()),
         );

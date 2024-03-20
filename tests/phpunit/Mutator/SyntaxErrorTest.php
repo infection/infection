@@ -51,16 +51,16 @@ final class SyntaxErrorTest extends BaseMutatorTestCase
     {
         yield 'It mutates method call to invalid syntax' => [
             <<<'PHP'
-<?php
+                <?php
 
-$this->methodCall();
-PHP
+                $this->methodCall();
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$->methodCall();
-PHP,
+                $->methodCall();
+                PHP,
         ];
     }
 }

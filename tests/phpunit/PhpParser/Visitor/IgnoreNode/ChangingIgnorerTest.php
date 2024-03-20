@@ -41,30 +41,30 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 final class ChangingIgnorerTest extends BaseNodeIgnorerTestCase
 {
     private const CODE_WITH_ONE_IGNORED_NODE = <<<'PHP'
-<?php
+        <?php
 
-class Foo
-{
-    public function bar()
-    {
-        $ignored + 1;
-    }
-}
+        class Foo
+        {
+            public function bar()
+            {
+                $ignored + 1;
+            }
+        }
 
-PHP;
+        PHP;
 
     private const CODE_WITH_ONE_COUNTED_NODE = <<<'PHP'
-<?php
+        <?php
 
-class Foo
-{
-    public function bar()
-    {
-        $counted + 1;
-    }
-}
+        class Foo
+        {
+            public function bar()
+            {
+                $counted + 1;
+            }
+        }
 
-PHP;
+        PHP;
 
     public function test_it_ignores_when_enabled(): ChangingIgnorer
     {

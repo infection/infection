@@ -69,9 +69,9 @@ final class AdapterInstallationDecider
         $question = new ConfirmationQuestion(
             sprintf(
                 <<<TEXT
-We noticed you are using a test framework supported by an external Infection plugin.
-Would you like to install <comment>%s</comment>? [<comment>yes</comment>]:
-TEXT
+                    We noticed you are using a test framework supported by an external Infection plugin.
+                    Would you like to install <comment>%s</comment>? [<comment>yes</comment>]:
+                    TEXT
                 ,
                 AdapterInstaller::OFFICIAL_ADAPTERS_MAP[$adapterName],
             ),

@@ -51,9 +51,9 @@ final class CastArray extends AbstractCastMutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a = (array) $object;
-+ $a = $object;
-DIFF,
+                - $a = (array) $object;
+                + $a = $object;
+                DIFF,
         );
     }
 

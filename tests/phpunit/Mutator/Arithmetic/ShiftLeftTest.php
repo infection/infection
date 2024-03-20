@@ -53,28 +53,28 @@ final class ShiftLeftTest extends BaseMutatorTestCase
     {
         yield 'It mutates shift left' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a << 2;
-PHP
+                $a = 1;
+                $a << 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a >> 2;
-PHP
+                $a = 1;
+                $a >> 2;
+                PHP
             ,
         ];
 
         yield 'It does not mutate shift right' => [
-        <<<'PHP'
-<?php
+            <<<'PHP'
+                <?php
 
-$a = 1;
-$a >> 2;
-PHP
+                $a = 1;
+                $a >> 2;
+                PHP
             ,
         ];
     }

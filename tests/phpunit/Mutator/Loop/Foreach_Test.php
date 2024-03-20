@@ -53,41 +53,41 @@ final class Foreach_Test extends BaseMutatorTestCase
     {
         yield 'It mutates to new array in foreach' => [
             <<<'PHP'
-<?php
+                <?php
 
-$array = [1, 2];
-foreach ($array as $value) {
-}
-PHP
+                $array = [1, 2];
+                foreach ($array as $value) {
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$array = [1, 2];
-foreach (array() as $value) {
-}
-PHP
+                $array = [1, 2];
+                foreach (array() as $value) {
+                }
+                PHP
             ,
         ];
 
         yield 'It does not change whether items were passed by reference' => [
             <<<'PHP'
-<?php
+                <?php
 
-$array = [1, 2];
-foreach ($array as $key => &$value) {
-    echo $value;
-}
-PHP
+                $array = [1, 2];
+                foreach ($array as $key => &$value) {
+                    echo $value;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$array = [1, 2];
-foreach (array() as $key => &$value) {
-    echo $value;
-}
-PHP,
+                $array = [1, 2];
+                foreach (array() as $key => &$value) {
+                    echo $value;
+                }
+                PHP,
         ];
     }
 }

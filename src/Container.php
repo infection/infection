@@ -191,6 +191,7 @@ final class Container
     public const DEFAULT_FILTER = '';
     public const DEFAULT_THREAD_COUNT = 1;
     public const DEFAULT_DRY_RUN = false;
+    public const DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
 
     /**
      * @var array<class-string<object>, true>
@@ -593,6 +594,7 @@ final class Container
             self::DEFAULT_HTML_LOGGER_PATH,
             self::DEFAULT_USE_NOOP_MUTATORS,
             self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
+            self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
         );
     }
 
@@ -628,6 +630,7 @@ final class Container
         ?string $htmlLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
+        ?string $mapSourceClassToTestStrategy,
     ): self {
         $clone = clone $this;
 
@@ -697,6 +700,7 @@ final class Container
                 $htmlLogFilePath,
                 $useNoopMutators,
                 $executeOnlyCoveringTestCases,
+                $mapSourceClassToTestStrategy,
             ),
         );
 

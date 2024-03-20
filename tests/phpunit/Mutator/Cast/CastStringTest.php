@@ -53,16 +53,16 @@ final class CastStringTest extends BaseMutatorTestCase
     {
         yield 'It removes casting to string' => [
             <<<'PHP'
-<?php
+                <?php
 
-(string) 1.0;
-PHP
+                (string) 1.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1.0;
-PHP
+                1.0;
+                PHP
             ,
         ];
     }

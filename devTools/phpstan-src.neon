@@ -71,11 +71,6 @@ parameters:
             path: ../src/Mutator/Unwrap/UnwrapFinally.php
 
         -
-            message: "#^Parameter \\#1 \\$callback of function array_map expects \\(callable\\(Infection\\\\TestFramework\\\\Coverage\\\\Trace\\|SplFileInfo\\)\\: mixed\\)\\|null, Closure\\(SplFileInfo\\)\\: \\(string\\|false\\) given\\.$#"
-            count: 1
-            path: ../src/TestFramework/Factory.php
-
-        -
             message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNode\\>\\.$#"
             count: 1
             path: ../src/TestFramework/SafeDOMXPath.php

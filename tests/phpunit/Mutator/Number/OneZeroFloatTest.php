@@ -53,79 +53,79 @@ final class OneZeroFloatTest extends BaseMutatorTestCase
     {
         yield 'It mutates float one to zero' => [
             <<<'PHP'
-<?php
+                <?php
 
-10 + 1.0;
-PHP
+                10 + 1.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-10 + 0.0;
-PHP
+                10 + 0.0;
+                PHP
             ,
         ];
 
         yield 'It mutates float zero to one' => [
             <<<'PHP'
-<?php
+                <?php
 
-10 + 0.0;
-PHP
+                10 + 0.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-10 + 1.0;
-PHP
+                10 + 1.0;
+                PHP
             ,
         ];
 
         yield 'It does not mutate int zero to one' => [
             <<<'PHP'
-<?php
+                <?php
 
-10 + 0;
-PHP
+                10 + 0;
+                PHP
             ,
         ];
 
         yield 'It does not mutate int one to zer0' => [
             <<<'PHP'
-<?php
+                <?php
 
-10 + 1;
-PHP
+                10 + 1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate the string 0.0' => [
             <<<'PHP'
-<?php
+                <?php
 
-'a' . '0.0';
-PHP,
+                'a' . '0.0';
+                PHP,
         ];
 
         yield 'It does not mutate other floats' => [
             <<<'PHP'
-<?php
+                <?php
 
-10 + 2.0;
-10 + 1.1;
-10 + 0.5;
-PHP
+                10 + 2.0;
+                10 + 1.1;
+                10 + 0.5;
+                PHP
             ,
         ];
 
         yield 'It does not mutate in a comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($a < 0.0) {
-    echo "small";
-}
-PHP,
+                if ($a < 0.0) {
+                    echo "small";
+                }
+                PHP,
         ];
     }
 }

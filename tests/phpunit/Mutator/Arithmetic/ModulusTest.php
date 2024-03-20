@@ -53,26 +53,26 @@ final class ModulusTest extends BaseMutatorTestCase
     {
         yield 'It mutates normal mod' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 % 3;
-PHP
+                $a = 10 % 3;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 * 3;
-PHP
+                $a = 10 * 3;
+                PHP
             ,
         ];
 
         yield 'It does not mutate mod equals' => [
             <<<'PHP'
-    <?php
+                    <?php
 
-    $a = 1;
-    $a %= 2;
-PHP
+                    $a = 1;
+                    $a %= 2;
+                PHP
             ,
         ];
     }

@@ -64,138 +64,130 @@ final class DiffSourceCodeMatcherTest extends TestCase
         yield 'Method name with PublicVisibility mutator' => [
             '.*getString.*',
             <<<'DIFF'
---- Original
-+++ New
-@@ @@
-         $this->getString();
-         return 'hello';
-     }
--    public function getString()
-+    protected function getString()
-     {
-         return 'string';
-     }
- }
-DIFF
-            ,
+                --- Original
+                +++ New
+                @@ @@
+                         $this->getString();
+                         return 'hello';
+                     }
+                -    public function getString()
+                +    protected function getString()
+                     {
+                         return 'string';
+                     }
+                 }
+                DIFF,
             true,
         ];
 
         yield 'Method name with MethodCallRemoval mutator' => [
             '.*getString.*',
             <<<'DIFF'
---- Original
-+++ New
-@@ @@
-     public function hello() : string
-     {
-         Assert::numeric('1');
--        $this->getString();
-+
-         return 'hello';
-     }
-     public function getString()
-DIFF
-            ,
+                --- Original
+                +++ New
+                @@ @@
+                     public function hello() : string
+                     {
+                         Assert::numeric('1');
+                -        $this->getString();
+                +
+                         return 'hello';
+                     }
+                     public function getString()
+                DIFF,
             true,
         ];
 
         yield 'Method name with not related PublicVisibility mutator' => [
             'getString',
             <<<'DIFF'
---- Original
-+++ New
-@@ @@
- use Webmozart\Assert\Assert;
- class SourceClass
- {
--    public function hello() : string
-+    protected function hello() : string
-     {
-         Assert::numeric('1');
-         $this->getString();
-DIFF
-            ,
+                --- Original
+                +++ New
+                @@ @@
+                 use Webmozart\Assert\Assert;
+                 class SourceClass
+                 {
+                -    public function hello() : string
+                +    protected function hello() : string
+                     {
+                         Assert::numeric('1');
+                         $this->getString();
+                DIFF,
             false,
         ];
 
         yield 'Method call on object with MethodCallRemoval mutator' => [
             '\$this->getString\(\);',
             <<<'DIFF'
---- Original
-+++ New
-@@ @@
-     public function hello() : string
-     {
-         Assert::numeric('1');
--        $this->getString();
-+
-         return 'hello';
-     }
-     public function getString()
-DIFF
-            ,
+                --- Original
+                +++ New
+                @@ @@
+                     public function hello() : string
+                     {
+                         Assert::numeric('1');
+                -        $this->getString();
+                +
+                         return 'hello';
+                     }
+                     public function getString()
+                DIFF,
             true,
         ];
 
         yield 'All methods of static class calls with MethodCallRemoval mutator' => [
             'Assert::.*',
             <<<'DIFF'
---- Original
-+++ New
-@@ @@
- {
-     public function hello() : string
-     {
--        Assert::numeric('1');
-+
-         $this->getString();
-         return 'hello';
-     }
-DIFF
-            ,
+                --- Original
+                +++ New
+                @@ @@
+                 {
+                     public function hello() : string
+                     {
+                -        Assert::numeric('1');
+                +
+                         $this->getString();
+                         return 'hello';
+                     }
+                DIFF,
             true,
         ];
 
         yield 'Method name with the minus operator' => [
             '.*getString.*',
             <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                --- Original
+                +++ New
+                @@ @@
 
-+ $a - 2 + $this->getString();
-DIFF
-            ,
+                + $a - 2 + $this->getString();
+                DIFF,
             false,
         ];
 
         yield 'Regex containing common delimiters should not lead to syntax error' => [
             '.*# comment\s*',
             <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                --- Original
+                +++ New
+                @@ @@
 
-- $a - 2 + $this->getString() / 2; # comment
-+ $a - 2 + $this->getString(); # comment
-DIFF
-            ,
-                true,
+                - $a - 2 + $this->getString() / 2; # comment
+                + $a - 2 + $this->getString(); # comment
+                DIFF,
+            true,
         ];
 
         yield 'Regex containing less common delimiters should not lead to syntax error' => [
             '.*%.*',
-                <<<'DIFF'
---- Original
-+++ New
-@@ @@
+            <<<'DIFF'
+                --- Original
+                +++ New
+                @@ @@
 
-- $a % 2;
-+ $a % 3;
-DIFF
-                ,
-                true,
+                - $a % 2;
+                + $a % 3;
+                DIFF,
+            true,
         ];
     }
 }

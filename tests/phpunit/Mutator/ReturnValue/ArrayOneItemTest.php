@@ -58,19 +58,19 @@ final class ArrayOneItemTest extends BaseMutatorTestCase
         yield 'It mutates when return typehint is not nullable array' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'mutates-not-nullable-array.php'),
             <<<'PHP'
-<?php
+                <?php
 
-namespace ArrayOneItem_NotNullableArray;
+                namespace ArrayOneItem_NotNullableArray;
 
-class Test
-{
-    public function getCollection() : array
-    {
-        $collection = [1, 2, 3];
-        return count($collection) > 1 ? array_slice($collection, 0, 1, true) : $collection;
-    }
-}
-PHP,
+                class Test
+                {
+                    public function getCollection() : array
+                    {
+                        $collection = [1, 2, 3];
+                        return count($collection) > 1 ? array_slice($collection, 0, 1, true) : $collection;
+                    }
+                }
+                PHP,
         ];
 
         yield 'It does not mutate the method call' => [

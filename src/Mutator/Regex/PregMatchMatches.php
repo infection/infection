@@ -57,30 +57,30 @@ final class PregMatchMatches implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `preg_match` search results with an empty result. For example:
+                Replaces a `preg_match` search results with an empty result. For example:
 
-```php
-if (preg_match('/pattern/', $subject, $matches, $flags)) {
-    // ...
-}
-```
+                ```php
+                if (preg_match('/pattern/', $subject, $matches, $flags)) {
+                    // ...
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-if ((int) $matches = []) {
-    // ...
-}
-```
+                ```php
+                if ((int) $matches = []) {
+                    // ...
+                }
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- preg_match('/pattern/', $subject, $matches, $flags);
-+ (int) $matches = [];
-DIFF,
+                - preg_match('/pattern/', $subject, $matches, $flags);
+                + (int) $matches = [];
+                DIFF,
         );
     }
 
@@ -104,8 +104,8 @@ DIFF,
             return false;
         }
 
-        if (!$node->name instanceof Node\Name ||
-            $node->name->toLowerString() !== 'preg_match') {
+        if (!$node->name instanceof Node\Name
+            || $node->name->toLowerString() !== 'preg_match') {
             return false;
         }
 

@@ -54,15 +54,15 @@ final class Plus implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an addition operator (`+`) with a subtraction operator (`-`).
-TXT
+                Replaces an addition operator (`+`) with a subtraction operator (`-`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b + $c;
-+ $a = $b - $c;
-DIFF,
+                - $a = $b + $c;
+                + $a = $b - $c;
+                DIFF,
         );
     }
 

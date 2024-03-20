@@ -45,9 +45,9 @@ final class NoLineExecutedTest extends TestCase
         $exception = NoLineExecuted::create();
 
         $expectedMessage = <<<'MSG'
-No line of code was executed during tests. This could be due to "@covers" annotations or your
-PHPUnit filters not being set up correctly.
-MSG;
+            No line of code was executed during tests. This could be due to "@covers" annotations or your
+            PHPUnit filters not being set up correctly.
+            MSG;
 
         $this->assertSame($expectedMessage, $exception->getMessage());
         $this->assertSame(0, $exception->getCode());

@@ -57,9 +57,9 @@ final class FalseValue implements Mutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = false;
-+ $a = true;
-DIFF,
+                - $a = false;
+                + $a = true;
+                DIFF,
         );
     }
 

@@ -41,12 +41,15 @@ use function array_merge;
 use function count;
 use function end;
 use function explode;
+use function implode;
+use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function is_numeric;
 use function ltrim;
 use function preg_quote;
 use function rtrim;
+use SplFileInfo;
 use function sprintf;
 use function version_compare;
 
@@ -57,21 +60,35 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 {
     private const MAX_EXPLODE_PARTS = 2;
 
-    public function __construct(private readonly bool $executeOnlyCoveringTestCases)
-    {
+    /**
+     * @param list<SplFileInfo> $filteredSourceFilesToMutate
+     */
+    public function __construct(
+        private readonly bool $executeOnlyCoveringTestCases,
+        private readonly array $filteredSourceFilesToMutate,
+        private readonly ?string $mapSourceClassToTestStrategy,
+    ) {
     }
 
+    /**
+     * @return list<string>
+     */
     public function buildForInitialTestsRun(string $configPath, string $extraOptions): array
     {
-        $options = [
-            '--configuration',
-            $configPath,
-        ];
+        $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
-        if ($extraOptions !== '') {
-            $options = array_merge(
-                $options,
-                array_map(static fn ($option): string => '--' . $option, explode(' --', ltrim($extraOptions, '-'))),
+        if ($this->filteredSourceFilesToMutate !== []
+            && $this->mapSourceClassToTestStrategy !== null
+            && !in_array('--filter', $options, true)
+        ) {
+            $options[] = '--filter';
+
+            $options[] = implode(
+                '|',
+                array_map(
+                    $this->mapSourceClassToTestClass(...),
+                    $this->filteredSourceFilesToMutate,
+                ),
             );
         }
 
@@ -80,10 +97,11 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 
     /**
      * @param TestLocation[] $tests
+     * @return list<string>
      */
     public function buildForMutant(string $configPath, string $extraOptions, array $tests, string $testFrameworkVersion): array
     {
-        $options = $this->buildForInitialTestsRun($configPath, $extraOptions);
+        $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
         if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
             $filterString = '/';
@@ -118,6 +136,34 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 
             $options[] = '--filter';
             $options[] = $filterString;
+        }
+
+        return $options;
+    }
+
+    private function mapSourceClassToTestClass(SplFileInfo $sourceFile): string
+    {
+        return sprintf('%sTest', $sourceFile->getBasename('.' . $sourceFile->getExtension()));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function prepareArgumentsAndOptions(string $configPath, string $extraOptions): array
+    {
+        $options = [
+            '--configuration',
+            $configPath,
+        ];
+
+        if ($extraOptions !== '') {
+            $options = array_merge(
+                $options,
+                array_map(
+                    static fn ($option): string => '--' . $option,
+                    explode(' --', ltrim($extraOptions, '-')),
+                ),
+            );
         }
 
         return $options;
