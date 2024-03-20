@@ -59,9 +59,9 @@ final class EnvManipulationTest extends TestCase
             file_get_contents($fileWithEnvManipulations),
             sprintf(
                 <<<'TXT'
-    Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have
-    been found in the file "%s".
-TXT
+                        Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have
+                        been found in the file "%s".
+                    TXT
                 ,
                 $testCaseClassName,
                 BacksUpEnvironmentVariables::class,

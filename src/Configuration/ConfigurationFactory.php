@@ -112,6 +112,7 @@ class ConfigurationFactory
         ?string $htmlLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
+        ?string $mapSourceClassToTestStrategy,
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -167,6 +168,7 @@ class ConfigurationFactory
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
             $gitDiffBase,
+            $mapSourceClassToTestStrategy,
         );
     }
 

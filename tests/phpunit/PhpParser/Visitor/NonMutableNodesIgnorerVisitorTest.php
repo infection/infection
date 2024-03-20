@@ -55,15 +55,15 @@ final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
     public function test_it_does_not_traverse_after_ignore(): void
     {
         $this->parseAndTraverse(<<<'PHP'
-<?php
+            <?php
 
-class Foo
-{
-    public function bar(): void
-    {
-    }
-}
-PHP
+            class Foo
+            {
+                public function bar(): void
+                {
+                }
+            }
+            PHP
         );
         $this->assertSame(0, $this->spyVisitor->getNumberOfNodesVisited());
     }

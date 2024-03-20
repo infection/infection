@@ -83,14 +83,14 @@ final class MutantProcessFactoryTest extends TestCase
             ),
             'killed#0',
             $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                --- Original
+                +++ New
+                @@ @@
 
-- echo 'original';
-+ echo 'killed#0';
+                - echo 'original';
+                + echo 'killed#0';
 
-DIFF,
+                DIFF,
             '<?php $a = 1;',
         );
 

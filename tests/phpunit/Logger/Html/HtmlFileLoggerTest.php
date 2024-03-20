@@ -51,26 +51,26 @@ final class HtmlFileLoggerTest extends TestCase
 
         $this->assertSame(
             <<<'HTML'
-            <!DOCTYPE html>
-            <html>
-                <body>
-                    <a href="/">Back</a>
-                    <mutation-test-report-app title-postfix="Infection"></mutation-test-report-app>
-                    <script defer src="https://cdn.jsdelivr.net/npm/mutation-testing-elements/dist/mutation-test-elements.js"></script>
-                    <script>
-                        const app = document.getElementsByTagName('mutation-test-report-app').item(0);
-                        function updateTheme() {
-                            document.body.style.backgroundColor = app.themeBackgroundColor;
-                        }
-                        app.addEventListener('theme-changed', updateTheme);
-                        updateTheme();
+                <!DOCTYPE html>
+                <html>
+                    <body>
+                        <a href="/">Back</a>
+                        <mutation-test-report-app title-postfix="Infection"></mutation-test-report-app>
+                        <script defer src="https://cdn.jsdelivr.net/npm/mutation-testing-elements/dist/mutation-test-elements.js"></script>
+                        <script>
+                            const app = document.getElementsByTagName('mutation-test-report-app').item(0);
+                            function updateTheme() {
+                                document.body.style.backgroundColor = app.themeBackgroundColor;
+                            }
+                            app.addEventListener('theme-changed', updateTheme);
+                            updateTheme();
 
-                        document.getElementsByTagName('mutation-test-report-app').item(0).report = {"schemaVersion":"1","thresholds":{"high":90,"low":50},"files":{},"testFiles":{},"framework":{"name":"Infection","branding":{"homepageUrl":"https:\/\/infection.github.io\/","imageUrl":"https:\/\/infection.github.io\/images\/logo.png"}}}
-                        ;
-                    </script>
-                </body>
-            </html>
-            HTML,
+                            document.getElementsByTagName('mutation-test-report-app').item(0).report = {"schemaVersion":"1","thresholds":{"high":90,"low":50},"files":{},"testFiles":{},"framework":{"name":"Infection","branding":{"homepageUrl":"https:\/\/infection.github.io\/","imageUrl":"https:\/\/infection.github.io\/images\/logo.png"}}}
+                            ;
+                        </script>
+                    </body>
+                </html>
+                HTML,
             $logLines[0],
         );
     }

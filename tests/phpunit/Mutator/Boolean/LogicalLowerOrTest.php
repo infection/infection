@@ -53,25 +53,25 @@ final class LogicalLowerOrTest extends BaseMutatorTestCase
     {
         yield 'It mutates logical lower or' => [
             <<<'PHP'
-<?php
+                <?php
 
-true or false;
-PHP
+                true or false;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-true and false;
-PHP
+                true and false;
+                PHP
             ,
         ];
 
         yield 'It does not mutate logical or' => [
             <<<'PHP'
-<?php
+                <?php
 
-true || false;
-PHP
+                true || false;
+                PHP
             ,
         ];
     }

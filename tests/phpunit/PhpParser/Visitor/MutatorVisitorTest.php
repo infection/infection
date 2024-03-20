@@ -78,33 +78,33 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
         yield 'it mutates the correct node' => (static function (): iterable {
             return [
                 $nodes = self::parseCode(<<<'PHP'
-<?php
+                    <?php
 
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
-    public function bye() : string
-    {
-        return 'bye';
-    }
-}
-PHP
+                    class Test
+                    {
+                        public function hello() : string
+                        {
+                            return 'hello';
+                        }
+                        public function bye() : string
+                        {
+                            return 'bye';
+                        }
+                    }
+                    PHP
                 ),
                 <<<'PHP'
-<?php
+                    <?php
 
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
+                    class Test
+                    {
+                        public function hello() : string
+                        {
+                            return 'hello';
+                        }
 
-}
-PHP
+                    }
+                    PHP
                 ,
                 new Mutation(
                     'path/to/file',
@@ -129,34 +129,34 @@ PHP
         yield 'it can mutate the node with multiple-ones' => (static function (): iterable {
             return [
                 $nodes = self::parseCode(<<<'PHP'
-<?php
+                    <?php
 
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
-    public function bye() : string
-    {
-        return 'bye';
-    }
-}
-PHP
+                    class Test
+                    {
+                        public function hello() : string
+                        {
+                            return 'hello';
+                        }
+                        public function bye() : string
+                        {
+                            return 'bye';
+                        }
+                    }
+                    PHP
                 ),
                 <<<'PHP'
-<?php
+                    <?php
 
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
+                    class Test
+                    {
+                        public function hello() : string
+                        {
+                            return 'hello';
+                        }
 
 
-}
-PHP
+                    }
+                    PHP
                 ,
                 new Mutation(
                     'path/to/file',
@@ -181,36 +181,36 @@ PHP
         yield 'it does not mutate if only one of start or end position is correctly set' => (static function (): iterable {
             return [
                 $nodes = self::parseCode(<<<'PHP'
-<?php
+                    <?php
 
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
-    public function bye() : string
-    {
-        return 'bye';
-    }
-}
-PHP
+                    class Test
+                    {
+                        public function hello() : string
+                        {
+                            return 'hello';
+                        }
+                        public function bye() : string
+                        {
+                            return 'bye';
+                        }
+                    }
+                    PHP
                 ),
                 <<<'PHP'
-<?php
+                    <?php
 
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
-    public function bye() : string
-    {
-        return 'bye';
-    }
-}
-PHP
+                    class Test
+                    {
+                        public function hello() : string
+                        {
+                            return 'hello';
+                        }
+                        public function bye() : string
+                        {
+                            return 'bye';
+                        }
+                    }
+                    PHP
                 ,
                 new Mutation(
                     'path/to/file',
@@ -249,36 +249,36 @@ PHP
 
             return [
                 $nodes = $badParser->parse(<<<'PHP'
-<?php
+                    <?php
 
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
-    public function bye() : string
-    {
-        return 'bye';
-    }
-}
-PHP
+                    class Test
+                    {
+                        public function hello() : string
+                        {
+                            return 'hello';
+                        }
+                        public function bye() : string
+                        {
+                            return 'bye';
+                        }
+                    }
+                    PHP
                 ),
                 <<<'PHP'
-<?php
+                    <?php
 
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
-    public function bye() : string
-    {
-        return 'bye';
-    }
-}
-PHP
+                    class Test
+                    {
+                        public function hello() : string
+                        {
+                            return 'hello';
+                        }
+                        public function bye() : string
+                        {
+                            return 'bye';
+                        }
+                    }
+                    PHP
                 ,
                 new Mutation(
                     'path/to/file',

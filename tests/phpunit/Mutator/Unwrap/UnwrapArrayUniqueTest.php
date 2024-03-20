@@ -53,148 +53,148 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_unique(['foo', 'bar', 'bar']);
-PHP
+                $a = array_unique(['foo', 'bar', 'bar']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'bar'];
-PHP,
+                $a = ['foo', 'bar', 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_unique(\Class_With_Const::Const);
-PHP
+                $a = array_unique(\Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP,
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_unique' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_unique(['foo', 'bar', 'bar']);
-PHP
+                $a = \array_unique(['foo', 'bar', 'bar']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'bar'];
-PHP,
+                $a = ['foo', 'bar', 'bar'];
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo', 'bar', 'bar']);
-PHP,
+                $a = array_map('strtolower', ['foo', 'bar', 'bar']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_unique' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_unique($array)
-{
-}
-PHP,
+                function array_unique($array)
+                {
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'bar'];
-if (array_unique($a) === $a) {
-    return true;
-}
-PHP
+                $a = ['foo', 'bar', 'bar'];
+                if (array_unique($a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'bar'];
-if ($a === $a) {
-    return true;
-}
-PHP,
+                $a = ['foo', 'bar', 'bar'];
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when array_unique is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_UnIqUe(['foo', 'bar', 'bar']);
-PHP
+                $a = aRrAy_UnIqUe(['foo', 'bar', 'bar']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'bar'];
-PHP,
+                $a = ['foo', 'bar', 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when array_unique uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_unique($foo->bar());
-PHP
+                $a = array_unique($foo->bar());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP,
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_unique(['foo', 'bar', 'bar']));
-PHP
+                $a = array_map('strtolower', array_unique(['foo', 'bar', 'bar']));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo', 'bar', 'bar']);
-PHP,
+                $a = array_map('strtolower', ['foo', 'bar', 'bar']);
+                PHP,
         ];
 
         yield 'It mutates correctly when the $sortFlags parameter is present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_unique(['foo', 'bar', 'bar'], $sortFlags);
-PHP
+                $a = array_unique(['foo', 'bar', 'bar'], $sortFlags);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'bar'];
-PHP,
+                $a = ['foo', 'bar', 'bar'];
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_unique';
+                $a = 'array_unique';
 
-$b = $a(['foo', 'bar', 'bar']);
-PHP
+                $b = $a(['foo', 'bar', 'bar']);
+                PHP
             ,
         ];
     }

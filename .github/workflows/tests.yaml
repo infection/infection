@@ -54,14 +54,6 @@ jobs:
         if: matrix.dependencies != 'locked'
         run: composer config --unset platform.php
 
-      - name: Configure for PHP >= 8.3
-        if: "matrix.php-version >= '8.3'"
-        run: composer config platform.php 8.2.99
-
-      - name: Configure minimum-stability
-        if: matrix.symfony-version == '7.*.*'
-        run: composer config minimum-stability dev
-
       - name: Enforce the Symfony version used
         if: matrix.dependencies != 'locked'
         run: composer config extra.symfony.require ${{ matrix.symfony-version }}

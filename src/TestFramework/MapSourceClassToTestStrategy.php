@@ -33,65 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Regex;
-
-use Generator;
-use Infection\Mutator\Definition;
-use Infection\Mutator\MutatorCategory;
-use function Safe\preg_match;
+namespace Infection\TestFramework;
 
 /**
  * @internal
  */
-final class PregMatchRemoveDollar extends AbstractPregMatch
+final class MapSourceClassToTestStrategy
 {
-    public const ANALYSE_REGEX = '/^([^\w\s\\\\])([^$]*)([$]?)\1([gmixXsuUAJD]*)$/';
-
-    public static function getDefinition(): ?Definition
-    {
-        return new Definition(
-            <<<'TXT'
-                Removes a "$" character from a regular expression in `preg_match()`. For example:
-
-                ```php
-                preg_match('/^test$/', $string);
-                ```
-
-                Will be mutated to:
-
-                ```php
-                preg_match('/^test/', $string);
-                ```
-
-                TXT
-            ,
-            MutatorCategory::SEMANTIC_REDUCTION,
-            null,
-            <<<'DIFF'
-                - preg_match('/^test$/', $string);
-                + preg_match('/^test/', $string);
-                DIFF,
-        );
-    }
+    public const SIMPLE = 'simple';
 
     /**
-     * @psalm-mutation-free
+     * @return list<string>
      */
-    protected function mutateRegex(string $regex): Generator
+    public static function getAll(): array
     {
-        preg_match(self::ANALYSE_REGEX, $regex, $matches);
-
-        $delimiter = $matches[1] ?? '';
-        $regexBody = $matches[2] ?? '';
-        $flags = $matches[4] ?? '';
-
-        yield $delimiter . $regexBody . $delimiter . $flags;
-    }
-
-    protected function isProperRegexToMutate(string $regex): bool
-    {
-        preg_match(self::ANALYSE_REGEX, $regex, $matches);
-
-        return ($matches[3] ?? null) === '$';
+        return [self::SIMPLE];
     }
 }

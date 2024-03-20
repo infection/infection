@@ -56,16 +56,16 @@ final class NotIdenticalNotEqual implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a strict inequality comparison (using a not-identical operator (`!==`)) with a loose
-inequality comparison (using a not-equal operator (`!=`)).
-TXT
+                Replaces a strict inequality comparison (using a not-identical operator (`!==`)) with a loose
+                inequality comparison (using a not-equal operator (`!=`)).
+                TXT
             ,
             MutatorCategory::SEMANTIC_ADDITION,
             null,
             <<<'DIFF'
-- $a = $b !== $c;
-+ $a = $b != $c;
-DIFF,
+                - $a = $b !== $c;
+                + $a = $b != $c;
+                DIFF,
         );
     }
 

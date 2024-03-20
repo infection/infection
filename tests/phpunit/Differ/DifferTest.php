@@ -64,124 +64,124 @@ final class DifferTest extends TestCase
             '',
             '',
             <<<'PHP'
---- Original
-+++ New
+                --- Original
+                +++ New
 
-PHP,
+                PHP,
         ];
 
         yield 'nominal' => [
             <<<'PHP'
 
-public function echo(): void
-{
-    echo 10;
-}
+                public function echo(): void
+                {
+                    echo 10;
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
 
-public function echo(): void
-{
-    echo 15;
-}
+                public function echo(): void
+                {
+                    echo 15;
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
---- Original
-+++ New
-@@ @@
+                --- Original
+                +++ New
+                @@ @@
 
- public function echo(): void
- {
--    echo 10;
-+    echo 15;
- }
+                 public function echo(): void
+                 {
+                -    echo 10;
+                +    echo 15;
+                 }
 
-PHP,
+                PHP,
         ];
 
         yield 'no change' => [
             <<<'PHP'
 
-public function echo(): void
-{
-    echo 10;
-}
+                public function echo(): void
+                {
+                    echo 10;
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
 
-public function echo(): void
-{
-    echo 10;
-}
+                public function echo(): void
+                {
+                    echo 10;
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
---- Original
-+++ New
+                --- Original
+                +++ New
 
-PHP,
+                PHP,
         ];
 
         yield 'line excess' => [
             <<<'PHP'
-0
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-PHP
+                0
+                1
+                2
+                3
+                4
+                5
+                6
+                7
+                8
+                9
+                10
+                11
+                12
+                13
+                14
+                15
+                PHP
             ,
             <<<'PHP'
-0
-1
-2
-3
-4
-5
-(6)
-7
-8
-9
-10
-11
-12
-13
-14
-15
-PHP
+                0
+                1
+                2
+                3
+                4
+                5
+                (6)
+                7
+                8
+                9
+                10
+                11
+                12
+                13
+                14
+                15
+                PHP
             ,
             <<<'PHP'
---- Original
-+++ New
-@@ @@
- 3
- 4
- 5
--6
-+(6)
- 7
- 8
- 9
+                --- Original
+                +++ New
+                @@ @@
+                 3
+                 4
+                 5
+                -6
+                +(6)
+                 7
+                 8
+                 9
 
-PHP,
+                PHP,
         ];
     }
 

@@ -60,9 +60,9 @@ final class InvalidPhpUnitConfigurationTest extends TestCase
 
         $this->assertSame(
             <<<'TXT'
-The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-<lib-xml-errors>
-TXT
+                The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
+                <lib-xml-errors>
+                TXT
             ,
             normalizeLineReturn($exception->getMessage()),
         );

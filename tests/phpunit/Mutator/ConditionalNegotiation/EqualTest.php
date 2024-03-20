@@ -53,34 +53,34 @@ final class EqualTest extends BaseMutatorTestCase
     {
         yield 'It mutates not strict comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 == 1;
-PHP
+                1 == 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1 != 1;
-PHP
+                1 != 1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate strict comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 === 1;
-PHP
+                1 === 1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate not equals comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 !== 1;
-PHP
+                1 !== 1;
+                PHP
             ,
         ];
     }

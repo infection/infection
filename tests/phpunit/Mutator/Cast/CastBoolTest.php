@@ -53,31 +53,31 @@ final class CastBoolTest extends BaseMutatorTestCase
     {
         yield 'It removes casting to bool with "bool"' => [
             <<<'PHP'
-<?php
+                <?php
 
-(bool) 1;
-PHP
+                (bool) 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1;
-PHP
+                1;
+                PHP
             ,
         ];
 
         yield 'It removes casting to bool with "boolean"' => [
             <<<'PHP'
-<?php
+                <?php
 
-(boolean) 1;
-PHP
+                (boolean) 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1;
-PHP
+                1;
+                PHP
             ,
         ];
     }

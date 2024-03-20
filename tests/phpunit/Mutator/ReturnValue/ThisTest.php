@@ -58,18 +58,18 @@ final class ThisTest extends BaseMutatorTestCase
         yield 'It does mutate with no typehint' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'this_return-this.php'),
             <<<'PHP'
-<?php
+                <?php
 
-namespace ThisReturnThis;
+                namespace ThisReturnThis;
 
-class Test
-{
-    function test()
-    {
-        return null;
-    }
-}
-PHP,
+                class Test
+                {
+                    function test()
+                    {
+                        return null;
+                    }
+                }
+                PHP,
         ];
 
         yield 'It does not mutate non \'this\' return statements' => [

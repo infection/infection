@@ -142,15 +142,15 @@ class MutationConfigBuilder extends ConfigBuilder
 
         return sprintf(
             <<<'PHP'
-<?php
+                <?php
 
-if (function_exists('proc_nice')) {
-    proc_nice(1);
-}
-%s
-require_once '%s';
+                if (function_exists('proc_nice')) {
+                    proc_nice(1);
+                }
+                %s
+                require_once '%s';
 
-PHP
+                PHP
             ,
             $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath),
             $originalAutoloadFile,

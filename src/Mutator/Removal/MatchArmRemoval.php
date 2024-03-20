@@ -55,48 +55,48 @@ final class MatchArmRemoval implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Removes `match arm`s from `match`.
+                Removes `match arm`s from `match`.
 
-```php
-match ($x) {
-    'cond1', 'cond2' => true,
-    default => throw new \Exception(),
-};
-```
+                ```php
+                match ($x) {
+                    'cond1', 'cond2' => true,
+                    default => throw new \Exception(),
+                };
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-match ($x) {
-    'cond1' => true,
-    default => throw new \Exception(),
-};
-```
+                ```php
+                match ($x) {
+                    'cond1' => true,
+                    default => throw new \Exception(),
+                };
+                ```
 
-```php
-match ($x) {
-    'cond2' => true,
-    default => throw new \Exception(),
-};
-```
+                ```php
+                match ($x) {
+                    'cond2' => true,
+                    default => throw new \Exception(),
+                };
+                ```
 
-And:
-```php
-match ($x) {
-    default => throw new \Exception(),
-};
-```
-TXT,
+                And:
+                ```php
+                match ($x) {
+                    default => throw new \Exception(),
+                };
+                ```
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-match ($x) {
--   0 => false,
-    1 => true,
-    2 => null,
-    default => throw new \Exception(),
-};
-DIFF,
+                match ($x) {
+                -   0 => false,
+                    1 => true,
+                    2 => null,
+                    default => throw new \Exception(),
+                };
+                DIFF,
         );
     }
 

@@ -54,16 +54,16 @@ final class Increment implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a pre- or post-increment operator (`++`) with the analogue pre- or post-decrement operator
-(`--`).
-TXT
+                Replaces a pre- or post-increment operator (`++`) with the analogue pre- or post-decrement operator
+                (`--`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a++;
-+ $a--;
-DIFF,
+                - $a++;
+                + $a--;
+                DIFF,
         );
     }
 

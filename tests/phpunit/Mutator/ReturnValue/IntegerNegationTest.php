@@ -55,79 +55,79 @@ final class IntegerNegationTest extends BaseMutatorTestCase
     {
         yield 'It mutates negative -1 int return to positive' => [
             <<<'PHP'
-<?php
+                <?php
 
-return -1;
-PHP
+                return -1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return 1;
-PHP
+                return 1;
+                PHP
             ,
         ];
 
         yield 'It mutates negative -2 int return to positive' => [
             <<<'PHP'
-<?php
+                <?php
 
-return -2;
-PHP
+                return -2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return 2;
-PHP
+                return 2;
+                PHP
             ,
         ];
 
         yield 'It mutates positive 1 int return to negative' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 1;
-PHP
+                return 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return -1;
-PHP
+                return -1;
+                PHP
             ,
         ];
 
         yield 'It mutates positive 2 int return to negative' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 2;
-PHP
+                return 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return -2;
-PHP
+                return -2;
+                PHP
             ,
         ];
 
         yield 'It does not mutate int zero' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 0;
-PHP
+                return 0;
+                PHP
             ,
         ];
 
         yield 'It does not mutate floats' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 1.0;
-PHP
+                return 1.0;
+                PHP
             ,
         ];
     }

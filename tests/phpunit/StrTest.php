@@ -72,18 +72,18 @@ final class StrTest extends TestCase
             <<<'TXT'
 
 
-Hello!
-TXT
+                Hello!
+                TXT
             ,
             'Hello!',
         ];
 
         yield 'string with trailing line returns' => [
             <<<'TXT'
-Hello!
+                Hello!
 
 
-TXT
+                TXT
             ,
             'Hello!',
         ];
@@ -92,10 +92,10 @@ TXT
             <<<'TXT'
 
 
-Hello!
+                Hello!
 
 
-TXT
+                TXT
             ,
             'Hello!',
         ];
@@ -104,36 +104,36 @@ TXT
             <<<'TXT'
 
 
-Hello...
+                Hello...
 
-...World!
+                ...World!
 
 
-TXT
+                TXT
             ,
             <<<'TXT'
-Hello...
+                Hello...
 
-...World!
-TXT,
+                ...World!
+                TXT,
         ];
 
         yield 'string with leading, trailing & in-between line returns & dirty empty strings' => [
             <<<'TXT'
-  
+                  
 
-  Hello...
-    
- ...World!
-  
+                  Hello...
+                    
+                 ...World!
+                  
 
-TXT
+                TXT
             ,
             <<<'TXT'
-  Hello...
-    
- ...World!
-TXT,
+                  Hello...
+                    
+                 ...World!
+                TXT,
         ];
     }
 }

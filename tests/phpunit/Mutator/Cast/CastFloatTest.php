@@ -53,46 +53,46 @@ final class CastFloatTest extends BaseMutatorTestCase
     {
         yield 'It removes casting to float' => [
             <<<'PHP'
-<?php
+                <?php
 
-(float) '1.1';
-PHP
+                (float) '1.1';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-'1.1';
-PHP
+                '1.1';
+                PHP
             ,
         ];
 
         yield 'It removes casting to double' => [
             <<<'PHP'
-<?php
+                <?php
 
-(double) '1.1';
-PHP
+                (double) '1.1';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-'1.1';
-PHP
+                '1.1';
+                PHP
             ,
         ];
 
         yield 'It removes casting to real' => [
             <<<'PHP'
-<?php
+                <?php
 
-(real) '1.1';
-PHP
+                (real) '1.1';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-'1.1';
-PHP
+                '1.1';
+                PHP
             ,
         ];
     }

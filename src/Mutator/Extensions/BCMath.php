@@ -70,25 +70,25 @@ final class BCMath implements ConfigurableMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a statement making use of the bcmath extension with its vanilla code equivalent. For example:
+                Replaces a statement making use of the bcmath extension with its vanilla code equivalent. For example:
 
-```php`
-$x = bcadd($a, $b);
-```
+                ```php`
+                $x = bcadd($a, $b);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = (string) ($a + $b);
-```
-TXT
+                ```php
+                $x = (string) ($a + $b);
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = bcadd($a, $b);
-+ $x = (string) ($a + $b);
-DIFF,
+                - $x = bcadd($a, $b);
+                + $x = (string) ($a + $b);
+                DIFF,
         );
     }
 

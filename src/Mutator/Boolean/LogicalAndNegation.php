@@ -55,15 +55,15 @@ final class LogicalAndNegation implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Negates a whole AND expression (`&&`).
-TXT
+                Negates a whole AND expression (`&&`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b && $c;
-+ $a = !($b && $c);
-DIFF,
+                - $a = $b && $c;
+                + $a = !($b && $c);
+                DIFF,
         );
     }
 
