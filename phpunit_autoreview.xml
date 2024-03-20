@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/10.4.xsd"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/9.2.xsd"
          bootstrap="./vendor/autoload.php"
          colors="true"
          executionOrder="random"
          stopOnFailure="true"
          failOnWarning="true"
          failOnRisky="true"
-         cacheDirectory=".phpunit.autoreview.cache"
+         verbose="true"
 >
 
-  <testsuites>
-    <testsuite name="Auto-Review Test Suite">
-      <directory>tests/phpunit/AutoReview</directory>
-    </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite name="Auto-Review Test Suite">
+            <directory>tests/phpunit/AutoReview</directory>
+        </testsuite>
+    </testsuites>
 
-  <source>
-    <include>
-      <directory>tests/phpunit/AutoReview</directory>
-    </include>
-  </source>
+    <filter>
+        <whitelist>
+            <directory>tests/phpunit/AutoReview</directory>
+        </whitelist>
+    </filter>
+
 </phpunit>
