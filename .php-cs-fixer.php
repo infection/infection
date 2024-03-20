@@ -107,9 +107,11 @@ return (new Config())
         'blank_line_between_import_groups' => false,
         'compact_nullable_typehint' => true,
         'concat_space' => ['spacing' => 'one'],
-        // TODO: enable back
-        'fully_qualified_strict_types' => false,
-        'get_class_to_class_keyword' => true,
+        'fully_qualified_strict_types' => [
+            'import_symbols' => true,
+        ],
+        // TODO: enable
+        'get_class_to_class_keyword' => false,
         'global_namespace_import' => [
             'import_classes' => true,
             'import_constants' => true,
