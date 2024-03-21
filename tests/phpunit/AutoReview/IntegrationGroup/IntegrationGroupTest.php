@@ -35,13 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use function array_flip;
-use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
-use function str_contains;
 
 final class IntegrationGroupTest extends TestCase
 {
@@ -52,32 +50,36 @@ final class IntegrationGroupTest extends TestCase
     ): void {
         $reflectionClass = new ReflectionClass($testCaseClassName);
 
-        $phpDoc = (string) $reflectionClass->getDocComment();
+        $groupAttributes = $reflectionClass->getAttributes(Group::class);
 
-        $this->assertArrayHasKey(
-            '@group',
-            array_flip(SingletonContainer::getPHPDocParser()->parse($phpDoc)),
-            sprintf(
-                <<<'TXT'
-                    Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been
-                    found in the file "%s".
-                    TXT
-                ,
-                $testCaseClassName,
-                $fileWithIoOperations,
-            ),
-        );
-
-        if (!str_contains($phpDoc, '@group integration')) {
-            $this->fail(sprintf(
-                <<<'TXT'
-                    Expected the test case "%s" to have the annotation `@group integration` as I/O operations have been
-                    found in the file "%s".
-                    TXT
-                ,
-                $testCaseClassName,
-                $fileWithIoOperations,
-            ));
+        if ($groupAttributes === []) {
+            $this->failWithIntegrationGroupMessage($testCaseClassName, $fileWithIoOperations);
         }
+
+        foreach ($groupAttributes as $groupAttribute) {
+            /** @var Group $instance */
+            $instance = $groupAttribute->newInstance();
+
+            if ($instance->name() === 'integration') {
+                $this->addToAssertionCount(1);
+
+                return;
+            }
+        }
+
+        $this->failWithIntegrationGroupMessage($testCaseClassName, $fileWithIoOperations);
+    }
+
+    private function failWithIntegrationGroupMessage(string $testCaseClassName, string $fileWithIoOperations): void
+    {
+        $this->fail(sprintf(
+            <<<'TXT'
+                Expected the test case "%s" to have the attribute `#[Group('integration')]` as I/O operations have been
+                found in the file "%s".
+                TXT
+            ,
+            $testCaseClassName,
+            $fileWithIoOperations,
+        ));
     }
 }
