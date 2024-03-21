@@ -6,7 +6,7 @@
          executionOrder="random"
          failOnWarning="true"
          failOnRisky="true"
-         verbose="true"
+         cacheDirectory="./build/cache/phpunit"
 >
 
     <php>
@@ -22,11 +22,11 @@
         </testsuite>
     </testsuites>
 
-    <coverage cacheDirectory="./reports/.coverage-cache">
+    <source>
         <include>
             <directory>src</directory>
         </include>
-    </coverage>
+    </source>
 
     <groups>
         <exclude>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/9.2.xsd"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/10.4.xsd"
          bootstrap="./vendor/autoload.php"
          colors="true"
          executionOrder="random"
          stopOnFailure="true"
          failOnWarning="true"
          failOnRisky="true"
-         verbose="true"
+         cacheDirectory="./build/cache/phpunit-autoreview"
 >
 
     <testsuites>
@@ -16,10 +16,9 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist>
+    <source>
+        <include>
             <directory>tests/phpunit/AutoReview</directory>
-        </whitelist>
-    </filter>
-
+        </include>
+    </source>
 </phpunit>
