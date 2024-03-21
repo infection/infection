@@ -6,30 +6,32 @@
          executionOrder="random"
          failOnWarning="true"
          failOnRisky="true"
-         cacheDirectory=".phpunit.cache"
+         cacheDirectory="./build/cache/phpunit"
 >
 
-  <php>
-    <env name="COLUMNS" value="100" force="true"/>
-  </php>
+    <php>
+        <env name="COLUMNS" value="100" force="true" />
+    </php>
 
-  <testsuites>
-    <testsuite name="Infection Test Suite">
-      <directory>tests/phpunit</directory>
-      <exclude>tests/phpunit/AutoReview</exclude>
-      <exclude>tests/phpunit/Fixtures</exclude>
-    </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite name="Infection Test Suite">
+            <directory>tests/phpunit</directory>
 
-  <groups>
-    <exclude>
-      <group>e2e</group>
-    </exclude>
-  </groups>
+            <exclude>tests/phpunit/AutoReview</exclude>
+            <exclude>tests/phpunit/Fixtures</exclude>
+        </testsuite>
+    </testsuites>
 
-  <source>
-    <include>
-      <directory>src</directory>
-    </include>
-  </source>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+
+    <groups>
+        <exclude>
+            <group>e2e</group>
+        </exclude>
+    </groups>
+
 </phpunit>

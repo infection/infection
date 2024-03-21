@@ -7,18 +7,18 @@
          stopOnFailure="true"
          failOnWarning="true"
          failOnRisky="true"
-         cacheDirectory=".phpunit.autoreview.cache"
+         cacheDirectory="./build/cache/phpunit-autoreview"
 >
 
-  <testsuites>
-    <testsuite name="Auto-Review Test Suite">
-      <directory>tests/phpunit/AutoReview</directory>
-    </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite name="Auto-Review Test Suite">
+            <directory>tests/phpunit/AutoReview</directory>
+        </testsuite>
+    </testsuites>
 
-  <source>
-    <include>
-      <directory>tests/phpunit/AutoReview</directory>
-    </include>
-  </source>
+    <source>
+        <include>
+            <directory>tests/phpunit/AutoReview</directory>
+        </include>
+    </source>
 </phpunit>
