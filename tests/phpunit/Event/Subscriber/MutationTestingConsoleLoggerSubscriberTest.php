@@ -51,6 +51,7 @@ use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use Infection\Tests\Logger\FakeMutationTestingResultsLogger;
+use Infection\Tests\WithConsecutive;
 use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -176,7 +177,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->output
             ->expects($this->atLeastOnce())
             ->method('writeln')
-            ->withConsecutive(
+            ->with(...WithConsecutive::create(
                 [
                     [
                         '',
@@ -191,7 +192,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                         '1) /original/filePath:10    [M] Plus',
                     ],
                 ],
-            );
+            ));
 
         $executionResult = $this->createMock(MutantExecutionResult::class);
         $executionResult->expects($this->once())
@@ -229,7 +230,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->output
             ->expects($this->atLeastOnce())
             ->method('writeln')
-            ->withConsecutive(
+            ->with(...WithConsecutive::create(
                 [
                     [
                         '',
@@ -239,7 +240,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                 [
                     '<options=bold>0</options=bold> mutations were generated:',
                 ],
-            );
+            ));
 
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')

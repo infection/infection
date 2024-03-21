@@ -49,6 +49,7 @@ use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
+use Infection\Tests\WithConsecutive;
 use function Later\now;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -138,12 +139,12 @@ final class MutationGeneratorTest extends TestCase
         $eventDispatcherMock
             ->expects($this->exactly(4))
             ->method('dispatch')
-            ->withConsecutive(
+            ->with(...WithConsecutive::create(
                 [new MutationGenerationWasStarted(2)],
                 [new MutableFileWasProcessed()],
                 [new MutableFileWasProcessed()],
                 [new MutationGenerationWasFinished()],
-            )
+            ))
         ;
 
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
@@ -197,12 +198,12 @@ final class MutationGeneratorTest extends TestCase
         $eventDispatcherMock
             ->expects($this->exactly(4))
             ->method('dispatch')
-            ->withConsecutive(
+            ->with(...WithConsecutive::create(
                 [new MutationGenerationWasStarted(0)],
                 [new MutableFileWasProcessed()],
                 [new MutableFileWasProcessed()],
                 [new MutationGenerationWasFinished()],
-            )
+            ))
         ;
 
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
