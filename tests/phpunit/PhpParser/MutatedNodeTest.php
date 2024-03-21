@@ -37,15 +37,15 @@ namespace Infection\Tests\PhpParser;
 
 use Infection\PhpParser\MutatedNode;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class MutatedNodeTest extends TestCase
 {
     /**
-     * @dataProvider nodeProvider
-     *
      * @param Node|Node[] $node
      */
+    #[DataProvider('nodeProvider')]
     public function test_it_can_be_instantiated($node): void
     {
         $mutatedNode = MutatedNode::wrap($node);

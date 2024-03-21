@@ -39,6 +39,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\FileSystem\Locator\Locator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -72,10 +73,9 @@ final class SchemaConfigurationLoaderTest extends TestCase
     }
 
     /**
-     * @dataProvider configurationPathsProvider
-     *
      * @param string[] $potentialPaths
      */
+    #[DataProvider('configurationPathsProvider')]
     public function test_it_loads_the_located_file(
         array $potentialPaths,
         string $expectedPath,

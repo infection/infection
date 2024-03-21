@@ -41,6 +41,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
 use const PHP_OS_FAMILY;
+use PHPUnit\Framework\Attributes\DataProvider;
 use function Safe\chdir;
 use function Safe\realpath;
 use function Safe\touch;
@@ -104,9 +105,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider jUnitPathsProvider
-     */
+    #[DataProvider('jUnitPathsProvider')]
     public function test_it_can_find_more_exotic_junit_file_names(string $jUnitRelativePaths): void
     {
         (new Filesystem())->dumpFile($jUnitRelativePaths, '');

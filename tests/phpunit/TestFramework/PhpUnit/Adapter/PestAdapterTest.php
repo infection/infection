@@ -44,6 +44,7 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\VersionParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class PestAdapterTest extends TestCase
@@ -90,9 +91,7 @@ final class PestAdapterTest extends TestCase
         $this->assertTrue($this->adapter->hasJUnitReport());
     }
 
-    /**
-     * @dataProvider passOutputProvider
-     */
+    #[DataProvider('passOutputProvider')]
     public function test_it_can_tell_if_tests_pass_from_the_output(
         string $output,
         bool $expected,
@@ -102,9 +101,7 @@ final class PestAdapterTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider syntaxErrorOutputProvider
-     */
+    #[DataProvider('syntaxErrorOutputProvider')]
     public function test_it_can_tell_if_there_is_a_syntax_error_from_the_output(
         string $output,
         bool $expected,
@@ -114,9 +111,7 @@ final class PestAdapterTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider memoryReportProvider
-     */
+    #[DataProvider('memoryReportProvider')]
     public function test_it_can_tell_the_memory_usage_from_the_output(string $output, float $expectedResult): void
     {
         $result = $this->adapter->getMemoryUsed($output);

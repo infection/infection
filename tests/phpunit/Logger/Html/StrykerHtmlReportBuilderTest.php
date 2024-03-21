@@ -52,6 +52,7 @@ use function Infection\Tests\normalize_trailing_spaces;
 use JsonSchema\Validator;
 use function Later\now;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\base64_decode;
 use function Safe\file_get_contents;
@@ -67,9 +68,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/mutation-testing-report-schema.json';
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,

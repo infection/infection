@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\SafeDOMXPath;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use function version_compare;
@@ -72,9 +73,7 @@ final class XmlConfigurationVersionProviderTest extends TestCase
             });
     }
 
-    /**
-     * @dataProvider configurationsProvider
-     */
+    #[DataProvider('configurationsProvider')]
     public function test_it_finds_correct_version(SafeDOMXPath $xPath, bool $mainline): void
     {
         $version = $this->versionProvider->provide($xPath);

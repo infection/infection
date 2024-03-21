@@ -37,6 +37,7 @@ namespace Infection\Tests\Differ;
 
 use Generator;
 use Infection\Differ\DiffSourceCodeMatcher;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class DiffSourceCodeMatcherTest extends TestCase
@@ -49,9 +50,7 @@ final class DiffSourceCodeMatcherTest extends TestCase
         $this->diffSourceCodeMatcher = new DiffSourceCodeMatcher();
     }
 
-    /**
-     * @dataProvider diffRegexProvider
-     */
+    #[DataProvider('diffRegexProvider')]
     public function test_it_matches_diff_with_provided_regex(string $regex, string $diff, bool $expectedMatches): void
     {
         $matches = $this->diffSourceCodeMatcher->matches($diff, $regex);

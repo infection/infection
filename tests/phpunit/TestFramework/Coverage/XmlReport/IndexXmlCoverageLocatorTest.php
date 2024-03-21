@@ -41,6 +41,7 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
 use const PHP_OS_FAMILY;
+use PHPUnit\Framework\Attributes\DataProvider;
 use function Safe\chdir;
 use function Safe\realpath;
 use function Safe\touch;
@@ -101,9 +102,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider indexPathsProvider
-     */
+    #[DataProvider('indexPathsProvider')]
     public function test_it_can_find_more_exotic_index_file_names(string $indexRelativePath): void
     {
         (new Filesystem())->dumpFile($indexRelativePath, '');

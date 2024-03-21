@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\PhpDoc;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class PHPDocParserTest extends TestCase
 {
-    /**
-     * @dataProvider phpDocProvider
-     */
+    #[DataProvider('phpDocProvider')]
     public function test_it_can_parse_phpdoc(string $phpDoc, array $expected): void
     {
         $actual = (new PHPDocParser())->parse($phpDoc);

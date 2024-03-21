@@ -47,6 +47,7 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @group integration
@@ -54,10 +55,9 @@ use PhpParser\ParserFactory;
 final class MutatorVisitorTest extends BaseVisitorTestCase
 {
     /**
-     * @dataProvider providesMutationCases
-     *
      * @param Node[] $nodes
      */
+    #[DataProvider('providesMutationCases')]
     public function test_it_mutates_the_correct_node(
         array $nodes,
         string $expectedCodeOutput,

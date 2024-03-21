@@ -53,6 +53,7 @@ use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\SingletonContainer;
 use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
@@ -144,9 +145,7 @@ final class FileMutationGeneratorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider parsedFilesProvider
-     */
+    #[DataProvider('parsedFilesProvider')]
     public function test_it_attempts_to_generate_mutations_for_the_file_if_covered_or_not_only_covered_code(
         string $file,
         string $relativePath,
@@ -195,9 +194,7 @@ final class FileMutationGeneratorTest extends TestCase
         $this->assertSame([], $mutations);
     }
 
-    /**
-     * @dataProvider skippedFilesProvider
-     */
+    #[DataProvider('skippedFilesProvider')]
     public function test_it_skips_the_mutation_generation_if_checks_only_covered_code_and_the_file_has_no_tests(
         string $file,
         string $relativePath,

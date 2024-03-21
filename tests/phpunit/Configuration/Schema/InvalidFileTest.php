@@ -38,6 +38,7 @@ namespace Infection\Tests\Configuration\Schema;
 use Error;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -85,9 +86,7 @@ final class InvalidFileTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    /**
-     * @dataProvider jsonErrorProvider
-     */
+    #[DataProvider('jsonErrorProvider')]
     public function test_it_can_be_created_for_file_with_invalid_json_content(
         SchemaConfigurationFile $config,
         string $error,

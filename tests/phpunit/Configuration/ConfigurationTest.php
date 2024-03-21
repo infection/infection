@@ -44,6 +44,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -52,14 +53,13 @@ final class ConfigurationTest extends TestCase
     use ConfigurationAssertions;
 
     /**
-     * @dataProvider valueProvider
-     *
      * @param string[] $sourceDirectories
      * @param string[] $sourceFilesExcludes
      * @param SplFileInfo[] $sourceFiles
      * @param Mutator[] $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
+    #[DataProvider('valueProvider')]
     public function test_it_can_be_instantiated(
         float $timeout,
         array $sourceDirectories,

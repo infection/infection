@@ -38,6 +38,7 @@ namespace Infection\Tests;
 use function is_dir;
 use const PHP_OS_FAMILY;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -57,9 +58,7 @@ final class BenchmarkTest extends TestCase
      */
     private $phpExecutable;
 
-    /**
-     * @dataProvider provideBenchmarks
-     */
+    #[DataProvider('provideBenchmarks')]
     public function test_all_the_benchmarks_can_be_executed(string $path, string $sourcesLocation): void
     {
         if (PHP_OS_FAMILY === 'Windows') {

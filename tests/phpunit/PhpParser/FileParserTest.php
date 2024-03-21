@@ -42,6 +42,7 @@ use Infection\Tests\StringNormalizer;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\Parser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
@@ -71,9 +72,7 @@ final class FileParserTest extends TestCase
         $this->assertSame($expectedReturnedStatements, $returnedStatements);
     }
 
-    /**
-     * @dataProvider fileToParserProvider
-     */
+    #[DataProvider('fileToParserProvider')]
     public function test_it_can_parse_a_file(SplFileInfo $fileInfo, string $expectedPrintedParsedContents): void
     {
         $statements = SingletonContainer::getContainer()->getFileParser()->parse($fileInfo);

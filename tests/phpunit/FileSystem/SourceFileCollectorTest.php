@@ -41,6 +41,7 @@ use function array_values;
 use function count;
 use Infection\FileSystem\SourceFileCollector;
 use function natcasesort;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use function range;
@@ -50,9 +51,7 @@ final class SourceFileCollectorTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
 
-    /**
-     * @dataProvider sourceFilesProvider
-     */
+    #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(array $sourceDirectories, array $excludedFiles, array $expected): void
     {
         $root = self::FIXTURES;

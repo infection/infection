@@ -43,6 +43,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
 use function Later\now;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class MutantTest extends TestCase
@@ -50,10 +51,9 @@ final class MutantTest extends TestCase
     use MutantAssertions;
 
     /**
-     * @dataProvider valuesProvider
-     *
      * @param TestLocation[] $expectedTests
      */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         string $filePath,
         Mutation $mutation,

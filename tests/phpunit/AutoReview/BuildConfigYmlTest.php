@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\realpath;
@@ -49,9 +50,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class BuildConfigYmlTest extends TestCase
 {
-    /**
-     * @dataProvider providesYamlFilesForTesting
-     */
+    #[DataProvider('providesYamlFilesForTesting')]
     public function test_valid_yaml_has_key($filePath): void
     {
         $this->assertFileExists($filePath);

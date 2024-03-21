@@ -45,6 +45,7 @@ use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
 use const PATH_SEPARATOR;
+use PHPUnit\Framework\Attributes\DataProvider;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
@@ -177,9 +178,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         );
     }
 
-    /**
-     * @dataProvider providesMockSetup
-     */
+    #[DataProvider('providesMockSetup')]
     public function test_it_finds_framework_script_from_bat(string $methodName): void
     {
         $mock = new MockVendor($this->tmp, $this->fileSystem);

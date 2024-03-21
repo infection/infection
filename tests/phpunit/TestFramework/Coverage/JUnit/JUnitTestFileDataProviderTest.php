@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_put_contents;
@@ -158,9 +159,7 @@ final class JUnitTestFileDataProviderTest extends TestCase
         $this->assertSame('/app/controllers/ExampleCest.php', $testFileInfo->path);
     }
 
-    /**
-     * @dataProvider xmlProvider
-     */
+    #[DataProvider('xmlProvider')]
     public function test_it_does_not_trigger_count_assertion(string $xml): void
     {
         file_put_contents($this->tempfile, $xml);

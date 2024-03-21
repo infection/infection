@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\MutatorParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class MutatorParserTest extends TestCase
@@ -51,10 +52,9 @@ final class MutatorParserTest extends TestCase
     }
 
     /**
-     * @dataProvider mutatorInputProvider
-     *
      * @param string[] $expectedMutators
      */
+    #[DataProvider('mutatorInputProvider')]
     public function test_it_can_parse_the_provided_input(
         string $mutatorInput,
         array $expectedMutators,

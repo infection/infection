@@ -38,6 +38,7 @@ namespace Infection\Tests\AutoReview\Event;
 use function class_exists;
 use function in_array;
 use Infection\Event\Subscriber\EventSubscriber;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use function Safe\class_implements;
 use function sprintf;
@@ -47,9 +48,7 @@ use function sprintf;
  */
 final class SubscriberProviderTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
-     */
+    #[DataProviderExternal(SubscriberProvider::class, 'subscriberClassesProvider')]
     public function test_subscriber_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(

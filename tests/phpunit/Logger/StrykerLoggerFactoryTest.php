@@ -44,6 +44,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\FakeCiDetector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -95,9 +96,7 @@ final class StrykerLoggerFactoryTest extends TestCase
         $this->assertInstanceOf(StrykerLogger::class, $logger);
     }
 
-    /**
-     * @dataProvider logsProvider
-     */
+    #[DataProvider('logsProvider')]
     public function test_it_creates_a_logger_for_log_type_on_normal_verbosity(
         Logs $logs,
         ?string $expectedLogger,

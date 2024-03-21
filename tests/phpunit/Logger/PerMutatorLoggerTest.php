@@ -38,6 +38,7 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\PerMutatorLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class PerMutatorLoggerTest extends TestCase
@@ -45,9 +46,7 @@ final class PerMutatorLoggerTest extends TestCase
     use CreateMetricsCalculator;
     use LineLoggerAssertions;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,

@@ -41,6 +41,7 @@ use Infection\Logger\ConsoleLogger;
 use function Infection\Tests\normalize_trailing_spaces;
 use InvalidArgumentException;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Safe\DateTime;
@@ -65,9 +66,7 @@ final class ConsoleLoggerTest extends TestCase
         $logger->log('unknownLogLevel', 'foo bar');
     }
 
-    /**
-     * @dataProvider outputMappingProvider
-     */
+    #[DataProvider('outputMappingProvider')]
     public function test_the_log_level_is_added_to_the_message(
         string $logLevel,
         int $outputVerbosity,
@@ -105,9 +104,7 @@ final class ConsoleLoggerTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider valueToCastProvider
-     */
+    #[DataProvider('valueToCastProvider')]
     public function test_it_casts_the_context_values_into_strings($value, string $expected): void
     {
         $output = new BufferedOutput();

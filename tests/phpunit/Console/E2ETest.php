@@ -53,6 +53,7 @@ use function is_readable;
 use const PHP_EOL;
 use const PHP_OS;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
 use function Safe\copy;
@@ -164,9 +165,9 @@ final class E2ETest extends TestCase
     }
 
     /**
-     * @dataProvider e2eTestSuiteDataProvider
      * @runInSeparateProcess
      */
+    #[DataProvider('e2eTestSuiteDataProvider')]
     public function test_it_runs_an_e2e_test_with_success(string $fullPath): void
     {
         $this->runOnE2EFixture($fullPath);

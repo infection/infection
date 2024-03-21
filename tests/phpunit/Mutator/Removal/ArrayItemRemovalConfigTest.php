@@ -39,14 +39,13 @@ use Infection\Mutator\Removal\ArrayItemRemovalConfig;
 use InvalidArgumentException;
 use const PHP_INT_MAX;
 use const PHP_VERSION_ID;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use TypeError;
 
 final class ArrayItemRemovalConfigTest extends TestCase
 {
-    /**
-     * @dataProvider settingsProvider
-     */
+    #[DataProvider('settingsProvider')]
     public function test_it_can_create_a_config(
         array $settings,
         string $expectedRemove,

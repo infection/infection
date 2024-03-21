@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
@@ -72,9 +73,7 @@ final class IndexXmlCoverageParserTest extends TestCase
         $this->parser = new IndexXmlCoverageParser(false);
     }
 
-    /**
-     * @dataProvider coverageProvider
-     */
+    #[DataProvider('coverageProvider')]
     public function test_it_collects_data_recursively_for_all_files(string $xml): void
     {
         $sourceFilesData = $this->parser->parse(
@@ -156,9 +155,7 @@ final class IndexXmlCoverageParserTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider noCoveredLineReportProviders
-     */
+    #[DataProvider('noCoveredLineReportProviders')]
     public function test_it_errors_when_no_lines_were_executed(string $xml): void
     {
         $this->expectException(NoLineExecuted::class);
@@ -170,9 +167,7 @@ final class IndexXmlCoverageParserTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider noCoveredLineReportProviders
-     */
+    #[DataProvider('noCoveredLineReportProviders')]
     public function test_it_errors_for_git_diff_lines_mode_when_no_lines_were_executed(string $xml): void
     {
         $this->expectException(NoLineExecutedInDiffLinesMode::class);

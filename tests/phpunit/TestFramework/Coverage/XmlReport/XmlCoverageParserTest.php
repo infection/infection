@@ -41,6 +41,7 @@ use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -57,10 +58,9 @@ final class XmlCoverageParserTest extends TestCase
     }
 
     /**
-     * @dataProvider sourceFileInfoProviderProvider
-     *
      * @param array<string, mixed> $expectedTests
      */
+    #[DataProvider('sourceFileInfoProviderProvider')]
     public function test_it_reads_every_type_of_fixture(
         SourceFileInfoProvider $provider,
         array $expectedTests,

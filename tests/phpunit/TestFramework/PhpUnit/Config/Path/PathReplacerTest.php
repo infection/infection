@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 use DOMDocument;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use function Infection\Tests\normalizePath as p;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
@@ -57,9 +58,7 @@ final class PathReplacerTest extends TestCase
         self::$projectPath = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
     }
 
-    /**
-     * @dataProvider pathProvider
-     */
+    #[DataProvider('pathProvider')]
     public function test_it_replaces_relative_path_with_absolute_path(
         string $originalPath,
         string $expectedPath,

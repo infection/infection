@@ -40,6 +40,7 @@ use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
@@ -64,10 +65,9 @@ final class RootsFileLocatorTest extends TestCase
     }
 
     /**
-     * @dataProvider pathsProvider
-     *
      * @param string[] $roots
      */
+    #[DataProvider('pathsProvider')]
     public function test_it_can_locate_files(
         array $roots,
         string $file,
@@ -79,10 +79,9 @@ final class RootsFileLocatorTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidPathsProvider
-     *
      * @param string[] $roots
      */
+    #[DataProvider('invalidPathsProvider')]
     public function test_it_throws_an_exception_if_file_or_folder_does_not_exist(
         array $roots,
         string $file,
@@ -102,11 +101,10 @@ final class RootsFileLocatorTest extends TestCase
     }
 
     /**
-     * @dataProvider multiplePathsProvider
-     *
      * @param string[] $roots
      * @param string[] $files
      */
+    #[DataProvider('multiplePathsProvider')]
     public function test_it_can_locate_one_of_the_given_files(
         array $roots,
         array $files,
@@ -118,11 +116,10 @@ final class RootsFileLocatorTest extends TestCase
     }
 
     /**
-     * @dataProvider multipleInvalidPathsProvider
-     *
      * @param string[] $roots
      * @param string[] $files
      */
+    #[DataProvider('multipleInvalidPathsProvider')]
     public function test_locate_any_throws_exception_if_no_file_could_be_found(
         array $roots,
         array $files,

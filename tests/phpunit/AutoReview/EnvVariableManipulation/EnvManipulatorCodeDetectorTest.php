@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -42,9 +43,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class EnvManipulatorCodeDetectorTest extends TestCase
 {
-    /**
-     * @dataProvider codeProvider
-     */
+    #[DataProvider('codeProvider')]
     public function test_it_can_detect_environment_variable_manipulations(string $code, bool $expected): void
     {
         $actual = EnvManipulatorCodeDetector::codeManipulatesEnvVariables($code);

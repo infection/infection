@@ -40,6 +40,7 @@ use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
 use function Infection\Tests\normalizeLineReturn;
 use function json_last_error_msg;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\json_decode;
@@ -47,9 +48,7 @@ use Webmozart\Assert\Assert;
 
 final class SchemaValidatorTest extends TestCase
 {
-    /**
-     * @dataProvider configProvider
-     */
+    #[DataProvider('configProvider')]
     public function test_it_validates_the_given_raw_config(
         SchemaConfigurationFile $config,
         ?string $expectedErrorMessage,

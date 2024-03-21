@@ -38,13 +38,12 @@ namespace Infection\Tests\Configuration\Schema;
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use function Infection\Tests\normalizeLineReturn;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class InvalidSchemaTest extends TestCase
 {
-    /**
-     * @dataProvider configWithErrorsProvider
-     */
+    #[DataProvider('configWithErrorsProvider')]
     public function test_it_can_be_instantiated(
         SchemaConfigurationFile $config,
         array $errors,

@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class DocBlockParserTest extends TestCase
 {
-    /**
-     * @dataProvider docBlocksProvider
-     */
+    #[DataProvider('docBlocksProvider')]
     public function test_it_can_parse_php_doc_blocks(string $docBlock, string $expected): void
     {
         $actual = DocBlockParser::parse($docBlock);

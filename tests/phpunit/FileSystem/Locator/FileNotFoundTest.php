@@ -36,15 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Locator;
 
 use Infection\FileSystem\Locator\FileNotFound;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class FileNotFoundTest extends TestCase
 {
     /**
-     * @dataProvider nonExistentPathsProvider
-     *
      * @param string[] $roots
      */
+    #[DataProvider('nonExistentPathsProvider')]
     public function test_file_or_directory_does_not_exist(
         string $file,
         array $roots,
@@ -58,11 +58,10 @@ final class FileNotFoundTest extends TestCase
     }
 
     /**
-     * @dataProvider multipleNonExistentPathsProvider
-     *
      * @param string[] $files
      * @param string[] $roots
      */
+    #[DataProvider('multipleNonExistentPathsProvider')]
     public function test_files_or_directories_does_not_exist(
         array $files,
         array $roots,

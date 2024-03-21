@@ -42,6 +42,7 @@ use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class TestLocatorTest extends TestCase
@@ -66,10 +67,9 @@ final class TestLocatorTest extends TestCase
     }
 
     /**
-     * @dataProvider rangeProvider
-     *
      * @param array<string, string|float>[] $expectedTests
      */
+    #[DataProvider('rangeProvider')]
     public function test_it_can_locate_the_tests_executing_the_given_range(
         NodeLineRangeData $range,
         bool $onFunctionSignature,
@@ -82,9 +82,7 @@ final class TestLocatorTest extends TestCase
         $this->assertSame($expectedTests, TestLocationsNormalizer::normalize($tests));
     }
 
-    /**
-     * @dataProvider rangeProvider
-     */
+    #[DataProvider('rangeProvider')]
     public function test_it_cannot_locate_any_tests_executing_the_given_range_if_no_tests_are_found(
         NodeLineRangeData $range,
         bool $onFunctionSignature,

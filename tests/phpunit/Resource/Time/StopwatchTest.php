@@ -37,6 +37,7 @@ namespace Infection\Tests\Resource\Time;
 
 use Infection\Resource\Time\Stopwatch;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function round;
 use function usleep;
@@ -59,9 +60,7 @@ final class StopwatchTest extends TestCase
         $this->stopwatch = new Stopwatch();
     }
 
-    /**
-     * @dataProvider timeProvider
-     */
+    #[DataProvider('timeProvider')]
     public function test_it_returns_the_time_took_on_stop(int $sleepTime, float $expectedTime): void
     {
         $this->stopwatch->start();

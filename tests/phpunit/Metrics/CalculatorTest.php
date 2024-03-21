@@ -39,15 +39,14 @@ use function array_sum;
 use Infection\Metrics\Calculator;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Tests\Logger\CreateMetricsCalculator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class CalculatorTest extends TestCase
 {
     use CreateMetricsCalculator;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_can_calculate_the_scores(
         int $roundingPrecision,
         int $killedCount,
@@ -84,9 +83,7 @@ final class CalculatorTest extends TestCase
         $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
-    /**
-     * @dataProvider metricsCalculatorProvider
-     */
+    #[DataProvider('metricsCalculatorProvider')]
     public function test_it_can_be_created_from_a_metrics_calculator(
         MetricsCalculator $metricsCalculator,
         float $expectedMsi,

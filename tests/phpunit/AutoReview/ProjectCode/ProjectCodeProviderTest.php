@@ -37,6 +37,7 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function class_exists;
 use function interface_exists;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use function trait_exists;
@@ -46,9 +47,7 @@ use function trait_exists;
  */
 final class ProjectCodeProviderTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
     public function test_source_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
@@ -66,9 +65,7 @@ final class ProjectCodeProviderTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::concreteSourceClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
     public function test_concrete_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
@@ -80,9 +77,7 @@ final class ProjectCodeProviderTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::nonTestedConcreteClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'nonTestedConcreteClassesProvider')]
     public function test_non_tested_concrete_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
@@ -96,9 +91,7 @@ final class ProjectCodeProviderTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesToCheckForPublicPropertiesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
     public function test_source_classes_to_check_for_public_properties_provider_is_valid(string $className): void
     {
         $this->assertTrue(
@@ -110,9 +103,7 @@ final class ProjectCodeProviderTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'classesTestProvider')]
     public function test_test_classes_provider_is_valid(string $className): void
     {
         $this->assertTrue(
@@ -130,9 +121,7 @@ final class ProjectCodeProviderTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::nonFinalExtensionClasses
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'nonFinalExtensionClasses')]
     public function test_non_final_extension_classes_provider_is_valid(string $className): void
     {
         $this->assertTrue(

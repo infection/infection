@@ -47,6 +47,7 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use InvalidArgumentException;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\DataProvider;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 use function Safe\simplexml_load_string;
@@ -356,9 +357,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(0, $printerClass->length);
     }
 
-    /**
-     * @dataProvider executionOrderProvider
-     */
+    #[DataProvider('executionOrderProvider')]
     public function test_it_adds_execution_order_for_proper_phpunit_versions(
         string $version,
         string $attributeName,
@@ -392,9 +391,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(0, $resolveDependencies->length);
     }
 
-    /**
-     * @dataProvider failOnProvider
-     */
+    #[DataProvider('failOnProvider')]
     public function test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions(
         string $version,
         string $attributeName,

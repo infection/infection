@@ -39,6 +39,7 @@ use function array_map;
 use Generator;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -113,9 +114,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideTestCases
-     */
+    #[DataProvider('provideTestCases')]
     public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(bool $executeOnlyCoveringTestCases, array $testCases, string $phpUnitVersion, ?string $expectedFilterOptionValue = null): void
     {
         $configPath = '/the config/path';

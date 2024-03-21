@@ -39,6 +39,7 @@ use function class_exists;
 use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\class_implements;
@@ -49,9 +50,7 @@ use function sprintf;
  */
 final class MutatorProviderTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::mutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'mutatorClassesProvider')]
     public function test_mutator_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
@@ -66,9 +65,7 @@ final class MutatorProviderTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::concreteMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'concreteMutatorClassesProvider')]
     public function test_concrete_mutator_class_provider_is_valid(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);
@@ -83,9 +80,7 @@ final class MutatorProviderTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::configurableMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'configurableMutatorClassesProvider')]
     public function test_configurable_mutator_class_provider_is_valid(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);

@@ -50,6 +50,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\DataProvider;
 use function Safe\exec;
 use function Safe\file_get_contents;
 use function Safe\realpath;
@@ -547,11 +548,10 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
     }
 
     /**
-     * @dataProvider locationsProvider
-     *
      * @param TestLocation[] $tests
      * @param string[] $expectedFiles
      */
+    #[DataProvider('locationsProvider')]
     public function test_it_sets_sorted_list_of_test_files(
         array $tests,
         array $expectedFiles,
@@ -622,9 +622,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         );
     }
 
-    /**
-     * @dataProvider failOnProvider
-     */
+    #[DataProvider('failOnProvider')]
     public function test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions(
         string $version,
         string $attributeName,

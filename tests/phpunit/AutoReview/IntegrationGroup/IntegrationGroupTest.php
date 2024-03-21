@@ -37,6 +37,7 @@ namespace Infection\Tests\AutoReview\IntegrationGroup;
 
 use function array_flip;
 use Infection\Tests\SingletonContainer;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
@@ -44,9 +45,7 @@ use function str_contains;
 
 final class IntegrationGroupTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::ioTestCaseTupleProvider
-     */
+    #[DataProviderExternal(IntegrationGroupProvider::class, 'ioTestCaseTupleProvider')]
     public function test_the_test_cases_requiring_io_operations_belongs_to_the_integration_group(
         string $testCaseClassName,
         string $fileWithIoOperations,

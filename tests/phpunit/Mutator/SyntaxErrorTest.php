@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 final class SyntaxErrorTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected, [], true);

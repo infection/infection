@@ -39,6 +39,7 @@ use function array_map;
 use Generator;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\DiffChangedLinesParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 
@@ -47,9 +48,7 @@ use function Safe\realpath;
  */
 final class DiffChangedLinesParserTest extends TestCase
 {
-    /**
-     * @dataProvider provideDiffs
-     */
+    #[DataProvider('provideDiffs')]
     public function test_it_converts_diff_to_files_and_changed_lines_map(string $diff, array $expectedMap): void
     {
         $collector = new DiffChangedLinesParser();

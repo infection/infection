@@ -42,14 +42,13 @@ use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function range;
 
 final class LineRangeCalculatorTest extends TestCase
 {
-    /**
-     * @dataProvider provideCodeAndRangeCases
-     */
+    #[DataProvider('provideCodeAndRangeCases')]
     public function test_it_can_find_the_outer_most_array(string $code, array $nodeRange): void
     {
         $nodes = SingletonContainer::getContainer()->getParser()->parse($code);

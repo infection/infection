@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\TestFramework\VersionParser;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
@@ -52,9 +53,7 @@ final class VersionParserTest extends TestCase
         $this->versionParser = new VersionParser();
     }
 
-    /**
-     * @dataProvider versionProvider
-     */
+    #[DataProvider('versionProvider')]
     public function test_it_parses_version_from_string(string $content, string $expectedVersion): void
     {
         $result = $this->versionParser->parse($content);
@@ -62,9 +61,7 @@ final class VersionParserTest extends TestCase
         $this->assertSame($expectedVersion, $result);
     }
 
-    /**
-     * @dataProvider invalidVersionProvider
-     */
+    #[DataProvider('invalidVersionProvider')]
     public function test_it_throws_exception_when_content_has_no_version_substring(string $content): void
     {
         try {

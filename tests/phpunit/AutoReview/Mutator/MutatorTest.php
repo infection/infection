@@ -44,6 +44,7 @@ use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorConfig;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -71,9 +72,7 @@ final class MutatorTest extends TestCase
         'canMutate',
     ];
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::mutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'mutatorClassesProvider')]
     public function test_mutators_do_not_declare_public_methods(string $className): void
     {
         $publicMethods = $this->getPublicMethods(new ReflectionClass($className));
@@ -104,9 +103,7 @@ final class MutatorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::concreteMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'concreteMutatorClassesProvider')]
     public function test_mutators_have_a_definition(string $className): void
     {
         /** @var Mutator $mutator */
@@ -126,9 +123,7 @@ final class MutatorTest extends TestCase
         ));
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::concreteMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'concreteMutatorClassesProvider')]
     public function test_configurable_mutators_declare_a_mutator_config(string $className): void
     {
         $mutatorReflection = new ReflectionClass($className);
@@ -191,9 +186,7 @@ final class MutatorTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::configurableMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'configurableMutatorClassesProvider')]
     public function test_only_configurable_mutators_have_a_config(string $className): void
     {
         $configClassName = $className::getConfigClassName();

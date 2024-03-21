@@ -37,15 +37,14 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @group integration
  */
 final class PublicVisibilityTest extends BaseMutatorTestCase
 {
-    /**
-     * @dataProvider blacklistedProvider
-     */
+    #[DataProvider('blacklistedProvider')]
     public function test_it_does_not_modify_blacklisted_functions(string $functionName): void
     {
         $code = MutatorFixturesProvider::getFixtureFileContent(self::class, "pv-{$functionName}.php");
@@ -70,10 +69,9 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
     }
 
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);

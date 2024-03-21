@@ -58,6 +58,7 @@ use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use function Infection\Tests\normalizePath;
 use Infection\Tests\SingletonContainer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -83,13 +84,12 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider valueProvider
-     *
      * @param SplFileInfo[] $expectedSourceDirectories
      * @param SplFileInfo[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
      * @param Mutator[] $expectedMutators
      */
+    #[DataProvider('valueProvider')]
     public function test_it_can_create_a_configuration(
         bool $ciDetected,
         bool $githubActionsDetected,

@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @group integration
@@ -44,10 +45,9 @@ use Infection\Tests\Mutator\MutatorFixturesProvider;
 final class ArrayOneItemTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);

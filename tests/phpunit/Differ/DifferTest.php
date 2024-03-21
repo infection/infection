@@ -39,15 +39,14 @@ use function array_map;
 use function explode;
 use function implode;
 use Infection\Differ\Differ;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 
 final class DifferTest extends TestCase
 {
-    /**
-     * @dataProvider diffProvider
-     */
+    #[DataProvider('diffProvider')]
     public function test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines(
         string $sourceA,
         string $sourceB,
