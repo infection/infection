@@ -40,10 +40,9 @@ use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class CloneVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'

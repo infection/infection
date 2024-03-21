@@ -38,11 +38,10 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\GitHubAnnotationsLogger;
 use Infection\Metrics\ResultsCollector;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class GitHubAnnotationsLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;

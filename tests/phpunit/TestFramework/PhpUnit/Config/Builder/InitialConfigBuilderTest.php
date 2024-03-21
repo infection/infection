@@ -48,15 +48,14 @@ use function Infection\Tests\normalizePath as p;
 use InvalidArgumentException;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 use function Safe\simplexml_load_string;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class InitialConfigBuilderTest extends FileSystemTestCase
 {
     private const FIXTURES = __DIR__ . '/../../../../Fixtures/Files/phpunit';

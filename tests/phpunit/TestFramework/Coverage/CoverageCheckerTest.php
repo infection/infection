@@ -43,6 +43,9 @@ use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
@@ -52,12 +55,11 @@ use Symfony\Component\Filesystem\Path;
  * All these tests should be ran in separate processes, as otherwise they may rely
  * on the internal state of XdebugHandler.
  *
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- *
- * @group integration
  * Requires some I/O operations
  */
+#[PreserveGlobalState(false)]
+#[Group('integration')]
+#[RunTestsInSeparateProcesses]
 final class CoverageCheckerTest extends TestCase
 {
     /**

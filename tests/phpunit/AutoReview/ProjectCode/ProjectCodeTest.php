@@ -45,6 +45,7 @@ use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\SingletonContainer;
 use function is_executable;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -52,14 +53,12 @@ use ReflectionProperty;
 use function sprintf;
 
 /**
- * @coversNothing
- *
  * This class is responsible for testing that our code base adheres to certain rules,
  * e.g. 'All classes that aren't intended to be used by users should be marked internal'.
- *
  * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
+#[CoversNothing]
 final class ProjectCodeTest extends TestCase
 {
     /**

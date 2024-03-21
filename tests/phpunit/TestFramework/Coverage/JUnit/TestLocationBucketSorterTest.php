@@ -50,14 +50,14 @@ use function log;
 use function microtime;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function usort;
 
 /**
  * Tagged as integration because it can be quite slow.
- *
- * @group integration
  */
+#[Group('integration')]
 final class TestLocationBucketSorterTest extends TestCase
 {
     /**

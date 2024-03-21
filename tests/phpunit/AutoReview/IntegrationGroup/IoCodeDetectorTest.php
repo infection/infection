@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Infection\Tests\AutoReview\IntegrationGroup\IoCodeDetector
- */
+#[CoversClass(IoCodeDetector::class)]
 final class IoCodeDetectorTest extends TestCase
 {
     #[DataProvider('codeProvider')]

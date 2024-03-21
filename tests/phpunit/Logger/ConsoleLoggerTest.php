@@ -42,6 +42,7 @@ use function Infection\Tests\normalize_trailing_spaces;
 use InvalidArgumentException;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Safe\DateTime;
@@ -51,9 +52,7 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class ConsoleLoggerTest extends TestCase
 {
     public function test_it_throws_a_friendly_error_on_invalid_log_level(): void

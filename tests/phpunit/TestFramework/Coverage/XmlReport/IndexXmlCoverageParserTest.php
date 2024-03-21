@@ -44,6 +44,7 @@ use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
@@ -53,9 +54,7 @@ use function str_replace;
 use Symfony\Component\Filesystem\Path;
 use Traversable;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class IndexXmlCoverageParserTest extends TestCase
 {
     /**

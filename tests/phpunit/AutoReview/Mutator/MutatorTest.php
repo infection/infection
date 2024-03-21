@@ -44,6 +44,7 @@ use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorConfig;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -55,14 +56,12 @@ use const SORT_STRING;
 use function sprintf;
 
 /**
- * @coversNothing
- *
  * This class is responsible for testing that all Mutator classes adhere to certain rules e.g.
  * 'Mutators shouldn't declare any public methods'.
- *
  * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
+#[CoversNothing]
 final class MutatorTest extends TestCase
 {
     private const KNOWN_MUTATOR_PUBLIC_METHODS = [

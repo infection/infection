@@ -41,12 +41,11 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Console\IO;
 use LogicException;
 use const PHP_OS;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function stripos;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class SourceDirsProviderTest extends BaseProviderTestCase
 {
     /**

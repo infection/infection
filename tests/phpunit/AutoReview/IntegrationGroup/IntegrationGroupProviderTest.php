@@ -37,14 +37,13 @@ namespace Infection\Tests\AutoReview\IntegrationGroup;
 
 use function class_exists;
 use Infection\Tests\Console\E2ETest;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
 
-/**
- * @covers \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider
- */
+#[CoversClass(IntegrationGroupProvider::class)]
 final class IntegrationGroupProviderTest extends TestCase
 {
     #[DataProviderExternal(IntegrationGroupProvider::class, 'ioTestCaseTupleProvider')]

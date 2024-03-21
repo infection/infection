@@ -39,6 +39,7 @@ use function extension_loaded;
 use Infection\Process\OriginalPhpProcess;
 use function ini_get as ini_get_unsafe;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -57,9 +58,7 @@ final class OriginalPhpProcessTest extends TestCase
         $this->assertStringContainsString('foo', $process->getCommandLine());
     }
 
-    /**
-     * @group integration
-     */
+    #[Group('integration')]
     public function test_it_injects_xdebug_env_vars(): void
     {
         $process = new OriginalPhpProcess(['env']);

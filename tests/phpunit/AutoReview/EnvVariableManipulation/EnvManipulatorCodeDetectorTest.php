@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Infection\Tests\AutoReview\EnvVariableManipulation\EnvManipulatorCodeDetector
- */
+#[CoversClass(EnvManipulatorCodeDetector::class)]
 final class EnvManipulatorCodeDetectorTest extends TestCase
 {
     #[DataProvider('codeProvider')]

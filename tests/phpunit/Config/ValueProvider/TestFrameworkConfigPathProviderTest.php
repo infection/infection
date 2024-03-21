@@ -40,13 +40,12 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Console\IO;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function Safe\realpath;
 use Symfony\Component\Console\Input\StringInput;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
 {
     /**

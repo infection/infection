@@ -39,15 +39,14 @@ use function class_exists;
 use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\class_implements;
 use function sprintf;
 
-/**
- * @covers \Infection\Tests\AutoReview\Mutator\MutatorProvider
- */
+#[CoversClass(MutatorProvider::class)]
 final class MutatorProviderTest extends TestCase
 {
     #[DataProviderExternal(MutatorProvider::class, 'mutatorClassesProvider')]

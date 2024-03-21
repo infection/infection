@@ -53,6 +53,7 @@ use JsonSchema\Validator;
 use function Later\now;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\base64_decode;
 use function Safe\file_get_contents;
@@ -61,9 +62,7 @@ use function Safe\json_encode;
 use function Safe\realpath;
 use function sprintf;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class StrykerHtmlReportBuilderTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/mutation-testing-report-schema.json';

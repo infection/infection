@@ -42,6 +42,7 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Tests\Fixtures\NullMutationVisitor;
 use Infection\Tests\SingletonContainer;
 use function ksort;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use const SORT_STRING;
@@ -50,9 +51,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
-/**
- * @coversNothing
- */
+#[CoversNothing]
 final class MutatorRobustnessTest extends TestCase
 {
     /**

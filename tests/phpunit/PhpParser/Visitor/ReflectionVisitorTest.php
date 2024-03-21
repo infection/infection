@@ -50,11 +50,10 @@ use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use ReflectionClass;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class ReflectionVisitorTest extends BaseVisitorTestCase
 {
     private $spyVisitor;

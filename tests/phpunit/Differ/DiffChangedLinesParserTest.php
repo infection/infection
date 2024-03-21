@@ -40,12 +40,11 @@ use Generator;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\DiffChangedLinesParser;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class DiffChangedLinesParserTest extends TestCase
 {
     #[DataProvider('provideDiffs')]

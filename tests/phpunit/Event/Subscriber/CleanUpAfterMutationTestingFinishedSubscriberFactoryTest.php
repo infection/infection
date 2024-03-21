@@ -39,13 +39,12 @@ use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Tests\Fixtures\Console\FakeOutput;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends TestCase
 {
     /**

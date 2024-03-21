@@ -39,15 +39,14 @@ use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_put_contents;
 use function Safe\tempnam;
 use function Safe\unlink;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class JUnitTestFileDataProviderTest extends TestCase
 {
     private const JUNIT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml';

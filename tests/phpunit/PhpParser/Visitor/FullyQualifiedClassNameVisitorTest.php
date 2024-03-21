@@ -41,10 +41,9 @@ use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Tests\Fixtures\PhpParser\FullyQualifiedClassNameSpyVisitor;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTestCase
 {
     /**

@@ -37,14 +37,13 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function class_exists;
 use function interface_exists;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use function trait_exists;
 
-/**
- * @covers \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider
- */
+#[CoversClass(ProjectCodeProvider::class)]
 final class ProjectCodeProviderTest extends TestCase
 {
     #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]

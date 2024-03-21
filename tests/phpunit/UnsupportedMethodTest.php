@@ -35,11 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Infection\Tests\UnsupportedMethod
- */
+#[CoversClass(UnsupportedMethod::class)]
 final class UnsupportedMethodTest extends TestCase
 {
     public function test_it_can_be_instantiated_for_a_method(): void

@@ -37,12 +37,13 @@ namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\IgnoreConfig;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @group integration
  * This is probably a false-positive of the IO checker regarding `fnmatch()`
  */
+#[Group('integration')]
 final class IgnoreConfigTest extends TestCase
 {
     public function test_it_returns_early_if_nothing_is_ignored(): void

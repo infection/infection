@@ -51,6 +51,7 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\exec;
 use function Safe\file_get_contents;
 use function Safe\realpath;
@@ -58,9 +59,7 @@ use function Safe\simplexml_load_string;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     public const HASH = 'a1b2c3';

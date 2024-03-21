@@ -40,13 +40,12 @@ use Exception;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class SchemaConfigurationFileTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Configuration';

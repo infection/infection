@@ -38,14 +38,13 @@ namespace Infection\Tests\AutoReview\Event;
 use function class_exists;
 use function in_array;
 use Infection\Event\Subscriber\EventSubscriber;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use function Safe\class_implements;
 use function sprintf;
 
-/**
- * @covers \Infection\Tests\AutoReview\Event\SubscriberProvider
- */
+#[CoversClass(SubscriberProvider::class)]
 final class SubscriberProviderTest extends TestCase
 {
     #[DataProviderExternal(SubscriberProvider::class, 'subscriberClassesProvider')]

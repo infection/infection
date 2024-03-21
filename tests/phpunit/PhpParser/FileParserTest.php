@@ -43,14 +43,13 @@ use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\Parser;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class FileParserTest extends TestCase
 {
     public function test_it_parses_the_given_file_only_once(): void

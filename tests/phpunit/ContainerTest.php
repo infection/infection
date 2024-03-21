@@ -38,13 +38,12 @@ namespace Infection\Tests;
 use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class ContainerTest extends TestCase
 {
     public function test_it_can_be_instantiated_without_any_services(): void

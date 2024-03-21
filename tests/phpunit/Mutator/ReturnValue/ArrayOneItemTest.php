@@ -38,10 +38,9 @@ namespace Infection\Tests\Mutator\ReturnValue;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class ArrayOneItemTest extends BaseMutatorTestCase
 {
     /**

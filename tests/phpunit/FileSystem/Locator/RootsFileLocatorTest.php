@@ -41,15 +41,16 @@ use Infection\FileSystem\Locator\RootsFileLocator;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration
  * Requires IO reads
  */
+#[Group('integration')]
 final class RootsFileLocatorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Locator';

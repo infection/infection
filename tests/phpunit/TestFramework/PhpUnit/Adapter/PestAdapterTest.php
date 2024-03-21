@@ -45,6 +45,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\VersionParser;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 final class PestAdapterTest extends TestCase
@@ -129,9 +130,7 @@ final class PestAdapterTest extends TestCase
         );
     }
 
-    /**
-     * @group integration
-     */
+    #[Group('integration')]
     public function test_it_provides_initial_test_run_command_line_when_no_coverage_is_expected(): void
     {
         $this->cliArgumentsBuilder
@@ -163,9 +162,7 @@ final class PestAdapterTest extends TestCase
         );
     }
 
-    /**
-     * @group integration
-     */
+    #[Group('integration')]
     public function test_it_provides_initial_test_run_command_line_when_coverage_report_is_requested(): void
     {
         $this->cliArgumentsBuilder
@@ -215,9 +212,7 @@ final class PestAdapterTest extends TestCase
         );
     }
 
-    /**
-     * @group integration
-     */
+    #[Group('integration')]
     public function test_it_provides_initial_test_run_command_line_when_coverage_report_is_requested_and_pcov_is_in_use(): void
     {
         $this->cliArgumentsBuilder

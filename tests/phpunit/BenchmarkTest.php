@@ -38,17 +38,17 @@ namespace Infection\Tests;
 use function is_dir;
 use const PHP_OS_FAMILY;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-/**
- * @group integration
- * @coversNothing
- */
+#[Group('integration')]
+#[CoversNothing]
 final class BenchmarkTest extends TestCase
 {
     private const BENCHMARK_DIR = __DIR__ . '/../benchmark';

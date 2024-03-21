@@ -40,14 +40,13 @@ use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use const PHP_SAPI;
 use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\ini_get;
 use function Safe\ini_set;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class MemoryLimiterEnvironmentTest extends TestCase
 {
     private ?string $originalMemoryLimit;
