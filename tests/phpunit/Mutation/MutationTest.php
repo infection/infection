@@ -43,18 +43,18 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
 use function md5;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class MutationTest extends TestCase
 {
     /**
-     * @dataProvider valuesProvider
-     *
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
      * @param array<string|int|float> $expectedAttributes
      * @param TestLocation[] $tests
      */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         string $originalFilePath,
         array $originalFileAst,

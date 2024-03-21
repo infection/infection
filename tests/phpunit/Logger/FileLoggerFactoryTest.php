@@ -56,14 +56,14 @@ use Infection\Logger\TextFileLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class FileLoggerFactoryTest extends TestCase
 {
     /**
@@ -115,9 +115,7 @@ final class FileLoggerFactoryTest extends TestCase
         $this->assertRegisteredLoggersAre([], $logger);
     }
 
-    /**
-     * @dataProvider logsProvider
-     */
+    #[DataProvider('logsProvider')]
     public function test_it_creates_a_logger_for_log_type_on_normal_verbosity(
         Logs $logs,
         array $expectedLoggerClasses,

@@ -36,13 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use Infection\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class StrTest extends TestCase
 {
-    /**
-     * @dataProvider stringProvider
-     */
+    #[DataProvider('stringProvider')]
     public function test_it_can_trim_string_of_line_returns(string $value, string $expected): void
     {
         $this->assertSame(

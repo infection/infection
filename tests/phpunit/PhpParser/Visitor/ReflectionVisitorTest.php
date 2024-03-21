@@ -49,11 +49,11 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use ReflectionClass;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class ReflectionVisitorTest extends BaseVisitorTestCase
 {
     private $spyVisitor;
@@ -63,9 +63,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
         $this->spyVisitor = $this->getInsideFunctionSpyVisitor();
     }
 
-    /**
-     * @dataProvider isPartOfSignatureFlagProvider
-     */
+    #[DataProvider('isPartOfSignatureFlagProvider')]
     public function test_it_marks_nodes_which_are_part_of_the_function_signature(string $nodeClass, bool $expected): void
     {
         $nodes = self::parseCode(
@@ -86,9 +84,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
         $this->assertSame($expected, $spyVisitor->isPartOfSignature());
     }
 
-    /**
-     * @dataProvider isPartOfSignatureFlagWithAttributesProvider
-     */
+    #[DataProvider('isPartOfSignatureFlagWithAttributesProvider')]
     public function test_it_marks_nodes_which_are_part_of_the_function_signature_with_attributes(string $nodeClass, bool $expected): void
     {
         $code = $this->getFileContent('Reflection/rv-part-of-signature-flag-with-attributes.php');

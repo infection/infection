@@ -36,14 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Config\Guesser;
 
 use Infection\Config\Guesser\PhpUnitPathGuesser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 
 final class PhpUnitPathGuesserTest extends TestCase
 {
-    /**
-     * @dataProvider providesJsonComposerAndLocations
-     */
+    #[DataProvider('providesJsonComposerAndLocations')]
     public function test_it_guesses_correctly(string $composerJson, string $directory): void
     {
         $guesser = new PhpUnitPathGuesser(json_decode($composerJson));

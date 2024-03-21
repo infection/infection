@@ -39,13 +39,13 @@ use ColinODell\Json5\SyntaxError;
 use Exception;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class SchemaConfigurationFileTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Configuration';
@@ -98,9 +98,7 @@ final class SchemaConfigurationFileTest extends TestCase
         $this->assertSame($expectedValue, $config->getDecodedContents());
     }
 
-    /**
-     * @dataProvider invalidConfigContentsProvider
-     */
+    #[DataProvider('invalidConfigContentsProvider')]
     public function test_it_cannot_retrieve_or_decode_invalid_contents(
         string $path,
         Exception $expectedException,

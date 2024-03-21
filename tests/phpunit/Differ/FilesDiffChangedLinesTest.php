@@ -40,6 +40,7 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\FilesDiffChangedLines;
 use Infection\Logger\GitHub\GitDiffFileProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
@@ -61,9 +62,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
     }
 
-    /**
-     * @dataProvider provideLines
-     */
+    #[DataProvider('provideLines')]
     public function test_it_finds_line_in_changed_lines_from_diff(
         bool $expectedIsFound,
         array $returnedFilesDiffChangedLinesMap,

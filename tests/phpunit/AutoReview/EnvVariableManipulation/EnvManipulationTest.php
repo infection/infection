@@ -36,15 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function sprintf;
 
 final class EnvManipulationTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::envTestCaseTupleProvider
-     */
+    #[DataProviderExternal(EnvTestCasesProvider::class, 'envTestCaseTupleProvider')]
     public function test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait(
         string $testCaseClassName,
         string $fileWithEnvManipulations,

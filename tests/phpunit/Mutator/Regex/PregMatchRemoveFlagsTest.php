@@ -37,15 +37,14 @@ namespace Infection\Tests\Mutator\Regex;
 
 use Generator;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
  */
 final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
 {
-    /**
-     * @dataProvider provideMutationCases
-     */
+    #[DataProvider('provideMutationCases')]
     public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);

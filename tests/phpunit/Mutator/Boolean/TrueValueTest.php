@@ -38,15 +38,15 @@ namespace Infection\Tests\Mutator\Boolean;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class TrueValueTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      * @param mixed[] $settings
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate($input, $expected = [], array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);

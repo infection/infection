@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class StringNormalizerTest extends TestCase
 {
-    /**
-     * @dataProvider stringValuesProvider
-     */
+    #[DataProvider('stringValuesProvider')]
     public function test_it_can_remove_right_trailing_spaces(string $input, string $expected): void
     {
         $actual = StringNormalizer::normalizeString($input);

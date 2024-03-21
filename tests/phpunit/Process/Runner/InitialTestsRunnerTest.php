@@ -44,6 +44,7 @@ use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function str_contains;
@@ -52,9 +53,7 @@ use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class InitialTestsRunnerTest extends TestCase
 {
     /**

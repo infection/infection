@@ -37,6 +37,7 @@ namespace Infection\Tests\Resource\Memory;
 
 use Infection\Resource\Memory\MemoryFormatter;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class MemoryFormatterTest extends TestCase
@@ -51,9 +52,7 @@ final class MemoryFormatterTest extends TestCase
         $this->memoryFormatter = new MemoryFormatter();
     }
 
-    /**
-     * @dataProvider bytesProvider
-     */
+    #[DataProvider('bytesProvider')]
     public function test_it_converts_bytes_to_human_readable_time(float $bytes, string $expectedString): void
     {
         $timeString = $this->memoryFormatter->toHumanReadableString($bytes);

@@ -43,6 +43,7 @@ use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -50,9 +51,7 @@ use Webmozart\Assert\Assert;
 
 final class FormatterFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider formatterProvider
-     */
+    #[DataProvider('formatterProvider')]
     public function test_it_can_create_all_known_factories(
         string $formatterName,
         string $expectedFormatterClassName,

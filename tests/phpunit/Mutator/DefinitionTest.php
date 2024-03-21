@@ -37,13 +37,12 @@ namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class DefinitionTest extends TestCase
 {
-    /**
-     * @dataProvider valuesProvider
-     */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         string $description,
         string $category,

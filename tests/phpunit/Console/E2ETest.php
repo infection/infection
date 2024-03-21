@@ -53,6 +53,10 @@ use function is_readable;
 use const PHP_EOL;
 use const PHP_OS;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Large;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
 use function Safe\copy;
@@ -69,10 +73,9 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
-/**
- * @group e2e
- * @group integration
- */
+#[Group('e2e')]
+#[Group('integration')]
+#[Large]
 final class E2ETest extends TestCase
 {
     /**
@@ -133,8 +136,6 @@ final class E2ETest extends TestCase
      * To be run with:
      *
      * php -dmemory_limit=128M vendor/bin/phpunit --group=large
-     *
-     * @large
      */
     public function test_it_runs_on_itself(): void
     {
@@ -163,10 +164,8 @@ final class E2ETest extends TestCase
         $this->assertStringContainsString(ConfigureCommand::NONINTERACTIVE_MODE_ERROR, $output);
     }
 
-    /**
-     * @dataProvider e2eTestSuiteDataProvider
-     * @runInSeparateProcess
-     */
+    #[DataProvider('e2eTestSuiteDataProvider')]
+    #[RunInSeparateProcess]
     public function test_it_runs_an_e2e_test_with_success(string $fullPath): void
     {
         $this->runOnE2EFixture($fullPath);

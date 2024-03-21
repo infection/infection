@@ -45,6 +45,8 @@ use Infection\TestFramework\SafeDOMXPath;
 use function Infection\Tests\normalizeLineReturn;
 use InvalidArgumentException;
 use const PHP_OS_FAMILY;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function restore_error_handler;
 use function set_error_handler;
@@ -53,9 +55,7 @@ use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class XmlConfigurationManipulatorTest extends TestCase
 {
     /**
@@ -735,9 +735,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
         $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
     }
 
-    /**
-     * @dataProvider invalidSchemaProvider
-     */
+    #[DataProvider('invalidSchemaProvider')]
     public function test_it_cannot_validates_xml_if_schema_file_is_invalid(
         string $xsdSchema,
         string $errorMessage,
@@ -789,11 +787,10 @@ final class XmlConfigurationManipulatorTest extends TestCase
     }
 
     /**
-     * @dataProvider schemaProvider
-     *
-     * @group integration
-     * Might require an external connection to download the XSD
+     * require an external connection to download the XSD
      */
+    #[DataProvider('schemaProvider')]
+    #[Group('integration')]
     public function test_it_validates_xml_by_xsd(string $xsdSchema): void
     {
         $xPath = $this->createXPath(<<<XML
@@ -841,11 +838,10 @@ final class XmlConfigurationManipulatorTest extends TestCase
     }
 
     /**
-     * @dataProvider schemaProvider
-     *
-     * @group integration
      * Might require an external connection to download the XSD
      */
+    #[DataProvider('schemaProvider')]
+    #[Group('integration')]
     public function test_it_passes_validation_by_xsd(string $xsdSchema): void
     {
         $xPath = $this->createXPath(<<<XML

@@ -41,6 +41,7 @@ use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Tests\Logger\DummyLogger;
 use function Infection\Tests\normalizeLineReturn;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
@@ -75,9 +76,7 @@ final class StrykerDashboardClientTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideResponseStatusCodes
-     */
+    #[DataProvider('provideResponseStatusCodes')]
     public function test_it_can_send_a_report_with_expected_response_status_code(): void
     {
         $this->clientMock

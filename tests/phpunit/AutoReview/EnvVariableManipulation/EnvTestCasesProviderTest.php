@@ -36,18 +36,16 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
 use function class_exists;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
 
-/**
- * @covers \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider
- */
+#[CoversClass(EnvTestCasesProvider::class)]
 final class EnvTestCasesProviderTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::envTestCaseTupleProvider
-     */
+    #[DataProviderExternal(EnvTestCasesProvider::class, 'envTestCaseTupleProvider')]
     public function test_env_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
     {
         $this->assertTrue(

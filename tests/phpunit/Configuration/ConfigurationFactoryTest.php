@@ -58,15 +58,15 @@ use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use function Infection\Tests\normalizePath;
 use Infection\Tests\SingletonContainer;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;
@@ -83,13 +83,12 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider valueProvider
-     *
      * @param SplFileInfo[] $expectedSourceDirectories
      * @param SplFileInfo[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
      * @param Mutator[] $expectedMutators
      */
+    #[DataProvider('valueProvider')]
     public function test_it_can_create_a_configuration(
         bool $ciDetected,
         bool $githubActionsDetected,

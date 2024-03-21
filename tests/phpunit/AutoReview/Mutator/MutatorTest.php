@@ -44,6 +44,8 @@ use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorConfig;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -54,14 +56,12 @@ use const SORT_STRING;
 use function sprintf;
 
 /**
- * @coversNothing
- *
  * This class is responsible for testing that all Mutator classes adhere to certain rules e.g.
  * 'Mutators shouldn't declare any public methods'.
- *
  * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
+#[CoversNothing]
 final class MutatorTest extends TestCase
 {
     private const KNOWN_MUTATOR_PUBLIC_METHODS = [
@@ -71,9 +71,7 @@ final class MutatorTest extends TestCase
         'canMutate',
     ];
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::mutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'mutatorClassesProvider')]
     public function test_mutators_do_not_declare_public_methods(string $className): void
     {
         $publicMethods = $this->getPublicMethods(new ReflectionClass($className));
@@ -104,9 +102,7 @@ final class MutatorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::concreteMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'concreteMutatorClassesProvider')]
     public function test_mutators_have_a_definition(string $className): void
     {
         /** @var Mutator $mutator */
@@ -126,9 +122,7 @@ final class MutatorTest extends TestCase
         ));
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::concreteMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'concreteMutatorClassesProvider')]
     public function test_configurable_mutators_declare_a_mutator_config(string $className): void
     {
         $mutatorReflection = new ReflectionClass($className);
@@ -191,9 +185,7 @@ final class MutatorTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::configurableMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'configurableMutatorClassesProvider')]
     public function test_only_configurable_mutators_have_a_config(string $className): void
     {
         $configClassName = $className::getConfigClassName();

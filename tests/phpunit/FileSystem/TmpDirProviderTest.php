@@ -37,6 +37,7 @@ namespace Infection\Tests\FileSystem;
 
 use Infection\FileSystem\TmpDirProvider;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class TmpDirProviderTest extends TestCase
@@ -51,9 +52,7 @@ final class TmpDirProviderTest extends TestCase
         $this->tmpDirProvider = new TmpDirProvider();
     }
 
-    /**
-     * @dataProvider tmpDirProvider
-     */
+    #[DataProvider('tmpDirProvider')]
     public function test_it_provides_a_tmp_dir_path(
         string $tmpDir,
         string $expectedTmpDir,
@@ -91,9 +90,7 @@ final class TmpDirProviderTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider invalidTmpDirProvider
-     */
+    #[DataProvider('invalidTmpDirProvider')]
     public function test_the_tmp_dir_given_must_be_an_absolute_path(
         string $tmpDir,
         string $expectedErrorMessage,

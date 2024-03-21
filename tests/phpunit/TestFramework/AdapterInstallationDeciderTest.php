@@ -39,14 +39,13 @@ use Infection\Console\IO;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Config\ValueProvider\BaseProviderTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\rewind;
 use function Safe\stream_get_contents;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use function trim;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class AdapterInstallationDeciderTest extends BaseProviderTestCase
 {
     /**

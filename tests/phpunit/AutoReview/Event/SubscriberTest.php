@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Event;
 
 use function count;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -45,10 +46,9 @@ use function sprintf;
 final class SubscriberTest extends TestCase
 {
     /**
-     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
-     *
      * @param class-string $subscriberClass
      */
+    #[DataProviderExternal(SubscriberProvider::class, 'subscriberClassesProvider')]
     public function test_subscription_methods_match_their_event_names(string $subscriberClass): void
     {
         $subscriberMethods = (new ReflectionClass($subscriberClass))->getMethods();

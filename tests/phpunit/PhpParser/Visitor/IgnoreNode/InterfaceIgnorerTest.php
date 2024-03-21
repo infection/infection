@@ -37,12 +37,11 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
 {
-    /**
-     * @dataProvider provideIgnoreCases
-     */
+    #[DataProvider('provideIgnoreCases')]
     public function test_it_ignores_the_correct_nodes(string $code, int $count): void
     {
         $spy = $this->createSpy();

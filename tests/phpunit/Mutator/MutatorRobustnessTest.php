@@ -42,6 +42,8 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Tests\Fixtures\NullMutationVisitor;
 use Infection\Tests\SingletonContainer;
 use function ksort;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use const SORT_STRING;
 use function sprintf;
@@ -49,9 +51,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
-/**
- * @coversNothing
- */
+#[CoversNothing]
 final class MutatorRobustnessTest extends TestCase
 {
     /**
@@ -62,9 +62,8 @@ final class MutatorRobustnessTest extends TestCase
     /**
      * This test only proves that the mutators do not crash on more 'exotic' code. It does not care
      * whether or not the code is actually mutated, only if it does not error.
-     *
-     * @dataProvider mutatorWithCodeCaseProvider
      */
+    #[DataProvider('mutatorWithCodeCaseProvider')]
     public function test_the_mutator_does_not_crash_during_parsing(string $fileName, string $code, Mutator $mutator): void
     {
         try {

@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutator\Extensions;
 use function array_map;
 use function implode;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use function range;
 use function strtoupper;
 use function ucfirst;
@@ -45,10 +46,9 @@ use function ucfirst;
 final class BCMathTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);

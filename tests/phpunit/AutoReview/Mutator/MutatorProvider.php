@@ -43,17 +43,16 @@ use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tests\Mutator\ProfileListProvider;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use function Safe\class_implements;
 
 /**
- * @coversNothing
- *
  * This class is responsible for testing that all Mutator classes adhere to certain rules e.g.
  * 'Mutators shouldn't declare any public methods'.
- *
  * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
+#[CoversNothing]
 final class MutatorProvider
 {
     use CannotBeInstantiated;

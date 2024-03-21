@@ -38,13 +38,12 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class TestLocationsNormalizerTest extends TestCase
 {
-    /**
-     * @dataProvider locationsProvider
-     */
+    #[DataProvider('locationsProvider')]
     public function test_it_can_convert_an_associative_array_of_test_locations_into_an_associative_array_of_scalar_values(
         array $value,
         array $expected,

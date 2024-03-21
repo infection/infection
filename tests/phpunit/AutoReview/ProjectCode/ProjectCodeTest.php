@@ -45,20 +45,20 @@ use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\SingletonContainer;
 use function is_executable;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 use function sprintf;
 
 /**
- * @coversNothing
- *
  * This class is responsible for testing that our code base adheres to certain rules,
  * e.g. 'All classes that aren't intended to be used by users should be marked internal'.
- *
  * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
+#[CoversNothing]
 final class ProjectCodeTest extends TestCase
 {
     /**
@@ -72,9 +72,7 @@ final class ProjectCodeTest extends TestCase
         $this->assertTrue(is_executable($infectionFile));
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::concreteSourceClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
     public function test_all_concrete_classes_have_tests(string $className): void
     {
         $testClassName = SourceTestClassNameScheme::getTestClassName($className);
@@ -112,9 +110,7 @@ final class ProjectCodeTest extends TestCase
         ));
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
     public function test_non_extension_points_are_internal(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);
@@ -158,9 +154,7 @@ final class ProjectCodeTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
     public function test_non_extension_points_are_traits_interfaces_abstracts_or_finals(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);
@@ -202,9 +196,7 @@ final class ProjectCodeTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesToCheckForPublicPropertiesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
     public function test_source_classes_do_not_expose_public_properties(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);
@@ -267,9 +259,7 @@ final class ProjectCodeTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'classesTestProvider')]
     public function test_all_test_classes_are_trait_abstract_or_final(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);

@@ -38,10 +38,9 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Console\IO;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class TextLogFileProviderTest extends BaseProviderTestCase
 {
     /**

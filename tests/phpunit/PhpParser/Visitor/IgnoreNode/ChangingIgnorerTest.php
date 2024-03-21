@@ -37,6 +37,7 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use PHPUnit\Framework\Attributes\Depends;
 
 final class ChangingIgnorerTest extends BaseNodeIgnorerTestCase
 {
@@ -82,9 +83,7 @@ final class ChangingIgnorerTest extends BaseNodeIgnorerTestCase
         return $ignorer;
     }
 
-    /**
-     * @depends test_it_ignores_when_enabled
-     */
+    #[Depends('test_it_ignores_when_enabled')]
     public function test_it_does_not_ignore_when_disabled(ChangingIgnorer $ignorer): void
     {
         $ignorer->stopIgnoring();

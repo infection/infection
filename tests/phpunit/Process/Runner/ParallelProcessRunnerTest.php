@@ -41,6 +41,7 @@ use Infection\Process\Runner\ProcessBearer;
 use Infection\Tests\Fixtures\Event\DummyEvent;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Fixtures\Process\DummyProcessBearer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -96,9 +97,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertDummyEventCounts(10, $eventDispatcher->getEvents());
     }
 
-    /**
-     * @dataProvider threadCountProvider
-     */
+    #[DataProvider('threadCountProvider')]
     public function test_it_handles_all_kids_of_processes_with_infinite_threads(int $threadCount): void
     {
         $this->runWithAllKindsOfProcesses($threadCount);

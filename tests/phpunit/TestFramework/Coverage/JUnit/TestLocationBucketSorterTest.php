@@ -49,14 +49,15 @@ use function iterator_to_array;
 use function log;
 use function microtime;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function usort;
 
 /**
  * Tagged as integration because it can be quite slow.
- *
- * @group integration
  */
+#[Group('integration')]
 final class TestLocationBucketSorterTest extends TestCase
 {
     /**
@@ -113,10 +114,9 @@ final class TestLocationBucketSorterTest extends TestCase
     }
 
     /**
-     * @dataProvider locationsArrayProvider
-     *
      * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
+    #[DataProvider('locationsArrayProvider')]
     public function test_it_sorts_correctly(ArrayIterator $uniqueTestLocations): void
     {
         $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
@@ -135,10 +135,9 @@ final class TestLocationBucketSorterTest extends TestCase
     /**
      * Sanity check
      *
-     * @dataProvider locationsArrayProvider
-     *
      * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
+    #[DataProvider('locationsArrayProvider')]
     public function test_quicksort_sorts_correctly(ArrayIterator $uniqueTestLocations): void
     {
         $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
@@ -152,10 +151,9 @@ final class TestLocationBucketSorterTest extends TestCase
     }
 
     /**
-     * @dataProvider locationsArrayProvider
-     *
      * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
+    #[DataProvider('locationsArrayProvider')]
     public function test_it_sorts_faster_than_quicksort(ArrayIterator $uniqueTestLocations): void
     {
         if (extension_loaded('xdebug') || PHP_SAPI === 'phpdbg') {

@@ -37,18 +37,16 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\GitHubAnnotationsLogger;
 use Infection\Metrics\ResultsCollector;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class GitHubAnnotationsLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         ResultsCollector $resultsCollector,
         array $expectedLines,

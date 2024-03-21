@@ -52,19 +52,19 @@ use Infection\Mutator\ProfileList;
 use Infection\TestFramework\TestFrameworkTypes;
 use JsonSchema\Validator;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 use function sprintf;
 use stdClass;
 use function var_export;
 
-/**
- * @covers \Infection\Configuration\Entry\Logs
- * @covers \Infection\Configuration\Entry\PhpUnit
- * @covers \Infection\Configuration\Entry\Source
- * @covers \Infection\Configuration\Entry\StrykerConfig
- * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
- */
+#[CoversClass(Logs::class)]
+#[CoversClass(PhpUnit::class)]
+#[CoversClass(Source::class)]
+#[CoversClass(StrykerConfig::class)]
+#[CoversClass(SchemaConfigurationFactory::class)]
 final class SchemaConfigurationFactoryTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/schema.json';
@@ -86,9 +86,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
         '@default',
     ];
 
-    /**
-     * @dataProvider provideRawConfig
-     */
+    #[DataProvider('provideRawConfig')]
     public function test_it_can_create_a_config(
         string $json,
         SchemaConfiguration $expected,

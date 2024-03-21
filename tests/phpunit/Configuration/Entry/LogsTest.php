@@ -37,15 +37,14 @@ namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class LogsTest extends TestCase
 {
     use LogsAssertions;
 
-    /**
-     * @dataProvider valuesProvider
-     */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         ?string $textLogFilePath,
         ?string $htmlLogFilePath,

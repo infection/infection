@@ -41,19 +41,17 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
 use const JSON_THROW_ON_ERROR;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class SummaryJsonLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
         array $expectedContents,

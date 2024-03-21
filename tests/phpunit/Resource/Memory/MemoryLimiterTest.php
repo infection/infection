@@ -42,13 +42,13 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use function microtime;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class MemoryLimiterTest extends FileSystemTestCase
 {
     /**
@@ -104,9 +104,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
         );
     }
 
-    /**
-     * @dataProvider memoryLimitProvider
-     */
+    #[DataProvider('memoryLimitProvider')]
     public function test_it_applies_memory_limit_if_possible(
         float $memoryLimit,
         float $expectedLimit,

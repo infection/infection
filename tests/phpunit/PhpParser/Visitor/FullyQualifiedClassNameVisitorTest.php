@@ -40,17 +40,16 @@ use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Tests\Fixtures\PhpParser\FullyQualifiedClassNameSpyVisitor;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTestCase
 {
     /**
-     * @dataProvider codeProvider
-     *
      * @param array<array{string, string}> $expected
      */
+    #[DataProvider('codeProvider')]
     public function test_it_adds_fqcn_to_the_appropriate_node(string $code, array $expected): void
     {
         $spyVisitor = new FullyQualifiedClassNameSpyVisitor();

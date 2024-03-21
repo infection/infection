@@ -37,6 +37,7 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\TextFileLogger;
 use Infection\Metrics\ResultsCollector;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class TextFileLoggerTest extends TestCase
@@ -44,9 +45,7 @@ final class TextFileLoggerTest extends TestCase
     use CreateMetricsCalculator;
     use LineLoggerAssertions;
 
-    /**
-     * @dataProvider emptyMetricsProvider
-     */
+    #[DataProvider('emptyMetricsProvider')]
     public function test_it_logs_results_in_a_text_file_when_there_is_no_mutation(
         bool $debugVerbosity,
         bool $onlyCoveredMode,
@@ -63,9 +62,7 @@ final class TextFileLoggerTest extends TestCase
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    /**
-     * @dataProvider completeMetricsProvider
-     */
+    #[DataProvider('completeMetricsProvider')]
     public function test_it_logs_results_in_a_text_file_when_there_are_mutations(
         bool $debugVerbosity,
         bool $onlyCoveredMode,

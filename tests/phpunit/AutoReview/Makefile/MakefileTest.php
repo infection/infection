@@ -44,17 +44,17 @@ use function count;
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
 use function implode;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\array_replace;
 use function sprintf;
 use function str_starts_with;
 use function substr;
 use function substr_count;
 
-/**
- * @coversNothing
- *
- * @group integration
- */
+#[Group('integration')]
+#[CoversNothing]
 final class MakefileTest extends BaseMakefileTestCase
 {
     private const MAKEFILE_PATH = __DIR__ . '/../../../../Makefile';
@@ -102,11 +102,10 @@ final class MakefileTest extends BaseMakefileTestCase
     }
 
     /**
-     * @dataProvider subTargetProvider
-     *
      * @param list<string> $expected
      * @param list<string> $notExpected
      */
+    #[DataProvider('subTargetProvider')]
     public function test_it_can_get_a_docker_test_target_sub_test_targets(
         string $target,
         array $expected,
@@ -143,11 +142,10 @@ final class MakefileTest extends BaseMakefileTestCase
     }
 
     /**
-     * @dataProvider rootTestTargetProvider
-     *
      * @param list<string> $expected
      * @param list<string> $notExpected
      */
+    #[DataProvider('rootTestTargetProvider')]
     public function test_it_can_get_all_the_root_test_targets(
         bool $docker,
         array $expected,

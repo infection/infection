@@ -37,13 +37,12 @@ namespace Infection\Tests\Mutator\Extensions;
 
 use Infection\Mutator\Extensions\BCMathConfig;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BCMathConfigTest extends TestCase
 {
-    /**
-     * @dataProvider settingsProvider
-     */
+    #[DataProvider('settingsProvider')]
     public function test_it_can_create_a_config(array $settings, array $expected): void
     {
         $config = new BCMathConfig($settings);

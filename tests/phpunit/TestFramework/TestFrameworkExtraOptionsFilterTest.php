@@ -36,13 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class TestFrameworkExtraOptionsFilterTest extends TestCase
 {
-    /**
-     * @dataProvider mutantProcessProvider
-     */
+    #[DataProvider('mutantProcessProvider')]
     public function test_it_skips_filter_for_mutant_process(string $actualExtraOptions, string $expectedExtraOptions): void
     {
         $filter = new TestFrameworkExtraOptionsFilter();

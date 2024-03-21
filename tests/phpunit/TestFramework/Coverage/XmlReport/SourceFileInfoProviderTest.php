@@ -38,18 +38,16 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class SourceFileInfoProviderTest extends TestCase
 {
-    /**
-     * @dataProvider fileFixturesProvider
-     */
+    #[DataProvider('fileFixturesProvider')]
     public function test_it_provides_file_info_and_xpath(
         string $coverageDir,
         string $relativeCoverageFilePath,

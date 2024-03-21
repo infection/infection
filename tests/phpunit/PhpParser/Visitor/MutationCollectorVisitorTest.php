@@ -39,10 +39,9 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class MutationCollectorVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'

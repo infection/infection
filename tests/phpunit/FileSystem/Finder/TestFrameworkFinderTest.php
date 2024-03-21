@@ -45,6 +45,8 @@ use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
 use const PATH_SEPARATOR;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
@@ -52,11 +54,10 @@ use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration
- * Requires I/O read & writes via the MockVendor
- *
  * @see MockVendor
+ * Requires I/O read & writes via the MockVendor
  */
+#[Group('integration')]
 final class TestFrameworkFinderTest extends FileSystemTestCase
 {
     use BacksUpEnvironmentVariables;
@@ -177,9 +178,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         );
     }
 
-    /**
-     * @dataProvider providesMockSetup
-     */
+    #[DataProvider('providesMockSetup')]
     public function test_it_finds_framework_script_from_bat(string $methodName): void
     {
         $mock = new MockVendor($this->tmp, $this->fileSystem);

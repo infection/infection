@@ -40,14 +40,14 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Console\IO;
 use function microtime;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function random_int;
 use function Safe\mkdir;
 use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class ExcludeDirsProviderTest extends BaseProviderTestCase
 {
     /**
@@ -84,9 +84,7 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
         $this->fileSystem->remove($this->workspace);
     }
 
-    /**
-     * @dataProvider excludeDirsProvider
-     */
+    #[DataProvider('excludeDirsProvider')]
     public function test_it_contains_vendors_when_sources_contains_current_dir(string $excludedRootDir, array $dirsInCurrentFolder): void
     {
         $excludedDirs = $this->provider->get(

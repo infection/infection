@@ -40,6 +40,7 @@ use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\Tests\Fixtures\MockSplFileInfo;
 use IteratorIterator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use Traversable;
@@ -47,10 +48,9 @@ use Traversable;
 final class SourceFileFilterTest extends TestCase
 {
     /**
-     * @dataProvider filterProvider
-     *
      * @param string[] $expectedFilters
      */
+    #[DataProvider('filterProvider')]
     public function test_it_can_parse_and_normalize_string_filter(
         string $filter,
         array $expectedFilters,
@@ -61,11 +61,10 @@ final class SourceFileFilterTest extends TestCase
     }
 
     /**
-     * @dataProvider fileListProvider
-     *
      * @param string[] $filePaths
      * @param string[] $expectedFilePaths
      */
+    #[DataProvider('fileListProvider')]
     public function test_it_filters_spl_file_info_files_traversable(
         string $filter,
         array $filePaths,
@@ -77,11 +76,10 @@ final class SourceFileFilterTest extends TestCase
     }
 
     /**
-     * @dataProvider fileListProvider
-     *
      * @param string[] $filePaths
      * @param string[] $expectedFilePaths
      */
+    #[DataProvider('fileListProvider')]
     public function test_it_filters_traces_traversable(
         string $filter,
         array $filePaths,
@@ -93,11 +91,10 @@ final class SourceFileFilterTest extends TestCase
     }
 
     /**
-     * @dataProvider fileListProvider
-     *
      * @param string[] $filePaths
      * @param string[] $expectedFilePaths
      */
+    #[DataProvider('fileListProvider')]
     public function test_it_filters_spl_file_info_iterator(
         string $filter,
         array $filePaths,
@@ -111,11 +108,10 @@ final class SourceFileFilterTest extends TestCase
     }
 
     /**
-     * @dataProvider fileListProvider
-     *
      * @param string[] $filePaths
      * @param string[] $expectedFilePaths
      */
+    #[DataProvider('fileListProvider')]
     public function test_it_filters_trace_iterator(
         string $filter,
         array $filePaths,

@@ -40,14 +40,14 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class RootsFileOrDirectoryLocatorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Locator';
@@ -62,9 +62,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         $this->filesystem = new Filesystem();
     }
 
-    /**
-     * @dataProvider pathsProvider
-     */
+    #[DataProvider('pathsProvider')]
     public function test_it_can_locate_files(array $roots, string $file, string $expected): void
     {
         $path = (new RootsFileOrDirectoryLocator($roots, $this->filesystem))->locate($file);
@@ -72,9 +70,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         $this->assertSame(p($expected), p($path));
     }
 
-    /**
-     * @dataProvider invalidPathsProvider
-     */
+    #[DataProvider('invalidPathsProvider')]
     public function test_it_throws_an_exception_if_file_or_folder_does_not_exist(
         array $roots,
         string $file,
@@ -93,9 +89,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider multiplePathsProvider
-     */
+    #[DataProvider('multiplePathsProvider')]
     public function test_it_can_locate_one_of_the_given_files(
         array $roots,
         array $files,
@@ -106,9 +100,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         $this->assertSame(p($expected), p($path));
     }
 
-    /**
-     * @dataProvider multipleInvalidPathsProvider
-     */
+    #[DataProvider('multipleInvalidPathsProvider')]
     public function test_locate_any_throws_exception_if_no_file_could_be_found(
         array $roots,
         array $files,

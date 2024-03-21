@@ -39,10 +39,9 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
 {
     private $spyVisitor;

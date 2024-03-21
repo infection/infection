@@ -37,6 +37,7 @@ namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
 use Infection\Console\LogVerbosity;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
@@ -71,9 +72,7 @@ final class LogVerbosityTest extends TestCase
         LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
     }
 
-    /**
-     * @dataProvider convertedLogVerbosityProvider
-     */
+    #[DataProvider('convertedLogVerbosityProvider')]
     public function test_it_converts_int_version_to_string_version_of_verbosity(
         $inputVerbosity,
         string $output,

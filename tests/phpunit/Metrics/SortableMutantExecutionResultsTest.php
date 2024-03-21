@@ -41,16 +41,16 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Tests\Mutator\MutatorName;
 use function Later\now;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class SortableMutantExecutionResultsTest extends TestCase
 {
     /**
-     * @dataProvider resultsProvider
-     *
      * @param MutantExecutionResult[] $executionResults
      * @param MutantExecutionResult[] $expectedResults
      */
+    #[DataProvider('resultsProvider')]
     public function test_it_can_sort_results(array $executionResults, array $expectedResults): void
     {
         $sortableResults = new SortableMutantExecutionResults();

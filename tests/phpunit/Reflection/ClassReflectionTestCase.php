@@ -38,13 +38,12 @@ namespace Infection\Tests\Reflection;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\Reflection\ClassReflection;
 use Infection\Reflection\Visibility;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 abstract class ClassReflectionTestCase extends TestCase
 {
-    /**
-     * @dataProvider provideParentMethodCases
-     */
+    #[DataProvider('provideParentMethodCases')]
     public function test_it_knows_if_a_function_is_inherited(
         ClassReflection $reflection,
         string $method,

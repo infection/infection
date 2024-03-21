@@ -42,6 +42,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class MutantCodeFactoryTest extends TestCase
@@ -56,9 +57,7 @@ final class MutantCodeFactoryTest extends TestCase
         $this->codeFactory = SingletonContainer::getContainer()->getMutantCodeFactory();
     }
 
-    /**
-     * @dataProvider mutationProvider
-     */
+    #[DataProvider('mutationProvider')]
     public function test_it_creates_the_mutant_code_from_the_given_mutation(
         Mutation $mutation,
         string $expectedMutantCode,
@@ -68,9 +67,7 @@ final class MutantCodeFactoryTest extends TestCase
         $this->assertSame($expectedMutantCode, $mutantCode);
     }
 
-    /**
-     * @dataProvider mutationProvider
-     */
+    #[DataProvider('mutationProvider')]
     public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
         Mutation $mutation,
     ): void {
