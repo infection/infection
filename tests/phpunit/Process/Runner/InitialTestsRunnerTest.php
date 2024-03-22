@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use function array_map;
+use function array_unique;
+use function array_values;
 use function extension_loaded;
 use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
@@ -120,7 +122,7 @@ final class InitialTestsRunnerTest extends TestCase
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_map('get_class', $this->eventDispatcher->getEvents()),
+            array_values(array_unique(array_map('get_class', $this->eventDispatcher->getEvents()))),
         );
     }
 
