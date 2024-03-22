@@ -1,5 +1,6 @@
 includes:
     - ../vendor/phpstan/phpstan/conf/bleedingEdge.neon
+    - phpstan-src-baseline.neon
 
 parameters:
     tmpDir: ../build/cache/phpstan-src
