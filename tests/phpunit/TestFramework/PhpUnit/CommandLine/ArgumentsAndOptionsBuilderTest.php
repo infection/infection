@@ -39,10 +39,12 @@ use function array_map;
 use Generator;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
+#[CoversClass(Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder::class)]
 final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
     public function test_it_can_build_the_command_without_extra_options(): void

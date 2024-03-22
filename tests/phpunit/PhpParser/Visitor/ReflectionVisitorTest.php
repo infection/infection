@@ -49,11 +49,13 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use ReflectionClass;
 
 #[Group('integration')]
+#[CoversClass(Infection\PhpParser\Visitor\ReflectionVisitor::class)]
 final class ReflectionVisitorTest extends BaseVisitorTestCase
 {
     private $spyVisitor;

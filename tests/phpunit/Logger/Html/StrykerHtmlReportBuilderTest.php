@@ -52,6 +52,7 @@ use function Infection\Tests\normalize_trailing_spaces;
 use JsonSchema\Validator;
 use function Later\now;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -63,6 +64,7 @@ use function Safe\realpath;
 use function sprintf;
 
 #[Group('integration')]
+#[CoversClass(Infection\Logger\Html\StrykerHtmlReportBuilder::class)]
 final class StrykerHtmlReportBuilderTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/mutation-testing-report-schema.json';

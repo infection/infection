@@ -41,11 +41,13 @@ use Infection\Process\Runner\ProcessBearer;
 use Infection\Tests\Fixtures\Event\DummyEvent;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Fixtures\Process\DummyProcessBearer;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
+#[CoversClass(Infection\Process\Runner\ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
 {
     public function test_it_does_nothing_when_no_process_is_given(): void

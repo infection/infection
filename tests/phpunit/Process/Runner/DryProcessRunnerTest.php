@@ -37,8 +37,10 @@ namespace Infection\Tests\Process\Runner;
 
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Tests\Fixtures\Process\FakeProcessBearer;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Process\Runner\DryProcessRunner::class)]
 final class DryProcessRunnerTest extends TestCase
 {
     public function test_it_can_iterate_over_the_processes(): void

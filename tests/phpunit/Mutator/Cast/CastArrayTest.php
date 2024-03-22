@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Cast;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Infection\Mutator\Cast\CastArray::class)]
 final class CastArrayTest extends BaseMutatorTestCase
 {
     /**

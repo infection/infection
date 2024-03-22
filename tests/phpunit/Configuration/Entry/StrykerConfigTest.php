@@ -37,9 +37,11 @@ namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\StrykerConfig;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Configuration\Entry\StrykerConfig::class)]
 final class StrykerConfigTest extends TestCase
 {
     #[DataProvider('branch_names_to_be_matched')]

@@ -39,9 +39,11 @@ use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Tests\Fixtures\Console\FakeOutput;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory::class)]
 final class MutationGeneratingConsoleLoggerSubscriberFactoryTest extends TestCase
 {
     public function test_it_creates_a_ci_subscriber_if_skips_the_progress_bar(): void

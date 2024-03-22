@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\TestFramework\Coverage\XmlReport\InvalidCoverage::class)]
 final class InvalidCoverageTest extends TestCase
 {
     public function test_it_can_be_instantiated(): void

@@ -36,9 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Locator;
 
 use Infection\FileSystem\Locator\FileNotFound;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\FileSystem\Locator\FileNotFound::class)]
 final class FileNotFoundTest extends TestCase
 {
     /**

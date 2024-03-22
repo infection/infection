@@ -37,9 +37,11 @@ namespace Infection\Tests\Resource\Memory;
 
 use Infection\Resource\Memory\MemoryFormatter;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Resource\Memory\MemoryFormatter::class)]
 final class MemoryFormatterTest extends TestCase
 {
     /**

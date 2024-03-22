@@ -37,9 +37,11 @@ namespace Infection\Tests\Command;
 
 use Infection\Console\Application;
 use Infection\Tests\SingletonContainer;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
+#[CoversClass(Infection\Command\DescribeCommand::class)]
 final class DescribeCommandTest extends TestCase
 {
     public function test_it_describes(): void

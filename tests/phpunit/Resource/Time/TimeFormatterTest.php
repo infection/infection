@@ -36,9 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Resource\Time;
 
 use Infection\Resource\Time\TimeFormatter;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Resource\Time\TimeFormatter::class)]
 final class TimeFormatterTest extends TestCase
 {
     /**

@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Differ;
 
 use Infection\Differ\DiffColorizer;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Differ\DiffColorizer::class)]
 final class DiffColorizerTest extends TestCase
 {
     public function test_id_adds_colours_to_a_given_diff(): void

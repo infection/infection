@@ -46,6 +46,7 @@ use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -56,6 +57,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 #[Group('integration')]
+#[CoversClass(Infection\Process\Runner\InitialTestsRunner::class)]
 final class InitialTestsRunnerTest extends TestCase
 {
     /**

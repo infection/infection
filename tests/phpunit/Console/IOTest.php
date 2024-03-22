@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Infection\Console\IO;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
 
+#[CoversClass(Infection\Console\IO::class)]
 final class IOTest extends TestCase
 {
     public function test_it_exposes_its_input_and_output(): void

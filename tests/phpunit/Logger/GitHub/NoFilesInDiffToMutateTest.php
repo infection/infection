@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\GitHub;
 
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Logger\GitHub\NoFilesInDiffToMutate::class)]
 final class NoFilesInDiffToMutateTest extends TestCase
 {
     public function test_composer_not_found_exception(): void

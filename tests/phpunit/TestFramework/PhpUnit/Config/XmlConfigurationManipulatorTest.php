@@ -45,6 +45,7 @@ use Infection\TestFramework\SafeDOMXPath;
 use function Infection\Tests\normalizeLineReturn;
 use InvalidArgumentException;
 use const PHP_OS_FAMILY;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -56,6 +57,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
+#[CoversClass(Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator::class)]
 final class XmlConfigurationManipulatorTest extends TestCase
 {
     /**

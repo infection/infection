@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Finder\Exception;
 
 use Infection\FileSystem\Finder\Exception\FinderException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\FileSystem\Finder\Exception\FinderException::class)]
 final class FinderExceptionTest extends TestCase
 {
     public function test_composer_not_found_exception(): void

@@ -41,11 +41,13 @@ use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Tests\Logger\DummyLogger;
 use function Infection\Tests\normalizeLineReturn;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
+#[CoversClass(Infection\Logger\Http\StrykerDashboardClient::class)]
 final class StrykerDashboardClientTest extends TestCase
 {
     private const API_KEY = '0e137d38-7611-4157-897b-54791cc1ef97';

@@ -40,9 +40,11 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Configuration\Schema\SchemaConfiguration::class)]
 final class SchemaConfigurationTest extends TestCase
 {
     #[DataProvider('valueProvider')]

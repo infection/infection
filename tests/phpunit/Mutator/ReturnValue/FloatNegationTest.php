@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Infection\Mutator\ReturnValue\FloatNegation::class)]
 final class FloatNegationTest extends BaseMutatorTestCase
 {
     /**

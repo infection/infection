@@ -44,11 +44,13 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\FakeCiDetector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[Group('integration')]
+#[CoversClass(Infection\Logger\StrykerLoggerFactory::class)]
 final class StrykerLoggerFactoryTest extends TestCase
 {
     public function test_it_does_not_create_any_logger_for_no_verbosity_level_and_no_badge(): void

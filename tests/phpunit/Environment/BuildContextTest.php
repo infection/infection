@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Environment;
 
 use Infection\Environment\BuildContext;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Environment\BuildContext::class)]
 final class BuildContextTest extends TestCase
 {
     public function test_constructor_sets_values(): void

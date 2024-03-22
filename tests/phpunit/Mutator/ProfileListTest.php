@@ -38,12 +38,14 @@ namespace Infection\Tests\Mutator;
 use function array_keys;
 use function in_array;
 use Infection\Mutator\ProfileList;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use function Safe\sort;
 use const SORT_STRING;
 use function sprintf;
 
+#[CoversClass(Infection\Mutator\ProfileList::class)]
 final class ProfileListTest extends TestCase
 {
     #[DataProviderExternal(ProfileListProvider::class, 'mutatorNameAndClassProvider')]

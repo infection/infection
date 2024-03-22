@@ -43,10 +43,12 @@ use Infection\Resource\Time\Stopwatch;
 use Infection\Tests\Fixtures\Resource\Memory\FakeMemoryFormatter;
 use Infection\Tests\Fixtures\Resource\Time\FakeTimeFormatter;
 use function is_array;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(Infection\Resource\Listener\PerformanceLoggerSubscriber::class)]
 final class PerformanceLoggerSubscriberTest extends TestCase
 {
     /**

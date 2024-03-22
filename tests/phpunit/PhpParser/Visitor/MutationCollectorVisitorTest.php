@@ -39,9 +39,11 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]
+#[CoversClass(Infection\PhpParser\Visitor\MutationCollectorVisitor::class)]
 final class MutationCollectorVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'

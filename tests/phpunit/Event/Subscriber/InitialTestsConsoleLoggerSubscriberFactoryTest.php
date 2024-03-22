@@ -40,11 +40,13 @@ use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Tests\Fixtures\Console\FakeOutput;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory::class)]
 final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
 {
     /**

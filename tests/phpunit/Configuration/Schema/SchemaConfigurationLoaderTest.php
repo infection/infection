@@ -39,11 +39,13 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\FileSystem\Locator\Locator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
+#[CoversClass(Infection\Configuration\Schema\SchemaConfigurationLoader::class)]
 final class SchemaConfigurationLoaderTest extends TestCase
 {
     /**

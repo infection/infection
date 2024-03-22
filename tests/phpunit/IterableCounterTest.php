@@ -38,8 +38,10 @@ namespace Infection\Tests;
 use ArrayIterator;
 use Infection\IterableCounter;
 use Iterator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\IterableCounter::class)]
 final class IterableCounterTest extends TestCase
 {
     public function test_it_does_not_count_when_not_asked(): void

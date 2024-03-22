@@ -42,6 +42,7 @@ use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Infection\Tests\normalizePath as p;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function Safe\realpath;
@@ -49,6 +50,7 @@ use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeExcept
 use Symfony\Component\Console\Input\StringInput;
 
 #[Group('integration')]
+#[CoversClass(Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider::class)]
 final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
 {
     /**

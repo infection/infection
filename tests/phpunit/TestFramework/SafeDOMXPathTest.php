@@ -38,8 +38,10 @@ namespace Infection\Tests\TestFramework;
 use DOMDocument;
 use Infection\TestFramework\SafeDOMXPath;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\TestFramework\SafeDOMXPath::class)]
 final class SafeDOMXPathTest extends TestCase
 {
     public function test_it_reads_xml(): void

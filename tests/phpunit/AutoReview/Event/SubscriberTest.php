@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Event;
 
 use function count;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -43,6 +44,7 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use function sprintf;
 
+#[CoversClass(Infection\AutoReview\Event\Subscriber::class)]
 final class SubscriberTest extends TestCase
 {
     /**

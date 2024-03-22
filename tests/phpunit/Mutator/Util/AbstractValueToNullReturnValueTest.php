@@ -38,11 +38,13 @@ namespace Infection\Tests\Mutator\Util;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Function_;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use stdClass;
 
+#[CoversClass(Infection\Mutator\Util\AbstractValueToNullReturnValue::class)]
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
     /**

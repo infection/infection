@@ -39,6 +39,7 @@ use Composer\XdebugHandler\XdebugHandler;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use const PHP_SAPI;
 use const PHP_VERSION_ID;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -47,6 +48,7 @@ use function Safe\ini_get;
 use function Safe\ini_set;
 
 #[Group('integration')]
+#[CoversClass(Infection\Resource\Memory\MemoryLimiterEnvironment::class)]
 final class MemoryLimiterEnvironmentTest extends TestCase
 {
     private ?string $originalMemoryLimit;

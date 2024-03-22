@@ -45,6 +45,7 @@ use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\SingletonContainer;
 use function is_executable;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
@@ -59,6 +60,7 @@ use function sprintf;
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
 #[CoversNothing]
+#[CoversClass(Infection\AutoReview\ProjectCode\ProjectCode::class)]
 final class ProjectCodeTest extends TestCase
 {
     /**

@@ -38,9 +38,11 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory::class)]
 final class StopInfectionOnSigintSignalSubscriberFactoryTest extends TestCase
 {
     public function test_it_creates_a_subscriber(): void

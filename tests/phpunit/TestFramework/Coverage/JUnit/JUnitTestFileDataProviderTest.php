@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -47,6 +48,7 @@ use function Safe\tempnam;
 use function Safe\unlink;
 
 #[Group('integration')]
+#[CoversClass(Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider::class)]
 final class JUnitTestFileDataProviderTest extends TestCase
 {
     private const JUNIT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml';

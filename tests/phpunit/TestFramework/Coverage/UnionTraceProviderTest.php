@@ -39,8 +39,10 @@ use function array_merge;
 use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\Coverage\UnionTraceProvider;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\TestFramework\Coverage\UnionTraceProvider::class)]
 final class UnionTraceProviderTest extends TestCase
 {
     public function test_it_provides_traces(): void

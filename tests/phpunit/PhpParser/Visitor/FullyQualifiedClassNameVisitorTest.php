@@ -40,10 +40,12 @@ use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Tests\Fixtures\PhpParser\FullyQualifiedClassNameSpyVisitor;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]
+#[CoversClass(Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor::class)]
 final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTestCase
 {
     /**

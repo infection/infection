@@ -40,11 +40,13 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\FilesDiffChangedLines;
 use Infection\Logger\GitHub\GitDiffFileProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
+#[CoversClass(Infection\Differ\FilesDiffChangedLines::class)]
 final class FilesDiffChangedLinesTest extends TestCase
 {
     public function test_it_memoizes_parsed_results(): void

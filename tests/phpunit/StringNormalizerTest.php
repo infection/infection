@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\StringNormalizer::class)]
 final class StringNormalizerTest extends TestCase
 {
     #[DataProvider('stringValuesProvider')]

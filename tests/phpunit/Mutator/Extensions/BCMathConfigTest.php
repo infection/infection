@@ -37,9 +37,11 @@ namespace Infection\Tests\Mutator\Extensions;
 
 use Infection\Mutator\Extensions\BCMathConfig;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Mutator\Extensions\BCMathConfig::class)]
 final class BCMathConfigTest extends TestCase
 {
     #[DataProvider('settingsProvider')]

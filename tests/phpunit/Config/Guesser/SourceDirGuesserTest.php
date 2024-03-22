@@ -37,9 +37,11 @@ namespace Infection\Tests\Config\Guesser;
 
 use Infection\Config\Guesser\SourceDirGuesser;
 use LogicException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 
+#[CoversClass(Infection\Config\Guesser\SourceDirGuesser::class)]
 final class SourceDirGuesserTest extends TestCase
 {
     public function test_it_parser_psr4(): void

@@ -42,9 +42,11 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Mutant\MutantCodeFactory::class)]
 final class MutantCodeFactoryTest extends TestCase
 {
     /**

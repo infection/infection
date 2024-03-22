@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\PhpDoc;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\AutoReview\PhpDoc\PHPDocParser::class)]
 final class PHPDocParserTest extends TestCase
 {
     #[DataProvider('phpDocProvider')]

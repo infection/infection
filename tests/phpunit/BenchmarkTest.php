@@ -38,6 +38,7 @@ namespace Infection\Tests;
 use function is_dir;
 use const PHP_OS_FAMILY;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -49,6 +50,7 @@ use Symfony\Component\Process\Process;
 
 #[Group('integration')]
 #[CoversNothing]
+#[CoversClass(Infection\Benchmark::class)]
 final class BenchmarkTest extends TestCase
 {
     private const BENCHMARK_DIR = __DIR__ . '/../benchmark';

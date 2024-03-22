@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Infection\Mutator\Arithmetic\ShiftRight::class)]
 final class ShiftRightTest extends BaseMutatorTestCase
 {
     /**

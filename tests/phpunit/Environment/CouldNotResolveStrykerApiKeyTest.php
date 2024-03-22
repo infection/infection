@@ -37,9 +37,11 @@ namespace Infection\Tests\Environment;
 
 use function implode;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
+#[CoversClass(Infection\Environment\CouldNotResolveStrykerApiKey::class)]
 final class CouldNotResolveStrykerApiKeyTest extends TestCase
 {
     public function test_from_returns_exception(): void

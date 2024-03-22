@@ -38,8 +38,10 @@ namespace Infection\Tests\Mutator\Boolean;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Infection\Mutator\Boolean\TrueValue::class)]
 final class TrueValueTest extends BaseMutatorTestCase
 {
     /**

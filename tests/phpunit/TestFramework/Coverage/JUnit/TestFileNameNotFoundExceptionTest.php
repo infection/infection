@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException::class)]
 final class TestFileNameNotFoundExceptionTest extends TestCase
 {
     public function test_from_fqn(): void

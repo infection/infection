@@ -38,9 +38,11 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Logger\DebugFileLogger::class)]
 final class DebugFileLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;

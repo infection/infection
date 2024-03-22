@@ -41,12 +41,14 @@ use function array_values;
 use function count;
 use Infection\FileSystem\SourceFileCollector;
 use function natcasesort;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use function range;
 use Symfony\Component\Filesystem\Path;
 
+#[CoversClass(Infection\FileSystem\SourceFileCollector::class)]
 final class SourceFileCollectorTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';

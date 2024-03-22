@@ -42,6 +42,7 @@ use Infection\Tests\StringNormalizer;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\Parser;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -50,6 +51,7 @@ use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 #[Group('integration')]
+#[CoversClass(Infection\PhpParser\FileParser::class)]
 final class FileParserTest extends TestCase
 {
     public function test_it_parses_the_given_file_only_once(): void

@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Event;
 
 use Infection\Event\MutableFileWasProcessed;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Event\MutableFileWasProcessed::class)]
 final class MutableFileWasProcessedTest extends TestCase
 {
     /**

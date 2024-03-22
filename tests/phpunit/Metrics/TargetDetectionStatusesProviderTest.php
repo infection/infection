@@ -43,8 +43,10 @@ use Infection\Console\LogVerbosity;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
 use function ksort;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Metrics\TargetDetectionStatusesProvider::class)]
 final class TargetDetectionStatusesProviderTest extends TestCase
 {
     public function test_it_provides_all_statuses_when_debugging_log_is_enabled(): void

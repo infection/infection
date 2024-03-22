@@ -37,8 +37,10 @@ namespace Infection\Tests\Event;
 
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\MutantExecutionResult;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Infection\Event\MutantProcessWasFinished::class)]
 final class MutantProcessWasFinishedTest extends TestCase
 {
     public function test_it_exposes_its_mutant_process(): void
