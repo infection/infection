@@ -37,7 +37,9 @@ namespace Infection\Tests\Reflection;
 
 use Infection\Reflection\ClassReflection;
 use Infection\Reflection\CoreClassReflection;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(CoreClassReflection::class)]
 final class CoreClassReflectionTest extends ClassReflectionTestCase
 {
     public function test_it_exposes_the_class_name(): void

@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
+use Infection\Mutator\ConditionalNegotiation\GreaterThanNegotiation;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(GreaterThanNegotiation::class)]
 final class GreaterThanNegotiationTest extends BaseMutatorTestCase
 {
     /**

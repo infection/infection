@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -55,6 +56,7 @@ use Symfony\Component\Filesystem\Path;
 use Traversable;
 
 #[Group('integration')]
+#[CoversClass(IndexXmlCoverageParser::class)]
 final class IndexXmlCoverageParserTest extends TestCase
 {
     /**

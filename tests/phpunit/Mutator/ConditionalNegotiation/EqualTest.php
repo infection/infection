@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
+use Infection\Mutator\ConditionalNegotiation\Equal;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Equal::class)]
 final class EqualTest extends BaseMutatorTestCase
 {
     /**

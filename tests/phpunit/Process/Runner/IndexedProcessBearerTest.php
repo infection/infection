@@ -37,8 +37,10 @@ namespace Infection\Tests\Process\Runner;
 
 use Infection\Process\Runner\IndexedProcessBearer;
 use Infection\Process\Runner\ProcessBearer;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(IndexedProcessBearer::class)]
 final class IndexedProcessBearerTest extends TestCase
 {
     public function test_it_creates_object(): void

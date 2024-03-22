@@ -37,12 +37,14 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
 #[Group('integration')]
+#[CoversClass(CleanUpAfterMutationTestingFinishedSubscriber::class)]
 final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
 {
     public function test_it_execute_remove_on_mutation_testing_finished(): void

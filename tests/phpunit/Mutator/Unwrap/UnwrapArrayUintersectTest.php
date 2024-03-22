@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
+use Infection\Mutator\Unwrap\UnwrapArrayUintersect;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapArrayUintersect::class)]
 final class UnwrapArrayUintersectTest extends BaseMutatorTestCase
 {
     /**

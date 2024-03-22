@@ -37,12 +37,15 @@ namespace Infection\Tests\Mutator\Extensions;
 
 use function array_map;
 use function implode;
+use Infection\Mutator\Extensions\BCMath;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use function range;
 use function strtoupper;
 use function ucfirst;
 
+#[CoversClass(BCMath::class)]
 final class BCMathTest extends BaseMutatorTestCase
 {
     /**

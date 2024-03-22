@@ -43,10 +43,12 @@ use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\file_put_contents;
 
 #[Group('integration')]
+#[CoversClass(PhpUnitXmlCoverageTraceProvider::class)]
 final class PhpUnitXmlCoverageTraceProviderTest extends FileSystemTestCase
 {
     public function test_it_can_parse_coverage_data(): void

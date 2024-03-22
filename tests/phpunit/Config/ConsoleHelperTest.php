@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Config;
 
 use Infection\Config\ConsoleHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(ConsoleHelper::class)]
 final class ConsoleHelperTest extends TestCase
 {
     public function test_it_writes_to_section(): void

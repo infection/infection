@@ -38,8 +38,10 @@ namespace Infection\Tests\Metrics;
 use function array_merge;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(ResultsCollector::class)]
 final class ResultsCollectorTest extends TestCase
 {
     use CreateMutantExecutionResult;

@@ -37,10 +37,12 @@ namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
+#[CoversClass(MutantProcess::class)]
 final class MutantProcessTest extends TestCase
 {
     /**

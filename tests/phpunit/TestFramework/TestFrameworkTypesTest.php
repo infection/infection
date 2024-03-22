@@ -37,8 +37,10 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TestFrameworkTypes::class)]
 final class TestFrameworkTypesTest extends TestCase
 {
     public function test_it_returns_default_types_when_no_test_framework_adapters_are_installed(): void

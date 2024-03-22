@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Infection\Mutator\Arithmetic\Minus;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Minus::class)]
 final class MinusTest extends BaseMutatorTestCase
 {
     /**

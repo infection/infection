@@ -39,8 +39,10 @@ use function array_flip;
 use Infection\Metrics\Collector;
 use Infection\Metrics\FilteringResultsCollector;
 use Infection\Mutant\DetectionStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FilteringResultsCollector::class)]
 final class FilteringResultsCollectorTest extends TestCase
 {
     use CreateMutantExecutionResult;

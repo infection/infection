@@ -39,10 +39,12 @@ use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use PhpParser\Comment;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use SplObjectStorage;
 
 #[Group('integration')]
+#[CoversClass(IgnoreAllMutationsAnnotationReaderVisitor::class)]
 final class IgnoreAllMutationsAnnotationReaderVisitorTest extends BaseVisitorTestCase
 {
     public function test_it_does_not_toggle_ignorer_for_nodes_without_comments(): void

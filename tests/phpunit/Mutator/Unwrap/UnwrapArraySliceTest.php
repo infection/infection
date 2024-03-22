@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
+use Infection\Mutator\Unwrap\UnwrapArraySlice;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapArraySlice::class)]
 final class UnwrapArraySliceTest extends BaseMutatorTestCase
 {
     /**

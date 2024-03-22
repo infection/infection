@@ -42,10 +42,12 @@ use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function range;
 
+#[CoversClass(LineRangeCalculator::class)]
 final class LineRangeCalculatorTest extends TestCase
 {
     #[DataProvider('provideCodeAndRangeCases')]

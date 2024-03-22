@@ -37,9 +37,11 @@ namespace Infection\Tests\PhpParser;
 
 use Infection\PhpParser\MutatedNode;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MutatedNode::class)]
 final class MutatedNodeTest extends TestCase
 {
     /**

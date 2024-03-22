@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Differ;
 
 use Infection\Differ\ChangedLinesRange;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(ChangedLinesRange::class)]
 final class ChangedLinesRangeTest extends TestCase
 {
     public function test_it_returns_lines(): void

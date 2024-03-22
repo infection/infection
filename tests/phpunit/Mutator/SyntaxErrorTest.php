@@ -35,8 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\SyntaxError;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(SyntaxError::class)]
 final class SyntaxErrorTest extends BaseMutatorTestCase
 {
     /**

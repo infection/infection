@@ -40,9 +40,11 @@ use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function str_replace;
 
+#[CoversClass(GitDiffFileProvider::class)]
 final class GitDiffFileProviderTest extends TestCase
 {
     public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void

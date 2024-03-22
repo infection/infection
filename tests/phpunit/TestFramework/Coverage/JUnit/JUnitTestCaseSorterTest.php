@@ -39,8 +39,10 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use function iterator_to_array;
 use function log;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(JUnitTestCaseSorter::class)]
 final class JUnitTestCaseSorterTest extends TestCase
 {
     public function test_it_returns_first_file_name_if_there_is_only_one(): void

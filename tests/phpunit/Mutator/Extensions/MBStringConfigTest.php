@@ -37,9 +37,11 @@ namespace Infection\Tests\Mutator\Extensions;
 
 use Infection\Mutator\Extensions\MBStringConfig;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MBStringConfig::class)]
 final class MBStringConfigTest extends TestCase
 {
     #[DataProvider('settingsProvider')]

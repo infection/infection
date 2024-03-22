@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Infection\Mutator\Arithmetic\PowEqual;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(PowEqual::class)]
 final class PowEqualTest extends BaseMutatorTestCase
 {
     /**

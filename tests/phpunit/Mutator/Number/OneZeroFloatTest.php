@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Number;
 
+use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(OneZeroFloat::class)]
 final class OneZeroFloatTest extends BaseMutatorTestCase
 {
     /**
