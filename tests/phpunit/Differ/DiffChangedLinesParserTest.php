@@ -39,14 +39,12 @@ use function array_map;
 use Generator;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\DiffChangedLinesParser;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 
 #[Group('integration')]
-#[CoversClass(Infection\Differ\DiffChangedLinesParser::class)]
 final class DiffChangedLinesParserTest extends TestCase
 {
     #[DataProvider('provideDiffs')]

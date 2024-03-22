@@ -51,13 +51,11 @@ use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\WithConsecutive;
 use function Later\now;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 
-#[CoversClass(Infection\Mutation\MutationGenerator::class)]
 final class MutationGeneratorTest extends TestCase
 {
     use ProphecyTrait;

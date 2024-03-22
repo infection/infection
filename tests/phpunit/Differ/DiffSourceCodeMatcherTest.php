@@ -37,11 +37,9 @@ namespace Infection\Tests\Differ;
 
 use Generator;
 use Infection\Differ\DiffSourceCodeMatcher;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Differ\DiffSourceCodeMatcher::class)]
 final class DiffSourceCodeMatcherTest extends TestCase
 {
     /** @var DiffSourceCodeMatcher */

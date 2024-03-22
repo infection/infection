@@ -37,11 +37,9 @@ namespace Infection\Tests\FileSystem;
 
 use Infection\FileSystem\TmpDirProvider;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\FileSystem\TmpDirProvider::class)]
 final class TmpDirProviderTest extends TestCase
 {
     /**

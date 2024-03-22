@@ -39,13 +39,11 @@ use function array_map;
 use function explode;
 use function implode;
 use Infection\Differ\Differ;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 
-#[CoversClass(Infection\Differ\Differ::class)]
 final class DifferTest extends TestCase
 {
     #[DataProvider('diffProvider')]

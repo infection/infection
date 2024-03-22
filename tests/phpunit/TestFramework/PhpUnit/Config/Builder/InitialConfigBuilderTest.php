@@ -47,7 +47,6 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use InvalidArgumentException;
 use const PHP_EOL;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\file_get_contents;
@@ -57,7 +56,6 @@ use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
-#[CoversClass(Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder::class)]
 final class InitialConfigBuilderTest extends FileSystemTestCase
 {
     private const FIXTURES = __DIR__ . '/../../../../Fixtures/Files/phpunit';

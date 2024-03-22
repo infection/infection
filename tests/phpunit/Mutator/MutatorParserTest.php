@@ -36,11 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\MutatorParser;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Mutator\MutatorParser::class)]
 final class MutatorParserTest extends TestCase
 {
     /**

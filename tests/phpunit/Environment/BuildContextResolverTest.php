@@ -41,11 +41,9 @@ use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use OndraM\CiDetector\TrinaryLogic;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Environment\BuildContextResolver::class)]
 final class BuildContextResolverTest extends TestCase
 {
     public function test_resolve_throws_when_ci_could_not_be_detected(): void

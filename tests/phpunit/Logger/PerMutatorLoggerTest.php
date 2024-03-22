@@ -38,11 +38,9 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\PerMutatorLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Logger\PerMutatorLogger::class)]
 final class PerMutatorLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;

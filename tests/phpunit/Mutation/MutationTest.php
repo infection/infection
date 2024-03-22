@@ -43,11 +43,9 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
 use function md5;
 use PhpParser\Node;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Mutation\Mutation::class)]
 final class MutationTest extends TestCase
 {
     /**

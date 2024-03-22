@@ -36,10 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Event;
 
 use Infection\Event\MutationGenerationWasFinished;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Event\MutationGenerationWasFinished::class)]
 final class MutationGenerationWasFinishedTest extends TestCase
 {
     /**

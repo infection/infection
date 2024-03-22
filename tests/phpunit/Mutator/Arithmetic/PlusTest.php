@@ -39,10 +39,8 @@ use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(Infection\Mutator\Arithmetic\Plus::class)]
 final class PlusTest extends BaseMutatorTestCase
 {
     /**

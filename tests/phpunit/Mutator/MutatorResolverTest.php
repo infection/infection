@@ -52,11 +52,9 @@ use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\ProfileList;
 use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
-#[CoversClass(Infection\Mutator\MutatorResolver::class)]
 final class MutatorResolverTest extends TestCase
 {
     /**

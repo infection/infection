@@ -58,7 +58,6 @@ use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use function Infection\Tests\normalizePath;
 use Infection\Tests\SingletonContainer;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -68,7 +67,6 @@ use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 
 #[Group('integration')]
-#[CoversClass(Infection\Configuration\ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;

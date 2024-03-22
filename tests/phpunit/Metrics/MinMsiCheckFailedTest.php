@@ -36,10 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Metrics;
 
 use Infection\Metrics\MinMsiCheckFailed;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Metrics\MinMsiCheckFailed::class)]
 final class MinMsiCheckFailedTest extends TestCase
 {
     public function test_it_can_be_created_for_min_msi(): void

@@ -38,11 +38,9 @@ namespace Infection\Tests\Configuration\Schema;
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use function Infection\Tests\normalizeLineReturn;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Configuration\Schema\InvalidSchema::class)]
 final class InvalidSchemaTest extends TestCase
 {
     #[DataProvider('configWithErrorsProvider')]

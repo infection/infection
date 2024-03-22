@@ -36,10 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Event;
 
 use Infection\Event\ApplicationExecutionWasFinished;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Event\ApplicationExecutionWasFinished::class)]
 final class ApplicationExecutionWasFinishedTest extends TestCase
 {
     /**

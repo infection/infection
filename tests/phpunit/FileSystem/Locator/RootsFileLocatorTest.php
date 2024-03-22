@@ -40,7 +40,6 @@ use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -52,7 +51,6 @@ use Symfony\Component\Filesystem\Filesystem;
  * Requires IO reads
  */
 #[Group('integration')]
-#[CoversClass(Infection\FileSystem\Locator\RootsFileLocator::class)]
 final class RootsFileLocatorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Locator';

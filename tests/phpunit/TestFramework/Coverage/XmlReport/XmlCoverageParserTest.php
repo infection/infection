@@ -41,14 +41,12 @@ use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[Group('integration')]
-#[CoversClass(Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser::class)]
 final class XmlCoverageParserTest extends TestCase
 {
     private XmlCoverageParser $parser;

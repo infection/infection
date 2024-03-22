@@ -41,10 +41,8 @@ use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use Infection\Tests\Fixtures\Event\DummySubscriberFactory;
 use Infection\Tests\Fixtures\Event\SubscriberCollectEventDispatcher;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Event\Subscriber\SubscriberRegisterer::class)]
 final class SubscriberRegistererTest extends TestCase
 {
     /**

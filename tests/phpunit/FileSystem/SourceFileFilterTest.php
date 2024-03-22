@@ -40,13 +40,11 @@ use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\Tests\Fixtures\MockSplFileInfo;
 use IteratorIterator;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use Traversable;
 
-#[CoversClass(Infection\FileSystem\SourceFileFilter::class)]
 final class SourceFileFilterTest extends TestCase
 {
     /**

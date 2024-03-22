@@ -37,10 +37,8 @@ namespace Infection\Tests\CI;
 
 use Infection\CI\MemoizedCiDetector;
 use OndraM\CiDetector\Env;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\CI\MemoizedCiDetector::class)]
 final class MemoizedCiDetectorTest extends TestCase
 {
     public function test_it_can_be_instantiated_from_environment(): void

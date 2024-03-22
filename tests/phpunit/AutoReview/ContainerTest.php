@@ -39,7 +39,6 @@ use function array_map;
 use function in_array;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\SingletonContainer;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -48,7 +47,6 @@ use function sprintf;
 use function strpos;
 use Symfony\Component\Filesystem\Path;
 
-#[CoversClass(Infection\AutoReview\Container::class)]
 final class ContainerTest extends TestCase
 {
     /**

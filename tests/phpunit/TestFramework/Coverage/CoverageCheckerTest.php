@@ -43,7 +43,6 @@ use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use const PHP_SAPI;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -61,7 +60,6 @@ use Symfony\Component\Filesystem\Path;
 #[PreserveGlobalState(false)]
 #[Group('integration')]
 #[RunTestsInSeparateProcesses]
-#[CoversClass(Infection\TestFramework\Coverage\CoverageChecker::class)]
 final class CoverageCheckerTest extends TestCase
 {
     /**

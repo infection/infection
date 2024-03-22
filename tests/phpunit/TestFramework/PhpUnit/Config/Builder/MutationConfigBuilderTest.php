@@ -50,7 +50,6 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\exec;
@@ -61,7 +60,6 @@ use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
-#[CoversClass(Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder::class)]
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     public const HASH = 'a1b2c3';

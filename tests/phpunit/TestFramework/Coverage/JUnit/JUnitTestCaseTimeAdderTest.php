@@ -37,10 +37,8 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder::class)]
 final class JUnitTestCaseTimeAdderTest extends TestCase
 {
     public function test_it_returns_time_for_the_only_test(): void

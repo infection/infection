@@ -39,12 +39,10 @@ use function extension_loaded;
 use Infection\Process\OriginalPhpProcess;
 use function ini_get as ini_get_unsafe;
 use const PHP_SAPI;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(Infection\Process\OriginalPhpProcess::class)]
 final class OriginalPhpProcessTest extends TestCase
 {
     public function test_it_extends_symfony_process(): void

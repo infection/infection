@@ -39,12 +39,10 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber::class)]
 final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
 {
     /**

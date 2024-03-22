@@ -43,7 +43,6 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
 use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -52,7 +51,6 @@ use function Safe\json_decode;
 use function str_replace;
 
 #[Group('integration')]
-#[CoversClass(Infection\Logger\JsonLogger::class)]
 final class JsonLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;

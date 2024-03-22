@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -48,7 +47,6 @@ use Symfony\Component\Yaml\Yaml;
 
 #[Group('integration')]
 #[CoversNothing]
-#[CoversClass(Infection\AutoReview\BuildConfigYml::class)]
 final class BuildConfigYmlTest extends TestCase
 {
     #[DataProvider('providesYamlFilesForTesting')]

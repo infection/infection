@@ -35,11 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\AutoReview\ProjectCode\DocBlockParser::class)]
 final class DocBlockParserTest extends TestCase
 {
     #[DataProvider('docBlocksProvider')]

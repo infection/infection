@@ -37,10 +37,8 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use const PHP_VERSION_ID;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(Infection\Mutator\Operator\Ternary::class)]
 final class TernaryTest extends BaseMutatorTestCase
 {
     /**

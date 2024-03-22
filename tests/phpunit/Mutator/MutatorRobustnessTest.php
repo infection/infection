@@ -42,7 +42,6 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Tests\Fixtures\NullMutationVisitor;
 use Infection\Tests\SingletonContainer;
 use function ksort;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -53,7 +52,6 @@ use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
 #[CoversNothing]
-#[CoversClass(Infection\Mutator\MutatorRobustness::class)]
 final class MutatorRobustnessTest extends TestCase
 {
     /**

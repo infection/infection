@@ -37,11 +37,9 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\TestFramework\Coverage\NodeLineRangeData::class)]
 final class NodeLineRangeDataTest extends TestCase
 {
     public function test_it_can_not_have_an_incorrect_range(): void

@@ -53,7 +53,6 @@ use Infection\Tests\Fixtures\Logger\FakeLogger;
 use Infection\Tests\Logger\FakeMutationTestingResultsLogger;
 use Infection\Tests\WithConsecutive;
 use const PHP_EOL;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -66,7 +65,6 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
-#[CoversClass(Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber::class)]
 final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
     /**

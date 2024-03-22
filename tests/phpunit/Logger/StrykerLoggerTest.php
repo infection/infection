@@ -46,13 +46,11 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Tests\CI\ConfigurableEnv;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use OndraM\CiDetector\CiDetector;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use function Safe\putenv;
 
-#[CoversClass(Infection\Logger\StrykerLogger::class)]
 final class StrykerLoggerTest extends TestCase
 {
     use BacksUpEnvironmentVariables;

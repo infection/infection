@@ -39,11 +39,9 @@ use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\Tests\Fixtures\PhpParser\ParentConnectorSpyVisitor;
 use Infection\Tests\Fixtures\PhpParser\StackSpyVisitor;
 use Infection\Tests\SingletonContainer;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]
-#[CoversClass(Infection\PhpParser\Visitor\ParentConnectorVisitor::class)]
 final class ParentConnectorVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'

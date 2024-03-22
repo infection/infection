@@ -41,11 +41,9 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\NoopMutator;
 use function iterator_to_array;
 use PhpParser\Node;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Mutator\NoopMutator::class)]
 final class NoopMutatorTest extends TestCase
 {
     /**

@@ -39,12 +39,10 @@ use Infection\Mutator\Removal\ArrayItemRemovalConfig;
 use InvalidArgumentException;
 use const PHP_INT_MAX;
 use const PHP_VERSION_ID;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use TypeError;
 
-#[CoversClass(Infection\Mutator\Removal\ArrayItemRemovalConfig::class)]
 final class ArrayItemRemovalConfigTest extends TestCase
 {
     #[DataProvider('settingsProvider')]

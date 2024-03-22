@@ -45,12 +45,10 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
-#[CoversClass(Infection\Mutant\MutantFactory::class)]
 final class MutantFactoryTest extends TestCase
 {
     use MutantAssertions;

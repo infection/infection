@@ -37,9 +37,7 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use PHPUnit\Framework\Attributes\CoversClass;
 
-#[CoversClass(Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer::class)]
 final class AbstractMethodIgnorerTest extends BaseNodeIgnorerTestCase
 {
     public function test_it_ignores_abstract_methods(): void

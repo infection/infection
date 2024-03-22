@@ -37,11 +37,9 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\TrueValueConfig;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Mutator\Boolean\TrueValueConfig::class)]
 final class TrueValueConfigTest extends TestCase
 {
     #[DataProvider('settingsProvider')]

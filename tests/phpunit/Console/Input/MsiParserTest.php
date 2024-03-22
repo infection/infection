@@ -37,11 +37,9 @@ namespace Infection\Tests\Console\Input;
 
 use Infection\Console\Input\MsiParser;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Console\Input\MsiParser::class)]
 final class MsiParserTest extends TestCase
 {
     /**

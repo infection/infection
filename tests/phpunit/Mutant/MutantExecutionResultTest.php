@@ -44,10 +44,8 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
 use function Later\now;
 use PhpParser\Node\Stmt\Nop;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Mutant\MutantExecutionResult::class)]
 final class MutantExecutionResultTest extends TestCase
 {
     use MutantExecutionResultAssertions;

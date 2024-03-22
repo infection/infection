@@ -35,14 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
 
-#[CoversClass(Infection\AutoReview\IntegrationGroup\IntegrationGroup::class)]
 final class IntegrationGroupTest extends TestCase
 {
     #[DataProviderExternal(IntegrationGroupProvider::class, 'ioTestCaseTupleProvider')]

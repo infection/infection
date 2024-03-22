@@ -36,10 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\TestFramework\Coverage\XmlReport\NoLineExecuted::class)]
 final class NoLineExecutedTest extends TestCase
 {
     public function test_it_can_create_an_instance(): void

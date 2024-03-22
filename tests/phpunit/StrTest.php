@@ -36,11 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use Infection\Str;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Str::class)]
 final class StrTest extends TestCase
 {
     #[DataProvider('stringProvider')]

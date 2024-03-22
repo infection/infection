@@ -37,12 +37,10 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\TestFramework\VersionParser;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
-#[CoversClass(Infection\TestFramework\VersionParser::class)]
 final class VersionParserTest extends TestCase
 {
     /**

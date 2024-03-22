@@ -37,11 +37,9 @@ namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Configuration\Entry\Logs::class)]
 final class LogsTest extends TestCase
 {
     use LogsAssertions;

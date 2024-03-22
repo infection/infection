@@ -37,11 +37,9 @@ namespace Infection\Tests;
 
 use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\Mutator\ProfileListProvider;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\MutatorName::class)]
 final class MutatorNameTest extends TestCase
 {
     #[DataProviderExternal(ProfileListProvider::class, 'mutatorNameAndClassProvider')]

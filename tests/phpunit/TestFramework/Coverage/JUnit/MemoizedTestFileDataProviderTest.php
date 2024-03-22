@@ -38,10 +38,8 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider::class)]
 final class MemoizedTestFileDataProviderTest extends TestCase
 {
     public function test_it_memoize_get_test_file_info_calls(): void

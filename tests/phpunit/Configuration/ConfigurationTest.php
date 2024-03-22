@@ -44,12 +44,10 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
-#[CoversClass(Infection\Configuration\Configuration::class)]
 final class ConfigurationTest extends TestCase
 {
     use ConfigurationAssertions;

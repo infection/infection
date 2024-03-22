@@ -42,11 +42,9 @@ use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\TestFramework\Coverage\XmlReport\TestLocator::class)]
 final class TestLocatorTest extends TestCase
 {
     /**

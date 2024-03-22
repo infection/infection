@@ -37,10 +37,8 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer::class)]
 final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
 {
     #[DataProvider('provideIgnoreCases')]

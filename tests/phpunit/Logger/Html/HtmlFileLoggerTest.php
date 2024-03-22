@@ -39,10 +39,8 @@ use Infection\Logger\Html\HtmlFileLogger;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Logger\Html\HtmlFileLogger::class)]
 final class HtmlFileLoggerTest extends TestCase
 {
     public function test_it_builds_html(): void

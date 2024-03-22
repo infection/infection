@@ -45,7 +45,6 @@ use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
 use const PATH_SEPARATOR;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\putenv;
@@ -59,7 +58,6 @@ use Symfony\Component\Filesystem\Filesystem;
  * Requires I/O read & writes via the MockVendor
  */
 #[Group('integration')]
-#[CoversClass(Infection\FileSystem\Finder\TestFrameworkFinder::class)]
 final class TestFrameworkFinderTest extends FileSystemTestCase
 {
     use BacksUpEnvironmentVariables;

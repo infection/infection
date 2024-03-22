@@ -37,10 +37,8 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 
-#[CoversClass(Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer::class)]
 final class ChangingIgnorerTest extends BaseNodeIgnorerTestCase
 {
     private const CODE_WITH_ONE_IGNORED_NODE = <<<'PHP'

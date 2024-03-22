@@ -36,10 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Event;
 
 use Infection\Event\InitialTestCaseWasCompleted;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Event\InitialTestCaseWasCompleted::class)]
 final class InitialTestCaseWasCompletedTest extends TestCase
 {
     /**

@@ -40,7 +40,6 @@ use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\Constraint\Constraint;
@@ -50,7 +49,6 @@ use ReflectionClass;
 use function Safe\realpath;
 
 #[Group('integration')]
-#[CoversClass(Infection\Configuration\Schema\SchemaConfigurationFileLoader::class)]
 final class SchemaConfigurationFileLoaderTest extends TestCase
 {
     /**

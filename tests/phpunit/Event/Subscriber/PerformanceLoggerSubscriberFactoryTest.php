@@ -41,10 +41,8 @@ use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory::class)]
 final class PerformanceLoggerSubscriberFactoryTest extends TestCase
 {
     public function test_it_can_create_a_subscriber(): void

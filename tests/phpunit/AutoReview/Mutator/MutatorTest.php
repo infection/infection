@@ -44,7 +44,6 @@ use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorConfig;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
@@ -63,7 +62,6 @@ use function sprintf;
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
 #[CoversNothing]
-#[CoversClass(Infection\AutoReview\Mutator\Mutator::class)]
 final class MutatorTest extends TestCase
 {
     private const KNOWN_MUTATOR_PUBLIC_METHODS = [

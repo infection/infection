@@ -37,11 +37,9 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\TextFileLogger;
 use Infection\Metrics\ResultsCollector;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Logger\TextFileLogger::class)]
 final class TextFileLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;

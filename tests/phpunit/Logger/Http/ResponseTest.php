@@ -37,11 +37,9 @@ namespace Infection\Tests\Logger\Http;
 
 use Infection\Logger\Http\Response;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Logger\Http\Response::class)]
 final class ResponseTest extends TestCase
 {
     #[DataProvider('valueProvider')]

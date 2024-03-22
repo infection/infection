@@ -40,7 +40,6 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Console\IO;
 use function microtime;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function random_int;
@@ -49,7 +48,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
 #[Group('integration')]
-#[CoversClass(Infection\Config\ValueProvider\ExcludeDirsProvider::class)]
 final class ExcludeDirsProviderTest extends BaseProviderTestCase
 {
     /**

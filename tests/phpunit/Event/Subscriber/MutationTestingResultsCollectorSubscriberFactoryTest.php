@@ -38,11 +38,9 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Metrics\Collector;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory::class)]
 final class MutationTestingResultsCollectorSubscriberFactoryTest extends TestCase
 {
     public function test_it_creates_a_subscriber(): void

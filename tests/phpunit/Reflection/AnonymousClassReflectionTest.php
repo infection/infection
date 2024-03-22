@@ -37,9 +37,7 @@ namespace Infection\Tests\Reflection;
 
 use Infection\Reflection\AnonymousClassReflection;
 use Infection\Reflection\ClassReflection;
-use PHPUnit\Framework\Attributes\CoversClass;
 
-#[CoversClass(Infection\Reflection\AnonymousClassReflection::class)]
 final class AnonymousClassReflectionTest extends ClassReflectionTestCase
 {
     public function test_it_has_no_name(): void

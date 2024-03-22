@@ -43,14 +43,12 @@ use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 
-#[CoversClass(Infection\Console\OutputFormatter\FormatterFactory::class)]
 final class FormatterFactoryTest extends TestCase
 {
     #[DataProvider('formatterProvider')]

@@ -37,11 +37,9 @@ namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Mutator\Definition::class)]
 final class DefinitionTest extends TestCase
 {
     #[DataProvider('valuesProvider')]

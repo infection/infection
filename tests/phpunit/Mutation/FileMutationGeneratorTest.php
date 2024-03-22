@@ -53,14 +53,12 @@ use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\SingletonContainer;
 use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
-#[CoversClass(Infection\Mutation\FileMutationGenerator::class)]
 final class FileMutationGeneratorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Files';

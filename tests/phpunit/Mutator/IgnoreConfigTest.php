@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\IgnoreConfig;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -45,7 +44,6 @@ use PHPUnit\Framework\TestCase;
  * This is probably a false-positive of the IO checker regarding `fnmatch()`
  */
 #[Group('integration')]
-#[CoversClass(Infection\Mutator\IgnoreConfig::class)]
 final class IgnoreConfigTest extends TestCase
 {
     public function test_it_returns_early_if_nothing_is_ignored(): void

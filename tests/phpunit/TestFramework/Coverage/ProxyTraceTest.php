@@ -43,10 +43,8 @@ use Infection\TestFramework\Coverage\TestLocations;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use function iterator_to_array;
 use function Later\now;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\TestFramework\Coverage\ProxyTrace::class)]
 final class ProxyTraceTest extends TestCase
 {
     public function test_it_exposes_its_source_file_file_info(): void

@@ -37,11 +37,9 @@ namespace Infection\Tests\Environment;
 
 use Infection\Environment\CouldNotResolveStrykerApiKey;
 use Infection\Environment\StrykerApiKeyResolver;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-#[CoversClass(Infection\Environment\StrykerApiKeyResolver::class)]
 final class StrykerApiKeyResolverTest extends TestCase
 {
     public function test_resolve_throws_when_environment_is_empty_array(): void

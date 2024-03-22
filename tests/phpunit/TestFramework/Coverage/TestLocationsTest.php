@@ -38,10 +38,8 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\TestFramework\Coverage\TestLocations::class)]
 final class TestLocationsTest extends TestCase
 {
     public function test_it_has_default_values(): void

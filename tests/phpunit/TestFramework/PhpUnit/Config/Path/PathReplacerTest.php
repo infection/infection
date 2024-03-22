@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 use DOMDocument;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use function Infection\Tests\normalizePath as p;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +45,6 @@ use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
-#[CoversClass(Infection\TestFramework\PhpUnit\Config\Path\PathReplacer::class)]
 final class PathReplacerTest extends TestCase
 {
     /**

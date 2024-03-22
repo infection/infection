@@ -37,10 +37,8 @@ namespace Infection\Tests\Reflection;
 
 use Infection\Reflection\NullReflection;
 use Infection\Reflection\Visibility;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Infection\Reflection\NullReflection::class)]
 final class NullReflectionTest extends TestCase
 {
     public function test_it_has_no_name(): void

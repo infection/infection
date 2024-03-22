@@ -38,10 +38,8 @@ namespace Infection\Tests\Mutator\ReturnValue;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt\Return_;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(Infection\Mutator\ReturnValue\IntegerNegation::class)]
 final class IntegerNegationTest extends BaseMutatorTestCase
 {
     /**

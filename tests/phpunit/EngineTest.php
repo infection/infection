@@ -50,11 +50,9 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(Infection\Engine::class)]
 final class EngineTest extends TestCase
 {
     public function test_initial_test_run_fails(): void

@@ -56,7 +56,6 @@ use Infection\Logger\TextFileLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -65,7 +64,6 @@ use ReflectionClass;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
-#[CoversClass(Infection\Logger\FileLoggerFactory::class)]
 final class FileLoggerFactoryTest extends TestCase
 {
     /**

@@ -45,11 +45,9 @@ use Infection\TestFramework\Coverage\TestLocations;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
 use function iterator_to_array;
 use function Later\now;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
-#[CoversClass(Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder::class)]
 final class JUnitTestExecutionInfoAdderTest extends TestCase
 {
     public function test_it_does_not_add_if_junit_is_not_provided(): void

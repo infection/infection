@@ -36,10 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(Infection\Mutator\ConditionalNegotiation\Identical::class)]
 final class IdenticalTest extends BaseMutatorTestCase
 {
     /**

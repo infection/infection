@@ -47,12 +47,10 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]
-#[CoversClass(Infection\PhpParser\Visitor\MutatorVisitor::class)]
 final class MutatorVisitorTest extends BaseVisitorTestCase
 {
     /**

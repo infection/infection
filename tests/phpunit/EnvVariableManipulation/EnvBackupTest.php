@@ -36,11 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\EnvVariableManipulation;
 
 use function getenv;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function Safe\putenv;
 
-#[CoversClass(Infection\EnvVariableManipulation\EnvBackup::class)]
 final class EnvBackupTest extends TestCase
 {
     public function test_it_can_backup_and_restore_environment_variables(): void
