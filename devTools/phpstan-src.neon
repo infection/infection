@@ -38,9 +38,6 @@ parameters:
         -
             message: '#^Function shell_exec is unsafe to use#'
             path: '../src/TestFramework/CommandLineBuilder.php'
-        -   # TODO: fix this; this was introduced as bumping to PHP 8.1 as the minimim requirement
-            message: '#^Parameter \#1 \$string of function trim expects string, string\|null given\.$#'
-            path: '../src/TestFramework/PhpUnit/Config/Path/PathReplacer.php'
         -
             message: "#^Instantiated class Infection\\\\FileSystem\\\\DummyFileSystem not found\\.$#"
             count: 1
