@@ -80,7 +80,7 @@ final class PregQuote implements Mutator
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Arg>
+     * @return iterable<Node\Expr>
      */
     public function mutate(Node $node): iterable
     {

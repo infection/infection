@@ -117,9 +117,11 @@ final class MatchArmRemoval implements Mutator
         foreach ($node->arms as $i => $arm) {
             $arms = $node->arms;
 
-            if (count((array) $arm->conds) > 1) {
-                foreach ($arm->conds as $j => $cond) {
-                    $conds = $arm->conds;
+            $armConds = $arm->conds ?? [];
+
+            if (count($armConds) > 1) {
+                foreach ($armConds as $j => $cond) {
+                    $conds = $armConds;
 
                     unset($conds[$j]);
 

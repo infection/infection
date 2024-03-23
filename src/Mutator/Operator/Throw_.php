@@ -44,7 +44,7 @@ use PhpParser\Node;
 /**
  * @internal
  *
- * @implements Mutator<Node\Stmt\Throw_|Node\Expr\Throw_>
+ * @implements Mutator<Node\Expr\Throw_>
  */
 final class Throw_ implements Mutator
 {
@@ -91,6 +91,6 @@ final class Throw_ implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Throw_ || $node instanceof Node\Stmt\Throw_;
+        return $node instanceof Node\Expr\Throw_;
     }
 }
