@@ -46,7 +46,7 @@ use stdClass;
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
     /**
-     * @var AbstractValueToNullReturnValue|MockObject
+     * @var AbstractValueToNullReturnValue&MockObject
      */
     private $testSubject;
 
@@ -64,13 +64,12 @@ final class AbstractValueToNullReturnValueTest extends TestCase
 
     public function test_return_type_is_node_identifier(): void
     {
-        /** @var Node\Identifier $mockNode */
-        $mockNode = $this->createMock(Node\Identifier::class);
+        $node = new Node\Identifier('int');
 
-        $this->assertTrue(
+        $this->assertFalse(
             $this->invokeMethod(
                 $this->mockNode(
-                    $this->mockFunction($mockNode),
+                    $this->mockFunction($node),
                 ),
             ),
         );

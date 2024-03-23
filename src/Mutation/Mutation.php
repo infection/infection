@@ -162,12 +162,12 @@ class Mutation
     public function getNominalTestExecutionTime(): float
     {
         // TestLocator returns non-unique tests, and JUnitTestCaseSorter works around that; we have to do that too.
-        return $this->nominalTimeToTest ?? $this->nominalTimeToTest = (new JUnitTestCaseTimeAdder($this->tests))->getTotalTestTime();
+        return $this->nominalTimeToTest ??= (new JUnitTestCaseTimeAdder($this->tests))->getTotalTestTime();
     }
 
     public function getHash(): string
     {
-        return $this->hash ?? $this->hash = $this->createHash();
+        return $this->hash ??= $this->createHash();
     }
 
     private function createHash(): string

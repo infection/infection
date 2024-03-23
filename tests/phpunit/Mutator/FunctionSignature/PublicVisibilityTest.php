@@ -87,7 +87,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    protected function &foo(int $param, $test = 1) : bool
+                    protected function &foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
@@ -105,7 +105,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    protected final function foo(int $param, $test = 1) : bool
+                    final protected function foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
@@ -123,7 +123,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 abstract class Test
                 {
-                    protected function foo(int $param, $test = 1) : bool
+                    protected function foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
@@ -141,7 +141,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    protected static function foo(int $param, $test = 1) : bool
+                    protected static function foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
@@ -243,7 +243,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 abstract class NonSameAbstract
                 {
-                    public abstract function foo();
+                    abstract public function foo();
                 }
                 class Child extends NonSameAbstract
                 {
@@ -297,7 +297,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 abstract class SameAbstract
                 {
-                    protected abstract function foo();
+                    abstract protected function foo();
                 }
                 class Child extends SameAbstract
                 {
@@ -326,7 +326,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 $var = ['class' => new class
                 {
-                    protected function foo() : bool
+                    protected function foo(): bool
                     {
                         return true;
                     }
@@ -344,7 +344,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                 {
                     #[SomeAttribute1]
                     #[SomeAttribute2]
-                    public function &foo(int $param, $test = 1) : bool
+                    public function &foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
@@ -360,7 +360,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                 {
                     #[SomeAttribute1]
                     #[SomeAttribute2]
-                    protected function &foo(int $param, $test = 1) : bool
+                    protected function &foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;

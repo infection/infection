@@ -466,6 +466,11 @@ parameters:
 			path: ../src/Mutator/Operator/SpreadOneItem.php
 
 		-
+			message: "#^Parameter \\#1 \\$items of class PhpParser\\\\Node\\\\Expr\\\\Array_ constructor expects array\\<PhpParser\\\\Node\\\\ArrayItem\\>, array\\<int, PhpParser\\\\Node\\\\Expr\\\\ArrayItem\\> given\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/SpreadOneItem.php
+
+		-
 			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\SpreadRemoval\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
 			count: 1
 			path: ../src/Mutator/Operator/SpreadRemoval.php
@@ -841,17 +846,22 @@ parameters:
 			path: ../src/Mutator/Unwrap/UnwrapUcWords.php
 
 		-
-			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\MutatorVisitor\\:\\:leaveNode\\(\\) never returns int so it can be removed from the return type\\.$#"
-			count: 1
-			path: ../src/PhpParser/Visitor/MutatorVisitor.php
-
-		-
 			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\NonMutableNodesIgnorerVisitor\\:\\:enterNode\\(\\) never returns PhpParser\\\\Node so it can be removed from the return type\\.$#"
 			count: 1
 			path: ../src/PhpParser/Visitor/NonMutableNodesIgnorerVisitor.php
 
 		-
+			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\NonMutableNodesIgnorerVisitor\\:\\:enterNode\\(\\) never returns array\\<PhpParser\\\\Node\\> so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/PhpParser/Visitor/NonMutableNodesIgnorerVisitor.php
+
+		-
 			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\ReflectionVisitor\\:\\:enterNode\\(\\) never returns PhpParser\\\\Node so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
+
+		-
+			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\ReflectionVisitor\\:\\:enterNode\\(\\) never returns array\\<PhpParser\\\\Node\\> so it can be removed from the return type\\.$#"
 			count: 1
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 

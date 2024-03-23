@@ -47,10 +47,7 @@ use PHPUnit\Framework\TestCase;
 
 final class MutantCodeFactoryTest extends TestCase
 {
-    /**
-     * @var MutantCodeFactory
-     */
-    private $codeFactory;
+    private MutantCodeFactory $codeFactory;
 
     protected function setUp(): void
     {
@@ -98,7 +95,7 @@ final class MutantCodeFactoryTest extends TestCase
                         ],
                     ),
                     [new Node\Stmt\Echo_(
-                        [new Node\Scalar\LNumber(
+                        [new Node\Scalar\Int_(
                             10,
                             [
                                 'startLine' => 5,
@@ -139,9 +136,9 @@ final class MutantCodeFactoryTest extends TestCase
                     'endFilePos' => 30,
                     'kind' => 10,
                 ],
-                Node\Scalar\LNumber::class,
+                Node\Scalar\Int_::class,
                 MutatedNode::wrap(
-                    new Node\Scalar\LNumber(
+                    new Node\Scalar\Int_(
                         15,
                         [
                             'startLine' => 5,

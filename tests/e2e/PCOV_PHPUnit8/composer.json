@@ -11,8 +11,5 @@
         "psr-4": {
             "PCOV_PHPUnit8\\Test\\": "tests/"
         }
-    },
-    "conflict": {
-        "nikic/php-parser": ">=5.0.0"
     }
 }

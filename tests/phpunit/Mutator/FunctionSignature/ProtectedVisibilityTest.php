@@ -63,7 +63,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    private function foo(int $param, $test = 1) : bool
+                    private function foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
@@ -90,7 +90,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 abstract class Test
                 {
-                    private function foo(int $param, $test = 1) : bool
+                    private function foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
@@ -109,7 +109,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    private static function foo(int $param, $test = 1) : bool
+                    private static function foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
@@ -181,7 +181,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 abstract class ProtectedNonSameAbstract
                 {
-                    protected abstract function foo();
+                    abstract protected function foo();
                 }
                 class Child extends ProtectedNonSameAbstract
                 {
@@ -237,7 +237,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                 {
                     #[SomeAttribute1]
                     #[SomeAttribute2]
-                    protected function &foo(int $param, $test = 1) : bool
+                    protected function &foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
@@ -253,7 +253,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                 {
                     #[SomeAttribute1]
                     #[SomeAttribute2]
-                    private function &foo(int $param, $test = 1) : bool
+                    private function &foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;

@@ -85,7 +85,7 @@ final class DiffSourceCodeMatcherTest extends TestCase
                 --- Original
                 +++ New
                 @@ @@
-                     public function hello() : string
+                     public function hello(): string
                      {
                          Assert::numeric('1');
                 -        $this->getString();
@@ -106,8 +106,8 @@ final class DiffSourceCodeMatcherTest extends TestCase
                  use Webmozart\Assert\Assert;
                  class SourceClass
                  {
-                -    public function hello() : string
-                +    protected function hello() : string
+                -    public function hello(): string
+                +    protected function hello(): string
                      {
                          Assert::numeric('1');
                          $this->getString();
@@ -121,7 +121,7 @@ final class DiffSourceCodeMatcherTest extends TestCase
                 --- Original
                 +++ New
                 @@ @@
-                     public function hello() : string
+                     public function hello(): string
                      {
                          Assert::numeric('1');
                 -        $this->getString();
@@ -140,7 +140,7 @@ final class DiffSourceCodeMatcherTest extends TestCase
                 +++ New
                 @@ @@
                  {
-                     public function hello() : string
+                     public function hello(): string
                      {
                 -        Assert::numeric('1');
                 +

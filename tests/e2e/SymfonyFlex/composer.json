@@ -18,8 +18,5 @@
         "allow-plugins": {
             "symfony/flex": true
         }
-    },
-    "conflict": {
-        "nikic/php-parser": ">=5.0.0"
     }
 }

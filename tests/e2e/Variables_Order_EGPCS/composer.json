@@ -11,8 +11,5 @@
         "psr-4": {
             "Variables_Order_EGPCS\\Test\\": "tests/"
         }
-    },
-    "conflict": {
-        "nikic/php-parser": ">=5.0.0"
     }
 }

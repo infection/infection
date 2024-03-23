@@ -143,7 +143,7 @@ final class IgnoreMutatorTest extends TestCase
 
         $this->nodeMock
             ->expects($this->once())
-            ->method('getLine')
+            ->method('getStartLine')
             ->willReturn(10)
         ;
 

@@ -84,9 +84,7 @@ final class ParentConnectorVisitorTest extends BaseVisitorTestCase
                 array(
                     0: Stmt_Namespace(
                         name: Name(
-                            parts: array(
-                                0: Foo
-                            )
+                            name: Foo
                         )
                         stmts: array(
                             0: Stmt_Echo(
@@ -107,9 +105,7 @@ final class ParentConnectorVisitorTest extends BaseVisitorTestCase
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            parts: array(
-                                0: Bar
-                            )
+                            name: Bar
                         )
                         stmts: array(
                         )
@@ -126,9 +122,7 @@ final class ParentConnectorVisitorTest extends BaseVisitorTestCase
                 array(
                     0: Stmt_Namespace(
                         name: Name(
-                            parts: array(
-                                0: Foo
-                            )
+                            name: Foo
                         )
                         stmts: array(
                             0: Stmt_Echo(
@@ -148,9 +142,7 @@ final class ParentConnectorVisitorTest extends BaseVisitorTestCase
                         )
                     )
                     1: Name(
-                        parts: array(
-                            0: Foo
-                        )
+                        name: Foo
                     )
                     2: Stmt_Echo(
                         exprs: array(
@@ -174,17 +166,13 @@ final class ParentConnectorVisitorTest extends BaseVisitorTestCase
                     )
                     6: Stmt_Namespace(
                         name: Name(
-                            parts: array(
-                                0: Bar
-                            )
+                            name: Bar
                         )
                         stmts: array(
                         )
                     )
                     7: Name(
-                        parts: array(
-                            0: Bar
-                        )
+                        name: Bar
                     )
                 )
                 STR
@@ -198,9 +186,7 @@ final class ParentConnectorVisitorTest extends BaseVisitorTestCase
                     0: null
                     1: Stmt_Namespace(
                         name: Name(
-                            parts: array(
-                                0: Foo
-                            )
+                            name: Foo
                         )
                         stmts: array(
                             0: Stmt_Echo(
@@ -221,9 +207,7 @@ final class ParentConnectorVisitorTest extends BaseVisitorTestCase
                     )
                     2: Stmt_Namespace(
                         name: Name(
-                            parts: array(
-                                0: Foo
-                            )
+                            name: Foo
                         )
                         stmts: array(
                             0: Stmt_Echo(
@@ -251,9 +235,7 @@ final class ParentConnectorVisitorTest extends BaseVisitorTestCase
                     )
                     4: Stmt_Namespace(
                         name: Name(
-                            parts: array(
-                                0: Foo
-                            )
+                            name: Foo
                         )
                         stmts: array(
                             0: Stmt_Echo(
@@ -282,9 +264,7 @@ final class ParentConnectorVisitorTest extends BaseVisitorTestCase
                     6: null
                     7: Stmt_Namespace(
                         name: Name(
-                            parts: array(
-                                0: Bar
-                            )
+                            name: Bar
                         )
                         stmts: array(
                         )

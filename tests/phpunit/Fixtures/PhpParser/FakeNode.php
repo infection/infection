@@ -60,17 +60,17 @@ final class FakeNode implements Node
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function getDocComment()
+    public function getDocComment(): ?Comment\Doc
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function setDocComment(Comment\Doc $docComment)
+    public function setDocComment(Comment\Doc $docComment): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function setAttribute(string $key, $value)
+    public function setAttribute(string $key, $value): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
@@ -90,7 +90,7 @@ final class FakeNode implements Node
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function setAttributes(array $attributes)
+    public function setAttributes(array $attributes): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }

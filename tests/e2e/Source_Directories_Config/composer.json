@@ -11,8 +11,5 @@
         "psr-4": {
             "Source_Directories_Config\\Test\\": "tests/"
         }
-    },
-    "conflict": {
-        "nikic/php-parser": ">=5.0.0"
     }
 }

@@ -11,8 +11,5 @@
         "psr-4": {
             "Test_Framework_Options_Config\\Test\\": "tests/"
         }
-    },
-    "conflict": {
-        "nikic/php-parser": ">=5.0.0"
     }
 }

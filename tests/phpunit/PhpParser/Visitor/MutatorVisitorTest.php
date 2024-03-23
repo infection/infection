@@ -42,7 +42,6 @@ use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\SingletonContainer;
 use Infection\Tests\StringNormalizer;
-use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
@@ -80,11 +79,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                 class Test
                 {
-                    public function hello() : string
+                    public function hello(): string
                     {
                         return 'hello';
                     }
-                    public function bye() : string
+                    public function bye(): string
                     {
                         return 'bye';
                     }
@@ -96,7 +95,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                 class Test
                 {
-                    public function hello() : string
+                    public function hello(): string
                     {
                         return 'hello';
                     }
@@ -109,8 +108,8 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                 $nodes,
                 MutatorName::getName(PublicVisibility::class),
                 [
-                    'startTokenPos' => 29,
-                    'endTokenPos' => 48,
+                    'startTokenPos' => 28,
+                    'endTokenPos' => 46,
                     'startLine' => -1,
                     'endLine' => -1,
                     'startFilePos' => -1,
@@ -129,11 +128,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                 class Test
                 {
-                    public function hello() : string
+                    public function hello(): string
                     {
                         return 'hello';
                     }
-                    public function bye() : string
+                    public function bye(): string
                     {
                         return 'bye';
                     }
@@ -145,7 +144,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                 class Test
                 {
-                    public function hello() : string
+                    public function hello(): string
                     {
                         return 'hello';
                     }
@@ -159,8 +158,8 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                 $nodes,
                 MutatorName::getName(PublicVisibility::class),
                 [
-                    'startTokenPos' => 29,
-                    'endTokenPos' => 48,
+                    'startTokenPos' => 28,
+                    'endTokenPos' => 46,
                     'startLine' => -1,
                     'endLine' => -1,
                     'startFilePos' => -1,
@@ -179,11 +178,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                 class Test
                 {
-                    public function hello() : string
+                    public function hello(): string
                     {
                         return 'hello';
                     }
-                    public function bye() : string
+                    public function bye(): string
                     {
                         return 'bye';
                     }
@@ -195,11 +194,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                 class Test
                 {
-                    public function hello() : string
+                    public function hello(): string
                     {
                         return 'hello';
                     }
-                    public function bye() : string
+                    public function bye(): string
                     {
                         return 'bye';
                     }
@@ -226,19 +225,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
         ])();
 
         yield 'it does not mutate if the parser does not contain startTokenPos' => (static function (): iterable {
-            $badLexer = new Lexer\Emulative([
-                'usedAttributes' => [
-                    'comments',
-                    'startLine',
-                    'endLine',
-                    // missing startTokenPos
-                    'endTokenPos',
-                    'startFilePos',
-                    'endFilePos',
-                ],
-            ]);
-
-            $badParser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $badLexer);
+            $badParser = (new ParserFactory())->createForNewestSupportedVersion();
 
             return [
                 $nodes = $badParser->parse(<<<'PHP'
@@ -246,11 +233,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                     class Test
                     {
-                        public function hello() : string
+                        public function hello(): string
                         {
                             return 'hello';
                         }
-                        public function bye() : string
+                        public function bye(): string
                         {
                             return 'bye';
                         }
@@ -262,11 +249,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                     class Test
                     {
-                        public function hello() : string
+                        public function hello(): string
                         {
                             return 'hello';
                         }
-                        public function bye() : string
+                        public function bye(): string
                         {
                             return 'bye';
                         }

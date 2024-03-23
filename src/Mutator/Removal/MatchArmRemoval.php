@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use function array_values;
 use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
@@ -116,13 +117,15 @@ final class MatchArmRemoval implements Mutator
         foreach ($node->arms as $i => $arm) {
             $arms = $node->arms;
 
-            if ($arm->conds !== null && count((array) $arm->conds) > 1) {
-                foreach ($arm->conds as $j => $cond) {
-                    $conds = $arm->conds;
+            $armConds = $arm->conds ?? [];
+
+            if (count($armConds) > 1) {
+                foreach ($armConds as $j => $cond) {
+                    $conds = $armConds;
 
                     unset($conds[$j]);
 
-                    $arms[$i] = new Node\MatchArm($conds, $arm->body, $node->getAttributes());
+                    $arms[$i] = new Node\MatchArm(array_values($conds), $arm->body, $node->getAttributes());
 
                     yield new Node\Expr\Match_($node->cond, $arms, $node->getAttributes());
                 }

@@ -181,11 +181,11 @@ final class FileParserTest extends TestCase
                     )
                     1: Stmt_Declare(
                         declares: array(
-                            0: Stmt_DeclareDeclare(
+                            0: DeclareItem(
                                 key: Identifier(
                                     name: strict_types
                                 )
-                                value: Scalar_LNumber(
+                                value: Scalar_Int(
                                     value: 1
                                 )
                             )
@@ -200,9 +200,7 @@ final class FileParserTest extends TestCase
                             expr: Expr_BinaryOp_Concat(
                                 left: Expr_FuncCall(
                                     name: Name(
-                                        parts: array(
-                                            0: getcwd
-                                        )
+                                        name: getcwd
                                     )
                                     args: array(
                                     )
@@ -216,14 +214,10 @@ final class FileParserTest extends TestCase
                     3: Stmt_Use(
                         type: TYPE_NORMAL (1)
                         uses: array(
-                            0: Stmt_UseUse(
+                            0: UseItem(
                                 type: TYPE_UNKNOWN (0)
                                 name: Name(
-                                    parts: array(
-                                        0: Infection
-                                        1: Console
-                                        2: Application
-                                    )
+                                    name: Infection\Console\Application
                                 )
                                 alias: null
                             )
@@ -232,14 +226,10 @@ final class FileParserTest extends TestCase
                     4: Stmt_Use(
                         type: TYPE_NORMAL (1)
                         uses: array(
-                            0: Stmt_UseUse(
+                            0: UseItem(
                                 type: TYPE_UNKNOWN (0)
                                 name: Name(
-                                    parts: array(
-                                        0: Infection
-                                        1: Console
-                                        2: InfectionContainer
-                                    )
+                                    name: Infection\Console\InfectionContainer
                                 )
                                 alias: null
                             )
@@ -249,18 +239,14 @@ final class FileParserTest extends TestCase
                         expr: Expr_MethodCall(
                             var: Expr_New(
                                 class: Name(
-                                    parts: array(
-                                        0: Application
-                                    )
+                                    name: Application
                                 )
                                 args: array(
                                     0: Arg(
                                         name: null
                                         value: Expr_StaticCall(
                                             class: Name(
-                                                parts: array(
-                                                    0: InfectionContainer
-                                                )
+                                                name: InfectionContainer
                                             )
                                             name: Identifier(
                                                 name: create

@@ -106,7 +106,7 @@ final class FunctionCallTest extends BaseMutatorTestCase
 
             class Test
             {
-                function test() : ?\DateTime
+                function test(): ?\DateTime
                 {
                     count([]);
                     return null;
@@ -130,7 +130,7 @@ final class FunctionCallTest extends BaseMutatorTestCase
 
             class Test
             {
-                function test() : ?int
+                function test(): ?int
                 {
                     count([]);
                     return null;
@@ -156,7 +156,7 @@ final class FunctionCallTest extends BaseMutatorTestCase
             {
                 function test()
                 {
-                    \$a = function (\$element) : ?int {
+                    \$a = function (\$element): ?int {
                         return \$element;
                     };
                     count([]);

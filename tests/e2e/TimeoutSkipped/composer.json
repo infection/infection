@@ -11,8 +11,5 @@
         "psr-4": {
             "TimeoutSkipped\\Test\\": "tests/"
         }
-    },
-    "conflict": {
-        "nikic/php-parser": ">=5.0.0"
     }
 }

@@ -48,43 +48,31 @@ use PhpParser\PrettyPrinterAbstract;
  */
 final class SingletonContainer
 {
-    /**
-     * @var Container|null
-     */
-    private static $container;
+    private static ?Container $container = null;
 
-    /**
-     * @var NodeDumper|null
-     */
-    private static $dumper;
+    private static ?NodeDumper $dumper = null;
 
-    /**
-     * @var PrettyPrinterAbstract|null
-     */
-    private static $printer;
+    private static ?PrettyPrinterAbstract $printer = null;
 
-    /**
-     * @var PHPDocParser|null
-     */
-    private static $phpDocParser;
+    private static ?PHPDocParser $phpDocParser = null;
 
     public static function getContainer(): Container
     {
-        return self::$container ?? self::$container = Container::create();
+        return self::$container ??= Container::create();
     }
 
     public static function getNodeDumper(): NodeDumper
     {
-        return self::$dumper ?? self::$dumper = new NodeDumper();
+        return self::$dumper ??= new NodeDumper();
     }
 
     public static function getPrinter(): PrettyPrinterAbstract
     {
-        return self::$printer ?? self::$printer = new Standard();
+        return self::$printer ??= new Standard();
     }
 
     public static function getPHPDocParser(): PHPDocParser
     {
-        return self::$phpDocParser ?? self::$phpDocParser = new PHPDocParser();
+        return self::$phpDocParser ??= new PHPDocParser();
     }
 }

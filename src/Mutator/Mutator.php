@@ -54,7 +54,7 @@ interface Mutator
      *
      * @param TNode $node
      *
-     * @return iterable<Node|Node[]>
+     * @return iterable<int|Node|Node[]>
      */
     public function mutate(Node $node): iterable;
 }

@@ -16,8 +16,5 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
-    },
-    "conflict": {
-        "nikic/php-parser": ">=5.0.0"
     }
 }
