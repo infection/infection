@@ -1,5 +1,15 @@
 # Change Log
 
+## [0.28.0](https://github.com/infection/infection/tree/0.28.0) (2024-03-23)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.27.11...0.28.0)
+
+**Added:**
+
+* Add PHP-Parser 5 support by @sidz in https://github.com/infection/infection/pull/1909
+
+# Change Log
+
 ## [0.27.3](https://github.com/infection/infection/tree/0.27.3) (2023-09-28)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.27.2...0.27.3)
