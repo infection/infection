@@ -11,8 +11,5 @@
         "psr-4": {
             "Exclude_by_file_name\\Test\\": "tests/"
         }
-    },
-    "conflict": {
-        "nikic/php-parser": ">=5.0.0"
     }
 }

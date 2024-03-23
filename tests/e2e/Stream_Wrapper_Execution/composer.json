@@ -12,8 +12,5 @@
         "psr-4": {
             "Stream_Wrapper_Execution\\Test\\": "tests/"
         }
-    },
-    "conflict": {
-        "nikic/php-parser": ">=5.0.0"
     }
 }

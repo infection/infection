@@ -12,8 +12,5 @@
         "psr-4": {
             "MultilineStatement\\Test\\": "tests/"
         }
-    },
-    "conflict": {
-        "nikic/php-parser": ">=5.0.0"
     }
 }
