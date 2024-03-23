@@ -84,7 +84,7 @@
         "phpstan/phpstan-strict-rules": "^1.1.0",
         "phpstan/phpstan-webmozart-assert": "^1.0.2",
         "phpunit/phpunit": "^10.5",
-        "rector/rector": "^0.16.0",
+        "rector/rector": "^1.0",
         "sidz/phpstan-rules": "^0.4.0",
         "symfony/yaml": "^5.4 || ^6.0 || ^7.0",
         "thecodingmachine/phpstan-safe-rule": "^1.2.0"

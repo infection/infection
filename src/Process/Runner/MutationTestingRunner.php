@@ -58,7 +58,7 @@ class MutationTestingRunner
     /**
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
-    public function __construct(private readonly MutantProcessFactory $processFactory, private readonly MutantFactory $mutantFactory, private readonly ProcessRunner $processRunner, private readonly EventDispatcher $eventDispatcher, private readonly Filesystem $fileSystem, private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher, private bool $runConcurrently, private readonly float $timeout, private readonly array $ignoreSourceCodeMutatorsMap)
+    public function __construct(private readonly MutantProcessFactory $processFactory, private readonly MutantFactory $mutantFactory, private readonly ProcessRunner $processRunner, private readonly EventDispatcher $eventDispatcher, private readonly Filesystem $fileSystem, private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher, private readonly bool $runConcurrently, private readonly float $timeout, private readonly array $ignoreSourceCodeMutatorsMap)
     {
     }
 
