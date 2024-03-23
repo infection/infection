@@ -65,46 +65,46 @@ final class ArrayItemRemoval implements ConfigurableMutator
     {
         return new Definition(
             <<<'TXT'
-Removes an element of an array literal. For example:
+                Removes an element of an array literal. For example:
 
-```php
-$x = [0, 1, 2];
-```
+                ```php
+                $x = [0, 1, 2];
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = [1, 2];
-```
+                ```php
+                $x = [1, 2];
+                ```
 
-And:
+                And:
 
-```php
-$x = [0, 2];
-```
+                ```php
+                $x = [0, 2];
+                ```
 
-And:
+                And:
 
-```php
-$x = [0, 1];
-```
+                ```php
+                $x = [0, 1];
+                ```
 
-Which elements it removes or how many elements it will attempt to remove will depend on its
-configuration.
+                Which elements it removes or how many elements it will attempt to remove will depend on its
+                configuration.
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = [0, 1, 2];
-# Mutation 1
-+ $x = [1, 2];
-# Mutation 2
-+ $x = [0, 2];
-# Mutation 3
-+ $x = [0, 1];
-DIFF
+                - $x = [0, 1, 2];
+                # Mutation 1
+                + $x = [1, 2];
+                # Mutation 2
+                + $x = [0, 2];
+                # Mutation 3
+                + $x = [0, 1];
+                DIFF,
         );
     }
 
@@ -167,7 +167,7 @@ DIFF
             default => range(
                 0,
                 min(count($items),
-                    $this->config->getLimit()) - 1
+                    $this->config->getLimit()) - 1,
             ),
         };
     }

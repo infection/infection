@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\realpath;
@@ -42,16 +45,11 @@ use function sprintf;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * @coversNothing
- *
- * @group integration
- */
+#[Group('integration')]
+#[CoversNothing]
 final class BuildConfigYmlTest extends TestCase
 {
-    /**
-     * @dataProvider providesYamlFilesForTesting
-     */
+    #[DataProvider('providesYamlFilesForTesting')]
     public function test_valid_yaml_has_key($filePath): void
     {
         $this->assertFileExists($filePath);
@@ -63,13 +61,13 @@ final class BuildConfigYmlTest extends TestCase
                 sprintf(
                     'Yaml file "%s" contains invalid yaml, and is used by our CI, please fix it. Original error message: "%s"',
                     realpath($filePath),
-                    $e->getMessage()
-                )
+                    $e->getMessage(),
+                ),
             );
         }
     }
 
-    public function providesYamlFilesForTesting(): iterable
+    public static function providesYamlFilesForTesting(): iterable
     {
         $rootPath = __DIR__ . '/../../../';
 

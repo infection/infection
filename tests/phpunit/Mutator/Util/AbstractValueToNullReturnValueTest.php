@@ -69,9 +69,9 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         $this->assertFalse(
             $this->invokeMethod(
                 $this->mockNode(
-                    $this->mockFunction($node)
-                )
-            )
+                    $this->mockFunction($node),
+                ),
+            ),
         );
     }
 
@@ -80,9 +80,9 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         $this->assertFalse(
             $this->invokeMethod(
                 $this->mockNode(
-                    $this->mockFunction('int')
-                )
-            )
+                    $this->mockFunction('int'),
+                ),
+            ),
         );
     }
 
@@ -92,10 +92,10 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        $this->createMock(Node\NullableType::class)
-                    )
-                )
-            )
+                        $this->createMock(Node\NullableType::class),
+                    ),
+                ),
+            ),
         );
     }
 
@@ -105,10 +105,10 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        new stdClass()
-                    )
-                )
-            )
+                        new stdClass(),
+                    ),
+                ),
+            ),
         );
     }
 
@@ -118,10 +118,10 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        $this->createMock(Node\Name::class)
-                    )
-                )
-            )
+                        $this->createMock(Node\Name::class),
+                    ),
+                ),
+            ),
         );
     }
 

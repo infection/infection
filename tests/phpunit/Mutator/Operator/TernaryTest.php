@@ -37,137 +37,137 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use const PHP_VERSION_ID;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class TernaryTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutates ternary and flip conditions' => [
             <<<'PHP'
-<?php
+                <?php
 
-isset($b) ? 'B' : 'C';
-PHP
+                isset($b) ? 'B' : 'C';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-isset($b) ? 'C' : 'B';
-PHP
+                isset($b) ? 'C' : 'B';
+                PHP,
         ];
 
         yield 'Mutates ternary expression without values in the if condition' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'foo';
-$foo ?: 'bar';
-PHP
+                $foo = 'foo';
+                $foo ?: 'bar';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'foo';
-$foo ? 'bar' : $foo;
-PHP
+                $foo = 'foo';
+                $foo ? 'bar' : $foo;
+                PHP,
         ];
 
         if (PHP_VERSION_ID < 80000) {
             yield 'Mutates nested ternary expression with values in the if condition' => [
                 <<<'PHP'
-<?php
+                    <?php
 
-true ? 'true' : false ? 't' : 'f';
-PHP
+                    true ? 'true' : false ? 't' : 'f';
+                    PHP
                 ,
                 [
                     <<<'PHP'
-<?php
+                        <?php
 
-(true ? false : 'true') ? 't' : 'f';
-PHP
+                        (true ? false : 'true') ? 't' : 'f';
+                        PHP
                     ,
                     <<<'PHP'
-<?php
+                        <?php
 
-(true ? 'true' : false) ? 'f' : 't';
-PHP
+                        (true ? 'true' : false) ? 'f' : 't';
+                        PHP,
                 ],
             ];
 
             yield 'Mutates nested ternary expression without values in the if condition' => [
                 <<<'PHP'
-<?php
+                    <?php
 
-true ?: false ?: 'f';
-PHP
+                    true ?: false ?: 'f';
+                    PHP
                 ,
                 [
                     <<<'PHP'
-<?php
+                        <?php
 
-(true ? false : true) ?: 'f';
-PHP
+                        (true ? false : true) ?: 'f';
+                        PHP
                     ,
                     <<<'PHP'
-<?php
+                        <?php
 
-(true ?: false) ? 'f' : (true ?: false);
-PHP
+                        (true ?: false) ? 'f' : (true ?: false);
+                        PHP,
                 ],
             ];
 
             yield 'Mutates wrapped in braces ternary expressions with values in the if condition' => [
                 <<<'PHP'
-<?php
+                    <?php
 
-(true ? 'true' : false) ? 't' : 'f';
-PHP
+                    (true ? 'true' : false) ? 't' : 'f';
+                    PHP
                 ,
                 [
                     <<<'PHP'
-<?php
+                        <?php
 
-(true ? false : 'true') ? 't' : 'f';
-PHP
+                        (true ? false : 'true') ? 't' : 'f';
+                        PHP
                     ,
                     <<<'PHP'
-<?php
+                        <?php
 
-(true ? 'true' : false) ? 'f' : 't';
-PHP
+                        (true ? 'true' : false) ? 'f' : 't';
+                        PHP,
                 ],
             ];
 
             yield 'Mutates wrapped in braces ternary expressions without values in the if condition' => [
                 <<<'PHP'
-<?php
+                    <?php
 
-((true ?: false) ? 't' : 'f');
-PHP
+                    ((true ?: false) ? 't' : 'f');
+                    PHP
                 ,
                 [
                     <<<'PHP'
-<?php
+                        <?php
 
-(true ? false : true) ? 't' : 'f';
-PHP
+                        (true ? false : true) ? 't' : 'f';
+                        PHP
                     ,
                     <<<'PHP'
-<?php
+                        <?php
 
-(true ?: false) ? 'f' : 't';
-PHP
+                        (true ?: false) ? 'f' : 't';
+                        PHP,
                 ],
             ];
         }

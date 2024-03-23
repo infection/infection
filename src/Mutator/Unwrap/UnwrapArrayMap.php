@@ -50,25 +50,25 @@ final class UnwrapArrayMap extends AbstractFunctionUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_map` function call with its array operand. For example:
+                Replaces an `array_map` function call with its array operand. For example:
 
-```php
-$x = array_map($callback, ['foo', 'bar', 'baz']);
-```
+                ```php
+                $x = array_map($callback, ['foo', 'bar', 'baz']);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo', 'bar', 'baz'];
-```
-TXT
+                ```php
+                $x = ['foo', 'bar', 'baz'];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_map($callback, ['foo', 'bar', 'baz']);
-+ $x = ['foo', 'bar', 'baz'];
-DIFF
+                - $x = array_map($callback, ['foo', 'bar', 'baz']);
+                + $x = ['foo', 'bar', 'baz'];
+                DIFF,
         );
     }
 

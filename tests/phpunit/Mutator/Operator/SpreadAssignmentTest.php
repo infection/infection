@@ -36,135 +36,135 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class SpreadAssignmentTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Spread assignment for a raw array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...[1, 2, 3]];
-PHP
+                $a = [...[1, 2, 3]];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [1, 2, 3];
-PHP
+                $a = [1, 2, 3];
+                PHP
             ,
         ];
 
         yield 'Spread assignment for a raw empty array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...[]];
-PHP
+                $a = [...[]];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [];
-PHP
+                $a = [];
+                PHP
             ,
         ];
 
         yield 'Spread assignment for a variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...$collection];
-PHP
+                $a = [...$collection];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $collection;
-PHP
+                $a = $collection;
+                PHP
             ,
         ];
 
         yield 'Spread assignment for a function call' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...getCollection()];
-PHP
+                $a = [...getCollection()];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = getCollection();
-PHP
+                $a = getCollection();
+                PHP
             ,
         ];
 
         yield 'Spread assignment for a method call' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...$object->getCollection()];
-PHP
+                $a = [...$object->getCollection()];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $object->getCollection();
-PHP
+                $a = $object->getCollection();
+                PHP
             ,
         ];
 
         yield 'Spread assignment for a new iterator object' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...new ArrayIterator(['a', 'b', 'c'])];
-PHP
+                $a = [...new ArrayIterator(['a', 'b', 'c'])];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = new ArrayIterator(['a', 'b', 'c']);
-PHP
+                $a = new ArrayIterator(['a', 'b', 'c']);
+                PHP
             ,
         ];
 
         yield 'It does not mutate argument unpacking' => [
             <<<'PHP'
-<?php
+                <?php
 
-function foo(...$array) {}
-PHP
+                function foo(...$array) {}
+                PHP
             ,
         ];
 
         yield 'It does not mutate list construct' => [
             <<<'PHP'
-<?php
+                <?php
 
-[$left, $right] = ['left', 'right'];
-PHP
+                [$left, $right] = ['left', 'right'];
+                PHP
             ,
         ];
 
         yield 'It does not mutate spread expression in array with more than one element' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...[1, 2, 3], 4];
-PHP
+                $a = [...[1, 2, 3], 4];
+                PHP
             ,
         ];
     }

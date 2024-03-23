@@ -37,34 +37,35 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use PHPUnit\Framework\Attributes\Depends;
 
 final class ChangingIgnorerTest extends BaseNodeIgnorerTestCase
 {
     private const CODE_WITH_ONE_IGNORED_NODE = <<<'PHP'
-<?php
+        <?php
 
-class Foo
-{
-    public function bar()
-    {
-        $ignored + 1;
-    }
-}
+        class Foo
+        {
+            public function bar()
+            {
+                $ignored + 1;
+            }
+        }
 
-PHP;
+        PHP;
 
     private const CODE_WITH_ONE_COUNTED_NODE = <<<'PHP'
-<?php
+        <?php
 
-class Foo
-{
-    public function bar()
-    {
-        $counted + 1;
-    }
-}
+        class Foo
+        {
+            public function bar()
+            {
+                $counted + 1;
+            }
+        }
 
-PHP;
+        PHP;
 
     public function test_it_ignores_when_enabled(): ChangingIgnorer
     {
@@ -74,7 +75,7 @@ PHP;
         $this->parseAndTraverse(
             self::CODE_WITH_ONE_IGNORED_NODE,
             $spy = $this->createSpy(),
-            $ignorer
+            $ignorer,
         );
 
         $this->assertSame(0, $spy->nodeCounter);
@@ -82,9 +83,7 @@ PHP;
         return $ignorer;
     }
 
-    /**
-     * @depends test_it_ignores_when_enabled
-     */
+    #[Depends('test_it_ignores_when_enabled')]
     public function test_it_does_not_ignore_when_disabled(ChangingIgnorer $ignorer): void
     {
         $ignorer->stopIgnoring();
@@ -92,7 +91,7 @@ PHP;
         $this->parseAndTraverse(
             self::CODE_WITH_ONE_COUNTED_NODE,
             $spy = $this->createSpy(),
-            $ignorer
+            $ignorer,
         );
 
         $this->assertSame(1, $spy->nodeCounter);

@@ -33,72 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Config\ValueProvider;
+namespace Infection\TestFramework;
 
-use PHPUnit\Framework\TestCase;
-use function Safe\exec;
-use function Safe\fopen;
-use function Safe\fwrite;
-use function Safe\rewind;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\StreamOutput;
-use Webmozart\Assert\Assert;
-
-abstract class BaseProviderTest extends TestCase
+/**
+ * @internal
+ */
+final class MapSourceClassToTestStrategy
 {
-    protected static $stty;
-
-    final protected function getQuestionHelper(): QuestionHelper
-    {
-        return new QuestionHelper();
-    }
+    public const SIMPLE = 'simple';
 
     /**
-     * @return resource
+     * @return list<string>
      */
-    final protected function getInputStream(string $input)
+    public static function getAll(): array
     {
-        $stream = fopen('php://memory', 'rb+', false);
-        fwrite($stream, $input);
-        rewind($stream);
-
-        return $stream;
-    }
-
-    final protected function createStreamOutput(): StreamOutput
-    {
-        return new StreamOutput(fopen('php://memory', 'rb+', false));
-    }
-
-    /**
-     * @param resource $stream
-     */
-    final protected function createStreamableInput(
-        $stream,
-        bool $interactive = true
-    ): InputInterface {
-        Assert::resource($stream);
-
-        $input = new StringInput('');
-        $input->setStream($stream);
-        $input->setInteractive($interactive);
-
-        return $input;
-    }
-
-    /**
-     * @see \Symfony\Component\Console\Terminal::hasSttyAvailable()
-     */
-    final protected function hasSttyAvailable(): bool
-    {
-        if (self::$stty !== null) {
-            return self::$stty;
-        }
-
-        exec('stty 2>&1', $output, $exitcode);
-
-        return self::$stty = $exitcode === 0;
+        return [self::SIMPLE];
     }
 }

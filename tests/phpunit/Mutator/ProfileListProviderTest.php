@@ -36,26 +36,23 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use function class_exists;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 
 final class ProfileListProviderTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::mutatorNameAndClassProvider
-     */
+    #[DataProviderExternal(ProfileListProvider::class, 'mutatorNameAndClassProvider')]
     public function test_mutator_name_and_class_provider_is_valid(string $name, string $className): void
     {
         $this->assertNotSame($name, $className);
         $this->assertTrue(class_exists($className));
     }
 
-    /**
-     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::implementedMutatorProvider
-     */
+    #[DataProviderExternal(ProfileListProvider::class, 'implementedMutatorProvider')]
     public function test_implemented_mutator_provider_is_valid(
         string $mutatorFilePath,
         string $mutatorClassName,
-        string $mutatorShortClassName
+        string $mutatorShortClassName,
     ): void {
         $this->assertFileExists($mutatorFilePath);
         $this->assertNotSame($mutatorClassName, $mutatorShortClassName);

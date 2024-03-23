@@ -11,5 +11,8 @@
         "psr-4": {
             "PHPUnit_XSD_Validation\\Test\\": "tests/"
         }
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }

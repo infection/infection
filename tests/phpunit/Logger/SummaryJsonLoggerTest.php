@@ -41,29 +41,27 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
 use const JSON_THROW_ON_ERROR;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class SummaryJsonLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
-        array $expectedContents
+        array $expectedContents,
     ): void {
         $logger = new SummaryJsonLogger($metricsCalculator);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations; only covered' => [
             new MetricsCalculator(2),
@@ -86,7 +84,7 @@ final class SummaryJsonLoggerTest extends TestCase
         ];
 
         yield 'all mutations; only covered' => [
-            $this->createCompleteMetricsCalculator(),
+            self::createCompleteMetricsCalculator(),
             [
                 'stats' => [
                     'totalMutantsCount' => 16,
@@ -106,7 +104,7 @@ final class SummaryJsonLoggerTest extends TestCase
         ];
 
         yield 'uncovered mutations' => [
-            $this->createUncoveredMetricsCalculator(),
+            self::createUncoveredMetricsCalculator(),
             [
                 'stats' => [
                     'totalMutantsCount' => 1,
@@ -126,7 +124,7 @@ final class SummaryJsonLoggerTest extends TestCase
         ];
 
         yield 'Ignored mutations' => [
-            $this->createIgnoredMetricsCalculator(),
+            self::createIgnoredMetricsCalculator(),
             [
                 'stats' => [
                     'totalMutantsCount' => 1,
@@ -151,44 +149,44 @@ final class SummaryJsonLoggerTest extends TestCase
         $this->assertSame($expectedJson, json_decode($logger->getLogLines()[0], true, JSON_THROW_ON_ERROR));
     }
 
-    private function createUncoveredMetricsCalculator(): MetricsCalculator
+    private static function createUncoveredMetricsCalculator(): MetricsCalculator
     {
         $collector = new MetricsCalculator(2);
 
-        $this->initUncoveredCollector($collector);
+        self::initUncoveredCollector($collector);
 
         return $collector;
     }
 
-    private function initUncoveredCollector(Collector $collector): void
+    private static function initUncoveredCollector(Collector $collector): void
     {
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,
-                'uncovered#0'
+                'uncovered#0',
             ),
         );
     }
 
-    private function createIgnoredMetricsCalculator(): MetricsCalculator
+    private static function createIgnoredMetricsCalculator(): MetricsCalculator
     {
         $collector = new MetricsCalculator(2);
 
-        $this->initIgnoredCollector($collector);
+        self::initIgnoredCollector($collector);
 
         return $collector;
     }
 
-    private function initIgnoredCollector(Collector $collector): void
+    private static function initIgnoredCollector(Collector $collector): void
     {
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::IGNORED,
-                'ignored#0'
+                'ignored#0',
             ),
         );
     }

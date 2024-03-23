@@ -65,13 +65,13 @@ class StrykerCurlClient
         string $repositorySlug,
         string $version,
         string $apiKey,
-        string $reportJson
+        string $reportJson,
     ): Response {
         $url = sprintf(
             '%s/%s/%s',
             self::STRYKER_DASHBOARD_API_BASE_URL,
             $repositorySlug,
-            $version
+            $version,
         );
 
         $headers = [

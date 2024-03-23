@@ -1,0 +1,876 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\#1 \\$array of static method Webmozart\\\\Assert\\\\Assert\\:\\:keyExists\\(\\) expects array, iterable\\<\\(int\\|string\\), string\\>\\|null given\\.$#"
+			count: 2
+			path: ../src/Differ/DiffChangedLinesParser.php
+
+		-
+			message: "#^Cannot access offset 1 on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
+			count: 1
+			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
+
+		-
+			message: "#^Cannot access offset 'name' on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
+			count: 1
+			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of static method Webmozart\\\\Assert\\\\Assert\\:\\:keyExists\\(\\) expects array, iterable\\<\\(int\\|string\\), string\\>\\|null given\\.$#"
+			count: 1
+			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\Assignment\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/Assignment.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\AssignmentEqual\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/AssignmentEqual.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\BitwiseAnd\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/BitwiseAnd.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\BitwiseNot\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/BitwiseNot.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\BitwiseOr\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/BitwiseOr.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\BitwiseXor\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/BitwiseXor.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\Decrement\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/Decrement.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\DivEqual\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/DivEqual.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\Division\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/Division.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\Exponentiation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/Exponentiation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\Increment\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/Increment.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\Minus\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/Minus.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\MinusEqual\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/MinusEqual.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\ModEqual\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/ModEqual.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\Modulus\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/Modulus.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\MulEqual\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/MulEqual.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\Multiplication\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/Multiplication.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\Plus\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/Plus.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\PlusEqual\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/PlusEqual.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\PowEqual\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/PowEqual.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\RoundingFamily\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/RoundingFamily.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\ShiftLeft\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/ShiftLeft.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Arithmetic\\\\ShiftRight\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Arithmetic/ShiftRight.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\ArrayItem\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/ArrayItem.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\EqualIdentical\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/EqualIdentical.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\FalseValue\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/FalseValue.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\IdenticalEqual\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/IdenticalEqual.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\InstanceOf_\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/InstanceOf_.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalAnd\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalAnd.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalAndAllSubExprNegation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalAndAllSubExprNegation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalAndNegation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalAndNegation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalAndSingleSubExprNegation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalAndSingleSubExprNegation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalLowerAnd\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalLowerAnd.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalLowerOr\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalLowerOr.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalNot\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalNot.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalOr\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalOr.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalOrAllSubExprNegation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalOrAllSubExprNegation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalOrNegation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalOrNegation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\LogicalOrSingleSubExprNegation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalOrSingleSubExprNegation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\NotEqualNotIdentical\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/NotEqualNotIdentical.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\NotIdenticalNotEqual\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/NotIdenticalNotEqual.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\TrueValue\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/TrueValue.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Boolean\\\\Yield_\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Boolean/Yield_.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Cast\\\\CastArray\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Cast/CastArray.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Cast\\\\CastBool\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Cast/CastBool.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Cast\\\\CastFloat\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Cast/CastFloat.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Cast\\\\CastInt\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Cast/CastInt.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Cast\\\\CastObject\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Cast/CastObject.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Cast\\\\CastString\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Cast/CastString.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalBoundary\\\\GreaterThan\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalBoundary/GreaterThan.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalBoundary\\\\GreaterThanOrEqualTo\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalBoundary/GreaterThanOrEqualTo.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalBoundary\\\\LessThan\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalBoundary/LessThan.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalBoundary\\\\LessThanOrEqualTo\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalBoundary/LessThanOrEqualTo.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\Equal\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalNegotiation/Equal.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\GreaterThanNegotiation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalNegotiation/GreaterThanNegotiation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\GreaterThanOrEqualToNegotiation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalNegotiation/GreaterThanOrEqualToNegotiation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\Identical\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalNegotiation/Identical.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\LessThanNegotiation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalNegotiation/LessThanNegotiation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\LessThanOrEqualToNegotiation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalNegotiation/LessThanOrEqualToNegotiation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\NotEqual\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalNegotiation/NotEqual.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ConditionalNegotiation\\\\NotIdentical\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ConditionalNegotiation/NotIdentical.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Extensions\\\\BCMath\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Extensions/BCMath.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Extensions\\\\MBString\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Extensions/MBString.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\FunctionSignature\\\\ProtectedVisibility\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/FunctionSignature/ProtectedVisibility.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\FunctionSignature\\\\PublicVisibility\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/FunctionSignature/PublicVisibility.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Loop\\\\DoWhile\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Loop/DoWhile.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Loop\\\\For_\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Loop/For_.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Loop\\\\Foreach_\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Loop/Foreach_.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Loop\\\\While_\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Loop/While_.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\MutatorResolver\\:\\:resolve\\(\\) should return array\\<class\\-string\\<Infection\\\\Mutator\\\\ConfigurableMutator\\<PhpParser\\\\Node\\>\\>, array\\> but returns array\\<string, array\\<string\\>\\>\\.$#"
+			count: 1
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			message: "#^Parameter &\\$mutators by\\-ref type of method Infection\\\\Mutator\\\\MutatorResolver\\:\\:registerFromClass\\(\\) expects array\\<string, array\\<string\\>\\>, array\\<string, array\\<array\\<string\\>\\|string\\>\\> given\\.$#"
+			count: 1
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			message: "#^Parameter &\\$mutators by\\-ref type of method Infection\\\\Mutator\\\\MutatorResolver\\:\\:registerFromClass\\(\\) expects array\\<string, array\\<string\\>\\>, array\\<string, array\\> given\\.$#"
+			count: 1
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			message: "#^Parameter &\\$mutators by\\-ref type of method Infection\\\\Mutator\\\\MutatorResolver\\:\\:registerFromName\\(\\) expects array\\<string, array\\<string, string\\>\\>, array\\<string, array\\<string\\>\\> given\\.$#"
+			count: 1
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Number\\\\DecrementInteger\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Number/DecrementInteger.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Number\\\\IncrementInteger\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Number/IncrementInteger.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Number\\\\OneZeroFloat\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Number/OneZeroFloat.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\AssignCoalesce\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/AssignCoalesce.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\Break_\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/Break_.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\Catch_\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/Catch_.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\Coalesce\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/Coalesce.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\Concat\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/Concat.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\Continue_\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/Continue_.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\ElseIfNegation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/ElseIfNegation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\Finally_\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/Finally_.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\IfNegation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/IfNegation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\NullSafeMethodCall\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/NullSafeMethodCall.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\NullSafePropertyCall\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/NullSafePropertyCall.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\SpreadAssignment\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/SpreadAssignment.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\SpreadOneItem\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/SpreadOneItem.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\SpreadRemoval\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/SpreadRemoval.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\Ternary\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/Ternary.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Operator\\\\Throw_\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Operator/Throw_.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Regex\\\\PregMatchMatches\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Regex/PregMatchMatches.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Regex\\\\PregMatchRemoveCaret\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Regex/PregMatchRemoveCaret.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Regex\\\\PregMatchRemoveDollar\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Regex/PregMatchRemoveDollar.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Regex\\\\PregMatchRemoveFlags\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Regex/PregMatchRemoveFlags.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Regex\\\\PregQuote\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Regex/PregQuote.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Removal\\\\ArrayItemRemoval\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Removal/ArrayItemRemoval.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Removal\\\\CatchBlockRemoval\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Removal/CatchBlockRemoval.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Removal\\\\CloneRemoval\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Removal/CloneRemoval.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Removal\\\\ConcatOperandRemoval\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Removal/ConcatOperandRemoval.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Removal\\\\FunctionCallRemoval\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Removal/FunctionCallRemoval.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Removal\\\\MatchArmRemoval\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Removal/MatchArmRemoval.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Removal\\\\MethodCallRemoval\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Removal/MethodCallRemoval.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Removal\\\\SharedCaseRemoval\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Removal/SharedCaseRemoval.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ReturnValue\\\\ArrayOneItem\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ReturnValue/ArrayOneItem.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ReturnValue\\\\FloatNegation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ReturnValue/FloatNegation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ReturnValue\\\\FunctionCall\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ReturnValue/FunctionCall.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ReturnValue\\\\IntegerNegation\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ReturnValue/IntegerNegation.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ReturnValue\\\\NewObject\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ReturnValue/NewObject.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ReturnValue\\\\This\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ReturnValue/This.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\ReturnValue\\\\YieldValue\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/ReturnValue/YieldValue.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Sort\\\\Spaceship\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Sort/Spaceship.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\SyntaxError\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/SyntaxError.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayChangeKeyCase\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayChangeKeyCase.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayChunk\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayChunk.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayColumn\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayColumn.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayCombine\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayCombine.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayDiff\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayDiff.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayDiffAssoc\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayDiffAssoc.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayDiffKey\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayDiffKey.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayDiffUassoc\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayDiffUassoc.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayDiffUkey\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayDiffUkey.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayFilter\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayFilter.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayFlip\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayFlip.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayIntersect\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayIntersect.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayIntersectAssoc\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayIntersectAssoc.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayIntersectKey\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayIntersectKey.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayIntersectUassoc\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayIntersectUassoc.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayIntersectUkey\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayIntersectUkey.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayKeys\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayKeys.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayMap\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayMap.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayMerge\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayMerge.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayMergeRecursive\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayMergeRecursive.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayPad\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayPad.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayReduce\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayReduce.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayReplace\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayReplace.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayReplaceRecursive\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayReplaceRecursive.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayReverse\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayReverse.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArraySlice\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArraySlice.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArraySplice\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArraySplice.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayUdiff\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayUdiff.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayUdiffAssoc\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayUdiffAssoc.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayUdiffUassoc\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayUdiffUassoc.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayUintersect\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayUintersect.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayUintersectAssoc\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayUintersectAssoc.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayUintersectUassoc\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayUintersectUassoc.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayUnique\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayUnique.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapArrayValues\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapArrayValues.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapFinally\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapFinally.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapLcFirst\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapLcFirst.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapLtrim\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapLtrim.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapRtrim\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapRtrim.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapStrIreplace\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrIreplace.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapStrRepeat\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrRepeat.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapStrReplace\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrReplace.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapStrRev\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrRev.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapStrShuffle\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrShuffle.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapStrToLower\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrToLower.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapStrToUpper\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrToUpper.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapSubstr\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapSubstr.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapTrim\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapTrim.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapUcFirst\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapUcFirst.php
+
+		-
+			message: "#^Method Infection\\\\Mutator\\\\Unwrap\\\\UnwrapUcWords\\:\\:getDefinition\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapUcWords.php
+
+		-
+			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\MutatorVisitor\\:\\:leaveNode\\(\\) never returns int so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/PhpParser/Visitor/MutatorVisitor.php
+
+		-
+			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\NonMutableNodesIgnorerVisitor\\:\\:enterNode\\(\\) never returns PhpParser\\\\Node so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/PhpParser/Visitor/NonMutableNodesIgnorerVisitor.php
+
+		-
+			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\ReflectionVisitor\\:\\:enterNode\\(\\) never returns PhpParser\\\\Node so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
+
+		-
+			message: "#^Parameter \\#2 \\$paths of method Composer\\\\Autoload\\\\ClassLoader\\:\\:setPsr4\\(\\) expects list\\<string\\>\\|string, array\\<string\\> given\\.$#"
+			count: 1
+			path: ../src/TestFramework/AdapterInstaller.php
+
+		-
+			message: "#^Cannot access offset 1 on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			message: "#^Cannot access offset 1 on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
+
+		-
+			message: "#^Cannot access offset 0 on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
+			count: 1
+			path: ../src/TestFramework/VersionParser.php

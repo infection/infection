@@ -38,57 +38,57 @@ namespace Infection\Tests\Mutator\Boolean;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class FalseValueTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates false to true' => [
             <<<'PHP'
-<?php
+                <?php
 
-return false;
-PHP
+                return false;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return true;
-PHP
+                return true;
+                PHP
             ,
         ];
 
         yield 'It does not mutate the string false to true' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 'false';
-PHP
+                return 'false';
+                PHP
             ,
         ];
 
         yield 'It mutates all caps false to true' => [
             <<<'PHP'
-<?php
+                <?php
 
-return FALSE;
-PHP
+                return FALSE;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return true;
-PHP
+                return true;
+                PHP
             ,
         ];
     }

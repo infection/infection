@@ -36,155 +36,155 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UnwrapTrimTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = trim(' Good Afternoon! ');
-PHP
+                $a = trim(' Good Afternoon! ');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ' Good Afternoon! ';
-PHP
+                $a = ' Good Afternoon! ';
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = trim(\Class_With_Const::Const);
-PHP
+                $a = trim(\Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of trim' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \trim(' Good Afternoon! ');
-PHP
+                $a = \trim(' Good Afternoon! ');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ' Good Afternoon! ';
-PHP
+                $a = ' Good Afternoon! ';
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ' Good Afternoon! ';
-if (trim($a) === $a) {
-    return true;
-}
-PHP
+                $a = ' Good Afternoon! ';
+                if (trim($a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ' Good Afternoon! ';
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = ' Good Afternoon! ';
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when trim is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = tRiM(' Good Afternoon! ');
-PHP
+                $a = tRiM(' Good Afternoon! ');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ' Good Afternoon! ';
-PHP
+                $a = ' Good Afternoon! ';
+                PHP,
         ];
 
         yield 'It mutates correctly when trim uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = trim($foo->bar());
-PHP
+                $a = trim($foo->bar());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = trim(array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-}));
-PHP
+                $a = trim(array_reduce($words, function (string $carry, string $item) {
+                    return $carry . substr($item, 0, 1);
+                }));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-});
-PHP
+                $a = array_reduce($words, function (string $carry, string $item) {
+                    return $carry . substr($item, 0, 1);
+                });
+                PHP,
         ];
 
         yield 'It does not mutate other *trim calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ltrim(' Good Afternoon! ');
-PHP
+                $a = ltrim(' Good Afternoon! ');
+                PHP,
         ];
 
         yield 'It does not mutate functions named trim' => [
             <<<'PHP'
-<?php
+                <?php
 
-function trim($string)
-{
-}
-PHP
+                function trim($string)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'trim';
+                $a = 'trim';
 
-$b = $a(' FooBar ');
-PHP
+                $b = $a(' FooBar ');
+                PHP
             ,
         ];
     }

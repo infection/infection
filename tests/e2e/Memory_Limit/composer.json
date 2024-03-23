@@ -11,5 +11,8 @@
         "psr-4": {
             "MemoryLimit\\Test\\": "tests/"
         }
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }

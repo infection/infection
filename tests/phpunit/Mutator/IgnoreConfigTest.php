@@ -36,12 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\IgnoreConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @group integration
  * This is probably a false-positive of the IO checker regarding `fnmatch()`
  */
+#[Group('integration')]
 final class IgnoreConfigTest extends TestCase
 {
     public function test_it_returns_early_if_nothing_is_ignored(): void
@@ -51,35 +53,31 @@ final class IgnoreConfigTest extends TestCase
         $this->assertFalse($config->isIgnored('Foo', 'bar', 100));
     }
 
-    /**
-     * @dataProvider ignoredValuesProvider
-     */
+    #[DataProvider('ignoredValuesProvider')]
     public function test_it_can_check_that_the_given_elements_are_ignored(
         array $ignored,
         string $class,
         string $method,
-        ?int $lineNumber
+        ?int $lineNumber,
     ): void {
         $config = new IgnoreConfig($ignored);
 
         $this->assertTrue($config->isIgnored($class, $method, $lineNumber));
     }
 
-    /**
-     * @dataProvider nonIgnoredValuesProvider
-     */
+    #[DataProvider('nonIgnoredValuesProvider')]
     public function test_it_can_check_that_the_given_elements_are_not_ignored(
         array $ignored,
         string $class,
         string $method,
-        ?int $lineNumber
+        ?int $lineNumber,
     ): void {
         $config = new IgnoreConfig($ignored);
 
         $this->assertFalse($config->isIgnored($class, $method, $lineNumber));
     }
 
-    public function ignoredValuesProvider(): iterable
+    public static function ignoredValuesProvider(): iterable
     {
         foreach ([null, 50] as $lineNumber) {
             $titleSuffix = $lineNumber === null ? '' : ' with line number #' . $lineNumber;
@@ -135,7 +133,7 @@ final class IgnoreConfigTest extends TestCase
         ];
     }
 
-    public function nonIgnoredValuesProvider(): iterable
+    public static function nonIgnoredValuesProvider(): iterable
     {
         foreach ([null, 50] as $lineNumber) {
             $titleSuffix = $lineNumber === null ? '' : ' with line number #' . $lineNumber;

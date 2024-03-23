@@ -55,15 +55,15 @@ final class Spaceship implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$b <=> $a`.
-TXT
+                Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$b <=> $a`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b <=> $c;
-+ $a = $c <=> $b;
-DIFF
+                - $a = $b <=> $c;
+                + $a = $c <=> $b;
+                DIFF,
         );
     }
 

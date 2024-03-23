@@ -49,12 +49,12 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use ReflectionClass;
 
-/**
- * @group integration
- */
-final class ReflectionVisitorTest extends BaseVisitorTest
+#[Group('integration')]
+final class ReflectionVisitorTest extends BaseVisitorTestCase
 {
     private $spyVisitor;
 
@@ -63,13 +63,11 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         $this->spyVisitor = $this->getInsideFunctionSpyVisitor();
     }
 
-    /**
-     * @dataProvider isPartOfSignatureFlagProvider
-     */
+    #[DataProvider('isPartOfSignatureFlagProvider')]
     public function test_it_marks_nodes_which_are_part_of_the_function_signature(string $nodeClass, bool $expected): void
     {
-        $nodes = $this->parseCode(
-            $this->getFileContent('Reflection/rv-part-of-signature-flag.php')
+        $nodes = self::parseCode(
+            $this->getFileContent('Reflection/rv-part-of-signature-flag.php'),
         );
 
         $this->traverse(
@@ -80,15 +78,13 @@ final class ReflectionVisitorTest extends BaseVisitorTest
                 new FullyQualifiedClassNameVisitor(),
                 new ReflectionVisitor(),
                 $spyVisitor = $this->getPartOfSignatureSpyVisitor($nodeClass),
-            ]
+            ],
         );
 
         $this->assertSame($expected, $spyVisitor->isPartOfSignature());
     }
 
-    /**
-     * @dataProvider isPartOfSignatureFlagWithAttributesProvider
-     */
+    #[DataProvider('isPartOfSignatureFlagWithAttributesProvider')]
     public function test_it_marks_nodes_which_are_part_of_the_function_signature_with_attributes(string $nodeClass, bool $expected): void
     {
         $code = $this->getFileContent('Reflection/rv-part-of-signature-flag-with-attributes.php');
@@ -207,7 +203,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         $this->assertSame(Bug2::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass->getName());
     }
 
-    public function isPartOfSignatureFlagProvider(): iterable
+    public static function isPartOfSignatureFlagProvider(): iterable
     {
         yield [Node\Stmt\ClassMethod::class, true];
 
@@ -224,7 +220,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         yield [Node\Expr\Array_::class, false];             // []
     }
 
-    public function isPartOfSignatureFlagWithAttributesProvider(): iterable
+    public static function isPartOfSignatureFlagWithAttributesProvider(): iterable
     {
         yield [Node\Stmt\ClassMethod::class, true];
 
@@ -367,7 +363,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
 
     private function parseAndTraverse(string $code, ?NodeVisitor $nodeVisitor = null): void
     {
-        $nodes = $this->parseCode($code);
+        $nodes = self::parseCode($code);
 
         $this->traverse(
             $nodes,
@@ -377,7 +373,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
                 new FullyQualifiedClassNameVisitor(),
                 new ReflectionVisitor(),
                 $nodeVisitor ?: $this->spyVisitor,
-            ]
+            ],
         );
     }
 

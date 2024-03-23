@@ -1,5 +1,6 @@
 includes:
     - ../vendor/phpstan/phpstan/conf/bleedingEdge.neon
+    - phpstan-src-baseline.neon
 
 parameters:
     tmpDir: ../build/cache/phpstan-src
@@ -37,9 +38,6 @@ parameters:
         -
             message: '#^Function shell_exec is unsafe to use#'
             path: '../src/TestFramework/CommandLineBuilder.php'
-        -   # TODO: fix this; this was introduced as bumping to PHP 8.1 as the minimim requirement
-            message: '#^Parameter \#1 \$string of function trim expects string, string\|null given\.$#'
-            path: '../src/TestFramework/PhpUnit/Config/Path/PathReplacer.php'
         -
             message: "#^Instantiated class Infection\\\\FileSystem\\\\DummyFileSystem not found\\.$#"
             count: 1
@@ -69,11 +67,6 @@ parameters:
             message: "#^Generator expects value type list\\<PhpParser\\\\Node\\\\Stmt\\>, non\\-empty\\-array\\<PhpParser\\\\Node\\\\Stmt\\> given\\.$#"
             count: 1
             path: ../src/Mutator/Unwrap/UnwrapFinally.php
-
-        -
-            message: "#^Parameter \\#1 \\$callback of function array_map expects \\(callable\\(Infection\\\\TestFramework\\\\Coverage\\\\Trace\\|SplFileInfo\\)\\: mixed\\)\\|null, Closure\\(SplFileInfo\\)\\: \\(string\\|false\\) given\\.$#"
-            count: 1
-            path: ../src/TestFramework/Factory.php
 
         -
             message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNode\\>\\.$#"

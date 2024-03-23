@@ -36,22 +36,21 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use Infection\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class StrTest extends TestCase
 {
-    /**
-     * @dataProvider stringProvider
-     */
+    #[DataProvider('stringProvider')]
     public function test_it_can_trim_string_of_line_returns(string $value, string $expected): void
     {
         $this->assertSame(
             $expected,
-            normalizeLineReturn(Str::trimLineReturns($value))
+            normalizeLineReturn(Str::trimLineReturns($value)),
         );
     }
 
-    public function stringProvider(): iterable
+    public static function stringProvider(): iterable
     {
         yield 'empty' => [
             '',
@@ -72,18 +71,18 @@ final class StrTest extends TestCase
             <<<'TXT'
 
 
-Hello!
-TXT
+                Hello!
+                TXT
             ,
             'Hello!',
         ];
 
         yield 'string with trailing line returns' => [
             <<<'TXT'
-Hello!
+                Hello!
 
 
-TXT
+                TXT
             ,
             'Hello!',
         ];
@@ -92,10 +91,10 @@ TXT
             <<<'TXT'
 
 
-Hello!
+                Hello!
 
 
-TXT
+                TXT
             ,
             'Hello!',
         ];
@@ -104,36 +103,36 @@ TXT
             <<<'TXT'
 
 
-Hello...
+                Hello...
 
-...World!
+                ...World!
 
 
-TXT
+                TXT
             ,
             <<<'TXT'
-Hello...
+                Hello...
 
-...World!
-TXT
+                ...World!
+                TXT,
         ];
 
         yield 'string with leading, trailing & in-between line returns & dirty empty strings' => [
             <<<'TXT'
-  
+                  
 
-  Hello...
-    
- ...World!
-  
+                  Hello...
+                    
+                 ...World!
+                  
 
-TXT
+                TXT
             ,
             <<<'TXT'
-  Hello...
-    
- ...World!
-TXT
+                  Hello...
+                    
+                 ...World!
+                TXT,
         ];
     }
 }

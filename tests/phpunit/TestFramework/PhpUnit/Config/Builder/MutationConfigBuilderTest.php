@@ -50,6 +50,8 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\exec;
 use function Safe\file_get_contents;
 use function Safe\realpath;
@@ -57,9 +59,7 @@ use function Safe\simplexml_load_string;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     public const HASH = 'a1b2c3';
@@ -94,12 +94,12 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             self::MUTATED_FILE_PATH,
             self::HASH,
             self::ORIGINAL_FILE_PATH,
-            '7.1'
+            '7.1',
         );
 
         $this->assertSame(
             $this->tmp . '/phpunitConfiguration.a1b2c3.infection.xml',
-            $configurationPath
+            $configurationPath,
         );
 
         $this->assertFileExists($configurationPath);
@@ -108,7 +108,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
         $this->assertNotFalse(
             @simplexml_load_string($xml),
-            'Expected dumped configuration content to be a valid XML file.'
+            'Expected dumped configuration content to be a valid XML file.',
         );
 
         $this->assertFileExists($this->tmp . '/interceptor.autoload.a1b2c3.infection.php');
@@ -121,7 +121,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             self::MUTATED_FILE_PATH,
             self::HASH,
             self::ORIGINAL_FILE_PATH,
-            '7.1'
+            '7.1',
         );
 
         $tmp = $this->tmp;
@@ -129,31 +129,31 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
         $this->assertSame(
             <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright © 2017 Maks Rafalko
-  ~
-  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-  -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
-  <testsuites>
-    <testsuite name="Infection testsuite with filtered tests"/>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>$projectPath/src/</directory>
-      <!--<exclude>-->
-      <!--<directory>src/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-      <!--</exclude>-->
-    </whitelist>
-  </filter>
-</phpunit>
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!--
+                  ~ Copyright © 2017 Maks Rafalko
+                  ~
+                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+                  -->
+                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
+                  <testsuites>
+                    <testsuite name="Infection testsuite with filtered tests"/>
+                  </testsuites>
+                  <filter>
+                    <whitelist>
+                      <directory>$projectPath/src/</directory>
+                      <!--<exclude>-->
+                      <!--<directory>src/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                      <!--</exclude>-->
+                    </whitelist>
+                  </filter>
+                </phpunit>
 
-XML
+                XML
             ,
-            file_get_contents($configurationPath)
+            file_get_contents($configurationPath),
         );
     }
 
@@ -165,31 +165,31 @@ XML
 
         $this->assertSame(
             <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright © 2017 Maks Rafalko
-  ~
-  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-  -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
-  <testsuites>
-    <testsuite name="Infection testsuite with filtered tests">
-      <file>/path/to/FooTest.php</file>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>$projectPath/src/</directory>
-      <!--<exclude>-->
-      <!--<directory>src/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-      <!--</exclude>-->
-    </whitelist>
-  </filter>
-</phpunit>
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!--
+                  ~ Copyright © 2017 Maks Rafalko
+                  ~
+                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+                  -->
+                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
+                  <testsuites>
+                    <testsuite name="Infection testsuite with filtered tests">
+                      <file>/path/to/FooTest.php</file>
+                    </testsuite>
+                  </testsuites>
+                  <filter>
+                    <whitelist>
+                      <directory>$projectPath/src/</directory>
+                      <!--<exclude>-->
+                      <!--<directory>src/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                      <!--</exclude>-->
+                    </whitelist>
+                  </filter>
+                </phpunit>
 
-XML
+                XML
             ,
             file_get_contents(
                 $this->builder->build(
@@ -197,69 +197,69 @@ XML
                         new TestLocation(
                             'FooTest::test_foo',
                             '/path/to/FooTest.php',
-                            1.
+                            1.,
                         ),
                     ],
                     self::MUTATED_FILE_PATH,
                     'hash1',
                     self::ORIGINAL_FILE_PATH,
-                    '7.1'
-                )
-            )
+                    '7.1',
+                ),
+            ),
         );
 
         $phpCode = file_get_contents($this->tmp . '/interceptor.autoload.hash1.infection.php');
 
         $this->assertSame(
             <<<PHP
-<?php
+                <?php
 
-if (function_exists('proc_nice')) {
-    proc_nice(1);
-}
+                if (function_exists('proc_nice')) {
+                    proc_nice(1);
+                }
 
-require_once '$interceptorPath';
+                require_once '$interceptorPath';
 
-use Infection\StreamWrapper\IncludeInterceptor;
+                use Infection\StreamWrapper\IncludeInterceptor;
 
-IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
-IncludeInterceptor::enable();
-require_once '$projectPath/app/autoload2.php';
+                IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
+                IncludeInterceptor::enable();
+                require_once '$projectPath/app/autoload2.php';
 
-PHP
+                PHP
             ,
-            $phpCode
+            $phpCode,
         );
 
         $this->assertPHPSyntaxIsValid($phpCode);
 
         $this->assertSame(
             <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright © 2017 Maks Rafalko
-  ~
-  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-  -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
-  <testsuites>
-    <testsuite name="Infection testsuite with filtered tests">
-      <file>/path/to/BarTest.php</file>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>$projectPath/src/</directory>
-      <!--<exclude>-->
-      <!--<directory>src/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-      <!--</exclude>-->
-    </whitelist>
-  </filter>
-</phpunit>
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!--
+                  ~ Copyright © 2017 Maks Rafalko
+                  ~
+                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+                  -->
+                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
+                  <testsuites>
+                    <testsuite name="Infection testsuite with filtered tests">
+                      <file>/path/to/BarTest.php</file>
+                    </testsuite>
+                  </testsuites>
+                  <filter>
+                    <whitelist>
+                      <directory>$projectPath/src/</directory>
+                      <!--<exclude>-->
+                      <!--<directory>src/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                      <!--</exclude>-->
+                    </whitelist>
+                  </filter>
+                </phpunit>
 
-XML
+                XML
             ,
             file_get_contents(
                 $this->builder->build(
@@ -267,38 +267,38 @@ XML
                         new TestLocation(
                             'BarTest::test_bar_1',
                             '/path/to/BarTest.php',
-                            1.
+                            1.,
                         ),
                     ],
                     self::MUTATED_FILE_PATH,
                     'hash2',
                     self::ORIGINAL_FILE_PATH,
-                    '7.1'
-                )
-            )
+                    '7.1',
+                ),
+            ),
         );
 
         $phpCode = file_get_contents($this->tmp . '/interceptor.autoload.hash2.infection.php');
 
         $this->assertSame(
             <<<PHP
-<?php
+                <?php
 
-if (function_exists('proc_nice')) {
-    proc_nice(1);
-}
+                if (function_exists('proc_nice')) {
+                    proc_nice(1);
+                }
 
-require_once '$interceptorPath';
+                require_once '$interceptorPath';
 
-use Infection\StreamWrapper\IncludeInterceptor;
+                use Infection\StreamWrapper\IncludeInterceptor;
 
-IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
-IncludeInterceptor::enable();
-require_once '$projectPath/app/autoload2.php';
+                IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
+                IncludeInterceptor::enable();
+                require_once '$projectPath/app/autoload2.php';
 
-PHP
+                PHP
             ,
-            $phpCode
+            $phpCode,
         );
 
         $this->assertPHPSyntaxIsValid($phpCode);
@@ -313,8 +313,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.1'
-            )
+                '7.1',
+            ),
         );
     }
 
@@ -326,8 +326,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.1'
-            )
+                '7.1',
+            ),
         );
 
         $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
@@ -335,13 +335,13 @@ PHP
         $expectedCustomAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->tmp,
-            self::HASH
+            self::HASH,
         );
 
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
         $this->assertStringContainsString(
             'app/autoload2.php',
-            file_get_contents($expectedCustomAutoloadFilePath)
+            file_get_contents($expectedCustomAutoloadFilePath),
         );
     }
 
@@ -355,8 +355,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.1'
-            )
+                '7.1',
+            ),
         );
 
         $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
@@ -364,13 +364,13 @@ PHP
         $expectedCustomAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->tmp,
-            self::HASH
+            self::HASH,
         );
 
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
         $this->assertStringContainsString(
             'vendor/autoload.php',
-            file_get_contents($expectedCustomAutoloadFilePath)
+            file_get_contents($expectedCustomAutoloadFilePath),
         );
     }
 
@@ -382,8 +382,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.1'
-            )
+                '7.1',
+            ),
         );
 
         $stopOnFailure = $this->queryXpath($xml, '/phpunit/@stopOnFailure')[0]->nodeValue;
@@ -399,8 +399,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.1'
-            )
+                '7.1',
+            ),
         );
 
         $colors = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
@@ -417,12 +417,12 @@ PHP
             self::MUTATED_FILE_PATH,
             self::HASH,
             self::ORIGINAL_FILE_PATH,
-            '7.1'
+            '7.1',
         );
 
         $testSuite = $this->queryXpath(
             file_get_contents($configurationPath),
-            '/phpunit/testsuite'
+            '/phpunit/testsuite',
         );
 
         $this->assertInstanceOf(DOMNodeList::class, $testSuite);
@@ -437,8 +437,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.1'
-            )
+                '7.1',
+            ),
         );
 
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
@@ -455,8 +455,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.1'
-            )
+                '7.1',
+            ),
         );
 
         $printerClass = $this->queryXpath($xml, '/phpunit/@printerClass');
@@ -475,8 +475,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.1'
-            )
+                '7.1',
+            ),
         );
 
         $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
@@ -494,8 +494,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.2'
-            )
+                '7.2',
+            ),
         );
 
         $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
@@ -513,8 +513,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.2'
-            )
+                '7.2',
+            ),
         );
 
         $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
@@ -532,8 +532,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.3'
-            )
+                '7.3',
+            ),
         );
 
         $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
@@ -547,14 +547,13 @@ PHP
     }
 
     /**
-     * @dataProvider locationsProvider
-     *
      * @param TestLocation[] $tests
      * @param string[] $expectedFiles
      */
+    #[DataProvider('locationsProvider')]
     public function test_it_sets_sorted_list_of_test_files(
         array $tests,
-        array $expectedFiles
+        array $expectedFiles,
     ): void {
         $xml = file_get_contents(
             $this->builder->build(
@@ -562,8 +561,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.1'
-            )
+                '7.1',
+            ),
         );
 
         $files = array_map(
@@ -572,8 +571,8 @@ PHP
             },
             iterator_to_array(
                 $this->queryXpath($xml, '/phpunit/testsuites/testsuite/file'),
-                false
-            )
+                false,
+            ),
         );
 
         $this->assertSame($expectedFiles, $files);
@@ -587,8 +586,8 @@ PHP
                 self::MUTATED_FILE_PATH,
                 self::HASH,
                 self::ORIGINAL_FILE_PATH,
-                '7.1'
-            )
+                '7.1',
+            ),
         );
 
         $defaultTestSuite = $this->queryXpath($xml, '/phpunit/@defaultTestSuite');
@@ -606,36 +605,34 @@ PHP
             self::MUTATED_FILE_PATH,
             self::HASH,
             self::ORIGINAL_FILE_PATH,
-            '7.1'
+            '7.1',
         );
 
         $expectedCustomAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->tmp,
-            self::HASH
+            self::HASH,
         );
 
         $this->assertFileExists($expectedCustomAutoloadFilePath);
         $this->assertStringContainsString(
             'IncludeInterceptor.php',
-            file_get_contents($expectedCustomAutoloadFilePath)
+            file_get_contents($expectedCustomAutoloadFilePath),
         );
     }
 
-    /**
-     * @dataProvider failOnProvider
-     */
+    #[DataProvider('failOnProvider')]
     public function test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions(
         string $version,
         string $attributeName,
-        int $expectedNodeCount
+        int $expectedNodeCount,
     ): void {
         $xml = file_get_contents($this->builder->build(
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
             self::ORIGINAL_FILE_PATH,
-            $version
+            $version,
         ));
 
         $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
@@ -656,7 +653,7 @@ PHP
             self::MUTATED_FILE_PATH,
             self::HASH,
             self::ORIGINAL_FILE_PATH,
-            '5.2'
+            '5.2',
         ));
 
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
@@ -676,7 +673,7 @@ PHP
             self::MUTATED_FILE_PATH,
             self::HASH,
             self::ORIGINAL_FILE_PATH,
-            '5.2'
+            '5.2',
         ));
 
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnWarning'));
@@ -685,7 +682,7 @@ PHP
         $this->assertSame('false', $failOnRisky[0]->value);
     }
 
-    public function failOnProvider(): iterable
+    public static function failOnProvider(): iterable
     {
         yield 'PHPUnit 5.1.99 runs without failOnRisky' => [
             '5.1.99',
@@ -724,29 +721,29 @@ PHP
         ];
     }
 
-    public function locationsProvider(): iterable
+    public static function locationsProvider(): iterable
     {
         yield [
             [
                 new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #5',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                    0.861780
+                    0.861780,
                 ),
                 new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #6',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                    0.861780
+                    0.861780,
                 ),
                 new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_id',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
-                    0.035935
+                    0.035935,
                 ),
                 new TestLocation(
                     'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_recorded_at_date',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
-                    0.035935
+                    0.035935,
                 ),
             ],
             [
@@ -760,17 +757,17 @@ PHP
                 new TestLocation(
                     'Path\\To\\A::test_a',
                     '/path/to/A.php',
-                    0.586178
+                    0.586178,
                 ),
                 new TestLocation(
                     'Path\\To\\B::test_b',
                     '/path/to/B.php',
-                    0.186178
+                    0.186178,
                 ),
                 new TestLocation(
                     'Path\\To\\C::test_c',
                     '/path/to/C.php',
-                    0.016178
+                    0.016178,
                 ),
             ],
             [
@@ -790,7 +787,7 @@ PHP
     }
 
     private function createConfigBuilder(
-        ?string $originalPhpUnitXmlConfigPath = null
+        ?string $originalPhpUnitXmlConfigPath = null,
     ): MutationConfigBuilder {
         $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
 
@@ -801,7 +798,7 @@ PHP
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationManipulator($replacer, ''),
             'project/dir',
-            new JUnitTestCaseSorter()
+            new JUnitTestCaseSorter(),
         );
     }
 
@@ -810,13 +807,13 @@ PHP
         exec(
             sprintf('echo %s | php -l', escapeshellarg($phpCode)),
             $output,
-            $returnCode
+            $returnCode,
         );
 
         $this->assertSame(
             0,
             $returnCode,
-            'Builder produced invalid code'
+            'Builder produced invalid code',
         );
     }
 }

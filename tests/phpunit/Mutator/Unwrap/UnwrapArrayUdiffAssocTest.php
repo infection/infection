@@ -36,165 +36,165 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UnwrapArrayUdiffAssocTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-PHP
+                $a = array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_udiff_assoc(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc);
-PHP
+                $a = array_udiff_assoc(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_udiff_assoc' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-PHP
+                $a = \array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-if (array_udiff_assoc($a, ['baz' => 'bar'], $valueCompareFunc) === $a) {
-    return true;
-}
-PHP
+                $a = ['foo' => 'bar'];
+                if (array_udiff_assoc($a, ['baz' => 'bar'], $valueCompareFunc) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = ['foo' => 'bar'];
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when array_udiff_assoc is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_UdIfF_aSsOc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-PHP
+                $a = aRrAy_UdIfF_aSsOc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when array_udiff_assoc uses functions as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_udiff_assoc($foo->bar(), $foo->baz(), $valueCompareFunc);
-PHP
+                $a = array_udiff_assoc($foo->bar(), $foo->baz(), $valueCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc));
-PHP
+                $a = array_map('strtolower', array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+                $a = array_map('strtolower', ['foo' => 'bar']);
+                PHP,
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc);
-PHP
+                $a = array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+                $a = array_map('strtolower', ['foo' => 'bar']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_udiff_assoc' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_udiff_assoc($array, $array1, $array2)
-{
-}
-PHP
+                function array_udiff_assoc($array, $array1, $array2)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_udiff_assoc';
+                $a = 'array_udiff_assoc';
 
-$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-PHP
+                $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
+                PHP,
         ];
     }
 }

@@ -40,13 +40,12 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class SchemaConfigurationTest extends TestCase
 {
-    /**
-     * @dataProvider valueProvider
-     */
+    #[DataProvider('valueProvider')]
     public function test_it_can_be_instantiated(
         string $path,
         ?float $timeout,
@@ -61,7 +60,7 @@ final class SchemaConfigurationTest extends TestCase
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkExtraOptions
+        ?string $testFrameworkExtraOptions,
     ): void {
         $config = new SchemaConfiguration(
             $path,
@@ -77,7 +76,7 @@ final class SchemaConfigurationTest extends TestCase
             $testFramework,
             $bootstrap,
             $initialTestsPhpOptions,
-            $testFrameworkExtraOptions
+            $testFrameworkExtraOptions,
         );
 
         $this->assertSame($path, $config->getFile());
@@ -96,7 +95,7 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions());
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         yield 'minimal' => [
             '',
@@ -129,7 +128,7 @@ final class SchemaConfigurationTest extends TestCase
                 'mutator.log',
                 true,
                 StrykerConfig::forFullReport('master'),
-                'summary.json'
+                'summary.json',
             ),
             'path/to/tmp',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),

@@ -71,11 +71,11 @@ final class PerformanceLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
-            new StopWatch(),
+            new Stopwatch(),
             new FakeTimeFormatter(5),
             new FakeMemoryFormatter(2048),
             1,
-            $this->output
+            $this->output,
         ));
 
         $dispatcher->dispatch(new ApplicationExecutionWasStarted());

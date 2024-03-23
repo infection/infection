@@ -75,26 +75,26 @@ final class MBString implements ConfigurableMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a statement making use of the mbstring extension with its vanilla code equivalent. For
-example:
+                Replaces a statement making use of the mbstring extension with its vanilla code equivalent. For
+                example:
 
-```php
-$x = mb_strlen($str) < 10;
-```
+                ```php
+                $x = mb_strlen($str) < 10;
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = strlen($str) < 10;
-```
-TXT
+                ```php
+                $x = strlen($str) < 10;
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = mb_strlen($str) < 10;
-+ $x = strlen($str) < 10;
-DIFF
+                - $x = mb_strlen($str) < 10;
+                + $x = strlen($str) < 10;
+                DIFF,
         );
     }
 
@@ -150,7 +150,7 @@ DIFF
                 'mb_substr' => self::makeFunctionAndRemoveExtraArgsMapper('substr', 3),
                 'mb_convert_case' => self::makeConvertCaseMapper(),
             ],
-            array_fill_keys($allowedFunctions, null)
+            array_fill_keys($allowedFunctions, null),
         );
     }
 
@@ -255,7 +255,7 @@ DIFF
         return new Node\Expr\FuncCall(
             new Node\Name($newFuncName, $node->name->getAttributes()),
             $args,
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 }

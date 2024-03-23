@@ -72,7 +72,7 @@ final class StrykerLogger implements MutationTestingResultsLogger
         if (!$this->strykerConfig->applicableForBranch($branch)) {
             $this->logReportWasNotSent(sprintf(
                 'Branch "%s" does not match expected Stryker configuration',
-                $branch
+                $branch,
             ));
 
             return;
@@ -98,7 +98,7 @@ final class StrykerLogger implements MutationTestingResultsLogger
             'github.com/' . $buildContext->repositorySlug(),
             $branch,
             $apiKey,
-            json_encode($report)
+            json_encode($report),
         );
     }
 

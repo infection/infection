@@ -42,15 +42,14 @@ use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Infection\Tests\normalizePath as p;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function Safe\realpath;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 use Symfony\Component\Console\Input\StringInput;
 
-/**
- * @group integration
- */
-final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
+#[Group('integration')]
+final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
 {
     /**
      * @var MockObject|TestFrameworkFinder
@@ -69,7 +68,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
         $this->provider = new PhpUnitCustomExecutablePathProvider(
             $this->finderMock,
             $this->createMock(ConsoleHelper::class),
-            $this->getQuestionHelper()
+            $this->getQuestionHelper(),
         );
     }
 
@@ -83,8 +82,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
         $this->assertNull(
             $this->provider->get(new IO(
                 new StringInput(''),
-                $this->createStreamOutput())
-            )
+                $this->createStreamOutput()),
+            ),
         );
     }
 
@@ -100,7 +99,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
 
         $path = $this->provider->get(new IO(
             $this->createStreamableInput($this->getInputStream("{$customExecutable}\n")),
-            $this->createStreamOutput()
+            $this->createStreamOutput(),
         ));
 
         $this->assertSame($customExecutable, $path);
@@ -122,7 +121,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTest
 
         $this->provider->get(new IO(
             $this->createStreamableInput($this->getInputStream("abc\n")),
-            $this->createStreamOutput()
+            $this->createStreamOutput(),
         ));
     }
 }

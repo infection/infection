@@ -36,155 +36,155 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UnwrapStrToLowerTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strtolower('Good Afternoon!');
-PHP
+                $a = strtolower('Good Afternoon!');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-PHP
+                $a = 'Good Afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strtolower(\Class_With_Const::Const);
-PHP
+                $a = strtolower(\Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of strtolower' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \strtolower('Good Afternoon!');
-PHP
+                $a = \strtolower('Good Afternoon!');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-PHP
+                $a = 'Good Afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-if (strtolower($a) === $a) {
-    return true;
-}
-PHP
+                $a = 'Good Afternoon!';
+                if (strtolower($a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = 'Good Afternoon!';
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when strtolower is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = sTrToLoWeR('Good Afternoon!');
-PHP
+                $a = sTrToLoWeR('Good Afternoon!');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-PHP
+                $a = 'Good Afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly when strtolower uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strtolower($foo->bar());
-PHP
+                $a = strtolower($foo->bar());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strtolower(array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-}));
-PHP
+                $a = strtolower(array_reduce($words, function (string $carry, string $item) {
+                    return $carry . substr($item, 0, 1);
+                }));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-});
-PHP
+                $a = array_reduce($words, function (string $carry, string $item) {
+                    return $carry . substr($item, 0, 1);
+                });
+                PHP,
         ];
 
         yield 'It does not mutate other str* calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strtoupper('Good Afternoon!');
-PHP
+                $a = strtoupper('Good Afternoon!');
+                PHP,
         ];
 
         yield 'It does not mutate functions named strtolower' => [
             <<<'PHP'
-<?php
+                <?php
 
-function strtolower($string)
-{
-}
-PHP
+                function strtolower($string)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'strtolower';
+                $a = 'strtolower';
 
-$b = $a('FooBar');
-PHP
+                $b = $a('FooBar');
+                PHP
             ,
         ];
     }

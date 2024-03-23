@@ -54,25 +54,25 @@ final class SpreadOneItem implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a spread operator in an array expression with its first element only. For example:
+                Replaces a spread operator in an array expression with its first element only. For example:
 
-```php
-$x = [...$collection, 4, 5];
-```
+                ```php
+                $x = [...$collection, 4, 5];
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = [[...$collection][0], 4, 5];
-```
-TXT
+                ```php
+                $x = [[...$collection][0], 4, 5];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = [...$collection, 4, 5];
-+ $x = [[...$collection][0], 4, 5];
-DIFF
+                - $x = [...$collection, 4, 5];
+                + $x = [[...$collection][0], 4, 5];
+                DIFF,
         );
     }
 
@@ -87,15 +87,15 @@ DIFF
             new Node\Expr\ArrayDimFetch(
                 new Node\Expr\Array_(
                     [$node],
-                    $node->getAttributes() + ['kind' => Node\Expr\Array_::KIND_SHORT]
+                    $node->getAttributes() + ['kind' => Node\Expr\Array_::KIND_SHORT],
                 ),
                 new Node\Scalar\LNumber(0),
-                $node->value->getAttributes()
+                $node->value->getAttributes(),
             ),
             null,
             false,
             $node->getAttributes(),
-            false
+            false,
         );
     }
 

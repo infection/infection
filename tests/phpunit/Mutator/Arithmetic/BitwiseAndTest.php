@@ -36,33 +36,33 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class BitwiseAndTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield [
             <<<'PHP'
-<?php
+                <?php
 
-1 & 2;
-PHP
+                1 & 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1 | 2;
-PHP
+                1 | 2;
+                PHP
             ,
         ];
     }

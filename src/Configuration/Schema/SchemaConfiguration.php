@@ -66,7 +66,7 @@ final class SchemaConfiguration
         ?string $testFramework,
         private readonly ?string $bootstrap,
         private readonly ?string $initialTestsPhpOptions,
-        private readonly ?string $testFrameworkExtraOptions
+        private readonly ?string $testFrameworkExtraOptions,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());

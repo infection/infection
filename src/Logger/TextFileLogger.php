@@ -64,38 +64,38 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getEscapedExecutionResults(),
             'Escaped',
-            $separateSections
+            $separateSections,
         );
 
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getTimedOutExecutionResults(),
             'Timed Out',
-            $separateSections
+            $separateSections,
         );
 
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getSkippedExecutionResults(),
             'Skipped',
-            $separateSections
+            $separateSections,
         );
 
         if ($this->debugVerbosity) {
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getKilledExecutionResults(),
                 'Killed',
-                $separateSections
+                $separateSections,
             );
 
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getErrorExecutionResults(),
                 'Errors',
-                $separateSections
+                $separateSections,
             );
 
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getSyntaxErrorExecutionResults(),
                 'Syntax Errors',
-                $separateSections
+                $separateSections,
             );
         }
 
@@ -103,7 +103,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getNotCoveredExecutionResults(),
                 'Not Covered',
-                $separateSections
+                $separateSections,
             );
         }
 
@@ -120,7 +120,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     private function getResultsLine(
         array $executionResults,
         string $headlinePrefix,
-        bool &$separateSections
+        bool &$separateSections,
     ): string {
         $lines = [];
 
@@ -172,7 +172,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
                 $headline,
                 str_repeat('=', strlen($headline)),
                 '',
-            ]
+            ],
         );
     }
 
@@ -183,7 +183,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
             $index + 1,
             $mutantProcess->getOriginalFilePath(),
             $mutantProcess->getOriginalStartingLine(),
-            $mutantProcess->getMutatorName()
+            $mutantProcess->getMutatorName(),
         );
     }
 
@@ -193,8 +193,8 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
             PHP_EOL,
             array_map(
                 static fn (string $line): string => '  ' . $line,
-                explode(PHP_EOL, Str::trimLineReturns($value))
-            )
+                explode(PHP_EOL, Str::trimLineReturns($value)),
+            ),
         );
     }
 }

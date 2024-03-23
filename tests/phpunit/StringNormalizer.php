@@ -48,7 +48,7 @@ final class StringNormalizer
     {
         return implode(
             "\n",
-            array_map('rtrim', explode("\n", $string))
+            array_map('rtrim', explode("\n", $string)),
         );
     }
 }

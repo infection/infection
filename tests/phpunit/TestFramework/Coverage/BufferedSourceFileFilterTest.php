@@ -66,15 +66,11 @@ final class BufferedSourceFileFilterTest extends TestCase
         $filter
             ->expects($this->exactly(2))
             ->method('filter')
-            ->withConsecutive(
-                [$traces],
-                [$uncoveredFiles]
-            )
-            ->willReturnOnConsecutiveCalls(
-                $traces,
-                $uncoveredFiles
-            )
-        ;
+            ->willReturnCallback(static fn (array $constraint) => match ($constraint) {
+                $traces => $traces,
+                $uncoveredFiles => $uncoveredFiles,
+                default => 'noop',
+            });
 
         $bufferedFilter = new BufferedSourceFileFilter($filter, $sourceFiles);
 

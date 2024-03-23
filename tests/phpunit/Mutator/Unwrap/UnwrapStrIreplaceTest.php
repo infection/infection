@@ -36,155 +36,155 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UnwrapStrIreplaceTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = str_ireplace('Afternoon', 'Evening' ,'Good Afternoon!');
-PHP
+                $a = str_ireplace('Afternoon', 'Evening' ,'Good Afternoon!');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-PHP
+                $a = 'Good Afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = str_ireplace('X', 'Y', \Class_With_Const::Const);
-PHP
+                $a = str_ireplace('X', 'Y', \Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of str_replace' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \str_ireplace('Afternoon', 'Evening' ,'Good Afternoon!');
-PHP
+                $a = \str_ireplace('Afternoon', 'Evening' ,'Good Afternoon!');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-PHP
+                $a = 'Good Afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-if (str_ireplace('Afternoon', 'Evening', $a) === $a) {
-    return true;
-}
-PHP
+                $a = 'Good Afternoon!';
+                if (str_ireplace('Afternoon', 'Evening', $a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = 'Good Afternoon!';
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when str_replace is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = sTr_iRepLace('Afternoon', 'Evening' ,'Good Afternoon!');
-PHP
+                $a = sTr_iRepLace('Afternoon', 'Evening' ,'Good Afternoon!');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-PHP
+                $a = 'Good Afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly when str_replace uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = str_ireplace('Afternoon', 'Evening' , $foo->bar());
-PHP
+                $a = str_ireplace('Afternoon', 'Evening' , $foo->bar());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = str_ireplace('Foo', 'Bar', array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-}));
-PHP
+                $a = str_ireplace('Foo', 'Bar', array_reduce($words, function (string $carry, string $item) {
+                    return $carry . substr($item, 0, 1);
+                }));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-});
-PHP
+                $a = array_reduce($words, function (string $carry, string $item) {
+                    return $carry . substr($item, 0, 1);
+                });
+                PHP,
         ];
 
         yield 'It does not mutate other str_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = str_replace('Afternoon', 'Evening' ,'Good Afternoon!');
-PHP
+                $a = str_replace('Afternoon', 'Evening' ,'Good Afternoon!');
+                PHP,
         ];
 
         yield 'It does not mutate functions named str_replace' => [
             <<<'PHP'
-<?php
+                <?php
 
-function str_ireplace($search , $replace , $subject , int &$count = null)
-{
-}
-PHP
+                function str_ireplace($search , $replace , $subject , int &$count = null)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'str_ireplace';
+                $a = 'str_ireplace';
 
-$b = $a('Bar', 'Baz', 'FooBar');
-PHP
+                $b = $a('Bar', 'Baz', 'FooBar');
+                PHP
             ,
         ];
     }

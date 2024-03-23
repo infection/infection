@@ -36,151 +36,151 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UnwrapArrayKeysTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_keys(['foo' => 'bar']);
-PHP
+                $a = array_keys(['foo' => 'bar']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_keys(\Class_With_Const::Const);
-PHP
+                $a = array_keys(\Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_keys' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_keys(['foo' => 'bar']);
-PHP
+                $a = \array_keys(['foo' => 'bar']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+                $a = array_map('strtolower', ['A', 'B', 'C']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_keys' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_keys($array)
-{
-}
-PHP
+                function array_keys($array)
+                {
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-if (array_keys($a) === $a) {
-    return true;
-}
-PHP
+                $a = ['foo' => 'bar'];
+                if (array_keys($a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = ['foo' => 'bar'];
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when array_keys is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_KeYs(['foo' => 'bar']);
-PHP
+                $a = aRrAy_KeYs(['foo' => 'bar']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when array_keys uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_keys($foo->bar());
-PHP
+                $a = array_keys($foo->bar());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_keys(['foo' => 'bar']));
-PHP
+                $a = array_map('strtolower', array_keys(['foo' => 'bar']));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+                $a = array_map('strtolower', ['foo' => 'bar']);
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_keys';
+                $a = 'array_keys';
 
-$b = $a(['foo' => 'bar']);
-PHP
+                $b = $a(['foo' => 'bar']);
+                PHP
             ,
         ];
     }

@@ -59,11 +59,11 @@ final class ElseIfNegation implements Mutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-if ($this->foo()) {
-- } elseif ($this->bar()) {
-+ } elseif (!$this->bar()) {
-}
-DIFF
+                if ($this->foo()) {
+                - } elseif ($this->bar()) {
+                + } elseif (!$this->bar()) {
+                }
+                DIFF,
         );
     }
 
@@ -79,7 +79,7 @@ DIFF
         yield new Node\Stmt\ElseIf_(
             new Node\Expr\BooleanNot($node->cond),
             $node->stmts,
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

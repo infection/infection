@@ -62,9 +62,9 @@ class MutantProcessFactory
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getHash(),
                 $mutant->getMutation()->getOriginalFilePath(),
-                $testFrameworkExtraOptions
+                $testFrameworkExtraOptions,
             ),
-            timeout: $this->timeout
+            timeout: $this->timeout,
         );
 
         $mutantProcess = new MutantProcess($process, $mutant);
@@ -78,7 +78,7 @@ class MutantProcessFactory
             $resultFactory
         ): void {
             $eventDispatcher->dispatch(new MutantProcessWasFinished(
-                $resultFactory->createFromProcess($mutantProcess))
+                $resultFactory->createFromProcess($mutantProcess)),
             );
         });
 

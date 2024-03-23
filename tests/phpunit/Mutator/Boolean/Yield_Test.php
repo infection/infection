@@ -42,36 +42,35 @@ use function version_compare;
 final class Yield_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates a yield with a double arrow to a yield with a greater than comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = function () {
-    (yield $a => $b);
-};
-PHP
+                $a = function () {
+                    (yield $a => $b);
+                };
+                PHP
             ,
             (static function () {
                 if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
                     return
                         <<<'PHP'
-<?php
+                <?php
 
-$a = function () {
-    (yield $a > $b);
-};
-PHP;
+                $a = function () {
+                    (yield $a > $b);
+                };
+                PHP;
                 }
 
                 return
@@ -87,12 +86,12 @@ PHP;
 
         yield 'It does not mutate yields without a double arrow operator' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = function () {
-    (yield $b);
-};
-PHP
+                $a = function () {
+                    (yield $b);
+                };
+                PHP
             ,
         ];
     }

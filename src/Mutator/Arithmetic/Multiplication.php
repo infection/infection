@@ -57,15 +57,15 @@ final class Multiplication implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a multiplication operator (`*`) with a division assignment operator (`/`).
-TXT
+                Replaces a multiplication operator (`*`) with a division assignment operator (`/`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b * $c;
-+ $a = $b / $c;
-DIFF
+                - $a = $b * $c;
+                + $a = $b / $c;
+                DIFF,
         );
     }
 

@@ -41,6 +41,7 @@ use function array_values;
 use function count;
 use Infection\FileSystem\SourceFileCollector;
 use function natcasesort;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use function range;
@@ -50,9 +51,7 @@ final class SourceFileCollectorTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
 
-    /**
-     * @dataProvider sourceFilesProvider
-     */
+    #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(array $sourceDirectories, array $excludedFiles, array $expected): void
     {
         $root = self::FIXTURES;
@@ -63,19 +62,19 @@ final class SourceFileCollectorTest extends TestCase
 
         $this->assertSame(
             $expected,
-            self::normalizePaths($files, $root)
+            self::normalizePaths($files, $root),
         );
 
         if ($files !== []) {
             $this->assertSame(
                 range(0, count($files) - 1),
                 array_keys($files),
-                'Expected the collected files to be a list'
+                'Expected the collected files to be a list',
             );
         }
     }
 
-    public function sourceFilesProvider(): iterable
+    public static function sourceFilesProvider(): iterable
     {
         yield 'empty' => [
             [],
@@ -178,8 +177,8 @@ final class SourceFileCollectorTest extends TestCase
                 static function (string $file) use ($root): string {
                     return Path::makeRelative($file, $root);
                 },
-                $files
-            )
+                $files,
+            ),
         );
 
         natcasesort($files);

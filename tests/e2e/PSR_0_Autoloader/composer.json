@@ -11,5 +11,8 @@
         "psr-0": {
             "PSR_0_Autoloader\\Tests": "tests/"
         }
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }

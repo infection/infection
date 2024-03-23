@@ -54,15 +54,15 @@ final class DivEqual implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a division assignment operator (`/=`) with a multiplication assignment operator (`*=`).
-TXT
+                Replaces a division assignment operator (`/=`) with a multiplication assignment operator (`*=`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a /= $b;
-+ $a *= $b;
-DIFF
+                - $a /= $b;
+                + $a *= $b;
+                DIFF,
         );
     }
 

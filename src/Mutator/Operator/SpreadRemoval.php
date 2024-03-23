@@ -54,25 +54,25 @@ final class SpreadRemoval implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Removes a spread operator in an array expression. For example:
+                Removes a spread operator in an array expression. For example:
 
-```php
-$x = [...$collection, 4, 5];
-```
+                ```php
+                $x = [...$collection, 4, 5];
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = [$collection, 4, 5];
-```
-TXT
+                ```php
+                $x = [$collection, 4, 5];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = [...$collection, 4, 5];
-+ $x = [$collection, 4, 5];
-DIFF
+                - $x = [...$collection, 4, 5];
+                + $x = [$collection, 4, 5];
+                DIFF,
         );
     }
 
@@ -88,7 +88,7 @@ DIFF
             null,
             false,
             $node->getAttributes(),
-            false
+            false,
         );
     }
 

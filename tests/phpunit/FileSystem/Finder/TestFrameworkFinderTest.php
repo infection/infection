@@ -45,6 +45,8 @@ use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
 use const PATH_SEPARATOR;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
@@ -52,11 +54,10 @@ use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration
- * Requires I/O read & writes via the MockVendor
- *
  * @see MockVendor
+ * Requires I/O read & writes via the MockVendor
  */
+#[Group('integration')]
 final class TestFrameworkFinderTest extends FileSystemTestCase
 {
     use BacksUpEnvironmentVariables;
@@ -134,7 +135,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertSame(
             normalizePath($expected),
             normalizePath($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
-            'Should return the phpunit path'
+            'Should return the phpunit path',
         );
 
         $pathAfterTest = getenv(self::$pathName);
@@ -148,7 +149,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertGreaterThan(
             strlen($path),
             strlen($pathAfterTest),
-            'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.'
+            'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.',
         );
     }
 
@@ -173,13 +174,11 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertSame(
             normalizePath(realpath($expected)),
             normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
-            'should return the vendor bin link or .bat'
+            'should return the vendor bin link or .bat',
         );
     }
 
-    /**
-     * @dataProvider providesMockSetup
-     */
+    #[DataProvider('providesMockSetup')]
     public function test_it_finds_framework_script_from_bat(string $methodName): void
     {
         $mock = new MockVendor($this->tmp, $this->fileSystem);
@@ -194,11 +193,11 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertSame(
             normalizePath(realpath($mock->getPackageScript())),
             normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
-            'should return the package script from .bat'
+            'should return the package script from .bat',
         );
     }
 
-    public function providesMockSetup(): array
+    public static function providesMockSetup(): array
     {
         return [
             'composer-bat' => ['setUpComposerBatchTest'],

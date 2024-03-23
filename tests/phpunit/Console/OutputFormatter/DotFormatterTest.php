@@ -82,7 +82,7 @@ final class DotFormatterTest extends TestCase
         $dot->start(10);
         $dot->advance(
             $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0],
-            10
+            10,
         );
     }
 
@@ -99,7 +99,7 @@ final class DotFormatterTest extends TestCase
         $dot->start(10);
         $dot->advance(
             $this->createMutantExecutionResultsOfType(DetectionStatus::ESCAPED)[0],
-            10
+            10,
         );
     }
 
@@ -116,7 +116,7 @@ final class DotFormatterTest extends TestCase
         $dot->start(10);
         $dot->advance(
             $this->createMutantExecutionResultsOfType(DetectionStatus::ERROR)[0],
-            10
+            10,
         );
     }
 
@@ -133,7 +133,7 @@ final class DotFormatterTest extends TestCase
         $dot->start(10);
         $dot->advance(
             $this->createMutantExecutionResultsOfType(DetectionStatus::TIMED_OUT)[0],
-            10
+            10,
         );
     }
 
@@ -150,7 +150,7 @@ final class DotFormatterTest extends TestCase
         $dot->start(10);
         $dot->advance(
             $this->createMutantExecutionResultsOfType(DetectionStatus::NOT_COVERED)[0],
-            10
+            10,
         );
     }
 
@@ -167,7 +167,7 @@ final class DotFormatterTest extends TestCase
         $dot->start(10);
         $dot->advance(
             $this->createMutantExecutionResultsOfType(DetectionStatus::SKIPPED)[0],
-            10
+            10,
         );
     }
 
@@ -184,7 +184,7 @@ final class DotFormatterTest extends TestCase
         $dot->start(10);
         $dot->advance(
             $this->createMutantExecutionResultsOfType(DetectionStatus::IGNORED)[0],
-            10
+            10,
         );
     }
 
@@ -203,14 +203,14 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-.: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
-..................................................   ( 50 / 127)
-..................................................   (100 / 127)
-...........................                          (127 / 127)
-TXT
+                ..................................................   ( 50 / 127)
+                ..................................................   (100 / 127)
+                ...........................                          (127 / 127)
+                TXT,
         ),
-            strip_tags($buffer->fetch())
+            strip_tags($buffer->fetch()),
         );
     }
 
@@ -225,27 +225,27 @@ TXT
         for ($i = 0; $i < $totalMutations; ++$i) {
             $dot->advance(
                 $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0],
-                0
+                0,
             );
         }
 
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-.: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
-..................................................   (   50)
-..................................................   (  100)
-...........................
-TXT
+                ..................................................   (   50)
+                ..................................................   (  100)
+                ...........................
+                TXT,
         ),
-            strip_tags($buffer->fetch())
+            strip_tags($buffer->fetch()),
         );
     }
 
     private function createMutantExecutionResultsOfType(
         string $detectionStatus,
-        int $count = 1
+        int $count = 1,
     ): array {
         $executionResults = [];
 

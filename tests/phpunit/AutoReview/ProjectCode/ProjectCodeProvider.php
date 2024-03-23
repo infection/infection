@@ -73,6 +73,7 @@ use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
@@ -115,6 +116,7 @@ final class ProjectCodeProvider
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
         StopInfectionOnSigintSignalSubscriber::class,
+        MapSourceClassToTestStrategy::class, // no need to test 1 const for now
     ];
 
     /**
@@ -179,10 +181,10 @@ final class ProjectCodeProvider
                     'Infection',
                     str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
                     $file->getRelativePath() !== '' ? '\\' : '',
-                    $file->getBasename('.' . $file->getExtension())
+                    $file->getBasename('.' . $file->getExtension()),
                 );
             },
-            iterator_to_array($finder, false)
+            iterator_to_array($finder, false),
         );
         sort($classes, SORT_STRING);
 
@@ -194,7 +196,7 @@ final class ProjectCodeProvider
     public static function sourceClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::provideSourceClasses()
+            self::provideSourceClasses(),
         );
     }
 
@@ -202,14 +204,14 @@ final class ProjectCodeProvider
     {
         yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(
             self::provideSourceClasses(),
-            true
+            true,
         ));
     }
 
     public static function concreteSourceClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::provideConcreteSourceClasses()
+            self::provideConcreteSourceClasses(),
         );
     }
 
@@ -237,10 +239,10 @@ final class ProjectCodeProvider
                             TestFileTimeData::class,
                             IndexedProcessBearer::class,
                         ],
-                        true
+                        true,
                     )
                 ;
-            }
+            },
         );
 
         yield from self::$sourceClassesToCheckForPublicProperties;
@@ -249,7 +251,7 @@ final class ProjectCodeProvider
     public static function sourceClassesToCheckForPublicPropertiesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::provideSourceClassesToCheckForPublicProperties()
+            self::provideSourceClassesToCheckForPublicProperties(),
         );
     }
 
@@ -285,10 +287,10 @@ final class ProjectCodeProvider
                     'Infection\\Tests\\%s%s%s',
                     $fqcnPart,
                     $file->getRelativePath() === 'phpunit' ? '' : '\\',
-                    $file->getBasename('.' . $file->getExtension())
+                    $file->getBasename('.' . $file->getExtension()),
                 );
             },
-            iterator_to_array($finder, false)
+            iterator_to_array($finder, false),
         );
 
         sort($classes, SORT_STRING);
@@ -303,21 +305,21 @@ final class ProjectCodeProvider
     public static function classesTestProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::provideTestClasses()
+            self::provideTestClasses(),
         );
     }
 
     public static function nonTestedConcreteClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::NON_TESTED_CONCRETE_CLASSES
+            self::NON_TESTED_CONCRETE_CLASSES,
         );
     }
 
     public static function nonFinalExtensionClasses(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::NON_FINAL_EXTENSION_CLASSES
+            self::NON_FINAL_EXTENSION_CLASSES,
         );
     }
 }

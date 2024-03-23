@@ -36,108 +36,108 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Removal;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CatchBlockRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, array|string $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes catch block' => [
             <<<'PHP'
-<?php
+                <?php
 
-try {
-    $callback();
-} catch (\DomainException $e) {
-    $logger->log($e);
-} catch (\LogicException $e) {
-    throw $e;
-} catch (\Throwable $e) {
-    throw new \RuntimeException();
-}
-PHP
+                try {
+                    $callback();
+                } catch (\DomainException $e) {
+                    $logger->log($e);
+                } catch (\LogicException $e) {
+                    throw $e;
+                } catch (\Throwable $e) {
+                    throw new \RuntimeException();
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-try {
-    $callback();
-} catch (\LogicException $e) {
-    throw $e;
-} catch (\Throwable $e) {
-    throw new \RuntimeException();
-}
-PHP,
+                    try {
+                        $callback();
+                    } catch (\LogicException $e) {
+                        throw $e;
+                    } catch (\Throwable $e) {
+                        throw new \RuntimeException();
+                    }
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-try {
-    $callback();
-} catch (\DomainException $e) {
-    $logger->log($e);
-} catch (\Throwable $e) {
-    throw new \RuntimeException();
-}
-PHP,
+                    try {
+                        $callback();
+                    } catch (\DomainException $e) {
+                        $logger->log($e);
+                    } catch (\Throwable $e) {
+                        throw new \RuntimeException();
+                    }
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-try {
-    $callback();
-} catch (\DomainException $e) {
-    $logger->log($e);
-} catch (\LogicException $e) {
-    throw $e;
-}
-PHP,
+                    try {
+                        $callback();
+                    } catch (\DomainException $e) {
+                        $logger->log($e);
+                    } catch (\LogicException $e) {
+                        throw $e;
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate with one catch block' => [
             <<<'PHP'
-<?php
+                <?php
 
-try {
-    $callback();
-} catch (\DomainException $e) {
-    $logger->log($e);
-}
-PHP
+                try {
+                    $callback();
+                } catch (\DomainException $e) {
+                    $logger->log($e);
+                }
+                PHP
             ,
         ];
 
         yield 'It does not mutate if catch block does not contain statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-try {
-    $callback();
-} catch (\DomainException $e) {
-    // DO nothing
-} catch (\Throwable $e) {
-    throw new \RuntimeException();
-}
-PHP
+                try {
+                    $callback();
+                } catch (\DomainException $e) {
+                    // DO nothing
+                } catch (\Throwable $e) {
+                    throw new \RuntimeException();
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-try {
-    $callback();
-} catch (\DomainException $e) {
-    // DO nothing
-}
-PHP
+                try {
+                    $callback();
+                } catch (\DomainException $e) {
+                    // DO nothing
+                }
+                PHP,
         ];
     }
 }

@@ -36,59 +36,59 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class LogicalAndNegationTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates and with two expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() && b();
-PHP
+                $var = a() && b();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !(a() && b());
-PHP
+                    $var = !(a() && b());
+                    PHP,
             ],
         ];
 
         yield 'It mutates and with more expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() && b() && c() && d();
-PHP
+                $var = a() && b() && c() && d();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !(a() && b() && c() && d());
-PHP
+                    $var = !(a() && b() && c() && d());
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate already negated expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = !(a() && !b());
-PHP
+                $var = !(a() && !b());
+                PHP,
         ];
     }
 }

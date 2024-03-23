@@ -37,13 +37,12 @@ namespace Infection\Tests\Mutator\Extensions;
 
 use Infection\Mutator\Extensions\BCMathConfig;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BCMathConfigTest extends TestCase
 {
-    /**
-     * @dataProvider settingsProvider
-     */
+    #[DataProvider('settingsProvider')]
     public function test_it_can_create_a_config(array $settings, array $expected): void
     {
         $config = new BCMathConfig($settings);
@@ -60,7 +59,7 @@ final class BCMathConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the value for "foo" to be a boolean. Got "string" instead',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -74,12 +73,12 @@ final class BCMathConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected one of: "bcadd", "bccomp", "bcdiv", "bcmod", "bcmul", "bcpow", "bcsub", "bcsqrt", "bcpowmod". Got: "foo"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function settingsProvider(): iterable
+    public static function settingsProvider(): iterable
     {
         yield 'default' => [
             [],

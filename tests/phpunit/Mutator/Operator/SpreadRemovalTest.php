@@ -36,102 +36,102 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class SpreadRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Spread removal for a raw array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...[1, 2, 3], 4];
-PHP
+                $a = [...[1, 2, 3], 4];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [[1, 2, 3], 4];
-PHP
+                $a = [[1, 2, 3], 4];
+                PHP
             ,
         ];
 
         yield 'Spread removal for a variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...$collection, 4];
-PHP
+                $a = [...$collection, 4];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [$collection, 4];
-PHP
+                $a = [$collection, 4];
+                PHP
             ,
         ];
 
         yield 'Spread removal for a function call' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...getCollection(), 4];
-PHP
+                $a = [...getCollection(), 4];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [getCollection(), 4];
-PHP
+                $a = [getCollection(), 4];
+                PHP
             ,
         ];
 
         yield 'Spread removal for a method call' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...$object->getCollection(), 4];
-PHP
+                $a = [...$object->getCollection(), 4];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [$object->getCollection(), 4];
-PHP
+                $a = [$object->getCollection(), 4];
+                PHP
             ,
         ];
 
         yield 'Spread removal for a new iterator object' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [...new ArrayIterator(['a', 'b', 'c'])];
-PHP
+                $a = [...new ArrayIterator(['a', 'b', 'c'])];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = [new ArrayIterator(['a', 'b', 'c'])];
-PHP
+                $a = [new ArrayIterator(['a', 'b', 'c'])];
+                PHP
             ,
         ];
 
         yield 'It does not mutate argument unpacking' => [
             <<<'PHP'
-<?php
+                <?php
 
-function foo(...$array) {}
-PHP
+                function foo(...$array) {}
+                PHP
             ,
         ];
     }

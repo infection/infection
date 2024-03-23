@@ -39,17 +39,15 @@ use function array_map;
 use Generator;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\DiffChangedLinesParser;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class DiffChangedLinesParserTest extends TestCase
 {
-    /**
-     * @dataProvider provideDiffs
-     */
+    #[DataProvider('provideDiffs')]
     public function test_it_converts_diff_to_files_and_changed_lines_map(string $diff, array $expectedMap): void
     {
         $collector = new DiffChangedLinesParser();
@@ -59,16 +57,16 @@ final class DiffChangedLinesParserTest extends TestCase
         $this->assertSame($this->convertToArray($expectedMap), $this->convertToArray($resultMap));
     }
 
-    public function provideDiffs(): Generator
+    public static function provideDiffs(): Generator
     {
         yield 'one file with added lines in different places' => [
             <<<'DIFF'
-            diff --git a/src/Container.php b/src/Container.php
-            @@ -37,0 +38 @@ namespace Infection;
-            @@ -533 +534,2 @@ final class Container
-            @@ -535,0 +538,3 @@ final class Container
-            @@ -1207,0 +1213,5 @@ final class Container
-            DIFF,
+                diff --git a/src/Container.php b/src/Container.php
+                @@ -37,0 +38 @@ namespace Infection;
+                @@ -533 +534,2 @@ final class Container
+                @@ -535,0 +538,3 @@ final class Container
+                @@ -1207,0 +1213,5 @@ final class Container
+                DIFF,
             [
                 realpath('src/Container.php') => [
                     new ChangedLinesRange(38, 38),
@@ -81,15 +79,15 @@ final class DiffChangedLinesParserTest extends TestCase
 
         yield 'two files, second one is new created' => [
             <<<'DIFF'
-            diff --git a/src/Container.php b/src/Container.php
-            @@ -37,0 +38 @@ namespace Infection;
-            @@ -533 +534,2 @@ final class Container
-            @@ -535,0 +538,3 @@ final class Container
-            @@ -1207,0 +1213,5 @@ final class Container
-            diff --git a/src/Differ/FilesDiffChangedLines.php b/src/Differ/FilesDiffChangedLines.php
-            new file mode 100644
-            @@ -0,0 +1,18 @@
-            DIFF,
+                diff --git a/src/Container.php b/src/Container.php
+                @@ -37,0 +38 @@ namespace Infection;
+                @@ -533 +534,2 @@ final class Container
+                @@ -535,0 +538,3 @@ final class Container
+                @@ -1207,0 +1213,5 @@ final class Container
+                diff --git a/src/Differ/FilesDiffChangedLines.php b/src/Differ/FilesDiffChangedLines.php
+                new file mode 100644
+                @@ -0,0 +1,18 @@
+                DIFF,
             [
                 realpath('src/Container.php') => [
                     new ChangedLinesRange(38, 38),
@@ -116,7 +114,7 @@ final class DiffChangedLinesParserTest extends TestCase
                 static function (ChangedLinesRange $changedLinesRange): array {
                     return [$changedLinesRange->getStartLine(), $changedLinesRange->getEndLine()];
                 },
-                $changedLinesRanges
+                $changedLinesRanges,
             );
         }
 

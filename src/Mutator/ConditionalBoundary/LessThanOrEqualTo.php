@@ -54,15 +54,15 @@ final class LessThanOrEqualTo implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a greater-than-or-equal-to operator (`<=`) with the greater-than operator (`<`).
-TXT
+                Replaces a greater-than-or-equal-to operator (`<=`) with the greater-than operator (`<`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a = $b <= $c;
-+ $a = $b < $c;
-DIFF
+                - $a = $b <= $c;
+                + $a = $b < $c;
+                DIFF,
         );
     }
 

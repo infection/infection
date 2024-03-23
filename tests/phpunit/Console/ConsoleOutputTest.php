@@ -67,8 +67,8 @@ final class ConsoleOutputTest extends TestCase
 
         $this->consoleOutput = new ConsoleOutput(
             new ConsoleLogger(
-                new IO(new StringInput(''), $this->output)
-            )
+                new IO(new StringInput(''), $this->output),
+            ),
         );
     }
 
@@ -79,13 +79,13 @@ final class ConsoleOutputTest extends TestCase
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] Numeric versions of log-verbosity have been deprecated, please use, all to keep the same
- !        result
+                 ! [NOTE] Numeric versions of log-verbosity have been deprecated, please use, all to keep the same
+                 !        result
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -96,12 +96,12 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] Running infection with an unknown log-verbosity option, falling back to default option
+                 ! [NOTE] Running infection with an unknown log-verbosity option, falling back to default option
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -111,11 +111,11 @@ TXT
 
         $this->assertSame(
             <<<'TXT'
-[notice] You are running Infection with foo enabled.
+                [notice] You are running Infection with foo enabled.
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -126,13 +126,13 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- [WARNING] Infection cannot control exit codes and unable to relaunch itself.
-           It is your responsibility to disable xdebug/phpdbg unless needed.
+                 [WARNING] Infection cannot control exit codes and unable to relaunch itself.
+                           It is your responsibility to disable xdebug/phpdbg unless needed.
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -140,19 +140,19 @@ TXT
     {
         $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
             5.0,
-            10.0
+            10.0,
         );
 
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The MSI is 5% percentage points over the required MSI. Consider increasing the required
- !        MSI percentage the next time you run Infection.
+                 ! [NOTE] The MSI is 5% percentage points over the required MSI. Consider increasing the required
+                 !        MSI percentage the next time you run Infection.
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -160,19 +160,19 @@ TXT
     {
         $this->consoleOutput->logMinCoveredCodeMsiCanGetIncreasedNotice(
             5.0,
-            10.0
+            10.0,
         );
 
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The Covered Code MSI is 5% percentage points over the required Covered Code MSI. Consider
- !        increasing the required Covered Code MSI percentage the next time you run Infection.
+                 ! [NOTE] The Covered Code MSI is 5% percentage points over the required Covered Code MSI. Consider
+                 !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 }

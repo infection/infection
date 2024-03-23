@@ -36,78 +36,78 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class NotEqualNotIdenticalTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates with two variables' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a != $b;
-PHP
+                $a != $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a !== $b;
-PHP
+                $a !== $b;
+                PHP
             ,
         ];
 
         yield 'It mutates with a cast' => [
             <<<'PHP'
-<?php
+                <?php
 
-(int) $c != 2;
-PHP
+                (int) $c != 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-(int) $c !== 2;
-PHP
+                (int) $c !== 2;
+                PHP
             ,
         ];
 
         yield 'It mutates with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$d != null;
-PHP
+                $d != null;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$d !== null;
-PHP
+                $d !== null;
+                PHP
             ,
         ];
 
         yield 'It mutates with a function' => [
             <<<'PHP'
-<?php
+                <?php
 
-false != strpos();
-PHP
+                false != strpos();
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-false !== strpos();
-PHP
+                false !== strpos();
+                PHP
             ,
         ];
     }

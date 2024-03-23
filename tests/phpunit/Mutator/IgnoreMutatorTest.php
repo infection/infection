@@ -42,6 +42,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\CoreClassReflection;
+use Infection\Tests\WithConsecutive;
 use function iterator_to_array;
 use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -74,7 +75,7 @@ final class IgnoreMutatorTest extends TestCase
         } catch (DomainException $exception) {
             $this->assertSame(
                 'The class "Infection\Mutator\IgnoreMutator" does not have a definition',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -130,13 +131,13 @@ final class IgnoreMutatorTest extends TestCase
         $this->nodeMock
             ->expects($this->exactly(2))
             ->method('getAttribute')
-            ->withConsecutive(
+            ->with(...WithConsecutive::create(
                 [ReflectionVisitor::REFLECTION_CLASS_KEY, false],
-                [ReflectionVisitor::FUNCTION_NAME, '']
-            )
+                [ReflectionVisitor::FUNCTION_NAME, ''],
+            ))
             ->willReturnOnConsecutiveCalls(
                 CoreClassReflection::fromClassName(self::class),
-                'foo'
+                'foo',
             )
         ;
 
@@ -188,7 +189,7 @@ final class IgnoreMutatorTest extends TestCase
 
         $this->assertSame(
             MutatorName::getName(Plus::class),
-            $ignoreMutator->getName()
+            $ignoreMutator->getName(),
         );
     }
 }

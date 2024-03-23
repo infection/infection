@@ -54,15 +54,15 @@ final class Ternary implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Swaps the ternary operator operands, e.g. replaces `true ? true : false` with `true ? false : true`.
-TXT
+                Swaps the ternary operator operands, e.g. replaces `true ? true : false` with `true ? false : true`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $x = true ? true : false;
-+ $x = true ? false : true;
-DIFF
+                - $x = true ? true : false;
+                + $x = true ? false : true;
+                DIFF,
         );
     }
 

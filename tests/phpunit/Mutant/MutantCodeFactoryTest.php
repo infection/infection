@@ -43,6 +43,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class MutantCodeFactoryTest extends TestCase
@@ -54,23 +55,20 @@ final class MutantCodeFactoryTest extends TestCase
         $this->codeFactory = SingletonContainer::getContainer()->getMutantCodeFactory();
     }
 
-    /**
-     * @dataProvider mutationProvider
-     */
+    #[DataProvider('mutationProvider')]
     public function test_it_creates_the_mutant_code_from_the_given_mutation(
         Mutation $mutation,
-        string $expectedMutantCode
+        string $expectedMutantCode,
     ): void {
         $mutantCode = $this->codeFactory->createCode($mutation);
 
         $this->assertSame($expectedMutantCode, $mutantCode);
     }
 
-    /**
-     * @dataProvider mutationProvider
-     */
-    public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(Mutation $mutation): void
-    {
+    #[DataProvider('mutationProvider')]
+    public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
+        Mutation $mutation,
+    ): void {
         $originalNodesDump = SingletonContainer::getNodeDumper()->dump($mutation->getOriginalFileAst());
 
         $this->codeFactory->createCode($mutation);
@@ -80,7 +78,7 @@ final class MutantCodeFactoryTest extends TestCase
         $this->assertSame($originalNodesDump, $originalNodesDumpAfterMutation);
     }
 
-    public function mutationProvider(): iterable
+    public static function mutationProvider(): iterable
     {
         /** @see https://github.com/nikic/PHP-Parser/blob/master/UPGRADE-5.0.md#renamed-nodes */
         $intNodeFQCN = class_exists(Node\Scalar\Int_::class) ? Node\Scalar\Int_::class : Node\Scalar\LNumber::class;
@@ -98,7 +96,7 @@ final class MutantCodeFactoryTest extends TestCase
                             'endLine' => 3,
                             'endTokenPos' => 4,
                             'endFilePos' => 20,
-                        ]
+                        ],
                     ),
                     [new Node\Stmt\Echo_(
                         [new $intNodeFQCN(
@@ -111,7 +109,7 @@ final class MutantCodeFactoryTest extends TestCase
                                 'endTokenPos' => 9,
                                 'endFilePos' => 30,
                                 'kind' => 10,
-                            ]
+                            ],
                         )],
                         [
                             'startLine' => 5,
@@ -120,7 +118,7 @@ final class MutantCodeFactoryTest extends TestCase
                             'endLine' => 5,
                             'endTokenPos' => 10,
                             'endFilePos' => 31,
-                        ]
+                        ],
                     )],
                     [
                         'startLine' => 3,
@@ -130,7 +128,7 @@ final class MutantCodeFactoryTest extends TestCase
                         'endTokenPos' => 10,
                         'endFilePos' => 31,
                         'kind' => 1,
-                    ]
+                    ],
                 )],
                 MutatorName::getName(Plus::class),
                 [
@@ -154,19 +152,19 @@ final class MutantCodeFactoryTest extends TestCase
                             'endTokenPos' => 9,
                             'endFilePos' => 30,
                             'kind' => 10,
-                        ]
-                    )
+                        ],
+                    ),
                 ),
                 0,
-                []
+                [],
             ),
             <<<'PHP'
-<?php
+                <?php
 
-namespace Acme;
+                namespace Acme;
 
-echo 15;
-PHP
+                echo 15;
+                PHP,
         ];
     }
 }

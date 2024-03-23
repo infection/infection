@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use function array_map;
-use function get_class;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
@@ -57,14 +56,14 @@ use Infection\Logger\TextFileLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class FileLoggerFactoryTest extends TestCase
 {
     /**
@@ -95,7 +94,7 @@ final class FileLoggerFactoryTest extends TestCase
         $factory = $this->createLoggerFactory(
             LogVerbosity::NONE,
             true,
-            true
+            true,
         );
 
         $logger = $factory->createFromLogEntries(
@@ -110,23 +109,21 @@ final class FileLoggerFactoryTest extends TestCase
                 true,
                 null,
                 '/a/file',
-            )
+            ),
         );
 
         $this->assertRegisteredLoggersAre([], $logger);
     }
 
-    /**
-     * @dataProvider logsProvider
-     */
+    #[DataProvider('logsProvider')]
     public function test_it_creates_a_logger_for_log_type_on_normal_verbosity(
         Logs $logs,
-        array $expectedLoggerClasses
+        array $expectedLoggerClasses,
     ): void {
         $factory = $this->createLoggerFactory(
             LogVerbosity::NORMAL,
             true,
-            true
+            true,
         );
 
         $logger = $factory->createFromLogEntries($logs);
@@ -134,7 +131,7 @@ final class FileLoggerFactoryTest extends TestCase
         $this->assertRegisteredLoggersAre($expectedLoggerClasses, $logger);
     }
 
-    public function logsProvider(): iterable
+    public static function logsProvider(): iterable
     {
         yield 'no logger' => [
             Logs::createEmpty(),
@@ -152,7 +149,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [TextFileLogger::class],
         ];
@@ -168,7 +165,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [HtmlFileLogger::class],
         ];
@@ -184,7 +181,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [SummaryFileLogger::class],
         ];
@@ -200,7 +197,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [DebugFileLogger::class],
         ];
@@ -216,7 +213,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [JsonLogger::class],
         ];
@@ -232,7 +229,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                null
+                null,
             ),
             [GitLabCodeQualityLogger::class],
         ];
@@ -248,7 +245,7 @@ final class FileLoggerFactoryTest extends TestCase
                 'per_muator',
                 false,
                 null,
-                null
+                null,
             ),
             [PerMutatorLogger::class],
         ];
@@ -264,7 +261,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 true,
                 null,
-                null
+                null,
             ),
             [GitHubAnnotationsLogger::class],
         ];
@@ -280,7 +277,7 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
                 false,
                 null,
-                'summary-json'
+                'summary-json',
             ),
             [SummaryJsonLogger::class],
         ];
@@ -296,7 +293,7 @@ final class FileLoggerFactoryTest extends TestCase
                 'per_mutator',
                 true,
                 StrykerConfig::forBadge('branch'),
-                'summary-json'
+                'summary-json',
             ),
             [
                 TextFileLogger::class,
@@ -315,7 +312,7 @@ final class FileLoggerFactoryTest extends TestCase
     private function createLoggerFactory(
         string $logVerbosity,
         bool $debugMode,
-        bool $onlyCoveredCode
+        bool $onlyCoveredCode,
     ): FileLoggerFactory {
         return new FileLoggerFactory(
             $this->metricsCalculator,
@@ -325,13 +322,13 @@ final class FileLoggerFactoryTest extends TestCase
             $debugMode,
             $onlyCoveredCode,
             new FakeLogger(),
-            new StrykerHtmlReportBuilder($this->metricsCalculator, $this->resultsCollector)
+            new StrykerHtmlReportBuilder($this->metricsCalculator, $this->resultsCollector),
         );
     }
 
     private function assertRegisteredLoggersAre(
         array $expectedLoggerClasses,
-        MutationTestingResultsLogger $logger
+        MutationTestingResultsLogger $logger,
     ): void {
         $this->assertInstanceOf(FederatedLogger::class, $logger);
 
@@ -349,9 +346,9 @@ final class FileLoggerFactoryTest extends TestCase
                     $logger = $fileLoggerDecoratedLogger->getValue($logger);
                 }
 
-                return get_class($logger);
+                return $logger::class;
             },
-            $loggers
+            $loggers,
         );
 
         $this->assertSame($expectedLoggerClasses, $actualLoggerClasses);

@@ -54,19 +54,19 @@ final class Coalesce implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Swaps the coalesce operator (`??`) operands,
-e.g. replaces `$a ?? $b` with `$b ?? $a` or `$a ?? $b ?? $c` with `$b ?? $a ?? $c` and `$a ?? $c ?? $b`.
-TXT
+                Swaps the coalesce operator (`??`) operands,
+                e.g. replaces `$a ?? $b` with `$b ?? $a` or `$a ?? $b ?? $c` with `$b ?? $a ?? $c` and `$a ?? $c ?? $b`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $d = $a ?? $b ?? $c;
-# Mutation 1
-+ $d = $b ?? $a ?? $c;
-# Mutation 2
-+ $d = $a ?? $c ?? $b;
-DIFF
+                - $d = $a ?? $b ?? $c;
+                # Mutation 1
+                + $d = $b ?? $a ?? $c;
+                # Mutation 2
+                + $d = $a ?? $c ?? $b;
+                DIFF,
         );
     }
 

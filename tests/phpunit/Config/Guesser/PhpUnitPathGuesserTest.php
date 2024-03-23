@@ -36,14 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Config\Guesser;
 
 use Infection\Config\Guesser\PhpUnitPathGuesser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 
 final class PhpUnitPathGuesserTest extends TestCase
 {
-    /**
-     * @dataProvider providesJsonComposerAndLocations
-     */
+    #[DataProvider('providesJsonComposerAndLocations')]
     public function test_it_guesses_correctly(string $composerJson, string $directory): void
     {
         $guesser = new PhpUnitPathGuesser(json_decode($composerJson));
@@ -51,103 +50,103 @@ final class PhpUnitPathGuesserTest extends TestCase
         $this->assertSame($directory, $guesser->guess());
     }
 
-    public function providesJsonComposerAndLocations(): iterable
+    public static function providesJsonComposerAndLocations(): iterable
     {
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "": "src"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-0": {
+                            "": "src"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "": "src/",
-            "SymfonyStandard": "app/"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-0": {
+                            "": "src/",
+                            "SymfonyStandard": "app/"
+                        }
+                    }
+                }
+                JSON
             ,
             'app',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "SymfonyStandard": "src/"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-0": {
+                            "SymfonyStandard": "src/"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "psr-4": {
-            "App": "src/"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-4": {
+                            "App": "src/"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload-dev": {
-        "psr-4": {
-            "App": "src/"
-        }
-    }
-}
-JSON
+                {
+                    "autoload-dev": {
+                        "psr-4": {
+                            "App": "src/"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "files": {
-            "": "src"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "files": {
+                            "": "src"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];
 
         yield [
             <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "App": "app/"
-        }
-    }
-}
-JSON
+                {
+                    "autoload": {
+                        "psr-0": {
+                            "App": "app/"
+                        }
+                    }
+                }
+                JSON
             ,
             '.',
         ];

@@ -36,238 +36,222 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class RoundingFamilyTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates round() to floor() and ceil()' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = round(1.23);
-PHP
+                $var = round(1.23);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = floor(1.23);
-PHP
-            ,
-            <<<'PHP'
-<?php
+                    $var = floor(1.23);
+                    PHP,
+                <<<'PHP'
+                    <?php
 
-$var = ceil(1.23);
-PHP
+                    $var = ceil(1.23);
+                    PHP,
             ],
         ];
 
         yield 'It mutates floor() to round() and ceil()' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = floor(1.23);
-PHP
-            ,
+                $var = floor(1.23);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = ceil(1.23);
-PHP
-                ,
+                    $var = ceil(1.23);
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = round(1.23);
-PHP
+                    $var = round(1.23);
+                    PHP,
             ],
         ];
 
         yield 'It mutates ceil() to round() and floor()' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = ceil(1.23);
-PHP
-            ,
+                $var = ceil(1.23);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = floor(1.23);
-PHP
-                ,
+                    $var = floor(1.23);
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = round(1.23);
-PHP
+                    $var = round(1.23);
+                    PHP,
             ],
         ];
 
         yield 'It mutates if function name is incorrectly cased' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = CeIl(1.23);
-PHP
-            ,
+                $var = CeIl(1.23);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = floor(1.23);
-PHP
-                ,
+                    $var = floor(1.23);
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = round(1.23);
-PHP
+                    $var = round(1.23);
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate if the function is a variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'floor';
-$foo(1.23);
-PHP
+                $foo = 'floor';
+                $foo(1.23);
+                PHP,
         ];
 
         yield 'It mutates round() to floor() and ceil() and leaves only 1 argument' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = round(1.23, 2, PHP_ROUND_HALF_UP);
-PHP
-            ,
+                $var = round(1.23, 2, PHP_ROUND_HALF_UP);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = floor(1.23);
-PHP
-                ,
+                    $var = floor(1.23);
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = ceil(1.23);
-PHP
+                    $var = ceil(1.23);
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate other functions' => [
             <<<'PHP'
-<?php
- strtolower('lower');
-PHP
+                <?php
+                 strtolower('lower');
+                PHP,
         ];
 
         yield 'It mutates \ceil() to round() and floor()' => [
             <<<'PHP'
-<?php
+                <?php
 
-$float = 1.23;
-return \ceil($float);
-PHP
-            ,
+                $float = 1.23;
+                return \ceil($float);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$float = 1.23;
-return floor($float);
-PHP
-                ,
+                    $float = 1.23;
+                    return floor($float);
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$float = 1.23;
-return round($float);
-PHP
+                    $float = 1.23;
+                    return round($float);
+                    PHP,
             ],
         ];
 
         yield 'It mutates \floor() to round() and ceil() in a control flow statement' => [
             <<<'PHP'
-<?php
+                <?php
 
-while (\floor(1.23)) {
-}
-PHP
-            ,
+                while (\floor(1.23)) {
+                }
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-while (ceil(1.23)) {
-}
-PHP
-                ,
+                    while (ceil(1.23)) {
+                    }
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-while (round(1.23)) {
-}
-PHP
+                    while (round(1.23)) {
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It mutates ceil() to round() and floor() while assigning inside the function call' => [
             <<<'PHP'
-<?php
+                <?php
 
-echo ceil($result = $this->average());
-PHP
+                echo ceil($result = $this->average());
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-echo floor($result = $this->average());
-PHP
-                ,
+                    echo floor($result = $this->average());
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-echo round($result = $this->average());
-PHP
+                    echo round($result = $this->average());
+                    PHP,
             ],
         ];
 
         yield 'It mutates round() to ceil() and floor() during arithmetic operations' => [
             <<<'PHP'
-<?php
+                <?php
 
-return round($this->positive / $this->total);
-PHP
-            ,
+                return round($this->positive / $this->total);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-return floor($this->positive / $this->total);
-PHP
-                ,
+                    return floor($this->positive / $this->total);
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-return ceil($this->positive / $this->total);
-PHP
+                    return ceil($this->positive / $this->total);
+                    PHP,
             ],
         ];
     }

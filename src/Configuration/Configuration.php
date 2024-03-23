@@ -102,7 +102,8 @@ class Configuration
         private readonly array $ignoreSourceCodeMutatorsMap,
         private readonly bool $executeOnlyCoveringTestCases,
         private readonly bool $isForGitDiffLines,
-        private readonly ?string $gitDiffBase
+        private readonly ?string $gitDiffBase,
+        private readonly ?string $mapSourceClassToTestStrategy,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
@@ -289,5 +290,10 @@ class Configuration
     public function getGitDiffBase(): ?string
     {
         return $this->gitDiffBase;
+    }
+
+    public function getMapSourceClassToTestStrategy(): ?string
+    {
+        return $this->mapSourceClassToTestStrategy;
     }
 }

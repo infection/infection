@@ -68,12 +68,12 @@ class StrykerLoggerFactory
             new StrykerApiKeyResolver(),
             new StrykerDashboardClient(
                 new StrykerCurlClient(),
-                $this->logger
+                $this->logger,
             ),
             $this->metricsCalculator,
             $this->strykerHtmlReportBuilder,
             $strykerConfig,
-            $this->logger
+            $this->logger,
         );
     }
 }

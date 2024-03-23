@@ -59,10 +59,10 @@ final class IfNegation implements Mutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- if ($this->fooBar()) {
-+ if (!$this->fooBar()) {
-}
-DIFF
+                - if ($this->fooBar()) {
+                + if (!$this->fooBar()) {
+                }
+                DIFF,
         );
     }
 
@@ -82,7 +82,7 @@ DIFF
                 'else' => $node->else,
                 'stmts' => $node->stmts,
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

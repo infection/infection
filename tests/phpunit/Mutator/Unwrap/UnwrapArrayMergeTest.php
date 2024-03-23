@@ -36,287 +36,287 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UnwrapArrayMergeTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_merge(['A', 1, 'C'], ['D']);
-PHP
+                $a = array_merge(['A', 1, 'C'], ['D']);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['A', 1, 'C'];
-PHP
+                    $a = ['A', 1, 'C'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['D'];
-PHP
+                    $a = ['D'];
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_merge(\Class_With_Const::Const, ['D']);
-PHP
+                $a = array_merge(\Class_With_Const::Const, ['D']);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                    $a = \Class_With_Const::Const;
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['D'];
-PHP
+                    $a = ['D'];
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_merge' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_merge(['A', 1, 'C'], ['D']);
-PHP
+                $a = \array_merge(['A', 1, 'C'], ['D']);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['A', 1, 'C'];
-PHP
+                    $a = ['A', 1, 'C'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['D'];
-PHP
+                    $a = ['D'];
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 1, 'C'];
-if (array_merge($a, ['D']) === $a) {
-    return true;
-}
-PHP
+                $a = ['A', 1, 'C'];
+                if (array_merge($a, ['D']) === $a) {
+                    return true;
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['A', 1, 'C'];
-if ($a === $a) {
-    return true;
-}
-PHP
+                    $a = ['A', 1, 'C'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['A', 1, 'C'];
-if (['D'] === $a) {
-    return true;
-}
-PHP
+                    $a = ['A', 1, 'C'];
+                    if (['D'] === $a) {
+                        return true;
+                    }
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly when array_merge is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_MeRgE(['A', 1, 'C'], ['D']);
-PHP
+                $a = aRrAy_MeRgE(['A', 1, 'C'], ['D']);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['A', 1, 'C'];
-PHP
+                    $a = ['A', 1, 'C'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['D'];
-PHP
+                    $a = ['D'];
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly when array_merge uses functions as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_merge($foo->bar(), $foo->baz());
-PHP
+                $a = array_merge($foo->bar(), $foo->baz());
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = $foo->bar();
-PHP
+                    $a = $foo->bar();
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = $foo->baz();
-PHP
+                    $a = $foo->baz();
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_merge(['A', 1, 'C'], ['D']));
-PHP
+                $a = array_map('strtolower', array_merge(['A', 1, 'C'], ['D']));
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = array_map('strtolower', ['A', 1, 'C']);
-PHP
+                    $a = array_map('strtolower', ['A', 1, 'C']);
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = array_map('strtolower', ['D']);
-PHP
+                    $a = array_map('strtolower', ['D']);
+                    PHP,
             ],
         ];
 
         yield 'It mutates correctly when only one parameter is present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_merge(['A', 1, 'C']);
-PHP
+                $a = array_merge(['A', 1, 'C']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 1, 'C'];
-PHP
+                $a = ['A', 1, 'C'];
+                PHP,
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_merge(['A', 1, 'C'], ['D'], ['E', 'F']);
-PHP
+                $a = array_merge(['A', 1, 'C'], ['D'], ['E', 'F']);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['A', 1, 'C'];
-PHP
+                    $a = ['A', 1, 'C'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['D'];
-PHP
+                    $a = ['D'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['E', 'F'];
-PHP
+                    $a = ['E', 'F'];
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+                $a = array_map('strtolower', ['A', 'B', 'C']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_merge' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_merge($array, $array1, $array2)
-{
-}
-PHP
+                function array_merge($array, $array1, $array2)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_merge';
+                $a = 'array_merge';
 
-$b = $a([1,2,3], [3,4,5]);
-PHP
+                $b = $a([1,2,3], [3,4,5]);
+                PHP
             ,
         ];
 
         yield 'It does not mutate when the input array is unpacked' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_merge(...$classes);
-PHP
+                $a = array_merge(...$classes);
+                PHP
             ,
         ];
 
         yield 'It does mutate the elements that are not unpacked' => [
             <<<'PHP'
-<?php
-$first = [1, 2, 3, 4, 5];
-$other = [[6, 7], [8]];
+                <?php
+                $first = [1, 2, 3, 4, 5];
+                $other = [[6, 7], [8]];
 
-$result = array_merge($first, ...$other);
-PHP
+                $result = array_merge($first, ...$other);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$first = [1, 2, 3, 4, 5];
-$other = [[6, 7], [8]];
-$result = $first;
-PHP
+                    $first = [1, 2, 3, 4, 5];
+                    $other = [[6, 7], [8]];
+                    $result = $first;
+                    PHP,
             ],
         ];
     }

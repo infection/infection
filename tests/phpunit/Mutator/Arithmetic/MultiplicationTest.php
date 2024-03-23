@@ -36,148 +36,147 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class MultiplicationTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates normal multiplication' => [
-                <<<'PHP'
-<?php
+            <<<'PHP'
+                <?php
 
-$a = 10 * 3;
-PHP
-                ,
-                <<<'PHP'
-<?php
+                $a = 10 * 3;
+                PHP,
+            <<<'PHP'
+                <?php
 
-$a = 10 / 3;
-PHP
+                $a = 10 / 3;
+                PHP,
         ];
 
         yield 'It does not mutate multiplication equals' => [
-                <<<'PHP'
-<?php
+            <<<'PHP'
+                <?php
 
-$a = 1;
-$a *= 2;
-PHP
+                $a = 1;
+                $a *= 2;
+                PHP,
         ];
 
         yield 'It does not mutate when the left side is 1 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1 * $b;
-PHP
+                $a = 1 * $b;
+                PHP,
         ];
 
         yield 'It does not mutate when the right side is 1 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b * 1;
-PHP
+                $a = $b * 1;
+                PHP,
         ];
 
         yield 'It does not mutate when the left side is -1 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = -1 * $b;
-PHP
+                $a = -1 * $b;
+                PHP,
         ];
 
         yield 'It does not mutate when the right side is -1 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b * -1;
-PHP
+                $a = $b * -1;
+                PHP,
         ];
 
         yield 'It does not mutate when the left side is 1.0 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1.0 * $b;
-PHP
+                $a = 1.0 * $b;
+                PHP,
         ];
 
         yield 'It does not mutate when the right side is 1.0 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b * 1.0;
-PHP
+                $a = $b * 1.0;
+                PHP,
         ];
 
         yield 'It does not mutate when the left side is -1.0 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = -1.0 * $b;
-PHP
+                $a = -1.0 * $b;
+                PHP,
         ];
 
         yield 'It does not mutate when the right side is -1.0 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = $b * -1.0;
-PHP
+                $a = $b * -1.0;
+                PHP,
         ];
 
         yield 'It does not mutate when class method returns type is integer' => [
             <<<'PHP'
-<?php
+                <?php
 
-new class
-{
-    public function mul(int $a, int $b): int
-    {
-        return $a * $b;
-    }
-};
-PHP
+                new class
+                {
+                    public function mul(int $a, int $b): int
+                    {
+                        return $a * $b;
+                    }
+                };
+                PHP,
         ];
 
         yield 'It mutates when class method returns type is integer' => [
             <<<'PHP'
-<?php
+                <?php
 
-new class
-{
-    public function mul(int $a, int $b): int
-    {
-        $c = $a * $b;
+                new class
+                {
+                    public function mul(int $a, int $b): int
+                    {
+                        $c = $a * $b;
 
-        return 1;
-    }
-};
-PHP,
+                        return 1;
+                    }
+                };
+                PHP,
             <<<'PHP'
-<?php
+                <?php
 
-new class
-{
-    public function mul(int $a, int $b): int
-    {
-        $c = $a / $b;
-        return 1;
-    }
-};
-PHP
+                new class
+                {
+                    public function mul(int $a, int $b): int
+                    {
+                        $c = $a / $b;
+                        return 1;
+                    }
+                };
+                PHP,
         ];
     }
 }

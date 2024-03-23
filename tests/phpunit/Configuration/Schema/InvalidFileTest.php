@@ -38,6 +38,7 @@ namespace Infection\Tests\Configuration\Schema;
 use Error;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -51,7 +52,7 @@ final class InvalidFileTest extends TestCase
 
         $this->assertSame(
             'The file "/path/to/config" could not be found or is not a file.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
@@ -65,7 +66,7 @@ final class InvalidFileTest extends TestCase
 
         $this->assertSame(
             'The file "/path/to/config" is not readable.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
@@ -79,20 +80,18 @@ final class InvalidFileTest extends TestCase
 
         $this->assertSame(
             'Could not retrieve the contents of the file "/path/to/config".',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
     }
 
-    /**
-     * @dataProvider jsonErrorProvider
-     */
+    #[DataProvider('jsonErrorProvider')]
     public function test_it_can_be_created_for_file_with_invalid_json_content(
         SchemaConfigurationFile $config,
         string $error,
         Throwable $previous,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = InvalidFile::createForInvalidJson($config, $error, $previous);
 
@@ -101,7 +100,7 @@ final class InvalidFileTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    public function jsonErrorProvider(): iterable
+    public static function jsonErrorProvider(): iterable
     {
         yield [
             new SchemaConfigurationFile('/path/to/config'),

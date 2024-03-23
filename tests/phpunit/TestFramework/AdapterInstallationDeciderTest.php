@@ -38,16 +38,15 @@ namespace Infection\Tests\TestFramework;
 use Infection\Console\IO;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\Config\ValueProvider\BaseProviderTest;
+use Infection\Tests\Config\ValueProvider\BaseProviderTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\rewind;
 use function Safe\stream_get_contents;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use function trim;
 
-/**
- * @group integration
- */
-final class AdapterInstallationDeciderTest extends BaseProviderTest
+#[Group('integration')]
+final class AdapterInstallationDeciderTest extends BaseProviderTestCase
 {
     /**
      * @var AdapterInstallationDecider
@@ -63,7 +62,7 @@ final class AdapterInstallationDeciderTest extends BaseProviderTest
     {
         $result = $this->installationDecider->shouldBeInstalled(
             TestFrameworkTypes::PHPUNIT,
-            IO::createNull()
+            IO::createNull(),
         );
 
         $this->assertFalse($result, 'PHPUnit adapter should not be installed');
@@ -75,8 +74,8 @@ final class AdapterInstallationDeciderTest extends BaseProviderTest
             TestFrameworkTypes::PHPSPEC,
             new IO(
                 $this->createStreamableInput($this->getInputStream("no\n")),
-                $this->createStreamOutput()
-            )
+                $this->createStreamOutput(),
+            ),
         );
 
         $this->assertFalse($result, 'Adapter should not be installed since user answered "no"');
@@ -88,8 +87,8 @@ final class AdapterInstallationDeciderTest extends BaseProviderTest
             TestFrameworkTypes::PHPSPEC,
             new IO(
                 $this->createStreamableInput($this->getInputStream("no\n"), false),
-                $this->createStreamOutput()
-            )
+                $this->createStreamOutput(),
+            ),
         );
 
         $this->assertTrue($result, 'Adapter should be installed in non-interactive mode');
@@ -103,8 +102,8 @@ final class AdapterInstallationDeciderTest extends BaseProviderTest
             TestFrameworkTypes::PHPSPEC,
             new IO(
                 $this->createStreamableInput($this->getInputStream("yes\n")),
-                $streamOutput
-            )
+                $streamOutput,
+            ),
         );
 
         $stream = $streamOutput->getStream();
@@ -114,11 +113,11 @@ final class AdapterInstallationDeciderTest extends BaseProviderTest
         $this->assertTrue($result, 'Adapter should be installed since user answered "yes"');
         $this->assertStringContainsString(
             'Would you like to install',
-            $output
+            $output,
         );
         $this->assertStringContainsString(
             'infection/phpspec-adapter',
-            $output
+            $output,
         );
     }
 }

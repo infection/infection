@@ -49,17 +49,17 @@ final class MinMsiCheckFailed extends UnexpectedValueException
             'The minimum required MSI percentage should be %s%%, but actual is %s%%. '
             . 'Improve your tests!',
             $minMsi,
-            $msi
+            $msi,
         ));
     }
 
     public static function createCoveredMsi(float $minMsi, float $coveredCodeMsi): self
     {
         return new self(sprintf(
-            'The minimum required Covered Code MSI percentage should be %s%%, but actual is ' .
-            '%s%%. Improve your tests!',
+            'The minimum required Covered Code MSI percentage should be %s%%, but actual is '
+            . '%s%%. Improve your tests!',
             $minMsi,
-            $coveredCodeMsi
+            $coveredCodeMsi,
         ));
     }
 }

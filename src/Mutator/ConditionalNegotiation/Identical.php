@@ -54,15 +54,15 @@ final class Identical implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an identical operator (`===`) with its counterpart the not identical operator (`!==`).
-TXT
+                Replaces an identical operator (`===`) with its counterpart the not identical operator (`!==`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b === $c;
-+ $a = $b !== $c;
-DIFF
+                - $a = $b === $c;
+                + $a = $b !== $c;
+                DIFF,
         );
     }
 

@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutator\Extensions;
 use function array_map;
 use function implode;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use function range;
 use function strtoupper;
 use function ucfirst;
@@ -45,45 +46,46 @@ use function ucfirst;
 final class BCMathTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
-        yield from $this->mutationsProviderForBinaryOperator('bcadd', '+', 'summation');
+        yield from self::mutationsProviderForBinaryOperator('bcadd', '+', 'summation');
 
-        yield from $this->mutationsProviderForBinaryOperator('bcdiv', '/', 'division');
+        yield from self::mutationsProviderForBinaryOperator('bcdiv', '/', 'division');
 
-        yield from $this->mutationsProviderForBinaryOperator('bcmod', '%', 'modulo');
+        yield from self::mutationsProviderForBinaryOperator('bcmod', '%', 'modulo');
 
-        yield from $this->mutationsProviderForBinaryOperator('bcmul', '*', 'multiplication');
+        yield from self::mutationsProviderForBinaryOperator('bcmul', '*', 'multiplication');
 
-        yield from $this->mutationsProviderForBinaryOperator('bcsub', '-', 'subtraction');
+        yield from self::mutationsProviderForBinaryOperator('bcsub', '-', 'subtraction');
 
-        yield from $this->mutationsProviderForPowerOperator();
+        yield from self::mutationsProviderForPowerOperator();
 
-        yield from $this->mutationsProviderForSquareRoot();
+        yield from self::mutationsProviderForSquareRoot();
 
-        yield from $this->mutationsProviderForPowerModulo();
+        yield from self::mutationsProviderForPowerModulo();
 
-        yield from $this->mutationsProviderForComparision();
+        yield from self::mutationsProviderForComparision();
     }
 
-    private function mutationsProviderForBinaryOperator(string $bcFunc, string $op, string $expression): iterable
+    private static function mutationsProviderForBinaryOperator(string $bcFunc, string $op, string $expression): iterable
     {
         yield "It converts $bcFunc to $expression expression" => [
             "<?php \\$bcFunc('3', \$b);",
             "<?php\n\n(string) ('3' $op \$b);",
         ];
 
+        $ranmizelyCasedFunction = self::randomizeCase($bcFunc);
+
         yield "It converts correctly when $bcFunc is wrongly capitalized" => [
-            "<?php \\{$this->randomizeCase($bcFunc)}(func(), \$b->test());",
+            "<?php \\{$ranmizelyCasedFunction}(func(), \$b->test());",
             "<?php\n\n(string) (func() $op \$b->test());",
         ];
 
@@ -92,10 +94,10 @@ final class BCMathTest extends BaseMutatorTestCase
             "<?php\n\n(string) (CONSTANT $op \$b);",
         ];
 
-        yield from $this->provideCasesWhereMutatorShouldNotApply($bcFunc);
+        yield from self::provideCasesWhereMutatorShouldNotApply($bcFunc);
     }
 
-    private function mutationsProviderForPowerOperator(): iterable
+    private static function mutationsProviderForPowerOperator(): iterable
     {
         yield 'It converts bcpow to power expression' => [
             '<?php \\bcpow(5, $b);',
@@ -112,10 +114,10 @@ final class BCMathTest extends BaseMutatorTestCase
             "<?php\n\n(string) \$a ** \$b;",
         ];
 
-        yield from $this->provideCasesWhereMutatorShouldNotApply('bcpow');
+        yield from self::provideCasesWhereMutatorShouldNotApply('bcpow');
     }
 
-    private function mutationsProviderForSquareRoot(): iterable
+    private static function mutationsProviderForSquareRoot(): iterable
     {
         yield 'It converts bcsqrt to sqrt call' => [
             '<?php \\bcsqrt(2);',
@@ -132,10 +134,10 @@ final class BCMathTest extends BaseMutatorTestCase
             "<?php\n\n(string) \sqrt(\$a);",
         ];
 
-        yield from $this->provideCasesWhereMutatorShouldNotApply('bcsqrt', 1);
+        yield from self::provideCasesWhereMutatorShouldNotApply('bcsqrt', 1);
     }
 
-    private function mutationsProviderForPowerModulo(): iterable
+    private static function mutationsProviderForPowerModulo(): iterable
     {
         yield 'It converts bcpowmod to power modulo expression' => [
             '<?php \\bcpowmod($a, $b, $mod);',
@@ -152,10 +154,10 @@ final class BCMathTest extends BaseMutatorTestCase
             "<?php\n\n(string) (\pow(\$a, \$b) % 2);",
         ];
 
-        yield from $this->provideCasesWhereMutatorShouldNotApply('bcpowmod', 3);
+        yield from self::provideCasesWhereMutatorShouldNotApply('bcpowmod', 3);
     }
 
-    private function mutationsProviderForComparision(): iterable
+    private static function mutationsProviderForComparision(): iterable
     {
         yield 'It converts bccomp to spaceship expression' => [
             '<?php \\bccomp(\'3\', $b);',
@@ -172,13 +174,13 @@ final class BCMathTest extends BaseMutatorTestCase
             "<?php\n\nCONSTANT <=> \$b;",
         ];
 
-        yield from $this->provideCasesWhereMutatorShouldNotApply('bccomp', 2);
+        yield from self::provideCasesWhereMutatorShouldNotApply('bccomp', 2);
     }
 
-    private function provideCasesWhereMutatorShouldNotApply(string $bcFunc, int $requiredArgumentsCount = 2): iterable
+    private static function provideCasesWhereMutatorShouldNotApply(string $bcFunc, int $requiredArgumentsCount = 2): iterable
     {
-        $invalidArgumentsExpression = $this->generateArgumentsExpression($requiredArgumentsCount - 1);
-        $validArgumentsExpression = $this->generateArgumentsExpression($requiredArgumentsCount);
+        $invalidArgumentsExpression = self::generateArgumentsExpression($requiredArgumentsCount - 1);
+        $validArgumentsExpression = self::generateArgumentsExpression($requiredArgumentsCount);
 
         yield "It does not convert $bcFunc when no enough arguments" => [
             "<?php $bcFunc($invalidArgumentsExpression);",
@@ -195,7 +197,7 @@ final class BCMathTest extends BaseMutatorTestCase
         ];
     }
 
-    private function randomizeCase(string $bcFunc): string
+    private static function randomizeCase(string $bcFunc): string
     {
         $bcFunc[2] = strtoupper($bcFunc[2]);
         $bcFunc[4] = strtoupper($bcFunc[4]);
@@ -203,7 +205,7 @@ final class BCMathTest extends BaseMutatorTestCase
         return ucfirst($bcFunc);
     }
 
-    private function generateArgumentsExpression(int $numberOfArguments): string
+    private static function generateArgumentsExpression(int $numberOfArguments): string
     {
         return implode(', ', array_map(static function (string $argument): string {
             return "'$argument'";

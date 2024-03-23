@@ -11,5 +11,8 @@
         "psr-0": {
             "Initial_Configuration": "tests/"
         }
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }

@@ -54,21 +54,21 @@ final class Yield_ implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only
-(without key) where the key or the value are potentially impure (i.e. have a side-effect); For
-example `yield foo() => $b->bar;`.
-TXT
+                Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only
+                (without key) where the key or the value are potentially impure (i.e. have a side-effect); For
+                example `yield foo() => $b->bar;`.
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
-This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
-- completely disregarding the actual yielded pair. The yielded content should either be checked or
-the impure calls should be made outside of the scope of the yielded value.
-TXT,
+                This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
+                - completely disregarding the actual yielded pair. The yielded content should either be checked or
+                the impure calls should be made outside of the scope of the yielded value.
+                TXT,
             <<<'DIFF'
-- yield $key => $value;
-+ yield $key > $value;
-DIFF
+                - yield $key => $value;
+                + yield $key > $value;
+                DIFF,
         );
     }
 

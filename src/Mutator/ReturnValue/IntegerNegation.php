@@ -54,15 +54,15 @@ final class IntegerNegation implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an integer value with its negated value. For example will replace `-5` with `5`.
-TXT
+                Replaces an integer value with its negated value. For example will replace `-5` with `5`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = -5;
-+ $a = 5;
-DIFF
+                - $a = -5;
+                + $a = 5;
+                DIFF,
         );
     }
 
@@ -74,7 +74,7 @@ DIFF
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Return_(
-            new Node\Scalar\LNumber(-1 * $this->getIntegerValueOfNode($node), $node->getAttributes())
+            new Node\Scalar\LNumber(-1 * $this->getIntegerValueOfNode($node), $node->getAttributes()),
         );
     }
 

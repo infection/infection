@@ -56,14 +56,14 @@ final class MutantExecutionResultTest extends TestCase
         $processOutput = 'Passed!';
         $processResultCode = DetectionStatus::ESCAPED;
         $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+            --- Original
+            +++ New
+            @@ @@
 
-- echo 'original';
-+ echo 'notCovered#0';
+            - echo 'original';
+            + echo 'notCovered#0';
 
-DIFF;
+            DIFF;
 
         $mutantHash = 'a1b2c3';
         $mutatorName = MutatorName::getName(For_::class);
@@ -89,7 +89,7 @@ DIFF;
             $originalEndingFilePosition,
             now($originalCode),
             now($mutatedCode),
-            []
+            [],
         );
 
         $this->assertResultStateIs(
@@ -102,7 +102,7 @@ DIFF;
             $originalFilePath,
             $originalStartingLine,
             $originalCode,
-            $mutatedCode
+            $mutatedCode,
         );
     }
 
@@ -132,21 +132,21 @@ DIFF;
                     new TestLocation(
                         'FooTest::test_it_can_instantiate',
                         '/path/to/acme/FooTest.php',
-                        0.01
+                        0.01,
                     ),
-                ]
+                ],
             ),
             $mutatedCode,
             $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                --- Original
+                +++ New
+                @@ @@
 
-- echo 'original';
-+ echo 'notCovered#0';
+                - echo 'original';
+                + echo 'notCovered#0';
 
-DIFF,
-            $originalCode
+                DIFF,
+            $originalCode,
         );
 
         $this->assertResultStateIs(
@@ -159,7 +159,7 @@ DIFF,
             $originalFilePath,
             $originalStartingLine,
             $originalCode,
-            $mutatedCode
+            $mutatedCode,
         );
     }
 
@@ -173,7 +173,7 @@ DIFF,
         string $expectedOriginalFilePath,
         int $expectedOriginalStartingLine,
         string $originalCode,
-        string $mutatedCode
+        string $mutatedCode,
     ): void {
         $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());

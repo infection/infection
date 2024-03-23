@@ -11,5 +11,8 @@
         "psr-4": {
             "Github1735\\Test\\": "tests/"
         }
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }

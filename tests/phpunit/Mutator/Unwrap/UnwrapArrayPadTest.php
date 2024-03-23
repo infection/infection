@@ -36,89 +36,89 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UnwrapArrayPadTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_pad(['a'], 2, 'a');
-PHP
+                $a = array_pad(['a'], 2, 'a');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['a'];
-PHP
+                $a = ['a'];
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_pad(\Class_With_Const::Const, 1, 'a');
-PHP
+                $a = array_pad(\Class_With_Const::Const, 1, 'a');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_pad' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_pad(['a'], 2, 'a');
-PHP
+                $a = \array_pad(['a'], 2, 'a');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['a'];
-PHP
+                $a = ['a'];
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+                $a = array_map('strtolower', ['A', 'B', 'C']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_pad' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_pad($array, $size, $value)
-{
-}
-PHP
+                function array_pad($array, $size, $value)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_pad';
+                $a = 'array_pad';
 
-$b = $a([], 1, 'foo');
-PHP
+                $b = $a([], 1, 'foo');
+                PHP
             ,
         ];
     }

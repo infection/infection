@@ -11,5 +11,8 @@
         "psr-4": {
             "PHPUnit_Hidden_Dependency\\Test\\": "tests/"
         }
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }

@@ -37,14 +37,14 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use const PHP_VERSION_ID;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class NullSafePropertyCallTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         if (PHP_VERSION_ID < 80000) {
@@ -54,82 +54,82 @@ final class NullSafePropertyCallTest extends BaseMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutate nullsafe property call' => [
             <<<'PHP'
-<?php
+                <?php
 
-$class?->property;
-PHP
+                $class?->property;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$class->property;
-PHP
+                $class->property;
+                PHP,
         ];
 
         yield 'Mutate nullsafe property call only' => [
             <<<'PHP'
-<?php
+                <?php
 
-$class?->getName()?->property;
-PHP
+                $class?->getName()?->property;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$class?->getName()->property;
-PHP
+                $class?->getName()->property;
+                PHP,
         ];
 
         yield 'Mutate chain of nullsafe property calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$class?->property?->nextProperty;
-PHP
+                $class?->property?->nextProperty;
+                PHP
             ,
             [
-            <<<'PHP'
-<?php
+                <<<'PHP'
+                    <?php
 
-$class->property?->nextProperty;
-PHP,
-            <<<'PHP'
-<?php
+                    $class->property?->nextProperty;
+                    PHP,
+                <<<'PHP'
+                    <?php
 
-$class?->property->nextProperty;
-PHP
+                    $class?->property->nextProperty;
+                    PHP,
             ],
         ];
 
         yield 'Mutate nullsafe applied right when class has been instantiated' => [
             <<<'PHP'
-<?php
+                <?php
 
-(new \stdClass())?->property;
-PHP,
+                (new \stdClass())?->property;
+                PHP,
             <<<'PHP'
-<?php
+                <?php
 
-(new \stdClass())->property;
-PHP,
+                (new \stdClass())->property;
+                PHP,
         ];
 
         yield 'Mutate nullsafe with dynamic property name' => [
             <<<'PHP'
-<?php
+                <?php
 
 
-$class?->{$property};
-PHP,
+                $class?->{$property};
+                PHP,
             <<<'PHP'
-<?php
+                <?php
 
-$class->{$property};
-PHP
+                $class->{$property};
+                PHP,
         ];
     }
 }

@@ -53,6 +53,7 @@ use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\SingletonContainer;
 use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
@@ -91,7 +92,7 @@ final class FileMutationGeneratorTest extends TestCase
             new LineRangeCalculator(),
             $this->filesDiffChangedLines,
             false,
-            'master'
+            'master',
         );
     }
 
@@ -100,7 +101,7 @@ final class FileMutationGeneratorTest extends TestCase
         $traceMock = $this->createTraceMock(
             self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php',
             '',
-            ''
+            '',
         );
         $traceMock
             ->expects($this->never())
@@ -123,7 +124,7 @@ final class FileMutationGeneratorTest extends TestCase
             $traceMock,
             false,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
-            []
+            [],
         );
 
         $mutations = iterator_to_array($mutations, false);
@@ -140,17 +141,18 @@ final class FileMutationGeneratorTest extends TestCase
 
         $this->assertSame(
             MutatorName::getName(Plus::class),
-            $mutation->getMutatorName()
+            $mutation->getMutatorName(),
         );
     }
 
-    /**
-     * @dataProvider parsedFilesProvider
-     */
+    #[DataProvider('parsedFilesProvider')]
     public function test_it_attempts_to_generate_mutations_for_the_file_if_covered_or_not_only_covered_code(
-        Trace $trace,
+        string $file,
+        string $relativePath,
+        string $relativePathname,
+        ?bool $hasTests,
         bool $onlyCovered,
-        string $expectedFilePath
+        string $expectedFilePath,
     ): void {
         $nodeIgnorers = [new FakeIgnorer()];
 
@@ -178,11 +180,13 @@ final class FileMutationGeneratorTest extends TestCase
             ->willReturn($traverserMock)
         ;
 
+        $trace = $this->createTraceMock($file, $relativePath, $relativePathname, $hasTests);
+
         $mutations = $this->mutationGenerator->generate(
             $trace,
             $onlyCovered,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
-            $nodeIgnorers
+            $nodeIgnorers,
         );
 
         $mutations = iterator_to_array($mutations, false);
@@ -190,11 +194,12 @@ final class FileMutationGeneratorTest extends TestCase
         $this->assertSame([], $mutations);
     }
 
-    /**
-     * @dataProvider skippedFilesProvider
-     */
+    #[DataProvider('skippedFilesProvider')]
     public function test_it_skips_the_mutation_generation_if_checks_only_covered_code_and_the_file_has_no_tests(
-        Trace $trace
+        string $file,
+        string $relativePath,
+        string $relativePathname,
+        ?bool $hasTests = null,
     ): void {
         $this->fileParserMock
             ->expects($this->never())
@@ -212,14 +217,16 @@ final class FileMutationGeneratorTest extends TestCase
             new LineRangeCalculator(),
             $this->filesDiffChangedLines,
             false,
-            'master'
+            'master',
         );
+
+        $trace = $this->createTraceMock($file, $relativePath, $relativePathname, $hasTests);
 
         $mutations = $mutationGenerator->generate(
             $trace,
             true,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
-            []
+            [],
         );
 
         $mutations = iterator_to_array($mutations, false);
@@ -227,89 +234,77 @@ final class FileMutationGeneratorTest extends TestCase
         $this->assertSame([], $mutations);
     }
 
-    public function parsedFilesProvider(): iterable
+    public static function parsedFilesProvider(): iterable
     {
-        foreach ($this->provideBoolean() as $hasTests) {
+        foreach (self::provideBoolean() as $hasTests) {
             $title = sprintf(
                 'path - only covered: false - has tests: %s',
-                $hasTests ? 'true' : 'false'
+                $hasTests ? 'true' : 'false',
             );
 
             yield $title => [
-                $this->createTraceMock(
-                    '/path/to/file',
-                    'relativePath',
-                    'relativePathName',
-                    true
-                ),
+                '/path/to/file',
+                'relativePath',
+                'relativePathName',
+                true,
                 false,
                 '/path/to/file',
             ];
         }
 
-        foreach ($this->provideBoolean() as $hasTests) {
+        foreach (self::provideBoolean() as $hasTests) {
             $title = sprintf(
                 'real path - only covered: false - has tests: %s',
-                $hasTests ? 'true' : 'false'
+                $hasTests ? 'true' : 'false',
             );
 
             yield $title => [
-                $this->createTraceMock(
-                    __FILE__,
-                    'relativePath',
-                    'relativePathName',
-                    true
-                ),
+                __FILE__,
+                'relativePath',
+                'relativePathName',
+                true,
                 false,
                 __FILE__,
             ];
         }
 
         yield 'path - only covered: true - has tests: %s' => [
-            $this->createTraceMock(
-                '/path/to/file',
-                'relativePath',
-                'relativePathName',
-                true
-            ),
+            '/path/to/file',
+            'relativePath',
+            'relativePathName',
+            true,
             true,
             '/path/to/file',
         ];
 
         yield 'real path - only covered: true - has tests: %s' => [
-            $this->createTraceMock(
-                __FILE__,
-                'relativePath',
-                'relativePathName',
-                true
-            ),
+            __FILE__,
+            'relativePath',
+            'relativePathName',
+            true,
             true,
             __FILE__,
         ];
     }
 
-    public function skippedFilesProvider(): iterable
+    public static function skippedFilesProvider(): iterable
     {
         yield 'path - only covered: true - has tests: %s' => [
-            $this->createTraceMock(
-                '/path/to/file',
-                'relativePath',
-                'relativePathName',
-                false
-            ),
+            '/path/to/file',
+            'relativePath',
+            'relativePathName',
+            false,
         ];
 
         yield 'real path - only covered: true - has tests: %s' => [
-            $this->createTraceMock(
-                __FILE__,
-                'relativePath',
-                'relativePathName',
-                false
-            ),
+            __FILE__,
+            'relativePath',
+            'relativePathName',
+            false,
         ];
     }
 
-    public function provideBoolean(): iterable
+    public static function provideBoolean(): iterable
     {
         yield from [true, false];
     }
@@ -321,7 +316,7 @@ final class FileMutationGeneratorTest extends TestCase
         string $file,
         string $relativePath,
         string $relativePathname,
-        ?bool $hasTests = null
+        ?bool $hasTests = null,
     ): Trace {
         $proxyTraceMock = $this->createMock(Trace::class);
         $proxyTraceMock

@@ -75,7 +75,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         $process = $this->factory->createProcess(
             $testFrameworkExtraOptions,
             $phpExtraOptions,
-            true
+            true,
         );
 
         if (PHP_OS_FAMILY === 'Windows') {
@@ -102,7 +102,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         $process = $this->factory->createProcess(
             $testFrameworkExtraOptions,
             $phpExtraOptions,
-            false
+            false,
         );
 
         if (PHP_OS_FAMILY === 'Windows') {

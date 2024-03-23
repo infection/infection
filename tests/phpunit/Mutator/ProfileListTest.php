@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutator;
 use function array_keys;
 use function in_array;
 use Infection\Mutator\ProfileList;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use function Safe\sort;
 use const SORT_STRING;
@@ -45,12 +46,10 @@ use function sprintf;
 
 final class ProfileListTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::mutatorNameAndClassProvider
-     */
+    #[DataProviderExternal(ProfileListProvider::class, 'mutatorNameAndClassProvider')]
     public function test_all_mutators_are_listed_by_their_short_and_fully_qualified_class_names(
         string $expectedMutatorName,
-        string $mutatorClass
+        string $mutatorClass,
     ): void {
         $actualMutatorName = MutatorName::getName($mutatorClass);
 
@@ -61,18 +60,16 @@ final class ProfileListTest extends TestCase
                 'Expected the name "%s" for the mutator "%s". Got "%s"',
                 $actualMutatorName,
                 $expectedMutatorName,
-                $mutatorClass
-            )
+                $mutatorClass,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::implementedMutatorProvider
-     */
+    #[DataProviderExternal(ProfileListProvider::class, 'implementedMutatorProvider')]
     public function test_all_mutators_are_listed_in_the_all_mutators_constant(
         string $mutatorFilePath,
         string $mutatorClassName,
-        string $mutatorShortClassName
+        string $mutatorShortClassName,
     ): void {
         $this->assertArrayHasKey(
             $mutatorShortClassName,
@@ -82,17 +79,15 @@ final class ProfileListTest extends TestCase
                 . '%s::ALL_MUTATORS',
                 $mutatorClassName,
                 $mutatorFilePath,
-                ProfileList::class
-            )
+                ProfileList::class,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::implementedMutatorProvider
-     */
+    #[DataProviderExternal(ProfileListProvider::class, 'implementedMutatorProvider')]
     public function test_all_mutators_are_listed_by_at_least_one_profile(
         string $mutatorFilePath,
-        string $mutatorClassName
+        string $mutatorClassName,
     ): void {
         $this->assertTrue(
             self::isMutatorInAtLeastOneProfile($mutatorClassName),
@@ -101,17 +96,15 @@ final class ProfileListTest extends TestCase
                 . 'profile. Please add it to the appropriate %s::*_PROFILE constant',
                 $mutatorClassName,
                 $mutatorFilePath,
-                ProfileList::class
-            )
+                ProfileList::class,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::profileProvider
-     */
+    #[DataProviderExternal(ProfileListProvider::class, 'profileProvider')]
     public function test_all_mutator_profiles_are_sorted_lexicographically(
         string $profile,
-        array $profileOrMutators
+        array $profileOrMutators,
     ): void {
         $sortedProfileOrMutators = (static function (array $value): array {
             sort($value, SORT_STRING);
@@ -125,8 +118,8 @@ final class ProfileListTest extends TestCase
             sprintf(
                 'Expected the profiles and mutators listed in %s::%s to be sorted lexicographically',
                 ProfileList::class,
-                $profile
-            )
+                $profile,
+            ),
         );
     }
 
@@ -145,8 +138,8 @@ final class ProfileListTest extends TestCase
             $allProfiles,
             sprintf(
                 'Expected profiles in %s::ALL_PROFILES to be sorted lexicographically',
-                ProfileList::class
-            )
+                ProfileList::class,
+            ),
         );
     }
 

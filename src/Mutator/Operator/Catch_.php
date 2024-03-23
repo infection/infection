@@ -58,13 +58,13 @@ final class Catch_ implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-try {
-    $fn();
-- } catch (\Exception | \DomainException $e) {
-+ } catch (\Exception $e) {
-    throw $e;
-}
-DIFF
+                try {
+                    $fn();
+                - } catch (\Exception | \DomainException $e) {
+                + } catch (\Exception $e) {
+                    throw $e;
+                }
+                DIFF,
         );
     }
 

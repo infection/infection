@@ -69,7 +69,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
-        ?string $version = null
+        ?string $version = null,
     ) {
         parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser, $commandLineBuilder, $version);
     }
@@ -89,14 +89,14 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
     public function getInitialTestRunCommandLine(
         string $extraOptions,
         array $phpExtraArgs,
-        bool $skipCoverage
+        bool $skipCoverage,
     ): array {
         if ($skipCoverage === false) {
             $extraOptions = trim(sprintf(
                 '%s --coverage-xml=%s --log-junit=%s',
                 $extraOptions,
                 $this->tmpDir . '/' . self::COVERAGE_DIR,
-                $this->jUnitFilePath // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
+                $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
             ));
 
             if ($this->pcovDirectoryProvider->shallProvide()) {
@@ -159,10 +159,10 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         if (version_compare($this->getVersion(), '7.2', '>=')) {
             $recommendations = sprintf(
                 "%s\n\n%s\n\n%s",
-                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n" .
-                'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
+                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
+                . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
                 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                parent::getInitialTestsFailRecommendations($commandLine)
+                parent::getInitialTestsFailRecommendations($commandLine),
             );
         }
 

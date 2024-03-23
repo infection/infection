@@ -60,9 +60,9 @@ final class ProtectedVisibility implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- protected function foo() {
-+ private function foo() {
-DIFF
+                - protected function foo() {
+                + private function foo() {
+                DIFF,
         );
     }
 
@@ -84,7 +84,7 @@ DIFF
                 'stmts' => $node->getStmts(),
                 'attrGroups' => $node->getAttrGroups(),
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

@@ -37,13 +37,12 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\TrueValueConfig;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class TrueValueConfigTest extends TestCase
 {
-    /**
-     * @dataProvider settingsProvider
-     */
+    #[DataProvider('settingsProvider')]
     public function test_it_can_create_a_config(array $settings, array $expected): void
     {
         $config = new TrueValueConfig($settings);
@@ -60,7 +59,7 @@ final class TrueValueConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the value for "foo" to be a boolean. Got "string" instead',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -74,12 +73,12 @@ final class TrueValueConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected one of: "array_search", "in_array". Got: "foo"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function settingsProvider(): iterable
+    public static function settingsProvider(): iterable
     {
         yield 'default' => [
             [],

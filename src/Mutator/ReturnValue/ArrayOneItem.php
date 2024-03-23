@@ -56,29 +56,29 @@ final class ArrayOneItem implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Leaves only one item in the returned array. For example:
+                Leaves only one item in the returned array. For example:
 
-```php
-return $array;
-```
+                ```php
+                return $array;
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-return count($array) > 1 ?
-    array_slice($array, 0, 1, true) :
-    $array
-;
-```
+                ```php
+                return count($array) > 1 ?
+                    array_slice($array, 0, 1, true) :
+                    $array
+                ;
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- return $array;
-+ return count($array) > 1 ? array_slice($array, 0, 1, true) : $array;
-DIFF
+                - return $array;
+                + return count($array) > 1 ? array_slice($array, 0, 1, true) : $array;
+                DIFF,
         );
     }
 
@@ -98,7 +98,7 @@ DIFF
             new Node\Expr\Ternary(
                 new Node\Expr\BinaryOp\Greater(
                     new Node\Expr\FuncCall(new Node\Name('count'), [new Node\Arg($arrayVariable)]),
-                    new Node\Scalar\LNumber(1)
+                    new Node\Scalar\LNumber(1),
                 ),
                 new Node\Expr\FuncCall(new Node\Name('array_slice'), [
                     new Node\Arg($arrayVariable),
@@ -106,8 +106,8 @@ DIFF
                     new Node\Arg(new Node\Scalar\LNumber(1)),
                     new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
                 ]),
-                $arrayVariable
-            )
+                $arrayVariable,
+            ),
         );
     }
 

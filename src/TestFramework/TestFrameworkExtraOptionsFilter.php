@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Safe\Exceptions\PcreException;
+use Safe\Exceptions\StringsException;
 use function Safe\preg_replace;
 use function sprintf;
 use function trim;
@@ -49,8 +51,8 @@ class TestFrameworkExtraOptionsFilter
     /**
      * @param string[] $initialRunOnlyOptions
      *
-     * @throws \Safe\Exceptions\PcreException
-     * @throws \Safe\Exceptions\StringsException
+     * @throws PcreException
+     * @throws StringsException
      */
     public function filterForMutantProcess(string $actualExtraOptions, array $initialRunOnlyOptions): string
     {

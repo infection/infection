@@ -49,7 +49,7 @@ final class JUnitTestCaseSorterTest extends TestCase
             new TestLocation(
                 'testMethod1',
                 '/path/to/test-file-1',
-                0.000234
+                0.000234,
             ),
         ];
 
@@ -66,22 +66,22 @@ final class JUnitTestCaseSorterTest extends TestCase
             new TestLocation(
                 'testMethod1',
                 '/path/to/test-file-1',
-                0.500234
+                0.500234,
             ),
             new TestLocation(
                 'testMethod2',
                 '/path/to/test-file-2',
-                0.900221
+                0.900221,
             ),
             new TestLocation(
                 'testMethod3_1',
                 '/path/to/test-file-3',
-                0.000022
+                0.000022,
             ),
             new TestLocation(
                 'testMethod3_2',
                 '/path/to/test-file-4',
-                0.210022
+                0.210022,
             ),
         ];
 
@@ -89,7 +89,7 @@ final class JUnitTestCaseSorterTest extends TestCase
 
         $uniqueSortedFileNames = iterator_to_array(
             $sorter->getUniqueSortedFileNames($coverageTestCases),
-            false
+            false,
         );
 
         $this->assertSame(
@@ -99,7 +99,7 @@ final class JUnitTestCaseSorterTest extends TestCase
                 '/path/to/test-file-1',
                 '/path/to/test-file-2',
             ],
-            $uniqueSortedFileNames
+            $uniqueSortedFileNames,
         );
     }
 
@@ -109,7 +109,7 @@ final class JUnitTestCaseSorterTest extends TestCase
             // Quicksort's average O(n log n)
             JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * log(JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER),
             // Bucket Sort's average O(n + k)
-            JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER + JUnitTestCaseSorter::BUCKETS_COUNT
+            JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER + JUnitTestCaseSorter::BUCKETS_COUNT,
         );
     }
 }

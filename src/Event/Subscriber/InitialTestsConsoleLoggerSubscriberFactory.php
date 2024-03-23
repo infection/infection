@@ -54,7 +54,7 @@ final class InitialTestsConsoleLoggerSubscriberFactory implements SubscriberFact
             : new InitialTestsConsoleLoggerSubscriber(
                 $output,
                 $this->testFrameworkAdapter,
-                $this->debug
+                $this->debug,
             )
         ;
     }

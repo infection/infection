@@ -36,11 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\TestFramework\CommandLineBuilder;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class CommandLineBuilderTest extends TestCase
 {
     private const PHP_EXTRA_ARGS = ['-d zend_extension=xdebug.so'];

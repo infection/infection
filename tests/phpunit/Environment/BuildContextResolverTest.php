@@ -41,6 +41,7 @@ use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use OndraM\CiDetector\TrinaryLogic;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BuildContextResolverTest extends TestCase
@@ -105,9 +106,7 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver->resolve();
     }
 
-    /**
-     * @dataProvider provideBlankOrEmptyString
-     */
+    #[DataProvider('provideBlankOrEmptyString')]
     public function test_resolve_throws_when_repository_name_is_empty(string $repositoryName): void
     {
         $gitBranch = 'fix/this';
@@ -140,9 +139,7 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver->resolve();
     }
 
-    /**
-     * @dataProvider provideBlankOrEmptyString
-     */
+    #[DataProvider('provideBlankOrEmptyString')]
     public function test_resolve_throws_when_branch_name_is_empty(string $gitBranch): void
     {
         $repositoryName = 'foo/bar';
@@ -175,7 +172,7 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver->resolve();
     }
 
-    public function provideBlankOrEmptyString(): iterable
+    public static function provideBlankOrEmptyString(): iterable
     {
         yield 'string-blank' => [' '];
 

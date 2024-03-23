@@ -11,5 +11,8 @@
         "psr-4": {
             "ExampleTest\\Test\\": "tests/"
         }
+    },
+    "conflict": {
+        "nikic/php-parser": ">=5.0.0"
     }
 }

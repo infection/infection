@@ -64,12 +64,12 @@ final class ArrayItemRemovalConfig implements MutatorConfig
         Assert::oneOf($this->remove, self::REMOVE_VALUES);
         Assert::integer(
             $this->limit,
-            'Expected the limit to be an integer. Got "%s" instead'
+            'Expected the limit to be an integer. Got "%s" instead',
         );
         Assert::greaterThanEq(
             $this->limit,
             1,
-            'Expected the limit to be greater or equal than 1. Got "%s" instead'
+            'Expected the limit to be greater or equal than 1. Got "%s" instead',
         );
     }
 

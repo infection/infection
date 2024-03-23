@@ -37,15 +37,14 @@ namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class LogsTest extends TestCase
 {
     use LogsAssertions;
 
-    /**
-     * @dataProvider valuesProvider
-     */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         ?string $textLogFilePath,
         ?string $htmlLogFilePath,
@@ -56,7 +55,7 @@ final class LogsTest extends TestCase
         ?string $perMutatorFilePath,
         bool $useGitHubAnnotationsLogger,
         ?StrykerConfig $strykerConfig,
-        ?string $summaryJsonLogFilePath
+        ?string $summaryJsonLogFilePath,
     ): void {
         $logs = new Logs(
             $textLogFilePath,
@@ -68,7 +67,7 @@ final class LogsTest extends TestCase
             $perMutatorFilePath,
             $useGitHubAnnotationsLogger,
             $strykerConfig,
-            $summaryJsonLogFilePath
+            $summaryJsonLogFilePath,
         );
 
         $this->assertLogsStateIs(
@@ -82,7 +81,7 @@ final class LogsTest extends TestCase
             $perMutatorFilePath,
             $useGitHubAnnotationsLogger,
             $strykerConfig,
-            $summaryJsonLogFilePath
+            $summaryJsonLogFilePath,
         );
     }
 
@@ -101,11 +100,11 @@ final class LogsTest extends TestCase
             null,
             false,
             null,
-            null
+            null,
         );
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         yield 'minimal' => [
             null,

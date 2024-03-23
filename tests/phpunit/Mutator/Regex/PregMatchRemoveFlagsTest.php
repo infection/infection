@@ -37,138 +37,127 @@ namespace Infection\Tests\Mutator\Regex;
 
 use Generator;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
  */
 final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
 {
-    /**
-     * @dataProvider provideMutationCases
-     */
+    #[DataProvider('provideMutationCases')]
     public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public static function provideMutationCases(): Generator
     {
         yield 'It removes flags one by one' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_match('~some-regexp$~igu', 'irrelevant');
-PHP
-            ,
+                preg_match('~some-regexp$~igu', 'irrelevant');
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-preg_match('~some-regexp$~gu', 'irrelevant');
-PHP
-            ,
+                    preg_match('~some-regexp$~gu', 'irrelevant');
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-preg_match('~some-regexp$~iu', 'irrelevant');
-PHP
-            ,
+                    preg_match('~some-regexp$~iu', 'irrelevant');
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-preg_match('~some-regexp$~ig', 'irrelevant');
-PHP
+                    preg_match('~some-regexp$~ig', 'irrelevant');
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate when no flags are used' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_match('~some-regexp$~', 'irrelevant');
-PHP
+                preg_match('~some-regexp$~', 'irrelevant');
+                PHP,
         ];
 
         yield 'It mutates correctly preg_match function is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-pReG_MaTcH('~some-regexp$~ig', 'irrelevant');
-PHP
-            ,
+                pReG_MaTcH('~some-regexp$~ig', 'irrelevant');
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-pReG_MaTcH('~some-regexp$~g', 'irrelevant');
-PHP
+                    pReG_MaTcH('~some-regexp$~g', 'irrelevant');
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-pReG_MaTcH('~some-regexp$~i', 'irrelevant');
-PHP
+                    pReG_MaTcH('~some-regexp$~i', 'irrelevant');
+                    PHP,
             ],
         ];
 
         yield 'It mutates correctly when delimeter is not standard' => [
             <<<'PHP'
-<?php
+                <?php
 
-pReG_MaTcH('^some-regexp$^ig', 'irrelevant');
-PHP
-            ,
+                pReG_MaTcH('^some-regexp$^ig', 'irrelevant');
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-pReG_MaTcH('^some-regexp$^g', 'irrelevant');
-PHP
-                ,
+                    pReG_MaTcH('^some-regexp$^g', 'irrelevant');
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-pReG_MaTcH('^some-regexp$^i', 'irrelevant');
-PHP
+                    pReG_MaTcH('^some-regexp$^i', 'irrelevant');
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate regular expression with an encapsed variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff);
-PHP
-            ,
+                preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff);
+                PHP,
         ];
 
         yield 'It does not mutate regular expression when provided with an unpacked array' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_match(...foo());
-PHP
-            ,
+                preg_match(...foo());
+                PHP,
         ];
 
         yield 'It does not mutate regular expression when provided with a variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_match($regex, 'irrelevant');
-PHP
-            ,
+                preg_match($regex, 'irrelevant');
+                PHP,
         ];
 
         yield 'It does not mutate when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$f = 'preg_match';
+                $f = 'preg_match';
 
-$f('~some-regexp$~ig', 'irrelevant');
-PHP
-            ,
+                $f('~some-regexp$~ig', 'irrelevant');
+                PHP,
         ];
     }
 }

@@ -61,7 +61,7 @@ final class NonExecutableFinder
 
         $dirs = array_merge(
             explode(PATH_SEPARATOR, $path),
-            $extraDirectories
+            $extraDirectories,
         );
 
         foreach ($dirs as $dir) {

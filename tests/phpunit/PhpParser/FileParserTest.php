@@ -42,14 +42,14 @@ use Infection\Tests\StringNormalizer;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\Parser;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class FileParserTest extends TestCase
 {
     public function test_it_parses_the_given_file_only_once(): void
@@ -71,9 +71,7 @@ final class FileParserTest extends TestCase
         $this->assertSame($expectedReturnedStatements, $returnedStatements);
     }
 
-    /**
-     * @dataProvider fileToParserProvider
-     */
+    #[DataProvider('fileToParserProvider')]
     public function test_it_can_parse_a_file(SplFileInfo $fileInfo, string $expectedPrintedParsedContents): void
     {
         $statements = SingletonContainer::getContainer()->getFileParser()->parse($fileInfo);
@@ -86,7 +84,7 @@ final class FileParserTest extends TestCase
 
         $this->assertSame(
             $expectedPrintedParsedContents,
-            StringNormalizer::normalizeString($actualPrintedParsedContents)
+            StringNormalizer::normalizeString($actualPrintedParsedContents),
         );
     }
 
@@ -101,7 +99,7 @@ final class FileParserTest extends TestCase
         } catch (UnparsableFile $exception) {
             $this->assertSame(
                 'Could not parse the file "/unknown". Check if it is a valid PHP file',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(Error::class, $exception->getPrevious());
@@ -119,23 +117,23 @@ final class FileParserTest extends TestCase
             $this->assertSame(
                 sprintf(
                     'Could not parse the file "%s". Check if it is a valid PHP file',
-                    $fileRealPath
+                    $fileRealPath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(Error::class, $exception->getPrevious());
         }
     }
 
-    public function fileToParserProvider(): iterable
+    public static function fileToParserProvider(): iterable
     {
         yield 'empty file' => [
             self::createFileInfo('/unknown', ''),
             <<<'AST'
-array(
-)
-AST
+                array(
+                )
+                AST
             ,
         ];
 
@@ -143,66 +141,66 @@ AST
             self::createFileInfo(
                 '/unknown',
                 <<<'PHP'
-<?php
+                    <?php
 
-PHP
+                    PHP,
             ),
             <<<'AST'
-array(
-)
-AST
+                array(
+                )
+                AST,
         ];
 
         yield 'nominal' => [
             self::createFileInfo(
                 '/unknown',
                 <<<'PHP'
-#!/usr/bin/env php
-<?php declare(strict_types=1);
+                    #!/usr/bin/env php
+                    <?php declare(strict_types=1);
 
-/**
- * ...
- */
+                    /**
+                     * ...
+                     */
 
-// Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
+                    // Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
 
-$autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
+                    $autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
 
-use Infection\Console\Application;
-use Infection\Console\InfectionContainer;
+                    use Infection\Console\Application;
+                    use Infection\Console\InfectionContainer;
 
-(new Application(InfectionContainer::create()))->run();
+                    (new Application(InfectionContainer::create()))->run();
 
-PHP
+                    PHP,
             ),
             <<<'AST'
-array(
-    0: Stmt_InlineHTML(
-        value: #!/usr/bin/env php
+                array(
+                    0: Stmt_InlineHTML(
+                        value: #!/usr/bin/env php
 
-    )
-    1: Stmt_Declare(
-        declares: array(
-            0: DeclareItem(
-                key: Identifier(
-                    name: strict_types
-                )
-                value: Scalar_Int(
-                    value: 1
-                )
-            )
-        )
-        stmts: null
-    )
-    2: Stmt_Expression(
-        expr: Expr_Assign(
-            var: Expr_Variable(
-                name: autoloaderInWorkingDirectory
-            )
-            expr: Expr_BinaryOp_Concat(
-                left: Expr_FuncCall(
-                    name: Name(
-                        name: getcwd
+                    )
+                    1: Stmt_Declare(
+                        declares: array(
+                            0: DeclareItem(
+                                key: Identifier(
+                                    name: strict_types
+                                )
+                                value: Scalar_Int(
+                                    value: 1
+                                )
+                            )
+                        )
+                        stmts: null
+                    )
+                    2: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                name: autoloaderInWorkingDirectory
+                            )
+                            expr: Expr_BinaryOp_Concat(
+                                left: Expr_FuncCall(
+                                    name: Name(
+                                        name: getcwd
                     )
                     args: array(
                     )
@@ -217,59 +215,59 @@ array(
         type: TYPE_NORMAL (1)
         uses: array(
             0: UseItem(
-                type: TYPE_UNKNOWN (0)
-                name: Name(
-                    name: Infection\Console\Application
-                )
-                alias: null
-            )
-        )
-    )
-    4: Stmt_Use(
-        type: TYPE_NORMAL (1)
-        uses: array(
-            0: UseItem(
-                type: TYPE_UNKNOWN (0)
-                name: Name(
-                    name: Infection\Console\InfectionContainer
-                )
-                alias: null
-            )
-        )
-    )
-    5: Stmt_Expression(
-        expr: Expr_MethodCall(
-            var: Expr_New(
-                class: Name(
-                    name: Application
-                )
-                args: array(
-                    0: Arg(
-                        name: null
-                        value: Expr_StaticCall(
-                            class: Name(
-                                name: InfectionContainer
+                                type: TYPE_UNKNOWN (0)
+                                name: Name(
+                                    name: Infection\Console\Application
+                                )
+                                alias: null
+                            )
+                        )
+                    )
+                    4: Stmt_Use(
+                        type: TYPE_NORMAL (1)
+                        uses: array(
+                            0: UseItem(
+                                type: TYPE_UNKNOWN (0)
+                                name: Name(
+                                    name: Infection\Console\InfectionContainer
+                                )
+                                alias: null
+                            )
+                        )
+                    )
+                    5: Stmt_Expression(
+                        expr: Expr_MethodCall(
+                            var: Expr_New(
+                                class: Name(
+                                    name: Application
+                                )
+                                args: array(
+                                    0: Arg(
+                                        name: null
+                                        value: Expr_StaticCall(
+                                            class: Name(
+                                                name: InfectionContainer
+                                            )
+                                            name: Identifier(
+                                                name: create
+                                            )
+                                            args: array(
+                                            )
+                                        )
+                                        byRef: false
+                                        unpack: false
+                                    )
+                                )
                             )
                             name: Identifier(
-                                name: create
+                                name: run
                             )
                             args: array(
                             )
                         )
-                        byRef: false
-                        unpack: false
                     )
                 )
-            )
-            name: Identifier(
-                name: run
-            )
-            args: array(
-            )
-        )
-    )
-)
-AST
+                AST,
         ];
     }
 

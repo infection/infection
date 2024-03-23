@@ -37,22 +37,23 @@ namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\StrykerConfig;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class StrykerConfigTest extends TestCase
 {
-    /** @dataProvider branch_names_to_be_matched */
+    #[DataProvider('branch_names_to_be_matched')]
     public function test_branch_match(string $branchName, string $branchMatch, bool $willMatch): void
     {
         $this->assertSame(
             $willMatch,
             StrykerConfig::forBadge($branchMatch)
-                ->applicableForBranch($branchName)
+                ->applicableForBranch($branchName),
         );
     }
 
     /** @return non-empty-list<array{string, non-empty-string, bool}> */
-    public function branch_names_to_be_matched(): array
+    public static function branch_names_to_be_matched(): array
     {
         return [
             ['master', 'master', true],

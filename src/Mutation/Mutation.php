@@ -74,7 +74,7 @@ class Mutation
         private readonly string $mutatedNodeClass,
         private readonly MutatedNode $mutatedNode,
         private readonly int $mutationByMutatorIndex,
-        private readonly array $tests
+        private readonly array $tests,
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 

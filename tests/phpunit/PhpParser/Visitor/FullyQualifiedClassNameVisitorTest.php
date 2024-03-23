@@ -40,27 +40,26 @@ use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Tests\Fixtures\PhpParser\FullyQualifiedClassNameSpyVisitor;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
-final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
+#[Group('integration')]
+final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTestCase
 {
     /**
-     * @dataProvider codeProvider
-     *
      * @param array<array{string, string}> $expected
      */
+    #[DataProvider('codeProvider')]
     public function test_it_adds_fqcn_to_the_appropriate_node(string $code, array $expected): void
     {
         $spyVisitor = new FullyQualifiedClassNameSpyVisitor();
 
         $this->traverse(
-            $this->parseCode($code),
+            self::parseCode($code),
             [
                 new FullyQualifiedClassNameVisitor(),
                 $spyVisitor,
-            ]
+            ],
         );
 
         $actual = array_map(
@@ -70,20 +69,20 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
                     (string) FullyQualifiedClassNameManipulator::getFqcn($node),
                 ];
             },
-            $spyVisitor->getCollectedNodes()
+            $spyVisitor->getCollectedNodes(),
         );
 
         $this->assertSame($expected, $actual);
     }
 
-    public function codeProvider(): iterable
+    public static function codeProvider(): iterable
     {
         yield 'global class' => [
             <<<'PHP'
-<?php
+                <?php
 
-class Foo {}
-PHP
+                class Foo {}
+                PHP
             ,
             [
                 ['Stmt_Class', 'Foo'],
@@ -92,10 +91,10 @@ PHP
 
         yield 'global abstract class' => [
             <<<'PHP'
-<?php
+                <?php
 
-abstract class Foo {}
-PHP
+                abstract class Foo {}
+                PHP
             ,
             [
                 ['Stmt_Class', 'Foo'],
@@ -104,10 +103,10 @@ PHP
 
         yield 'global final class' => [
             <<<'PHP'
-<?php
+                <?php
 
-abstract class Foo {}
-PHP
+                abstract class Foo {}
+                PHP
             ,
             [
                 ['Stmt_Class', 'Foo'],
@@ -116,12 +115,12 @@ PHP
 
         yield 'namespaced class' => [
             <<<'PHP'
-<?php
+                <?php
 
-namespace Acme;
+                namespace Acme;
 
-class Foo {}
-PHP
+                class Foo {}
+                PHP
             ,
             [
                 ['Stmt_Class', 'Acme\Foo'],
@@ -130,10 +129,10 @@ PHP
 
         yield 'global interface' => [
             <<<'PHP'
-<?php
+                <?php
 
-interface Foo {}
-PHP
+                interface Foo {}
+                PHP
             ,
             [
                 ['Stmt_Interface', 'Foo'],
@@ -142,12 +141,12 @@ PHP
 
         yield 'namespaced interface' => [
             <<<'PHP'
-<?php
+                <?php
 
-namespace Acme;
+                namespace Acme;
 
-interface Foo {}
-PHP
+                interface Foo {}
+                PHP
             ,
             [
                 ['Stmt_Interface', 'Acme\Foo'],
@@ -156,10 +155,10 @@ PHP
 
         yield 'global anonymous class' => [
             <<<'PHP'
-<?php
+                <?php
 
-new class() extends SplFileInfo {};
-PHP
+                new class() extends SplFileInfo {};
+                PHP
             ,
             [
                 ['Stmt_Class', ''],
@@ -168,12 +167,12 @@ PHP
 
         yield 'namespaced anonymous class' => [
             <<<'PHP'
-<?php
+                <?php
 
-namespace Acme;
+                namespace Acme;
 
-new class() extends SplFileInfo {};
-PHP
+                new class() extends SplFileInfo {};
+                PHP
             ,
             [
                 ['Stmt_Class', ''],
@@ -186,31 +185,31 @@ PHP
         // class body declaration.
         yield 'ignore regular instances' => [
             <<<'PHP'
-<?php
+                <?php
 
-new Foo();
-PHP
+                new Foo();
+                PHP
             ,
             [],
         ];
 
         yield 'multiple namespace classes with multiple classes' => [
             <<<'PHP'
-<?php
+                <?php
 
-namespace X {
-    class Foo {}
-}
+                namespace X {
+                    class Foo {}
+                }
 
-namespace Y {
-    class Bar {}
-    class Baz {}
-}
+                namespace Y {
+                    class Bar {}
+                    class Baz {}
+                }
 
-namespace {
-    class Faz {}
-}
-PHP
+                namespace {
+                    class Faz {}
+                }
+                PHP
             ,
             [
                 ['Stmt_Class', 'X\Foo'],

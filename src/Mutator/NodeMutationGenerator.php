@@ -78,7 +78,7 @@ class NodeMutationGenerator
         private readonly bool $isForGitDiffLines,
         private readonly ?string $gitDiffBase,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly FilesDiffChangedLines $filesDiffChangedLines
+        private readonly FilesDiffChangedLines $filesDiffChangedLines,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -125,7 +125,7 @@ class NodeMutationGenerator
             throw InvalidMutator::create(
                 $this->filePath,
                 $mutator->getName(),
-                $throwable
+                $throwable,
             );
         }
 
@@ -146,7 +146,7 @@ class NodeMutationGenerator
                 $node::class,
                 MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
-                $tests
+                $tests,
             );
 
             ++$mutationByMutatorIndex;
@@ -155,14 +155,14 @@ class NodeMutationGenerator
 
     private function isOnFunctionSignature(): bool
     {
-        return $this->isOnFunctionSignatureMemoized ??
-            $this->isOnFunctionSignatureMemoized = $this->currentNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+        return $this->isOnFunctionSignatureMemoized
+            ?? $this->isOnFunctionSignatureMemoized = $this->currentNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
     }
 
     private function isInsideFunction(): bool
     {
-        return $this->isInsideFunctionMemoized ??
-            $this->isInsideFunctionMemoized = $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
+        return $this->isInsideFunctionMemoized
+            ?? $this->isInsideFunctionMemoized = $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
     }
 
     /**
@@ -176,7 +176,7 @@ class NodeMutationGenerator
 
         $testsMemoized = $this->trace->getAllTestsForMutation(
             $this->lineRangeCalculator->calculateRange($this->currentNode),
-            $this->isOnFunctionSignature()
+            $this->isOnFunctionSignature(),
         );
 
         if ($testsMemoized instanceof Traversable) {

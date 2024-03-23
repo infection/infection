@@ -37,13 +37,12 @@ namespace Infection\Tests\FileSystem\Finder\Iterator;
 
 use Infection\Tests\Fixtures\Finder\MockRealPathFinder;
 use Infection\Tests\Fixtures\Finder\MockRelativePathFinder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class RealPathFilterIteratorTest extends TestCase
 {
-    /**
-     * @dataProvider providesFinders
-     */
+    #[DataProvider('providesFinders')]
     public function test_it_differs_from_relative_path(string $finder, int $expectedFilecount): void
     {
         $sourceFilesFinder = new $finder(['tests/phpunit/Fixtures/Files/Finder']);
@@ -62,7 +61,7 @@ final class RealPathFilterIteratorTest extends TestCase
         }
     }
 
-    public function providesFinders()
+    public static function providesFinders()
     {
         yield 'RealPathFileIterator' => [
             MockRealPathFinder::class,

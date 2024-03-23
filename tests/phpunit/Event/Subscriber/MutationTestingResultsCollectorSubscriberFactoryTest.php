@@ -47,7 +47,7 @@ final class MutationTestingResultsCollectorSubscriberFactoryTest extends TestCas
     {
         $factory = new MutationTestingResultsCollectorSubscriberFactory(
             $this->createMock(Collector::class),
-            $this->createMock(Collector::class)
+            $this->createMock(Collector::class),
         );
 
         $outputMock = $this->createMock(OutputInterface::class);

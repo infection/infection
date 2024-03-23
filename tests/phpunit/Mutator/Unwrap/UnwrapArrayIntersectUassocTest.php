@@ -36,245 +36,221 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UnwrapArrayIntersectUassocTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
-            ,
+                $a = array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-PHP
-            ,
+                    $a = ['foo' => 'bar'];
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['baz' => 'bar'];
-PHP
+                    $a = ['baz' => 'bar'];
+                    PHP,
             ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_intersect_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $keyCompareFunc);
-PHP
-            ,
+                $a = array_intersect_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $keyCompareFunc);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = \Class_With_Const::Const;
-PHP
-                ,
+                    $a = \Class_With_Const::Const;
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['baz' => 'bar'];
-PHP
-                ,
+                    $a = ['baz' => 'bar'];
+                    PHP,
             ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_intersect_uassoc' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
-            ,
+                $a = \array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
+                PHP,
             [
-               <<<'PHP'
-<?php
-
-$a = ['foo' => 'bar'];
-PHP
-                ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['baz' => 'bar'];
-PHP
-                ,
+                    $a = ['foo' => 'bar'];
+                    PHP,
+                <<<'PHP'
+                    <?php
+
+                    $a = ['baz' => 'bar'];
+                    PHP,
             ],
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-if (array_intersect_uassoc($a, ['baz' => 'bar'], $keyCompareFunc) === $a) {
-    return true;
-}
-PHP
-            ,
+                $a = ['foo' => 'bar'];
+                if (array_intersect_uassoc($a, ['baz' => 'bar'], $keyCompareFunc) === $a) {
+                    return true;
+                }
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-if ($a === $a) {
-    return true;
-}
-PHP
-                ,
+                    $a = ['foo' => 'bar'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-if (['baz' => 'bar'] === $a) {
-    return true;
-}
-PHP
-                ,
+                    $a = ['foo' => 'bar'];
+                    if (['baz' => 'bar'] === $a) {
+                        return true;
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It mutates correctly when array_intersect_uassoc is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_InTeRsEcT_uAsSoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
-            ,
+                $a = aRrAy_InTeRsEcT_uAsSoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-PHP
-                ,
+                    $a = ['foo' => 'bar'];
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['baz' => 'bar'];
-PHP
-                ,
+                    $a = ['baz' => 'bar'];
+                    PHP,
             ],
         ];
 
         yield 'It mutates correctly when array_intersect_uassoc uses functions as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_intersect_uassoc($foo->bar(), $foo->baz(), $keyCompareFunc);
-PHP
-            ,
+                $a = array_intersect_uassoc($foo->bar(), $foo->baz(), $keyCompareFunc);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = $foo->bar();
-PHP
-                ,
+                    $a = $foo->bar();
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = $foo->baz();
-PHP
-                ,
+                    $a = $foo->baz();
+                    PHP,
             ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc));
-PHP
-            ,
+                $a = array_map('strtolower', array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc));
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = array_map('strtolower', ['foo' => 'bar']);
-PHP
-                ,
+                    $a = array_map('strtolower', ['foo' => 'bar']);
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = array_map('strtolower', ['baz' => 'bar']);
-PHP
-                ,
+                    $a = array_map('strtolower', ['baz' => 'bar']);
+                    PHP,
             ],
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $keyCompareFunc);
-PHP
-            ,
+                $a = array_intersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $keyCompareFunc);
+                PHP,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-PHP
-                ,
+                    $a = ['foo' => 'bar'];
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['baz' => 'bar'];
-PHP
-                ,
+                    $a = ['baz' => 'bar'];
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['qux' => 'bar'];
-PHP
-                ,
+                    $a = ['qux' => 'bar'];
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+                $a = array_map('strtolower', ['foo' => 'bar']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_intersect_uassoc' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_intersect_uassoc($array, $array1, $keyCompareFunc)
-{
-}
-PHP
+                function array_intersect_uassoc($array, $array1, $keyCompareFunc)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_intersect_uassoc';
+                $a = 'array_intersect_uassoc';
 
-$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
+                $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
+                PHP,
         ];
     }
 }

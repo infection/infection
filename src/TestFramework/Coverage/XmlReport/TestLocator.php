@@ -68,7 +68,7 @@ class TestLocator
      */
     public function getAllTestsForMutation(
         NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature
+        bool $isOnFunctionSignature,
     ): iterable {
         // TODO: would any of those operations benefit from being cached? To be checked with a profile
         if ($isOnFunctionSignature) {
@@ -119,7 +119,7 @@ class TestLocator
             ) {
                 return $this->getTestsForLineRange(new NodeLineRangeData(
                     $methodRange->getStartLine(),
-                    $methodRange->getEndLine()
+                    $methodRange->getEndLine(),
                 ));
             }
         }

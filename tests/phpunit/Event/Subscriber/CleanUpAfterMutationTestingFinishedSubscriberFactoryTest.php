@@ -39,13 +39,12 @@ use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Tests\Fixtures\Console\FakeOutput;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends TestCase
 {
     /**
@@ -67,7 +66,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
         $factory = new CleanUpAfterMutationTestingFinishedSubscriberFactory(
             false,
             $this->fileSystemMock,
-            '/path/to/tmp'
+            '/path/to/tmp',
         );
 
         $subscriber = $factory->create(new FakeOutput());
@@ -80,7 +79,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
         $factory = new CleanUpAfterMutationTestingFinishedSubscriberFactory(
             true,
             $this->fileSystemMock,
-            '/path/to/tmp'
+            '/path/to/tmp',
         );
 
         $subscriber = $factory->create(new FakeOutput());

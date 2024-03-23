@@ -36,69 +36,69 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class AssignCoalesceTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutate coalesce when right part is a scalar value' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] ??= 'otherValue';
-PHP
+                $a['value'] ??= 'otherValue';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] = 'otherValue';
-PHP
+                $a['value'] = 'otherValue';
+                PHP,
         ];
 
         yield 'Mutate coalesce when right part is an expression' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] ??= 'other' . ' Value';
-PHP
+                $a['value'] ??= 'other' . ' Value';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] = 'other' . ' Value';
-PHP
+                $a['value'] = 'other' . ' Value';
+                PHP,
         ];
 
         yield 'Mutate coalesce when right part is a variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] ??= $var;
-PHP
+                $a['value'] ??= $var;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] = $var;
-PHP
+                $a['value'] = $var;
+                PHP,
         ];
 
         yield 'Does not mutate coalesce binary operator' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a['value'] = $foo ?? $bar;
-PHP
+                $a['value'] = $foo ?? $bar;
+                PHP
             ,
         ];
     }

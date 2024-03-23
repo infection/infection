@@ -36,123 +36,123 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Removal;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class MethodCallRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes a method call without parameters' => [
             <<<'PHP'
-<?php
+                <?php
 
-$this->foo();
-$a = 3;
-PHP
+                $this->foo();
+                $a = 3;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 3;
-PHP
+                $a = 3;
+                PHP
             ,
         ];
 
         yield 'It removes a method call with parameters' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo->bar(3, 4);
-$a = 3;
-PHP
+                $foo->bar(3, 4);
+                $a = 3;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 3;
-PHP
+                $a = 3;
+                PHP
             ,
         ];
 
         yield 'It remove a static method call without parameters' => [
             <<<'PHP'
-<?php
+                <?php
 
-self::foo();
-$a = 3;
-PHP
+                self::foo();
+                $a = 3;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 3;
-PHP
+                $a = 3;
+                PHP,
         ];
 
         yield 'It remove a static method call with parameters' => [
             <<<'PHP'
-<?php
+                <?php
 
-THatClass::bar(3, 4);
-$a = 3;
-PHP
+                THatClass::bar(3, 4);
+                $a = 3;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 3;
-PHP
+                $a = 3;
+                PHP,
         ];
 
         yield 'It does not remove a method call that is assigned to something' => [
             <<<'PHP'
-<?php
+                <?php
 
-$b = foo();
-$a = 3;
-PHP
+                $b = foo();
+                $a = 3;
+                PHP
             ,
         ];
 
         yield 'It does not remove a method call within a statement' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($this->foo()) {
-    $a = 3;
-}
-while ($foo->foo()) {
-    $a = 3;
-}
+                if ($this->foo()) {
+                    $a = 3;
+                }
+                while ($foo->foo()) {
+                    $a = 3;
+                }
 
-PHP
+                PHP
             ,
         ];
 
         yield 'It does not remove a method call that is the parameter of another function or method' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = $this->foo(3, $a->bar());
-PHP
+                $a = $this->foo(3, $a->bar());
+                PHP,
         ];
 
         yield 'It does not remove a function call' => [
             <<<'PHP'
-<?php
+                <?php
 
-foo();
-$a = 3;
-PHP
+                foo();
+                $a = 3;
+                PHP,
         ];
     }
 }

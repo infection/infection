@@ -55,19 +55,19 @@ final class Continue_ implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a continue statement (`continue`) with its counterpart break statement (`break`).
-TXT
+                Replaces a continue statement (`continue`) with its counterpart break statement (`break`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-foreach ($collection as $item) {
-    if ($condition) {
--       continue;
-+       break;
-    }
-}
-DIFF
+                foreach ($collection as $item) {
+                    if ($condition) {
+                -       continue;
+                +       break;
+                    }
+                }
+                DIFF,
         );
     }
 

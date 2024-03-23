@@ -57,9 +57,9 @@ final class BitwiseNot implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a = ~$b;
-+ $a = $b;
-DIFF
+                - $a = ~$b;
+                + $a = $b;
+                DIFF,
         );
     }
 

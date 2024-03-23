@@ -57,9 +57,9 @@ final class LogicalLowerOr implements Mutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b or $c;
-+ $a = $b and $c;
-DIFF
+                - $a = $b or $c;
+                + $a = $b and $c;
+                DIFF,
         );
     }
 

@@ -74,7 +74,7 @@ class GitDiffFileProvider
                 '--name-only',
                 '--',
             ],
-            $sourceDirectories
+            $sourceDirectories,
         ));
 
         if ($filter === '') {

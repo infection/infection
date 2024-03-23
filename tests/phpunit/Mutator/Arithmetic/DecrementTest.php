@@ -36,61 +36,61 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class DecrementTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It replaces post decrement' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a--;
-PHP
+                $a = 1;
+                $a--;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a++;
-PHP
+                $a = 1;
+                $a++;
+                PHP
             ,
         ];
 
         yield 'It replaces pre decrement' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
---$a;
-PHP
+                $a = 1;
+                --$a;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-++$a;
-PHP
+                $a = 1;
+                ++$a;
+                PHP
             ,
         ];
 
         yield 'It does not change when its not a real decrement' => [
             <<<'PHP'
-<?php
+                <?php
 
-$b - -$a;
-PHP
+                $b - -$a;
+                PHP
             ,
         ];
     }

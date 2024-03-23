@@ -44,17 +44,17 @@ use function count;
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
 use function implode;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\array_replace;
 use function sprintf;
 use function str_starts_with;
 use function substr;
 use function substr_count;
 
-/**
- * @coversNothing
- *
- * @group integration
- */
+#[Group('integration')]
+#[CoversNothing]
 final class MakefileTest extends BaseMakefileTestCase
 {
     private const MAKEFILE_PATH = __DIR__ . '/../../../../Makefile';
@@ -76,11 +76,11 @@ final class MakefileTest extends BaseMakefileTestCase
 
         $this->assertArrayContains(
             $testRuleTargets,
-            ['test', 'test-autoreview', 'test-unit', 'test-e2e']
+            ['test', 'test-autoreview', 'test-unit', 'test-e2e'],
         );
         $this->assertDoesNotArrayContain(
             $testRuleTargets,
-            ['test-docker', 'test-unit-docker', 'test-e2e-docker']
+            ['test-docker', 'test-unit-docker', 'test-e2e-docker'],
         );
     }
 
@@ -93,24 +93,23 @@ final class MakefileTest extends BaseMakefileTestCase
 
         $this->assertArrayContains(
             $testRuleTargets,
-            ['test-docker', 'test-unit-docker', 'test-e2e-docker']
+            ['test-docker', 'test-unit-docker', 'test-e2e-docker'],
         );
         $this->assertDoesNotArrayContain(
             $testRuleTargets,
-            ['test', 'test-autoreview', 'test-unit', 'test-e2e']
+            ['test', 'test-autoreview', 'test-unit', 'test-e2e'],
         );
     }
 
     /**
-     * @dataProvider subTargetProvider
-     *
      * @param list<string> $expected
      * @param list<string> $notExpected
      */
+    #[DataProvider('subTargetProvider')]
     public function test_it_can_get_a_docker_test_target_sub_test_targets(
         string $target,
         array $expected,
-        array $notExpected
+        array $notExpected,
     ): void {
         $subTestTargets = self::getDockerSubTestTargets(
             $target,
@@ -143,15 +142,14 @@ final class MakefileTest extends BaseMakefileTestCase
     }
 
     /**
-     * @dataProvider rootTestTargetProvider
-     *
      * @param list<string> $expected
      * @param list<string> $notExpected
      */
+    #[DataProvider('rootTestTargetProvider')]
     public function test_it_can_get_all_the_root_test_targets(
         bool $docker,
         array $expected,
-        array $notExpected
+        array $notExpected,
     ): void {
         $dashCount = $docker ? 2 : 1;
 
@@ -213,8 +211,8 @@ final class MakefileTest extends BaseMakefileTestCase
                     'Expected the pre-requisite of the "%s" target to be "%s". Found "%s" instead',
                     $target,
                     implode(' ', $subTestTargets),
-                    implode(' ', $prerequisites)
-                )
+                    implode(' ', $prerequisites),
+                ),
             );
         }
     }
@@ -253,31 +251,31 @@ final class MakefileTest extends BaseMakefileTestCase
     protected function getExpectedHelpOutput(): string
     {
         return <<<'EOF'
-[33mUsage:[0m
-  make TARGET
+            [33mUsage:[0m
+              make TARGET
 
-[32m#
-# Commands
-#---------------------------------------------------------------------------[0m
+            [32m#
+            # Commands
+            #---------------------------------------------------------------------------[0m
 
-[33mcompile:[0m	 	 Bundles Infection into a PHAR
-[33mcompile-docker:[0m	 	 Bundles Infection into a PHAR using docker
-[33mcs:[0m	  	 	 Runs PHP-CS-Fixer
-[33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
-[33mprofile:[0m 	 	 Runs Blackfire
-[33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)
-[33mtest:[0m		 	 Runs all the tests
-[33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
-[33mtest-unit:[0m	 	 Runs the unit tests
-[33mtest-unit-parallel:[0m	 Runs the unit tests in parallel
-[33mtest-unit-docker:[0m	 Runs the unit tests on the different Docker platforms
-[33mtest-e2e:[0m 	 	 Runs the end-to-end tests
-[33mtest-e2e-phpunit:[0m	 Runs PHPUnit-enabled subset of end-to-end tests
-[33mtest-e2e-docker:[0m 	 Runs the end-to-end tests on the different Docker platforms
-[33mtest-infection:[0m		 Runs Infection against itself
-[33mtest-infection-docker:[0m	 Runs Infection against itself on the different Docker platforms
+            [33mcompile:[0m	 	 Bundles Infection into a PHAR
+            [33mcompile-docker:[0m	 	 Bundles Infection into a PHAR using docker
+            [33mcs:[0m	  	 	 Runs PHP-CS-Fixer
+            [33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
+            [33mprofile:[0m 	 	 Runs Blackfire
+            [33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)
+            [33mtest:[0m		 	 Runs all the tests
+            [33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
+            [33mtest-unit:[0m	 	 Runs the unit tests
+            [33mtest-unit-parallel:[0m	 Runs the unit tests in parallel
+            [33mtest-unit-docker:[0m	 Runs the unit tests on the different Docker platforms
+            [33mtest-e2e:[0m 	 	 Runs the end-to-end tests
+            [33mtest-e2e-phpunit:[0m	 Runs PHPUnit-enabled subset of end-to-end tests
+            [33mtest-e2e-docker:[0m 	 Runs the end-to-end tests on the different Docker platforms
+            [33mtest-infection:[0m		 Runs Infection against itself
+            [33mtest-infection-docker:[0m	 Runs Infection against itself on the different Docker platforms
 
-EOF;
+            EOF;
     }
 
     /**
@@ -299,7 +297,7 @@ EOF;
                         && !str_starts_with($target, 'tests/')
                         && $filterDockerTarget($target)
                         && !$rule->isComment();
-                }
+                },
             ),
         );
     }
@@ -321,7 +319,7 @@ EOF;
 
                 return str_starts_with($subTarget, $targetWithoutSuffix . '-')
                     && substr_count($subTarget, '-') === $dashCount + 1;
-            }
+            },
         );
 
         return array_values(
@@ -361,7 +359,7 @@ EOF;
      */
     private function assertArrayContains(
         array $array,
-        array $items
+        array $items,
     ): void {
         if (count($items) === 0) {
             $this->addToAssertionCount(1);
@@ -382,7 +380,7 @@ EOF;
      */
     private function assertDoesNotArrayContain(
         array $array,
-        array $items
+        array $items,
     ): void {
         if (count($items) === 0) {
             $this->addToAssertionCount(1);

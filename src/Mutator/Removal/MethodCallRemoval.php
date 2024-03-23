@@ -57,8 +57,8 @@ final class MethodCallRemoval implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $this->fooBar();
-DIFF
+                - $this->fooBar();
+                DIFF,
         );
     }
 

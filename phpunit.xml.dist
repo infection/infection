@@ -6,11 +6,10 @@
          executionOrder="random"
          failOnWarning="true"
          failOnRisky="true"
-         verbose="true"
+         cacheDirectory="./build/cache/phpunit"
 >
 
     <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
         <env name="COLUMNS" value="100" force="true" />
     </php>
 
@@ -23,21 +22,16 @@
         </testsuite>
     </testsuites>
 
-    <coverage cacheDirectory="./reports/.coverage-cache">
+    <source>
         <include>
             <directory>src</directory>
         </include>
-    </coverage>
+    </source>
 
     <groups>
         <exclude>
             <group>e2e</group>
         </exclude>
     </groups>
-
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
-        <listener class="Symfony\Bridge\PhpUnit\CoverageListener" />
-    </listeners>
 
 </phpunit>

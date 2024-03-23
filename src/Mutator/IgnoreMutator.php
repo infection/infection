@@ -72,7 +72,7 @@ final class IgnoreMutator implements Mutator
         // can also be made non-static to return the definition of the decorated mutator.
         throw new DomainException(sprintf(
             'The class "%s" does not have a definition',
-            self::class
+            self::class,
         ));
     }
 
@@ -92,7 +92,7 @@ final class IgnoreMutator implements Mutator
         return !$this->config->isIgnored(
             $reflectionClass->getName(),
             $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getStartLine()
+            $node->getStartLine(),
         );
     }
 
