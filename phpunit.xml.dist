@@ -21,6 +21,10 @@
             <exclude>tests/phpunit/AutoReview</exclude>
             <exclude>tests/phpunit/Fixtures</exclude>
         </testsuite>
+
+        <testsuite name="Rector">
+            <directory>utils/rector/tests</directory>
+        </testsuite>
     </testsuites>
 
     <source>
