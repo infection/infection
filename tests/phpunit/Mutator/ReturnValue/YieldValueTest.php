@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Composer\InstalledVersions;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use function version_compare;
 
 final class YieldValueTest extends BaseMutatorTestCase
@@ -59,28 +60,27 @@ final class YieldValueTest extends BaseMutatorTestCase
                 $a = function () {
                     (yield $a => $b);
                 };
-                PHP
-            ,
+                PHP,
             (static function () {
                 if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
                     return
                         <<<'PHP'
-                <?php
+                            <?php
 
-                $a = function () {
-                    (yield $b);
-                };
-                PHP;
+                            $a = function () {
+                                (yield $b);
+                            };
+                            PHP;
                 }
 
                 return
                     <<<'PHP'
-<?php
+                        <?php
 
-$a = function () {
-    yield $b;
-};
-PHP;
+                        $a = function () {
+                            yield $b;
+                        };
+                        PHP;
             })(),
         ];
 

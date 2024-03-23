@@ -204,17 +204,10 @@ final class FileParserTest extends TestCase
                     )
                     args: array(
                     )
-                )
-                right: Scalar_String(
-                    value: /vendor/autoload.php
-                )
-            )
-        )
-    )
-    3: Stmt_Use(
-        type: TYPE_NORMAL (1)
-        uses: array(
-            0: UseItem(
+                    3: Stmt_Use(
+                        type: TYPE_NORMAL (1)
+                        uses: array(
+                            0: UseItem(
                                 type: TYPE_UNKNOWN (0)
                                 name: Name(
                                     name: Infection\Console\Application

@@ -231,19 +231,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
         })();
 
         yield 'it does not mutate if the parser does not contain startTokenPos' => (static function (): iterable {
-            $badLexer = new Lexer\Emulative([
-                'usedAttributes' => [
-                    'comments',
-                    'startLine',
-                    'endLine',
-                    // missing startTokenPos
-                    'endTokenPos',
-                    'startFilePos',
-                    'endFilePos',
-                ],
-            ]);
-
-            $badParser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $badLexer);
+            $badParser = (new ParserFactory())->createForNewestSupportedVersion();
 
             return [
                 $nodes = $badParser->parse(<<<'PHP'
