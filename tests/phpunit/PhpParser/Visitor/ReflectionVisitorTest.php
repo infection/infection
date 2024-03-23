@@ -242,16 +242,10 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
     private function getPartOfSignatureSpyVisitor(string $nodeClass)
     {
         return new class($nodeClass) extends NodeVisitorAbstract {
-            /**
-             * @var string
-             */
-            private $nodeClassUnderTest;
-
             private $isPartOfSignature;
 
-            public function __construct(string $nodeClass)
+            public function __construct(private readonly string $nodeClassUnderTest)
             {
-                $this->nodeClassUnderTest = $nodeClass;
             }
 
             public function leaveNode(Node $node): void
@@ -271,16 +265,10 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
     private function getSpyVisitor(string $nodeClass)
     {
         return new class($nodeClass) extends NodeVisitorAbstract {
-            /**
-             * @var string
-             */
-            private $nodeClassUnderTest;
-
             public $spyCalled = false;
 
-            public function __construct(string $nodeClass)
+            public function __construct(private readonly string $nodeClassUnderTest)
             {
-                $this->nodeClassUnderTest = $nodeClass;
             }
 
             public function leaveNode(Node $node): void

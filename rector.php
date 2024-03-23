@@ -39,8 +39,7 @@ use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 return RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/src',
-        // TODO uncomment as a separate PR
-        // __DIR__ . '/tests/phpunit',
+        __DIR__ . '/tests/phpunit',
     ])
     ->withPhpSets(php81: true)
     ->withSkip([

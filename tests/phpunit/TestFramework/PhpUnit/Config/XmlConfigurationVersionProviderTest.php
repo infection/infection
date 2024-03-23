@@ -149,41 +149,41 @@ final class XmlConfigurationVersionProviderTest extends TestCase
             <phpunit></phpunit>
             XML;
 
-        yield <<<'XML'
+        yield <<<'XML_WRAP'
             <?xml version="1.0" encoding="UTF-8"?>
             <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></phpunit>
-            XML;
+            XML_WRAP;
 
-        yield <<<'XML'
+        yield <<<'XML_WRAP'
             <?xml version="1.0" encoding="UTF-8"?>
             <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.0/phpunit.xsd">
             </phpunit>
-            XML;
+            XML_WRAP;
 
-        yield <<<'XML'
+        yield <<<'XML_WRAP'
             <?xml version="1.0" encoding="UTF-8"?>
             <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/9.2.xsd">
             </phpunit>
-            XML;
+            XML_WRAP;
 
-        yield <<<'XML'
+        yield <<<'XML_WRAP'
             <?xml version="1.0" encoding="UTF-8"?>
             <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:noNamespaceSchemaLocation="./phpunit.xsd">
             </phpunit>
-            XML;
+            XML_WRAP;
     }
 
     protected static function mainlineConfigurationsProvider()
     {
-        yield <<<'XML'
+        yield <<<'XML_WRAP'
             <?xml version="1.0" encoding="UTF-8"?>
             <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
             </phpunit>
-            XML;
+            XML_WRAP;
 
         yield <<<'XML'
             <?xml version="1.0" encoding="UTF-8"?>

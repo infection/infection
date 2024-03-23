@@ -211,14 +211,10 @@ final class MutatorTest extends TestCase
     private function getPublicMethods(ReflectionClass $reflectionClass): array
     {
         $publicMethods = array_map(
-            static function (ReflectionMethod $reflectionMethod): string {
-                return $reflectionMethod->getName();
-            },
+            static fn (ReflectionMethod $reflectionMethod): string => $reflectionMethod->getName(),
             array_filter(
                 $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC),
-                static function (ReflectionMethod $reflectionMethod): bool {
-                    return !$reflectionMethod->isConstructor();
-                },
+                static fn (ReflectionMethod $reflectionMethod): bool => !$reflectionMethod->isConstructor(),
             ),
         );
 

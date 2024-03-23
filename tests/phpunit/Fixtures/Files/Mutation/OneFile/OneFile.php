@@ -11,12 +11,10 @@ namespace Infection\Tests\Fixtures\Files\Mutation\OneFile;
 
 class OneFile
 {
-    const FOO = 1 + 2;
+    public const FOO = 1 + 2;
 
     public function foo($value = true): int
     {
-        return (function ($input = 33) {
-            return $input;
-        })() + 44;
+        return (fn($input = 33) => $input)() + 44;
     }
 }

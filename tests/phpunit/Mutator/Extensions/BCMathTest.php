@@ -207,8 +207,6 @@ final class BCMathTest extends BaseMutatorTestCase
 
     private static function generateArgumentsExpression(int $numberOfArguments): string
     {
-        return implode(', ', array_map(static function (string $argument): string {
-            return "'$argument'";
-        }, $numberOfArguments > 0 ? range(1, $numberOfArguments) : []));
+        return implode(', ', array_map(static fn (string $argument): string => "'$argument'", $numberOfArguments > 0 ? range(1, $numberOfArguments) : []));
     }
 }

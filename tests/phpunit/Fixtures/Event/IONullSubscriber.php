@@ -9,11 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class IONullSubscriber implements EventSubscriber
 {
-    private $output;
-
-    public function __construct(OutputInterface $output)
+    public function __construct(private readonly OutputInterface $output)
     {
-        $this->output = $output;
     }
 
     public function getOutput(): OutputInterface

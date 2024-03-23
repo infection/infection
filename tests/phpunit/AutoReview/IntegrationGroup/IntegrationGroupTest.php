@@ -70,7 +70,7 @@ final class IntegrationGroupTest extends TestCase
         $this->failWithIntegrationGroupMessage($testCaseClassName, $fileWithIoOperations);
     }
 
-    private function failWithIntegrationGroupMessage(string $testCaseClassName, string $fileWithIoOperations): void
+    private function failWithIntegrationGroupMessage(string $testCaseClassName, string $fileWithIoOperations): never
     {
         $this->fail(sprintf(
             <<<'TXT'

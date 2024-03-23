@@ -115,7 +115,7 @@ function make_tmp_dir(string $namespace, string $className): string
             $filesystem->mkdir($tmpDir, 0777);
 
             $result = true;
-        } catch (IOException $exception) {
+        } catch (IOException) {
             ++$attempts;
         }
     } while ($result === false && $attempts <= 10);

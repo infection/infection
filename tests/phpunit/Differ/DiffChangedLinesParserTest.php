@@ -111,9 +111,7 @@ final class DiffChangedLinesParserTest extends TestCase
 
         foreach ($map as $filePath => $changedLinesRanges) {
             $convertedMap[$filePath] = array_map(
-                static function (ChangedLinesRange $changedLinesRange): array {
-                    return [$changedLinesRange->getStartLine(), $changedLinesRange->getEndLine()];
-                },
+                static fn (ChangedLinesRange $changedLinesRange): array => [$changedLinesRange->getStartLine(), $changedLinesRange->getEndLine()],
                 $changedLinesRanges,
             );
         }

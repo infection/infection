@@ -82,9 +82,7 @@ final class IntegrationGroupProvider
         }
 
         self::$ioTestCaseClassesTuple = array_values(array_filter(array_map(
-            static function (string $className): ?array {
-                return self::ioTestCaseTuple($className);
-            },
+            static fn (string $className): ?array => self::ioTestCaseTuple($className),
             iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
         )));
 

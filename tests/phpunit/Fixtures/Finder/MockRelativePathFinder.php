@@ -12,7 +12,7 @@ class MockRelativePathFinder extends Finder
 {
     private array $filters = [];
 
-    public function __construct(private array $sourceDirectories)
+    public function __construct(private readonly array $sourceDirectories)
     {
         parent::__construct();
     }
