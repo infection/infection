@@ -58,14 +58,11 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 preg_match('/a/', 'b', $foo);
                 PHP
             ,
-            (static function () {
-                return
-                    <<<'PHP'
-                        <?php
+            (static fn () => <<<'PHP'
+                <?php
 
-                        (int) $foo = [];
-                        PHP;
-            })(),
+                (int) $foo = [];
+                PHP)(),
         ];
 
         yield 'It does not mutate if the function is a variable' => [
@@ -84,14 +81,11 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 PreG_maTch('/a/', 'b', $foo);
                 PHP
             ,
-            (static function () {
-                return
-                    <<<'PHP'
-                        <?php
+            (static fn () => <<<'PHP'
+                <?php
 
-                        (int) $foo = [];
-                        PHP;
-            })(),
+                (int) $foo = [];
+                PHP)(),
         ];
 
         yield 'It does not mutate if there are less than 3 arguments' => [
@@ -109,14 +103,11 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 preg_match('/a/', 'b', $a->b);
                 PHP
             ,
-            (static function () {
-                return
-                    <<<'PHP'
-                        <?php
+            (static fn () => <<<'PHP'
+                <?php
 
-                        (int) $a->b = [];
-                        PHP;
-            })(),
+                (int) $a->b = [];
+                PHP)(),
         ];
 
         yield 'It mutates correctly even with four arguments' => [
@@ -126,14 +117,11 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE);
                 PHP
             ,
-            (static function () {
-                return
-                    <<<'PHP'
-                        <?php
+            (static fn () => <<<'PHP'
+                <?php
 
-                        (int) $foo = [];
-                        PHP;
-            })(),
+                (int) $foo = [];
+                PHP)(),
         ];
 
         yield 'It mutates correctly even with five arguments' => [
@@ -143,14 +131,11 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE, 3);
                 PHP
             ,
-            (static function () {
-                return
-                    <<<'PHP'
-                        <?php
+            (static fn () => <<<'PHP'
+                <?php
 
-                        (int) $foo = [];
-                        PHP;
-            })(),
+                (int) $foo = [];
+                PHP)(),
         ];
     }
 }

@@ -59,16 +59,13 @@ final class YieldValueTest extends BaseMutatorTestCase
                     (yield $a => $b);
                 };
                 PHP,
-            (static function () {
-                return
-                    <<<'PHP'
-                        <?php
+            (static fn () => <<<'PHP'
+                <?php
 
-                        $a = function () {
-                            yield $b;
-                        };
-                        PHP;
-            })(),
+                $a = function () {
+                    yield $b;
+                };
+                PHP)(),
         ];
 
         yield 'It does not mutate yields without a double arrow operator' => [

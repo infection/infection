@@ -48,13 +48,13 @@ use PhpParser\PrettyPrinterAbstract;
  */
 final class SingletonContainer
 {
-    private static ?Container $container;
+    private static ?Container $container = null;
 
-    private static ?NodeDumper $dumper;
+    private static ?NodeDumper $dumper = null;
 
-    private static ?PrettyPrinterAbstract $printer;
+    private static ?PrettyPrinterAbstract $printer = null;
 
-    private static ?PHPDocParser $phpDocParser;
+    private static ?PHPDocParser $phpDocParser = null;
 
     public static function getContainer(): Container
     {
