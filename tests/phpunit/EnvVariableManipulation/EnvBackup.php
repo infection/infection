@@ -43,14 +43,11 @@ use Webmozart\Assert\Assert;
 
 final class EnvBackup
 {
-    private $environmentVariables;
-
     /**
      * @param array<string, string> $environmentVariables
      */
-    private function __construct(array $environmentVariables)
+    private function __construct(private array $environmentVariables)
     {
-        $this->environmentVariables = $environmentVariables;
     }
 
     public static function createSnapshot(): self

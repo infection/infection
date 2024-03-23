@@ -49,6 +49,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\array_replace;
 use function sprintf;
+use function str_ends_with;
 use function str_starts_with;
 use function substr;
 use function substr_count;
@@ -284,8 +285,8 @@ final class MakefileTest extends BaseMakefileTestCase
     private static function getTestRules(bool $dockerTargets): array
     {
         $filterDockerTarget = $dockerTargets
-            ? static fn (string $target) => substr($target, -7) === '-docker'
-            : static fn (string $target) => substr($target, -7) !== '-docker';
+            ? static fn (string $target) => str_ends_with($target, '-docker')
+            : static fn (string $target) => !str_ends_with($target, '-docker');
 
         return array_values(
             array_filter(

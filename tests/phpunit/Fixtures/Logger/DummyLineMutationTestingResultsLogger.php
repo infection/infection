@@ -8,14 +8,11 @@ use Infection\Logger\LineMutationTestingResultsLogger;
 
 final class DummyLineMutationTestingResultsLogger implements LineMutationTestingResultsLogger
 {
-    private $lines;
-
     /**
      * @param string[] $lines
      */
-    public function __construct(array $lines)
+    public function __construct(private readonly array $lines)
     {
-        $this->lines = $lines;
     }
 
     public function getLogLines(): array

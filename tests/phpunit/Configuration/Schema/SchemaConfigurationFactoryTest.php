@@ -955,25 +955,21 @@ final class SchemaConfigurationFactoryTest extends TestCase
         ];
 
         foreach (TestFrameworkTypes::getTypes() as $testFrameworkType) {
-            yield '[testFramework] ' . $testFrameworkType => (static function () use (
-                $testFrameworkType
-            ): array {
-                return [
-                    <<<"JSON"
-                        {
-                            "source": {
-                                "directories": ["src"]
-                            },
-                            "testFramework": "{$testFrameworkType}"
-                        }
-                        JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'testFramework' => $testFrameworkType,
-                    ]),
-                ];
-            })();
+            yield '[testFramework] ' . $testFrameworkType => (static fn (): array => [
+                <<<"JSON"
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "testFramework": "{$testFrameworkType}"
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'testFramework' => $testFrameworkType,
+                ]),
+            ])();
         }
 
         yield '[bootstrap] nominal' => [
@@ -1729,35 +1725,33 @@ final class SchemaConfigurationFactoryTest extends TestCase
         ];
 
         foreach ($orderedBcMathSettings as $bcMathSetting) {
-            yield '[mutators][BCMath] setting ' . $bcMathSetting => (static function () use ($bcMathSetting): array {
-                return [
-                    <<<JSON
-                        {
-                            "source": {
-                                "directories": ["src"]
-                            },
-                            "mutators": {
-                                "BCMath": {
-                                    "settings": {
-                                        "$bcMathSetting": false
-                                    }
+            yield '[mutators][BCMath] setting ' . $bcMathSetting => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "BCMath": {
+                                "settings": {
+                                    "$bcMathSetting": false
                                 }
                             }
                         }
-                        JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            'BCMath' => (object) [
-                                'settings' => (object) [
-                                    $bcMathSetting => false,
-                                ],
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        'BCMath' => (object) [
+                            'settings' => (object) [
+                                $bcMathSetting => false,
                             ],
                         ],
-                    ]),
-                ];
-            })();
+                    ],
+                ]),
+            ])();
         }
 
         yield '[mutators][BCMath] nominal' => [
@@ -1948,35 +1942,33 @@ final class SchemaConfigurationFactoryTest extends TestCase
         ];
 
         foreach ($orderedMBStringSettings as $mbStringSetting) {
-            yield '[mutators][MBString] setting ' . $mbStringSetting => (static function () use ($mbStringSetting): array {
-                return [
-                    <<<JSON
-                        {
-                            "source": {
-                                "directories": ["src"]
-                            },
-                            "mutators": {
-                                "MBString": {
-                                    "settings": {
-                                        "$mbStringSetting": false
-                                    }
+            yield '[mutators][MBString] setting ' . $mbStringSetting => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "MBString": {
+                                "settings": {
+                                    "$mbStringSetting": false
                                 }
                             }
                         }
-                        JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            'MBString' => (object) [
-                                'settings' => (object) [
-                                    $mbStringSetting => false,
-                                ],
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        'MBString' => (object) [
+                            'settings' => (object) [
+                                $mbStringSetting => false,
                             ],
                         ],
-                    ]),
-                ];
-            })();
+                    ],
+                ]),
+            ])();
         }
 
         yield '[mutators][MBString] nominal' => [
@@ -2150,112 +2142,96 @@ final class SchemaConfigurationFactoryTest extends TestCase
         }
 
         foreach (self::PROFILES as $index => $profile) {
-            yield '[mutators][profile] ' . $profile . ' false' => (static function () use (
-                $profile
-            ): array {
-                return [
-                    <<<JSON
-                        {
-                            "source": {
-                                "directories": ["src"]
-                            },
-                            "mutators": {
-                                "$profile": false
-                            }
+            yield '[mutators][profile] ' . $profile . ' false' => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$profile": false
                         }
-                        JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            $profile => false,
-                        ],
-                    ]),
-                ];
-            })();
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        $profile => false,
+                    ],
+                ]),
+            ])();
 
-            yield '[mutators][profile] ' . $profile . ' true' => (static function () use (
-                $profile
-            ): array {
-                return [
-                    <<<JSON
-                        {
-                            "source": {
-                                "directories": ["src"]
-                            },
-                            "mutators": {
-                                "$profile": true
-                            }
+            yield '[mutators][profile] ' . $profile . ' true' => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$profile": true
                         }
-                        JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            $profile => true,
-                        ],
-                    ]),
-                ];
-            })();
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        $profile => true,
+                    ],
+                ]),
+            ])();
 
-            yield '[mutators][profile] ' . $profile . ' ignore' => (static function () use (
-                $profile
-            ): array {
-                return [
-                    <<<JSON
-                        {
-                            "source": {
-                                "directories": ["src"]
-                            },
-                            "mutators": {
-                                "$profile": {
-                                    "ignore": ["fileA", "fileB"]
-                                }
+            yield '[mutators][profile] ' . $profile . ' ignore' => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$profile": {
+                                "ignore": ["fileA", "fileB"]
                             }
                         }
-                        JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            $profile => (object) [
-                                'ignore' => ['fileA', 'fileB'],
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        $profile => (object) [
+                            'ignore' => ['fileA', 'fileB'],
+                        ],
+                    ],
+                ]),
+            ])();
+
+            yield '[mutators][profile] ' . $profile . ' ignore empty & untrimmed' => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$profile": {
+                                "ignore": [" file ", ""]
+                            }
+                        }
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        $profile => (object) [
+                            'ignore' => [
+                                ' file ',
+                                '',
                             ],
                         ],
-                    ]),
-                ];
-            })();
-
-            yield '[mutators][profile] ' . $profile . ' ignore empty & untrimmed' => (static function () use (
-                $profile
-            ): array {
-                return [
-                    <<<JSON
-                        {
-                            "source": {
-                                "directories": ["src"]
-                            },
-                            "mutators": {
-                                "$profile": {
-                                    "ignore": [" file ", ""]
-                                }
-                            }
-                        }
-                        JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            $profile => (object) [
-                                'ignore' => [
-                                    ' file ',
-                                    '',
-                                ],
-                            ],
-                        ],
-                    ]),
-                ];
-            })();
+                    ],
+                ]),
+            ])();
         }
 
         yield '[mutators][profile] nominal' => [
@@ -2795,9 +2771,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
         $validator->validate($decodedJson, (object) ['$ref' => self::SCHEMA_FILE]);
 
         $normalizedErrors = array_map(
-            static function (array $error): string {
-                return sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL);
-            },
+            static fn (array $error): string => sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL),
             $validator->getErrors(),
         );
 

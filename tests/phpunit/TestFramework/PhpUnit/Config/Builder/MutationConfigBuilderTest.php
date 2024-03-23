@@ -566,9 +566,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         );
 
         $files = array_map(
-            static function (DOMNode $file): string {
-                return $file->nodeValue;
-            },
+            static fn (DOMNode $file): string => $file->nodeValue,
             iterator_to_array(
                 $this->queryXpath($xml, '/phpunit/testsuites/testsuite/file'),
                 false,

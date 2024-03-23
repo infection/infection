@@ -63,12 +63,10 @@ final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTestCase
         );
 
         $actual = array_map(
-            static function (Node $node): array {
-                return [
-                    $node->getType(),
-                    (string) FullyQualifiedClassNameManipulator::getFqcn($node),
-                ];
-            },
+            static fn (Node $node): array => [
+                $node->getType(),
+                (string) FullyQualifiedClassNameManipulator::getFqcn($node),
+            ],
             $spyVisitor->getCollectedNodes(),
         );
 

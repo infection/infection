@@ -233,18 +233,14 @@ final class ProjectCodeTest extends TestCase
         // we're extending from, e.g. we can't change Symfony\Component\Process\Process to not have
         // a public property it has.
         $propertyNames = array_map(
-            static function (ReflectionProperty $reflectionProperty): string {
-                return sprintf(
-                    '%s#%s',
-                    $reflectionProperty->getDeclaringClass()->getName(),
-                    $reflectionProperty->getName(),
-                );
-            },
+            static fn (ReflectionProperty $reflectionProperty): string => sprintf(
+                '%s#%s',
+                $reflectionProperty->getDeclaringClass()->getName(),
+                $reflectionProperty->getName(),
+            ),
             array_filter(
                 $properties,
-                static function (ReflectionProperty $property) use ($className): bool {
-                    return $property->class === $className;
-                },
+                static fn (ReflectionProperty $property): bool => $property->class === $className,
             ),
         );
 

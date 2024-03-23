@@ -205,10 +205,7 @@ final class SourceFileFilterTest extends TestCase
         $actual = (new SourceFileFilter($filter, []))->filter($input);
 
         $actual = take($actual)
-            ->map(static function ($traceOrFileInfo) {
-                /* @var Trace|MockSplFileInfo */
-                return $traceOrFileInfo->getRealPath();
-            })
+            ->map(static fn ($traceOrFileInfo) => $traceOrFileInfo->getRealPath())
             ->toArray();
 
         $this->assertSame($expectedFilePaths, $actual);
@@ -222,13 +219,11 @@ final class SourceFileFilterTest extends TestCase
     private function createSplFileInfosTraversable(array $filePaths): Traversable
     {
         return take($filePaths)
-            ->map(static function (string $realPath): MockSplFileInfo {
-                return new MockSplFileInfo([
-                    'realPath' => $realPath,
-                    'type' => 'file',
-                    'mode' => 'r+',
-                ]);
-            })
+            ->map(static fn (string $realPath): MockSplFileInfo => new MockSplFileInfo([
+                'realPath' => $realPath,
+                'type' => 'file',
+                'mode' => 'r+',
+            ]))
         ;
     }
 

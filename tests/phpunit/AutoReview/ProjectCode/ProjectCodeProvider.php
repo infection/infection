@@ -175,15 +175,13 @@ final class ProjectCodeProvider
         ;
 
         $classes = array_map(
-            static function (SplFileInfo $file): string {
-                return sprintf(
-                    '%s\\%s%s%s',
-                    'Infection',
-                    str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
-                    $file->getRelativePath() !== '' ? '\\' : '',
-                    $file->getBasename('.' . $file->getExtension()),
-                );
-            },
+            static fn (SplFileInfo $file): string => sprintf(
+                '%s\\%s%s%s',
+                'Infection',
+                str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
+                $file->getRelativePath() !== '' ? '\\' : '',
+                $file->getBasename('.' . $file->getExtension()),
+            ),
             iterator_to_array($finder, false),
         );
         sort($classes, SORT_STRING);

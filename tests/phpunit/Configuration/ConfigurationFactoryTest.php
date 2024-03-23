@@ -764,12 +764,10 @@ final class ConfigurationFactoryTest extends TestCase
             ],
             'AssignmentEqual,EqualIdentical',
             false,
-            (static function (): array {
-                return [
-                    'AssignmentEqual' => new AssignmentEqual(),
-                    'EqualIdentical' => new EqualIdentical(),
-                ];
-            })(),
+            (static fn (): array => [
+                'AssignmentEqual' => new AssignmentEqual(),
+                'EqualIdentical' => new EqualIdentical(),
+            ])(),
         );
 
         yield 'with source files' => [
@@ -932,11 +930,9 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/config/phpunit-dir',
                 'config/phpunit',
             ),
-            (static function (): array {
-                return [
-                    'TrueValue' => new TrueValue(new TrueValueConfig([])),
-                ];
-            })(),
+            (static fn (): array => [
+                'TrueValue' => new TrueValue(new TrueValueConfig([])),
+            ])(),
             'phpspec',
             'config/bootstrap.php',
             '-d zend_extension=xdebug.so',

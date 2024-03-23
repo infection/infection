@@ -153,9 +153,7 @@ trait ConfigurationAssertions
     private static function normalizePaths(array $fileInfos): array
     {
         return array_map(
-            static function (SplFileInfo $fileInfo): string {
-                return $fileInfo->getPathname();
-            },
+            static fn (SplFileInfo $fileInfo): string => $fileInfo->getPathname(),
             $fileInfos,
         );
     }

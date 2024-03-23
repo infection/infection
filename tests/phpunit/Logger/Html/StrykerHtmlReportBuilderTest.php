@@ -264,9 +264,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $validator->validate($resultReport, (object) ['$ref' => self::SCHEMA_FILE]);
 
         $normalizedErrors = array_map(
-            static function (array $error): string {
-                return sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL);
-            },
+            static fn (array $error): string => sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL),
             $validator->getErrors(),
         );
 

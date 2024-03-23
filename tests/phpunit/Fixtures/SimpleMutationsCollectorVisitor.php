@@ -15,27 +15,21 @@ use PhpParser\NodeVisitorAbstract;
 final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var Mutator<\PhpParser\Node>
-     */
-    private $mutator;
-
-    /**
      * @var SimpleMutation[]
      */
     private $mutations = [];
 
     /**
-     * @var Node[]
-     */
-    private $fileAst;
-
-    /**
      * @param Mutator<Node> $mutator
      */
-    public function __construct(Mutator $mutator, array $fileAst)
+    public function __construct(
+        private readonly Mutator $mutator,
+        /**
+         * @var Node[]
+         */
+        private readonly array $fileAst
+    )
     {
-        $this->mutator = $mutator;
-        $this->fileAst = $fileAst;
     }
 
     public function leaveNode(Node $node)
@@ -52,7 +46,7 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
                 $this->mutator,
                 MutatedNode::wrap($mutatedNode),
                 $node->getAttributes(),
-                get_class($node)
+                $node::class
             );
         }
     }
