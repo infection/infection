@@ -101,7 +101,6 @@ use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\PrettyPrinter\BackwardCompatibleStandard;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Process\Runner\DryProcessRunner;
@@ -141,6 +140,7 @@ use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
+use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -298,7 +298,7 @@ final class Container
             ),
             Parser::class => static fn (): Parser => (new ParserFactory())->createForHostVersion(),
             FileParser::class => static fn (self $container): FileParser => new FileParser($container->getParser()),
-            PrettyPrinterAbstract::class => static fn (): BackwardCompatibleStandard => new BackwardCompatibleStandard(),
+            PrettyPrinterAbstract::class => static fn (): Standard => new Standard(),
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator($container->getConfiguration()->getMsiPrecision()),
             ResultsCollector::class => static fn (self $container): ResultsCollector => new ResultsCollector(),
             Stopwatch::class => static fn (): Stopwatch => new Stopwatch(),

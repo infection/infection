@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use Infection\Container;
-use Infection\PhpParser\PrettyPrinter\BackwardCompatibleStandard;
 use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
 use PhpParser\NodeDumper;
+use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 
 /**
@@ -68,7 +68,7 @@ final class SingletonContainer
 
     public static function getPrinter(): PrettyPrinterAbstract
     {
-        return self::$printer ??= new BackwardCompatibleStandard();
+        return self::$printer ??= new Standard();
     }
 
     public static function getPHPDocParser(): PHPDocParser
