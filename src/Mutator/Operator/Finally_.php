@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Composer\InstalledVersions;
 use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
@@ -44,7 +43,6 @@ use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
-use function version_compare;
 use Webmozart\Assert\Assert;
 
 /**
@@ -80,11 +78,7 @@ final class Finally_ implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
-            yield new Node\Stmt\Nop();
-        } else {
-            yield NodeVisitor::REPLACE_WITH_NULL;
-        }
+        yield NodeVisitor::REPLACE_WITH_NULL;
     }
 
     public function canMutate(Node $node): bool

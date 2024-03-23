@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Composer\InstalledVersions;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use function version_compare;
 
 final class Yield_Test extends BaseMutatorTestCase
 {
@@ -63,17 +61,6 @@ final class Yield_Test extends BaseMutatorTestCase
                 PHP
             ,
             (static function () {
-                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
-                    return
-                        <<<'PHP'
-                            <?php
-
-                            $a = function () {
-                                (yield $a > $b);
-                            };
-                            PHP;
-                }
-
                 return
                     <<<'PHP'
                         <?php

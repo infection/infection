@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
-use Composer\InstalledVersions;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use function version_compare;
 
 final class PregMatchMatchesTest extends BaseMutatorTestCase
 {
@@ -61,15 +59,6 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 PHP
             ,
             (static function () {
-                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
-                    return
-                        <<<'PHP'
-                            <?php
-
-                            (int) ($foo = []);
-                            PHP;
-                }
-
                 return
                     <<<'PHP'
                         <?php
@@ -96,15 +85,6 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 PHP
             ,
             (static function () {
-                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
-                    return
-                        <<<'PHP'
-                            <?php
-
-                            (int) ($foo = []);
-                            PHP;
-                }
-
                 return
                     <<<'PHP'
                         <?php
@@ -130,15 +110,6 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 PHP
             ,
             (static function () {
-                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
-                    return
-                        <<<'PHP'
-                            <?php
-
-                            (int) ($a->b = []);
-                            PHP;
-                }
-
                 return
                     <<<'PHP'
                         <?php
@@ -156,15 +127,6 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 PHP
             ,
             (static function () {
-                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
-                    return
-                        <<<'PHP'
-                            <?php
-
-                            (int) ($foo = []);
-                            PHP;
-                }
-
                 return
                     <<<'PHP'
                         <?php
@@ -182,15 +144,6 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 PHP
             ,
             (static function () {
-                if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
-                    return
-                        <<<'PHP'
-                            <?php
-
-                            (int) ($foo = []);
-                            PHP;
-                }
-
                 return
                     <<<'PHP'
                         <?php

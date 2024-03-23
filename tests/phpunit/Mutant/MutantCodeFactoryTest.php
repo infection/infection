@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use function class_exists;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -80,9 +79,6 @@ final class MutantCodeFactoryTest extends TestCase
 
     public static function mutationProvider(): iterable
     {
-        /** @see https://github.com/nikic/PHP-Parser/blob/master/UPGRADE-5.0.md#renamed-nodes */
-        $intNodeFQCN = class_exists(Node\Scalar\Int_::class) ? Node\Scalar\Int_::class : Node\Scalar\LNumber::class;
-
         yield [
             new Mutation(
                 '/path/to/acme/Foo.php',
@@ -99,7 +95,7 @@ final class MutantCodeFactoryTest extends TestCase
                         ],
                     ),
                     [new Node\Stmt\Echo_(
-                        [new $intNodeFQCN(
+                        [new Node\Scalar\Int_(
                             10,
                             [
                                 'startLine' => 5,
@@ -140,9 +136,9 @@ final class MutantCodeFactoryTest extends TestCase
                     'endFilePos' => 30,
                     'kind' => 10,
                 ],
-                $intNodeFQCN,
+                Node\Scalar\Int_::class,
                 MutatedNode::wrap(
-                    new $intNodeFQCN(
+                    new Node\Scalar\Int_(
                         15,
                         [
                             'startLine' => 5,

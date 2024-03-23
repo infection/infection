@@ -35,13 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Composer\InstalledVersions;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
-use function version_compare;
 
 /**
  * @internal
@@ -88,11 +86,7 @@ final class Throw_ implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.0', '<')) {
-            yield new Node\Stmt\Expression($node->expr);
-        } else {
-            yield $node->expr;
-        }
+        yield $node->expr;
     }
 
     public function canMutate(Node $node): bool
