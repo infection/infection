@@ -201,8 +201,15 @@ final class FileParserTest extends TestCase
                                 left: Expr_FuncCall(
                                     name: Name(
                                         name: getcwd
-                    )
-                    args: array(
+                                    )
+                                    args: array(
+                                    )
+                                )
+                                right: Scalar_String(
+                                    value: /vendor/autoload.php
+                                )
+                            )
+                        )
                     )
                     3: Stmt_Use(
                         type: TYPE_NORMAL (1)

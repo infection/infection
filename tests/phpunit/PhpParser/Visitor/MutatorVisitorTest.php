@@ -109,8 +109,8 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                     $nodes,
                     MutatorName::getName(PublicVisibility::class),
                     [
-                        'startTokenPos' => 29,
-                        'endTokenPos' => 48,
+                        'startTokenPos' => 28,
+                        'endTokenPos' => 46,
                         'startLine' => -1,
                         'endLine' => -1,
                         'startFilePos' => -1,
@@ -161,8 +161,8 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                     $nodes,
                     MutatorName::getName(PublicVisibility::class),
                     [
-                        'startTokenPos' => 29,
-                        'endTokenPos' => 48,
+                        'startTokenPos' => 28,
+                        'endTokenPos' => 46,
                         'startLine' => -1,
                         'endLine' => -1,
                         'startFilePos' => -1,
