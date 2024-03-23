@@ -50,6 +50,7 @@ use ReflectionClass;
 use function Safe\realpath;
 use const SORT_STRING;
 use function sprintf;
+use function str_ends_with;
 use function str_replace;
 use function substr;
 use Symfony\Component\Filesystem\Path;
@@ -137,9 +138,7 @@ final class ProfileListProvider
 
         self::$profileConstants = array_filter(
             $profileListReflection->getConstants(),
-            static function (string $constantName): bool {
-                return substr($constantName, -8) === '_PROFILE';
-            },
+            static fn (string $constantName): bool => str_ends_with($constantName, '_PROFILE'),
             ARRAY_FILTER_USE_KEY,
         );
 

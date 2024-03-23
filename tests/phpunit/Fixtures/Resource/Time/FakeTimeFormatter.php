@@ -7,7 +7,7 @@ use Infection\Resource\Time\TimeFormatter;
 
 final class FakeTimeFormatter extends TimeFormatter
 {
-    public function __construct(private float $seconds)
+    public function __construct(private readonly float $seconds)
     {
     }
 

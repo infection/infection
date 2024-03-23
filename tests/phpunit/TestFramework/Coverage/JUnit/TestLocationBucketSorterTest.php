@@ -200,9 +200,7 @@ final class TestLocationBucketSorterTest extends TestCase
     public static function locationsArrayProvider(): iterable
     {
         $locations = array_map(
-            static function (float $executionTime): TestLocation {
-                return new TestLocation('', '', $executionTime);
-            },
+            static fn (float $executionTime): TestLocation => new TestLocation('', '', $executionTime),
             JUnitTimes::JUNIT_TIMES,
         );
 
@@ -231,9 +229,7 @@ final class TestLocationBucketSorterTest extends TestCase
     {
         usort(
             $uniqueTestLocations,
-            static function (TestLocation $a, TestLocation $b): int {
-                return $a->getExecutionTime() <=> $b->getExecutionTime();
-            },
+            static fn (TestLocation $a, TestLocation $b): int => $a->getExecutionTime() <=> $b->getExecutionTime(),
         );
     }
 

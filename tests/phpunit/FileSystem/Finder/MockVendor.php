@@ -50,16 +50,6 @@ final class MockVendor
     /**
      * @var string
      */
-    private $tmpDir;
-
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
-
-    /**
-     * @var string
-     */
     private $packageScript;
 
     /**
@@ -82,11 +72,8 @@ final class MockVendor
      */
     private $vendorBinBat;
 
-    public function __construct(string $tmpDir, Filesystem $fileSystem)
+    public function __construct(private readonly string $tmpDir, private readonly Filesystem $fileSystem)
     {
-        $this->tmpDir = $tmpDir;
-        $this->fileSystem = $fileSystem;
-
         $vendorDir = $this->tmpDir . '/vendor';
         $this->vendorBinDir = $vendorDir . '/bin';
 

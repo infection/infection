@@ -12,15 +12,8 @@ use Symfony\Component\Process\Process;
 
 final class DummyProcessBearer implements ProcessBearer
 {
-    private $process;
-    private $expectTimeOut;
-    private $terminateCallback;
-
-    public function __construct(Process $process, bool $expectTimeOut, Closure $terminateCallback)
+    public function __construct(private readonly Process $process, private readonly bool $expectTimeOut, private readonly Closure $terminateCallback)
     {
-        $this->process = $process;
-        $this->expectTimeOut = $expectTimeOut;
-        $this->terminateCallback = $terminateCallback;
     }
 
     public function getProcess(): Process

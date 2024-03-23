@@ -92,9 +92,7 @@ final class ContainerTest extends TestCase
         }
 
         self::$containerFiles = array_map(
-            static function (string $path): string {
-                return Path::canonicalize($path);
-            },
+            static fn (string $path): string => Path::canonicalize($path),
             [
                 __DIR__ . '/ContainerTest.php',
                 __DIR__ . '/../ContainerTest.php',

@@ -309,7 +309,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->removeExistingLoggers($xPath);
             },
-            <<<'XML'
+            <<<'XML_WRAP'
                 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
                   <coverage disableCodeCoverageIgnore="true" ignoreDeprecatedCodeUnits="true" includeUncoveredFiles="true" processUncoveredFiles="true">
                     <include>
@@ -321,7 +321,8 @@ final class XmlConfigurationManipulatorTest extends TestCase
                     </exclude>
                   </coverage>
                 </phpunit>
-                XML,
+                XML_WRAP
+            ,
         );
     }
 
@@ -775,12 +776,12 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
     public function test_it_works_if_schema_location_is_absent_but_xmlns_xsi_is_present(): void
     {
-        $xPath = $this->createXPath(<<<XML
+        $xPath = $this->createXPath(<<<XML_WRAP
             <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                     bootstrap="vendor/autoload.php"
                     colors="true">
             </phpunit>
-            XML
+            XML_WRAP
         );
 
         $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
@@ -864,14 +865,14 @@ final class XmlConfigurationManipulatorTest extends TestCase
             __DIR__ . '/../../../../..',
         );
 
-        $xPath = $this->createXPath(<<<XML
+        $xPath = $this->createXPath(<<<XML_WRAP
             <?xml version="1.0" encoding="UTF-8"?>
             <phpunit
                 xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             >
             </phpunit>
-            XML
+            XML_WRAP
         );
 
         $this->assertTrue($configManipulator->validate('/path/to/phpunit.xml', $xPath));
@@ -942,7 +943,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
     private function assertItChangesPostPHPUnit93Configuration(Closure $changeXml, string $expectedXml): void
     {
-        $this->assertItChangesXML(<<<'XML'
+        $this->assertItChangesXML(<<<'XML_WRAP'
             <?xml version="1.0" encoding="UTF-8"?>
             <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
@@ -979,7 +980,8 @@ final class XmlConfigurationManipulatorTest extends TestCase
                     <text outputFile="logfile.txt"/>
                 </logging>
             </phpunit>
-            XML
+            XML_WRAP
+
             ,
             $changeXml,
             $expectedXml,

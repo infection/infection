@@ -174,9 +174,7 @@ final class SourceFileCollectorTest extends TestCase
 
         $files = array_values(
             array_map(
-                static function (string $file) use ($root): string {
-                    return Path::makeRelative($file, $root);
-                },
+                static fn (string $file): string => Path::makeRelative($file, $root),
                 $files,
             ),
         );

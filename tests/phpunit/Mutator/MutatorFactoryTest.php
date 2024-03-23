@@ -38,7 +38,6 @@ namespace Infection\Tests\Mutator;
 use function array_fill_keys;
 use function array_values;
 use function count;
-use function get_class;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\IgnoreMutator;
@@ -203,11 +202,9 @@ final class MutatorFactoryTest extends TestCase
             $this->assertInstanceOf(Mutator::class, $mutator);
 
             $expectedMutatorClass = $expectedMutatorClassNames[$index];
-            $actualMutatorClass = get_class(
-                $mutator instanceof IgnoreMutator
-                    ? $decoratedMutatorReflection->getValue($mutator)
-                    : $mutator,
-            );
+            $actualMutatorClass = ($mutator instanceof IgnoreMutator
+                ? $decoratedMutatorReflection->getValue($mutator)
+                : $mutator)::class;
 
             $this->assertSame(
                 $expectedMutatorClass,

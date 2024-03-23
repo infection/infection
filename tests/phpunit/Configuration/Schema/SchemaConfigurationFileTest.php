@@ -69,7 +69,7 @@ final class SchemaConfigurationFileTest extends TestCase
             $config->getDecodedContents();
 
             $this->fail('Expected the content to be invalid.');
-        } catch (Exception $exception) {
+        } catch (Exception) {
             $this->addToAssertionCount(1);
         }
 

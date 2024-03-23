@@ -7,7 +7,7 @@ use Infection\Resource\Memory\MemoryFormatter;
 
 final class FakeMemoryFormatter extends MemoryFormatter
 {
-    public function __construct(private float $bytes)
+    public function __construct(private readonly float $bytes)
     {
     }
 

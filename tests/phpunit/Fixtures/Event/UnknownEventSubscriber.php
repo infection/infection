@@ -9,8 +9,8 @@ use Infection\Tests\UnsupportedMethod;
 
 final class UnknownEventSubscriber implements EventSubscriber
 {
-    public function onUnknownEventSubscriber(UnknownEventSubscriber $event): void
+    public function onUnknownEventSubscriber(UnknownEventSubscriber $event): never
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }
