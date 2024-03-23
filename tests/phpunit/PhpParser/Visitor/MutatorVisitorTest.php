@@ -80,11 +80,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                     class Test
                     {
-                        public function hello() : string
+                        public function hello(): string
                         {
                             return 'hello';
                         }
-                        public function bye() : string
+                        public function bye(): string
                         {
                             return 'bye';
                         }
@@ -131,11 +131,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                     class Test
                     {
-                        public function hello() : string
+                        public function hello(): string
                         {
                             return 'hello';
                         }
-                        public function bye() : string
+                        public function bye(): string
                         {
                             return 'bye';
                         }
@@ -183,11 +183,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                     class Test
                     {
-                        public function hello() : string
+                        public function hello(): string
                         {
                             return 'hello';
                         }
-                        public function bye() : string
+                        public function bye(): string
                         {
                             return 'bye';
                         }
@@ -239,11 +239,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                     class Test
                     {
-                        public function hello() : string
+                        public function hello(): string
                         {
                             return 'hello';
                         }
-                        public function bye() : string
+                        public function bye(): string
                         {
                             return 'bye';
                         }
@@ -255,11 +255,11 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
                     class Test
                     {
-                        public function hello() : string
+                        public function hello(): string
                         {
                             return 'hello';
                         }
-                        public function bye() : string
+                        public function bye(): string
                         {
                             return 'bye';
                         }

@@ -99,20 +99,19 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
         yield 'It does not mutate final flag' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-final.php'),
             <<<'PHP'
-                                <?php
+                <?php
 
-                                namespace PublicVisibilityFinal;
+                namespace PublicVisibilityFinal;
 
-                                class Test
-                                {
-                                    final protected function foo(int $param, $test = 1): bool
+                class Test
+                {
+                    final protected function foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates non abstract public to protected in an abstract class' => [
@@ -238,13 +237,13 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
         yield 'it does mutate non-inherited methods' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-non-same-method-parent.php'),
             <<<'PHP'
-                                <?php
+                <?php
 
-                                namespace NonSameAbstract;
+                namespace NonSameAbstract;
 
-                                abstract class NonSameAbstract
-                                {
-                                    abstract public function foo();
+                abstract class NonSameAbstract
+                {
+                    abstract public function foo();
                 }
                 class Child extends NonSameAbstract
                 {
@@ -292,13 +291,13 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
         yield 'It does mutate when the parents method is protected' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-protected-parent.php'),
             <<<'PHP'
-                                <?php
+                <?php
 
-                                namespace ProtectedParent;
+                namespace ProtectedParent;
 
-                                abstract class SameAbstract
-                                {
-                                    abstract protected function foo();
+                abstract class SameAbstract
+                {
+                    abstract protected function foo();
                 }
                 class Child extends SameAbstract
                 {

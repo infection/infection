@@ -175,13 +175,13 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
         yield 'it does mutate non-inherited methods' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-non-same-method-parent.php'),
             <<<'PHP'
-                                <?php
+                <?php
 
-                                namespace ProtectedNonSameAbstract;
+                namespace ProtectedNonSameAbstract;
 
-                                abstract class ProtectedNonSameAbstract
-                                {
-                                    abstract protected function foo();
+                abstract class ProtectedNonSameAbstract
+                {
+                    abstract protected function foo();
                 }
                 class Child extends ProtectedNonSameAbstract
                 {
