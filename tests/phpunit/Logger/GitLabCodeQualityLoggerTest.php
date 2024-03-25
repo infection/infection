@@ -39,6 +39,7 @@ use Infection\Logger\GitLabCodeQualityLogger;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
+use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -53,7 +54,23 @@ use function str_replace;
 #[CoversClass(GitLabCodeQualityLogger::class)]
 final class GitLabCodeQualityLoggerTest extends TestCase
 {
+    use BacksUpEnvironmentVariables;
     use CreateMetricsCalculator;
+
+    protected function setUp(): void
+    {
+        $this->backupEnvironmentVariables();
+
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->restoreEnvironmentVariables();
+        self::resetOriginalFilePrefix();
+    }
 
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
@@ -128,6 +145,18 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    public function test_it_logs_correctly_with_ci_project_dir(): void
+    {
+        \Safe\putenv('CI_PROJECT_DIR=/my/project/dir');
+        self::setOriginalFilePrefix('/my/project/dir/');
+
+        $resultsCollector = self::createCompleteResultsCollector();
+
+        $logger = new GitLabCodeQualityLogger($resultsCollector);
+
+        $this->assertStringContainsString('"path":"foo\/bar"', $logger->getLogLines()[0]);
     }
 
     private function assertLoggedContentIs(array $expectedJson, GitLabCodeQualityLogger $logger): void

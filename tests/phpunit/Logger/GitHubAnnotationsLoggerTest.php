@@ -37,6 +37,7 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\GitHubAnnotationsLogger;
 use Infection\Metrics\ResultsCollector;
+use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -46,7 +47,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(GitHubAnnotationsLogger::class)]
 final class GitHubAnnotationsLoggerTest extends TestCase
 {
+    use BacksUpEnvironmentVariables;
     use CreateMetricsCalculator;
+
+    protected function setUp(): void
+    {
+        $this->backupEnvironmentVariables();
+
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->restoreEnvironmentVariables();
+        self::resetOriginalFilePrefix();
+    }
 
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
@@ -72,5 +89,17 @@ final class GitHubAnnotationsLoggerTest extends TestCase
                 "::warning file=foo/bar,line=10::Escaped Mutant for Mutator \"For_\":%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A\n",
             ],
         ];
+    }
+
+    public function test_it_logs_correctly_with_ci_github_workspace(): void
+    {
+        \Safe\putenv('GITHUB_WORKSPACE=/my/project/dir');
+        self::setOriginalFilePrefix('/my/project/dir/');
+
+        $resultsCollector = self::createCompleteResultsCollector();
+
+        $logger = new GitHubAnnotationsLogger($resultsCollector);
+
+        $this->assertStringContainsString('warning file=foo/bar', $logger->getLogLines()[0]);
     }
 }
