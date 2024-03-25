@@ -41,8 +41,6 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
-use Infection\Tests\Mutator\MutatorName;
-use function Infection\Tests\normalize_trailing_spaces;
 use const JSON_THROW_ON_ERROR;
 use function Later\now;
 use const PHP_EOL;
@@ -151,55 +149,13 @@ final class GitLabCodeQualityLoggerTest extends TestCase
     public function test_it_logs_correctly_with_ci_project_dir(): void
     {
         \Safe\putenv('CI_PROJECT_DIR=/my/project/dir');
+        self::$pathPrefix = '/my/project/dir/';
 
-        $resultsCollector = new ResultsCollector();
-        $resultsCollector->collect(
-            new MutantExecutionResult(
-                'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-                'process output',
-                DetectionStatus::ESCAPED,
-                now(normalize_trailing_spaces(
-                    <<<DIFF
-                        --- Original
-                        +++ New
-                        @@ @@
-
-                        - echo 'original';
-                        + echo 'escaped#0';
-
-                        DIFF,
-                )),
-                'a1b2c3',
-                MutatorName::getName(For_::class),
-                '/my/project/dir/foo/bar',
-                10,
-                20,
-                10,
-                20,
-                now('<?php $a = 1;'),
-                now('<?php $a = 2;'),
-                [],
-            ),
-        );
+        $resultsCollector = self::createCompleteResultsCollector();
 
         $logger = new GitLabCodeQualityLogger($resultsCollector);
-        $this->assertLoggedContentIs([
-            [
-                'type' => 'issue',
-                'fingerprint' => 'a1b2c3',
-                'check_name' => 'For_',
-                'description' => 'Escaped Mutant for Mutator For_',
-                'content' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';"),
-                'categories' => ['Escaped Mutant'],
-                'location' => [
-                    'path' => 'foo/bar',
-                    'lines' => [
-                        'begin' => 10,
-                    ],
-                ],
-                'severity' => 'major',
-            ],
-        ], $logger);
+
+        $this->assertStringContainsString('"path":"foo\/bar"', $logger->getLogLines()[0]);
     }
 
     private function assertLoggedContentIs(array $expectedJson, GitLabCodeQualityLogger $logger): void

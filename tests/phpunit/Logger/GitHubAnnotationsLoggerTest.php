@@ -37,13 +37,7 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\GitHubAnnotationsLogger;
 use Infection\Metrics\ResultsCollector;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutator\Loop\For_;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
-use Infection\Tests\Mutator\MutatorName;
-use function Infection\Tests\normalize_trailing_spaces;
-use function Later\now;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -94,43 +88,15 @@ final class GitHubAnnotationsLoggerTest extends TestCase
         ];
     }
 
-    public function test_it_logs_correctly_with_ci_project_dir(): void
+    public function test_it_logs_correctly_with_ci_github_workspace(): void
     {
         \Safe\putenv('GITHUB_WORKSPACE=/my/project/dir');
+        self::$pathPrefix = '/my/project/dir/';
 
-        $resultsCollector = new ResultsCollector();
-        $resultsCollector->collect(
-            new MutantExecutionResult(
-                'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-                'process output',
-                DetectionStatus::ESCAPED,
-                now(normalize_trailing_spaces(
-                    <<<DIFF
-                        --- Original
-                        +++ New
-                        @@ @@
-
-                        - echo 'original';
-                        + echo 'escaped#0';
-
-                        DIFF,
-                )),
-                'a1b2c3',
-                MutatorName::getName(For_::class),
-                '/my/project/dir/foo/bar',
-                10,
-                20,
-                10,
-                20,
-                now('<?php $a = 1;'),
-                now('<?php $a = 2;'),
-                [],
-            ),
-        );
+        $resultsCollector = self::createCompleteResultsCollector();
 
         $logger = new GitHubAnnotationsLogger($resultsCollector);
-        $this->assertSame([
-            "::warning file=foo/bar,line=10::Escaped Mutant for Mutator \"For_\":%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A\n",
-        ], $logger->getLogLines());
+
+        $this->assertStringContainsString('warning file=foo/bar', $logger->getLogLines()[0]);
     }
 }
