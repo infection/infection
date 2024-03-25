@@ -37,6 +37,7 @@ namespace Infection\Tests\Resource\Time;
 
 use Infection\Resource\Time\Stopwatch;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -46,6 +47,7 @@ use function usleep;
 // Cannot import this one as it would remove the ability to mock it
 // use function usleep()
 #[Group('time-sensitive')]
+#[CoversClass(Stopwatch::class)]
 final class StopwatchTest extends TestCase
 {
     /**

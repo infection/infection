@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SourceTestClassNameScheme::class)]
 final class SourceTestClassNameSchemeTest extends TestCase
 {
     public function test_it_can_give_the_source_class_name_for_a_test_case_class(): void

@@ -39,8 +39,10 @@ use Infection\FileSystem\FileFilter;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\TraceProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(CoveredTraceProvider::class)]
 final class CoveredTraceProviderTest extends TestCase
 {
     public function test_it_provides_traces(): void

@@ -36,12 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Regex;
 
 use Generator;
+use Infection\Mutator\Regex\PregMatchRemoveFlags;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
  */
+#[CoversClass(PregMatchRemoveFlags::class)]
 final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
 {
     #[DataProvider('provideMutationCases')]

@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
+use Infection\Mutator\Operator\SpreadRemoval;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(SpreadRemoval::class)]
 final class SpreadRemovalTest extends BaseMutatorTestCase
 {
     /**

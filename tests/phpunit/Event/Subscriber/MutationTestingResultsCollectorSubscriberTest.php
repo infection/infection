@@ -40,8 +40,10 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
 use Infection\Metrics\Collector;
 use Infection\Mutant\MutantExecutionResult;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MutationTestingResultsCollectorSubscriber::class)]
 final class MutationTestingResultsCollectorSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_mutation_process_finished(): void

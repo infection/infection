@@ -37,8 +37,10 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\MutationTestingResultsLogger;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FederatedLogger::class)]
 final class FederatedLoggerTest extends TestCase
 {
     public function test_it_logs_with_all_the_registered_loggers(): void

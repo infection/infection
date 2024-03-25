@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
+use Infection\Mutator\Operator\Catch_;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Catch_::class)]
 final class Catch_Test extends BaseMutatorTestCase
 {
     /**

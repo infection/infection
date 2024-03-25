@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
+use Infection\Mutator\Regex\PregQuote;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(PregQuote::class)]
 final class PregQuoteTest extends BaseMutatorTestCase
 {
     /**

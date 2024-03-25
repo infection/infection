@@ -37,8 +37,10 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use function Infection\Tests\normalizeLineReturn;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(InvalidPhpUnitConfiguration::class)]
 final class InvalidPhpUnitConfigurationTest extends TestCase
 {
     public function test_for_root_node(): void

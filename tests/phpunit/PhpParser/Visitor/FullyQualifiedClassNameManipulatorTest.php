@@ -40,9 +40,11 @@ use InvalidArgumentException;
 use PhpParser\Node;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt\Nop;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FullyQualifiedClassNameManipulator::class)]
 final class FullyQualifiedClassNameManipulatorTest extends TestCase
 {
     #[DataProvider('hasFqcnProvider')]

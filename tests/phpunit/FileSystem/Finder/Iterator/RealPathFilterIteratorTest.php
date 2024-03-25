@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder\Iterator;
 
+use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Infection\Tests\Fixtures\Finder\MockRealPathFinder;
 use Infection\Tests\Fixtures\Finder\MockRelativePathFinder;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(RealPathFilterIterator::class)]
 final class RealPathFilterIteratorTest extends TestCase
 {
     #[DataProvider('providesFinders')]

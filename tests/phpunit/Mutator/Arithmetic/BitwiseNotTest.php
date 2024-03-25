@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Infection\Mutator\Arithmetic\BitwiseNot;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(BitwiseNot::class)]
 final class BitwiseNotTest extends BaseMutatorTestCase
 {
     /**

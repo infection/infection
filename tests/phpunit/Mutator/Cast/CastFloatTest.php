@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
+use Infection\Mutator\Cast\CastFloat;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(CastFloat::class)]
 final class CastFloatTest extends BaseMutatorTestCase
 {
     /**

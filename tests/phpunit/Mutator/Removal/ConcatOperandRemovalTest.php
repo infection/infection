@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
+use Infection\Mutator\Removal\ConcatOperandRemoval;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(ConcatOperandRemoval::class)]
 final class ConcatOperandRemovalTest extends BaseMutatorTestCase
 {
     /**

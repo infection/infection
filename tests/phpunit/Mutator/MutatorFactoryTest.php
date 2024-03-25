@@ -50,12 +50,14 @@ use Infection\Reflection\ClassReflection;
 use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
 use stdClass;
 
+#[CoversClass(MutatorFactory::class)]
 final class MutatorFactoryTest extends TestCase
 {
     /**

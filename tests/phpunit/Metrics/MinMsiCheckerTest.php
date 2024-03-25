@@ -42,11 +42,13 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use function Infection\Tests\normalize_trailing_spaces;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Terminal;
 
+#[CoversClass(MinMsiChecker::class)]
 final class MinMsiCheckerTest extends TestCase
 {
     /**

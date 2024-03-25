@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
+use Infection\Mutator\Boolean\ArrayItem;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(ArrayItem::class)]
 final class ArrayItemTest extends BaseMutatorTestCase
 {
     /**
