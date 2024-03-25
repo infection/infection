@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use Infection\TestFramework\PhpUnit\Adapter\PestAdapterFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[Group('integration')]
+#[CoversClass(PestAdapterFactory::class)]
 final class PestAdapterFactoryTest extends TestCase
 {
     public function test_it_can_create_an_adapter(): void

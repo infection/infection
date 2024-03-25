@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Sort;
 
+use Infection\Mutator\Sort\Spaceship;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Spaceship::class)]
 final class SpaceshipTest extends BaseMutatorTestCase
 {
     public function test_get_name(): void

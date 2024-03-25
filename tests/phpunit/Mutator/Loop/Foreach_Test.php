@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Loop;
 
+use Infection\Mutator\Loop\Foreach_;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Foreach_::class)]
 final class Foreach_Test extends BaseMutatorTestCase
 {
     /**

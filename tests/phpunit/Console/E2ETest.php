@@ -46,6 +46,7 @@ use function getenv;
 use function implode;
 use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
+use Infection\Console\E2E;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\Tests\SingletonContainer;
@@ -53,6 +54,7 @@ use function is_readable;
 use const PHP_EOL;
 use const PHP_OS;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Large;
@@ -76,6 +78,7 @@ use Symfony\Component\Process\Process;
 #[Group('e2e')]
 #[Group('integration')]
 #[Large]
+#[CoversNothing]
 final class E2ETest extends TestCase
 {
     /**

@@ -37,11 +37,13 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\SafeDOMXPath;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use function version_compare;
 
+#[CoversClass(XmlConfigurationVersionProvider::class)]
 final class XmlConfigurationVersionProviderTest extends TestCase
 {
     /**

@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(StringNormalizer::class)]
 final class StringNormalizerTest extends TestCase
 {
     #[DataProvider('stringValuesProvider')]
@@ -56,8 +58,8 @@ final class StringNormalizerTest extends TestCase
 
         yield 'multi-line spaces' => [
             <<<'TXT'
-                 
-                 
+
+
                 TXT
             ,
             <<<'TXT'
@@ -72,10 +74,10 @@ final class StringNormalizerTest extends TestCase
 
         yield 'multi-line text with spaces' => [
             <<<'TXT'
-                 
+
                  foo
-                 bar 
-                 
+                 bar
+
                 TXT
             ,
             <<<'TXT'

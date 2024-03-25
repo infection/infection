@@ -39,9 +39,11 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\OriginalPhpProcess;
 use const PHP_OS_FAMILY;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(InitialTestsRunProcessFactory::class)]
 final class InitialTestsRunProcessFactoryTest extends TestCase
 {
     /**

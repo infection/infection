@@ -36,9 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use function class_exists;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(ProfileListProvider::class)]
 final class ProfileListProviderTest extends TestCase
 {
     #[DataProviderExternal(ProfileListProvider::class, 'mutatorNameAndClassProvider')]

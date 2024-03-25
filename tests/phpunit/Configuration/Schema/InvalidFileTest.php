@@ -38,10 +38,12 @@ namespace Infection\Tests\Configuration\Schema;
 use Error;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
+#[CoversClass(InvalidFile::class)]
 final class InvalidFileTest extends TestCase
 {
     public function test_it_can_be_created_for_file_not_found(): void

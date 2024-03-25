@@ -6,6 +6,7 @@
          executionOrder="random"
          failOnWarning="true"
          failOnRisky="true"
+         requireCoverageMetadata="true"
          cacheDirectory="./build/cache/phpunit"
 >
 

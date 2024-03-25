@@ -41,8 +41,10 @@ use Infection\Metrics\FilteringResultsCollector;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FilteringResultsCollectorFactory::class)]
 final class FilteringResultsCollectorFactoryTest extends TestCase
 {
     use CreateMutantExecutionResult;

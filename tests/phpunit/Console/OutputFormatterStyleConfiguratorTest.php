@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Infection\Console\OutputFormatterStyleConfigurator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(OutputFormatterStyleConfigurator::class)]
 final class OutputFormatterStyleConfiguratorTest extends TestCase
 {
     public function test_it_adds_styles(): void

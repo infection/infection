@@ -37,8 +37,10 @@ namespace Infection\Tests\Event;
 
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Process\Runner\ProcessRunner;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MutationTestingWasStarted::class)]
 final class MutationTestingWasStartedTest extends TestCase
 {
     public function test_it_exposes_its_mutation_count_and_process_runner(): void

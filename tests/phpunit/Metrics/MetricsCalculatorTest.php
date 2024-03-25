@@ -37,8 +37,10 @@ namespace Infection\Tests\Metrics;
 
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MetricsCalculator::class)]
 final class MetricsCalculatorTest extends TestCase
 {
     use CreateMutantExecutionResult;

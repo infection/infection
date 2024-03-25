@@ -35,12 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\FunctionSignature;
 
+use Infection\Mutator\FunctionSignature\ProtectedVisibility;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]
+#[CoversClass(ProtectedVisibility::class)]
 final class ProtectedVisibilityTest extends BaseMutatorTestCase
 {
     /**

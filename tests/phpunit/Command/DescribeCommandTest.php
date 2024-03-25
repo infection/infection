@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command;
 
+use Infection\Command\DescribeCommand;
 use Infection\Console\Application;
 use Infection\Tests\SingletonContainer;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
+#[CoversClass(DescribeCommand::class)]
 final class DescribeCommandTest extends TestCase
 {
     public function test_it_describes(): void
