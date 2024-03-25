@@ -48,7 +48,7 @@ use function Later\now;
 
 trait CreateMetricsCalculator
 {
-    private static $pathPrefix = '';
+    private static $originalFilePrefix = '';
 
     private static function createCompleteMetricsCalculator(): MetricsCalculator
     {
@@ -193,7 +193,7 @@ trait CreateMetricsCalculator
             )),
             'a1b2c3',
             MutatorName::getName($mutatorClassName),
-            self::$pathPrefix . 'foo/bar',
+            self::$originalFilePrefix . 'foo/bar',
             10 - $i,
             20 - $i,
             10 - $i,
@@ -202,5 +202,15 @@ trait CreateMetricsCalculator
             now('<?php $a = 2;'),
             [],
         );
+    }
+
+    private static function setOriginalFilePrefix(string $pathPrefix): void
+    {
+        self::$originalFilePrefix = $pathPrefix;
+    }
+
+    private static function resetOriginalFilePrefix(): void
+    {
+        self::$originalFilePrefix = '';
     }
 }

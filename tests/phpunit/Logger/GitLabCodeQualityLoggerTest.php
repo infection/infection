@@ -69,6 +69,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         parent::tearDown();
 
         $this->restoreEnvironmentVariables();
+        self::resetOriginalFilePrefix();
     }
 
     #[DataProvider('metricsProvider')]
@@ -149,7 +150,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
     public function test_it_logs_correctly_with_ci_project_dir(): void
     {
         \Safe\putenv('CI_PROJECT_DIR=/my/project/dir');
-        self::$pathPrefix = '/my/project/dir/';
+        self::setOriginalFilePrefix('/my/project/dir/');
 
         $resultsCollector = self::createCompleteResultsCollector();
 

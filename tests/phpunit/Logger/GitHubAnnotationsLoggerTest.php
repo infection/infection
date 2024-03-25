@@ -62,6 +62,7 @@ final class GitHubAnnotationsLoggerTest extends TestCase
         parent::tearDown();
 
         $this->restoreEnvironmentVariables();
+        self::resetOriginalFilePrefix();
     }
 
     #[DataProvider('metricsProvider')]
@@ -93,7 +94,7 @@ final class GitHubAnnotationsLoggerTest extends TestCase
     public function test_it_logs_correctly_with_ci_github_workspace(): void
     {
         \Safe\putenv('GITHUB_WORKSPACE=/my/project/dir');
-        self::$pathPrefix = '/my/project/dir/';
+        self::setOriginalFilePrefix('/my/project/dir/');
 
         $resultsCollector = self::createCompleteResultsCollector();
 
