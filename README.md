@@ -14,6 +14,7 @@
 Please read documentation here: [infection.github.io][doc]
 
 * Twitter: [@infection_php][twitter]
+* Mastodon: [@infection_php][mastodon]
 * Discord: https://discord.gg/ZUmyHTJ
 * [Playground](https://infection-php.dev/) - try it right in your browser!
 
@@ -34,3 +35,4 @@ Humbug has since then been discontinued in favour of this project.
 [humbug]: https://github.com/humbug/humbug
 [padraic]: https://github.com/padraic
 [twitter]: http://twitter.com/infection_php
+[mastodon]: https://mastodon.social/@infection_php
