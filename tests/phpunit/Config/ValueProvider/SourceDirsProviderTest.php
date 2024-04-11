@@ -41,13 +41,14 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Console\IO;
 use LogicException;
 use const PHP_OS;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function stripos;
 
-/**
- * @group integration
- */
-final class SourceDirsProviderTest extends BaseProviderTest
+#[Group('integration')]
+#[CoversClass(SourceDirsProvider::class)]
+final class SourceDirsProviderTest extends BaseProviderTestCase
 {
     /**
      * @var SourceDirsProvider
@@ -66,7 +67,7 @@ final class SourceDirsProviderTest extends BaseProviderTest
         $this->provider = new SourceDirsProvider(
             $this->createMock(ConsoleHelper::class),
             $this->getQuestionHelper(),
-            $this->sourceDirGuesser
+            $this->sourceDirGuesser,
         );
     }
 
@@ -83,9 +84,9 @@ final class SourceDirsProviderTest extends BaseProviderTest
         $sourceDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
-            ['src']
+            ['src'],
         );
 
         $this->assertSame(['src'], $sourceDirs);
@@ -100,9 +101,9 @@ final class SourceDirsProviderTest extends BaseProviderTest
         $sourceDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
-            ['src']
+            ['src'],
         );
 
         $this->assertSame(['src/Namespace'], $sourceDirs);
@@ -117,9 +118,9 @@ final class SourceDirsProviderTest extends BaseProviderTest
         $sourceDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
-            ['src']
+            ['src'],
         );
 
         $this->assertSame(['foo', 'bar'], $sourceDirs);
@@ -134,9 +135,9 @@ final class SourceDirsProviderTest extends BaseProviderTest
         $sourceDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("0\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
-            ['src']
+            ['src'],
         );
 
         $this->assertSame(['.'], $sourceDirs);
@@ -153,9 +154,9 @@ final class SourceDirsProviderTest extends BaseProviderTest
         $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("0,1\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
-            ['src']
+            ['src'],
         );
     }
 }

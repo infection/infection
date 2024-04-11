@@ -62,11 +62,11 @@ class InitialConfigBuilder implements ConfigBuilder
         private readonly XmlConfigurationManipulator $configManipulator,
         private readonly XmlConfigurationVersionProvider $versionProvider,
         private readonly array $srcDirs,
-        private readonly array $filteredSourceFilesToMutate
+        private readonly array $filteredSourceFilesToMutate,
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,
-            'The original XML config content cannot be an empty string'
+            'The original XML config content cannot be an empty string',
         );
         $this->originalXmlConfigContent = $originalXmlConfigContent;
     }

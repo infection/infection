@@ -63,7 +63,7 @@ class MutantFactory
         $mutantFilePath = sprintf(
             '%s/mutant.%s.infection.php',
             $this->tmpDir,
-            $mutation->getHash()
+            $mutation->getHash(),
         );
 
         $mutatedCode = lazy($this->createMutatedCode($mutation));
@@ -74,7 +74,7 @@ class MutantFactory
             $mutation,
             $mutatedCode,
             lazy($this->createMutantDiff($originalPrettyPrintedFile, $mutation, $mutatedCode)),
-            $originalPrettyPrintedFile
+            $originalPrettyPrintedFile,
         );
     }
 

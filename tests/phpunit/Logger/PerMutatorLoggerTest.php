@@ -38,52 +38,53 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\PerMutatorLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(PerMutatorLogger::class)]
 final class PerMutatorLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
     use LineLoggerAssertions;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,
-        string $expectedContents
+        string $expectedContents,
     ): void {
         $logger = new PerMutatorLogger($metricsCalculator, $resultsCollector);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
             new ResultsCollector(),
             <<<'TXT'
-# Effects per Mutator
+                # Effects per Mutator
 
-| Mutator | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
-| ------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
+                | Mutator | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+                | ------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
 
-TXT
+                TXT,
         ];
 
         yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
-            $this->createCompleteResultsCollector(),
+            self::createCompleteMetricsCalculator(),
+            self::createCompleteResultsCollector(),
             <<<'TXT'
-# Effects per Mutator
+                # Effects per Mutator
 
-| Mutator   | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
-| --------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
-| For_      |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
-| PregQuote |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
+                | Mutator   | Mutations | Killed | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+                | --------- | --------- | ------ | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
+                | For_      |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
+                | PregQuote |         8 |      1 |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
 
-TXT
+                TXT,
         ];
     }
 }

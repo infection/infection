@@ -12,6 +12,6 @@ final class FakeIgnorer implements NodeIgnorer
 {
     public function ignores(Node $node): bool
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }

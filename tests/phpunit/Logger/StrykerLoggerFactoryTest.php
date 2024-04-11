@@ -44,11 +44,13 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\FakeCiDetector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(StrykerLoggerFactory::class)]
 final class StrykerLoggerFactoryTest extends TestCase
 {
     public function test_it_does_not_create_any_logger_for_no_verbosity_level_and_no_badge(): void
@@ -67,7 +69,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 true,
                 null,
                 '/a/file',
-            )
+            ),
         );
 
         $this->assertNull($logger);
@@ -88,19 +90,17 @@ final class StrykerLoggerFactoryTest extends TestCase
                 null,
                 false,
                 StrykerConfig::forBadge('master'),
-                null
-            )
+                null,
+            ),
         );
 
         $this->assertInstanceOf(StrykerLogger::class, $logger);
     }
 
-    /**
-     * @dataProvider logsProvider
-     */
+    #[DataProvider('logsProvider')]
     public function test_it_creates_a_logger_for_log_type_on_normal_verbosity(
         Logs $logs,
-        ?string $expectedLogger
+        ?string $expectedLogger,
     ): void {
         $factory = $this->createLoggerFactory();
 
@@ -115,7 +115,7 @@ final class StrykerLoggerFactoryTest extends TestCase
         $this->assertInstanceOf($expectedLogger, $logger);
     }
 
-    public function logsProvider(): iterable
+    public static function logsProvider(): iterable
     {
         yield 'no logger' => [
             Logs::createEmpty(),
@@ -133,7 +133,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 null,
                 false,
                 StrykerConfig::forBadge('foo'),
-                null
+                null,
             ),
             StrykerLogger::class,
         ];
@@ -149,7 +149,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 null,
                 false,
                 StrykerConfig::forFullReport('foo'),
-                null
+                null,
             ),
             StrykerLogger::class,
         ];
@@ -165,7 +165,7 @@ final class StrykerLoggerFactoryTest extends TestCase
                 'per_mutator',
                 true,
                 StrykerConfig::forBadge('branch'),
-                'summary_json'
+                'summary_json',
             ),
             StrykerLogger::class,
         ];

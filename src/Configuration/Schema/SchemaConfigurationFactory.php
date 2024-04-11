@@ -66,7 +66,7 @@ class SchemaConfigurationFactory
             $rawConfig->testFramework ?? null,
             self::normalizeString($rawConfig->bootstrap ?? null),
             self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
-            self::normalizeString($rawConfig->testFrameworkOptions ?? null)
+            self::normalizeString($rawConfig->testFrameworkOptions ?? null),
         );
     }
 
@@ -74,7 +74,7 @@ class SchemaConfigurationFactory
     {
         return new Source(
             self::normalizeStringArray($source->directories ?? []),
-            self::normalizeStringArray($source->excludes ?? [])
+            self::normalizeStringArray($source->excludes ?? []),
         );
     }
 
@@ -117,7 +117,7 @@ class SchemaConfigurationFactory
     {
         return new PhpUnit(
             self::normalizeString($phpUnit->configDir ?? null),
-            self::normalizeString($phpUnit->customPath ?? null)
+            self::normalizeString($phpUnit->customPath ?? null),
         );
     }
 

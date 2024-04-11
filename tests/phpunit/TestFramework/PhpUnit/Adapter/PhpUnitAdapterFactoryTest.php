@@ -36,11 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(PhpUnitAdapterFactory::class)]
 final class PhpUnitAdapterFactoryTest extends TestCase
 {
     public function test_it_can_create_an_adapter(): void
@@ -53,7 +54,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '/path/to/junit.xml',
             '/path/to/project',
             [],
-            true
+            true,
         );
 
         $this->assertSame('PHPUnit', $adapter->getName());

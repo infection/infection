@@ -91,8 +91,8 @@ abstract class BaseMutatorTestCase extends TestCase
                 'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Mutants are: %s',
                 count($expectedCodeSamples),
                 count($mutants),
-                StringNormalizer::normalizeString(implode(PHP_EOL, $mutants))
-            )
+                StringNormalizer::normalizeString(implode(PHP_EOL, $mutants)),
+            ),
         );
 
         foreach ($mutants as $realMutatedCode) {
@@ -107,7 +107,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
             $this->assertSame(
                 StringNormalizer::normalizeString($expectedCodeSample),
-                StringNormalizer::normalizeString($realMutatedCode)
+                StringNormalizer::normalizeString($realMutatedCode),
             );
 
             if (!$allowInvalidCode) {
@@ -165,7 +165,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor(
             $this->createMutator($settings),
-            $nodes
+            $nodes,
         );
 
         (new NodeTraverserFactory())
@@ -181,7 +181,7 @@ abstract class BaseMutatorTestCase extends TestCase
         exec(
             sprintf('echo %s | php -l', escapeshellarg($realMutatedCode)),
             $output,
-            $returnCode
+            $returnCode,
         );
 
         $this->assertSame(
@@ -189,8 +189,8 @@ abstract class BaseMutatorTestCase extends TestCase
             $returnCode,
             sprintf(
                 'Mutator %s produces invalid code',
-                $this->createMutator()->getName()
-            )
+                $this->createMutator()->getName(),
+            ),
         );
     }
 }

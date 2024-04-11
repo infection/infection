@@ -35,46 +35,49 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
+use Infection\Mutator\Boolean\LogicalNot;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(LogicalNot::class)]
 final class LogicalNotTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes logical not' => [
             <<<'PHP'
-<?php
+                <?php
 
-return !false;
-PHP
+                return !false;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return false;
-PHP
+                return false;
+                PHP
             ,
         ];
 
         yield 'It does not remove double logical not' => [
             <<<'PHP'
-<?php
+                <?php
 
-return !!false;
-PHP
+                return !!false;
+                PHP
             ,
         ];
     }
@@ -89,7 +92,7 @@ PHP
     public function test_it_does_not_mutates_doubled_logical_not(): void
     {
         $expr = new BooleanNot(
-            new BooleanNot(new ConstFetch(new Name('false')))
+            new BooleanNot(new ConstFetch(new Name('false'))),
         );
 
         $this->assertFalse($this->mutator->canMutate($expr));

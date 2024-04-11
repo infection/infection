@@ -37,27 +37,27 @@ namespace Infection\Tests\Console\Input;
 
 use Infection\Console\Input\MsiParser;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MsiParser::class)]
 final class MsiParserTest extends TestCase
 {
     /**
-     * @dataProvider precisionProvider
-     *
      * @param array<string|null> $values
      */
+    #[DataProvider('precisionProvider')]
     public function test_it_can_detect_the_precision_of_the_given_values(
         array $values,
-        int $expected
+        int $expected,
     ): void {
         $actual = MsiParser::detectPrecision(...$values);
 
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider validValueProvider
-     */
+    #[DataProvider('validValueProvider')]
     public function test_it_can_parse_valid_values(?string $value, ?float $expected): void
     {
         $actual = MsiParser::parse($value, 2, 'min-msi');
@@ -65,12 +65,10 @@ final class MsiParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider invalidValueProvider
-     */
+    #[DataProvider('invalidValueProvider')]
     public function test_it_cannot_parse_invalid_values(
         string $value,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedErrorMessage);

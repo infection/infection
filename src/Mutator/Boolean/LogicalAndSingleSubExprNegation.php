@@ -54,18 +54,18 @@ final class LogicalAndSingleSubExprNegation extends AbstractSingleSubExprNegatio
     {
         return new Definition(
             <<<'TXT'
-Negates all sub-expressions separately in AND (`&&`).
-TXT
+                Negates all sub-expressions separately in AND (`&&`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b && $c;
-# Mutation 1
-+ $a = !$b && $c;
-# Mutation 2
-+ $a = $b && !$c;
-DIFF
+                - $a = $b && $c;
+                # Mutation 1
+                + $a = !$b && $c;
+                # Mutation 2
+                + $a = $b && !$c;
+                DIFF,
         );
     }
 

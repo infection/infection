@@ -61,12 +61,12 @@ $traces = array_map(
 
         return new PartialTrace($fileInfo);
     },
-    iterator_to_array($files, false)
+    iterator_to_array($files, false),
 );
 
 $mutators = $container->getMutatorFactory()->create(
     $container->getMutatorResolver()->resolve(['@default' => true]),
-    true
+    true,
 );
 
 $fileMutationGenerator = $container->getFileMutationGenerator();
@@ -83,7 +83,7 @@ return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mu
             $trace,
             false,
             $mutators,
-            []
+            [],
         );
 
         foreach ($mutations as $_) {

@@ -52,6 +52,9 @@ use function Infection\Tests\normalize_trailing_spaces;
 use JsonSchema\Validator;
 use function Later\now;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\base64_decode;
 use function Safe\file_get_contents;
@@ -60,20 +63,17 @@ use function Safe\json_encode;
 use function Safe\realpath;
 use function sprintf;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(StrykerHtmlReportBuilder::class)]
 final class StrykerHtmlReportBuilderTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/mutation-testing-report-schema.json';
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,
-        array $expectedReport
+        array $expectedReport,
     ): void {
         $report = (new StrykerHtmlReportBuilder($metricsCalculator, $resultsCollector))->build();
 
@@ -81,7 +81,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $this->assertJsonDocumentMatchesSchema($report);
     }
 
-    public function metricsProvider()
+    public static function metricsProvider()
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
@@ -108,8 +108,8 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $realPathForHtmlReport2 = realpath(__DIR__ . '/../../Fixtures/ForHtmlReport2.php');
 
         yield 'different mutations' => [
-            $this->createFullHtmlReportMetricsCalculator(),
-            $this->createFullHtmlReportResultsCollector(),
+            self::createFullHtmlReportMetricsCalculator(),
+            self::createFullHtmlReportResultsCollector(),
             [
                 'schemaVersion' => '1',
                 'thresholds' => [
@@ -239,20 +239,20 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         ];
     }
 
-    private function createFullHtmlReportMetricsCalculator(): MetricsCalculator
+    private static function createFullHtmlReportMetricsCalculator(): MetricsCalculator
     {
         $collector = new MetricsCalculator(2);
 
-        $this->initHtmlReportCollector($collector);
+        self::initHtmlReportCollector($collector);
 
         return $collector;
     }
 
-    private function createFullHtmlReportResultsCollector(): ResultsCollector
+    private static function createFullHtmlReportResultsCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
-        $this->initHtmlReportCollector($collector);
+        self::initHtmlReportCollector($collector);
 
         return $collector;
     }
@@ -266,10 +266,8 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $validator->validate($resultReport, (object) ['$ref' => self::SCHEMA_FILE]);
 
         $normalizedErrors = array_map(
-            static function (array $error): string {
-                return sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL);
-            },
-            $validator->getErrors()
+            static fn (array $error): string => sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL),
+            $validator->getErrors(),
         );
 
         $this->assertTrue(
@@ -278,30 +276,30 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 'Expected the given JSON to be valid but is violating the following rules of'
                 . ' the schema: %s- %s',
                 PHP_EOL,
-                implode('- ', $normalizedErrors)
-            )
+                implode('- ', $normalizedErrors),
+            ),
         );
     }
 
-    private function initHtmlReportCollector(Collector $collector): void
+    private static function initHtmlReportCollector(Collector $collector): void
     {
         $collector->collect(
             // this tests diffs on the method signature line
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                 use function array_fill_keys;
-                 final class ForHtmlReport
-                 {
-                -    public function add(int $a, int $b) : int
-                +    protected function add(int $a, int $b) : int
+                    --- Original
+                    +++ New
+                    @@ @@
+                     use function array_fill_keys;
+                     final class ForHtmlReport
                      {
-                         $this->inner('3');
-                         $this->inner('3');
-                DIFF,
+                    -    public function add(int $a, int $b) : int
+                    +    protected function add(int $a, int $b) : int
+                         {
+                             $this->inner('3');
+                             $this->inner('3');
+                    DIFF,
                 '32f68ca331c9262cc97322271d88d06d',
                 PublicVisibility::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
@@ -313,24 +311,24 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
                     // check that duplicate values are moved in the report
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
-                ]
+                ],
             ),
             // this tests diff on the one-line method call removal
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                 {
-                     public function add(int $a, int $b) : int
+                    --- Original
+                    +++ New
+                    @@ @@
                      {
-                -        $this->inner('3');
-                +
-                         $this->inner('3');
-                         switch (true) {
-                             case 1 !== 1:
-                DIFF,
+                         public function add(int $a, int $b) : int
+                         {
+                    -        $this->inner('3');
+                    +
+                             $this->inner('3');
+                             switch (true) {
+                                 case 1 !== 1:
+                    DIFF,
                 'fd66aff56e903645c21271264b062b4f',
                 MethodCallRemoval::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
@@ -341,24 +339,24 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 [
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
                 ],
-                'PHPUnit output. Tests: 1, Assertions: 3. Failure: 1) TestClass::test_method1 Failed'
+                'PHPUnit output. Tests: 1, Assertions: 3. Failure: 1) TestClass::test_method1 Failed',
             ),
             // this tests diff on the multi-line (in original source code) method call removal
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                     public function add(int $a, int $b) : int
-                     {
-                         $this->inner('3');
-                -        $this->inner('3');
-                +
-                         switch (true) {
-                             case 0 !== 1:
-                                 break;
-                DIFF,
+                    --- Original
+                    +++ New
+                    @@ @@
+                         public function add(int $a, int $b) : int
+                         {
+                             $this->inner('3');
+                    -        $this->inner('3');
+                    +
+                             switch (true) {
+                                 case 0 !== 1:
+                                     break;
+                    DIFF,
                 '746519c01522ddc7da799a9b7927e4c2',
                 MethodCallRemoval::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
@@ -369,24 +367,24 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 [
                     new TestLocation('TestClass::test_method1 with data set #1', '/infection/path/to/TestClass.php', 0.123),
                 ],
-                'PHPUnit output. Tests: 1, Assertions: 3. Failure: 1) TestClass::test_method1 with data set #1'
+                'PHPUnit output. Tests: 1, Assertions: 3. Failure: 1) TestClass::test_method1 with data set #1',
             ),
             // this tests diff on the one-line diff with array item removal
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                             default:
-                                 break;
-                         }
-                -        $this->innerArray(array_keys(['a' => '1', 'b' => '2']));
-                +        $this->innerArray(array_keys(['b' => '2']));
-                         if ($this instanceof ForHtmlReport) {
-                             // ...
-                         }
-                DIFF,
+                    --- Original
+                    +++ New
+                    @@ @@
+                                 default:
+                                     break;
+                             }
+                    -        $this->innerArray(array_keys(['a' => '1', 'b' => '2']));
+                    +        $this->innerArray(array_keys(['b' => '2']));
+                             if ($this instanceof ForHtmlReport) {
+                                 // ...
+                             }
+                    DIFF,
                 '633b144fb6d55bbc60430df68a952388',
                 ArrayItemRemoval::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
@@ -399,23 +397,23 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                     new TestLocation('TestClass2::test_method2', '/infection/path/to/TestClass2.php', 0.456),
                     new TestLocation('TestClass2::test_method3', '/infection/path/to/TestClass2.php', 0.789),
                 ],
-                'PHPUnit output. Tests: 3, Assertions: 3'
+                'PHPUnit output. Tests: 3, Assertions: 3',
             ),
             // add one test for the second file
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                 use function array_fill_keys;
-                 final class ForHtmlReport2
-                 {
-                -    public function add(int $a, int $b) : int
-                +    protected function add(int $a, int $b) : int
+                    --- Original
+                    +++ New
+                    @@ @@
+                     use function array_fill_keys;
+                     final class ForHtmlReport2
                      {
-                         return 0;
-                DIFF,
+                    -    public function add(int $a, int $b) : int
+                    +    protected function add(int $a, int $b) : int
+                         {
+                             return 0;
+                    DIFF,
                 '12f68ca331c9262cc97322271d88d06d',
                 PublicVisibility::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport2.php'),
@@ -426,24 +424,24 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 [
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
                 ],
-                'Output without ability to detect the number of executed tests'
+                'Output without ability to detect the number of executed tests',
             ),
             //
             // with non UTF-8 character
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-                 use function array_fill_keys;
-                 final class ForHtmlReport2
-                 {
-                -    public function add(int $a, int $b) : int
-                +    protected function add(int $a, int $b) : int
+                    --- Original
+                    +++ New
+                    @@ @@
+                     use function array_fill_keys;
+                     final class ForHtmlReport2
                      {
-                         return 0;
-                DIFF,
+                    -    public function add(int $a, int $b) : int
+                    +    protected function add(int $a, int $b) : int
+                         {
+                             return 0;
+                    DIFF,
                 '22f68ca331c9262cc97322271d88d06d',
                 PublicVisibility::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport2.php'),
@@ -454,7 +452,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 [
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
                 ],
-                'Output without ability to detect the number of executed tests' . base64_decode('abc', true) // produces non UTF-8 character
+                'Output without ability to detect the number of executed tests' . base64_decode('abc', true), // produces non UTF-8 character
             ),
         );
     }
@@ -462,7 +460,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
     /**
      * @param array<int, TestLocation> $testLocations
      */
-    private function createMutantExecutionResult(
+    private static function createMutantExecutionResult(
         string $detectionStatus,
         string $diff,
         string $mutantHash,
@@ -473,7 +471,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         int $originalStartFilePosition,
         int $originalEndFilePosition,
         array $testLocations,
-        ?string $processOutput = 'PHPUnit output. Tests: 1, Assertions: 3'
+        ?string $processOutput = 'PHPUnit output. Tests: 1, Assertions: 3',
     ): MutantExecutionResult {
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
@@ -489,7 +487,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             $originalEndFilePosition,
             now('<?php $a = 1;'),
             now('<?php $a = 2;'),
-            $testLocations
+            $testLocations,
         );
     }
 }

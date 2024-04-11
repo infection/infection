@@ -50,8 +50,10 @@ use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutator\MutatorName;
 use const PHP_OS_FAMILY;
 use PhpParser\Node\Stmt\Nop;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MutantProcessFactory::class)]
 final class MutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
@@ -77,21 +79,21 @@ final class MutantProcessFactoryTest extends TestCase
                     new TestLocation(
                         'FooTest::test_it_can_instantiate',
                         '/path/to/acme/FooTest.php',
-                        0.01
+                        0.01,
                     ),
-                ]
+                ],
             ),
             'killed#0',
             $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                --- Original
+                +++ New
+                @@ @@
 
-- echo 'original';
-+ echo 'killed#0';
+                - echo 'original';
+                + echo 'killed#0';
 
-DIFF,
-            '<?php $a = 1;'
+                DIFF,
+            '<?php $a = 1;',
         );
 
         $testFrameworkExtraOptions = '--verbose';
@@ -104,7 +106,7 @@ DIFF,
                 $mutantFilePath,
                 $this->isType('string'),
                 $originalFilePath,
-                $testFrameworkExtraOptions
+                $testFrameworkExtraOptions,
             )
             ->willReturn(['/usr/bin/php', 'bin/phpunit', '--filter', '/path/to/acme/FooTest.php'])
         ;
@@ -127,7 +129,7 @@ DIFF,
             $testFrameworkAdapterMock,
             100,
             $eventDispatcher,
-            $resultFactoryMock
+            $resultFactoryMock,
         );
 
         $mutantProcess = $factory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
@@ -138,7 +140,7 @@ DIFF,
             PHP_OS_FAMILY === 'Windows'
                 ? '"/usr/bin/php" "bin/phpunit" --filter "/path/to/acme/FooTest.php"'
                 : "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
-            $process->getCommandLine()
+            $process->getCommandLine(),
         );
         $this->assertSame(100., $process->getTimeout());
         $this->assertFalse($process->isStarted());

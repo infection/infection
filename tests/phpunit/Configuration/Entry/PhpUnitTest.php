@@ -36,18 +36,19 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\PhpUnit;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(PhpUnit::class)]
 final class PhpUnitTest extends TestCase
 {
     use PhpUnitAssertions;
 
-    /**
-     * @dataProvider valuesProvider
-     */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         ?string $configDir,
-        ?string $executablePath
+        ?string $executablePath,
     ): void {
         $phpUnit = new PhpUnit($configDir, $executablePath);
 
@@ -58,7 +59,7 @@ final class PhpUnitTest extends TestCase
     {
         $phpUnit = new PhpUnit(
             '/path/to/phpunit-config',
-            '/path/to/phpunit'
+            '/path/to/phpunit',
         );
 
         $phpUnit->setConfigDir('/path/to/another-phpunit-config');
@@ -66,11 +67,11 @@ final class PhpUnitTest extends TestCase
         $this->assertPhpUnitStateIs(
             $phpUnit,
             '/path/to/another-phpunit-config',
-            '/path/to/phpunit'
+            '/path/to/phpunit',
         );
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         yield 'minimal' => [
             null,

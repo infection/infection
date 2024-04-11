@@ -41,10 +41,13 @@ use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Tests\Logger\DummyLogger;
 use function Infection\Tests\normalizeLineReturn;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
+#[CoversClass(StrykerDashboardClient::class)]
 final class StrykerDashboardClientTest extends TestCase
 {
     private const API_KEY = '0e137d38-7611-4157-897b-54791cc1ef97';
@@ -71,13 +74,11 @@ final class StrykerDashboardClientTest extends TestCase
 
         $this->dashboardClient = new StrykerDashboardClient(
             $this->clientMock,
-            $this->logger
+            $this->logger,
         );
     }
 
-    /**
-     * @dataProvider provideResponseStatusCodes
-     */
+    #[DataProvider('provideResponseStatusCodes')]
     public function test_it_can_send_a_report_with_expected_response_status_code(): void
     {
         $this->clientMock
@@ -87,7 +88,7 @@ final class StrykerDashboardClientTest extends TestCase
                 'infection/infection',
                 'master',
                 self::API_KEY,
-                '{"mutationScore": 80.31}'
+                '{"mutationScore": 80.31}',
             )
             ->willReturn(new Response(201, 'Report received!'))
         ;
@@ -96,7 +97,7 @@ final class StrykerDashboardClientTest extends TestCase
             'infection/infection',
             'master',
             self::API_KEY,
-            '{"mutationScore": 80.31}'
+            '{"mutationScore": 80.31}',
         );
 
         $this->assertSame(
@@ -104,18 +105,18 @@ final class StrykerDashboardClientTest extends TestCase
                 [
                     LogLevel::NOTICE,
                     normalizeLineReturn(<<<'EOF'
-Dashboard response:
-Report received!
-EOF
+                        Dashboard response:
+                        Report received!
+                        EOF
                     ),
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
-    public function provideResponseStatusCodes(): Generator
+    public static function provideResponseStatusCodes(): Generator
     {
         yield '200 OK' => [Response::HTTP_OK];
 
@@ -131,7 +132,7 @@ EOF
                 'infection/infection',
                 'master',
                 self::API_KEY,
-                '{"mutationScore": 80.31}'
+                '{"mutationScore": 80.31}',
             )
             ->willReturn(new Response(400, 'Report invalid!'))
         ;
@@ -140,7 +141,7 @@ EOF
             'infection/infection',
             'master',
             self::API_KEY,
-            '{"mutationScore": 80.31}'
+            '{"mutationScore": 80.31}',
         );
 
         $this->assertSame(
@@ -153,14 +154,14 @@ EOF
                 [
                     LogLevel::NOTICE,
                     <<<'EOF'
-Dashboard response:
-Report invalid!
-EOF
+                        Dashboard response:
+                        Report invalid!
+                        EOF
                     ,
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 }

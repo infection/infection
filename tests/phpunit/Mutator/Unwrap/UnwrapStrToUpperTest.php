@@ -35,151 +35,154 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
+use Infection\Mutator\Unwrap\UnwrapStrToUpper;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapStrToUpper::class)]
 final class UnwrapStrToUpperTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an string' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strtoupper('infection');
-PHP
+                $a = strtoupper('infection');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'infection';
-PHP
+                $a = 'infection';
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strtoupper(\Class_With_Const::Const);
-PHP
+                $a = strtoupper(\Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of strtoupper' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \strtoupper('infection');
-PHP
+                $a = \strtoupper('infection');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'infection';
-PHP
+                $a = 'infection';
+                PHP,
         ];
 
         yield 'It does not mutate other strto calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strtolower('INFECTION');
-PHP
+                $a = strtolower('INFECTION');
+                PHP,
         ];
 
         yield 'It does not mutate functions named strtoupper' => [
             <<<'PHP'
-<?php
+                <?php
 
-function strtoupper($text)
-{
-}
-PHP
+                function strtoupper($text)
+                {
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'infection';
-if (strtoupper($a) === $a) {
-    return true;
-}
-PHP
+                $a = 'infection';
+                if (strtoupper($a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'infection';
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = 'infection';
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when strtoupper is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = StrToUpper('infection');
-PHP
+                $a = StrToUpper('infection');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'infection';
-PHP
+                $a = 'infection';
+                PHP,
         ];
 
         yield 'It mutates correctly when strtoupper uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strtoupper($foo->bar());
-PHP
+                $a = strtoupper($foo->bar());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtoupper', strtoupper('infection'));
-PHP
+                $a = array_map('strtoupper', strtoupper('infection'));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtoupper', 'infection');
-PHP
+                $a = array_map('strtoupper', 'infection');
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
- $a = 'strtoupper';
- $b = $a('infection');
-PHP
+                 $a = 'strtoupper';
+                 $b = $a('infection');
+                PHP
             ,
         ];
     }

@@ -38,13 +38,14 @@ namespace Infection\Tests;
 use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(Container::class)]
 final class ContainerTest extends TestCase
 {
     public function test_it_can_be_instantiated_without_any_services(): void
@@ -99,7 +100,8 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_GITLAB_LOGGER_PATH,
             Container::DEFAULT_HTML_LOGGER_PATH,
             Container::DEFAULT_USE_NOOP_MUTATORS,
-            Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES
+            Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
+            Container::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
         );
 
         $traces = $newContainer->getUnionTraceProvider()->provideTraces();
@@ -151,6 +153,7 @@ final class ContainerTest extends TestCase
             Container::DEFAULT_HTML_LOGGER_PATH,
             Container::DEFAULT_USE_NOOP_MUTATORS,
             Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
+            Container::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
         );
     }
 }

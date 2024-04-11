@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 
 /**
  * @internal
@@ -53,7 +54,7 @@ final class TestLocations
     /**
      * This method needs to be able to return a reference for performance reasons.
      *
-     * @see \Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder
+     * @see JUnitTestExecutionInfoAdder
      *
      * @return array<int, array<int, TestLocation>>
      */

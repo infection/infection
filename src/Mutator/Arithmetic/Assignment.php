@@ -54,16 +54,16 @@ final class Assignment implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
-assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment operator `=`.
-TXT
+                Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
+                assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment operator `=`.
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a += $b;
-+ $a = $b;
-DIFF
+                - $a += $b;
+                + $a = $b;
+                DIFF,
         );
     }
 

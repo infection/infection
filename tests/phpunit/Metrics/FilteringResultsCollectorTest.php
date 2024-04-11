@@ -39,8 +39,10 @@ use function array_flip;
 use Infection\Metrics\Collector;
 use Infection\Metrics\FilteringResultsCollector;
 use Infection\Mutant\DetectionStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FilteringResultsCollector::class)]
 final class FilteringResultsCollectorTest extends TestCase
 {
     use CreateMutantExecutionResult;
@@ -58,7 +60,7 @@ final class FilteringResultsCollectorTest extends TestCase
         $this->addMutantExecutionResult(
             $collector,
             DetectionStatus::ESCAPED,
-            2
+            2,
         );
     }
 
@@ -98,31 +100,31 @@ final class FilteringResultsCollectorTest extends TestCase
         $this->addMutantExecutionResult(
             $collector,
             DetectionStatus::KILLED,
-            7
+            7,
         );
 
         $this->addMutantExecutionResult(
             $collector,
             DetectionStatus::ERROR,
-            2
+            2,
         );
 
         $this->addMutantExecutionResult(
             $collector,
             DetectionStatus::ESCAPED,
-            2
+            2,
         );
 
         $this->addMutantExecutionResult(
             $collector,
             DetectionStatus::TIMED_OUT,
-            2
+            2,
         );
 
         $this->addMutantExecutionResult(
             $collector,
             DetectionStatus::NOT_COVERED,
-            1
+            1,
         );
     }
 }

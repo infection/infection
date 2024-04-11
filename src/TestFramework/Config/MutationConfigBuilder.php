@@ -56,7 +56,7 @@ abstract class MutationConfigBuilder
         string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath,
-        string $version
+        string $version,
     ): string;
 
     protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutantFilePath): string
@@ -67,21 +67,21 @@ abstract class MutationConfigBuilder
             $infectionPhar = sprintf(
                 '\Phar::loadPhar("%s", "%s");',
                 str_replace('phar://', '', Phar::running(true)),
-                'infection.phar'
+                'infection.phar',
             );
         }
 
         $namespacePrefix = $this->getInterceptorNamespacePrefix();
 
         return <<<CONTENT
-{$infectionPhar}
-require_once '{$interceptorPath}';
+            {$infectionPhar}
+            require_once '{$interceptorPath}';
 
-use {$namespacePrefix}Infection\StreamWrapper\IncludeInterceptor;
+            use {$namespacePrefix}Infection\StreamWrapper\IncludeInterceptor;
 
-IncludeInterceptor::intercept('{$originalFilePath}', '{$mutantFilePath}');
-IncludeInterceptor::enable();
-CONTENT;
+            IncludeInterceptor::intercept('{$originalFilePath}', '{$mutantFilePath}');
+            IncludeInterceptor::enable();
+            CONTENT;
     }
 
     private function getInterceptorNamespacePrefix(): string

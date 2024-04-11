@@ -35,280 +35,283 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
+use Infection\Mutator\Boolean\LogicalOrSingleSubExprNegation;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(LogicalOrSingleSubExprNegation::class)]
 final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates array item fetch' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $array[0] || $array[1];
-PHP
+                $var = $array[0] || $array[1];
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !$array[0] || $array[1];
-PHP,
+                    $var = !$array[0] || $array[1];
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = $array[0] || !$array[1];
-PHP
+                    $var = $array[0] || !$array[1];
+                    PHP,
             ],
         ];
 
         yield 'It mutates variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $foo || $bar;
-PHP
+                $var = $foo || $bar;
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !$foo || $bar;
-PHP,
+                    $var = !$foo || $bar;
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = $foo || !$bar;
-PHP
+                    $var = $foo || !$bar;
+                    PHP,
             ],
         ];
 
         yield 'It mutates method call' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $this->foo() || $bar->baz();
-PHP
+                $var = $this->foo() || $bar->baz();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !$this->foo() || $bar->baz();
-PHP,
+                    $var = !$this->foo() || $bar->baz();
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = $this->foo() || !$bar->baz();
-PHP
+                    $var = $this->foo() || !$bar->baz();
+                    PHP,
             ],
         ];
 
         yield 'It mutates static calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = self::foo() || static::bar() || Test::baz();
-PHP
+                $var = self::foo() || static::bar() || Test::baz();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !self::foo() || static::bar() || Test::baz();
-PHP
+                    $var = !self::foo() || static::bar() || Test::baz();
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = self::foo() || !static::bar() || Test::baz();
-PHP
+                    $var = self::foo() || !static::bar() || Test::baz();
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = self::foo() || static::bar() || !Test::baz();
-PHP
+                    $var = self::foo() || static::bar() || !Test::baz();
+                    PHP,
             ],
         ];
 
         yield 'It mutates constant calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = self::FOO || self::BAR;
-PHP
+                $var = self::FOO || self::BAR;
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !self::FOO || self::BAR;
-PHP
+                    $var = !self::FOO || self::BAR;
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = self::FOO || !self::BAR;
-PHP
+                    $var = self::FOO || !self::BAR;
+                    PHP,
             ],
         ];
 
         yield 'It mutates closure calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = $foo() || $bar();
-PHP
+                $var = $foo() || $bar();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !$foo() || $bar();
-PHP
+                    $var = !$foo() || $bar();
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = $foo() || !$bar();
-PHP
+                    $var = $foo() || !$bar();
+                    PHP,
             ],
         ];
 
         yield 'It mutates invoke calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = ($this->foo)() || ($this->bar)();
-PHP
+                $var = ($this->foo)() || ($this->bar)();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !($this->foo)() || ($this->bar)();
-PHP
+                    $var = !($this->foo)() || ($this->bar)();
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = ($this->foo)() || !($this->bar)();
-PHP
+                    $var = ($this->foo)() || !($this->bar)();
+                    PHP,
             ],
         ];
 
         yield 'It mutates function calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() || b();
-PHP
+                $var = a() || b();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !a() || b();
-PHP,
+                    $var = !a() || b();
+                    PHP,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = a() || !b();
-PHP
+                    $var = a() || !b();
+                    PHP,
             ],
         ];
 
         yield 'It mutates and with more expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() || b() || c() || d();
-PHP
+                $var = a() || b() || c() || d();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !a() || b() || c() || d();
-PHP
+                    $var = !a() || b() || c() || d();
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = a() || !b() || c() || d();
-PHP
+                    $var = a() || !b() || c() || d();
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = a() || b() || !c() || d();
-PHP
+                    $var = a() || b() || !c() || d();
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = a() || b() || c() || !d();
-PHP
+                    $var = a() || b() || c() || !d();
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate equal\'s expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() != 1 || b() == 1;
-PHP
+                $var = a() != 1 || b() == 1;
+                PHP,
         ];
 
         yield 'It does not mutate identical\'s expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() !== 1 || b() === 1;
-PHP
+                $var = a() !== 1 || b() === 1;
+                PHP,
         ];
 
         yield 'It does not mutate already negated expressions' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = !(a() || !b());
-PHP
+                $var = !(a() || !b());
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !(!a() || !b());
-PHP
+                    $var = !(!a() || !b());
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates expressions with logical and' => [
             <<<'PHP'
-<?php
+                <?php
 
-$var = a() || b() && c();
-PHP
+                $var = a() || b() && c();
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$var = !a() || b() && c();
-PHP
+                    $var = !a() || b() && c();
+                    PHP,
             ],
         ];
     }

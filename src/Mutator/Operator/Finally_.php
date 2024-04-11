@@ -42,6 +42,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use PhpParser\NodeVisitor;
 use Webmozart\Assert\Assert;
 
 /**
@@ -60,24 +61,24 @@ final class Finally_ implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-try {
-    // do smth
-+ }
-- } finally {
--
-- }
-DIFF
+                try {
+                    // do smth
+                + }
+                - } finally {
+                -
+                - }
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Stmt\Nop>
+     * @return iterable<int|Node\Stmt\Nop>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Stmt\Nop();
+        yield NodeVisitor::REPLACE_WITH_NULL;
     }
 
     public function canMutate(Node $node): bool

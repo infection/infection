@@ -35,99 +35,102 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
+use Infection\Mutator\Boolean\ArrayItem;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(ArrayItem::class)]
 final class ArrayItemTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is property' => [
             <<<'PHP'
-<?php
+                <?php
 
-[$a->foo => $b->bar];
-PHP
+                [$a->foo => $b->bar];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-[$a->foo > $b->bar];
-PHP
+                [$a->foo > $b->bar];
+                PHP
             ,
         ];
 
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is method call' => [
             <<<'PHP'
-<?php
+                <?php
 
-[$a->foo() => $b->bar()];
-PHP
+                [$a->foo() => $b->bar()];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-[$a->foo() > $b->bar()];
-PHP
+                [$a->foo() > $b->bar()];
+                PHP
             ,
         ];
 
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is function call' => [
             <<<'PHP'
-<?php
+                <?php
 
-[foo() => $b->bar];
-PHP
+                [foo() => $b->bar];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-[foo() > $b->bar];
-PHP
+                [foo() > $b->bar];
+                PHP
             ,
         ];
 
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and right is property' => [
             <<<'PHP'
-<?php
+                <?php
 
-[$foo => $b->bar];
-PHP
+                [$foo => $b->bar];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-[$foo > $b->bar];
-PHP
+                [$foo > $b->bar];
+                PHP
             ,
         ];
 
         yield 'It does not mutate arrays without double arrow operator' => [
             <<<'PHP'
-<?php
+                <?php
 
-[$b];
-PHP
+                [$b];
+                PHP
             ,
         ];
 
         yield 'It does not mutate arrays when side-effects are not expected' => [
             <<<'PHP'
-<?php
+                <?php
 
-['string' => 1];
-[true => false];
-[$a => $b];
-PHP
+                ['string' => 1];
+                [true => false];
+                [$a => $b];
+                PHP
             ,
         ];
     }

@@ -42,10 +42,13 @@ use Infection\Logger\FederatedLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\Console\FakeOutputFormatter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(MutationTestingConsoleLoggerSubscriberFactory::class)]
 final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
 {
     /**
@@ -84,9 +87,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         ;
     }
 
-    /**
-     * @dataProvider showMutationsProvider
-     */
+    #[DataProvider('showMutationsProvider')]
     public function test_it_creates_a_subscriber(bool $showMutations): void
     {
         $factory = new MutationTestingConsoleLoggerSubscriberFactory(
@@ -95,7 +96,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             $this->diffColorizerMock,
             new FederatedLogger(),
             $showMutations,
-            new FakeOutputFormatter()
+            new FakeOutputFormatter(),
         );
 
         $outputMock = $this->createMock(OutputInterface::class);
@@ -109,7 +110,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         $this->assertInstanceOf(MutationTestingConsoleLoggerSubscriber::class, $subscriber);
     }
 
-    public function showMutationsProvider(): iterable
+    public static function showMutationsProvider(): iterable
     {
         foreach ([true, false] as $showMutations) {
             yield [$showMutations];

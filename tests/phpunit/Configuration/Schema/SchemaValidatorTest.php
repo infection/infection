@@ -40,19 +40,20 @@ use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
 use function Infection\Tests\normalizeLineReturn;
 use function json_last_error_msg;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\json_decode;
 use Webmozart\Assert\Assert;
 
+#[CoversClass(SchemaValidator::class)]
 final class SchemaValidatorTest extends TestCase
 {
-    /**
-     * @dataProvider configProvider
-     */
+    #[DataProvider('configProvider')]
     public function test_it_validates_the_given_raw_config(
         SchemaConfigurationFile $config,
-        ?string $expectedErrorMessage
+        ?string $expectedErrorMessage,
     ): void {
         try {
             (new SchemaValidator())->validate($config);
@@ -68,38 +69,38 @@ final class SchemaValidatorTest extends TestCase
             } else {
                 $this->assertSame(
                     $expectedErrorMessage,
-                    normalizeLineReturn($exception->getMessage())
+                    normalizeLineReturn($exception->getMessage()),
                 );
             }
         }
     }
 
-    public function configProvider(): iterable
+    public static function configProvider(): iterable
     {
         $path = '/path/to/config';
 
         yield 'empty JSON' => [
             self::createConfigWithContents(
                 $path,
-                '{}'
+                '{}',
             ),
             <<<'ERROR'
-"/path/to/config" does not match the expected JSON schema:
- - [source] The property source is required
-ERROR
+                "/path/to/config" does not match the expected JSON schema:
+                 - [source] The property source is required
+                ERROR
             ,
         ];
 
         yield 'invalid timeout' => [
             self::createConfigWithContents(
                 $path,
-                '{"timeout": "10"}'
+                '{"timeout": "10"}',
             ),
             <<<'ERROR'
-"/path/to/config" does not match the expected JSON schema:
- - [source] The property source is required
- - [timeout] String value found, but a number is required
-ERROR
+                "/path/to/config" does not match the expected JSON schema:
+                 - [source] The property source is required
+                 - [timeout] String value found, but a number is required
+                ERROR
             ,
         ];
 
@@ -107,12 +108,12 @@ ERROR
             self::createConfigWithContents(
                 $path,
                 <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    }
-}
-JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        }
+                    }
+                    JSON,
             ),
             null,
         ];
@@ -120,7 +121,7 @@ JSON
 
     private static function createConfigWithContents(
         string $path,
-        string $contents
+        string $contents,
     ): SchemaConfigurationFile {
         $config = new SchemaConfigurationFile($path);
 

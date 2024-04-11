@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(NoLineExecutedInDiffLinesMode::class)]
 final class NoLineExecutedInDiffLinesModeTest extends TestCase
 {
     public function test_it_can_create_an_instance(): void
@@ -47,7 +49,7 @@ final class NoLineExecutedInDiffLinesModeTest extends TestCase
         $this->assertInstanceOf(NoLineExecutedInDiffLinesMode::class, $exception);
         $this->assertSame(
             'No covered lines in diff found, skipping mutation analysis.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 }

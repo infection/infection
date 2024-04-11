@@ -35,26 +35,28 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
+use Infection\Mutator\Removal\ArrayItemRemoval;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(ArrayItemRemoval::class)]
 final class ArrayItemRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      * @param mixed[] $settings
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It does not mutate empty arrays' => [
             '<?php $a = [];',
@@ -120,7 +122,7 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
         ];
 
         yield 'It does not mutate arrays as an attribute argument' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'does-not-mutate-array-in-attribute.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'does-not-mutate-array-in-attribute.php'),
         ];
 
         yield 'It does not mutate destructured array values in foreach loops' => [

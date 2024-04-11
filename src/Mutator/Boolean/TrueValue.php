@@ -72,9 +72,9 @@ final class TrueValue implements ConfigurableMutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = true;
-+ $a = false;
-DIFF
+                - $a = true;
+                + $a = false;
+                DIFF,
         );
     }
 

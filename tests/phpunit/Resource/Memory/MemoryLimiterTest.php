@@ -42,13 +42,15 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use function microtime;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(MemoryLimiter::class)]
 final class MemoryLimiterTest extends FileSystemTestCase
 {
     /**
@@ -100,16 +102,14 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter->limitMemory(
             '',
-            new FakeAwareAdapter(10)
+            new FakeAwareAdapter(10),
         );
     }
 
-    /**
-     * @dataProvider memoryLimitProvider
-     */
+    #[DataProvider('memoryLimitProvider')]
     public function test_it_applies_memory_limit_if_possible(
         float $memoryLimit,
-        float $expectedLimit
+        float $expectedLimit,
     ): void {
         $filename = $this->tmp . '/fake-ini' . microtime() . '.ini';
 
@@ -124,7 +124,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
             ->method('appendToFile')
             ->with(
                 $filename,
-                PHP_EOL . sprintf('memory_limit = %dM', $expectedLimit)
+                PHP_EOL . sprintf('memory_limit = %dM', $expectedLimit),
             );
 
         $this->configureEnvironmentToBeCalledOnce();

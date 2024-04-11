@@ -35,154 +35,157 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
+use Infection\Mutator\Operator\Concat;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Concat::class)]
 final class ConcatTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Flips two concatenated variables' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'foo';
-$b = 'bar';
-$a . $b;
-PHP
+                $a = 'foo';
+                $b = 'bar';
+                $a . $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'foo';
-$b = 'bar';
-$b . $a;
-PHP
+                $a = 'foo';
+                $b = 'bar';
+                $b . $a;
+                PHP,
         ];
 
         yield 'Flips multiple concatenated variables' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'foo';
-$b = 'bar';
-$c = 'baz';
-$a . $b . $c;
-PHP
+                $a = 'foo';
+                $b = 'bar';
+                $c = 'baz';
+                $a . $b . $c;
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'foo';
-$b = 'bar';
-$c = 'baz';
-$b . $a . $c;
-PHP
+                    $a = 'foo';
+                    $b = 'bar';
+                    $c = 'baz';
+                    $b . $a . $c;
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'foo';
-$b = 'bar';
-$c = 'baz';
-$a . $c . $b;
-PHP
+                    $a = 'foo';
+                    $b = 'bar';
+                    $c = 'baz';
+                    $a . $c . $b;
+                    PHP,
             ],
         ];
 
         yield 'Flips the operands of more than two concatenation operators' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'a';
-$b = 'b';
-$c = 'c';
-$e = 'e';
-$a . $b . $c . 'd' . $e;
-PHP
+                $a = 'a';
+                $b = 'b';
+                $c = 'c';
+                $e = 'e';
+                $a . $b . $c . 'd' . $e;
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$c = 'c';
-$e = 'e';
-$b . $a . $c . 'd' . $e;
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $c = 'c';
+                    $e = 'e';
+                    $b . $a . $c . 'd' . $e;
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$c = 'c';
-$e = 'e';
-$a . $c . $b . 'd' . $e;
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $c = 'c';
+                    $e = 'e';
+                    $a . $c . $b . 'd' . $e;
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$c = 'c';
-$e = 'e';
-$a . $b . 'd' . $c . $e;
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $c = 'c';
+                    $e = 'e';
+                    $a . $b . 'd' . $c . $e;
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$c = 'c';
-$e = 'e';
-$a . $b . $c . $e . 'd';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $c = 'c';
+                    $e = 'e';
+                    $a . $b . $c . $e . 'd';
+                    PHP
                 ,
             ],
         ];
 
         yield 'Does not flip the same variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'foo';
-$a . $a;
-PHP
+                $a = 'foo';
+                $a . $a;
+                PHP
             ,
             [],
         ];
 
         yield 'Does not flip the same variable - multiple concatenation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'foo';
-$a . $a . $a;
-PHP
+                $a = 'foo';
+                $a . $a . $a;
+                PHP
             ,
             [],
         ];
 
         yield 'Does not flip the same value' => [
             <<<'PHP'
-<?php
+                <?php
 
-'foo' . 'foo';
-PHP
+                'foo' . 'foo';
+                PHP
             ,
             [],
         ];

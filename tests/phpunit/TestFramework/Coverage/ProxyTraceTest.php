@@ -43,8 +43,10 @@ use Infection\TestFramework\Coverage\TestLocations;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use function iterator_to_array;
 use function Later\now;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(ProxyTrace::class)]
 final class ProxyTraceTest extends TestCase
 {
     public function test_it_exposes_its_source_file_file_info(): void
@@ -140,9 +142,9 @@ final class ProxyTraceTest extends TestCase
             [
                 '__construct' => new SourceMethodLineRange(
                     19,
-                    22
+                    22,
                 ),
-            ]
+            ],
         );
 
         $trace = new ProxyTrace($fileInfoMock, now($tests));
@@ -154,16 +156,16 @@ final class ProxyTraceTest extends TestCase
             0,
             [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(1, 1),
-                false
-            )]
+                false,
+            )],
         );
 
         $this->assertCount(
             1,
             [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(20, 21),
-                false
-            )]
+                false,
+            )],
         );
 
         // This iterator_to_array is due to bug in our version of PHPUnit
@@ -171,16 +173,16 @@ final class ProxyTraceTest extends TestCase
             0,
             [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(1, 1),
-                true
-            )]
+                true,
+            )],
         );
 
         $this->assertCount(
             1,
             [...$trace->getAllTestsForMutation(
                 new NodeLineRangeData(19, 19),
-                true
-            )]
+                true,
+            )],
         );
     }
 }

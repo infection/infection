@@ -59,9 +59,9 @@ final class LogicalOr implements Mutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b || $c;
-+ $a = $b && $c;
-DIFF
+                - $a = $b || $c;
+                + $a = $b && $c;
+                DIFF,
         );
     }
 
@@ -130,32 +130,32 @@ DIFF
             (
                 $nodeLeft instanceof Node\Expr\BinaryOp\Greater
                 && $nodeRight instanceof Node\Expr\BinaryOp\Smaller
-            ) ||
-            (
+            )
+            || (
                 $nodeLeft instanceof Node\Expr\BinaryOp\Greater
                 && $nodeRight instanceof Node\Expr\BinaryOp\SmallerOrEqual
-            ) ||
-            (
+            )
+            || (
                 $nodeLeft instanceof Node\Expr\BinaryOp\GreaterOrEqual
                 && $nodeRight instanceof Node\Expr\BinaryOp\SmallerOrEqual
-            ) ||
-            (
+            )
+            || (
                 $nodeLeft instanceof Node\Expr\BinaryOp\GreaterOrEqual
                 && $nodeRight instanceof Node\Expr\BinaryOp\Smaller
-            ) ||
-            (
+            )
+            || (
                 $nodeLeft instanceof Node\Expr\BinaryOp\Smaller
                 && $nodeRight instanceof Node\Expr\BinaryOp\Greater
-            ) ||
-            (
+            )
+            || (
                 $nodeLeft instanceof Node\Expr\BinaryOp\Smaller
                 && $nodeRight instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            ) ||
-            (
+            )
+            || (
                 $nodeLeft instanceof Node\Expr\BinaryOp\SmallerOrEqual
                 && $nodeRight instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            ) ||
-            (
+            )
+            || (
                 $nodeLeft instanceof Node\Expr\BinaryOp\SmallerOrEqual
                 && $nodeRight instanceof Node\Expr\BinaryOp\Greater
             )
@@ -227,7 +227,7 @@ DIFF
                 '>::<=' => static fn () => $valueRight > $valueLeft, // a>5 && a<=7; 7>=a>5; 7>5;
                 '>=::<=' => static fn () => $valueRight >= $valueLeft, // a>=5 && a<=7; 7>=a>=5; 7>=5;
                 '>=::<' => static fn () => $valueRight > $valueLeft, // a>=5 && a<7; 7>a>=5; 7>5;
-                default => throw new LogicException('This is an unreachable statement.')
+                default => throw new LogicException('This is an unreachable statement.'),
             })();
         }
 

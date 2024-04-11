@@ -35,154 +35,157 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
+use Infection\Mutator\Unwrap\UnwrapArrayFilter;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapArrayFilter::class)]
 final class UnwrapArrayFilterTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_filter(['A', 1, 'C'], 'is_int');
-PHP
+                $a = array_filter(['A', 1, 'C'], 'is_int');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 1, 'C'];
-PHP
+                $a = ['A', 1, 'C'];
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_filter(\Class_With_Const::Const, 'is_int');
-PHP
+                $a = array_filter(\Class_With_Const::Const, 'is_int');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_filter' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_filter(['A', 1, 'C'], 'is_int');
-PHP
+                $a = \array_filter(['A', 1, 'C'], 'is_int');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 1, 'C'];
-PHP
+                $a = ['A', 1, 'C'];
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+                $a = array_map('strtolower', ['A', 'B', 'C']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_filter' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_filter($text, $other)
-{
-}
-PHP
+                function array_filter($text, $other)
+                {
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 1, 'C'];
-if (array_filter($a, 'is_int') === $a) {
-    return true;
-}
-PHP
+                $a = ['A', 1, 'C'];
+                if (array_filter($a, 'is_int') === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 1, 'C'];
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = ['A', 1, 'C'];
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when array_filter is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_FiLtEr(['A', 1, 'C'], 'is_int');
-PHP
+                $a = aRrAy_FiLtEr(['A', 1, 'C'], 'is_int');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 1, 'C'];
-PHP
+                $a = ['A', 1, 'C'];
+                PHP,
         ];
 
         yield 'It mutates correctly when array_filter uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_filter($foo->bar(), 'is_int');
-PHP
+                $a = array_filter($foo->bar(), 'is_int');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_filter(['A', 1, 'C'], function($char): bool {
-    return !is_int($char);
-}));
-PHP
+                $a = array_map('strtolower', array_filter(['A', 1, 'C'], function($char): bool {
+                    return !is_int($char);
+                }));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['A', 1, 'C']);
-PHP
+                $a = array_map('strtolower', ['A', 1, 'C']);
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_filter';
+                $a = 'array_filter';
 
-$b = $a([1,2,3], 'is_int');
-PHP
+                $b = $a([1,2,3], 'is_int');
+                PHP
             ,
         ];
     }

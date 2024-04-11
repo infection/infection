@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function array_map;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
@@ -48,6 +49,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
+use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
@@ -58,7 +60,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
      * @param string[] $sourceDirectories
-     * @param list<string> $filteredSourceFilesToMutate
+     * @param list<SplFileInfo> $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -70,7 +72,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         array $sourceDirectories,
         bool $skipCoverage,
         bool $executeOnlyCoveringTestCases = false,
-        array $filteredSourceFilesToMutate = []
+        array $filteredSourceFilesToMutate = [],
+        ?string $mapSourceClassToTestStrategy = null,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
 
@@ -79,9 +82,9 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(
                 new Filesystem(),
-                $testFrameworkConfigDir
+                $testFrameworkConfigDir,
             ),
-            $testFrameworkConfigDir
+            $testFrameworkConfigDir,
         );
 
         return new PhpUnitAdapter(
@@ -95,18 +98,25 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
                 $sourceDirectories,
-                $filteredSourceFilesToMutate
+                array_map(
+                    static fn (SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
+                    $filteredSourceFilesToMutate,
+                ),
             ),
             new MutationConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
                 $projectDir,
-                new JUnitTestCaseSorter()
+                new JUnitTestCaseSorter(),
             ),
-            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases),
+            new ArgumentsAndOptionsBuilder(
+                $executeOnlyCoveringTestCases,
+                $filteredSourceFilesToMutate,
+                $mapSourceClassToTestStrategy,
+            ),
             new VersionParser(),
-            new CommandLineBuilder()
+            new CommandLineBuilder(),
         );
     }
 

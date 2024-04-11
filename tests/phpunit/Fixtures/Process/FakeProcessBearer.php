@@ -12,12 +12,12 @@ final class FakeProcessBearer implements ProcessBearer
 {
     public function getProcess(): Process
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function markAsTimedOut(): void
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function terminateProcess(): void

@@ -63,7 +63,7 @@ final class ExcludeDirsProvider
     public function __construct(
         private readonly ConsoleHelper $consoleHelper,
         private readonly QuestionHelper $questionHelper,
-        private readonly Filesystem $filesystem
+        private readonly Filesystem $filesystem,
     ) {
     }
 
@@ -88,7 +88,7 @@ final class ExcludeDirsProvider
         $autocompleteValues = [];
         $questionText = $this->consoleHelper->getQuestion(
             'Any directories to exclude from within your source directories?',
-            ''
+            '',
         );
         $excludedDirs = [];
 
@@ -105,7 +105,7 @@ final class ExcludeDirsProvider
 
             $autocompleteValues = array_map(
                 static fn (string $dir): string => str_replace($sourceDirs[0] . '/', '', $dir),
-                $globDirs
+                $globDirs,
             );
         }
 

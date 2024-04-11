@@ -43,8 +43,10 @@ use Infection\Console\LogVerbosity;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
 use function ksort;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TargetDetectionStatusesProvider::class)]
 final class TargetDetectionStatusesProviderTest extends TestCase
 {
     public function test_it_provides_all_statuses_when_debugging_log_is_enabled(): void
@@ -100,11 +102,12 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
 
-        $this->assertProvidesExcluding([
+        $this->assertProvidesExcluding(
+            [
                 DetectionStatus::KILLED,
                 DetectionStatus::ERROR,
             ],
-            $provider->get()
+            $provider->get(),
         );
     }
 
@@ -119,12 +122,13 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
 
-        $this->assertProvidesExcluding([
+        $this->assertProvidesExcluding(
+            [
                 DetectionStatus::KILLED,
                 DetectionStatus::ERROR,
                 DetectionStatus::NOT_COVERED,
             ],
-            $provider->get()
+            $provider->get(),
         );
     }
 

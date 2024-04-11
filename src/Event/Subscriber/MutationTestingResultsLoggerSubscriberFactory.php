@@ -50,7 +50,7 @@ final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberF
     public function create(OutputInterface $output): EventSubscriber
     {
         return new MutationTestingResultsLoggerSubscriber(
-            $this->logger
+            $this->logger,
         );
     }
 }

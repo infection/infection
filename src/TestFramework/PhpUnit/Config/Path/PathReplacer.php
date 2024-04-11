@@ -54,13 +54,13 @@ final class PathReplacer
 
     public function replaceInNode(DOMElement|DOMNode $domElement): void
     {
-        $path = trim($domElement->nodeValue);
+        $path = trim((string) $domElement->nodeValue);
 
         if (!$this->filesystem->isAbsolutePath($path)) {
             $newPath = sprintf(
                 '%s/%s',
                 $this->phpUnitConfigDir,
-                ltrim($path, '\/')
+                ltrim($path, '\/'),
             );
 
             // remove all occurrences of "/./". realpath can't be used because of glob patterns

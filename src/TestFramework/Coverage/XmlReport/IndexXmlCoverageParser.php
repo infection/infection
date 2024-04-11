@@ -60,7 +60,7 @@ class IndexXmlCoverageParser
     public function parse(
         string $coverageIndexPath,
         string $xmlIndexCoverageContent,
-        string $coverageBasePath
+        string $coverageBasePath,
     ): iterable {
         $xPath = XPathFactory::createXPath($xmlIndexCoverageContent);
 
@@ -75,7 +75,7 @@ class IndexXmlCoverageParser
     private function parseNodes(
         string $coverageIndexPath,
         string $coverageBasePath,
-        SafeDOMXPath $xPath
+        SafeDOMXPath $xPath,
     ): iterable {
         $projectSource = self::getProjectSource($xPath);
 
@@ -86,7 +86,7 @@ class IndexXmlCoverageParser
                 $coverageIndexPath,
                 $coverageBasePath,
                 $relativeCoverageFilePath,
-                $projectSource
+                $projectSource,
             );
         }
     }

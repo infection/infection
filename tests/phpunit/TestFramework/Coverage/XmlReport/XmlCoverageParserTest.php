@@ -41,12 +41,14 @@ use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(XmlCoverageParser::class)]
 final class XmlCoverageParserTest extends TestCase
 {
     private XmlCoverageParser $parser;
@@ -57,43 +59,42 @@ final class XmlCoverageParserTest extends TestCase
     }
 
     /**
-     * @dataProvider sourceFileInfoProviderProvider
-     *
      * @param array<string, mixed> $expectedTests
      */
+    #[DataProvider('sourceFileInfoProviderProvider')]
     public function test_it_reads_every_type_of_fixture(
         SourceFileInfoProvider $provider,
-        array $expectedTests
+        array $expectedTests,
     ): void {
         $fileData = $this->parser->parse($provider);
 
         $this->assertSame(
             $fileData->getSourceFileInfo()->getRealPath(),
-            $provider->provideFileInfo()->getRealPath()
+            $provider->provideFileInfo()->getRealPath(),
         );
 
         $coverageData = $fileData->getTests();
 
         $this->assertSame(
             $expectedTests,
-            TestLocationsNormalizer::normalize([$coverageData])[0]
+            TestLocationsNormalizer::normalize([$coverageData])[0],
         );
     }
 
     public function test_it_reads_report_with_no_covered_lines(): void
     {
         $xml = <<<'XML'
-<?xml version="1.0"?>
-<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-    <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
-        <totals>
-            <lines total="1" comments="0" code="1" executable="1" executed="1" percent="100"/>
-        </totals>
-        <coverage>
-        </coverage>
-    </file>
-</phpunit>
-XML;
+            <?xml version="1.0"?>
+            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+                <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
+                    <totals>
+                        <lines total="1" comments="0" code="1" executable="1" executed="1" percent="100"/>
+                    </totals>
+                    <coverage>
+                    </coverage>
+                </file>
+            </phpunit>
+            XML;
 
         $coverageData = $this->parser
             ->parse($this->createSourceFileInfoProvider($xml))
@@ -107,20 +108,20 @@ XML;
     public function test_it_reads_report_with_percent_signs(): void
     {
         $xml = <<<'XML'
-<?xml version="1.0"?>
-<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-    <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
-        <totals>
-            <lines total="1e7" comments="0" code="1" executable="1" executed="1" percent="1.0%"/>
-        </totals>
-        <coverage>
-            <line nr="11">
-                <covered by="ExampleTest::test_it_just_works"/>
-            </line>
-        </coverage>
-    </file>
-</phpunit>
-XML;
+            <?xml version="1.0"?>
+            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+                <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
+                    <totals>
+                        <lines total="1e7" comments="0" code="1" executable="1" executed="1" percent="1.0%"/>
+                    </totals>
+                    <coverage>
+                        <line nr="11">
+                            <covered by="ExampleTest::test_it_just_works"/>
+                        </line>
+                    </coverage>
+                </file>
+            </phpunit>
+            XML;
 
         $coverageData = $this->parser
             ->parse($this->createSourceFileInfoProvider($xml))
@@ -133,20 +134,20 @@ XML;
     public function test_it_reads_report_with_empty_percentage(): void
     {
         $xml = <<<'XML'
-<?xml version="1.0"?>
-<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-    <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
-        <totals>
-            <lines total="1e7" comments="0" code="1" executable="1" executed="1" percent=""/>
-        </totals>
-        <coverage>
-            <line nr="11">
-                <covered by="ExampleTest::test_it_just_works"/>
-            </line>
-        </coverage>
-    </file>
-</phpunit>
-XML;
+            <?xml version="1.0"?>
+            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+                <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
+                    <totals>
+                        <lines total="1e7" comments="0" code="1" executable="1" executed="1" percent=""/>
+                    </totals>
+                    <coverage>
+                        <line nr="11">
+                            <covered by="ExampleTest::test_it_just_works"/>
+                        </line>
+                    </coverage>
+                </file>
+            </phpunit>
+            XML;
 
         $coverageData = $this->parser
             ->parse($this->createSourceFileInfoProvider($xml))
@@ -156,7 +157,7 @@ XML;
         $this->assertArrayNotHasKey(11, $coverageData->getTestsLocationsBySourceLine());
     }
 
-    public function sourceFileInfoProviderProvider(): iterable
+    public static function sourceFileInfoProviderProvider(): iterable
     {
         foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
             yield [
@@ -164,7 +165,7 @@ XML;
                     '/path/to/index.xml',
                     $fixture->coverageDir,
                     $fixture->relativeCoverageFilePath,
-                    $fixture->projectSource
+                    $fixture->projectSource,
                 ),
                 $fixture->normalizedTests,
             ];

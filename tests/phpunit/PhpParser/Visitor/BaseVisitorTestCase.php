@@ -43,12 +43,12 @@ use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function sprintf;
 
-abstract class BaseVisitorTest extends TestCase
+abstract class BaseVisitorTestCase extends TestCase
 {
     /**
      * @return Node[]
      */
-    final protected function parseCode(string $code): array
+    final protected static function parseCode(string $code): array
     {
         return (array) SingletonContainer::getContainer()->getParser()->parse($code);
     }

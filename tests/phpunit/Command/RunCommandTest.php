@@ -35,15 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command;
 
+use Infection\Command\RunCommand;
 use Infection\Console\Application;
 use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(RunCommand::class)]
 final class RunCommandTest extends TestCase
 {
     public function test_it_fails_when_threads_value_is_string_but_not_max(): void

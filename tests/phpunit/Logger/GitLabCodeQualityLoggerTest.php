@@ -39,33 +39,50 @@ use Infection\Logger\GitLabCodeQualityLogger;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
+use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\base64_decode;
 use function Safe\json_decode;
 use function str_replace;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(GitLabCodeQualityLogger::class)]
 final class GitLabCodeQualityLoggerTest extends TestCase
 {
+    use BacksUpEnvironmentVariables;
     use CreateMetricsCalculator;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    protected function setUp(): void
+    {
+        $this->backupEnvironmentVariables();
+
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->restoreEnvironmentVariables();
+        self::resetOriginalFilePrefix();
+    }
+
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         ResultsCollector $resultsCollector,
-        array $expectedContents
+        array $expectedContents,
     ): void {
         $logger = new GitLabCodeQualityLogger($resultsCollector);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations; only covered' => [
             new ResultsCollector(),
@@ -73,7 +90,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         ];
 
         yield 'all mutations; only covered' => [
-            $this->createCompleteResultsCollector(),
+            self::createCompleteResultsCollector(),
             [
                 [
                     'type' => 'issue',
@@ -85,7 +102,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'location' => [
                         'path' => 'foo/bar',
                         'lines' => [
-                          'begin' => 9,
+                            'begin' => 9,
                         ],
                     ],
                     'severity' => 'major',
@@ -100,7 +117,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'location' => [
                         'path' => 'foo/bar',
                         'lines' => [
-                          'begin' => 10,
+                            'begin' => 10,
                         ],
                     ],
                     'severity' => 'major',
@@ -109,7 +126,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         ];
 
         yield 'Non UTF-8 characters' => [
-            $this->createNonUtf8CharactersCollector(),
+            self::createNonUtf8CharactersCollector(),
             [
                 [
                     'type' => 'issue',
@@ -121,7 +138,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'location' => [
                         'path' => 'foo/bar',
                         'lines' => [
-                          'begin' => 10,
+                            'begin' => 10,
                         ],
                     ],
                     'severity' => 'major',
@@ -130,21 +147,33 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         ];
     }
 
+    public function test_it_logs_correctly_with_ci_project_dir(): void
+    {
+        \Safe\putenv('CI_PROJECT_DIR=/my/project/dir');
+        self::setOriginalFilePrefix('/my/project/dir/');
+
+        $resultsCollector = self::createCompleteResultsCollector();
+
+        $logger = new GitLabCodeQualityLogger($resultsCollector);
+
+        $this->assertStringContainsString('"path":"foo\/bar"', $logger->getLogLines()[0]);
+    }
+
     private function assertLoggedContentIs(array $expectedJson, GitLabCodeQualityLogger $logger): void
     {
         $this->assertSame($expectedJson, json_decode($logger->getLogLines()[0], true, JSON_THROW_ON_ERROR));
     }
 
-    private function createNonUtf8CharactersCollector(): ResultsCollector
+    private static function createNonUtf8CharactersCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::ESCAPED,
-                base64_decode('abc', true) // produces non UTF-8 character
+                base64_decode('abc', true), // produces non UTF-8 character
             ),
         );
 

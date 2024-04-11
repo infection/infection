@@ -58,12 +58,12 @@ final class InstanceOf_ implements Mutator
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b instanceof User;
-# Mutation 1
-+ $a = true;
-# Mutation 2
-+ $a = false;
-DIFF
+                - $a = $b instanceof User;
+                # Mutation 1
+                + $a = true;
+                # Mutation 2
+                + $a = false;
+                DIFF,
         );
     }
 

@@ -51,15 +51,15 @@ final class LogicalAndAllSubExprNegation extends AbstractAllSubExprNegation
     {
         return new Definition(
             <<<'TXT'
-Negates all sub-expressions of an AND expression (`&&`).
-TXT
+                Negates all sub-expressions of an AND expression (`&&`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b && $c;
-+ $a = !$b && !$c;
-DIFF
+                - $a = $b && $c;
+                + $a = !$b && !$c;
+                DIFF,
         );
     }
 

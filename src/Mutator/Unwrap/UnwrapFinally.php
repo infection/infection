@@ -57,16 +57,16 @@ final class UnwrapFinally implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-$check = true;
-- try {
--     $callback();
-- }
-- } finally {
--     $check = false;
-- }
-+ $callback();
-+ $check = false
-DIFF
+                $check = true;
+                - try {
+                -     $callback();
+                - }
+                - } finally {
+                -     $check = false;
+                - }
+                + $callback();
+                + $check = false
+                DIFF,
         );
     }
 

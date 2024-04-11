@@ -48,131 +48,133 @@ use function Later\now;
 
 trait CreateMetricsCalculator
 {
-    private function createCompleteMetricsCalculator(): MetricsCalculator
+    private static $originalFilePrefix = '';
+
+    private static function createCompleteMetricsCalculator(): MetricsCalculator
     {
         $calculator = new MetricsCalculator(2);
 
-        $this->feedCollector($calculator);
+        self::feedCollector($calculator);
 
         return $calculator;
     }
 
-    private function createCompleteResultsCollector(): ResultsCollector
+    private static function createCompleteResultsCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
-        $this->feedCollector($collector);
+        self::feedCollector($collector);
 
         return $collector;
     }
 
-    private function feedCollector(Collector $collector): void
+    private static function feedCollector(Collector $collector): void
     {
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::KILLED,
-                'killed#0'
+                'killed#0',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::KILLED,
-                'killed#1'
+                'killed#1',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::ERROR,
-                'error#0'
+                'error#0',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::ERROR,
-                'error#1'
+                'error#1',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::SYNTAX_ERROR,
-                'syntaxError#0'
+                'syntaxError#0',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::SYNTAX_ERROR,
-                'syntaxError#1'
+                'syntaxError#1',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::ESCAPED,
-                'escaped#0'
+                'escaped#0',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::ESCAPED,
-                'escaped#1'
+                'escaped#1',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::TIMED_OUT,
-                'timedOut#0'
+                'timedOut#0',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::TIMED_OUT,
-                'timedOut#1'
+                'timedOut#1',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::SKIPPED,
-                'skipped#0'
+                'skipped#0',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 PregQuote::class,
                 DetectionStatus::SKIPPED,
-                'skipped#1'
+                'skipped#1',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,
-                'notCovered#0'
+                'notCovered#0',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::NOT_COVERED,
-                'notCovered#1'
+                'notCovered#1',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::IGNORED,
-                'ignored#0'
+                'ignored#0',
             ),
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 DetectionStatus::IGNORED,
-                'ignored#1'
-            )
+                'ignored#1',
+            ),
         );
     }
 
-    private function createMutantExecutionResult(
+    private static function createMutantExecutionResult(
         int $i,
         string $mutatorClassName,
         string $detectionStatus,
-        string $echoMutatedMessage
+        string $echoMutatedMessage,
     ): MutantExecutionResult {
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
@@ -180,25 +182,35 @@ trait CreateMetricsCalculator
             $detectionStatus,
             now(normalize_trailing_spaces(
                 <<<DIFF
---- Original
-+++ New
-@@ @@
+                    --- Original
+                    +++ New
+                    @@ @@
 
-- echo 'original';
-+ echo '$echoMutatedMessage';
+                    - echo 'original';
+                    + echo '$echoMutatedMessage';
 
-DIFF
+                    DIFF,
             )),
             'a1b2c3',
             MutatorName::getName($mutatorClassName),
-            'foo/bar',
+            self::$originalFilePrefix . 'foo/bar',
             10 - $i,
             20 - $i,
             10 - $i,
             20 - $i,
             now('<?php $a = 1;'),
             now('<?php $a = 2;'),
-            []
+            [],
         );
+    }
+
+    private static function setOriginalFilePrefix(string $pathPrefix): void
+    {
+        self::$originalFilePrefix = $pathPrefix;
+    }
+
+    private static function resetOriginalFilePrefix(): void
+    {
+        self::$originalFilePrefix = '';
     }
 }

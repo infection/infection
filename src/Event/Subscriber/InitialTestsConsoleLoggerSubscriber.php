@@ -73,7 +73,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
             sprintf(
                 '%s version: %s',
                 $this->testFrameworkAdapter->getName(),
-                $version
+                $version,
             ),
             '',
         ]);

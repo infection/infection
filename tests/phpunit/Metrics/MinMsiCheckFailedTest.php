@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Metrics;
 
 use Infection\Metrics\MinMsiCheckFailed;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MinMsiCheckFailed::class)]
 final class MinMsiCheckFailedTest extends TestCase
 {
     public function test_it_can_be_created_for_min_msi(): void
@@ -46,7 +48,7 @@ final class MinMsiCheckFailedTest extends TestCase
 
         $this->assertSame(
             'The minimum required MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -56,7 +58,7 @@ final class MinMsiCheckFailedTest extends TestCase
 
         $this->assertSame(
             'The minimum required Covered Code MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 }

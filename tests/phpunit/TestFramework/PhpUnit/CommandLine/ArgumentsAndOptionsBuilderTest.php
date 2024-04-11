@@ -39,22 +39,17 @@ use function array_map;
 use Generator;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 
+#[CoversClass(ArgumentsAndOptionsBuilder::class)]
 final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
-    /**
-     * @var ArgumentsAndOptionsBuilder
-     */
-    private $builder;
-
-    protected function setUp(): void
-    {
-        $this->builder = new ArgumentsAndOptionsBuilder(false);
-    }
-
     public function test_it_can_build_the_command_without_extra_options(): void
     {
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
         $configPath = '/config/path';
 
         $this->assertSame(
@@ -62,12 +57,13 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--configuration',
                 $configPath,
             ],
-            $this->builder->buildForInitialTestsRun($configPath, '')
+            $builder->buildForInitialTestsRun($configPath, ''),
         );
     }
 
     public function test_it_can_build_the_command_with_extra_options(): void
     {
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
         $configPath = '/config/path';
 
         $this->assertSame(
@@ -77,12 +73,37 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--verbose',
                 '--debug',
             ],
-            $this->builder->buildForInitialTestsRun($configPath, '--verbose --debug')
+            $builder->buildForInitialTestsRun($configPath, '--verbose --debug'),
+        );
+    }
+
+    public function test_it_can_build_the_command_with_filtered_files_for_initial_tests_run(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(false,
+            [
+                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
+                new SplFileInfo('src/bar/Baz.php', 'src/bar/Baz.php', 'src/bar/Baz.php'),
+            ],
+            'simple',
+        );
+        $configPath = '/config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--verbose',
+                '--debug',
+                '--filter',
+                'FooTest|BazTest',
+            ],
+            $builder->buildForInitialTestsRun($configPath, '--verbose --debug'),
         );
     }
 
     public function test_it_can_build_the_command_with_extra_options_that_contains_spaces(): void
     {
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
         $configPath = '/the config/path';
 
         $this->assertSame(
@@ -91,18 +112,16 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 $configPath,
                 '--path=/a path/with spaces',
             ],
-            $this->builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces')
+            $builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces'),
         );
     }
 
-    /**
-     * @dataProvider provideTestCases
-     */
+    #[DataProvider('provideTestCases')]
     public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(bool $executeOnlyCoveringTestCases, array $testCases, string $phpUnitVersion, ?string $expectedFilterOptionValue = null): void
     {
         $configPath = '/the config/path';
 
-        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases);
+        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, [], null);
 
         $expectedArgumentsAndOptions = [
             '--configuration',
@@ -122,14 +141,14 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--path=/a path/with spaces',
                 array_map(
                     static fn (string $testCase): TestLocation => TestLocation::forTestMethod($testCase),
-                    $testCases
+                    $testCases,
                 ),
-                $phpUnitVersion
-            )
+                $phpUnitVersion,
+            ),
         );
     }
 
-    public function provideTestCases(): Generator
+    public static function provideTestCases(): Generator
     {
         yield '--only-covering-test-cases is disabled' => [
             false,

@@ -38,68 +38,67 @@ namespace Infection\Tests\Reflection;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\Reflection\ClassReflection;
 use Infection\Reflection\Visibility;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 abstract class ClassReflectionTestCase extends TestCase
 {
-    /**
-     * @dataProvider provideParentMethodCases
-     */
+    #[DataProvider('provideParentMethodCases')]
     public function test_it_knows_if_a_function_is_inherited(
         ClassReflection $reflection,
         string $method,
         Visibility $visibility,
-        bool $hasParent
+        bool $hasParent,
     ): void {
         $this->assertSame($hasParent, $reflection->hasParentMethodWithVisibility($method, $visibility));
     }
 
-    public function provideParentMethodCases(): iterable
+    public static function provideParentMethodCases(): iterable
     {
         yield [
-            $this->createFromName(CloneVisitor::class),
+            static::createFromName(CloneVisitor::class),
             'enterNode',
             Visibility::asPublic(),
             true,
         ];
 
         yield [
-            $this->createFromName(CloneVisitor::class),
+            static::createFromName(CloneVisitor::class),
             'enterNode',
             Visibility::asProtected(),
             false,
         ];
 
         yield [
-            $this->createFromName(static::class),
+            static::createFromName(static::class),
             'foo',
             Visibility::asProtected(),
             false,
         ];
 
         yield [
-            $this->createFromName(static::class),
+            static::createFromName(static::class),
             'foo',
             Visibility::asPublic(),
             false,
         ];
 
         yield [
-            $this->createFromName(ProtChild::class),
+            static::createFromName(ProtChild::class),
             'foo',
             Visibility::asPublic(),
             false,
         ];
 
         yield [
-            $this->createFromName(ProtChild::class),
+            static::createFromName(ProtChild::class),
             'foo',
             Visibility::asProtected(),
             true,
         ];
     }
 
-    abstract protected function createFromName(string $name): ClassReflection;
+    abstract protected static function createFromName(string $name): ClassReflection;
 }
 
 class ProtParent

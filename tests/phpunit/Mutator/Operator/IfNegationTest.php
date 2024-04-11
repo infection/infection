@@ -35,253 +35,256 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
+use Infection\Mutator\Operator\IfNegation;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(IfNegation::class)]
 final class IfNegationTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It preserve elseif and else expression' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($this->fooBar()) {
-    return 1;
-} elseif ($this->barFoo()) {
-    return 2;
-} else {
-    return 3;
-}
-PHP
+                if ($this->fooBar()) {
+                    return 1;
+                } elseif ($this->barFoo()) {
+                    return 2;
+                } else {
+                    return 3;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-if (!$this->fooBar()) {
-    return 1;
-} elseif ($this->barFoo()) {
-    return 2;
-} else {
-    return 3;
-}
-PHP
+                if (!$this->fooBar()) {
+                    return 1;
+                } elseif ($this->barFoo()) {
+                    return 2;
+                } else {
+                    return 3;
+                }
+                PHP,
         ];
 
         yield 'It mutates array item fetch' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($array[0]) {
-}
-PHP
+                if ($array[0]) {
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-if (!$array[0]) {
-}
-PHP
+                    if (!$array[0]) {
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It mutates variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo) {
-}
-PHP
+                if ($foo) {
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-if (!$foo) {
-}
-PHP
+                    if (!$foo) {
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It mutates method call' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($this->foo()) {
-}
-PHP
+                if ($this->foo()) {
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-if (!$this->foo()) {
-}
-PHP,
+                    if (!$this->foo()) {
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It mutates static calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (self::foo()) {
-}
-PHP
+                if (self::foo()) {
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-if (!self::foo()) {
-}
-PHP
+                    if (!self::foo()) {
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It mutates constant calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (self::FOO) {
-}
-PHP
+                if (self::FOO) {
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-if (!self::FOO) {
-}
-PHP
+                    if (!self::FOO) {
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It mutates closure calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo()) {
-}
-PHP
+                if ($foo()) {
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-if (!$foo()) {
-}
-PHP
+                    if (!$foo()) {
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It mutates invoke calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (($this->foo)()) {
-}
-PHP
+                if (($this->foo)()) {
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-if (!($this->foo)()) {
-}
-PHP
+                    if (!($this->foo)()) {
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It mutates function calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (a()) {
-}
-PHP
+                if (a()) {
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-if (!a()) {
-}
-PHP
+                    if (!a()) {
+                    }
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate already negated expression' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (!$this->fooBar()) {
-}
-PHP
+                if (!$this->fooBar()) {
+                }
+                PHP,
         ];
 
         yield 'It does not mutate equal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($this->fooBar() == 1) {
-}
-PHP
+                if ($this->fooBar() == 1) {
+                }
+                PHP,
         ];
 
         yield 'It does not mutate not equal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($this->fooBar() != 1) {
-}
-PHP
+                if ($this->fooBar() != 1) {
+                }
+                PHP,
         ];
 
         yield 'It does not mutate identical comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($this->fooBar() === true) {
-}
-PHP
+                if ($this->fooBar() === true) {
+                }
+                PHP,
         ];
 
         yield 'It does not mutate not identical comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($this->fooBar() !== true) {
-}
-PHP
+                if ($this->fooBar() !== true) {
+                }
+                PHP,
         ];
 
         yield 'It does not mutate and condition' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (a() && b()) {
-}
-PHP
+                if (a() && b()) {
+                }
+                PHP,
         ];
 
         yield 'It does not mutate or condition' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (a() || b()) {
-}
-PHP
+                if (a() || b()) {
+                }
+                PHP,
         ];
     }
 }

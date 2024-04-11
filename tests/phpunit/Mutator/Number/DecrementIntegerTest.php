@@ -35,502 +35,505 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Number;
 
+use Infection\Mutator\Number\DecrementInteger;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use const PHP_INT_MAX;
 use const PHP_INT_MIN;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(DecrementInteger::class)]
 final class DecrementIntegerTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It does not decrement an integer in a comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo < 10) {
-    echo 'bar';
-}
-PHP
+                if ($foo < 10) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of count()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (count($a) === 0) {
-    echo 'bar';
-}
-PHP
+                if (count($a) === 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero with yoda style when it is being compared as identical with result of count()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (0 === count($a)) {
-    echo 'bar';
-}
-PHP
+                if (0 === count($a)) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero with when it is being compared as identical with result of cOunT()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (cOunT($a) === 0) {
-    echo 'bar';
-}
-PHP
+                if (cOunT($a) === 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of sizeOf()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (sizeOf($a) === 0) {
-    echo 'bar';
-}
-PHP
+                if (sizeOf($a) === 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero when it is being compared as not identical with result of count()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (count($a) !== 0) {
-    echo 'bar';
-}
-PHP
+                if (count($a) !== 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero when it is compared as equal with result of count()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (count($a) == 0) {
-    echo 'bar';
-}
-PHP
+                if (count($a) == 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero when it is compared as not equal with result of count()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (count($a) != 0) {
-    echo 'bar';
-}
-PHP
+                if (count($a) != 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero when it is compared as more than count()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (count($a) > 0) {
-    echo 'bar';
-}
-PHP
+                if (count($a) > 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero when it is compared as less than count() on the right side' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (0 < count($a)) {
-    echo 'bar';
-}
-PHP
+                if (0 < count($a)) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero when it is compared as less than or equal to count() on the right side' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (0 <= count($a)) {
-    echo 'bar';
-}
-PHP
+                if (0 <= count($a)) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero when it is compared as equal to count() on the right side' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (0 == count($a)) {
-    echo 'bar';
-}
-PHP
+                if (0 == count($a)) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not decrement zero when it is compared as greater than count() on the right side' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (0 > count($a)) {
-    echo 'bar';
-}
-PHP
+                if (0 > count($a)) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is compared as more or equal than count()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (count($a) >= 0) {
-    echo 'bar';
-}
-PHP
+                if (count($a) >= 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It doest not decrement zero when it is compared as less than count()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (count($a) < 0) {
-    echo 'bar';
-}
-PHP
+                if (count($a) < 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does decrement when compared against a variable function' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === 0) {
-    echo 'bar';
-}
-PHP
+                if ($foo === 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === -1) {
-    echo 'bar';
-}
-PHP
+                if ($foo === -1) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It decrements zero when it is compared any other, not count() function' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (abs($a) === 0) {
-    echo 'bar';
-}
-PHP
+                if (abs($a) === 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-if (abs($a) === -1) {
-    echo 'bar';
-}
-PHP
+                if (abs($a) === -1) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It doest not decrements zero when it is compared as less or equal than count()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (count($a) <= 0) {
-    echo 'bar';
-}
-PHP
+                if (count($a) <= 0) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It decrements zero' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 0;
-PHP
+                $a = 0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = -1;
-PHP
+                $a = -1;
+                PHP
             ,
         ];
 
         yield 'It decrements a negative integer' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === -10) {
-    echo 'bar';
-}
-PHP
+                if ($foo === -10) {
+                    echo 'bar';
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === -11) {
-    echo 'bar';
-}
-PHP
+                if ($foo === -11) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It decrements an assignment' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 10;
-PHP
+                $foo = 10;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 9;
-PHP
+                $foo = 9;
+                PHP,
         ];
 
         yield 'It decrements an assignment of 0' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 0;
-PHP
+                $foo = 0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$foo = -1;
-PHP
+                $foo = -1;
+                PHP,
         ];
 
         yield 'It does not decrement an assignment of 1' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 1;
-PHP
+                $foo = 1;
+                PHP,
         ];
 
         yield 'It does not decrement 1 in greater comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo > 1) {
-    echo 'bar';
-}
-PHP
+                if ($foo > 1) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement 1 in greater or equal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo >= 1) {
-    echo 'bar';
-}
-PHP
+                if ($foo >= 1) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement 1 in smaller comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo < 1) {
-    echo 'bar';
-}
-PHP
+                if ($foo < 1) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement 1 in smaller or equal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo <= 1) {
-    echo 'bar';
-}
-PHP
+                if ($foo <= 1) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement 1 in equal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo == 1) {
-    echo 'bar';
-}
-PHP
+                if ($foo == 1) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement 1 in not equal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo != 1) {
-    echo 'bar';
-}
-PHP
+                if ($foo != 1) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement 1 in identical comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === 1) {
-    echo 'bar';
-}
-PHP
+                if ($foo === 1) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement 1 in not identical comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo !== 1) {
-    echo 'bar';
-}
-PHP
+                if ($foo !== 1) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of grapheme_strlen()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (grapheme_strlen($a) === 0) {
-    echo 'bar';
-}
-PHP
+                if (grapheme_strlen($a) === 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of iconv_strlen()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (iconv_strlen($a) === 0) {
-    echo 'bar';
-}
-PHP
+                if (iconv_strlen($a) === 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of mb_strlen()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (mb_strlen($a) === 0) {
-    echo 'bar';
-}
-PHP
+                if (mb_strlen($a) === 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of sizeof()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (sizeof($a) === 0) {
-    echo 'bar';
-}
-PHP
+                if (sizeof($a) === 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of strlen()' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (strlen($a) === 0) {
-    echo 'bar';
-}
-PHP
+                if (strlen($a) === 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not decrement when it is accessed zero index of an array' => [
             <<<'PHP'
-<?php
-$b = $a[0];
-PHP
+                <?php
+                $b = $a[0];
+                PHP,
         ];
 
         yield 'It does not decrement limit argument of preg_split function when it equals to 0' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_split('//', 'string', 0);
-PHP
+                preg_split('//', 'string', 0);
+                PHP,
         ];
 
         yield 'It does decrement limit argument of preg_split function when it greater than 0' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_split('//', 'string', 1);
-PHP
+                preg_split('//', 'string', 1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-preg_split('//', 'string', 0);
-PHP
+                preg_split('//', 'string', 0);
+                PHP,
         ];
 
         yield 'It does decrement limit argument of preg_split function when it equal to -1' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_split('//', 'string', -1);
-PHP
+                preg_split('//', 'string', -1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-preg_split('//', 'string', -2);
-PHP
+                preg_split('//', 'string', -2);
+                PHP,
         ];
 
         $minInt = PHP_INT_MIN;
 
         yield 'It does not decrement min int' => [
             <<<"PHP"
-<?php
+                <?php
 
-if (1 === {$minInt}) {
-    echo 'bar';
-}
-PHP
+                if (1 === {$minInt}) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         $maxInt = PHP_INT_MAX;
 
         yield 'It does not decrement max int negative to avoid parser bugs' => [
             <<<"PHP"
-            <?php
+                <?php
 
-            if (1 === -{$maxInt}) {
-                echo 'bar';
-            }
-            PHP,
+                if (1 === -{$maxInt}) {
+                    echo 'bar';
+                }
+                PHP,
         ];
     }
 }

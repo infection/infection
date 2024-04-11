@@ -52,19 +52,19 @@ use Infection\Mutator\ProfileList;
 use Infection\TestFramework\TestFrameworkTypes;
 use JsonSchema\Validator;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 use function sprintf;
 use stdClass;
 use function var_export;
 
-/**
- * @covers \Infection\Configuration\Entry\Logs
- * @covers \Infection\Configuration\Entry\PhpUnit
- * @covers \Infection\Configuration\Entry\Source
- * @covers \Infection\Configuration\Entry\StrykerConfig
- * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
- */
+#[CoversClass(Logs::class)]
+#[CoversClass(PhpUnit::class)]
+#[CoversClass(Source::class)]
+#[CoversClass(StrykerConfig::class)]
+#[CoversClass(SchemaConfigurationFactory::class)]
 final class SchemaConfigurationFactoryTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/schema.json';
@@ -86,12 +86,10 @@ final class SchemaConfigurationFactoryTest extends TestCase
         '@default',
     ];
 
-    /**
-     * @dataProvider provideRawConfig
-     */
+    #[DataProvider('provideRawConfig')]
     public function test_it_can_create_a_config(
         string $json,
-        SchemaConfiguration $expected
+        SchemaConfiguration $expected,
     ): void {
         $rawConfig = json_decode($json);
 
@@ -103,26 +101,26 @@ final class SchemaConfigurationFactoryTest extends TestCase
 
         $actual = (new SchemaConfigurationFactory())->create(
             '/path/to/config',
-            $rawConfig
+            $rawConfig,
         );
 
         $this->assertSame(
             var_export($expected, true),
-            var_export($actual, true)
+            var_export($actual, true),
         );
     }
 
-    public function provideRawConfig(): iterable
+    public static function provideRawConfig(): iterable
     {
         // The schema is given as a JSON here to be closer to how the user configure the schema
         yield 'minimal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -131,48 +129,48 @@ JSON
 
         yield '[source] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src", "lib"]
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src", "lib"]
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(
                     ['src', 'lib'],
-                    []
+                    [],
                 ),
             ]),
         ];
 
         yield '[source] excludes nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"],
-        "excludes": ["fixtures", "tests"]
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"],
+                        "excludes": ["fixtures", "tests"]
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(
                     ['src'],
-                    ['fixtures', 'tests']
+                    ['fixtures', 'tests'],
                 ),
             ]),
         ];
 
         yield '[source] empty strings' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": [""],
-        "excludes": [""]
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": [""],
+                        "excludes": [""]
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source([], []),
@@ -181,13 +179,13 @@ JSON
 
         yield '[source] empty & untrimmed strings' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": [" src ", ""],
-        "excludes": [" fixtures ", ""]
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": [" src ", ""],
+                        "excludes": [" fixtures ", ""]
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], ['fixtures']),
@@ -196,13 +194,13 @@ JSON
 
         yield '[timeout] nominal' => [
             <<<'JSON'
-{
-    "timeout": 100,
-    "source": {
-        "directories": ["src"]
-    }
-}
-JSON
+                {
+                    "timeout": 100,
+                    "source": {
+                        "directories": ["src"]
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'timeout' => 100,
@@ -212,15 +210,15 @@ JSON
 
         yield '[logs][text] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "text": "text.log"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "text": "text.log"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -234,22 +232,22 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][html] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "html": "report.html"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "html": "report.html"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -263,22 +261,22 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][summary] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "summary": "summary.log"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "summary": "summary.log"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -292,22 +290,22 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][json] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "json": "json.log"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "json": "json.log"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -321,22 +319,22 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][gitlab] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "gitlab": "gitlab.log"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "gitlab": "gitlab.log"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -350,22 +348,22 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][debug] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "debug": "debug.log"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "debug": "debug.log"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -379,22 +377,22 @@ JSON
                     null,
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][perMutator] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "perMutator": "perMutator.log"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "perMutator": "perMutator.log"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -408,24 +406,24 @@ JSON
                     'perMutator.log',
                     false,
                     null,
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][stryker] badge' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "stryker": {
-            "badge": "master"
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "stryker": {
+                            "badge": "master"
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -439,24 +437,24 @@ JSON
                     null,
                     false,
                     StrykerConfig::forBadge('master'),
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][stryker] report' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "stryker": {
-            "report": "master"
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "stryker": {
+                            "report": "master"
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -470,24 +468,24 @@ JSON
                     null,
                     false,
                     StrykerConfig::forFullReport('master'),
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][stryker] badge regex' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "stryker": {
-            "badge": "/^foo$/"
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "stryker": {
+                            "badge": "/^foo$/"
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -501,24 +499,24 @@ JSON
                     null,
                     false,
                     StrykerConfig::forBadge('/^foo$/'),
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][stryker] report regex' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "stryker": {
-            "report": "/^foo$/"
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "stryker": {
+                            "report": "/^foo$/"
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -532,22 +530,22 @@ JSON
                     null,
                     false,
                     StrykerConfig::forFullReport('/^foo$/'),
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[logs][summaryJson] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "summaryJson": "summary.json"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "summaryJson": "summary.json"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -561,33 +559,33 @@ JSON
                     null,
                     false,
                     null,
-                    'summary.json'
+                    'summary.json',
                 ),
             ]),
         ];
 
         yield '[logs] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "text": "text.log",
-        "html": "report.html",
-        "summary": "summary.log",
-        "json": "json.log",
-        "gitlab": "gitlab.log",
-        "debug": "debug.log",
-        "perMutator": "perMutator.log",
-        "github": true,
-        "stryker": {
-            "badge": "master"
-        },
-        "summaryJson": "summary.json"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "text": "text.log",
+                        "html": "report.html",
+                        "summary": "summary.log",
+                        "json": "json.log",
+                        "gitlab": "gitlab.log",
+                        "debug": "debug.log",
+                        "perMutator": "perMutator.log",
+                        "github": true,
+                        "stryker": {
+                            "badge": "master"
+                        },
+                        "summaryJson": "summary.json"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -601,28 +599,28 @@ JSON
                     'perMutator.log',
                     true,
                     StrykerConfig::forBadge('master'),
-                    'summary.json'
+                    'summary.json',
                 ),
             ]),
         ];
 
         yield '[logs] empty strings' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "text": "",
-        "summary": "",
-        "debug": "",
-        "perMutator": "",
-        "stryker": {
-            "report": ""
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "text": "",
+                        "summary": "",
+                        "debug": "",
+                        "perMutator": "",
+                        "stryker": {
+                            "report": ""
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -632,21 +630,21 @@ JSON
 
         yield '[logs] empty branch match regex' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "text": "",
-        "summary": "",
-        "debug": "",
-        "perMutator": "",
-        "stryker": {
-            "badge": ""
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "text": "",
+                        "summary": "",
+                        "debug": "",
+                        "perMutator": "",
+                        "stryker": {
+                            "badge": ""
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -656,26 +654,26 @@ JSON
 
         yield '[logs] empty & untrimmed strings' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "logs": {
-        "text": " text.log ",
-        "html": " report.html ",
-        "summary": " summary.log ",
-        "json": " json.log ",
-        "gitlab": " gitlab.log",
-        "debug": " debug.log ",
-        "perMutator": " perMutator.log ",
-        "github": true ,
-        "stryker": {
-            "badge": " master "
-        },
-        "summaryJson": " summary.json "
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "logs": {
+                        "text": " text.log ",
+                        "html": " report.html ",
+                        "summary": " summary.log ",
+                        "json": " json.log ",
+                        "gitlab": " gitlab.log",
+                        "debug": " debug.log ",
+                        "perMutator": " perMutator.log ",
+                        "github": true ,
+                        "stryker": {
+                            "badge": " master "
+                        },
+                        "summaryJson": " summary.json "
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -689,20 +687,20 @@ JSON
                     'perMutator.log',
                     true,
                     StrykerConfig::forBadge('master'),
-                    'summary.json'
+                    'summary.json',
                 ),
             ]),
         ];
 
         yield '[tmpDir] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "tmpDir": "custom-tmp"
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "tmpDir": "custom-tmp"
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -712,13 +710,13 @@ JSON
 
         yield '[tmpDir] empty string' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "tmpDir": ""
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "tmpDir": ""
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -728,13 +726,13 @@ JSON
 
         yield '[tmpDir] untrimmed string' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "tmpDir": " custom-tmp "
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "tmpDir": " custom-tmp "
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -744,13 +742,13 @@ JSON
 
         yield '[phpUnit] no property' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "phpUnit": {}
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "phpUnit": {}
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -760,99 +758,99 @@ JSON
 
         yield '[phpUnit][configDir] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "phpUnit": {
-        "configDir": "phpunit.xml"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "phpUnit": {
+                        "configDir": "phpunit.xml"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
                     'phpunit.xml',
-                    null
+                    null,
                 ),
             ]),
         ];
 
         yield '[phpUnit][customPath] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "phpUnit": {
-        "customPath": "bin/phpunit"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "phpUnit": {
+                        "customPath": "bin/phpunit"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
                     null,
-                    'bin/phpunit'
+                    'bin/phpunit',
                 ),
             ]),
         ];
 
         yield '[phpUnit] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "phpUnit": {
-        "configDir": "phpunit.xml",
-        "customPath": "bin/phpunit"
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "phpUnit": {
+                        "configDir": "phpunit.xml",
+                        "customPath": "bin/phpunit"
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
                     'phpunit.xml',
-                    'bin/phpunit'
+                    'bin/phpunit',
                 ),
             ]),
         ];
 
         yield '[phpUnit] empty & untrimmed strings' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "phpUnit": {
-        "configDir": "",
-        "customPath": " bin/phpunit "
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "phpUnit": {
+                        "configDir": "",
+                        "customPath": " bin/phpunit "
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
                     null,
-                    'bin/phpunit'
+                    'bin/phpunit',
                 ),
             ]),
         ];
 
         yield '[ignoreMsiWithNoMutations] is true' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "ignoreMsiWithNoMutations": true
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "ignoreMsiWithNoMutations": true
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -862,13 +860,13 @@ JSON
 
         yield '[ignoreMsiWithNoMutations] is false' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "ignoreMsiWithNoMutations": false
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "ignoreMsiWithNoMutations": false
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -878,13 +876,13 @@ JSON
 
         yield '[minMsi] is float' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "minMsi": 3.14
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "minMsi": 3.14
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -894,13 +892,13 @@ JSON
 
         yield '[minMsi] is int' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "minMsi": 32
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "minMsi": 32
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -910,13 +908,13 @@ JSON
 
         yield '[minCoveredMsi] is float' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "minCoveredMsi": 3.14
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "minCoveredMsi": 3.14
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -926,13 +924,13 @@ JSON
 
         yield '[minCoveredMsi] is int' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "minCoveredMsi": 32
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "minCoveredMsi": 32
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -942,13 +940,13 @@ JSON
 
         yield '[testFramework] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "testFramework": "phpunit"
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "testFramework": "phpunit"
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -957,36 +955,32 @@ JSON
         ];
 
         foreach (TestFrameworkTypes::getTypes() as $testFrameworkType) {
-            yield '[testFramework] ' . $testFrameworkType => (static function () use (
-                $testFrameworkType
-            ): array {
-                return [
-                    <<<"JSON"
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "testFramework": "{$testFrameworkType}"
-}
-JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'testFramework' => $testFrameworkType,
-                    ]),
-                ];
-            })();
+            yield '[testFramework] ' . $testFrameworkType => (static fn (): array => [
+                <<<"JSON"
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "testFramework": "{$testFrameworkType}"
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'testFramework' => $testFrameworkType,
+                ]),
+            ])();
         }
 
         yield '[bootstrap] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "bootstrap": "src/bootstrap.php"
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "bootstrap": "src/bootstrap.php"
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -996,13 +990,13 @@ JSON
 
         yield '[bootstrap] empty string' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "bootstrap": ""
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "bootstrap": ""
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1012,13 +1006,13 @@ JSON
 
         yield '[bootstrap] untrimmed string' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "bootstrap": " src/bootstrap.php "
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "bootstrap": " src/bootstrap.php "
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1028,13 +1022,13 @@ JSON
 
         yield '[initialTestsPhpOptions] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "initialTestsPhpOptions": "-d zend_extension=xdebug.so"
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "initialTestsPhpOptions": "-d zend_extension=xdebug.so"
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1044,13 +1038,13 @@ JSON
 
         yield '[initialTestsPhpOptions] empty string' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "initialTestsPhpOptions": ""
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "initialTestsPhpOptions": ""
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1060,13 +1054,13 @@ JSON
 
         yield '[initialTestsPhpOptions] untrimmed string' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "initialTestsPhpOptions": " -d zend_extension=xdebug.so "
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "initialTestsPhpOptions": " -d zend_extension=xdebug.so "
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1076,13 +1070,13 @@ JSON
 
         yield '[testFrameworkOptions] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "testFrameworkOptions": "--debug"
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "testFrameworkOptions": "--debug"
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1092,13 +1086,13 @@ JSON
 
         yield '[testFrameworkOptions] empty string' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "testFrameworkOptions": ""
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "testFrameworkOptions": ""
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1108,13 +1102,13 @@ JSON
 
         yield '[testFrameworkOptions] untrimmed string' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "testFrameworkOptions": "--debug"
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "testFrameworkOptions": "--debug"
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1124,15 +1118,15 @@ JSON
 
         yield '[mutators][global ignore] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "global-ignore": ["A::B"]
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "global-ignore": ["A::B"]
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1144,15 +1138,15 @@ JSON
 
         yield '[mutators][global ignore] empty & untrimmed ignore' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "global-ignore": [" file ", " "]
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "global-ignore": [" file ", " "]
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1164,15 +1158,15 @@ JSON
 
         yield '[mutators][global ignore] empty' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "global-ignore": []
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "global-ignore": []
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1184,15 +1178,15 @@ JSON
 
         yield '[mutators][TrueValue] true' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "TrueValue": true
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "TrueValue": true
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1204,15 +1198,15 @@ JSON
 
         yield '[mutators][TrueValue] false' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "TrueValue": false
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "TrueValue": false
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1224,17 +1218,17 @@ JSON
 
         yield '[mutators][TrueValue] ignore' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "TrueValue": {
-            "ignore": ["fileA", "fileB"]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "TrueValue": {
+                            "ignore": ["fileA", "fileB"]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1251,17 +1245,17 @@ JSON
 
         yield '[mutators][TrueValue] ignoreSourceCodeByRegex' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "TrueValue": {
-            "ignoreSourceCodeByRegex": [".*test.*"]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "TrueValue": {
+                            "ignoreSourceCodeByRegex": [".*test.*"]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1277,17 +1271,17 @@ JSON
 
         yield '[mutators][TrueValue] empty & untrimmed ignore' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "TrueValue": {
-            "ignore": [" file ", ""]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "TrueValue": {
+                            "ignore": [" file ", ""]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1304,19 +1298,19 @@ JSON
 
         yield '[mutators][TrueValue] in_array' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "TrueValue": {
-            "settings": {
-                "in_array": false
-            }
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "TrueValue": {
+                            "settings": {
+                                "in_array": false
+                            }
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1332,19 +1326,19 @@ JSON
 
         yield '[mutators][TrueValue] array_search' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "TrueValue": {
-            "settings": {
-                "array_search": false
-            }
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "TrueValue": {
+                            "settings": {
+                                "array_search": false
+                            }
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1360,21 +1354,21 @@ JSON
 
         yield '[mutators][TrueValue] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "TrueValue": {
-            "ignore": ["fileA"],
-            "settings": {
-                "in_array": false,
-                "array_search": false
-            }
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "TrueValue": {
+                            "ignore": ["fileA"],
+                            "settings": {
+                                "in_array": false,
+                                "array_search": false
+                            }
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1392,15 +1386,15 @@ JSON
 
         yield '[mutators][ArrayItemRemoval] true' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "ArrayItemRemoval": true
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "ArrayItemRemoval": true
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1412,15 +1406,15 @@ JSON
 
         yield '[mutators][ArrayItemRemoval] false' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "ArrayItemRemoval": false
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "ArrayItemRemoval": false
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1432,17 +1426,17 @@ JSON
 
         yield '[mutators][ArrayItemRemoval] ignore' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "ArrayItemRemoval": {
-            "ignore": ["fileA", "fileB"]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "ArrayItemRemoval": {
+                            "ignore": ["fileA", "fileB"]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1459,17 +1453,17 @@ JSON
 
         yield '[mutators][ArrayItemRemoval] ignoreSourceCodeByRegex' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "ArrayItemRemoval": {
-            "ignoreSourceCodeByRegex": [".*test.*"]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "ArrayItemRemoval": {
+                            "ignoreSourceCodeByRegex": [".*test.*"]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1485,17 +1479,17 @@ JSON
 
         yield '[mutators][ArrayItemRemoval] empty & untrimmed ignore' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "ArrayItemRemoval": {
-            "ignore": [" file ", ""]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "ArrayItemRemoval": {
+                            "ignore": [" file ", ""]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1512,19 +1506,19 @@ JSON
 
         yield '[mutators][ArrayItemRemoval] remove' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "ArrayItemRemoval": {
-            "settings": {
-                "remove": "first"
-            }
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "ArrayItemRemoval": {
+                            "settings": {
+                                "remove": "first"
+                            }
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1540,19 +1534,19 @@ JSON
 
         yield '[mutators][ArrayItemRemoval] limit' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "ArrayItemRemoval": {
-            "settings": {
-                "limit": 10
-            }
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "ArrayItemRemoval": {
+                            "settings": {
+                                "limit": 10
+                            }
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1568,21 +1562,21 @@ JSON
 
         yield '[mutators][ArrayItemRemoval] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "ArrayItemRemoval": {
-            "ignore": ["file"],
-            "settings": {
-                "remove": "first",
-                "limit": 10
-            }
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "ArrayItemRemoval": {
+                            "ignore": ["file"],
+                            "settings": {
+                                "remove": "first",
+                                "limit": 10
+                            }
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1600,15 +1594,15 @@ JSON
 
         yield '[mutators][BCMath] true' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "BCMath": true
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "BCMath": true
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1620,15 +1614,15 @@ JSON
 
         yield '[mutators][BCMath] false' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "BCMath": false
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "BCMath": false
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1640,17 +1634,17 @@ JSON
 
         yield '[mutators][BCMath] ignore' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "BCMath": {
-            "ignore": ["fileA", "fileB"]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "BCMath": {
+                            "ignore": ["fileA", "fileB"]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1667,17 +1661,17 @@ JSON
 
         yield '[mutators][BCMath] ignoreSourceCodeByRegex' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "BCMath": {
-            "ignoreSourceCodeByRegex": [".*test.*"]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "BCMath": {
+                            "ignoreSourceCodeByRegex": [".*test.*"]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1693,17 +1687,17 @@ JSON
 
         yield '[mutators][BCMath] empty & untrimmed ignore' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "BCMath": {
-            "ignore": [" file ", ""]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "BCMath": {
+                            "ignore": [" file ", ""]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1731,61 +1725,59 @@ JSON
         ];
 
         foreach ($orderedBcMathSettings as $bcMathSetting) {
-            yield '[mutators][BCMath] setting ' . $bcMathSetting => (static function () use ($bcMathSetting): array {
-                return [
-                    <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "BCMath": {
-            "settings": {
-                "$bcMathSetting": false
-            }
-        }
-    }
-}
-JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            'BCMath' => (object) [
-                                'settings' => (object) [
-                                    $bcMathSetting => false,
-                                ],
+            yield '[mutators][BCMath] setting ' . $bcMathSetting => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "BCMath": {
+                                "settings": {
+                                    "$bcMathSetting": false
+                                }
+                            }
+                        }
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        'BCMath' => (object) [
+                            'settings' => (object) [
+                                $bcMathSetting => false,
                             ],
                         ],
-                    ]),
-                ];
-            })();
+                    ],
+                ]),
+            ])();
         }
 
         yield '[mutators][BCMath] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "BCMath": {
-            "ignore": ["file"],
-            "settings": {
-                "bcadd": false,
-                "bccomp": false,
-                "bcdiv": false,
-                "bcmod": false,
-                "bcmul": false,
-                "bcpow": false,
-                "bcsub": false,
-                "bcsqrt": false,
-                "bcpowmod": false
-            }
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "BCMath": {
+                            "ignore": ["file"],
+                            "settings": {
+                                "bcadd": false,
+                                "bccomp": false,
+                                "bcdiv": false,
+                                "bcmod": false,
+                                "bcmul": false,
+                                "bcpow": false,
+                                "bcsub": false,
+                                "bcsqrt": false,
+                                "bcpowmod": false
+                            }
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1810,15 +1802,15 @@ JSON
 
         yield '[mutators][MBString] true' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "MBString": true
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "MBString": true
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1830,15 +1822,15 @@ JSON
 
         yield '[mutators][MBString] false' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "MBString": false
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "MBString": false
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1850,17 +1842,17 @@ JSON
 
         yield '[mutators][MBString] ignore' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "MBString": {
-            "ignore": ["fileA", "fileB"]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "MBString": {
+                            "ignore": ["fileA", "fileB"]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1877,17 +1869,17 @@ JSON
 
         yield '[mutators][MBString] ignoreSourceCodeByRegex' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "MBString": {
-            "ignoreSourceCodeByRegex": [".*test.*"]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "MBString": {
+                            "ignoreSourceCodeByRegex": [".*test.*"]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1903,17 +1895,17 @@ JSON
 
         yield '[mutators][MBString] empty & untrimmed ignore' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "MBString": {
-            "ignore": [" file ", ""]
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "MBString": {
+                            "ignore": [" file ", ""]
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -1950,70 +1942,68 @@ JSON
         ];
 
         foreach ($orderedMBStringSettings as $mbStringSetting) {
-            yield '[mutators][MBString] setting ' . $mbStringSetting => (static function () use ($mbStringSetting): array {
-                return [
-                    <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "MBString": {
-            "settings": {
-                "$mbStringSetting": false
-            }
-        }
-    }
-}
-JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            'MBString' => (object) [
-                                'settings' => (object) [
-                                    $mbStringSetting => false,
-                                ],
+            yield '[mutators][MBString] setting ' . $mbStringSetting => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "MBString": {
+                                "settings": {
+                                    "$mbStringSetting": false
+                                }
+                            }
+                        }
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        'MBString' => (object) [
+                            'settings' => (object) [
+                                $mbStringSetting => false,
                             ],
                         ],
-                    ]),
-                ];
-            })();
+                    ],
+                ]),
+            ])();
         }
 
         yield '[mutators][MBString] nominal' => [
             <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "MBString": {
-            "ignore": ["file"],
-            "settings": {
-                "mb_chr": false,
-                "mb_ord": false,
-                "mb_parse_str": false,
-                "mb_send_mail": false,
-                "mb_strcut": false,
-                "mb_stripos": false,
-                "mb_stristr": false,
-                "mb_strlen": false,
-                "mb_strpos": false,
-                "mb_strrchr": false,
-                "mb_strripos": false,
-                "mb_strrpos": false,
-                "mb_strstr": false,
-                "mb_strtolower": false,
-                "mb_strtoupper": false,
-                "mb_substr_count": false,
-                "mb_substr": false,
-                "mb_convert_case": false
-            }
-        }
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "MBString": {
+                            "ignore": ["file"],
+                            "settings": {
+                                "mb_chr": false,
+                                "mb_ord": false,
+                                "mb_parse_str": false,
+                                "mb_send_mail": false,
+                                "mb_strcut": false,
+                                "mb_stripos": false,
+                                "mb_stristr": false,
+                                "mb_strlen": false,
+                                "mb_strpos": false,
+                                "mb_strrchr": false,
+                                "mb_strripos": false,
+                                "mb_strrpos": false,
+                                "mb_strstr": false,
+                                "mb_strtolower": false,
+                                "mb_strtoupper": false,
+                                "mb_substr_count": false,
+                                "mb_substr": false,
+                                "mb_convert_case": false
+                            }
+                        }
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -2054,22 +2044,22 @@ JSON
                     'BCMath',
                     'MBString',
                 ],
-                null
-            )
+                null,
+            ),
         ));
 
         foreach ($genericMutatorNamesList as $mutator) {
             yield '[mutators][generic][' . $mutator . '] enabled' => [
                 <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "$mutator": true
-    }
-}
-JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$mutator": true
+                        }
+                    }
+                    JSON
                 ,
                 self::createConfig([
                     'source' => new Source(['src'], []),
@@ -2081,15 +2071,15 @@ JSON
 
             yield '[mutators][generic][' . $mutator . '] disabled' => [
                 <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "$mutator": false
-    }
-}
-JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$mutator": false
+                        }
+                    }
+                    JSON
                 ,
                 self::createConfig([
                     'source' => new Source(['src'], []),
@@ -2101,17 +2091,17 @@ JSON
 
             yield '[mutators][generic][' . $mutator . '] ignore' => [
                 <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "$mutator": {
-            "ignore": ["fileA", "fileB"]
-        }
-    }
-}
-JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$mutator": {
+                                "ignore": ["fileA", "fileB"]
+                            }
+                        }
+                    }
+                    JSON
                 ,
                 self::createConfig([
                     'source' => new Source(['src'], []),
@@ -2125,17 +2115,17 @@ JSON
 
             yield '[mutators][generic][' . $mutator . '] ignore empty & untrimmed' => [
                 <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "$mutator": {
-            "ignore": [" file ", ""]
-        }
-    }
-}
-JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$mutator": {
+                                "ignore": [" file ", ""]
+                            }
+                        }
+                    }
+                    JSON
                 ,
                 self::createConfig([
                     'source' => new Source(['src'], []),
@@ -2152,138 +2142,122 @@ JSON
         }
 
         foreach (self::PROFILES as $index => $profile) {
-            yield '[mutators][profile] ' . $profile . ' false' => (static function () use (
-                $profile
-            ): array {
-                return [
-                    <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "$profile": false
-    }
-}
-JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            $profile => false,
-                        ],
-                    ]),
-                ];
-            })();
+            yield '[mutators][profile] ' . $profile . ' false' => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$profile": false
+                        }
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        $profile => false,
+                    ],
+                ]),
+            ])();
 
-            yield '[mutators][profile] ' . $profile . ' true' => (static function () use (
-                $profile
-            ): array {
-                return [
-                    <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "$profile": true
-    }
-}
-JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            $profile => true,
-                        ],
-                    ]),
-                ];
-            })();
+            yield '[mutators][profile] ' . $profile . ' true' => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$profile": true
+                        }
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        $profile => true,
+                    ],
+                ]),
+            ])();
 
-            yield '[mutators][profile] ' . $profile . ' ignore' => (static function () use (
-                $profile
-            ): array {
-                return [
-                    <<<JSON
-    {
-        "source": {
-            "directories": ["src"]
-        },
-        "mutators": {
-            "$profile": {
-                "ignore": ["fileA", "fileB"]
-            }
-        }
-    }
-    JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            $profile => (object) [
-                                'ignore' => ['fileA', 'fileB'],
+            yield '[mutators][profile] ' . $profile . ' ignore' => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$profile": {
+                                "ignore": ["fileA", "fileB"]
+                            }
+                        }
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        $profile => (object) [
+                            'ignore' => ['fileA', 'fileB'],
+                        ],
+                    ],
+                ]),
+            ])();
+
+            yield '[mutators][profile] ' . $profile . ' ignore empty & untrimmed' => (static fn (): array => [
+                <<<JSON
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "$profile": {
+                                "ignore": [" file ", ""]
+                            }
+                        }
+                    }
+                    JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        $profile => (object) [
+                            'ignore' => [
+                                ' file ',
+                                '',
                             ],
                         ],
-                    ]),
-                ];
-            })();
-
-            yield '[mutators][profile] ' . $profile . ' ignore empty & untrimmed' => (static function () use (
-                $profile
-            ): array {
-                return [
-                    <<<JSON
-    {
-        "source": {
-            "directories": ["src"]
-        },
-        "mutators": {
-            "$profile": {
-                "ignore": [" file ", ""]
-            }
-        }
-    }
-    JSON
-                    ,
-                    self::createConfig([
-                        'source' => new Source(['src'], []),
-                        'mutators' => [
-                            $profile => (object) [
-                                'ignore' => [
-                                    ' file ',
-                                    '',
-                                ],
-                            ],
-                        ],
-                    ]),
-                ];
-            })();
+                    ],
+                ]),
+            ])();
         }
 
         yield '[mutators][profile] nominal' => [
             <<<JSON
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "mutators": {
-        "@arithmetic": true,
-        "@boolean": true,
-        "@cast": true,
-        "@conditional_boundary": true,
-        "@conditional_negotiation": true,
-        "@function_signature": true,
-        "@number": true,
-        "@operator": true,
-        "@regex": true,
-        "@removal": true,
-        "@return_value": true,
-        "@sort": true,
-        "@loop": true,
-        "@default": true
-    }
-}
-JSON
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mutators": {
+                        "@arithmetic": true,
+                        "@boolean": true,
+                        "@cast": true,
+                        "@conditional_boundary": true,
+                        "@conditional_negotiation": true,
+                        "@function_signature": true,
+                        "@number": true,
+                        "@operator": true,
+                        "@regex": true,
+                        "@removal": true,
+                        "@return_value": true,
+                        "@sort": true,
+                        "@loop": true,
+                        "@default": true
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
@@ -2308,252 +2282,252 @@ JSON
 
         yield 'nominal' => [
             <<<'JSON'
-{
-    "timeout": 5,
-    "source": {
-        "directories": ["src", "lib"],
-        "excludes": ["fixtures", "tests"]
-    },
-    "logs": {
-        "text": "text.log",
-        "html": "report.html",
-        "summary": "summary.log",
-        "json": "json.log",
-        "gitlab": "gitlab.log",
-        "debug": "debug.log",
-        "perMutator": "perMutator.log",
-        "github": true,
-        "stryker": {
-            "badge": "master"
-        },
-        "summaryJson": "summary.json"
-    },
-    "tmpDir": "custom-tmp",
-    "phpUnit": {
-        "configDir": "phpunit.xml",
-        "customPath": "bin/phpunit"
-    },
-    "testFramework": "phpunit",
-    "bootstrap": "src/bootstrap.php",
-    "initialTestsPhpOptions": "-d zend_extension=xdebug.so",
-    "testFrameworkOptions": "--debug",
-    "mutators": {
-        "TrueValue": {
-            "ignore": ["fileA"],
-            "settings": {
-                "in_array": false,
-                "array_search": false
-            }
-        },
-        "ArrayItemRemoval": {
-            "ignore": ["file"],
-            "settings": {
-                "remove": "first",
-                "limit": 10
-            }
-        },
-        "MBString": {
-            "ignore": ["file"],
-            "settings": {
-                "mb_chr": false,
-                "mb_ord": false,
-                "mb_parse_str": false,
-                "mb_send_mail": false,
-                "mb_strcut": false,
-                "mb_stripos": false,
-                "mb_stristr": false,
-                "mb_strlen": false,
-                "mb_strpos": false,
-                "mb_strrchr": false,
-                "mb_strripos": false,
-                "mb_strrpos": false,
-                "mb_strstr": false,
-                "mb_strtolower": false,
-                "mb_strtoupper": false,
-                "mb_substr_count": false,
-                "mb_substr": false,
-                "mb_convert_case": false
-            }
-        },
-        "BCMath": {
-            "ignore": ["file"],
-            "settings": {
-                "bcadd": false,
-                "bccomp": false,
-                "bcdiv": false,
-                "bcmod": false,
-                "bcmul": false,
-                "bcpow": false,
-                "bcsub": false,
-                "bcsqrt": false,
-                "bcpowmod": false
-            }
-        },
-        "MBString": {
-            "ignore": ["file"],
-            "settings": {
-                "mb_chr": false,
-                "mb_ord": false,
-                "mb_parse_str": false,
-                "mb_send_mail": false,
-                "mb_strcut": false,
-                "mb_stripos": false,
-                "mb_stristr": false,
-                "mb_strlen": false,
-                "mb_strpos": false,
-                "mb_strrchr": false,
-                "mb_strripos": false,
-                "mb_strrpos": false,
-                "mb_strstr": false,
-                "mb_strtolower": false,
-                "mb_strtoupper": false,
-                "mb_substr_count": false,
-                "mb_substr": false,
-                "mb_convert_case": false
-            }
-        },
-        "Assignment": true,
-        "AssignmentEqual": true,
-        "BitwiseAnd": true,
-        "BitwiseNot": true,
-        "BitwiseOr": true,
-        "BitwiseXor": true,
-        "Decrement": true,
-        "DivEqual": true,
-        "Division": true,
-        "Exponentiation": true,
-        "Increment": true,
-        "Minus": true,
-        "MinusEqual": true,
-        "ModEqual": true,
-        "Modulus": true,
-        "MulEqual": true,
-        "Multiplication": true,
-        "Plus": true,
-        "PlusEqual": true,
-        "PowEqual": true,
-        "ShiftLeft": true,
-        "ShiftRight": true,
-        "RoundingFamily": true,
-        "ArrayItem": true,
-        "EqualIdentical": true,
-        "FalseValue": true,
-        "IdenticalEqual": true,
-        "LogicalAnd": true,
-        "LogicalLowerAnd": true,
-        "LogicalLowerOr": true,
-        "LogicalNot": true,
-        "LogicalOr": true,
-        "NotEqualNotIdentical": true,
-        "NotIdenticalNotEqual": true,
-        "Yield_": true,
-        "GreaterThan": true,
-        "GreaterThanOrEqualTo": true,
-        "LessThan": true,
-        "LessThanOrEqualTo": true,
-        "Equal": true,
-        "GreaterThanNegotiation": true,
-        "GreaterThanOrEqualToNegotiation": true,
-        "Identical": true,
-        "LessThanNegotiation": true,
-        "LessThanOrEqualToNegotiation": true,
-        "NotEqual": true,
-        "NotIdentical": true,
-        "PublicVisibility": true,
-        "ProtectedVisibility": true,
-        "DecrementInteger": true,
-        "IncrementInteger": true,
-        "OneZeroFloat": true,
-        "AssignCoalesce": true,
-        "Break_": true,
-        "Continue_": true,
-        "Throw_": true,
-        "Finally_": true,
-        "Coalesce": true,
-        "PregQuote": true,
-        "PregMatchMatches": true,
-        "FunctionCallRemoval": true,
-        "MethodCallRemoval": true,
-        "ArrayOneItem": true,
-        "FloatNegation": true,
-        "FunctionCall": true,
-        "IntegerNegation": true,
-        "NewObject": true,
-        "This": true,
-        "Spaceship": true,
-        "Foreach_": true,
-        "For_": true,
-        "CastArray": true,
-        "CastBool": true,
-        "CastFloat": true,
-        "CastInt": true,
-        "CastObject": true,
-        "CastString": true,
-        "UnwrapArrayChangeKeyCase": true,
-        "UnwrapArrayChunk": true,
-        "UnwrapArrayColumn": true,
-        "UnwrapArrayCombine": true,
-        "UnwrapArrayDiff": true,
-        "UnwrapArrayDiffAssoc": true,
-        "UnwrapArrayDiffKey": true,
-        "UnwrapArrayDiffUassoc": true,
-        "UnwrapArrayDiffUkey": true,
-        "UnwrapArrayFilter": true,
-        "UnwrapArrayFlip": true,
-        "UnwrapArrayIntersect": true,
-        "UnwrapArrayIntersectAssoc": true,
-        "UnwrapArrayIntersectKey": true,
-        "UnwrapArrayIntersectUassoc": true,
-        "UnwrapArrayIntersectUkey": true,
-        "UnwrapArrayKeys": true,
-        "UnwrapArrayMap": true,
-        "UnwrapArrayMerge": true,
-        "UnwrapArrayMergeRecursive": true,
-        "UnwrapArrayPad": true,
-        "UnwrapArrayReduce": true,
-        "UnwrapArrayReplace": true,
-        "UnwrapArrayReplaceRecursive": true,
-        "UnwrapArrayReverse": true,
-        "UnwrapArraySlice": true,
-        "UnwrapArraySplice": true,
-        "UnwrapArrayUdiff": true,
-        "UnwrapArrayUdiffAssoc": true,
-        "UnwrapArrayUdiffUassoc": true,
-        "UnwrapArrayUintersect": true,
-        "UnwrapArrayUintersectAssoc": true,
-        "UnwrapArrayUintersectUassoc": true,
-        "UnwrapArrayUnique": true,
-        "UnwrapArrayValues": true,
-        "UnwrapLcFirst": true,
-        "UnwrapStrRepeat": true,
-        "UnwrapStrToLower": true,
-        "UnwrapStrToUpper": true,
-        "UnwrapTrim": true,
-        "UnwrapUcFirst": true,
-        "UnwrapUcWords": true,
-        "@arithmetic": true,
-        "@boolean": true,
-        "@cast": true,
-        "@conditional_boundary": true,
-        "@conditional_negotiation": true,
-        "@function_signature": true,
-        "@number": true,
-        "@operator": true,
-        "@regex": true,
-        "@removal": true,
-        "@return_value": true,
-        "@sort": true,
-        "@loop": true,
-        "@default": true
-    }
-}
-JSON
+                {
+                    "timeout": 5,
+                    "source": {
+                        "directories": ["src", "lib"],
+                        "excludes": ["fixtures", "tests"]
+                    },
+                    "logs": {
+                        "text": "text.log",
+                        "html": "report.html",
+                        "summary": "summary.log",
+                        "json": "json.log",
+                        "gitlab": "gitlab.log",
+                        "debug": "debug.log",
+                        "perMutator": "perMutator.log",
+                        "github": true,
+                        "stryker": {
+                            "badge": "master"
+                        },
+                        "summaryJson": "summary.json"
+                    },
+                    "tmpDir": "custom-tmp",
+                    "phpUnit": {
+                        "configDir": "phpunit.xml",
+                        "customPath": "bin/phpunit"
+                    },
+                    "testFramework": "phpunit",
+                    "bootstrap": "src/bootstrap.php",
+                    "initialTestsPhpOptions": "-d zend_extension=xdebug.so",
+                    "testFrameworkOptions": "--debug",
+                    "mutators": {
+                        "TrueValue": {
+                            "ignore": ["fileA"],
+                            "settings": {
+                                "in_array": false,
+                                "array_search": false
+                            }
+                        },
+                        "ArrayItemRemoval": {
+                            "ignore": ["file"],
+                            "settings": {
+                                "remove": "first",
+                                "limit": 10
+                            }
+                        },
+                        "MBString": {
+                            "ignore": ["file"],
+                            "settings": {
+                                "mb_chr": false,
+                                "mb_ord": false,
+                                "mb_parse_str": false,
+                                "mb_send_mail": false,
+                                "mb_strcut": false,
+                                "mb_stripos": false,
+                                "mb_stristr": false,
+                                "mb_strlen": false,
+                                "mb_strpos": false,
+                                "mb_strrchr": false,
+                                "mb_strripos": false,
+                                "mb_strrpos": false,
+                                "mb_strstr": false,
+                                "mb_strtolower": false,
+                                "mb_strtoupper": false,
+                                "mb_substr_count": false,
+                                "mb_substr": false,
+                                "mb_convert_case": false
+                            }
+                        },
+                        "BCMath": {
+                            "ignore": ["file"],
+                            "settings": {
+                                "bcadd": false,
+                                "bccomp": false,
+                                "bcdiv": false,
+                                "bcmod": false,
+                                "bcmul": false,
+                                "bcpow": false,
+                                "bcsub": false,
+                                "bcsqrt": false,
+                                "bcpowmod": false
+                            }
+                        },
+                        "MBString": {
+                            "ignore": ["file"],
+                            "settings": {
+                                "mb_chr": false,
+                                "mb_ord": false,
+                                "mb_parse_str": false,
+                                "mb_send_mail": false,
+                                "mb_strcut": false,
+                                "mb_stripos": false,
+                                "mb_stristr": false,
+                                "mb_strlen": false,
+                                "mb_strpos": false,
+                                "mb_strrchr": false,
+                                "mb_strripos": false,
+                                "mb_strrpos": false,
+                                "mb_strstr": false,
+                                "mb_strtolower": false,
+                                "mb_strtoupper": false,
+                                "mb_substr_count": false,
+                                "mb_substr": false,
+                                "mb_convert_case": false
+                            }
+                        },
+                        "Assignment": true,
+                        "AssignmentEqual": true,
+                        "BitwiseAnd": true,
+                        "BitwiseNot": true,
+                        "BitwiseOr": true,
+                        "BitwiseXor": true,
+                        "Decrement": true,
+                        "DivEqual": true,
+                        "Division": true,
+                        "Exponentiation": true,
+                        "Increment": true,
+                        "Minus": true,
+                        "MinusEqual": true,
+                        "ModEqual": true,
+                        "Modulus": true,
+                        "MulEqual": true,
+                        "Multiplication": true,
+                        "Plus": true,
+                        "PlusEqual": true,
+                        "PowEqual": true,
+                        "ShiftLeft": true,
+                        "ShiftRight": true,
+                        "RoundingFamily": true,
+                        "ArrayItem": true,
+                        "EqualIdentical": true,
+                        "FalseValue": true,
+                        "IdenticalEqual": true,
+                        "LogicalAnd": true,
+                        "LogicalLowerAnd": true,
+                        "LogicalLowerOr": true,
+                        "LogicalNot": true,
+                        "LogicalOr": true,
+                        "NotEqualNotIdentical": true,
+                        "NotIdenticalNotEqual": true,
+                        "Yield_": true,
+                        "GreaterThan": true,
+                        "GreaterThanOrEqualTo": true,
+                        "LessThan": true,
+                        "LessThanOrEqualTo": true,
+                        "Equal": true,
+                        "GreaterThanNegotiation": true,
+                        "GreaterThanOrEqualToNegotiation": true,
+                        "Identical": true,
+                        "LessThanNegotiation": true,
+                        "LessThanOrEqualToNegotiation": true,
+                        "NotEqual": true,
+                        "NotIdentical": true,
+                        "PublicVisibility": true,
+                        "ProtectedVisibility": true,
+                        "DecrementInteger": true,
+                        "IncrementInteger": true,
+                        "OneZeroFloat": true,
+                        "AssignCoalesce": true,
+                        "Break_": true,
+                        "Continue_": true,
+                        "Throw_": true,
+                        "Finally_": true,
+                        "Coalesce": true,
+                        "PregQuote": true,
+                        "PregMatchMatches": true,
+                        "FunctionCallRemoval": true,
+                        "MethodCallRemoval": true,
+                        "ArrayOneItem": true,
+                        "FloatNegation": true,
+                        "FunctionCall": true,
+                        "IntegerNegation": true,
+                        "NewObject": true,
+                        "This": true,
+                        "Spaceship": true,
+                        "Foreach_": true,
+                        "For_": true,
+                        "CastArray": true,
+                        "CastBool": true,
+                        "CastFloat": true,
+                        "CastInt": true,
+                        "CastObject": true,
+                        "CastString": true,
+                        "UnwrapArrayChangeKeyCase": true,
+                        "UnwrapArrayChunk": true,
+                        "UnwrapArrayColumn": true,
+                        "UnwrapArrayCombine": true,
+                        "UnwrapArrayDiff": true,
+                        "UnwrapArrayDiffAssoc": true,
+                        "UnwrapArrayDiffKey": true,
+                        "UnwrapArrayDiffUassoc": true,
+                        "UnwrapArrayDiffUkey": true,
+                        "UnwrapArrayFilter": true,
+                        "UnwrapArrayFlip": true,
+                        "UnwrapArrayIntersect": true,
+                        "UnwrapArrayIntersectAssoc": true,
+                        "UnwrapArrayIntersectKey": true,
+                        "UnwrapArrayIntersectUassoc": true,
+                        "UnwrapArrayIntersectUkey": true,
+                        "UnwrapArrayKeys": true,
+                        "UnwrapArrayMap": true,
+                        "UnwrapArrayMerge": true,
+                        "UnwrapArrayMergeRecursive": true,
+                        "UnwrapArrayPad": true,
+                        "UnwrapArrayReduce": true,
+                        "UnwrapArrayReplace": true,
+                        "UnwrapArrayReplaceRecursive": true,
+                        "UnwrapArrayReverse": true,
+                        "UnwrapArraySlice": true,
+                        "UnwrapArraySplice": true,
+                        "UnwrapArrayUdiff": true,
+                        "UnwrapArrayUdiffAssoc": true,
+                        "UnwrapArrayUdiffUassoc": true,
+                        "UnwrapArrayUintersect": true,
+                        "UnwrapArrayUintersectAssoc": true,
+                        "UnwrapArrayUintersectUassoc": true,
+                        "UnwrapArrayUnique": true,
+                        "UnwrapArrayValues": true,
+                        "UnwrapLcFirst": true,
+                        "UnwrapStrRepeat": true,
+                        "UnwrapStrToLower": true,
+                        "UnwrapStrToUpper": true,
+                        "UnwrapTrim": true,
+                        "UnwrapUcFirst": true,
+                        "UnwrapUcWords": true,
+                        "@arithmetic": true,
+                        "@boolean": true,
+                        "@cast": true,
+                        "@conditional_boundary": true,
+                        "@conditional_negotiation": true,
+                        "@function_signature": true,
+                        "@number": true,
+                        "@operator": true,
+                        "@regex": true,
+                        "@removal": true,
+                        "@return_value": true,
+                        "@sort": true,
+                        "@loop": true,
+                        "@default": true
+                    }
+                }
+                JSON
             ,
             self::createConfig([
                 'timeout' => 5,
                 'source' => new Source(
                     ['src', 'lib'],
-                    ['fixtures', 'tests']
+                    ['fixtures', 'tests'],
                 ),
                 'logs' => new Logs(
                     'text.log',
@@ -2565,12 +2539,12 @@ JSON
                     'perMutator.log',
                     true,
                     StrykerConfig::forBadge('master'),
-                    'summary.json'
+                    'summary.json',
                 ),
                 'tmpDir' => 'custom-tmp',
                 'phpunit' => new PhpUnit(
                     'phpunit.xml',
-                    'bin/phpunit'
+                    'bin/phpunit',
                 ),
                 'testFramework' => 'phpunit',
                 'bootstrap' => 'src/bootstrap.php',
@@ -2797,10 +2771,8 @@ JSON
         $validator->validate($decodedJson, (object) ['$ref' => self::SCHEMA_FILE]);
 
         $normalizedErrors = array_map(
-            static function (array $error): string {
-                return sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL);
-            },
-            $validator->getErrors()
+            static fn (array $error): string => sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL),
+            $validator->getErrors(),
         );
 
         $this->assertTrue(
@@ -2809,8 +2781,8 @@ JSON
                 'Expected the given JSON to be valid but is violating the following rules of'
                 . ' the schema: %s- %s',
                 PHP_EOL,
-                implode('- ', $normalizedErrors)
-            )
+                implode('- ', $normalizedErrors),
+            ),
         );
     }
 }

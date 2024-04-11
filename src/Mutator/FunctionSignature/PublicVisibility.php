@@ -60,9 +60,9 @@ final class PublicVisibility implements Mutator
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- public function foo() {
-+ protected function foo() {
-DIFF
+                - public function foo() {
+                + protected function foo() {
+                DIFF,
         );
     }
 
@@ -83,7 +83,7 @@ DIFF
                 'stmts' => $node->getStmts(),
                 'attrGroups' => $node->getAttrGroups(),
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

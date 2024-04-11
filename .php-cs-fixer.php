@@ -40,13 +40,14 @@ $header = \trim(\sprintf(
     'This code is licensed under the BSD 3-Clause License.%s',
     \substr(
         \file_get_contents('LICENSE'),
-        \strlen('BSD 3-Clause License')
-    )
+        \strlen('BSD 3-Clause License'),
+    ),
 ));
 
 $finder = Finder::create()
     ->in(__DIR__)
     ->exclude([
+        '.box_dump',
         '.ci',
         '.composer',
         '.github',
@@ -79,14 +80,17 @@ return (new Config())
         '@PHPUnit75Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
+        'array_indentation' => true,
         'blank_line_before_statement' => [
             'statements' => [
                 'break',
                 'continue',
                 'declare',
                 'do',
+                'exit',
                 'for',
                 'foreach',
+                'goto',
                 'if',
                 'include',
                 'include_once',
@@ -98,12 +102,17 @@ return (new Config())
                 'try',
                 'while',
                 'yield',
+                'yield_from',
             ],
         ],
         'blank_line_between_import_groups' => false,
         'compact_nullable_typehint' => true,
         'concat_space' => ['spacing' => 'one'],
-        'fully_qualified_strict_types' => true,
+        'fully_qualified_strict_types' => [
+            'import_symbols' => true,
+        ],
+        // TODO: enable
+        'get_class_to_class_keyword' => false,
         'global_namespace_import' => [
             'import_classes' => true,
             'import_constants' => true,
@@ -119,6 +128,7 @@ return (new Config())
             'syntax' => 'short',
         ],
         'logical_operators' => true,
+        'modernize_strpos' => true,
         'native_constant_invocation' => true,
         'native_function_invocation' => [
             'include' => ['@internal'],
@@ -130,6 +140,7 @@ return (new Config())
         'no_useless_else' => true,
         'no_useless_return' => true,
         'nullable_type_declaration_for_default_null_value' => true,
+        'operator_linebreak' => true,
         'ordered_class_elements' => true,
         'ordered_imports' => true,
         'ordered_interfaces' => true,
@@ -155,11 +166,16 @@ return (new Config())
         'phpdoc_order' => true,
         'phpdoc_summary' => false,
         'phpdoc_separation' => false,
+        'heredoc_indentation' => true,
         'self_static_accessor' => true,
         'single_line_throw' => false,
         'static_lambda' => true,
         'strict_comparison' => true,
         'strict_param' => true,
+        'trailing_comma_in_multiline' => [
+            'after_heredoc' => true,
+            'elements' => ['arguments', 'arrays', 'match', 'parameters'],
+        ],
         'yoda_style' => [
             'equal' => false,
             'identical' => false,

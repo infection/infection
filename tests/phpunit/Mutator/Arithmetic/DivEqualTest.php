@@ -35,85 +35,88 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Infection\Mutator\Arithmetic\DivEqual;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(DivEqual::class)]
 final class DivEqualTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It changes divison equals' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a /=2;
-PHP
+                $a = 1;
+                $a /=2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a *= 2;
-PHP
+                $a = 1;
+                $a *= 2;
+                PHP
             ,
         ];
 
         yield 'It does not change normal division' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 / 2;
-PHP
+                $a = 10 / 2;
+                PHP
             ,
         ];
 
         yield 'It does not mutate division by 1 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a /= 1;
-PHP
+                $a = 1;
+                $a /= 1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate division by -1 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a /= -1;
-PHP
+                $a = 1;
+                $a /= -1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate division by 1.0 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a /= 1.0;
-PHP
+                $a = 1;
+                $a /= 1.0;
+                PHP
             ,
         ];
 
         yield 'It does not mutate division by -1.0 to avoid an equivalent mutation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a /= -1.0;
-PHP
+                $a = 1;
+                $a /= -1.0;
+                PHP
             ,
         ];
     }

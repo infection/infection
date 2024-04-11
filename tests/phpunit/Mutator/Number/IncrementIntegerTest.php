@@ -35,229 +35,232 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Number;
 
+use Infection\Mutator\Number\IncrementInteger;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use const PHP_INT_MAX;
 use const PHP_INT_MIN;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(IncrementInteger::class)]
 final class IncrementIntegerTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It increments an integer' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === 10) {
-    echo 'bar';
-}
-PHP
+                if ($foo === 10) {
+                    echo 'bar';
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === 11) {
-    echo 'bar';
-}
-PHP
+                if ($foo === 11) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not increment assigment of 0' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 0;
-PHP
+                $foo = 0;
+                PHP
             ,
         ];
 
         yield 'It does not increment 0 in greater comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo > 0) {
-    echo 'bar';
-}
-PHP
+                if ($foo > 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not increment 0 in greater or equal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo >= 0) {
-    echo 'bar';
-}
-PHP
+                if ($foo >= 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not increment 0 in smaller comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo < 0) {
-    echo 'bar';
-}
-PHP
+                if ($foo < 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not increment 0 in smaller or equal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo <= 0) {
-    echo 'bar';
-}
-PHP
+                if ($foo <= 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not increment 0 in equal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo == 0) {
-    echo 'bar';
-}
-PHP
+                if ($foo == 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not increment 0 in not equal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo != 0) {
-    echo 'bar';
-}
-PHP
+                if ($foo != 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not increment 0 in identical comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === 0) {
-    echo 'bar';
-}
-PHP
+                if ($foo === 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It does not increment 0 in not identical comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo !== 0) {
-    echo 'bar';
-}
-PHP
+                if ($foo !== 0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It increments one' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === 1) {
-    echo 'bar';
-}
-PHP
+                if ($foo === 1) {
+                    echo 'bar';
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === 2) {
-    echo 'bar';
-}
-PHP
+                if ($foo === 2) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not increment floats' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === 1.0) {
-    echo 'bar';
-}
-PHP
+                if ($foo === 1.0) {
+                    echo 'bar';
+                }
+                PHP,
         ];
 
         yield 'It increments a negative integer' => [
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === -10) {
-    echo 'bar';
-}
-PHP
+                if ($foo === -10) {
+                    echo 'bar';
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-if ($foo === -9) {
-    echo 'bar';
-}
-PHP
+                if ($foo === -9) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
 
         yield 'It does not increment limit argument of preg_split function when it equals to -1' => [
             <<<'PHP'
-<?php
-preg_split('//', 'string', -1);
-PHP
+                <?php
+                preg_split('//', 'string', -1);
+                PHP,
         ];
 
         yield 'It does increment limit argument of preg_split function when it equals to 0' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_split('//', 'string', 0);
-PHP
+                preg_split('//', 'string', 0);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-preg_split('//', 'string', 1);
-PHP
+                preg_split('//', 'string', 1);
+                PHP,
         ];
 
         yield 'It does increment limit argument of preg_split function when it equals to -2' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_split('//', 'string', -2);
-PHP
+                preg_split('//', 'string', -2);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-preg_split('//', 'string', -1);
-PHP
+                preg_split('//', 'string', -1);
+                PHP,
         ];
 
         $maxInt = PHP_INT_MAX;
 
         yield 'It does not increment max int' => [
             <<<"PHP"
-<?php
+                <?php
 
-random_int(10000000, {$maxInt});
-PHP
+                random_int(10000000, {$maxInt});
+                PHP
             ,
             <<<"PHP"
-<?php
+                <?php
 
-random_int(10000001, {$maxInt});
-PHP
+                random_int(10000001, {$maxInt});
+                PHP,
         ];
 
         $minIntPlus1 = PHP_INT_MIN + 1;
@@ -265,20 +268,20 @@ PHP
 
         yield 'It increments min int plus one, up to value of -PHP_INT_MAX' => [
             <<<"PHP"
-            <?php
+                <?php
 
-            if (\$foo === {$minIntPlus1}) {
-                echo 'bar';
-            }
-            PHP
+                if (\$foo === {$minIntPlus1}) {
+                    echo 'bar';
+                }
+                PHP
             ,
             <<<"PHP"
-            <?php
+                <?php
 
-            if (\$foo === {$minIntPlus2}) {
-                echo 'bar';
-            }
-            PHP
+                if (\$foo === {$minIntPlus2}) {
+                    echo 'bar';
+                }
+                PHP
             ,
         ];
     }

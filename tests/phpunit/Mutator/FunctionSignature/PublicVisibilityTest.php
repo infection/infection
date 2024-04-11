@@ -35,25 +35,26 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\FunctionSignature;
 
+use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(PublicVisibility::class)]
 final class PublicVisibilityTest extends BaseMutatorTestCase
 {
-    /**
-     * @dataProvider blacklistedProvider
-     */
+    #[DataProvider('blacklistedProvider')]
     public function test_it_does_not_modify_blacklisted_functions(string $functionName): void
     {
-        $code = MutatorFixturesProvider::getFixtureFileContent($this, "pv-{$functionName}.php");
+        $code = MutatorFixturesProvider::getFixtureFileContent(self::class, "pv-{$functionName}.php");
 
         $this->doTest($code);
     }
 
-    public function blacklistedProvider(): array
+    public static function blacklistedProvider(): array
     {
         return [
             ['__construct'],
@@ -70,314 +71,305 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
     }
 
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates public to protected' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-one-class.php'),
-                <<<'PHP'
-<?php
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-one-class.php'),
+            <<<'PHP'
+                <?php
 
-namespace PublicVisibilityOneClass;
+                namespace PublicVisibilityOneClass;
 
-class Test
-{
-    protected function &foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-                ,
-            ];
+                class Test
+                {
+                    protected function &foo(int $param, $test = 1): bool
+                    {
+                        echo 1;
+                        return false;
+                    }
+                }
+                PHP,
+        ];
 
         yield 'It does not mutate final flag' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-final.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-final.php'),
             <<<'PHP'
-<?php
+                <?php
 
-namespace PublicVisibilityFinal;
+                namespace PublicVisibilityFinal;
 
-class Test
-{
-    protected final function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-            ,
+                class Test
+                {
+                    final protected function foo(int $param, $test = 1): bool
+                    {
+                        echo 1;
+                        return false;
+                    }
+                }
+                PHP,
         ];
 
         yield 'It mutates non abstract public to protected in an abstract class' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-non-abstract-in-abstract-class.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-non-abstract-in-abstract-class.php'),
             <<<'PHP'
-<?php
+                <?php
 
-namespace PublicVisibilityNonAbstractInAbstractClass;
+                namespace PublicVisibilityNonAbstractInAbstractClass;
 
-abstract class Test
-{
-    protected function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-            ,
+                abstract class Test
+                {
+                    protected function foo(int $param, $test = 1): bool
+                    {
+                        echo 1;
+                        return false;
+                    }
+                }
+                PHP,
         ];
 
         yield 'It does not mutate static flag' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-static.php'),
-        <<<'PHP'
-<?php
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-static.php'),
+            <<<'PHP'
+                <?php
 
-namespace PublicVisibilityStatic;
+                namespace PublicVisibilityStatic;
 
-class Test
-{
-    protected static function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-        ,
+                class Test
+                {
+                    protected static function foo(int $param, $test = 1): bool
+                    {
+                        echo 1;
+                        return false;
+                    }
+                }
+                PHP,
         ];
 
         yield 'It replaces visibility if not set' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-not-set.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-not-set.php'),
             <<<'PHP'
-<?php
+                <?php
 
-namespace PublicVisibilityNotSet;
+                namespace PublicVisibilityNotSet;
 
-class Test
-{
-    protected function foo()
-    {
-    }
-}
-PHP
-            ,
+                class Test
+                {
+                    protected function foo()
+                    {
+                    }
+                }
+                PHP,
         ];
 
         yield 'It does not mutate an interface' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-interface.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-interface.php'),
         ];
 
         yield 'It does not mutate an abstract function' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-abstract.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-abstract.php'),
         ];
 
         yield 'It does not mutate if interface has same public method' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-interface.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-same-method-interface.php'),
         ];
 
         yield 'It does not mutate if any of interfaces has same public method' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-any-interface.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-same-method-any-interface.php'),
         ];
 
         yield 'It does not mutate if parent abstract has same public method' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-abstract.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-same-method-abstract.php'),
         ];
 
         yield 'It does not mutate if parent class has same public method' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-parent.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-same-method-parent.php'),
             <<<'PHP'
-<?php
+                <?php
 
-namespace SameParent;
+                namespace SameParent;
 
-class SameParent
-{
-    protected function foo()
-    {
-    }
-}
-class Child extends SameParent
-{
-    public function foo()
-    {
-    }
-}
-PHP
+                class SameParent
+                {
+                    protected function foo()
+                    {
+                    }
+                }
+                class Child extends SameParent
+                {
+                    public function foo()
+                    {
+                    }
+                }
+                PHP
             ,
         ];
 
         yield 'it does not mutate if grandparent class has same public method' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-same-method-grandparent.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-same-method-grandparent.php'),
             <<<'PHP'
-<?php
+                <?php
 
-namespace SameGrandParent;
+                namespace SameGrandParent;
 
-class GrandParent
-{
-    protected function foo()
-    {
-    }
-}
-class SameParent extends GrandParent
-{
-}
-class Child extends SameParent
-{
-    public function foo()
-    {
-    }
-}
-PHP
-            ,
+                class GrandParent
+                {
+                    protected function foo()
+                    {
+                    }
+                }
+                class SameParent extends GrandParent
+                {
+                }
+                class Child extends SameParent
+                {
+                    public function foo()
+                    {
+                    }
+                }
+                PHP,
         ];
 
         yield 'it does mutate non-inherited methods' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-non-same-method-parent.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-non-same-method-parent.php'),
             <<<'PHP'
-<?php
+                <?php
 
-namespace NonSameAbstract;
+                namespace NonSameAbstract;
 
-abstract class NonSameAbstract
-{
-    public abstract function foo();
-}
-class Child extends NonSameAbstract
-{
-    public function foo()
-    {
-    }
-    protected function bar()
-    {
-    }
-}
-PHP
+                abstract class NonSameAbstract
+                {
+                    abstract public function foo();
+                }
+                class Child extends NonSameAbstract
+                {
+                    public function foo()
+                    {
+                    }
+                    protected function bar()
+                    {
+                    }
+                }
+                PHP,
         ];
 
         yield 'it mutates an anonymous class' => [
             <<<'PHP'
-<?php
+                <?php
 
-function something()
-{
-    return new class
-    {
-        public function anything()
-        {
-            return null;
-        }
-    };
-}
-PHP
-            ,
+                function something()
+                {
+                    return new class
+                    {
+                        public function anything()
+                        {
+                            return null;
+                        }
+                    };
+                }
+                PHP,
             <<<'PHP'
-<?php
+                <?php
 
-function something()
-{
-    return new class
-    {
-        protected function anything()
-        {
-            return null;
-        }
-    };
-}
-PHP
+                function something()
+                {
+                    return new class
+                    {
+                        protected function anything()
+                        {
+                            return null;
+                        }
+                    };
+                }
+                PHP,
         ];
 
         yield 'It does mutate when the parents method is protected' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'pv-protected-parent.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-protected-parent.php'),
             <<<'PHP'
-<?php
+                <?php
 
-namespace ProtectedParent;
+                namespace ProtectedParent;
 
-abstract class SameAbstract
-{
-    protected abstract function foo();
-}
-class Child extends SameAbstract
-{
-    protected function foo()
-    {
-    }
-}
-PHP
+                abstract class SameAbstract
+                {
+                    abstract protected function foo();
+                }
+                class Child extends SameAbstract
+                {
+                    protected function foo()
+                    {
+                    }
+                }
+                PHP,
         ];
 
         yield 'It does mutate anonymous classes' => [
             <<<'PHP'
-            <?php
+                <?php
 
-            $var = [
-                'class' => new class() {
-                    public function foo(): bool
+                $var = [
+                    'class' => new class() {
+                        public function foo(): bool
+                        {
+                            return true;
+                        }
+                    },
+                ];
+                PHP,
+            <<<'PHP'
+                <?php
+
+                $var = ['class' => new class
+                {
+                    protected function foo(): bool
                     {
                         return true;
                     }
-                },
-            ];
-            PHP,
-            <<<'PHP'
-            <?php
-
-            $var = ['class' => new class
-            {
-                protected function foo() : bool
-                {
-                    return true;
-                }
-            }];
-            PHP,
+                }];
+                PHP,
         ];
 
         yield 'It does not remove attributes' => [
             <<<'PHP'
-<?php
+                <?php
 
-namespace PublicVisibilityOneClass;
+                namespace PublicVisibilityOneClass;
 
-class Test
-{
-    #[SomeAttribute1]
-    #[SomeAttribute2]
-    public function &foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP,
+                class Test
+                {
+                    #[SomeAttribute1]
+                    #[SomeAttribute2]
+                    public function &foo(int $param, $test = 1): bool
+                    {
+                        echo 1;
+                        return false;
+                    }
+                }
+                PHP,
             <<<'PHP'
-<?php
+                <?php
 
-namespace PublicVisibilityOneClass;
+                namespace PublicVisibilityOneClass;
 
-class Test
-{
-    #[SomeAttribute1]
-    #[SomeAttribute2]
-    protected function &foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-            ,
+                class Test
+                {
+                    #[SomeAttribute1]
+                    #[SomeAttribute2]
+                    protected function &foo(int $param, $test = 1): bool
+                    {
+                        echo 1;
+                        return false;
+                    }
+                }
+                PHP,
         ];
     }
 }

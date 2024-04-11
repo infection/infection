@@ -36,13 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TestFrameworkExtraOptionsFilter::class)]
 final class TestFrameworkExtraOptionsFilterTest extends TestCase
 {
-    /**
-     * @dataProvider mutantProcessProvider
-     */
+    #[DataProvider('mutantProcessProvider')]
     public function test_it_skips_filter_for_mutant_process(string $actualExtraOptions, string $expectedExtraOptions): void
     {
         $filter = new TestFrameworkExtraOptionsFilter();
@@ -52,7 +53,7 @@ final class TestFrameworkExtraOptionsFilterTest extends TestCase
         $this->assertSame($expectedExtraOptions, $filteredOptions);
     }
 
-    public function mutantProcessProvider(): iterable
+    public static function mutantProcessProvider(): iterable
     {
         yield ['--filter=someTest#2 --a --b=value', '--a --b=value'];
 

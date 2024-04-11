@@ -39,11 +39,12 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
-final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTest
+#[Group('integration')]
+#[CoversClass(NonMutableNodesIgnorerVisitor::class)]
+final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
 {
     private $spyVisitor;
 
@@ -55,15 +56,15 @@ final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTest
     public function test_it_does_not_traverse_after_ignore(): void
     {
         $this->parseAndTraverse(<<<'PHP'
-<?php
+            <?php
 
-class Foo
-{
-    public function bar(): void
-    {
-    }
-}
-PHP
+            class Foo
+            {
+                public function bar(): void
+                {
+                }
+            }
+            PHP
         );
         $this->assertSame(0, $this->spyVisitor->getNumberOfNodesVisited());
     }
@@ -87,7 +88,7 @@ PHP
 
     private function parseAndTraverse(string $code): void
     {
-        $nodes = $this->parseCode($code);
+        $nodes = self::parseCode($code);
 
         $this->traverse(
             $nodes,
@@ -99,7 +100,7 @@ PHP
                     }
                 }]),
                 $this->spyVisitor,
-            ]
+            ],
         );
     }
 }

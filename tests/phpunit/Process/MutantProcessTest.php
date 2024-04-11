@@ -37,10 +37,12 @@ namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
+#[CoversClass(MutantProcess::class)]
 final class MutantProcessTest extends TestCase
 {
     /**
@@ -72,7 +74,7 @@ final class MutantProcessTest extends TestCase
             $this->mutantProcess,
             $this->processMock,
             $this->mutantMock,
-            false
+            false,
         );
     }
 
@@ -84,7 +86,7 @@ final class MutantProcessTest extends TestCase
             $this->mutantProcess,
             $this->processMock,
             $this->mutantMock,
-            true
+            true,
         );
     }
 
@@ -95,7 +97,7 @@ final class MutantProcessTest extends TestCase
         $this->mutantProcess->registerTerminateProcessClosure(
             static function () use (&$called): void {
                 $called = true;
-            }
+            },
         );
 
         $this->assertFalse($called);
@@ -109,7 +111,7 @@ final class MutantProcessTest extends TestCase
         MutantProcess $mutantProcess,
         Process $expectedProcess,
         Mutant $expectedMutant,
-        bool $expectedTimedOut
+        bool $expectedTimedOut,
     ): void {
         $this->assertSame($expectedProcess, $mutantProcess->getProcess());
         $this->assertSame($expectedMutant, $mutantProcess->getMutant());

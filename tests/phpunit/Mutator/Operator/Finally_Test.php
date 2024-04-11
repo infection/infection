@@ -35,57 +35,60 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
+use Infection\Mutator\Operator\Finally_;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Finally_::class)]
 final class Finally_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes the finally statement' => [
             <<<'PHP'
-<?php
+                <?php
 
-try {
-    $a = 1;
-} catch (\Exception $e) {
-    $a = 2;
-} finally {
-    $a = 3;
-}
-PHP
+                try {
+                    $a = 1;
+                } catch (\Exception $e) {
+                    $a = 2;
+                } finally {
+                    $a = 3;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-try {
-    $a = 1;
-} catch (\Exception $e) {
-    $a = 2;
-}
-PHP
+                try {
+                    $a = 1;
+                } catch (\Exception $e) {
+                    $a = 2;
+                }
+                PHP
             ,
         ];
 
         yield 'It does not mutate when no catch() blocks are present' => [
             <<<'PHP'
-<?php
+                <?php
 
-try {
-    $a = 1;
-} finally {
-    $a = 2;
-}
-PHP
+                try {
+                    $a = 1;
+                } finally {
+                    $a = 2;
+                }
+                PHP
             ,
         ];
     }

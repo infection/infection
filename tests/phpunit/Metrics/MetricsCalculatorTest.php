@@ -37,8 +37,10 @@ namespace Infection\Tests\Metrics;
 
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MetricsCalculator::class)]
 final class MetricsCalculatorTest extends TestCase
 {
     use CreateMutantExecutionResult;
@@ -66,27 +68,27 @@ final class MetricsCalculatorTest extends TestCase
         $expectedKilledResults = $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::KILLED,
-            7
+            7,
         );
         $expectedErrorResults = $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::ERROR,
-            2
+            2,
         );
         $expectedEscapedResults = $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::ESCAPED,
-            2
+            2,
         );
         $expectedTimedOutResults = $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::TIMED_OUT,
-            2
+            2,
         );
         $expectedNotCoveredResults = $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::NOT_COVERED,
-            1
+            1,
         );
 
         $this->assertSame(7, $calculator->getKilledCount());
@@ -114,7 +116,7 @@ final class MetricsCalculatorTest extends TestCase
         $expectedKilledResults = $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::KILLED,
-            1
+            1,
         );
 
         $this->assertSame(1, $calculator->getKilledCount());

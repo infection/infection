@@ -35,50 +35,53 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
+use Infection\Mutator\Operator\Continue_;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Continue_::class)]
 final class Continue_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It replaces continue with break in while' => [
             <<<'PHP'
-<?php
+                <?php
 
-while (true) {
-    continue;
-}
-PHP
+                while (true) {
+                    continue;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-while (true) {
-    break;
-}
-PHP
+                while (true) {
+                    break;
+                }
+                PHP
             ,
         ];
 
         yield 'It does not replaces continue with break in switch' => [
             <<<'PHP'
-<?php
+                <?php
 
-switch (1) {
-    case 1:
-        continue;
-}
-PHP
+                switch (1) {
+                    case 1:
+                        continue;
+                }
+                PHP
             ,
         ];
     }

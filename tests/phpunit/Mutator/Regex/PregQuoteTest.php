@@ -35,195 +35,198 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
+use Infection\Mutator\Regex\PregQuote;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(PregQuote::class)]
 final class PregQuoteTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = preg_quote('bbbb');
-PHP
+                $a = preg_quote('bbbb');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'bbbb';
-PHP
+                $a = 'bbbb';
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'to_quote';
-$a = preg_quote($a);
-PHP
+                $a = 'to_quote';
+                $a = preg_quote($a);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'to_quote';
-$a = $a;
-PHP
+                $a = 'to_quote';
+                $a = $a;
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
 
-$a = preg_quote(\Class_With_Const::Const);
-PHP
+                $a = preg_quote(\Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of the preg_quote' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \preg_quote('bbbb');
-PHP
+                $a = \preg_quote('bbbb');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'bbbb';
-PHP
+                $a = 'bbbb';
+                PHP,
         ];
 
         yield 'It mutates correctly when preg_quote has a second parameter' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = preg_quote('bbbb','/');
-PHP
+                $a = preg_quote('bbbb','/');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'bbbb';
-PHP
+                $a = 'bbbb';
+                PHP,
         ];
 
         yield 'It does not mutate other regex calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = preg_match('bbbb', '/');
-PHP
+                $a = preg_match('bbbb', '/');
+                PHP,
         ];
 
         yield 'It does not mutate functions named preg_quote' => [
             <<<'PHP'
-<?php
+                <?php
 
-function preg_quote($text, $other)
-{
-}
-PHP
+                function preg_quote($text, $other)
+                {
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'string';
-if (preg_quote($a) === $a) {
-    return true;
-}
-PHP
+                $a = 'string';
+                if (preg_quote($a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'string';
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = 'string';
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when preg_quote is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = PreG_qUotE('bbbb','/');
-PHP
+                $a = PreG_qUotE('bbbb','/');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'bbbb';
-PHP
+                $a = 'bbbb';
+                PHP,
         ];
 
         yield 'It mutates correctly when preg_quote uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = preg_quote($foo->bar(),'/');
-PHP
+                $a = preg_quote($foo->bar(),'/');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly within a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$bar = function ($input) {
-    return array_map(function ($key, $value) {
-        return strtolower(preg_quote($key . (ctype_alnum($value) ? '' : $value), '/'));
-    }, $input);
-};
-PHP
+                $bar = function ($input) {
+                    return array_map(function ($key, $value) {
+                        return strtolower(preg_quote($key . (ctype_alnum($value) ? '' : $value), '/'));
+                    }, $input);
+                };
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$bar = function ($input) {
-    return array_map(function ($key, $value) {
-        return strtolower($key . (ctype_alnum($value) ? '' : $value));
-    }, $input);
-};
-PHP
+                $bar = function ($input) {
+                    return array_map(function ($key, $value) {
+                        return strtolower($key . (ctype_alnum($value) ? '' : $value));
+                    }, $input);
+                };
+                PHP,
         ];
 
         yield 'It does not mutate when the function name can\'t be determined' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = $method($foo->bar(), '/');
-$b = ('preg_quote')('/asdf/', '/');
-$c = $class->{'foo'}('/asdf/');
-$d = Foo::{'foo'}('/asdf/');
-$e = Foo::$bar('/asdf/');
-$f = ($foo->bar)('/asdf/');
+                $a = $method($foo->bar(), '/');
+                $b = ('preg_quote')('/asdf/', '/');
+                $c = $class->{'foo'}('/asdf/');
+                $d = Foo::{'foo'}('/asdf/');
+                $e = Foo::$bar('/asdf/');
+                $f = ($foo->bar)('/asdf/');
 
-PHP
+                PHP,
         ];
     }
 }

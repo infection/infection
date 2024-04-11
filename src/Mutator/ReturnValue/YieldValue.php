@@ -56,16 +56,16 @@ final class YieldValue implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only;
-For example `yield $value;`.
-TXT
+                Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only;
+                For example `yield $value;`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- yield $key => $value;
-+ yield $value;
-DIFF
+                - yield $key => $value;
+                + yield $value;
+                DIFF,
         );
     }
 

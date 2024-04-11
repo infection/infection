@@ -10,11 +10,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class DummySubscriberFactory implements SubscriberFactory
 {
-    private $subscriber;
-
-    public function __construct(EventSubscriber $subscriber)
+    public function __construct(private readonly EventSubscriber $subscriber)
     {
-        $this->subscriber = $subscriber;
     }
 
     public function create(OutputInterface $output): EventSubscriber

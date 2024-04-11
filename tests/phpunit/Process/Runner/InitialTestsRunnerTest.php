@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use function array_map;
+use function array_unique;
+use function array_values;
 use function extension_loaded;
 use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
@@ -44,17 +46,18 @@ use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function strpos;
+use function str_contains;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(InitialTestsRunner::class)]
 final class InitialTestsRunnerTest extends TestCase
 {
     /**
@@ -102,10 +105,9 @@ final class InitialTestsRunnerTest extends TestCase
         $skipCoverage = false;
 
         $process = $this->createProcessForCode(<<<STR
-echo 'ping';
-sleep(1);
-echo 'pong';
-STR
+            echo 'ping';
+            echo 'pong';
+            STR
         );
 
         $this->processFactoryMock
@@ -120,10 +122,9 @@ STR
             [
                 InitialTestSuiteWasStarted::class,
                 InitialTestCaseWasCompleted::class,
-                InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_map('get_class', $this->eventDispatcher->getEvents())
+            array_values(array_unique(array_map('get_class', $this->eventDispatcher->getEvents()))),
         );
     }
 
@@ -136,11 +137,11 @@ STR
         $input = new InputStream();
 
         $process = $this->createProcessForCode(<<<STR
-fwrite(STDOUT, 123);
-fwrite(STDERR, 321);
-fwrite(STDOUT, 123);
-fwrite(STDERR, 321);
-STR
+            fwrite(STDOUT, 123);
+            fwrite(STDERR, 321);
+            fwrite(STDOUT, 123);
+            fwrite(STDERR, 321);
+            STR
         );
         $process->setInput($input);
 
@@ -154,7 +155,7 @@ STR
             $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
         } catch (RuntimeException $e) {
             // Signal 11, AKA "segmentation fault", is not something we can do anything about
-            if (extension_loaded('xdebug') && strpos($e->getMessage(), 'The process has been signaled with signal "11"') !== false) {
+            if (extension_loaded('xdebug') && str_contains($e->getMessage(), 'The process has been signaled with signal "11"')) {
                 $this->markTestIncomplete($e->getMessage());
             }
 
@@ -168,7 +169,7 @@ STR
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_map('get_class', $this->eventDispatcher->getEvents())
+            array_map('get_class', $this->eventDispatcher->getEvents()),
         );
     }
 

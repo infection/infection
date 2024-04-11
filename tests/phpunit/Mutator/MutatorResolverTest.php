@@ -52,9 +52,11 @@ use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\ProfileList;
 use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
+#[CoversClass(MutatorResolver::class)]
 final class MutatorResolverTest extends TestCase
 {
     /**
@@ -80,7 +82,7 @@ final class MutatorResolverTest extends TestCase
 
         $this->assertSameMutatorsByClass(
             ProfileList::BOOLEAN_PROFILE,
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -90,7 +92,7 @@ final class MutatorResolverTest extends TestCase
 
         $this->assertSameMutatorsByClass(
             ProfileList::BOOLEAN_PROFILE,
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -105,7 +107,7 @@ final class MutatorResolverTest extends TestCase
 
         $this->assertSameMutatorsByClass(
             ProfileList::getDefaultProfileMutators(),
-            $resolvedMutators
+            $resolvedMutators,
         );
 
         foreach (ProfileList::BOOLEAN_PROFILE as $booleanMutatorClassName) {
@@ -123,13 +125,13 @@ final class MutatorResolverTest extends TestCase
     public function test_it_will_remove_the_mutators_from_the_ignored_profile_even_if_included_from_a_different_profile(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve([
-             '@default' => true,
-             '@boolean' => false,
+            '@default' => true,
+            '@boolean' => false,
         ]);
 
         $expectedMutators = array_values(array_diff(
             ProfileList::getDefaultProfileMutators(),
-            ProfileList::BOOLEAN_PROFILE
+            ProfileList::BOOLEAN_PROFILE,
         ));
 
         $this->assertSameMutatorsByClass($expectedMutators, $resolvedMutators);
@@ -144,7 +146,7 @@ final class MutatorResolverTest extends TestCase
 
         $this->assertSameMutatorsByClass(
             ProfileList::BOOLEAN_PROFILE,
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -160,7 +162,7 @@ final class MutatorResolverTest extends TestCase
                 Plus::class,
                 Minus::class,
             ],
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -176,7 +178,7 @@ final class MutatorResolverTest extends TestCase
                 Plus::class,
                 Minus::class,
             ],
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -191,7 +193,7 @@ final class MutatorResolverTest extends TestCase
 
         $this->assertSameMutatorsByClass(
             ProfileList::BOOLEAN_PROFILE,
-            $resolvedMutators
+            $resolvedMutators,
         );
 
         $this->assertSame($settings, $resolvedMutators[TrueValue::class]);
@@ -200,7 +202,7 @@ final class MutatorResolverTest extends TestCase
     public function test_it_can_ignore_a_mutator(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve(
-            [MutatorName::getName(Plus::class) => false]
+            [MutatorName::getName(Plus::class) => false],
         );
 
         $this->assertCount(0, $resolvedMutators);
@@ -215,7 +217,7 @@ final class MutatorResolverTest extends TestCase
 
         $this->assertSameMutatorsByClass(
             [NotIdenticalNotEqual::class],
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -228,7 +230,7 @@ final class MutatorResolverTest extends TestCase
 
         $this->assertSameMutatorsByClass(
             ProfileList::EQUAL_PROFILE,
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -242,7 +244,7 @@ final class MutatorResolverTest extends TestCase
 
         $this->assertSameMutatorsByClass(
             ProfileList::EQUAL_PROFILE,
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -262,7 +264,7 @@ final class MutatorResolverTest extends TestCase
                 Plus::class,
                 IdenticalEqual::class,
             ],
-            $resolvedMutators
+            $resolvedMutators,
         );
 
         $this->assertSame(['ignore' => ['A::B']], $resolvedMutators[Plus::class]);
@@ -285,7 +287,7 @@ final class MutatorResolverTest extends TestCase
                 Plus::class,
                 IdenticalEqual::class,
             ],
-            $resolvedMutators
+            $resolvedMutators,
         );
 
         $this->assertSame(['ignoreSourceCodeByRegex' => ['A::B']], $resolvedMutators[Plus::class]);
@@ -310,7 +312,7 @@ final class MutatorResolverTest extends TestCase
                 Plus::class,
                 IdenticalEqual::class,
             ],
-            $resolvedMutators
+            $resolvedMutators,
         );
 
         $this->assertSame(
@@ -318,14 +320,14 @@ final class MutatorResolverTest extends TestCase
                 'ignore' => ['A::B'],
                 'ignoreSourceCodeByRegex' => ['A::B'],
             ],
-            $resolvedMutators[Plus::class]
+            $resolvedMutators[Plus::class],
         );
         $this->assertSame(
             [
                 'ignore' => ['A::B', 'B::C'],
                 'ignoreSourceCodeByRegex' => ['A::B', 'B::C'],
             ],
-            $resolvedMutators[IdenticalEqual::class]
+            $resolvedMutators[IdenticalEqual::class],
         );
     }
 
@@ -349,14 +351,14 @@ final class MutatorResolverTest extends TestCase
                 MBString::class,
                 IdenticalEqual::class,
             ],
-            $resolvedMutators
+            $resolvedMutators,
         );
 
         $this->assertSame(
             [
                 'ignoreSourceCodeByRegex' => ['A::B', 'C::D'],
             ],
-            $resolvedMutators[Plus::class]
+            $resolvedMutators[Plus::class],
         );
 
         $this->assertSame(
@@ -364,14 +366,14 @@ final class MutatorResolverTest extends TestCase
                 'ignoreSourceCodeByRegex' => ['A::B', 'C::D'],
                 'settings' => ['mb_substr' => false],
             ],
-            $resolvedMutators[MBString::class]
+            $resolvedMutators[MBString::class],
         );
 
         $this->assertSame(
             [
                 'ignoreSourceCodeByRegex' => ['A::B', 'C::D'],
             ],
-            $resolvedMutators[IdenticalEqual::class]
+            $resolvedMutators[IdenticalEqual::class],
         );
     }
 
@@ -397,7 +399,7 @@ final class MutatorResolverTest extends TestCase
                 MBString::class,
                 IdenticalEqual::class,
             ],
-            $resolvedMutators
+            $resolvedMutators,
         );
 
         $this->assertSame(
@@ -405,7 +407,7 @@ final class MutatorResolverTest extends TestCase
                 'ignore' => ['A::B'],
                 'ignoreSourceCodeByRegex' => ['A::B', 'C::D'],
             ],
-            $resolvedMutators[Plus::class]
+            $resolvedMutators[Plus::class],
         );
         $this->assertSame(
             [
@@ -413,14 +415,14 @@ final class MutatorResolverTest extends TestCase
                 'ignoreSourceCodeByRegex' => ['A::B', 'C::D'],
                 'settings' => ['mb_substr' => false],
             ],
-            $resolvedMutators[MBString::class]
+            $resolvedMutators[MBString::class],
         );
         $this->assertSame(
             [
                 'ignore' => ['A::B', 'B::C'],
                 'ignoreSourceCodeByRegex' => ['A::B', 'C::D', 'B::C'],
             ],
-            $resolvedMutators[IdenticalEqual::class]
+            $resolvedMutators[IdenticalEqual::class],
         );
     }
 
@@ -447,7 +449,7 @@ final class MutatorResolverTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The profile or mutator "@unknown-profile" was not recognized.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -461,7 +463,7 @@ final class MutatorResolverTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The profile or mutator "Unknwon\Mutator" was not recognized.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -489,7 +491,7 @@ final class MutatorResolverTest extends TestCase
                 OneZeroFloat::class => [
                 ],
             ],
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -516,7 +518,7 @@ final class MutatorResolverTest extends TestCase
                 OneZeroFloat::class => [
                 ],
             ],
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -554,7 +556,7 @@ final class MutatorResolverTest extends TestCase
                     ],
                 ],
             ],
-            $resolvedMutators
+            $resolvedMutators,
         );
     }
 
@@ -580,8 +582,8 @@ final class MutatorResolverTest extends TestCase
                     'Expected the %d-th mutator to be an instance of "%s". Got "%s"',
                     $index,
                     $expectedMutatorClass,
-                    $mutatorClassName
-                )
+                    $mutatorClassName,
+                ),
             );
 
             $this->assertIsArray($settings);

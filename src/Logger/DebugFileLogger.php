@@ -67,44 +67,44 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getKilledExecutionResults(),
             'Killed',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getErrorExecutionResults(),
             'Errors',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getSyntaxErrorExecutionResults(),
             'Syntax Errors',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getEscapedExecutionResults(),
             'Escaped',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getTimedOutExecutionResults(),
             'Timed Out',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getSkippedExecutionResults(),
             'Skipped',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getIgnoredExecutionResults(),
             'Ignored',
-            $separateSections
+            $separateSections,
         );
 
         if (!$this->onlyCoveredMode) {
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getNotCoveredExecutionResults(),
                 'Not Covered',
-                $separateSections
+                $separateSections,
             );
         }
 
@@ -121,7 +121,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
     private function getResultsLine(
         array $executionResults,
         string $headlinePrefix,
-        bool &$separateSections
+        bool &$separateSections,
     ): string {
         $lines = [];
 
@@ -158,7 +158,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
                 $headline,
                 str_repeat('=', strlen($headline)),
                 '',
-            ]
+            ],
         );
     }
 }

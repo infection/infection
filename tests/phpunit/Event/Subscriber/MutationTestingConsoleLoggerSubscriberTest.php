@@ -51,7 +51,10 @@ use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use Infection\Tests\Logger\FakeMutationTestingResultsLogger;
+use Infection\Tests\WithConsecutive;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\fopen;
@@ -62,9 +65,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(MutationTestingConsoleLoggerSubscriber::class)]
 final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
     /**
@@ -115,7 +117,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            false
+            false,
         ));
 
         $processRunner = $this->createMock(ProcessRunner::class);
@@ -141,13 +143,13 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            false
+            false,
         ));
 
         $dispatcher->dispatch(
             new MutantProcessWasFinished(
-                $this->createMock(MutantExecutionResult::class)
-            )
+                $this->createMock(MutantExecutionResult::class),
+            ),
         );
     }
 
@@ -165,7 +167,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            false
+            false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -176,7 +178,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->output
             ->expects($this->atLeastOnce())
             ->method('writeln')
-            ->withConsecutive(
+            ->with(...WithConsecutive::create(
                 [
                     [
                         '',
@@ -190,8 +192,8 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                         '',
                         '1) /original/filePath:10    [M] Plus',
                     ],
-                ]
-            );
+                ],
+            ));
 
         $executionResult = $this->createMock(MutantExecutionResult::class);
         $executionResult->expects($this->once())
@@ -218,7 +220,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            true
+            true,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -229,7 +231,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->output
             ->expects($this->atLeastOnce())
             ->method('writeln')
-            ->withConsecutive(
+            ->with(...WithConsecutive::create(
                 [
                     [
                         '',
@@ -238,8 +240,8 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                 ],
                 [
                     '<options=bold>0</options=bold> mutations were generated:',
-                ]
-            );
+                ],
+            ));
 
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
@@ -253,7 +255,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            true
+            true,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -276,19 +278,19 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                         'relative/path.log',
                         new Filesystem(),
                         new DummyLineMutationTestingResultsLogger([]),
-                        new FakeLogger()
+                        new FakeLogger(),
                     ),
                     new FileLogger(
                         '/absolute/path.html',
                         new Filesystem(),
                         new DummyLineMutationTestingResultsLogger([]),
-                        new FakeLogger()
+                        new FakeLogger(),
                     ),
                     new FakeMutationTestingResultsLogger(),
                 ),
                 new FakeMutationTestingResultsLogger(),
             ),
-            false
+            false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -296,16 +298,16 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $output = $this->getDisplay($output);
         $this->assertStringContainsString(
             <<<TEXT
-            Generated Reports:
-                     - relative/path.log
-                     - /absolute/path.html
-            TEXT
+                Generated Reports:
+                         - relative/path.log
+                         - /absolute/path.html
+                TEXT
             ,
-            $output
+            $output,
         );
         $this->assertStringNotContainsString(
             'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
-            $output
+            $output,
         );
     }
 
@@ -321,14 +323,14 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(/* no file loggers */),
-            false
+            false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
 
         $this->assertStringContainsString(
             'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
-            $this->getDisplay($output)
+            $this->getDisplay($output),
         );
     }
 
@@ -344,14 +346,14 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(/* no file loggers */),
-            true
+            true,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
 
         $this->assertStringNotContainsString(
             'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
-            $this->getDisplay($output)
+            $this->getDisplay($output),
         );
     }
 
@@ -372,7 +374,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            true
+            true,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());

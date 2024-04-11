@@ -54,15 +54,15 @@ final class PlusEqual implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an addition assignment operator (`+=`) with a subtraction assignment operator (`-=`).
-TXT
+                Replaces an addition assignment operator (`+=`) with a subtraction assignment operator (`-=`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a += $b;
-+ $a -= $b;
-DIFF
+                - $a += $b;
+                + $a -= $b;
+                DIFF,
         );
     }
 

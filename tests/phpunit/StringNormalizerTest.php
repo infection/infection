@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(StringNormalizer::class)]
 final class StringNormalizerTest extends TestCase
 {
-    /**
-     * @dataProvider stringValuesProvider
-     */
+    #[DataProvider('stringValuesProvider')]
     public function test_it_can_remove_right_trailing_spaces(string $input, string $expected): void
     {
         $actual = StringNormalizer::normalizeString($input);
@@ -49,7 +50,7 @@ final class StringNormalizerTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function stringValuesProvider(): iterable
+    public static function stringValuesProvider(): iterable
     {
         yield 'empty' => ['', ''];
 
@@ -57,14 +58,14 @@ final class StringNormalizerTest extends TestCase
 
         yield 'multi-line spaces' => [
             <<<'TXT'
- 
- 
-TXT
+
+
+                TXT
             ,
             <<<'TXT'
 
 
-TXT
+                TXT,
         ];
 
         yield 'text' => ['foo', 'foo'];
@@ -73,18 +74,18 @@ TXT
 
         yield 'multi-line text with spaces' => [
             <<<'TXT'
- 
- foo
- bar 
- 
-TXT
+
+                 foo
+                 bar
+
+                TXT
             ,
             <<<'TXT'
 
- foo
- bar
+                 foo
+                 bar
 
-TXT
+                TXT,
         ];
     }
 }

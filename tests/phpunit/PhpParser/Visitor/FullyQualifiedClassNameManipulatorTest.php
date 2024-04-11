@@ -40,16 +40,17 @@ use InvalidArgumentException;
 use PhpParser\Node;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt\Nop;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FullyQualifiedClassNameManipulator::class)]
 final class FullyQualifiedClassNameManipulatorTest extends TestCase
 {
-    /**
-     * @dataProvider hasFqcnProvider
-     */
+    #[DataProvider('hasFqcnProvider')]
     public function test_it_can_determine_if_the_given_node_has_a_fqcn_attribute(
         Node $node,
-        bool $expected
+        bool $expected,
     ): void {
         $this->assertSame($expected, FullyQualifiedClassNameManipulator::hasFqcn($node));
     }

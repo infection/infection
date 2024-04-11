@@ -35,49 +35,52 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
+use Infection\Mutator\Cast\CastInt;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(CastInt::class)]
 final class CastIntTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to int' => [
             <<<'PHP'
-<?php
+                <?php
 
-(int) 1.0;
-PHP
+                (int) 1.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1.0;
-PHP
+                1.0;
+                PHP
             ,
         ];
 
         yield 'It removes casting to integer' => [
             <<<'PHP'
-<?php
+                <?php
 
-(integer) 1.0;
-PHP
+                (integer) 1.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1.0;
-PHP
+                1.0;
+                PHP
             ,
         ];
     }

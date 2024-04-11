@@ -12,40 +12,19 @@ use PhpParser\Node;
 class SimpleMutation extends Mutation
 {
     /**
-     * @var Mutator
+     * @param MutatedNode $mutatedNode
      */
-    private $mutator;
-
-    /**
-     * @var Node[]
-     */
-    private $originalFileAst;
-
-    /**
-     * @var MutatedNode
-     */
-    private $mutatedNode;
-    /**
-     * @var array
-     */
-    private $attributes;
-    /**
-     * @var string
-     */
-    private $mutatedNodeClass;
-
     public function __construct(
-        array $originalFileAst,
-        Mutator $mutator,
-        $mutatedNode,
-        array $attributes,
-        string $mutatedNodeClass
-    ) {
-        $this->originalFileAst = $originalFileAst;
-        $this->mutator = $mutator;
-        $this->mutatedNode = $mutatedNode;
-        $this->attributes = $attributes;
-        $this->mutatedNodeClass = $mutatedNodeClass;
+        /**
+         * @var Node[]
+         */
+        private readonly array $originalFileAst,
+        private readonly Mutator $mutator,
+        private $mutatedNode,
+        private readonly array $attributes,
+        private readonly string $mutatedNodeClass
+    )
+    {
     }
 
     public function getMutator(): Mutator

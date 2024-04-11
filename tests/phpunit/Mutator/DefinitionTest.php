@@ -41,19 +41,20 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\ProfileList;
 use Infection\Tests\SingletonContainer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
+#[CoversClass(Definition::class)]
 final class DefinitionTest extends TestCase
 {
-    /**
-     * @dataProvider valuesProvider
-     */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         string $description,
         string $category,
         ?string $remedies,
-        ?string $diff
+        ?string $diff,
     ): void {
         $definition = new Definition($description, $category, $remedies, $diff);
 
@@ -63,7 +64,7 @@ final class DefinitionTest extends TestCase
         $this->assertSame($diff, $definition->getDiff());
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         yield 'empty' => [
             '',

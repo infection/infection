@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function getenv;
 use Infection\Metrics\ResultsCollector;
 use Infection\Str;
 use function json_encode;
@@ -55,7 +56,10 @@ final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
     public function getLogLines(): array
     {
         $lines = [];
-        $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
+
+        if (($projectRootDirectory = getenv('CI_PROJECT_DIR')) === false) {
+            $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
+        }
 
         foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
             $lines[] = [
@@ -68,7 +72,7 @@ final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
                 'location' => [
                     'path' => Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $projectRootDirectory),
                     'lines' => [
-                      'begin' => $escapedExecutionResult->getOriginalStartingLine(),
+                        'begin' => $escapedExecutionResult->getOriginalStartingLine(),
                     ],
                 ],
                 'severity' => 'major',

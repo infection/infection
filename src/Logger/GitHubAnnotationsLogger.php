@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function getenv;
 use Infection\Metrics\ResultsCollector;
 use function Safe\shell_exec;
 use function str_replace;
@@ -55,17 +56,20 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
     public function getLogLines(): array
     {
         $lines = [];
-        $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
+
+        if (($projectRootDirectory = getenv('GITHUB_WORKSPACE')) === false) {
+            $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
+        }
 
         foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
             $error = [
                 'line' => $escapedExecutionResult->getOriginalStartingLine(),
                 'message' => <<<"TEXT"
-Escaped Mutant for Mutator "{$escapedExecutionResult->getMutatorName()}":
+                    Escaped Mutant for Mutator "{$escapedExecutionResult->getMutatorName()}":
 
-{$escapedExecutionResult->getMutantDiff()}
-TEXT
-            ,
+                    {$escapedExecutionResult->getMutantDiff()}
+                    TEXT
+                ,
             ];
 
             $lines[] = $this->buildAnnotation(

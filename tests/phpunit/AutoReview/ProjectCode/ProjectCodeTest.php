@@ -45,20 +45,20 @@ use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\SingletonContainer;
 use function is_executable;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 use function sprintf;
 
 /**
- * @coversNothing
- *
  * This class is responsible for testing that our code base adheres to certain rules,
  * e.g. 'All classes that aren't intended to be used by users should be marked internal'.
- *
  * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
+#[CoversNothing]
 final class ProjectCodeTest extends TestCase
 {
     /**
@@ -72,9 +72,7 @@ final class ProjectCodeTest extends TestCase
         $this->assertTrue(is_executable($infectionFile));
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::concreteSourceClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
     public function test_all_concrete_classes_have_tests(string $className): void
     {
         $testClassName = SourceTestClassNameScheme::getTestClassName($className);
@@ -87,8 +85,8 @@ final class ProjectCodeTest extends TestCase
                     . ' or add it to %s::NON_TESTED_CONCRETE_CLASSES',
                     $testClassName,
                     $className,
-                    ProjectCodeProvider::class
-                )
+                    ProjectCodeProvider::class,
+                ),
             );
 
             return;
@@ -101,20 +99,18 @@ final class ProjectCodeTest extends TestCase
                 . 'tested concrete classes in %s::NON_TESTED_CONCRETE_CLASSES',
                 $className,
                 $testClassName,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
 
         $this->markTestSkipped(sprintf(
             'No test found for "%s". You can improve this by adding the test "%s".',
             $className,
-            $testClassName
+            $testClassName,
         ));
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
     public function test_non_extension_points_are_internal(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);
@@ -127,8 +123,8 @@ final class ProjectCodeTest extends TestCase
                     sprintf(
                         'The "%s" class is an extension point, but does not have a PHP '
                         . 'doc-block or an empty one. Consider adding one to improve usability.',
-                        $className
-                    )
+                        $className,
+                    ),
                 );
             }
 
@@ -139,8 +135,8 @@ final class ProjectCodeTest extends TestCase
                     'The "%s" class is marked as an extension point in %s::EXTENSION_POINTS'
                     . '; It should either not be tagged as "@internal" or not be listed there.',
                     $className,
-                    ProjectCodeProvider::class
-                )
+                    ProjectCodeProvider::class,
+                ),
             );
 
             return;
@@ -153,22 +149,20 @@ final class ProjectCodeTest extends TestCase
                 'The "%s" class is not an extension point: it should be marked as internal'
                 . ' or listed as an extension point in %s::EXTENSION_POINTS.',
                 $className,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
     public function test_non_extension_points_are_traits_interfaces_abstracts_or_finals(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);
 
         $tagsAsKeys = array_flip(
             SingletonContainer::getPHPDocParser()->parse(
-                (string) $reflectionClass->getDocComment()
-            )
+                (string) $reflectionClass->getDocComment(),
+            ),
         );
 
         $pass = $reflectionClass->isTrait()
@@ -185,8 +179,8 @@ final class ProjectCodeTest extends TestCase
                     'The class "%s" is registered to "%s::NON_FINAL_EXTENSION_CLASSES but '
                     . 'this should not be necessary.',
                     $className,
-                    ProjectCodeProvider::class
-                )
+                    ProjectCodeProvider::class,
+                ),
             );
         } else {
             $this->assertTrue(
@@ -196,15 +190,13 @@ final class ProjectCodeTest extends TestCase
                     . 'class. Either fix it or if it is an extension point, add it to '
                     . '%s::NON_FINAL_EXTENSION_CLASSES.',
                     $className,
-                    ProjectCodeProvider::class
-                )
+                    ProjectCodeProvider::class,
+                ),
             );
         }
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesToCheckForPublicPropertiesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
     public function test_source_classes_do_not_expose_public_properties(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);
@@ -218,20 +210,20 @@ final class ProjectCodeTest extends TestCase
                 1,
                 $properties,
                 sprintf(
-                    'The "%s" class must have exactly 1 public property as it is a streamwrapper. ' .
-                    'If this has changed due to recent PHP developments, consider updating this test.',
-                    $className
-                )
+                    'The "%s" class must have exactly 1 public property as it is a streamwrapper. '
+                    . 'If this has changed due to recent PHP developments, consider updating this test.',
+                    $className,
+                ),
             );
 
             $this->assertSame(
                 'context',
                 $properties[0]->getName(),
                 sprintf(
-                    'The "%s" class must have exactly 1 public property named "context". ' .
-                    'If this has changed due to recent PHP developments, consider updating this test.',
-                    $className
-                )
+                    'The "%s" class must have exactly 1 public property named "context". '
+                    . 'If this has changed due to recent PHP developments, consider updating this test.',
+                    $className,
+                ),
             );
 
             return;
@@ -241,19 +233,15 @@ final class ProjectCodeTest extends TestCase
         // we're extending from, e.g. we can't change Symfony\Component\Process\Process to not have
         // a public property it has.
         $propertyNames = array_map(
-            static function (ReflectionProperty $reflectionProperty): string {
-                return sprintf(
-                    '%s#%s',
-                    $reflectionProperty->getDeclaringClass()->getName(),
-                    $reflectionProperty->getName()
-                );
-            },
+            static fn (ReflectionProperty $reflectionProperty): string => sprintf(
+                '%s#%s',
+                $reflectionProperty->getDeclaringClass()->getName(),
+                $reflectionProperty->getName(),
+            ),
             array_filter(
                 $properties,
-                static function (ReflectionProperty $property) use ($className): bool {
-                    return $property->class === $className;
-                }
-            )
+                static fn (ReflectionProperty $property): bool => $property->class === $className,
+            ),
         );
 
         $this->assertSame(
@@ -262,14 +250,12 @@ final class ProjectCodeTest extends TestCase
             sprintf(
                 'The class "%s" should not have any public properties declared. If it has '
                 . 'properties that needs to be accessed, getters should be used instead.',
-                $className
-            )
+                $className,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'classesTestProvider')]
     public function test_all_test_classes_are_trait_abstract_or_final(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);
@@ -280,8 +266,8 @@ final class ProjectCodeTest extends TestCase
             || $reflectionClass->isFinal(),
             sprintf(
                 'The test class "%s" should be a trait, an abstract or final class.',
-                $className
-            )
+                $className,
+            ),
         );
     }
 }

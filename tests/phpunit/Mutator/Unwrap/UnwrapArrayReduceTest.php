@@ -35,204 +35,207 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
+use Infection\Mutator\Unwrap\UnwrapArrayReduce;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapArrayReduce::class)]
 final class UnwrapArrayReduceTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when the $initial parameter is provided as an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce(
-    ['A', 1, 'C'],
-    function ($carry, $item) {
-       return $item;
-    },
-    ['D']
-);
-PHP
+                $a = array_reduce(
+                    ['A', 1, 'C'],
+                    function ($carry, $item) {
+                       return $item;
+                    },
+                    ['D']
+                );
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['D'];
-PHP
+                $a = ['D'];
+                PHP,
         ];
 
         yield 'It mutates correctly when the $initial parameter is provided as a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce(
-    ['A', 1, 'C'],
-    function ($carry, $item) {
-       return $item;
-    },
-    \Class_With_Const::Const
-);
-PHP
+                $a = array_reduce(
+                    ['A', 1, 'C'],
+                    function ($carry, $item) {
+                       return $item;
+                    },
+                    \Class_With_Const::Const
+                );
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when the $initial parameter is provided and a backslash is in front of array_reduce' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_reduce(
-    ['A', 1, 'C'],
-    function ($carry, $item) {
-       return $item;
-    },
-    ['D']
-);
-PHP
+                $a = \array_reduce(
+                    ['A', 1, 'C'],
+                    function ($carry, $item) {
+                       return $item;
+                    },
+                    ['D']
+                );
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['D'];
-PHP
+                $a = ['D'];
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements when the $initial parameter is provided' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 1, 'C'];
-if (array_reduce($a, function ($carry, $item) { return $item; }, ['D']) === $a) {
-    return true;
-}
-PHP
+                $a = ['A', 1, 'C'];
+                if (array_reduce($a, function ($carry, $item) { return $item; }, ['D']) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 1, 'C'];
-if (['D'] === $a) {
-    return true;
-}
-PHP
+                $a = ['A', 1, 'C'];
+                if (['D'] === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when the $initial parameter is provided and array_reduce is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_ReDuCe(
-    ['A', 1, 'C'],
-    function ($carry, $item) {
-        return $item;
-    },
-    ['D']
-);
-PHP
+                $a = aRrAy_ReDuCe(
+                    ['A', 1, 'C'],
+                    function ($carry, $item) {
+                        return $item;
+                    },
+                    ['D']
+                );
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['D'];
-PHP
+                $a = ['D'];
+                PHP,
         ];
 
         yield 'It mutates correctly when the $initial parameter is provided and array_reduce uses other functions as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce(
-    $foo->bar(),
-    $foo->baz(),
-    $foo->qux()
-);
-PHP
+                $a = array_reduce(
+                    $foo->bar(),
+                    $foo->baz(),
+                    $foo->qux()
+                );
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->qux();
-PHP
+                $a = $foo->qux();
+                PHP,
         ];
 
         yield 'It mutates correctly when the $initial parameter is provided in a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_reduce(['A', 1, 'C'], $callback, ['D']));
-PHP
+                $a = array_map('strtolower', array_reduce(['A', 1, 'C'], $callback, ['D']));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['D']);
-PHP
+                $a = array_map('strtolower', ['D']);
+                PHP,
         ];
 
         yield 'It mutates correctly when the the $initial parameter is provided and the $callback parameter is provided as a variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce(['A', 1, 'C'], $callback, ['D']);
-PHP
+                $a = array_reduce(['A', 1, 'C'], $callback, ['D']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['D'];
-PHP
+                $a = ['D'];
+                PHP,
         ];
 
         yield 'It does not mutate when the $initial parameter is not provided' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce(['A', 1, 'C'], function ($carry, $item) {
-    return $item;
-});
-PHP
+                $a = array_reduce(['A', 1, 'C'], function ($carry, $item) {
+                    return $item;
+                });
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+                $a = array_map('strtolower', ['A', 'B', 'C']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_reduce' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_reduce($array, $callback, $initial = null)
-{
-}
-PHP
+                function array_reduce($array, $callback, $initial = null)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_reduce';
+                $a = 'array_reduce';
 
-$b = $a('strtolower', [3,4,5]);
-PHP
+                $b = $a('strtolower', [3,4,5]);
+                PHP
             ,
         ];
     }

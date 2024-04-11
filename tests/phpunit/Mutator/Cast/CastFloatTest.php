@@ -35,64 +35,67 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
+use Infection\Mutator\Cast\CastFloat;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(CastFloat::class)]
 final class CastFloatTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to float' => [
             <<<'PHP'
-<?php
+                <?php
 
-(float) '1.1';
-PHP
+                (float) '1.1';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-'1.1';
-PHP
+                '1.1';
+                PHP
             ,
         ];
 
         yield 'It removes casting to double' => [
             <<<'PHP'
-<?php
+                <?php
 
-(double) '1.1';
-PHP
+                (double) '1.1';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-'1.1';
-PHP
+                '1.1';
+                PHP
             ,
         ];
 
         yield 'It removes casting to real' => [
             <<<'PHP'
-<?php
+                <?php
 
-(real) '1.1';
-PHP
+                (real) '1.1';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-'1.1';
-PHP
+                '1.1';
+                PHP
             ,
         ];
     }

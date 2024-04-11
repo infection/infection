@@ -86,13 +86,14 @@ trait ConfigurationAssertions
         array $expectedIgnoreSourceCodeMutatorsMap,
         bool $expectedExecuteOnlyCoveringTestCases,
         bool $expectedIsForGitDiffLines,
-        ?string $expectedGitDiffBase
+        ?string $expectedGitDiffBase,
+        ?string $expectedMapSourceClassToTest,
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
         $this->assertSame(
             self::normalizePaths($expectedSourceFiles),
-            self::normalizePaths($configuration->getSourceFiles())
+            self::normalizePaths($configuration->getSourceFiles()),
         );
         $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter());
         $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes());
@@ -107,14 +108,14 @@ trait ConfigurationAssertions
             $expectedLogs->getPerMutatorFilePath(),
             $expectedLogs->getUseGitHubAnnotationsLogger(),
             $expectedLogs->getStrykerConfig(),
-            $expectedLogs->getSummaryJsonLogFilePath()
+            $expectedLogs->getSummaryJsonLogFilePath(),
         );
         $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity());
         $this->assertSame($expectedTmpDir, $configuration->getTmpDir());
         $this->assertPhpUnitStateIs(
             $configuration->getPhpUnit(),
             $expectedPhpUnit->getConfigDir(),
-            $expectedPhpUnit->getCustomPath()
+            $expectedPhpUnit->getCustomPath(),
         );
         $this->assertEqualsWithDelta($expectedMutators, $configuration->getMutators(), 10.);
         $this->assertSame($expectedTestFramework, $configuration->getTestFramework());
@@ -122,7 +123,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions());
         $this->assertSame(
             $expectedTestFrameworkExtraOptions,
-            $configuration->getTestFrameworkExtraOptions()
+            $configuration->getTestFrameworkExtraOptions(),
         );
         $this->assertSame($expectedCoveragePath, $configuration->getCoveragePath());
         $this->assertSame($expectedSkipCoverage, $configuration->shouldSkipCoverage());
@@ -141,6 +142,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedExecuteOnlyCoveringTestCases, $configuration->getExecuteOnlyCoveringTestCases());
         $this->assertSame($expectedIsForGitDiffLines, $configuration->isForGitDiffLines());
         $this->assertSame($expectedGitDiffBase, $configuration->getGitDiffBase());
+        $this->assertSame($expectedMapSourceClassToTest, $configuration->getMapSourceClassToTestStrategy());
     }
 
     /**
@@ -151,10 +153,8 @@ trait ConfigurationAssertions
     private static function normalizePaths(array $fileInfos): array
     {
         return array_map(
-            static function (SplFileInfo $fileInfo): string {
-                return $fileInfo->getPathname();
-            },
-            $fileInfos
+            static fn (SplFileInfo $fileInfo): string => $fileInfo->getPathname(),
+            $fileInfos,
         );
     }
 }

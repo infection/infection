@@ -36,32 +36,34 @@ declare(strict_types=1);
 namespace Infection\Tests\Differ;
 
 use Infection\Differ\DiffColorizer;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(DiffColorizer::class)]
 final class DiffColorizerTest extends TestCase
 {
     public function test_id_adds_colours_to_a_given_diff(): void
     {
         $originalDiff = <<<'CODE'
---- Original
-+++ New
-@@ @@
-     function ($a) {
--        return $a < 0;
-+        return $a <= 0;
-     }
-CODE;
+            --- Original
+            +++ New
+            @@ @@
+                 function ($a) {
+            -        return $a < 0;
+            +        return $a <= 0;
+                 }
+            CODE;
 
         $expected = <<<'CODE'
-<code>
-<diff-del>--- Original</diff-del>
-<diff-add>+++ New</diff-add>
-@@ @@
-     function ($a) {
-<diff-del>-        return $a < 0;</diff-del>
-<diff-add>+        return $a <= 0;</diff-add>
-     }</code>
-CODE;
+            <code>
+            <diff-del>--- Original</diff-del>
+            <diff-add>+++ New</diff-add>
+            @@ @@
+                 function ($a) {
+            <diff-del>-        return $a < 0;</diff-del>
+            <diff-add>+        return $a <= 0;</diff-add>
+                 }</code>
+            CODE;
 
         $actual = (new DiffColorizer())->colorize($originalDiff);
 

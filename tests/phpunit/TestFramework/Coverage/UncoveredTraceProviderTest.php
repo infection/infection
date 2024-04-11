@@ -41,8 +41,10 @@ use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(UncoveredTraceProvider::class)]
 final class UncoveredTraceProviderTest extends TestCase
 {
     public function test_it_provides_traces(): void

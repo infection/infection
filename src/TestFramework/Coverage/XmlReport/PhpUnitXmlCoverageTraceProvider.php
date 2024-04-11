@@ -66,7 +66,7 @@ class PhpUnitXmlCoverageTraceProvider implements TraceProvider
         foreach ($this->indexParser->parse(
             $indexPath,
             $indexContents,
-            $coverageBasePath
+            $coverageBasePath,
         ) as $infoProvider) {
             // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
             yield $this->parser->parse($infoProvider);

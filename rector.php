@@ -35,24 +35,16 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
-use Rector\Set\ValueObject\LevelSetList;
 
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->paths([
+return RectorConfig::configure()
+    ->withPaths([
         __DIR__ . '/src',
-        // TODO uncomment as a separate PR
-        // __DIR__ . '/tests/phpunit',
-    ]);
-
-    // define sets of rules
-    $rectorConfig->sets([
-        LevelSetList::UP_TO_PHP_81,
-    ]);
-
-    $rectorConfig->skip([
+        __DIR__ . '/tests/phpunit',
+    ])
+    ->withPhpSets(php81: true)
+    ->withSkip([
         ReadOnlyPropertyRector::class => [
             // property can't be readonly as it's returned by reference and may be updated
             __DIR__ . '/src/TestFramework/Coverage/TestLocations.php',
         ],
     ]);
-};

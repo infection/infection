@@ -38,15 +38,17 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_put_contents;
 use function Safe\tempnam;
 use function Safe\unlink;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(JUnitTestFileDataProvider::class)]
 final class JUnitTestFileDataProviderTest extends TestCase
 {
     private const JUNIT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml';
@@ -158,9 +160,7 @@ final class JUnitTestFileDataProviderTest extends TestCase
         $this->assertSame('/app/controllers/ExampleCest.php', $testFileInfo->path);
     }
 
-    /**
-     * @dataProvider xmlProvider
-     */
+    #[DataProvider('xmlProvider')]
     public function test_it_does_not_trigger_count_assertion(string $xml): void
     {
         file_put_contents($this->tempfile, $xml);
@@ -178,27 +178,27 @@ final class JUnitTestFileDataProviderTest extends TestCase
     public static function xmlProvider(): iterable
     {
         yield [<<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-    <testsuite name="ExampleTest"/>
-    <testsuite name="ExampleTest"/>
-</testsuites>
-XML];
+            <?xml version="1.0" encoding="UTF-8"?>
+            <testsuites>
+                <testsuite name="ExampleTest"/>
+                <testsuite name="ExampleTest"/>
+            </testsuites>
+            XML];
 
         yield [<<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-    <testcase class="ExampleTest"/>
-    <testcase class="ExampleTest"/>
-</testsuites>
-XML];
+            <?xml version="1.0" encoding="UTF-8"?>
+            <testsuites>
+                <testcase class="ExampleTest"/>
+                <testcase class="ExampleTest"/>
+            </testsuites>
+            XML];
 
         yield [<<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-    <testcase file="foo/ExampleTest.feature"/>
-    <testcase file="foo/ExampleTest.feature"/>
-</testsuites>
-XML];
+            <?xml version="1.0" encoding="UTF-8"?>
+            <testsuites>
+                <testcase file="foo/ExampleTest.feature"/>
+                <testcase file="foo/ExampleTest.feature"/>
+            </testsuites>
+            XML];
     }
 }

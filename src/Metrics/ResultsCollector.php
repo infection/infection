@@ -73,7 +73,7 @@ class ResultsCollector implements Collector
             if (!array_key_exists($detectionStatus, $this->resultsByStatus)) {
                 throw new InvalidArgumentException(sprintf(
                     'Unknown execution result process result code "%s"',
-                    $detectionStatus
+                    $detectionStatus,
                 ));
             }
 

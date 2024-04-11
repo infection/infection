@@ -58,7 +58,7 @@ class MutationTestingRunner
     /**
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
-    public function __construct(private readonly MutantProcessFactory $processFactory, private readonly MutantFactory $mutantFactory, private readonly ProcessRunner $processRunner, private readonly EventDispatcher $eventDispatcher, private readonly Filesystem $fileSystem, private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher, private bool $runConcurrently, private readonly float $timeout, private readonly array $ignoreSourceCodeMutatorsMap)
+    public function __construct(private readonly MutantProcessFactory $processFactory, private readonly MutantFactory $mutantFactory, private readonly ProcessRunner $processRunner, private readonly EventDispatcher $eventDispatcher, private readonly Filesystem $fileSystem, private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher, private readonly bool $runConcurrently, private readonly float $timeout, private readonly array $ignoreSourceCodeMutatorsMap)
     {
     }
 
@@ -78,7 +78,7 @@ class MutationTestingRunner
                 foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] ?? [] as $sourceCodeRegex) {
                     if ($this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {
                         $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                            MutantExecutionResult::createFromIgnoredMutant($mutant)
+                            MutantExecutionResult::createFromIgnoredMutant($mutant),
                         ));
 
                         return false;
@@ -94,7 +94,7 @@ class MutationTestingRunner
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromNonCoveredMutant($mutant)
+                    MutantExecutionResult::createFromNonCoveredMutant($mutant),
                 ));
 
                 return false;
@@ -106,7 +106,7 @@ class MutationTestingRunner
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromTimeSkippedMutant($mutant)
+                    MutantExecutionResult::createFromTimeSkippedMutant($mutant),
                 ));
 
                 return false;

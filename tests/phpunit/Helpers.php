@@ -67,8 +67,8 @@ function normalize_trailing_spaces(string $value): string
         "\n",
         array_map(
             'rtrim',
-            explode("\n", normalizeLineReturn($value))
-        )
+            explode("\n", normalizeLineReturn($value)),
+        ),
     );
 }
 
@@ -115,7 +115,7 @@ function make_tmp_dir(string $namespace, string $className): string
             $filesystem->mkdir($tmpDir, 0777);
 
             $result = true;
-        } catch (IOException $exception) {
+        } catch (IOException) {
             ++$attempts;
         }
     } while ($result === false && $attempts <= 10);

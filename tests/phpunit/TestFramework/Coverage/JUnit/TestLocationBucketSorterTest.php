@@ -49,14 +49,17 @@ use function iterator_to_array;
 use function log;
 use function microtime;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function usort;
 
 /**
  * Tagged as integration because it can be quite slow.
- *
- * @group integration
  */
+#[Group('integration')]
+#[CoversClass(TestLocationBucketSorter::class)]
 final class TestLocationBucketSorterTest extends TestCase
 {
     /**
@@ -72,7 +75,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort([$testLocation]),
-            false
+            false,
         );
 
         $this->assertSame([$testLocation], $sortedTestLocations);
@@ -93,7 +96,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort(array_reverse($testLocations)),
-            false
+            false,
         );
 
         $this->assertSame($testLocations, $sortedTestLocations);
@@ -106,39 +109,37 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort([$testLocation2, $testLocation1]),
-            false
+            false,
         );
 
         $this->assertSame([$testLocation1, $testLocation2], $sortedTestLocations);
     }
 
     /**
-     * @dataProvider locationsArrayProvider
-     *
      * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
+    #[DataProvider('locationsArrayProvider')]
     public function test_it_sorts_correctly(ArrayIterator $uniqueTestLocations): void
     {
         $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
 
         $sortedTestLocations = iterator_to_array(
             TestLocationBucketSorter::bucketSort($uniqueTestLocations),
-            false
+            false,
         );
 
         $this->assertTrue(
             self::areConstraintsOrderValid($sortedTestLocations),
-            'Bucket sort failed order check'
+            'Bucket sort failed order check',
         );
     }
 
     /**
      * Sanity check
      *
-     * @dataProvider locationsArrayProvider
-     *
      * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
+    #[DataProvider('locationsArrayProvider')]
     public function test_quicksort_sorts_correctly(ArrayIterator $uniqueTestLocations): void
     {
         $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
@@ -147,15 +148,14 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $this->assertTrue(
             self::areConstraintsOrderValid($uniqueTestLocations),
-            'Quicksort failed order check'
+            'Quicksort failed order check',
         );
     }
 
     /**
-     * @dataProvider locationsArrayProvider
-     *
      * @param ArrayIterator<TestLocation> $uniqueTestLocations
      */
+    #[DataProvider('locationsArrayProvider')]
     public function test_it_sorts_faster_than_quicksort(ArrayIterator $uniqueTestLocations): void
     {
         if (extension_loaded('xdebug') || PHP_SAPI === 'phpdbg') {
@@ -180,7 +180,7 @@ final class TestLocationBucketSorterTest extends TestCase
             $start = microtime(true);
             $dummy = iterator_to_array(
                 TestLocationBucketSorter::bucketSort($uniqueTestLocations),
-                false
+                false,
             );
             $totalBucketSort += microtime(true) - $start;
         }
@@ -202,10 +202,8 @@ final class TestLocationBucketSorterTest extends TestCase
     public static function locationsArrayProvider(): iterable
     {
         $locations = array_map(
-            static function (float $executionTime): TestLocation {
-                return new TestLocation('', '', $executionTime);
-            },
-            JUnitTimes::JUNIT_TIMES
+            static fn (float $executionTime): TestLocation => new TestLocation('', '', $executionTime),
+            JUnitTimes::JUNIT_TIMES,
         );
 
         yield 'Ten times the minimal amount of locations' => [new ArrayIterator(array_slice($locations, 0, JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * 10))];
@@ -233,9 +231,7 @@ final class TestLocationBucketSorterTest extends TestCase
     {
         usort(
             $uniqueTestLocations,
-            static function (TestLocation $a, TestLocation $b): int {
-                return $a->getExecutionTime() <=> $b->getExecutionTime();
-            }
+            static fn (TestLocation $a, TestLocation $b): int => $a->getExecutionTime() <=> $b->getExecutionTime(),
         );
     }
 

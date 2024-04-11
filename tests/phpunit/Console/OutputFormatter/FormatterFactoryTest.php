@@ -43,19 +43,20 @@ use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 
+#[CoversClass(FormatterFactory::class)]
 final class FormatterFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider formatterProvider
-     */
+    #[DataProvider('formatterProvider')]
     public function test_it_can_create_all_known_factories(
         string $formatterName,
-        string $expectedFormatterClassName
+        string $expectedFormatterClassName,
     ): void {
         $outputMock = $this->createMock(OutputInterface::class);
         $outputMock
@@ -91,8 +92,8 @@ final class FormatterFactoryTest extends TestCase
             sprintf(
                 'Expected the given map to contain all the known formatters "%s". Got "%s"',
                 implode('", "', FormatterName::ALL),
-                implode('", "', array_keys($map))
-            )
+                implode('", "', array_keys($map)),
+            ),
         );
 
         foreach ($map as $formatterName => $formatterClassName) {

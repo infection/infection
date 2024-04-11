@@ -63,14 +63,14 @@ final class MutatorFactory
             Assert::keyExists(
                 $knownMutatorClassNames,
                 $mutatorClassName,
-                sprintf('Unknown mutator "%s"', $mutatorClassName)
+                sprintf('Unknown mutator "%s"', $mutatorClassName),
             );
             Assert::isArray(
                 $config,
                 sprintf(
                     'Expected config of the mutator "%s" to be an array. Got "%%s" instead',
-                    $mutatorClassName
-                )
+                    $mutatorClassName,
+                ),
             );
 
             $settings = (array) ($config['settings'] ?? []);
@@ -78,10 +78,10 @@ final class MutatorFactory
             $ignored = $config['ignore'] ?? [];
 
             /** @var Mutator<\PhpParser\Node> $mutator */
-            $mutator =
-                is_a($mutatorClassName, ConfigurableMutator::class, true) ?
-                    self::getConfigurableMutator($mutatorClassName, $settings) :
-                    new $mutatorClassName();
+            $mutator
+                = is_a($mutatorClassName, ConfigurableMutator::class, true)
+                    ? self::getConfigurableMutator($mutatorClassName, $settings)
+                    : new $mutatorClassName();
 
             if ($ignored !== []) {
                 $mutator = new IgnoreMutator(new IgnoreConfig($ignored), $mutator);

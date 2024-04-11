@@ -35,34 +35,37 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
+use Infection\Mutator\Cast\CastObject;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(CastObject::class)]
 final class CastObjectTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to object' => [
             <<<'PHP'
-<?php
+                <?php
 
-(object) ['test' => 1];
-PHP
+                (object) ['test' => 1];
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-['test' => 1];
-PHP
+                ['test' => 1];
+                PHP
             ,
         ];
     }

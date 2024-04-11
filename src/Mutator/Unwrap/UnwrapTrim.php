@@ -47,25 +47,25 @@ final class UnwrapTrim extends AbstractFunctionUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `trim` function call with its first operand. For example:
+                Replaces a `trim` function call with its first operand. For example:
 
-```php
-$x = trim('Hello!');
-```
+                ```php
+                $x = trim('Hello!');
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = 'Hello!';
-```
-TXT
+                ```php
+                $x = 'Hello!';
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = trim('Hello!');
-+ $x = 'Hello!';
-DIFF
+                - $x = trim('Hello!');
+                + $x = 'Hello!';
+                DIFF,
         );
     }
 

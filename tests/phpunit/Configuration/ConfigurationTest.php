@@ -42,23 +42,26 @@ use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
+use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
+#[CoversClass(Configuration::class)]
 final class ConfigurationTest extends TestCase
 {
     use ConfigurationAssertions;
 
     /**
-     * @dataProvider valueProvider
-     *
      * @param string[] $sourceDirectories
      * @param string[] $sourceFilesExcludes
      * @param SplFileInfo[] $sourceFiles
      * @param Mutator[] $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
+    #[DataProvider('valueProvider')]
     public function test_it_can_be_instantiated(
         float $timeout,
         array $sourceDirectories,
@@ -90,7 +93,8 @@ final class ConfigurationTest extends TestCase
         array $ignoreSourceCodeMutatorsMap,
         bool $executeOnlyCoveringTestCases,
         bool $isForGitDiffLines,
-        ?string $gitDiffBase
+        ?string $gitDiffBase,
+        ?string $mapSourceClassToTest,
     ): void {
         $config = new Configuration(
             $timeout,
@@ -123,7 +127,8 @@ final class ConfigurationTest extends TestCase
             $ignoreSourceCodeMutatorsMap,
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
-            $gitDiffBase
+            $gitDiffBase,
+            $mapSourceClassToTest,
         );
 
         $this->assertConfigurationStateIs(
@@ -158,11 +163,12 @@ final class ConfigurationTest extends TestCase
             $ignoreSourceCodeMutatorsMap,
             $executeOnlyCoveringTestCases,
             $isForGitDiffLines,
-            $gitDiffBase
+            $gitDiffBase,
+            $mapSourceClassToTest,
         );
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         yield 'empty' => [
             10.,
@@ -196,6 +202,7 @@ final class ConfigurationTest extends TestCase
             false,
             false,
             'master',
+            null,
         ];
 
         yield 'nominal' => [
@@ -217,7 +224,7 @@ final class ConfigurationTest extends TestCase
                 'mutator.log',
                 true,
                 StrykerConfig::forBadge('master'),
-                'summary.json'
+                'summary.json',
             ),
             'default',
             'custom-dir',
@@ -248,6 +255,7 @@ final class ConfigurationTest extends TestCase
             true,
             false,
             'master',
+            MapSourceClassToTestStrategy::SIMPLE,
         ];
     }
 }

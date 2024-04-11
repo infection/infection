@@ -39,14 +39,16 @@ use Composer\XdebugHandler\XdebugHandler;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use const PHP_SAPI;
 use const PHP_VERSION_ID;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\ini_get;
 use function Safe\ini_set;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(MemoryLimiterEnvironment::class)]
 final class MemoryLimiterEnvironmentTest extends TestCase
 {
     private ?string $originalMemoryLimit;
@@ -65,9 +67,7 @@ final class MemoryLimiterEnvironmentTest extends TestCase
         ini_set('memory_limit', $this->originalMemoryLimit);
     }
 
-    /**
-     * @dataProvider memoryLimitProvider
-     */
+    #[DataProvider('memoryLimitProvider')]
     public function test_it_can_detect_if_a_memory_limit_is_set(string $memoryLimit, bool $expected): void
     {
         @ini_set('memory_limit', $memoryLimit);

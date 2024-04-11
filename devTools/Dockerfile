@@ -8,6 +8,12 @@ RUN set -eux; \
     apk add --no-cache --virtual .build-deps \
         ${PHPIZE_DEPS} \
         build-base \
+        libzip-dev \
+        zlib-dev \
+    ; \
+    docker-php-ext-configure zip; \
+    docker-php-ext-install -j$(nproc) \
+        pcntl \
     ; \
     pecl install xdebug-${XDEBUG_VERSION}; \
     pecl clear-cache; \

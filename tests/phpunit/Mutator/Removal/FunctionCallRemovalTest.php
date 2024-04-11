@@ -35,154 +35,157 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
+use Infection\Mutator\Removal\FunctionCallRemoval;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(FunctionCallRemoval::class)]
 final class FunctionCallRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes a function call without parameters' => [
             <<<'PHP'
-<?php
+                <?php
 
-foo();
-$a = 3;
-PHP
+                foo();
+                $a = 3;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 3;
-PHP
+                $a = 3;
+                PHP
             ,
         ];
 
         yield 'It removes a function call with parameters' => [
             <<<'PHP'
-<?php
+                <?php
 
-bar(3, 4);
-$a = 3;
-PHP
+                bar(3, 4);
+                $a = 3;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 3;
-PHP
+                $a = 3;
+                PHP
             ,
         ];
 
         yield 'It removes dynamic function calls with string' => [
             <<<'PHP'
-<?php
+                <?php
 
-$start = true;
-('foo')();
-$end = true;
+                $start = true;
+                ('foo')();
+                $end = true;
 
-PHP
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$start = true;
+                $start = true;
 
-$end = true;
-PHP
+                $end = true;
+                PHP
             ,
         ];
 
         yield 'It removes dynamic function call with variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$start = true;
-$foo();
-$end = true;
+                $start = true;
+                $foo();
+                $end = true;
 
-PHP
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$start = true;
+                $start = true;
 
-$end = true;
-PHP
+                $end = true;
+                PHP
             ,
         ];
 
         yield 'It does not remove a function call that is assigned to something' => [
             <<<'PHP'
-<?php
+                <?php
 
-$b = foo();
-$a = 3;
-PHP
+                $b = foo();
+                $a = 3;
+                PHP
             ,
         ];
 
         yield 'It does not remove a function call within a statement' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (foo()) {
-    $a = 3;
-}
-while (foo()) {
-    $a = 3;
-}
+                if (foo()) {
+                    $a = 3;
+                }
+                while (foo()) {
+                    $a = 3;
+                }
 
-PHP
+                PHP
             ,
         ];
 
         yield 'It does not remove a function call that is the parameter of another function or method' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = foo(3, bar());
-PHP
+                $a = foo(3, bar());
+                PHP,
         ];
 
         yield 'It does not remove a method call' => [
             <<<'PHP'
-<?php
+                <?php
 
-$this->foo();
-$a = 3;
-PHP
+                $this->foo();
+                $a = 3;
+                PHP,
         ];
 
         yield 'It does not remove disallowed calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-assert(true === true);
-aSsert(true === true);
-\assert(true === true);
-fclose($fileHandle);
-closedir($close);
-curl_close($curlHandle);
-fclose();
-mysqli_free_result();
-mysqli_close();
-socket_close();
-openssl_free_key();
+                assert(true === true);
+                aSsert(true === true);
+                \assert(true === true);
+                fclose($fileHandle);
+                closedir($close);
+                curl_close($curlHandle);
+                fclose();
+                mysqli_free_result();
+                mysqli_close();
+                socket_close();
+                openssl_free_key();
 
-$a = 3;
-PHP
+                $a = 3;
+                PHP,
         ];
     }
 }

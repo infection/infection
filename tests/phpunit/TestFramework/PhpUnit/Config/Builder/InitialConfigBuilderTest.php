@@ -47,15 +47,17 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use InvalidArgumentException;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 use function Safe\simplexml_load_string;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(InitialConfigBuilder::class)]
 final class InitialConfigBuilderTest extends FileSystemTestCase
 {
     private const FIXTURES = __DIR__ . '/../../../../Fixtures/Files/phpunit';
@@ -85,7 +87,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $this->assertSame(
             $this->tmp . '/phpunitConfiguration.initial.infection.xml',
-            $configurationPath
+            $configurationPath,
         );
 
         $this->assertFileExists($configurationPath);
@@ -94,7 +96,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $this->assertNotFalse(
             @simplexml_load_string($xml),
-            'Expected dumped configuration content to be a valid XML file.'
+            'Expected dumped configuration content to be a valid XML file.',
         );
     }
 
@@ -105,14 +107,14 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         }
 
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/format-whitespace/original-phpunit.xml'
+            self::FIXTURES . '/format-whitespace/original-phpunit.xml',
         );
 
         $configurationPath = $builder->build('6.5');
 
         $this->assertFileEquals(
             self::FIXTURES . '/format-whitespace/expected-phpunit.xml',
-            $configurationPath
+            $configurationPath,
         );
     }
 
@@ -120,14 +122,14 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         try {
             $this->createConfigBuilder(
-                self::FIXTURES . '/invalid/empty-phpunit.xml'
+                self::FIXTURES . '/invalid/empty-phpunit.xml',
             );
 
             $this->fail('Expected an exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'The original XML config content cannot be an empty string',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -135,7 +137,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     public function test_the_original_xml_config_must_be_a_valid_phpunit_config_file(): void
     {
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/invalid/invalid-phpunit.xml'
+            self::FIXTURES . '/invalid/invalid-phpunit.xml',
         );
 
         try {
@@ -146,9 +148,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
             $this->assertSame(
                 sprintf(
                     'The file "%s/phpunitConfiguration.initial.infection.xml" is not a valid PHPUnit configuration file',
-                    $this->tmp
+                    $this->tmp,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -356,13 +358,11 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(0, $printerClass->length);
     }
 
-    /**
-     * @dataProvider executionOrderProvider
-     */
+    #[DataProvider('executionOrderProvider')]
     public function test_it_adds_execution_order_for_proper_phpunit_versions(
         string $version,
         string $attributeName,
-        int $expectedNodeCount
+        int $expectedNodeCount,
     ): void {
         $xml = file_get_contents($this->builder->build($version));
 
@@ -392,13 +392,11 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(0, $resolveDependencies->length);
     }
 
-    /**
-     * @dataProvider failOnProvider
-     */
+    #[DataProvider('failOnProvider')]
     public function test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions(
         string $version,
         string $attributeName,
-        int $expectedNodeCount
+        int $expectedNodeCount,
     ): void {
         $xml = file_get_contents($this->builder->build($version));
 
@@ -440,7 +438,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     public function test_it_creates_a_configuration(): void
     {
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/phpunit.xml'
+            self::FIXTURES . '/phpunit.xml',
         );
 
         $configurationPath = $builder->build('6.5');
@@ -449,37 +447,37 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $this->assertSame(
             <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright © 2017 Maks Rafalko
-  ~
-  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-  -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
-  <testsuites>
-    <testsuite name="Application Test Suite">
-      <directory>$projectPath/*Bundle</directory>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>$projectPath/src/</directory>
-      <!--<exclude>-->
-      <!--<directory>src/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/*Bundle/Resources</directory>-->
-      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-      <!--</exclude>-->
-    </whitelist>
-  </filter>
-</phpunit>
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!--
+                  ~ Copyright © 2017 Maks Rafalko
+                  ~
+                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+                  -->
+                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+                  <testsuites>
+                    <testsuite name="Application Test Suite">
+                      <directory>$projectPath/*Bundle</directory>
+                    </testsuite>
+                  </testsuites>
+                  <filter>
+                    <whitelist>
+                      <directory>$projectPath/src/</directory>
+                      <!--<exclude>-->
+                      <!--<directory>src/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/*Bundle/Resources</directory>-->
+                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                      <!--</exclude>-->
+                    </whitelist>
+                  </filter>
+                </phpunit>
 
-XML
+                XML
             ,
-            file_get_contents($configurationPath)
+            file_get_contents($configurationPath),
         );
     }
 
-    public function executionOrderProvider(): iterable
+    public static function executionOrderProvider(): iterable
     {
         yield 'PHPUnit 7.1.99 runs without random test order' => [
             '7.1.99',
@@ -518,7 +516,7 @@ XML
         ];
     }
 
-    public function failOnProvider(): iterable
+    public static function failOnProvider(): iterable
     {
         yield 'PHPUnit 5.1.99 runs without failOnRisky' => [
             '5.1.99',
@@ -572,7 +570,7 @@ XML
 
     private function createConfigBuilder(
         ?string $originalPhpUnitXmlConfigPath = null,
-        array $filteredSourceFilesToMutate = []
+        array $filteredSourceFilesToMutate = [],
     ): InitialConfigBuilder {
         $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
 
@@ -586,7 +584,7 @@ XML
             new XmlConfigurationManipulator($replacer, ''),
             new XmlConfigurationVersionProvider(),
             $srcDirs,
-            $filteredSourceFilesToMutate
+            $filteredSourceFilesToMutate,
         );
     }
 }

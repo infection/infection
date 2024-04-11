@@ -35,180 +35,183 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
+use Infection\Mutator\Unwrap\UnwrapArraySlice;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapArraySlice::class)]
 final class UnwrapArraySliceTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_slice(['foo', 'bar', 'baz'], 1);
-PHP
+                $a = array_slice(['foo', 'bar', 'baz'], 1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'baz'];
-PHP
+                $a = ['foo', 'bar', 'baz'];
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_slice(\Class_With_Const::Const, 1);
-PHP
+                $a = array_slice(\Class_With_Const::Const, 1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_slice' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_slice(['foo', 'bar', 'baz'], 1);
-PHP
+                $a = \array_slice(['foo', 'bar', 'baz'], 1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'baz'];
-PHP
+                $a = ['foo', 'bar', 'baz'];
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo', 'bar', 'baz']);
-PHP
+                $a = array_map('strtolower', ['foo', 'bar', 'baz']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_slice' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_slice($array, $offset, $length = null, $preserveKeys = null)
-{
-}
-PHP
+                function array_slice($array, $offset, $length = null, $preserveKeys = null)
+                {
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'baz'];
-if (array_slice($a, 1) === $a) {
-    return true;
-}
-PHP
+                $a = ['foo', 'bar', 'baz'];
+                if (array_slice($a, 1) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'baz'];
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = ['foo', 'bar', 'baz'];
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when array_slice is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_SlIcE(['foo', 'bar', 'baz'], 1);
-PHP
+                $a = aRrAy_SlIcE(['foo', 'bar', 'baz'], 1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'baz'];
-PHP
+                $a = ['foo', 'bar', 'baz'];
+                PHP,
         ];
 
         yield 'It mutates correctly when array_slice uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_slice($foo->bar(), 1);
-PHP
+                $a = array_slice($foo->bar(), 1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_slice(['foo', 'bar', 'baz'], 1));
-PHP
+                $a = array_map('strtolower', array_slice(['foo', 'bar', 'baz'], 1));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo', 'bar', 'baz']);
-PHP
+                $a = array_map('strtolower', ['foo', 'bar', 'baz']);
+                PHP,
         ];
 
         yield 'It mutates correctly when the $length parameter is present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_slice(['foo', 'bar', 'baz'], 1, 2);
-PHP
+                $a = array_slice(['foo', 'bar', 'baz'], 1, 2);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'baz'];
-PHP
+                $a = ['foo', 'bar', 'baz'];
+                PHP,
         ];
 
         yield 'It mutates correctly when the $preserveKeys parameter is present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_slice(['foo', 'bar', 'baz'], 1, 2, true);
-PHP
+                $a = array_slice(['foo', 'bar', 'baz'], 1, 2, true);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo', 'bar', 'baz'];
-PHP
+                $a = ['foo', 'bar', 'baz'];
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_slice';
+                $a = 'array_slice';
 
-$b = $a(['foo', 'bar', 'baz'], 1);
-PHP
+                $b = $a(['foo', 'bar', 'baz'], 1);
+                PHP
             ,
         ];
     }

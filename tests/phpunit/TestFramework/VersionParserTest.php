@@ -37,9 +37,12 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\TestFramework\VersionParser;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
+#[CoversClass(VersionParser::class)]
 final class VersionParserTest extends TestCase
 {
     /**
@@ -52,9 +55,7 @@ final class VersionParserTest extends TestCase
         $this->versionParser = new VersionParser();
     }
 
-    /**
-     * @dataProvider versionProvider
-     */
+    #[DataProvider('versionProvider')]
     public function test_it_parses_version_from_string(string $content, string $expectedVersion): void
     {
         $result = $this->versionParser->parse($content);
@@ -62,9 +63,7 @@ final class VersionParserTest extends TestCase
         $this->assertSame($expectedVersion, $result);
     }
 
-    /**
-     * @dataProvider invalidVersionProvider
-     */
+    #[DataProvider('invalidVersionProvider')]
     public function test_it_throws_exception_when_content_has_no_version_substring(string $content): void
     {
         try {
@@ -74,12 +73,12 @@ final class VersionParserTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 sprintf('Expected "%s" to be contain a valid SemVer (sub)string value.', $content),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function versionProvider(): iterable
+    public static function versionProvider(): iterable
     {
         yield 'nominal stable' => ['7.0.2', '7.0.2'];
 
@@ -116,7 +115,7 @@ final class VersionParserTest extends TestCase
         yield 'PHPUnit' => ['PHPUnit 7.5.11 by Sebastian Bergmann and contributors.', '7.5.11'];
     }
 
-    public function invalidVersionProvider(): iterable
+    public static function invalidVersionProvider(): iterable
     {
         yield 'ascii-only string' => ['abc'];
 

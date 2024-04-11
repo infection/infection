@@ -37,13 +37,14 @@ namespace Infection\Tests\Mutator\Extensions;
 
 use Infection\Mutator\Extensions\MBStringConfig;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MBStringConfig::class)]
 final class MBStringConfigTest extends TestCase
 {
-    /**
-     * @dataProvider settingsProvider
-     */
+    #[DataProvider('settingsProvider')]
     public function test_it_can_create_a_config(array $settings, array $expected): void
     {
         $config = new MBStringConfig($settings);
@@ -60,7 +61,7 @@ final class MBStringConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the value for "foo" to be a boolean. Got "string" instead',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -74,12 +75,12 @@ final class MBStringConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected one of: "mb_chr", "mb_ord", "mb_parse_str", "mb_send_mail", "mb_strcut", "mb_stripos", "mb_stristr", "mb_strlen", "mb_strpos", "mb_strrchr", "mb_strripos", "mb_strrpos", "mb_strstr", "mb_strtolower", "mb_strtoupper", "mb_str_split", "mb_substr_count", "mb_substr", "mb_convert_case". Got: "foo"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function settingsProvider(): iterable
+    public static function settingsProvider(): iterable
     {
         yield 'default' => [
             [],

@@ -35,560 +35,566 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
+use Infection\Mutator\Boolean\LogicalOr;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(LogicalOr::class)]
 final class LogicalOrTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates logical or' => [
             <<<'PHP'
-<?php
+                <?php
 
-true || false;
-PHP
+                true || false;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-true && false;
-PHP
+                true && false;
+                PHP
             ,
         ];
 
         yield 'It does not mutate logical lower or' => [
             <<<'PHP'
-<?php
+                <?php
 
-true or false;
-PHP
+                true or false;
+                PHP
             ,
         ];
 
-        yield from $this->equalityMutationsProvider();
-        yield from $this->nonMutableSmallerAndGreaterMatrixMutationsProvider();
-        yield from $this->mutableSmallerAndGreaterMatrixMutationsProvider();
-        yield from $this->smallerAndGreaterMatrixWithSameValueMutationsProvider();
+        yield from self::equalityMutationsProvider();
+
+        yield from self::nonMutableSmallerAndGreaterMatrixMutationsProvider();
+
+        yield from self::mutableSmallerAndGreaterMatrixMutationsProvider();
+
+        yield from self::smallerAndGreaterMatrixWithSameValueMutationsProvider();
     }
 
-    private function equalityMutationsProvider(): iterable
+    private static function equalityMutationsProvider(): iterable
     {
         yield 'It does not mutate logical or if same variable is tested against "Identical".' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar === 'hello' || $myVar === 'world';
-PHP
+                $myVar === 'hello' || $myVar === 'world';
+                PHP
             ,
         ];
 
         // TODO : improve this to mutate only if checking for falsy values on both sides.
         yield 'It does mutate logical or if same variable is tested against "Equal".' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar == 'hello' || $myVar == 'world';
-PHP
+                $myVar == 'hello' || $myVar == 'world';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar == 'hello' && $myVar == 'world';
-PHP
+                $myVar == 'hello' && $myVar == 'world';
+                PHP,
         ];
 
         yield 'It does mutate logical or if same variable is tested against "Equal" & "Identical".' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar === 'hello' || $myVar == 'world';
-PHP
+                $myVar === 'hello' || $myVar == 'world';
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar === 'hello' && $myVar == 'world';
-PHP
+                $myVar === 'hello' && $myVar == 'world';
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "Identical" (mirrored #1).' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar === 'hello' || 'world' === $myVar;
-PHP
+                $myVar === 'hello' || 'world' === $myVar;
+                PHP
             ,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "Identical" (mirrored #2).' => [
             <<<'PHP'
-<?php
+                <?php
 
-'world' === $myVar || $myVar === 'hello';
-PHP
+                'world' === $myVar || $myVar === 'hello';
+                PHP
             ,
         ];
 
         yield 'It mutates logical or if variables names are different' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar === true || $myOtherVar === false;
-PHP
+                $myVar === true || $myOtherVar === false;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar === true && $myOtherVar === false;
-PHP
+                $myVar === true && $myOtherVar === false;
+                PHP
             ,
         ];
     }
 
-    private function nonMutableSmallerAndGreaterMatrixMutationsProvider(): iterable
+    private static function nonMutableSmallerAndGreaterMatrixMutationsProvider(): iterable
     {
         yield 'It does not mutate logical or if same variable is tested against "Smaller" and "Greater" #1.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 5 || $myVar > 10;
-PHP
+                $myVar < 5 || $myVar > 10;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "Smaller" and "Greater" #2.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 5 || $myVar > 10.1;
-PHP
+                $myVar < 5 || $myVar > 10.1;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "Smaller" and "Greater" #3.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 5.5 || $myVar > 10.1;
-PHP
+                $myVar < 5.5 || $myVar > 10.1;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "Smaller" and "Greater" #4.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 5.5 || $myVar > 10;
-PHP
+                $myVar < 5.5 || $myVar > 10;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "Smaller" and "GreaterOrEqual" #1.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 5 || $myVar >= 10;
-PHP
+                $myVar < 5 || $myVar >= 10;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "Smaller" and "GreaterOrEqual" #2.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 5 || $myVar >= 10.1;
-PHP
+                $myVar < 5 || $myVar >= 10.1;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "Smaller" and "GreaterOrEqual" #3.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 5.5 || $myVar >= 10.1;
-PHP
+                $myVar < 5.5 || $myVar >= 10.1;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "Smaller" and "GreaterOrEqual" #4.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 5.5 || $myVar >= 10;
-PHP
+                $myVar < 5.5 || $myVar >= 10;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "SmallerOrEqual" and "GreaterOrEqual" #1.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5 || $myVar >= 10;
-PHP
+                $myVar <= 5 || $myVar >= 10;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "SmallerOrEqual" and "GreaterOrEqual" #2.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5 || $myVar >= 10.1;
-PHP
+                $myVar <= 5 || $myVar >= 10.1;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "SmallerOrEqual" and "GreaterOrEqual" #3.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5.5 || $myVar >= 10.1;
-PHP
+                $myVar <= 5.5 || $myVar >= 10.1;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "SmallerOrEqual" and "GreaterOrEqual" #4.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5.5 || $myVar >= 10;
-PHP
+                $myVar <= 5.5 || $myVar >= 10;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "SmallerOrEqual" and "Greater" #1.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5 || $myVar > 10;
-PHP
+                $myVar <= 5 || $myVar > 10;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "SmallerOrEqual" and "Greater" #2.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5 || $myVar > 10.1;
-PHP
+                $myVar <= 5 || $myVar > 10.1;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "SmallerOrEqual" and "Greater" #3.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5.5 || $myVar > 10.1;
-PHP
+                $myVar <= 5.5 || $myVar > 10.1;
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "SmallerOrEqual" and "Greater" #4.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5.5 || $myVar > 10;
-PHP
+                $myVar <= 5.5 || $myVar > 10;
+                PHP,
         ];
     }
 
-    private function mutableSmallerAndGreaterMatrixMutationsProvider(): iterable
+    private static function mutableSmallerAndGreaterMatrixMutationsProvider(): iterable
     {
         yield 'It mutates logical or if same variable is tested against "Smaller" and "Greater" and values permits it #1.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10 || $myVar > 5;
-PHP
+                $myVar < 10 || $myVar > 5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10 && $myVar > 5;
-PHP
+                $myVar < 10 && $myVar > 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "Smaller" and "Greater" and values permits it #2.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10 || $myVar > 5.5;
-PHP
+                $myVar < 10 || $myVar > 5.5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10 && $myVar > 5.5;
-PHP
+                $myVar < 10 && $myVar > 5.5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "Smaller" and "Greater" and values permits it #3.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10.1 || $myVar > 5.5;
-PHP
+                $myVar < 10.1 || $myVar > 5.5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10.1 && $myVar > 5.5;
-PHP
+                $myVar < 10.1 && $myVar > 5.5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "Smaller" and "Greater" and values permits it #4.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10.1 || $myVar > 5;
-PHP
+                $myVar < 10.1 || $myVar > 5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10.1 && $myVar > 5;
-PHP
+                $myVar < 10.1 && $myVar > 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "Smaller" and "GreaterOrEqual" and values permits it #1.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10 || $myVar >= 5;
-PHP
+                $myVar < 10 || $myVar >= 5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10 && $myVar >= 5;
-PHP
+                $myVar < 10 && $myVar >= 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "Smaller" and "GreaterOrEqual" and values permits it #2.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10 || $myVar >= 5.5;
-PHP
+                $myVar < 10 || $myVar >= 5.5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10 && $myVar >= 5.5;
-PHP
+                $myVar < 10 && $myVar >= 5.5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "Smaller" and "GreaterOrEqual" and values permits it #3.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10.1 || $myVar >= 5.5;
-PHP
+                $myVar < 10.1 || $myVar >= 5.5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10.1 && $myVar >= 5.5;
-PHP
+                $myVar < 10.1 && $myVar >= 5.5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "Smaller" and "GreaterOrEqual" and values permits it #4.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10.1 || $myVar >= 5;
-PHP
+                $myVar < 10.1 || $myVar >= 5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 10.1 && $myVar >= 5;
-PHP
+                $myVar < 10.1 && $myVar >= 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "SmallerOrEqual" and "GreaterOrEqual" and values permits it #1.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10 || $myVar >= 5;
-PHP
+                $myVar <= 10 || $myVar >= 5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10 && $myVar >= 5;
-PHP
+                $myVar <= 10 && $myVar >= 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "SmallerOrEqual" and "GreaterOrEqual" and values permits it #2.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10 || $myVar >= 5.5;
-PHP
+                $myVar <= 10 || $myVar >= 5.5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10 && $myVar >= 5.5;
-PHP
+                $myVar <= 10 && $myVar >= 5.5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "SmallerOrEqual" and "GreaterOrEqual" and values permits it #3.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10.1 || $myVar >= 5.5;
-PHP
+                $myVar <= 10.1 || $myVar >= 5.5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10.1 && $myVar >= 5.5;
-PHP
+                $myVar <= 10.1 && $myVar >= 5.5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "SmallerOrEqual" and "GreaterOrEqual" and values permits it #4.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10.1 || $myVar >= 5;
-PHP
+                $myVar <= 10.1 || $myVar >= 5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10.1 && $myVar >= 5;
-PHP
+                $myVar <= 10.1 && $myVar >= 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "SmallerOrEqual" and "Greater" and values permits it #1.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10 || $myVar > 5;
-PHP
+                $myVar <= 10 || $myVar > 5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10 && $myVar > 5;
-PHP
+                $myVar <= 10 && $myVar > 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "SmallerOrEqual" and "Greater" and values permits it #2.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10 || $myVar > 5.5;
-PHP
+                $myVar <= 10 || $myVar > 5.5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10 && $myVar > 5.5;
-PHP
+                $myVar <= 10 && $myVar > 5.5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "SmallerOrEqual" and "Greater" and values permits it #3.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10.1 || $myVar > 5.5;
-PHP
+                $myVar <= 10.1 || $myVar > 5.5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10.1 && $myVar > 5.5;
-PHP
+                $myVar <= 10.1 && $myVar > 5.5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "SmallerOrEqual" and "Greater" and values permits it #4.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10.1 || $myVar > 5;
-PHP
+                $myVar <= 10.1 || $myVar > 5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 10.1 && $myVar > 5;
-PHP
+                $myVar <= 10.1 && $myVar > 5;
+                PHP,
         ];
     }
 
-    private function smallerAndGreaterMatrixWithSameValueMutationsProvider(): iterable
+    private static function smallerAndGreaterMatrixWithSameValueMutationsProvider(): iterable
     {
         yield 'It mutates logical or if same variable is tested against "Smaller" and "Greater" and values are the same.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 5 || $myVar > 5;
-PHP
+                $myVar < 5 || $myVar > 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "Greater" and "Smaller" and values are the same.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar > 5 || $myVar < 5;
-PHP
+                $myVar > 5 || $myVar < 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "Smaller" and "GreaterOrEqual" and values are the same.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar < 5 || $myVar >= 5;
-PHP
+                $myVar < 5 || $myVar >= 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "GreaterOrEqual" and "Smaller" and values are the same.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar >= 5 || $myVar < 5;
-PHP
+                $myVar >= 5 || $myVar < 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "SmallerOrEqual" and "GreaterOrEqual" and values are the same.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5 || $myVar >= 5;
-PHP
+                $myVar <= 5 || $myVar >= 5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5 && $myVar >= 5;
-PHP
+                $myVar <= 5 && $myVar >= 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "GreaterOrEqual" and "SmallerOrEqual" and values are the same.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar >= 5 || $myVar <= 5;
-PHP
+                $myVar >= 5 || $myVar <= 5;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$myVar >= 5 && $myVar <= 5;
-PHP
+                $myVar >= 5 && $myVar <= 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "SmallerOrEqual" and "Greater" and values are the same.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar <= 5 || $myVar > 5;
-PHP
+                $myVar <= 5 || $myVar > 5;
+                PHP,
         ];
 
         yield 'It mutates logical or if same variable is tested against "Greater" and "SmallerOrEqual" and values are the same.' => [
             <<<'PHP'
-<?php
+                <?php
 
-$myVar > 5 || $myVar <= 5;
-PHP
+                $myVar > 5 || $myVar <= 5;
+                PHP,
         ];
     }
 }

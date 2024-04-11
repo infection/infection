@@ -71,10 +71,8 @@ final class EnvTestCasesProvider
         }
 
         self::$envTestCaseClassesTuple = array_values(array_filter(array_map(
-            static function (string $className): ?array {
-                return self::envTestCaseTuple($className);
-            },
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true)
+            static fn (string $className): ?array => self::envTestCaseTuple($className),
+            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
         )));
 
         yield from self::$envTestCaseClassesTuple;

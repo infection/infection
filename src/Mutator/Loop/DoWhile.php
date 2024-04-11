@@ -54,36 +54,36 @@ final class DoWhile implements Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces the iterable being iterated over with a `do-while` condition with false, preventing next iteration
-within the block to be executed. For example:
+                Replaces the iterable being iterated over with a `do-while` condition with false, preventing next iteration
+                within the block to be executed. For example:
 
-```php`
+                ```php`
 
-$condition = true;
-do {
-    // ...
-} while ($condition);
-```
+                $condition = true;
+                do {
+                    // ...
+                } while ($condition);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
+                ```php
 
-$condition = true;
-do {
-    // ...
-} while (false);
-```
-TXT
+                $condition = true;
+                do {
+                    // ...
+                } while (false);
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-do {
-    // ...
-- } while ($condition);
-+ } while (false);
-DIFF
+                do {
+                    // ...
+                - } while ($condition);
+                + } while (false);
+                DIFF,
         );
     }
 
@@ -97,7 +97,7 @@ DIFF
         yield new Node\Stmt\Do_(
             new Node\Expr\ConstFetch(new Node\Name('false')),
             $node->stmts,
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

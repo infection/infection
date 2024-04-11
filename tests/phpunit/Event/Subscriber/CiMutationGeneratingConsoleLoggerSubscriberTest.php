@@ -38,10 +38,12 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\MutationGenerationWasStarted;
 use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(CiMutationGeneratingConsoleLoggerSubscriber::class)]
 final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
 {
     /**

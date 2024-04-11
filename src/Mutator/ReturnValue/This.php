@@ -54,14 +54,14 @@ final class This extends AbstractValueToNullReturnValue
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-class X {
-    function foo()
-    {
--        return $this;
-+        return null;
-    }
-}
-DIFF
+                class X {
+                    function foo()
+                    {
+                -        return $this;
+                +        return null;
+                    }
+                }
+                DIFF,
         );
     }
 
@@ -75,15 +75,15 @@ DIFF
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Return_(
-            new Node\Expr\ConstFetch(new Node\Name('null'))
+            new Node\Expr\ConstFetch(new Node\Name('null')),
         );
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Return_ &&
-            $node->expr instanceof Node\Expr\Variable &&
-            $node->expr->name === 'this'
+        return $node instanceof Node\Stmt\Return_
+            && $node->expr instanceof Node\Expr\Variable
+            && $node->expr->name === 'this'
             && $this->isNullReturnValueAllowed($node);
     }
 }

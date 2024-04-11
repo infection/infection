@@ -50,9 +50,11 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
+#[CoversClass(Engine::class)]
 final class EngineTest extends TestCase
 {
     public function test_initial_test_run_fails(): void
@@ -130,7 +132,7 @@ final class EngineTest extends TestCase
             $minMsiChecker,
             $consoleOutput,
             $metricsCalculator,
-            $testFrameworkExtraOptionsFilter
+            $testFrameworkExtraOptionsFilter,
         );
 
         $this->expectException(InitialTestsFailed::class);
@@ -160,9 +162,7 @@ final class EngineTest extends TestCase
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->callback(static function (ApplicationExecutionWasFinished $event): bool {
-                return true;
-            }));
+            ->with($this->callback(static fn (ApplicationExecutionWasFinished $event): bool => true));
 
         $process = $this->createMock(Process::class);
         $process
@@ -208,9 +208,7 @@ final class EngineTest extends TestCase
         $mutationTestingRunner
             ->expects($this->once())
             ->method('run')
-            ->with($this->callback(static function (iterable $input): bool {
-                return true;
-            }))
+            ->with($this->callback(static fn (iterable $input): bool => true))
         ;
 
         $consoleOutput = $this->createMock(ConsoleOutput::class);
@@ -255,7 +253,7 @@ final class EngineTest extends TestCase
             $minMsiChecker,
             $consoleOutput,
             $metricsCalculator,
-            $testFrameworkExtraOptionsFilter
+            $testFrameworkExtraOptionsFilter,
         );
 
         $engine->execute();

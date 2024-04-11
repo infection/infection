@@ -35,22 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
+use Infection\Mutator\Unwrap\UnwrapFinally;
 use Infection\Tests\Mutator\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapFinally::class)]
 final class UnwrapFinallyTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      * @param mixed[] $settings
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, array|string $expected = [], array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Can unwrap try-finally block without catches' => [
             '<?php
@@ -66,7 +69,7 @@ function withoutChecks(callable $fn): void
 }',
             '<?php
 
-function withoutChecks(callable $fn) : void
+function withoutChecks(callable $fn): void
 {
     $this->useChecks = false;
     $fn();
@@ -90,7 +93,7 @@ function withoutChecks(callable $fn): void
 }',
             '<?php
 
-function withoutChecks(callable $fn) : void
+function withoutChecks(callable $fn): void
 {
     $this->useChecks = false;
     try {
