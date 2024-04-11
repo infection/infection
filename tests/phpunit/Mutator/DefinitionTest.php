@@ -85,7 +85,7 @@ final class DefinitionTest extends TestCase
      * @dataProvider mutatorsProvider
      */
     public function test_it_must_define_remedies(
-        Mutator $mutator
+        Mutator $mutator,
     ): void {
         $this->assertNotNull(
             $mutator::getDefinition()->getRemedies(),
@@ -102,7 +102,7 @@ final class DefinitionTest extends TestCase
 
         $mutators = $mutatorFactory->create(array_fill_keys(
             ProfileList::ALL_MUTATORS,
-            []
+            [],
         ), false);
 
         foreach ($mutators as $name => $mutator) {
