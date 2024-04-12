@@ -64,7 +64,13 @@ final class UnwrapArrayMap extends AbstractFunctionUnwrapMutator
                 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null,
+            <<<'TXT'
+                    This mutation escaping suggests that the `$callback` transformation passed to
+                    `array_map()` does no effect to the passed elements.
+
+                    Either this transformation is needed in which case additional tests capturing
+                    this need are required, or it is not and should be removed.
+                TXT,
             <<<'DIFF'
                 - $x = array_map($callback, ['foo', 'bar', 'baz']);
                 + $x = ['foo', 'bar', 'baz'];
