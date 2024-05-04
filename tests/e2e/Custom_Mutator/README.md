@@ -1,9 +1,3 @@
-# Title
-
-* Link to github ticket if relevant
-
 ## Summary
-Short summary of the ticket
 
-## Full Ticket
-Full github ticket
+* Related to https://github.com/infection/infection/pull/1686. Adds e2e test to make sure custom mutator, implemented outside of Infection, works as expected.
