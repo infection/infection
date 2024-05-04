@@ -104,6 +104,44 @@ final class SchemaValidatorTest extends TestCase
             ,
         ];
 
+        yield 'invalid custom mutator' => [
+            self::createConfigWithContents(
+                $path,
+                <<<'JSON'
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "CustomMutator": true
+                        }
+                    }
+                    JSON,
+            ),
+            <<<'ERROR'
+                "/path/to/config" does not match the expected JSON schema:
+                 - [mutators] The property CustomMutator is not defined and the definition does not allow additional properties
+                ERROR
+            ,
+        ];
+
+        yield 'valid custom mutator' => [
+            self::createConfigWithContents(
+                $path,
+                <<<'JSON'
+                    {
+                        "source": {
+                            "directories": ["src"]
+                        },
+                        "mutators": {
+                            "Vendor\\CustomMutator": true
+                        }
+                    }
+                    JSON,
+            ),
+            null,
+        ];
+
         yield 'valid schema' => [
             self::createConfigWithContents(
                 $path,
