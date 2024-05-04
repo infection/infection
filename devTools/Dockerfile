@@ -35,7 +35,7 @@ RUN apk add --no-cache \
         git \
         zip
 
-COPY --from=composer:2.1 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY memory-limit.ini xdebug.ini ${PHP_INI_DIR}/conf.d/
 
 RUN adduser -h /opt/infection -s /bin/bash -D infection
