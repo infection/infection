@@ -33,66 +33,63 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator;
+namespace Custom_Mutator\Mutator;
 
-use Infection\CannotBeInstantiated;
+use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
+use PhpParser\Node;
+use function end;
+use function explode;
 
-final class MutatorCategory
+/**
+ * @implements Mutator<Node\Expr\BinaryOp\Plus>
+ */
+final class CustomMutator implements Mutator
 {
-    use CannotBeInstantiated;
+    public function getName(): string
+    {
+        $parts = explode('\\', self::class);
+
+        return end($parts);
+    }
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+                Replaces an addition operator (`+`) with a subtraction operator (`-`).
+                TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null,
+            <<<'DIFF'
+                - $a = $b + $c;
+                + $a = $b - $c;
+                DIFF,
+        );
+    }
 
     /**
-     * Semantic reductions exposes unused semantics. For example:
+     * @psalm-mutation-free
      *
-     * ```php
-     * $x = $a + $b;
-     *
-     * // to
-     *
-     * $x = $a;
-     * ```
-     *
-     * If the semantics are unneeded, they should be removed. Otherwise they should be tested.
+     * @return iterable<Node\Expr\BinaryOp\Minus>
      */
-    public const SEMANTIC_REDUCTION = 'semanticReduction';
+    public function mutate(Node $node): iterable
+    {
+        yield new Node\Expr\BinaryOp\Minus($node->left, $node->right, $node->getAttributes());
+    }
 
-    /**
-     * Semantic additions are a peculiar case and usually do not make sense. For example:
-     *
-     * ```php
-     * $x = $a === $b;
-     *
-     * // to
-     *
-     * $x = $a == $b;
-     * ```
-     *
-     * More information on how a mutator of this category should be tackled should be provided in
-     * the mutator definition.
-     */
-    public const SEMANTIC_ADDITION = 'semanticAddition';
+    public function canMutate(Node $node): bool
+    {
+        if (!$node instanceof Node\Expr\BinaryOp\Plus) {
+            return false;
+        }
 
-    /**
-     * An example of orthogonal replacement is:
-     *
-     * ```php
-     * $a > $b;
-     *
-     * // to
-     *
-     * $a < $b;
-     * ```
-     *
-     * Neither form has less semantics than the other. It is however a mutation that shows a lack
-     * of coverage.
-     */
-    public const ORTHOGONAL_REPLACEMENT = 'orthogonalReplacement';
+        if ($node->left instanceof Node\Expr\Array_ || $node->right instanceof Node\Expr\Array_) {
+            return false;
+        }
 
-    // Also known but unused for now: neutral, semantic addition
-
-    public const ALL = [
-        self::SEMANTIC_REDUCTION,
-        self::SEMANTIC_ADDITION,
-        self::ORTHOGONAL_REPLACEMENT,
-    ];
+        return true;
+    }
 }

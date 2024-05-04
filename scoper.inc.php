@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 return [
     'prefix' => 'Infected',
+    'exclude-classes' => [
+        'Infection\Mutator\Definition',
+        'Infection\Mutator\Mutator',
+        'Infection\Mutator\MutatorCategory',
+    ],
     'exclude-constants' => [
         // Symfony global constants
         '/^SYMFONY\_[\p{L}_]+$/',

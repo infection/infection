@@ -42,6 +42,7 @@ use function array_values;
 use function class_exists;
 use function in_array;
 use InvalidArgumentException;
+use function is_subclass_of;
 use function sprintf;
 use stdClass;
 
@@ -116,7 +117,7 @@ final class MutatorResolver
                 self::registerFromClass(
                     $mutatorOrProfile,
                     $resolvedSettings,
-                    $mutators
+                    $mutators,
                 );
 
                 continue;

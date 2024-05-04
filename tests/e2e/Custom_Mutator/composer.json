@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^9.5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Custom_Mutator\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Custom_Mutator\\Test\\": "tests/"
+        }
+    }
+}

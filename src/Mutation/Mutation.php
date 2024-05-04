@@ -44,6 +44,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
 use PhpParser\Node;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -52,8 +53,7 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
-    private string $mutatorClass;
-    private readonly string $mutatorName;
+    private readonly string $mutatorClass;
     /** @var array<string|int|float> */
     private readonly array $attributes;
     private readonly bool $coveredByTests;
@@ -70,7 +70,7 @@ class Mutation
         private readonly string $originalFilePath,
         private readonly array $originalFileAst,
         string $mutatorClass,
-        string $mutatorName,
+        private readonly string $mutatorName,
         array $attributes,
         private readonly string $mutatedNodeClass,
         private readonly MutatedNode $mutatedNode,
@@ -83,7 +83,6 @@ class Mutation
             Assert::keyExists($attributes, $key);
         }
         $this->mutatorClass = $mutatorClass;
-        $this->mutatorName = $mutatorName;
         $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
         $this->coveredByTests = $tests !== [];
     }

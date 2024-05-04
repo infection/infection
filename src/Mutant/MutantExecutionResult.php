@@ -52,7 +52,6 @@ class MutantExecutionResult
 {
     private readonly string $detectionStatus;
     private readonly string $mutatorClass;
-    private readonly string $mutatorName;
 
     /**
      * @param Deferred<string> $mutantDiff
@@ -67,7 +66,7 @@ class MutantExecutionResult
         private readonly Deferred $mutantDiff,
         private readonly string $mutantHash,
         string $mutatorClass,
-        string $mutatorName,
+        private readonly string $mutatorName,
         private readonly string $originalFilePath,
         private readonly int $originalStartingLine,
         private readonly int $originalEndingLine,
@@ -82,7 +81,6 @@ class MutantExecutionResult
 
         $this->detectionStatus = $detectionStatus;
         $this->mutatorClass = $mutatorClass;
-        $this->mutatorName = $mutatorName;
     }
 
     public static function createFromNonCoveredMutant(Mutant $mutant): self

@@ -371,17 +371,12 @@ parameters:
 			path: ../src/Mutator/MutatorResolver.php
 
 		-
-			message: "#^Parameter &\\$mutators by\\-ref type of method Infection\\\\Mutator\\\\MutatorResolver\\:\\:registerFromClass\\(\\) expects array\\<string, array\\<string\\>\\>, array\\<string, array\\<array\\<string\\>\\|string\\>\\> given\\.$#"
+			message: "#^Parameter &\\$mutators by\\-ref type of method Infection\\\\Mutator\\\\MutatorResolver\\:\\:registerFromClass\\(\\) expects array\\<string, array\\<string, string\\>\\>, array\\<string, array\\<string, array\\<string\\>\\|string\\>\\> given\\.$#"
 			count: 1
 			path: ../src/Mutator/MutatorResolver.php
 
 		-
-			message: "#^Parameter &\\$mutators by\\-ref type of method Infection\\\\Mutator\\\\MutatorResolver\\:\\:registerFromClass\\(\\) expects array\\<string, array\\<string\\>\\>, array\\<string, array\\> given\\.$#"
-			count: 1
-			path: ../src/Mutator/MutatorResolver.php
-
-		-
-			message: "#^Parameter &\\$mutators by\\-ref type of method Infection\\\\Mutator\\\\MutatorResolver\\:\\:registerFromName\\(\\) expects array\\<string, array\\<string, string\\>\\>, array\\<string, array\\<string\\>\\> given\\.$#"
+			message: "#^Parameter &\\$mutators by\\-ref type of method Infection\\\\Mutator\\\\MutatorResolver\\:\\:registerFromClass\\(\\) expects array\\<string, array\\<string, string\\>\\>, array\\<string, array\\> given\\.$#"
 			count: 1
 			path: ../src/Mutator/MutatorResolver.php
 

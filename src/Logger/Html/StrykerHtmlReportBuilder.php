@@ -64,6 +64,7 @@ use const PHP_EOL;
 use function Safe\file_get_contents;
 use function Safe\preg_match;
 use function Safe\preg_split;
+use function sprintf;
 use function str_starts_with;
 use function strlen;
 use function substr;

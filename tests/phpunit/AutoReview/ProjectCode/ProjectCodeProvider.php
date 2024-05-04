@@ -64,6 +64,9 @@ use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\MutationAttributeKeys;
+use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Runner\IndexedProcessBearer;
 use Infection\Process\ShellCommandLineExecutor;
@@ -141,6 +144,9 @@ final class ProjectCodeProvider
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
         SchemaValidator::class,
+        Mutator::class,
+        Definition::class,
+        MutatorCategory::class,
     ];
 
     /**
