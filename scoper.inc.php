@@ -40,8 +40,8 @@ return [
         'Infection\Mutator\Mutator',
         'Infection\Mutator\MutatorCategory',
     ],
-    'expose-namespaces' => [
-        // we have to expose it cause Mutator depends on PhpParser/Node interface, and it's not in a separate package
+    'exclude-namespaces' => [
+        // we have to exclude it cause Mutator depends on PhpParser/Node interface, and it's not in a separate package
         '/^PhpParser/',
     ],
     'exclude-constants' => [
