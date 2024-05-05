@@ -45,7 +45,7 @@ use PhpParser\Node;
  */
 final class UnwrapArrayMerge extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'

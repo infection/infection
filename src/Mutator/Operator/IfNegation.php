@@ -52,7 +52,7 @@ final class IfNegation implements Mutator
     use GetMutatorName;
     use SimpleExpression;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Negates an expression in if statement.',

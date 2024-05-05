@@ -58,7 +58,7 @@ final class RoundingFamily implements Mutator
         'round',
     ];
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'

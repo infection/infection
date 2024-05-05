@@ -50,7 +50,7 @@ final class LogicalLowerOr implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces an OR logical operator (`or`) with an AND logical operator (`AND`).',

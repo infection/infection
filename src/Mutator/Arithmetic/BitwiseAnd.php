@@ -50,7 +50,7 @@ final class BitwiseAnd implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a bitwise AND operator (`&`) with a bitwise OR operator (`|`).',

@@ -44,7 +44,7 @@ use PhpParser\Node;
  */
 final class CastFloat extends AbstractCastMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes a float cast operator (`(float)`).',

@@ -47,7 +47,7 @@ use PhpParser\Node;
  */
 final class LogicalOrAllSubExprNegation extends AbstractAllSubExprNegation
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'

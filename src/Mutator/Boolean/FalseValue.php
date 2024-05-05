@@ -50,7 +50,7 @@ final class FalseValue implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a boolean literal (`false`) with its opposite value (`true`). ',

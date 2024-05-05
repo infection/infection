@@ -61,7 +61,7 @@ final class DecrementInteger extends AbstractNumberMutator
         'strlen',
     ];
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Decrements an integer value with 1.',

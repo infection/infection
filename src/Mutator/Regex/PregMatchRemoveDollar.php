@@ -47,7 +47,7 @@ final class PregMatchRemoveDollar extends AbstractPregMatch
 {
     public const ANALYSE_REGEX = '/^([^\w\s\\\\])([^$]*)([$]?)\1([gmixXsuUAJD]*)$/';
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'

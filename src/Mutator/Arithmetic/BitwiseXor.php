@@ -50,7 +50,7 @@ final class BitwiseXor implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a bitwise XOR operator (`^`) with a bitwise AND operator (`&`).',

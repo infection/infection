@@ -50,7 +50,7 @@ final class LogicalAnd implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces an AND operator (`&&`) with an OR operator (`||`).',

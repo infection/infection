@@ -66,7 +66,7 @@ final class BCMath implements ConfigurableMutator
         $this->converters = self::createConverters($config->getAllowedFunctions());
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'

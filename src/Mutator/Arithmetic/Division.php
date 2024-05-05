@@ -50,7 +50,7 @@ final class Division implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a division operator (`/`) with a multiplication operator (`*`).',

@@ -54,7 +54,7 @@ final class NoopMutator implements Mutator
     {
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         throw new DomainException(sprintf(
             'The class "%s" does not have a definition',

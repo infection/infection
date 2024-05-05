@@ -64,7 +64,7 @@ final class FunctionCallRemoval implements Mutator
         'socket_close',
     ];
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes the function call.',

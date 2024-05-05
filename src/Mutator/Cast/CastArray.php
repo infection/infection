@@ -44,7 +44,7 @@ use PhpParser\Node;
  */
 final class CastArray extends AbstractCastMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes an array cast operator (`(array)`).',

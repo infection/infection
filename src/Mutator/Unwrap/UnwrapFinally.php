@@ -50,7 +50,7 @@ final class UnwrapFinally implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces `try-catch-finally` block with try-catch or try-finally with simple statements.',

@@ -42,7 +42,7 @@ use PhpParser\Node;
 
 final class FakeMutator implements Mutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }

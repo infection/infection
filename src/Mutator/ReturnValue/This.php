@@ -47,7 +47,7 @@ use PhpParser\Node;
  */
 final class This extends AbstractValueToNullReturnValue
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a `return $this` statement with `return null` instead.',

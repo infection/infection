@@ -44,7 +44,7 @@ use PhpParser\Node;
  */
 final class CastObject extends AbstractCastMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes an object cast operator (`(object)`).',

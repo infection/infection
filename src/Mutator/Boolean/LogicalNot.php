@@ -50,7 +50,7 @@ final class LogicalNot implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes a negation operator (`!`), e.g. transforms `!$foo` with `$foo`.',
