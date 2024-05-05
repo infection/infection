@@ -42,7 +42,6 @@ final class ChangedLinesRange
 {
     public function __construct(private readonly int $startLine, private readonly int $endLine)
     {
-        // test
     }
 
     public function getStartLine(): int
