@@ -44,7 +44,7 @@ use PhpParser\Node;
  */
 final class CastBool extends AbstractCastMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes an boolean cast operator (`(bool)`).',

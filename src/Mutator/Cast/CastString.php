@@ -44,7 +44,7 @@ use PhpParser\Node;
  */
 final class CastString extends AbstractCastMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes a string cast operator (`(string)`).',

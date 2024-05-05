@@ -51,7 +51,7 @@ final class Catch_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes exception types in `catch` block.',

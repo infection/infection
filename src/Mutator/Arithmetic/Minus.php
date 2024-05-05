@@ -50,7 +50,7 @@ final class Minus implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a subtraction operator (`-`) with an addition operator (`+`).',

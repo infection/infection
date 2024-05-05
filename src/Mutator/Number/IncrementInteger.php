@@ -51,7 +51,7 @@ final class IncrementInteger extends AbstractNumberMutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Increments an integer value with 1.',

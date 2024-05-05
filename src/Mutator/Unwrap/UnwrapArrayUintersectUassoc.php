@@ -49,7 +49,7 @@ final class UnwrapArrayUintersectUassoc extends AbstractFunctionUnwrapMutator
 {
     private const NON_MUTABLE_ARGS_COUNT = 2;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'

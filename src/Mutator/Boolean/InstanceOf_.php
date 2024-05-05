@@ -51,7 +51,7 @@ final class InstanceOf_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces an instanceof comparison with `true` and `false`.',

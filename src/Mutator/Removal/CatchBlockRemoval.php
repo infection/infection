@@ -53,7 +53,7 @@ final class CatchBlockRemoval implements Mutator
 
     private const MIN_CATCH_COUNT_TO_MUTATE = 2;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes `catch` block when more than one defined in `try-catch`.',

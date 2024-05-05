@@ -46,7 +46,7 @@ use function range;
  */
 final class UnwrapArrayMap extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'

@@ -50,7 +50,7 @@ final class SharedCaseRemoval implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes `case`s from `switch`.',

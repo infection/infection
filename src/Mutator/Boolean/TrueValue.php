@@ -65,7 +65,7 @@ final class TrueValue implements ConfigurableMutator
         $this->allowedFunctions = array_flip($config->getAllowedFunctions());
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a boolean literal (`true`) with its opposite value (`false`). ',

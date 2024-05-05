@@ -43,7 +43,7 @@ use Infection\Mutator\MutatorCategory;
  */
 final class UnwrapTrim extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'

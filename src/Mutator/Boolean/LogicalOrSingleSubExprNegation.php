@@ -50,7 +50,7 @@ final class LogicalOrSingleSubExprNegation extends AbstractSingleSubExprNegation
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'

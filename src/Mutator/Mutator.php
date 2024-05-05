@@ -43,7 +43,7 @@ use PhpParser\Node;
  */
 interface Mutator
 {
-    public static function getDefinition(): ?Definition;
+    public static function getDefinition(): Definition;
 
     public function getName(): string;
 

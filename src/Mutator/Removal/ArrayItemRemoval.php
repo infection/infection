@@ -61,7 +61,7 @@ final class ArrayItemRemoval implements ConfigurableMutator
     {
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'

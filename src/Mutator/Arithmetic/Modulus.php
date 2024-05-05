@@ -50,7 +50,7 @@ final class Modulus implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a modulo operator (`%`) with a multiplication operator (`*`).',

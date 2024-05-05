@@ -46,7 +46,7 @@ final class SyntaxError implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a `$this` with `false` to produce a syntax error. Internal usage only.',
