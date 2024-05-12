@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -42,6 +43,9 @@ return RectorConfig::configure()
         __DIR__ . '/tests/phpunit',
     ])
     ->withPhpSets(php81: true)
+    ->withRules([
+        AddCoversClassAttributeRector::class,
+    ])
     ->withSkip([
         ReadOnlyPropertyRector::class => [
             // property can't be readonly as it's returned by reference and may be updated
