@@ -37,7 +37,6 @@ namespace Infection\TestFramework\Coverage;
 
 use function array_key_exists;
 use Infection\FileSystem\FileFilter;
-use Infection\FileSystem\SourceFileFilter;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -64,7 +63,6 @@ class BufferedSourceFileFilter implements FileFilter
     private array $sourceFiles = [];
 
     /**
-     * @param SourceFileFilter|FileFilter $filter
      * @param iterable<SplFileInfo> $sourceFiles
      */
     public function __construct(
