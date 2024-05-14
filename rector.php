@@ -34,6 +34,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Php80\Rector\FunctionLike\MixedTypeRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 
 return RectorConfig::configure()
@@ -43,6 +44,12 @@ return RectorConfig::configure()
     ])
     ->withPhpSets(php81: true)
     ->withSkip([
+        MixedTypeRector::class => [
+            // see https://github.com/rectorphp/rector/issues/8633
+            __DIR__ . '/src/TestFramework/Coverage/BufferedSourceFileFilter.php',
+            __DIR__ . '/src/TestFramework/Coverage/CoveredTraceProvider.php',
+            __DIR__ . '/src/TestFramework/Coverage/UnionTraceProvider.php',
+        ],
         ReadOnlyPropertyRector::class => [
             // property can't be readonly as it's returned by reference and may be updated
             __DIR__ . '/src/TestFramework/Coverage/TestLocations.php',
