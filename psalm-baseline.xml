@@ -10,11 +10,6 @@
       <code><![CDATA[$this->converters[$name->toLowerString()]($node)]]></code>
     </ImpureFunctionCall>
   </file>
-  <file src="src/Mutator/IgnoreMutator.php">
-    <InvalidArgument>
-      <code>$node</code>
-    </InvalidArgument>
-  </file>
   <file src="src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php">
     <InvalidReturnType>
       <code><![CDATA[iterable<string, string>]]></code>
