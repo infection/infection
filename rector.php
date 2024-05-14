@@ -36,6 +36,7 @@ declare(strict_types=1);
 use Rector\Config\RectorConfig;
 use Rector\Php80\Rector\FunctionLike\MixedTypeRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -43,6 +44,9 @@ return RectorConfig::configure()
         __DIR__ . '/tests/phpunit',
     ])
     ->withPhpSets(php81: true)
+    ->withRules([
+        AddCoversClassAttributeRector::class,
+    ])
     ->withSkip([
         MixedTypeRector::class => [
             // see https://github.com/rectorphp/rector/issues/8633
