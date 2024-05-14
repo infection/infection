@@ -35,6 +35,15 @@ declare(strict_types=1);
 
 return [
     'prefix' => 'Infected',
+    'expose-classes' => [
+        'Infection\Mutator\Definition',
+        'Infection\Mutator\Mutator',
+        'Infection\Mutator\MutatorCategory',
+    ],
+    'exclude-namespaces' => [
+        // we have to exclude it cause Mutator depends on PhpParser/Node interface, and it's not in a separate package
+        '/^PhpParser/',
+    ],
     'exclude-constants' => [
         // Symfony global constants
         '/^SYMFONY\_[\p{L}_]+$/',

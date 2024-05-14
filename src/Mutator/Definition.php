@@ -37,9 +37,6 @@ namespace Infection\Mutator;
 
 use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
 final class Definition
 {
     private readonly string $category;

@@ -186,6 +186,7 @@ final class MutantFactoryTest extends TestCase
         return new Mutation(
             '/path/to/acme/Foo.php',
             $originalNodes,
+            Plus::class,
             MutatorName::getName(Plus::class),
             [
                 'startLine' => 3,

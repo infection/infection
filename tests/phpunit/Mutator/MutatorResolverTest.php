@@ -560,6 +560,21 @@ final class MutatorResolverTest extends TestCase
         );
     }
 
+    public function test_it_can_prove_that_got_valid_mutator(): void
+    {
+        $this->assertTrue(MutatorResolver::isValidMutator(Plus::class));
+    }
+
+    public function test_it_can_prove_that_got_not_existing_class(): void
+    {
+        $this->assertFalse(MutatorResolver::isValidMutator('Unknwon\Mutator'));
+    }
+
+    public function test_it_can_prove_that_got_class_which_not_implement_mutator_interface(): void
+    {
+        $this->assertFalse(MutatorResolver::isValidMutator(MutatorResolver::class));
+    }
+
     /**
      * @param string[] $expectedMutators
      * @param array<string, mixed[]> $actualMutators

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use function array_flip;
 use function end;
 use function explode;
 use function is_a;
@@ -56,13 +55,9 @@ final class MutatorFactory
     {
         $mutators = [];
 
-        /** @var array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, string> $knownMutatorClassNames */
-        $knownMutatorClassNames = array_flip(ProfileList::ALL_MUTATORS);
-
         foreach ($resolvedMutators as $mutatorClassName => $config) {
-            Assert::keyExists(
-                $knownMutatorClassNames,
-                $mutatorClassName,
+            Assert::true(
+                MutatorResolver::isValidMutator($mutatorClassName),
                 sprintf('Unknown mutator "%s"', $mutatorClassName),
             );
             Assert::isArray(

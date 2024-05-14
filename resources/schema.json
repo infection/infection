@@ -144,6 +144,9 @@
         "mutators": {
             "type": "object",
             "additionalProperties": false,
+            "patternProperties": {
+                "^[\\w]+(?:\\\\[\\w]+){1,}$": { "$ref": "#/definitions/default-mutator-config" }
+            },
             "description": "Contains the settings for different mutations and profiles",
             "properties": {
                 "global-ignore": {

@@ -128,6 +128,7 @@ final class MutantCodeFactoryTest extends TestCase
                         'kind' => 1,
                     ],
                 )],
+                Plus::class,
                 MutatorName::getName(Plus::class),
                 [
                     'startLine' => 5,

@@ -54,18 +54,17 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\FunctionSignature\ProtectedVisibility;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
-use Infection\Mutator\ProfileList;
+use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Str;
 use function ltrim;
 use function md5;
 use const PHP_EOL;
-use PhpParser\NodeAbstract;
 use function Safe\file_get_contents;
 use function Safe\preg_match;
 use function Safe\preg_split;
+use function sprintf;
 use function str_starts_with;
 use function strlen;
 use function substr;
@@ -247,7 +246,7 @@ final class StrykerHtmlReportBuilder
                     'id' => $result->getMutantHash(),
                     'mutatorName' => $result->getMutatorName(),
                     'replacement' => Str::convertToUtf8(Str::trimLineReturns(ltrim($replacement))),
-                    'description' => $this->getMutatorDescription($result->getMutatorName()),
+                    'description' => $this->getMutatorDescription($result->getMutatorClass()),
                     'location' => [
                         'start' => ['line' => $result->getOriginalStartingLine(), 'column' => $startingColumn],
                         'end' => ['line' => $endingLine, 'column' => $endingColumn],
@@ -313,12 +312,9 @@ final class StrykerHtmlReportBuilder
         return 0;
     }
 
-    private function getMutatorDescription(string $mutatorName): string
+    private function getMutatorDescription(string $mutatorClass): string
     {
-        Assert::keyExists(ProfileList::ALL_MUTATORS, $mutatorName);
-
-        /** @var Mutator<NodeAbstract> $mutatorClass */
-        $mutatorClass = ProfileList::ALL_MUTATORS[$mutatorName];
+        Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
         $definition = $mutatorClass::getDefinition();
 

@@ -108,6 +108,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
             new Mutation(
                 'path/to/file',
                 $nodes,
+                PublicVisibility::class,
                 MutatorName::getName(PublicVisibility::class),
                 [
                     'startTokenPos' => 28,
@@ -158,6 +159,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
             new Mutation(
                 'path/to/file',
                 $nodes,
+                PublicVisibility::class,
                 MutatorName::getName(PublicVisibility::class),
                 [
                     'startTokenPos' => 28,
@@ -210,6 +212,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
             new Mutation(
                 'path/to/file',
                 $nodes,
+                PublicVisibility::class,
                 MutatorName::getName(PublicVisibility::class),
                 [
                     'startTokenPos' => 29,
@@ -265,6 +268,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                 new Mutation(
                     'path/to/file',
                     $nodes,
+                    PublicVisibility::class,
                     MutatorName::getName(PublicVisibility::class),
                     [
                         'startTokenPos' => 29,

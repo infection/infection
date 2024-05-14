@@ -102,6 +102,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
+                    For_::class,
                     $mutatorName = MutatorName::getName(For_::class),
                     [
                         'startLine' => $originalStartingLine = 10,
@@ -172,6 +173,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
+                    For_::class,
                     $mutatorName = MutatorName::getName(For_::class),
                     [
                         'startLine' => $originalStartingLine = 10,
@@ -254,6 +256,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
+                    For_::class,
                     $mutatorName = MutatorName::getName(For_::class),
                     [
                         'startLine' => $originalStartingLine = 10,
@@ -337,6 +340,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
+                    For_::class,
                     $mutatorName = MutatorName::getName(For_::class),
                     [
                         'startLine' => $originalStartingLine = 10,
@@ -420,6 +424,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
+                    For_::class,
                     $mutatorName = MutatorName::getName(For_::class),
                     [
                         'startLine' => $originalStartingLine = 10,
@@ -512,6 +517,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
+                    For_::class,
                     $mutatorName = MutatorName::getName(For_::class),
                     [
                         'startLine' => $originalStartingLine = 10,

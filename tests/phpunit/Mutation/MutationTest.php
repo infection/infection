@@ -60,6 +60,7 @@ final class MutationTest extends TestCase
     public function test_it_can_be_instantiated(
         string $originalFilePath,
         array $originalFileAst,
+        string $mutatorClass,
         string $mutatorName,
         array $attributes,
         string $mutatedNodeClass,
@@ -75,6 +76,7 @@ final class MutationTest extends TestCase
         $mutation = new Mutation(
             $originalFilePath,
             $originalFileAst,
+            $mutatorClass,
             $mutatorName,
             $attributes,
             $mutatedNodeClass,
@@ -85,6 +87,7 @@ final class MutationTest extends TestCase
 
         $this->assertSame($originalFilePath, $mutation->getOriginalFilePath());
         $this->assertSame($originalFileAst, $mutation->getOriginalFileAst());
+        $this->assertSame($mutatorClass, $mutation->getMutatorClass());
         $this->assertSame($mutatorName, $mutation->getMutatorName());
         $this->assertSame($expectedAttributes, $mutation->getAttributes());
         $this->assertSame($expectedOriginalStartingLine, $mutation->getOriginalStartingLine());
@@ -110,6 +113,7 @@ final class MutationTest extends TestCase
         yield 'empty' => [
             '',
             [],
+            Plus::class,
             MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
@@ -129,6 +133,7 @@ final class MutationTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)],
             )],
+            Plus::class,
             MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
@@ -154,6 +159,7 @@ final class MutationTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)],
             )],
+            Plus::class,
             MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
@@ -179,6 +185,7 @@ final class MutationTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)],
             )],
+            Plus::class,
             MutatorName::getName(Plus::class),
             array_merge($nominalAttributes, ['foo' => 100, 'bar' => 1000]),
             Node\Scalar\LNumber::class,
@@ -209,6 +216,7 @@ final class MutationTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)],
             )],
+            Plus::class,
             MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
@@ -228,6 +236,7 @@ final class MutationTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)],
             )],
+            Plus::class,
             MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
