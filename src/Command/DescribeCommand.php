@@ -87,7 +87,7 @@ final class DescribeCommand extends BaseCommand
 
         Assert::subclassOf($mutatorClass, Mutator::class);
 
-        /** @var ?Definition $definition */
+        /** @var Definition $definition */
         $definition = $mutatorClass::getDefinition();
 
         if ($definition === null) {

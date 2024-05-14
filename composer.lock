@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7886ba1ebddaabb0ddbdc228fb5ab64d",
+    "content-hash": "af8e344ed128e3aaedc7bc25f4639cb7",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -464,16 +464,16 @@
         },
         {
             "name": "infection/mutator",
-            "version": "0.3.0",
+            "version": "0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/mutator.git",
-                "reference": "9f1ad0f05b5d9ea0e836d1365ff0bd42c6951d03"
+                "reference": "51d6d01a2357102030aee9d603063c4bad86b144"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/mutator/zipball/9f1ad0f05b5d9ea0e836d1365ff0bd42c6951d03",
-                "reference": "9f1ad0f05b5d9ea0e836d1365ff0bd42c6951d03",
+                "url": "https://api.github.com/repos/infection/mutator/zipball/51d6d01a2357102030aee9d603063c4bad86b144",
+                "reference": "51d6d01a2357102030aee9d603063c4bad86b144",
                 "shasum": ""
             },
             "require": {
@@ -501,7 +501,7 @@
             "description": "Mutator interface to implement custom mutators (mutation operators) for Infection",
             "support": {
                 "issues": "https://github.com/infection/mutator/issues",
-                "source": "https://github.com/infection/mutator/tree/0.3.0"
+                "source": "https://github.com/infection/mutator/tree/0.4.0"
             },
             "funding": [
                 {
@@ -513,7 +513,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-05-14T22:21:33+00:00"
+            "time": "2024-05-14T22:39:59+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
