@@ -54,7 +54,7 @@ final class CustomMutator implements Mutator
         return end($parts);
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
