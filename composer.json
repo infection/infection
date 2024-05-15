@@ -54,6 +54,7 @@
         "infection/abstract-testframework-adapter": "^0.5.0",
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.5",
+        "infection/mutator": "^0.4",
         "justinrainbow/json-schema": "^5.2.10",
         "nikic/php-parser": "^5.0",
         "ondram/ci-detector": "^4.1.0",

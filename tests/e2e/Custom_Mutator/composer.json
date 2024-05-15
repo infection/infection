@@ -11,5 +11,8 @@
         "psr-4": {
             "Custom_Mutator\\Test\\": "tests/"
         }
+    },
+    "require": {
+        "infection/mutator": "^0.4.0"
     }
 }
