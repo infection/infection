@@ -103,7 +103,7 @@ class JUnitTestExecutionInfoAdder
         return new TestLocation(
             $test->getMethod(),
             $testFileData->path,
-            $testFileData->time,
+            $test->getExecutionTime() ?? $testFileData->time,
         );
     }
 }
