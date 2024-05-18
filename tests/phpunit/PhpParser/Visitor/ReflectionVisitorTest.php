@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\AnonymousClassReflection;
@@ -77,7 +76,6 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
             [
                 new ParentConnectorVisitor(),
                 self::createNameResolver(),
-                new FullyQualifiedClassNameVisitor(),
                 new ReflectionVisitor(),
                 $spyVisitor = $this->getPartOfSignatureSpyVisitor($nodeClass),
             ],
@@ -360,7 +358,6 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
             [
                 self::createNameResolver(),
                 new ParentConnectorVisitor(),
-                new FullyQualifiedClassNameVisitor(),
                 new ReflectionVisitor(),
                 $nodeVisitor ?: $this->spyVisitor,
             ],

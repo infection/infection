@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
@@ -79,7 +78,6 @@ class NodeTraverserFactory
             ]),
         );
         $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
         $traverser->addVisitor($mutationVisitor);
 
