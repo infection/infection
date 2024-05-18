@@ -29,8 +29,10 @@ files_with_trailing_whitespaces=$(
         -not -name "*.cache" \
         -not -name "*.log" \
         -not -path "./.composer/*" \
+        -not -path "./.cache/*" \
         -not -path "./.box_dump/*" \
         -not -path "./build/*" \
+        -not -path "./.idea/*" \
         -not -path "./.git/*" \
         -not -path "./vendor/*" \
         -not -path "./tests/autoloaded/*" \
