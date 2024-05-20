@@ -35,10 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use function array_map;
 use ArrayIterator;
-use function count;
-use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\MutantProcessWasFinished;
@@ -53,9 +50,9 @@ use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
+use Infection\Testing\MutatorName;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
-use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\WithConsecutive;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -63,8 +60,11 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
+use function array_map;
+use function count;
+use function implode;
+use function sprintf;
 
 #[Group('integration')]
 #[CoversClass(MutationTestingRunner::class)]

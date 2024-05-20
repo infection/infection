@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Fixtures;
+namespace Infection\Testing;
 
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\MutatedNode;

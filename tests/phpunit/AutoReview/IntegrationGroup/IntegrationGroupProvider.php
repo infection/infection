@@ -35,20 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
+use Infection\CannotBeInstantiated;
+use Infection\Testing\SourceTestClassNameScheme;
+use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
+use Infection\Tests\Console\E2ETest;
+use Infection\Tests\FileSystem\FileSystemTestCase;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use Webmozart\Assert\Assert;
 use function array_filter;
 use function array_map;
 use function array_values;
 use function class_exists;
-use Infection\CannotBeInstantiated;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use Infection\Tests\AutoReview\SourceTestClassNameScheme;
-use Infection\Tests\Console\E2ETest;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use function iterator_to_array;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use function Safe\file_get_contents;
-use Webmozart\Assert\Assert;
 
 final class IntegrationGroupProvider
 {

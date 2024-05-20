@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutator;
 use Error;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\InvalidMutator;
+use Infection\Testing\MutatorName;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

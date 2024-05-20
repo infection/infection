@@ -37,8 +37,8 @@ namespace Infection\Tests\PhpParser;
 
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\UnparsableFile;
-use Infection\Tests\SingletonContainer;
-use Infection\Tests\StringNormalizer;
+use Infection\Testing\SingletonContainer;
+use Infection\Testing\StringNormalizer;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\Parser;
@@ -46,9 +46,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 use function Safe\realpath;
 use function sprintf;
-use Symfony\Component\Finder\SplFileInfo;
 
 #[Group('integration')]
 #[CoversClass(FileParser::class)]

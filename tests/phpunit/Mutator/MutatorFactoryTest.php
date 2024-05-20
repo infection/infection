@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use function array_fill_keys;
-use function array_values;
-use function count;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\IgnoreMutator;
@@ -47,15 +44,19 @@ use Infection\Mutator\ProfileList;
 use Infection\Mutator\Sort\Spaceship;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\MutatorName;
+use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function sprintf;
 use stdClass;
+use function array_fill_keys;
+use function array_values;
+use function count;
+use function sprintf;
 
 #[CoversClass(MutatorFactory::class)]
 final class MutatorFactoryTest extends TestCase

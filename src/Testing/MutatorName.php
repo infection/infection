@@ -33,33 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview;
+namespace Infection\Testing;
 
 use Infection\CannotBeInstantiated;
-use function Safe\preg_match;
-use function Safe\preg_replace;
-use function str_contains;
-use function str_replace;
+use Infection\Mutator\ProfileList;
+use Webmozart\Assert\Assert;
+use function array_flip;
 
-final class SourceTestClassNameScheme
+final class MutatorName
 {
     use CannotBeInstantiated;
 
-    public static function getSourceClassName(string $testCaseClassName): string
+    public static function getName(string $mutatorClass): string
     {
-        if (preg_match('/(Infection\\\\Tests\\\\.*)Test$/', $testCaseClassName, $matches) === 1) {
-            return str_replace('Infection\\Tests\\', 'Infection\\', (string) $matches[1]);
-        }
+        Assert::oneOf($mutatorClass, ProfileList::ALL_MUTATORS);
 
-        return $testCaseClassName;
-    }
-
-    public static function getTestClassName(string $sourceClassName): string
-    {
-        if (str_contains($sourceClassName, 'Infection\\Tests')) {
-            return $sourceClassName . 'Test';
-        }
-
-        return preg_replace('/Infection/', 'Infection\\Tests', $sourceClassName, 1) . 'Test';
+        return array_flip(ProfileList::ALL_MUTATORS)[$mutatorClass];
     }
 }

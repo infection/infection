@@ -39,11 +39,11 @@ use Infection\Metrics\SortableMutantExecutionResults;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
-use Infection\Tests\Mutator\MutatorName;
-use function Later\now;
+use Infection\Testing\MutatorName;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Later\now;
 
 #[CoversClass(SortableMutantExecutionResults::class)]
 final class SortableMutantExecutionResultsTest extends TestCase

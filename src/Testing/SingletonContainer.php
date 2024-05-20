@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Testing;
 
 use Infection\Container;
 use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;

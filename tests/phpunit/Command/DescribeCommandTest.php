@@ -37,7 +37,7 @@ namespace Infection\Tests\Command;
 
 use Infection\Command\DescribeCommand;
 use Infection\Console\Application;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;

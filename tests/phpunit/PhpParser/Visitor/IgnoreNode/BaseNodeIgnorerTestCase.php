@@ -37,7 +37,7 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PHPUnit\Framework\TestCase;

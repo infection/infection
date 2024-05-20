@@ -35,21 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\StreamWrapper\IncludeInterceptor;
+use Infection\Testing\SingletonContainer;
+use Infection\Testing\SourceTestClassNameScheme;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionProperty;
 use function array_filter;
 use function array_flip;
 use function array_key_exists;
 use function array_map;
 use function class_exists;
 use function in_array;
-use Infection\StreamWrapper\IncludeInterceptor;
-use Infection\Tests\AutoReview\SourceTestClassNameScheme;
-use Infection\Tests\SingletonContainer;
 use function is_executable;
-use PHPUnit\Framework\Attributes\CoversNothing;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use ReflectionProperty;
 use function sprintf;
 
 /**

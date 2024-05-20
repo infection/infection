@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\Command\CustomMutatorCommand;
 use function array_merge;
 use function class_exists;
 use Composer\InstalledVersions;
@@ -104,6 +105,7 @@ final class Application extends BaseApplication
                 new ConfigureCommand(),
                 new RunCommand(),
                 new DescribeCommand(),
+                new CustomMutatorCommand(),
             ],
         );
 

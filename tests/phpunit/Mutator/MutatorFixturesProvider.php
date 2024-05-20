@@ -35,15 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\CannotBeInstantiated;
+use Infection\Testing\BaseMutatorTestCase;
+use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 use function array_key_exists;
 use function end;
 use function explode;
-use Infection\CannotBeInstantiated;
 use function Safe\file_get_contents;
 use function sprintf;
 use function substr;
-use Symfony\Component\Filesystem\Path;
-use Webmozart\Assert\Assert;
 
 final class MutatorFixturesProvider
 {

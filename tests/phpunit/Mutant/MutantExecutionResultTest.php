@@ -41,11 +41,11 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
-use function Later\now;
+use Infection\Testing\MutatorName;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use function Later\now;
 
 #[CoversClass(MutantExecutionResult::class)]
 final class MutantExecutionResultTest extends TestCase

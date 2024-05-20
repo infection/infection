@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use function current;
 use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
@@ -47,18 +46,19 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
+use Infection\Testing\MutatorName;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
-use Infection\Tests\Mutator\MutatorName;
-use Infection\Tests\SingletonContainer;
-use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
+use function current;
+use function iterator_to_array;
+use function sprintf;
 
 #[CoversClass(FileMutationGenerator::class)]
 final class FileMutationGeneratorTest extends TestCase

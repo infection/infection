@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use function array_diff;
-use function array_values;
-use function count;
 use Infection\Mutator\Arithmetic\Minus;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\IdenticalEqual;
@@ -50,10 +47,14 @@ use Infection\Mutator\Number\DecrementInteger;
 use Infection\Mutator\Number\IncrementInteger;
 use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\ProfileList;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\MutatorName;
+use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use function array_diff;
+use function array_values;
+use function count;
 use function sprintf;
 
 #[CoversClass(MutatorResolver::class)]

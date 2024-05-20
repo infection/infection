@@ -35,6 +35,6 @@
             ignore: [
                 "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
             ]
-        }
+        },
     }
 }

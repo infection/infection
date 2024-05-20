@@ -35,18 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
-use function array_map;
-use function in_array;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Symfony\Component\Filesystem\Path;
+use function array_map;
+use function in_array;
 use function Safe\file_get_contents;
 use function sprintf;
 use function strpos;
-use Symfony\Component\Filesystem\Path;
 
 #[CoversNothing]
 final class ContainerTest extends TestCase

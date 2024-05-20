@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Number;
 
 use Infection\Mutator\Number\DecrementInteger;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
-use const PHP_INT_MAX;
-use const PHP_INT_MIN;
+use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use const PHP_INT_MAX;
+use const PHP_INT_MIN;
 
 #[CoversClass(DecrementInteger::class)]
 final class DecrementIntegerTest extends BaseMutatorTestCase

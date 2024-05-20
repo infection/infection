@@ -39,11 +39,12 @@ use DomainException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NoopMutator;
-use function iterator_to_array;
+use Infection\Testing\MutatorName;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function iterator_to_array;
 
 #[CoversClass(NoopMutator::class)]
 final class NoopMutatorTest extends TestCase

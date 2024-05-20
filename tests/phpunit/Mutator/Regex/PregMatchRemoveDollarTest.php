@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Regex;
 
 use Generator;
 use Infection\Mutator\Regex\PregMatchRemoveDollar;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 

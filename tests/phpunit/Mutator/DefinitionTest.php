@@ -35,17 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use function array_diff_key;
-use function array_fill_keys;
-use function array_flip;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\ProfileList;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function array_diff_key;
+use function array_fill_keys;
+use function array_flip;
 use function sprintf;
 
 #[CoversClass(Definition::class)]

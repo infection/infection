@@ -33,27 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator;
+namespace Infection\Testing;
 
+use Infection\Mutator\Mutator;
+use Infection\Mutator\ProfileList;
+use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Visitor\CloneVisitor;
+use Infection\PhpParser\Visitor\MutatorVisitor;
+use PhpParser\NodeTraverser;
+use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
+use function array_flip;
+use function array_key_exists;
 use function array_shift;
 use function count;
 use function escapeshellarg;
 use function implode;
-use Infection\Mutator\Mutator;
-use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\Visitor\CloneVisitor;
-use Infection\PhpParser\Visitor\MutatorVisitor;
-use Infection\Tests\AutoReview\SourceTestClassNameScheme;
-use Infection\Tests\Fixtures\SimpleMutation;
-use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
-use Infection\Tests\SingletonContainer;
-use Infection\Tests\StringNormalizer;
-use const PHP_EOL;
-use PhpParser\NodeTraverser;
-use PHPUnit\Framework\TestCase;
 use function Safe\exec;
 use function sprintf;
-use Webmozart\Assert\Assert;
+use const PHP_EOL;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
@@ -118,15 +116,23 @@ abstract class BaseMutatorTestCase extends TestCase
 
     final protected function createMutator(array $settings = []): Mutator
     {
-        $mutatorClassName = SourceTestClassNameScheme::getSourceClassName(static::class);
+        $mutatorClassName = $this->getTestedMutatorClassName();
+
+        $isBuiltinMutator = array_key_exists($mutatorClassName, array_flip(ProfileList::ALL_MUTATORS));
+        $mutatorName = $isBuiltinMutator ? MutatorName::getName($mutatorClassName) : $mutatorClassName;
 
         // TODO: this is a bit ridicule...
         return SingletonContainer::getContainer()
             ->getMutatorFactory()
             ->create([
                 $mutatorClassName => ['settings' => $settings],
-            ], false)[MutatorName::getName($mutatorClassName)]
+            ], false)[$mutatorName]
         ;
+    }
+
+    protected function getTestedMutatorClassName(): string
+    {
+        return SourceTestClassNameScheme::getSourceClassName(static::class);
     }
 
     /**
@@ -189,7 +195,7 @@ abstract class BaseMutatorTestCase extends TestCase
             $returnCode,
             sprintf(
                 'Mutator %s produces invalid code',
-                $this->createMutator()->getName(),
+                $this->mutator->getName(),
             ),
         );
     }
