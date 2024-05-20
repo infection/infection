@@ -56,7 +56,7 @@ final class CustomMutatorCommand extends BaseCommand
     {
         $this
             ->setName('custom-mutator')
-            ->setDescription('Creates a cusotm mutator')
+            ->setDescription('Creates a custom mutator')
             ->addArgument('Mutator name', InputArgument::OPTIONAL);
     }
 
