@@ -35,22 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use function array_values;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\NullMutationVisitor;
+use function ksort;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use const SORT_STRING;
+use function sprintf;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
-use function array_values;
-use function ksort;
-use function sprintf;
-use const SORT_STRING;
 
 #[CoversNothing]
 final class MutatorRobustnessTest extends TestCase

@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Command\CustomMutatorCommand;
 use function array_merge;
 use function class_exists;
 use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\CustomMutatorCommand;
 use Infection\Command\DescribeCommand;
 use Infection\Command\RunCommand;
 use Infection\Container;

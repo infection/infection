@@ -90,6 +90,8 @@ parameters:
         - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
         - %currentWorkingDirectory%/src/FileSystem/DummySymfony5FileSystem.php
         - %currentWorkingDirectory%/src/FileSystem/DummySymfony6FileSystem.php
+        - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__.php
+        - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__Test.php
     stubFiles:
         - phpstan.stub
     treatPhpDocTypesAsCertain: false

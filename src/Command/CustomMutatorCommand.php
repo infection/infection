@@ -35,22 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-use function array_key_exists;
-use function array_keys;
 use Infection\Console\IO;
-use Infection\Mutator\Definition;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorResolver;
-use Infection\Mutator\ProfileList;
-use function getcwd;
 use function iterator_to_array;
+use RuntimeException;
+use function Safe\getcwd;
 use function sprintf;
+use function str_replace;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Question\Question;
-use Webmozart\Assert\Assert;
-use function str_replace;
+use Symfony\Component\Finder\Finder;
+use function trim;
+use function ucfirst;
 
 /**
  * @internal
@@ -71,9 +66,9 @@ final class CustomMutatorCommand extends BaseCommand
 
         if ($mutator === null) {
             $question = new Question('What mutator do you wish to create (e.g. `AnyStringToInfectedMutator`)?');
-            $question->setValidator(function (string|null $answer): string {
+            $question->setValidator(static function (?string $answer): string {
                 if ($answer === null || trim($answer) === '') {
-                    throw new \RuntimeException('Mutator name is mandaory.');
+                    throw new RuntimeException('Mutator name is mandaory.');
                 }
 
                 return $answer;
@@ -112,7 +107,7 @@ final class CustomMutatorCommand extends BaseCommand
         $io->title('Generated files');
         $io->listing($generatedFilePaths);
         $io->success(
-            sprintf('Base classes for the "%s" mutator were created. Complee the missing parts inside them.', $mutator)
+            sprintf('Base classes for the "%s" mutator were created. Complee the missing parts inside them.', $mutator),
         );
 
         return true;

@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Testing;
 
-use Infection\CannotBeInstantiated;
 use function array_map;
 use function explode;
 use function implode;
+use Infection\CannotBeInstantiated;
 
+/**
+ * @internal
+ */
 final class StringNormalizer
 {
     use CannotBeInstantiated;

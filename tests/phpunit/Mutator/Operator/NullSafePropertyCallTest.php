@@ -37,9 +37,9 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Mutator\Operator\NullSafePropertyCall;
 use Infection\Testing\BaseMutatorTestCase;
+use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use const PHP_VERSION_ID;
 
 #[CoversClass(NullSafePropertyCall::class)]
 final class NullSafePropertyCallTest extends BaseMutatorTestCase

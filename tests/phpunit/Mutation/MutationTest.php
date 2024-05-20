@@ -35,17 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
+use function array_merge;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
 use Infection\Testing\MutatorName;
+use function md5;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function array_merge;
-use function md5;
 
 #[CoversClass(Mutation::class)]
 final class MutationTest extends TestCase

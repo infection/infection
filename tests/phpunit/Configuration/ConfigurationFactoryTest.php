@@ -57,6 +57,7 @@ use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\DummyCiDetector;
+use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -64,7 +65,6 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
-use function Infection\Tests\normalizePath;
 use function sys_get_temp_dir;
 
 #[Group('integration')]

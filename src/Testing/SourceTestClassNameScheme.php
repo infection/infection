@@ -41,6 +41,9 @@ use function Safe\preg_replace;
 use function str_contains;
 use function str_replace;
 
+/**
+ * @internal
+ */
 final class SourceTestClassNameScheme
 {
     use CannotBeInstantiated;

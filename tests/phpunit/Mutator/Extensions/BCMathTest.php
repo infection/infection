@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Extensions;
 
+use function array_map;
+use function implode;
 use Infection\Mutator\Extensions\BCMath;
 use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use function array_map;
-use function implode;
 use function range;
 use function strtoupper;
 use function ucfirst;

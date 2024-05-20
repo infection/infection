@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Testing;
 
+use function array_flip;
 use Infection\CannotBeInstantiated;
 use Infection\Mutator\ProfileList;
 use Webmozart\Assert\Assert;
-use function array_flip;
 
+/**
+ * @internal
+ */
 final class MutatorName
 {
     use CannotBeInstantiated;

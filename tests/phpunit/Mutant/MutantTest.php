@@ -41,11 +41,11 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
 use Infection\Testing\MutatorName;
+use function Later\now;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function Later\now;
 
 #[CoversClass(Mutant::class)]
 final class MutantTest extends TestCase

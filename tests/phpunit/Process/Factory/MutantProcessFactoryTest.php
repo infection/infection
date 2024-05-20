@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Factory;
 
+use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\MutantProcessWasFinished;
@@ -47,11 +48,10 @@ use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
+use const PHP_OS_FAMILY;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function current;
-use const PHP_OS_FAMILY;
 
 #[CoversClass(MutantProcessFactory::class)]
 final class MutantProcessFactoryTest extends TestCase

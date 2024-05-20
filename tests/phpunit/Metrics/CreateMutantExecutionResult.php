@@ -40,8 +40,8 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Testing\MutatorName;
 use function Later\now;
-use function str_replace;
 use const PHP_EOL;
+use function str_replace;
 
 trait CreateMutantExecutionResult
 {

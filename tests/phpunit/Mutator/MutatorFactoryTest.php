@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use function array_fill_keys;
+use function array_values;
+use function count;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\IgnoreMutator;
@@ -52,11 +55,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use stdClass;
-use function array_fill_keys;
-use function array_values;
-use function count;
 use function sprintf;
+use stdClass;
 
 #[CoversClass(MutatorFactory::class)]
 final class MutatorFactoryTest extends TestCase

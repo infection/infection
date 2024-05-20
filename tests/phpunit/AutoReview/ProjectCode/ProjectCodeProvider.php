@@ -41,6 +41,7 @@ use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\CustomMutatorCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
@@ -79,6 +80,13 @@ use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
+use Infection\Testing\BaseMutatorTestCase;
+use Infection\Testing\MutatorName;
+use Infection\Testing\SimpleMutation;
+use Infection\Testing\SimpleMutationsCollectorVisitor;
+use Infection\Testing\SingletonContainer;
+use Infection\Testing\SourceTestClassNameScheme;
+use Infection\Testing\StringNormalizer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
@@ -120,6 +128,14 @@ final class ProjectCodeProvider
         DispatchPcntlSignalSubscriber::class,
         StopInfectionOnSigintSignalSubscriber::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
+        MutatorName::class,
+        BaseMutatorTestCase::class,
+        SimpleMutation::class,
+        StringNormalizer::class,
+        SourceTestClassNameScheme::class,
+        SimpleMutationsCollectorVisitor::class,
+        CustomMutatorCommand::class,
+        SingletonContainer::class,
     ];
 
     /**
@@ -147,6 +163,7 @@ final class ProjectCodeProvider
         Mutator::class,
         Definition::class,
         MutatorCategory::class,
+        BaseMutatorTestCase::class,
     ];
 
     /**
@@ -177,6 +194,8 @@ final class ProjectCodeProvider
             ->name('*.php')
             ->notName('DummySymfony5FileSystem.php')
             ->notName('DummySymfony6FileSystem.php')
+            ->notName('__Name__.php')
+            ->notName('__Name__Test.php')
             ->in(__DIR__ . '/../../../../src')
         ;
 

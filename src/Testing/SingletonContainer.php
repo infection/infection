@@ -45,6 +45,8 @@ use PhpParser\PrettyPrinterAbstract;
  * Singleton for the container and a few services (used for tests). The goal is to avoid
  * instantiating multiple times stateless services across the tests to reduce the memory footprint
  * and remove some redundant code.
+ *
+ * @internal
  */
 final class SingletonContainer
 {

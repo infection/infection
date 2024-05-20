@@ -35,23 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Testing;
 
-use Infection\Mutator\Mutator;
-use Infection\Mutator\ProfileList;
-use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\Visitor\CloneVisitor;
-use Infection\PhpParser\Visitor\MutatorVisitor;
-use PhpParser\NodeTraverser;
-use PHPUnit\Framework\TestCase;
-use Webmozart\Assert\Assert;
 use function array_flip;
 use function array_key_exists;
 use function array_shift;
 use function count;
 use function escapeshellarg;
 use function implode;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\ProfileList;
+use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Visitor\CloneVisitor;
+use Infection\PhpParser\Visitor\MutatorVisitor;
+use const PHP_EOL;
+use PhpParser\NodeTraverser;
+use PHPUnit\Framework\TestCase;
 use function Safe\exec;
 use function sprintf;
-use const PHP_EOL;
+use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
