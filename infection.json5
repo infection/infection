@@ -8,7 +8,9 @@
         excludes: [
             "FileSystem/DummyFileSystem.php",
             "FileSystem/DummySymfony5FileSystem.php",
-            "FileSystem/DummySymfony6FileSystem.php"
+            "FileSystem/DummySymfony6FileSystem.php",
+            "CustomMutator/templates/__Name__.php",
+            "CustomMutator/templates/__Name__Test.php",
         ]
     },
     "logs": {
