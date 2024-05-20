@@ -86,7 +86,7 @@ abstract class BaseMutatorTestCase extends TestCase
             count($mutants),
             $expectedCodeSamples,
             sprintf(
-                'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Mutants are: %s',
+                'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Make sure mutator is enabled and mutates the source code. Mutants are: %s',
                 count($expectedCodeSamples),
                 count($mutants),
                 StringNormalizer::normalizeString(implode(PHP_EOL, $mutants)),
