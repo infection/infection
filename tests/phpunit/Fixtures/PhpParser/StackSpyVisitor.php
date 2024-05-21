@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\PhpParser;
 
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitorAbstract;
-use function array_unshift;
 
 final class StackSpyVisitor implements NodeVisitor
 {
