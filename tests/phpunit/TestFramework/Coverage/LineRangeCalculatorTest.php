@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -58,7 +58,7 @@ final class LineRangeCalculatorTest extends TestCase
         $spy = $this->createSpyTraverser();
 
         $traverser = new NodeTraverser();
-        $traverser->addVisitor(new ParentConnectorVisitor());
+        $traverser->addVisitor(new ParentConnectingVisitor());
         $traverser->addVisitor($spy);
         $traverser->traverse($nodes);
 
