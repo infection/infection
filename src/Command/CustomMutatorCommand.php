@@ -81,9 +81,9 @@ final class CustomMutatorCommand extends BaseCommand
         $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
 
         foreach ($filePaths as $filePath) {
-            // replace __Name__ with $mutator
-            $newContent = $this->replaceNameVariable($mutatorName, file_get_contents($filePath));
-            $replacedNamePath = $this->replaceNameVariable($mutatorName, basename($filePath));
+            // replace __Name__ with $mutatorName
+            $newContent = self::replaceNameVariable($mutatorName, file_get_contents($filePath));
+            $replacedNamePath = self::replaceNameVariable($mutatorName, basename($filePath));
 
             $newFilePath = $currentDirectory . '/src/Mutator/' . $replacedNamePath;
 
@@ -101,7 +101,7 @@ final class CustomMutatorCommand extends BaseCommand
         return true;
     }
 
-    private function replaceNameVariable(string $rectorName, string $contents): string
+    private static function replaceNameVariable(string $rectorName, string $contents): string
     {
         return str_replace('__Name__', $rectorName, $contents);
     }
