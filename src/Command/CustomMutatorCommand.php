@@ -68,7 +68,7 @@ final class CustomMutatorCommand extends BaseCommand
             $question = new Question('What mutator do you wish to create (e.g. `AnyStringToInfectedMutator`)?');
             $question->setValidator(static function (?string $answer): string {
                 if ($answer === null || trim($answer) === '') {
-                    throw new RuntimeException('Mutator name is mandaory.');
+                    throw new RuntimeException('Mutator name is mandatory.');
                 }
 
                 return $answer;
