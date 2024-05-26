@@ -70,27 +70,12 @@ final class CustomMutatorCommand extends BaseCommand
 
         $mutatorName = ucfirst((string) $mutatorName);
 
-        $filePaths = [
+        $templateFilePaths = [
             __DIR__ . '/../CustomMutator/templates/__Name__.php',
             __DIR__ . '/../CustomMutator/templates/__Name__Test.php',
         ];
 
-        $currentDirectory = getcwd();
-        $generatedFilePaths = [];
-
-        $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
-
-        foreach ($filePaths as $filePath) {
-            // replace __Name__ with $mutatorName
-            $newContent = self::replaceNameVariable($mutatorName, file_get_contents($filePath));
-            $replacedNamePath = self::replaceNameVariable($mutatorName, basename($filePath));
-
-            $newFilePath = $currentDirectory . '/src/Mutator/' . $replacedNamePath;
-
-            $fileSystem->dumpFile($newFilePath, $newContent);
-
-            $generatedFilePaths[] = $newFilePath;
-        }
+        $generatedFilePaths = $this->createProjectFilesFromTemplates($templateFilePaths, $mutatorName);
 
         $io->title('Generated files');
         $io->listing($generatedFilePaths);
@@ -120,5 +105,31 @@ final class CustomMutatorCommand extends BaseCommand
         return $io->askQuestion(
             $question,
         );
+    }
+
+    /**
+     * @param list<string> $filePaths
+     * @return list<string>
+     */
+    private function createProjectFilesFromTemplates(array $filePaths, string $mutatorName): array
+    {
+        $currentDirectory = getcwd();
+        $generatedFilePaths = [];
+
+        $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
+
+        foreach ($filePaths as $filePath) {
+            // replace __Name__ with $mutatorName
+            $newContent = self::replaceNameVariable($mutatorName, file_get_contents($filePath));
+            $replacedNamePath = self::replaceNameVariable($mutatorName, basename($filePath));
+
+            $newFilePath = $currentDirectory . '/src/Mutator/' . $replacedNamePath;
+
+            $fileSystem->dumpFile($newFilePath, $newContent);
+
+            $generatedFilePaths[] = $newFilePath;
+        }
+
+        return $generatedFilePaths;
     }
 }
