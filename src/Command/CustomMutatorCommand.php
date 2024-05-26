@@ -62,9 +62,9 @@ final class CustomMutatorCommand extends BaseCommand
 
     protected function executeCommand(IO $io): bool
     {
-        $mutator = $io->getInput()->getArgument('Mutator name');
+        $mutatorName = $io->getInput()->getArgument('Mutator name');
 
-        if ($mutator === null) {
+        if ($mutatorName === null) {
             $question = new Question('What mutator do you wish to create (e.g. `AnyStringToInfectedMutator`)?');
             $question->setValidator(static function (?string $answer): string {
                 if ($answer === null || trim($answer) === '') {
@@ -73,12 +73,12 @@ final class CustomMutatorCommand extends BaseCommand
 
                 return $answer;
             });
-            $mutator = $io->askQuestion(
+            $mutatorName = $io->askQuestion(
                 $question,
             );
         }
 
-        $mutator = ucfirst((string) $mutator);
+        $mutatorName = ucfirst((string) $mutatorName);
 
         // find all files in templates directory
         $finder = Finder::create()
@@ -94,8 +94,8 @@ final class CustomMutatorCommand extends BaseCommand
 
         foreach ($fileInfos as $fileInfo) {
             // replace __Name__ with $mutator
-            $newContent = $this->replaceNameVariable($mutator, $fileInfo->getContents());
-            $replacedNamePath = $this->replaceNameVariable($mutator, $fileInfo->getRelativePathname());
+            $newContent = $this->replaceNameVariable($mutatorName, $fileInfo->getContents());
+            $replacedNamePath = $this->replaceNameVariable($mutatorName, $fileInfo->getRelativePathname());
 
             $newFilePath = $currentDirectory . '/src/Mutator/' . $replacedNamePath;
 
@@ -107,7 +107,7 @@ final class CustomMutatorCommand extends BaseCommand
         $io->title('Generated files');
         $io->listing($generatedFilePaths);
         $io->success(
-            sprintf('Base classes for the "%s" mutator were created. Complee the missing parts inside them.', $mutator),
+            sprintf('Base classes for the "%s" mutator were created. Complee the missing parts inside them.', $mutatorName),
         );
 
         return true;
