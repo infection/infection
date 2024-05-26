@@ -65,17 +65,7 @@ final class CustomMutatorCommand extends BaseCommand
         $mutatorName = $io->getInput()->getArgument('Mutator name');
 
         if ($mutatorName === null) {
-            $question = new Question('What mutator do you wish to create (e.g. `AnyStringToInfectedMutator`)?');
-            $question->setValidator(static function (?string $answer): string {
-                if ($answer === null || trim($answer) === '') {
-                    throw new RuntimeException('Mutator name is mandatory.');
-                }
-
-                return $answer;
-            });
-            $mutatorName = $io->askQuestion(
-                $question,
-            );
+            $mutatorName = $this->askMutatorName($io);
         }
 
         $mutatorName = ucfirst((string) $mutatorName);
@@ -116,5 +106,21 @@ final class CustomMutatorCommand extends BaseCommand
     private function replaceNameVariable(string $rectorName, string $contents): string
     {
         return str_replace('__Name__', $rectorName, $contents);
+    }
+
+    private function askMutatorName(IO $io): mixed
+    {
+        $question = new Question('What mutator do you wish to create (e.g. `AnyStringToInfectedMutator`)?');
+        $question->setValidator(static function (?string $answer): string {
+            if ($answer === null || trim($answer) === '') {
+                throw new RuntimeException('Mutator name is mandatory.');
+            }
+
+            return $answer;
+        });
+
+        return $io->askQuestion(
+            $question,
+        );
     }
 }
