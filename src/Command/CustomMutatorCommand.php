@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use function basename;
-use function file_get_contents;
 use Infection\Console\IO;
 use RuntimeException;
 use function Safe\getcwd;
+use function Safe\file_get_contents;
 use function sprintf;
 use function str_replace;
 use Symfony\Component\Console\Input\InputArgument;
