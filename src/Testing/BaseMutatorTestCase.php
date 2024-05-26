@@ -64,10 +64,10 @@ abstract class BaseMutatorTestCase extends TestCase
     }
 
     /**
-     * @param string|string[] $expectedCode
+     * @param string|string[]|null $expectedCode
      * @param mixed[] $settings
      */
-    final public function doTest(string $inputCode, $expectedCode = [], array $settings = [], bool $allowInvalidCode = false): void
+    final protected function assertMutatesInput(string $inputCode, string|array|null $expectedCode = [], array $settings = [], bool $allowInvalidCode = false): void
     {
         $expectedCodeSamples = (array) $expectedCode;
 

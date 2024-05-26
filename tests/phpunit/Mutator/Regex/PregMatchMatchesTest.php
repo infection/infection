@@ -49,7 +49,7 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $output = []): void
     {
-        $this->doTest($input, $output);
+        $this->assertMutatesInput($input, $output);
     }
 
     public static function mutationsProvider(): iterable

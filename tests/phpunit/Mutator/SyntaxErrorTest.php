@@ -49,7 +49,7 @@ final class SyntaxErrorTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected, [], true);
+        $this->assertMutatesInput($input, $expected, [], true);
     }
 
     public static function mutationsProvider(): iterable

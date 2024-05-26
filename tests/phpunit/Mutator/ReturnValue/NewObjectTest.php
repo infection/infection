@@ -55,7 +55,7 @@ final class NewObjectTest extends BaseMutatorTestCase
         if (!$allowed) {
             $this->markTestSkipped($message);
         }
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
     public static function mutationsProvider(): iterable

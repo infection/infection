@@ -54,7 +54,7 @@ final class NullSafeMethodCallTest extends BaseMutatorTestCase
             $this->markTestSkipped('Null Safe operator is available only in PHP 8 or higher');
         }
 
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
     public static function mutationsProvider(): iterable

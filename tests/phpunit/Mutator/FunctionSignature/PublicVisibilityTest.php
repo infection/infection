@@ -51,7 +51,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
     {
         $code = MutatorFixturesProvider::getFixtureFileContent(self::class, "pv-{$functionName}.php");
 
-        $this->doTest($code);
+        $this->assertMutatesInput($code);
     }
 
     public static function blacklistedProvider(): array
@@ -76,7 +76,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
     public static function mutationsProvider(): iterable
