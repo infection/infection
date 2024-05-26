@@ -55,10 +55,7 @@ use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
-    /**
-     * @var Mutator
-     */
-    protected $mutator;
+    protected Mutator $mutator;
 
     protected function setUp(): void
     {
