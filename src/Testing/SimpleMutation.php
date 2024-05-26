@@ -45,16 +45,13 @@ use PhpParser\Node;
  */
 final class SimpleMutation extends Mutation
 {
-    /**
-     * @param MutatedNode $mutatedNode
-     */
     public function __construct(
         /**
          * @var Node[]
          */
         private readonly array $originalFileAst,
         private readonly Mutator $mutator,
-        private $mutatedNode,
+        private MutatedNode $mutatedNode,
         private readonly array $attributes,
         private readonly string $mutatedNodeClass,
     ) {
