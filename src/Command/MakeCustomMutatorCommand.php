@@ -38,8 +38,8 @@ namespace Infection\Command;
 use function basename;
 use Infection\Console\IO;
 use RuntimeException;
-use function Safe\getcwd;
 use function Safe\file_get_contents;
+use function Safe\getcwd;
 use function sprintf;
 use function str_replace;
 use Symfony\Component\Console\Input\InputArgument;
@@ -50,12 +50,12 @@ use function ucfirst;
 /**
  * @internal
  */
-final class CustomMutatorCommand extends BaseCommand
+final class MakeCustomMutatorCommand extends BaseCommand
 {
     protected function configure(): void
     {
         $this
-            ->setName('custom-mutator')
+            ->setName('make:custom-mutator')
             ->setDescription('Creates a custom mutator')
             ->addArgument('Mutator name', InputArgument::OPTIONAL);
     }

@@ -41,7 +41,7 @@ use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
-use Infection\Command\CustomMutatorCommand;
+use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
@@ -134,7 +134,7 @@ final class ProjectCodeProvider
         StringNormalizer::class,
         SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
-        CustomMutatorCommand::class,
+        MakeCustomMutatorCommand::class,
         SingletonContainer::class,
     ];
 
