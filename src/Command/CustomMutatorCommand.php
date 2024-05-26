@@ -80,7 +80,7 @@ final class CustomMutatorCommand extends BaseCommand
         $io->title('Generated files');
         $io->listing($generatedFilePaths);
         $io->success(
-            sprintf('Base classes for the "%s" mutator were created. Complete the missing parts inside them.', $mutatorName),
+            sprintf('Base classes for the mutator "%s" were created. Complete the missing parts inside them.', $mutatorName),
         );
 
         return true;
