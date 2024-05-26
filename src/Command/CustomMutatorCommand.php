@@ -35,15 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function basename;
+use function file_get_contents;
 use Infection\Console\IO;
-use function iterator_to_array;
 use RuntimeException;
 use function Safe\getcwd;
 use function sprintf;
 use function str_replace;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Finder\Finder;
 use function trim;
 use function ucfirst;
 
@@ -70,22 +70,20 @@ final class CustomMutatorCommand extends BaseCommand
 
         $mutatorName = ucfirst((string) $mutatorName);
 
-        // find all files in templates directory
-        $finder = Finder::create()
-            ->files()
-            ->in(__DIR__ . '/../CustomMutator/templates');
+        $filePaths = [
+            __DIR__ . '/../CustomMutator/templates/__Name__.php',
+            __DIR__ . '/../CustomMutator/templates/__Name__Test.php',
+        ];
 
         $currentDirectory = getcwd();
-
         $generatedFilePaths = [];
 
-        $fileInfos = iterator_to_array($finder->getIterator());
         $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
 
-        foreach ($fileInfos as $fileInfo) {
+        foreach ($filePaths as $filePath) {
             // replace __Name__ with $mutator
-            $newContent = $this->replaceNameVariable($mutatorName, $fileInfo->getContents());
-            $replacedNamePath = $this->replaceNameVariable($mutatorName, $fileInfo->getRelativePathname());
+            $newContent = $this->replaceNameVariable($mutatorName, file_get_contents($filePath));
+            $replacedNamePath = $this->replaceNameVariable($mutatorName, basename($filePath));
 
             $newFilePath = $currentDirectory . '/src/Mutator/' . $replacedNamePath;
 
