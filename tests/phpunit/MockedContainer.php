@@ -33,57 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command;
+namespace Infection\Tests;
 
-use Infection\Console\Application;
-use Infection\Console\IO;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\Assert\Assert;
+use Infection\Container;
 
-/**
- * @internal
- */
-abstract class BaseCommand extends Command
+final class MockedContainer
 {
-    protected ?IO $io = null;
-
-    final public function getApplication(): Application
+    /**
+     * @param array<class-string<object>, Closure(Container): object> $values
+     */
+    public static function createWithServices(array $values): Container
     {
-        $application = parent::getApplication();
-
-        Assert::isInstanceOf(
-            $application,
-            Application::class,
-            'Cannot access to the command application if the command has not been '
-            . 'registered to the application yet',
-        );
-
-        return $application;
-    }
-
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        parent::initialize($input, $output);
-
-        $this->io = new IO($input, $output);
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        return $this->executeCommand($this->getIO()) ? 0 : 1;
-    }
-
-    abstract protected function executeCommand(IO $io): bool;
-
-    final protected function getIO(): IO
-    {
-        Assert::notNull(
-            $this->io,
-            'Cannot retrieve the IO object before the command was initialized',
-        );
-
-        return $this->io;
+        return new Container($values);
     }
 }

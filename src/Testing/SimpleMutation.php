@@ -51,7 +51,7 @@ final class SimpleMutation extends Mutation
          */
         private readonly array $originalFileAst,
         private readonly Mutator $mutator,
-        private MutatedNode $mutatedNode,
+        private readonly MutatedNode $mutatedNode,
         private readonly array $attributes,
         private readonly string $mutatedNodeClass,
     ) {

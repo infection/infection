@@ -43,6 +43,8 @@ use function Safe\getcwd;
 use function sprintf;
 use function str_replace;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use function trim;
 use function ucfirst;
@@ -52,23 +54,30 @@ use function ucfirst;
  */
 final class MakeCustomMutatorCommand extends BaseCommand
 {
+    private const MUTATOT_NAME_ARGUMENT = 'Mutator name';
+
     protected function configure(): void
     {
         $this
             ->setName('make:custom-mutator')
             ->setDescription('Creates a custom mutator')
-            ->addArgument('Mutator name', InputArgument::OPTIONAL);
+            ->addArgument(self::MUTATOT_NAME_ARGUMENT, InputArgument::REQUIRED);
+    }
+
+    protected function interact(InputInterface $input, OutputInterface $output): void
+    {
+        $mutatorName = $input->getArgument(self::MUTATOT_NAME_ARGUMENT);
+
+        if ($this->mutatorNameIsEmpty($mutatorName)) {
+            $mutatorName = $this->askMutatorName();
+
+            $input->setArgument(self::MUTATOT_NAME_ARGUMENT, $mutatorName);
+        }
     }
 
     protected function executeCommand(IO $io): bool
     {
-        $mutatorName = $io->getInput()->getArgument('Mutator name');
-
-        if ($mutatorName === null) {
-            $mutatorName = $this->askMutatorName($io);
-        }
-
-        $mutatorName = ucfirst((string) $mutatorName);
+        $mutatorName = ucfirst(trim((string) $io->getInput()->getArgument(self::MUTATOT_NAME_ARGUMENT)));
 
         $templateFilePaths = [
             __DIR__ . '/../CustomMutator/templates/__Name__.php',
@@ -91,20 +100,26 @@ final class MakeCustomMutatorCommand extends BaseCommand
         return str_replace('__Name__', $rectorName, $contents);
     }
 
-    private function askMutatorName(IO $io): mixed
+    private function askMutatorName(): mixed
     {
         $question = new Question('What mutator do you wish to create (e.g. `AnyStringToInfectedMutator`)?');
-        $question->setValidator(static function (?string $answer): string {
-            if ($answer === null || trim($answer) === '') {
+
+        $question->setValidator(function (?string $answer): string {
+            if ($this->mutatorNameIsEmpty($answer)) {
                 throw new RuntimeException('Mutator name is mandatory.');
             }
 
             return $answer;
         });
 
-        return $io->askQuestion(
+        return $this->io->askQuestion(
             $question,
         );
+    }
+
+    private function mutatorNameIsEmpty(?string $mutatorName): bool
+    {
+        return $mutatorName === null || trim($mutatorName) === '';
     }
 
     /**

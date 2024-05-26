@@ -99,6 +99,7 @@ final class ContainerTest extends TestCase
                 __DIR__ . '/ContainerTest.php',
                 __DIR__ . '/../ContainerTest.php',
                 __DIR__ . '/../SingletonContainer.php',
+                __DIR__ . '/../MockedContainer.php',
             ],
         );
 

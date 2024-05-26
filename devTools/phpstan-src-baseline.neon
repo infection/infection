@@ -1,6 +1,16 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Anonymous function should return string but returns string\\|null\\.$#"
+			count: 1
+			path: ../src/Command/MakeCustomMutatorCommand.php
+
+		-
+			message: "#^Cannot call method askQuestion\\(\\) on Infection\\\\Console\\\\IO\\|null\\.$#"
+			count: 1
+			path: ../src/Command/MakeCustomMutatorCommand.php
+
+		-
 			message: "#^Parameter \\#1 \\$array of static method Webmozart\\\\Assert\\\\Assert\\:\\:keyExists\\(\\) expects array, iterable\\<\\(int\\|string\\), string\\>\\|null given\\.$#"
 			count: 2
 			path: ../src/Differ/DiffChangedLinesParser.php

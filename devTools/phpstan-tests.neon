@@ -42,6 +42,10 @@ parameters:
             message: "#^Instantiated class Infection\\\\Tests\\\\Fixtures\\\\Console\\\\FakeOutput not found\\.$#"
             count: 11
             path:  ../tests/*
+        -
+            message: "#^PHPDoc tag @param for parameter \\$values contains unresolvable type\\.$#"
+            count: 1
+            path: ../tests/phpunit/MockedContainer.php
     level: 4
     paths:
         - ../tests/phpunit
