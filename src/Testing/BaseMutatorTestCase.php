@@ -59,7 +59,6 @@ abstract class BaseMutatorTestCase extends TestCase
 
     protected function setUp(): void
     {
-        // TODO: refactor this bit...
         $this->mutator = $this->createMutator();
     }
 
@@ -118,7 +117,6 @@ abstract class BaseMutatorTestCase extends TestCase
         $isBuiltinMutator = array_key_exists($mutatorClassName, array_flip(ProfileList::ALL_MUTATORS));
         $mutatorName = $isBuiltinMutator ? MutatorName::getName($mutatorClassName) : $mutatorClassName;
 
-        // TODO: this is a bit ridicule...
         return SingletonContainer::getContainer()
             ->getMutatorFactory()
             ->create([
