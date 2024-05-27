@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\CloneVisitor;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;

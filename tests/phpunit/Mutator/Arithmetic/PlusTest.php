@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
@@ -52,7 +52,7 @@ final class PlusTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
     public static function mutationsProvider(): iterable

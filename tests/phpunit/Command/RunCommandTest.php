@@ -37,7 +37,7 @@ namespace Infection\Tests\Command;
 
 use Infection\Command\RunCommand;
 use Infection\Console\Application;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

@@ -42,7 +42,7 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\Attributes\CoversClass;

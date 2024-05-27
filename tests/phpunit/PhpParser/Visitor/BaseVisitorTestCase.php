@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;

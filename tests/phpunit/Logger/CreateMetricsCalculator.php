@@ -42,7 +42,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Mutator\Regex\PregQuote;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use function Infection\Tests\normalize_trailing_spaces;
 use function Later\now;
 

@@ -37,6 +37,7 @@ namespace Infection\Tests;
 
 use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
+use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

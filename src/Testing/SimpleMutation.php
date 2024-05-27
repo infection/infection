@@ -33,33 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview;
+namespace Infection\Testing;
 
-use Infection\CannotBeInstantiated;
-use function Safe\preg_match;
-use function Safe\preg_replace;
-use function str_contains;
-use function str_replace;
+use Infection\Mutation\Mutation;
+use Infection\Mutator\Mutator;
+use Infection\PhpParser\MutatedNode;
+use PhpParser\Node;
 
-final class SourceTestClassNameScheme
+/**
+ * @internal
+ */
+final class SimpleMutation extends Mutation
 {
-    use CannotBeInstantiated;
-
-    public static function getSourceClassName(string $testCaseClassName): string
-    {
-        if (preg_match('/(Infection\\\\Tests\\\\.*)Test$/', $testCaseClassName, $matches) === 1) {
-            return str_replace('Infection\\Tests\\', 'Infection\\', (string) $matches[1]);
-        }
-
-        return $testCaseClassName;
+    public function __construct(
+        /**
+         * @var Node[]
+         */
+        private readonly array $originalFileAst,
+        private readonly Mutator $mutator,
+        private readonly MutatedNode $mutatedNode,
+        private readonly array $attributes,
+        private readonly string $mutatedNodeClass,
+    ) {
     }
 
-    public static function getTestClassName(string $sourceClassName): string
+    public function getMutator(): Mutator
     {
-        if (str_contains($sourceClassName, 'Infection\\Tests')) {
-            return $sourceClassName . 'Test';
-        }
+        return $this->mutator;
+    }
 
-        return preg_replace('/Infection/', 'Infection\\Tests', $sourceClassName, 1) . 'Test';
+    public function getOriginalFileAst(): array
+    {
+        return $this->originalFileAst;
+    }
+
+    public function getMutatedNode(): MutatedNode
+    {
+        return $this->mutatedNode;
+    }
+
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    public function getMutatedNodeClass(): string
+    {
+        return $this->mutatedNodeClass;
     }
 }

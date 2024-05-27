@@ -49,7 +49,7 @@ use Infection\Console\Application;
 use Infection\Console\E2E;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use function is_readable;
 use const PHP_EOL;
 use const PHP_OS;

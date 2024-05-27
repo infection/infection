@@ -40,7 +40,7 @@ use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use function Later\now;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;

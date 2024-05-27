@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutator\Extensions;
 use function array_map;
 use function implode;
 use Infection\Mutator\Extensions\BCMath;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use function range;
@@ -54,7 +54,7 @@ final class BCMathTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
     {
-        $this->doTest($input, $expected, $settings);
+        $this->assertMutatesInput($input, $expected, $settings);
     }
 
     public static function mutationsProvider(): iterable

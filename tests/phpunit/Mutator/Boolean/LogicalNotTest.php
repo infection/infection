@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\LogicalNot;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
@@ -52,7 +52,7 @@ final class LogicalNotTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
     public static function mutationsProvider(): iterable

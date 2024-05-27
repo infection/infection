@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use Infection\Tests\Mutator\ProfileListProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;

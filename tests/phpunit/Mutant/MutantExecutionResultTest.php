@@ -41,7 +41,7 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use function Later\now;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\ReturnValue\IntegerNegation;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt\Return_;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -51,7 +51,7 @@ final class IntegerNegationTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
     public static function mutationsProvider(): iterable

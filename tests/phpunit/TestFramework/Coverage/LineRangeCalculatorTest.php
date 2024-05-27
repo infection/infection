@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;

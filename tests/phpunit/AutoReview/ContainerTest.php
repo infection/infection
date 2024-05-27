@@ -37,8 +37,8 @@ namespace Infection\Tests\AutoReview;
 
 use function array_map;
 use function in_array;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
@@ -99,6 +99,7 @@ final class ContainerTest extends TestCase
                 __DIR__ . '/ContainerTest.php',
                 __DIR__ . '/../ContainerTest.php',
                 __DIR__ . '/../SingletonContainer.php',
+                __DIR__ . '/../MockedContainer.php',
             ],
         );
 

@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Extensions;
 
 use function defined;
 use Infection\Mutator\Extensions\MBString;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use function Safe\define;
@@ -56,7 +56,7 @@ final class MBStringTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
     {
-        $this->doTest($input, $expected, $settings);
+        $this->assertMutatesInput($input, $expected, $settings);
     }
 
     public static function mutationsProvider(): iterable

@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutator;
 use function array_keys;
 use function in_array;
 use Infection\Mutator\ProfileList;
+use Infection\Testing\MutatorName;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;

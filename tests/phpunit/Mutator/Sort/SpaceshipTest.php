@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Sort;
 
 use Infection\Mutator\Sort\Spaceship;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -54,7 +54,7 @@ final class SpaceshipTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
     public static function mutationsProvider(): iterable

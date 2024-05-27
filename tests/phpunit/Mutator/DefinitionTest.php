@@ -42,7 +42,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\ProfileList;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

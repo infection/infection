@@ -47,7 +47,7 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Removal\ArrayItemRemoval;
 use Infection\Mutator\Removal\MethodCallRemoval;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use function Infection\Tests\normalize_trailing_spaces;
 use JsonSchema\Validator;
 use function Later\now;

@@ -13,6 +13,8 @@
         <directory name="src" />
         <ignoreFiles>
             <directory name="src/PhpParser" />
+            <directory name="src/Testing" />
+            <directory name="src/CustomMutator/templates" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>

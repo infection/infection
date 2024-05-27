@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\TrueValue;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -52,7 +52,7 @@ final class TrueValueTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate($input, $expected = [], array $settings = []): void
     {
-        $this->doTest($input, $expected, $settings);
+        $this->assertMutatesInput($input, $expected, $settings);
     }
 
     public static function mutationsProvider(): iterable

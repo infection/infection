@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Mutator\Operator\NullSafeMethodCall;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -54,7 +54,7 @@ final class NullSafeMethodCallTest extends BaseMutatorTestCase
             $this->markTestSkipped('Null Safe operator is available only in PHP 8 or higher');
         }
 
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
     public static function mutationsProvider(): iterable

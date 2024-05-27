@@ -39,6 +39,7 @@ use DomainException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NoopMutator;
+use Infection\Testing\MutatorName;
 use function iterator_to_array;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;

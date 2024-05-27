@@ -37,8 +37,8 @@ namespace Infection\Tests\PhpParser;
 
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\UnparsableFile;
-use Infection\Tests\SingletonContainer;
-use Infection\Tests\StringNormalizer;
+use Infection\Testing\SingletonContainer;
+use Infection\Testing\StringNormalizer;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\Parser;

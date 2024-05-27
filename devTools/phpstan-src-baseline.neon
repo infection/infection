@@ -1,6 +1,16 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Anonymous function should return string but returns string\\|null\\.$#"
+			count: 1
+			path: ../src/Command/MakeCustomMutatorCommand.php
+
+		-
+			message: "#^Cannot call method askQuestion\\(\\) on Infection\\\\Console\\\\IO\\|null\\.$#"
+			count: 1
+			path: ../src/Command/MakeCustomMutatorCommand.php
+
+		-
 			message: "#^Parameter \\#1 \\$array of static method Webmozart\\\\Assert\\\\Assert\\:\\:keyExists\\(\\) expects array, iterable\\<\\(int\\|string\\), string\\>\\|null given\\.$#"
 			count: 2
 			path: ../src/Differ/DiffChangedLinesParser.php
@@ -79,3 +89,83 @@ parameters:
 			message: "#^Cannot access offset 0 on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
 			count: 1
 			path: ../src/TestFramework/VersionParser.php
+
+		-
+			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertCount\\(\\)\\.$#"
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\)\\.$#"
+			count: 2
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:fail\\(\\)\\.$#"
+			count: 2
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Method Infection\\\\Testing\\\\BaseMutatorTestCase\\:\\:createMutator\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Method Infection\\\\Testing\\\\BaseMutatorTestCase\\:\\:createMutator\\(\\) return type with generic interface Infection\\\\Mutator\\\\Mutator does not specify its types\\: TNode$#"
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Method Infection\\\\Testing\\\\BaseMutatorTestCase\\:\\:getMutationsFromCode\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Method Infection\\\\Testing\\\\BaseMutatorTestCase\\:\\:mutate\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Parameter \\#1 \\$nodes of method PhpParser\\\\NodeTraverserInterface\\:\\:traverse\\(\\) expects array\\<PhpParser\\\\Node\\>, array\\<PhpParser\\\\Node\\\\Stmt\\>\\|null given\\.$#"
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Parameter \\#1 \\$resolvedMutators of method Infection\\\\Mutator\\\\MutatorFactory\\:\\:create\\(\\) expects array\\<class\\-string\\<Infection\\\\Mutator\\\\ConfigurableMutator\\<PhpParser\\\\Node\\>\\>, array\\>, non\\-empty\\-array\\<string, array\\{settings\\: array\\}\\> given\\.$#"
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Parameter \\#2 \\$fileAst of class Infection\\\\Testing\\\\SimpleMutationsCollectorVisitor constructor expects array\\<PhpParser\\\\Node\\>, array\\<PhpParser\\\\Node\\\\Stmt\\>\\|null given\\.$#"
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Property Infection\\\\Testing\\\\BaseMutatorTestCase\\:\\:\\$mutator with generic interface Infection\\\\Mutator\\\\Mutator does not specify its types\\: TNode$#"
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			message: "#^Class Infection\\\\Testing\\\\SimpleMutation extends @final class Infection\\\\Mutation\\\\Mutation\\.$#"
+			count: 1
+			path: ../src/Testing/SimpleMutation.php
+
+		-
+			message: "#^Infection\\\\Testing\\\\SimpleMutation\\:\\:__construct\\(\\) does not call parent constructor from Infection\\\\Mutation\\\\Mutation\\.$#"
+			count: 1
+			path: ../src/Testing/SimpleMutation.php
+
+		-
+			message: "#^Method Infection\\\\Testing\\\\SimpleMutation\\:\\:__construct\\(\\) has parameter \\$mutator with generic interface Infection\\\\Mutator\\\\Mutator but does not specify its types\\: TNode$#"
+			count: 1
+			path: ../src/Testing/SimpleMutation.php
+
+		-
+			message: "#^Method Infection\\\\Testing\\\\SimpleMutation\\:\\:getMutator\\(\\) return type with generic interface Infection\\\\Mutator\\\\Mutator does not specify its types\\: TNode$#"
+			count: 1
+			path: ../src/Testing/SimpleMutation.php
+
+		-
+			message: "#^Cannot access offset 1 on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
+			count: 1
+			path: ../src/Testing/SourceTestClassNameScheme.php

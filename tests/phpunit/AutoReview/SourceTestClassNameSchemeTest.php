@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use Infection\Testing\SourceTestClassNameScheme;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

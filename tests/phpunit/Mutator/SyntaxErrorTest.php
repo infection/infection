@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\SyntaxError;
+use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -48,7 +49,7 @@ final class SyntaxErrorTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected, [], true);
+        $this->assertMutatesInput($input, $expected, [], true);
     }
 
     public static function mutationsProvider(): iterable

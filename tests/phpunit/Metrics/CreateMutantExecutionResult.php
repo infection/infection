@@ -38,7 +38,7 @@ namespace Infection\Tests\Metrics;
 use Infection\Metrics\Collector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use function Later\now;
 use const PHP_EOL;
 use function str_replace;

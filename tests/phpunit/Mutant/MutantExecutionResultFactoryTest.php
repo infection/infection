@@ -43,7 +43,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\MutantProcess;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;

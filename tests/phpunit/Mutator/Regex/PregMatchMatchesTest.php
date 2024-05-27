@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Regex;
 
 use Infection\Mutator\Regex\PregMatchMatches;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -49,7 +49,7 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $output = []): void
     {
-        $this->doTest($input, $output);
+        $this->assertMutatesInput($input, $output);
     }
 
     public static function mutationsProvider(): iterable

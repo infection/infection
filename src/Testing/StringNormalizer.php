@@ -33,46 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Testing;
 
-use Infection\Container;
-use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
-use PhpParser\NodeDumper;
-use PhpParser\PrettyPrinter\Standard;
-use PhpParser\PrettyPrinterAbstract;
+use function array_map;
+use function explode;
+use function implode;
+use Infection\CannotBeInstantiated;
 
 /**
- * Singleton for the container and a few services (used for tests). The goal is to avoid
- * instantiating multiple times stateless services across the tests to reduce the memory footprint
- * and remove some redundant code.
+ * @internal
  */
-final class SingletonContainer
+final class StringNormalizer
 {
-    private static ?Container $container = null;
+    use CannotBeInstantiated;
 
-    private static ?NodeDumper $dumper = null;
-
-    private static ?PrettyPrinterAbstract $printer = null;
-
-    private static ?PHPDocParser $phpDocParser = null;
-
-    public static function getContainer(): Container
+    public static function normalizeString(string $string): string
     {
-        return self::$container ??= Container::create();
-    }
-
-    public static function getNodeDumper(): NodeDumper
-    {
-        return self::$dumper ??= new NodeDumper();
-    }
-
-    public static function getPrinter(): PrettyPrinterAbstract
-    {
-        return self::$printer ??= new Standard();
-    }
-
-    public static function getPHPDocParser(): PHPDocParser
-    {
-        return self::$phpDocParser ??= new PHPDocParser();
+        return implode(
+            "\n",
+            array_map('rtrim', explode("\n", $string)),
+        );
     }
 }

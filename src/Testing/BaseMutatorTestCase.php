@@ -33,21 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator;
+namespace Infection\Testing;
 
+use function array_flip;
+use function array_key_exists;
 use function array_shift;
 use function count;
 use function escapeshellarg;
 use function implode;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
-use Infection\Tests\AutoReview\SourceTestClassNameScheme;
-use Infection\Tests\Fixtures\SimpleMutation;
-use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
-use Infection\Tests\SingletonContainer;
-use Infection\Tests\StringNormalizer;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
@@ -57,22 +55,18 @@ use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
-    /**
-     * @var Mutator
-     */
-    protected $mutator;
+    protected Mutator $mutator;
 
     protected function setUp(): void
     {
-        // TODO: refactor this bit...
         $this->mutator = $this->createMutator();
     }
 
     /**
-     * @param string|string[] $expectedCode
+     * @param string|string[]|null $expectedCode
      * @param mixed[] $settings
      */
-    final public function doTest(string $inputCode, $expectedCode = [], array $settings = [], bool $allowInvalidCode = false): void
+    final protected function assertMutatesInput(string $inputCode, string|array|null $expectedCode = [], array $settings = [], bool $allowInvalidCode = false): void
     {
         $expectedCodeSamples = (array) $expectedCode;
 
@@ -88,7 +82,7 @@ abstract class BaseMutatorTestCase extends TestCase
             count($mutants),
             $expectedCodeSamples,
             sprintf(
-                'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Mutants are: %s',
+                'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Make sure mutator is enabled and mutates the source code. Mutants are: %s',
                 count($expectedCodeSamples),
                 count($mutants),
                 StringNormalizer::normalizeString(implode(PHP_EOL, $mutants)),
@@ -118,15 +112,22 @@ abstract class BaseMutatorTestCase extends TestCase
 
     final protected function createMutator(array $settings = []): Mutator
     {
-        $mutatorClassName = SourceTestClassNameScheme::getSourceClassName(static::class);
+        $mutatorClassName = $this->getTestedMutatorClassName();
 
-        // TODO: this is a bit ridicule...
+        $isBuiltinMutator = array_key_exists($mutatorClassName, array_flip(ProfileList::ALL_MUTATORS));
+        $mutatorName = $isBuiltinMutator ? MutatorName::getName($mutatorClassName) : $mutatorClassName;
+
         return SingletonContainer::getContainer()
             ->getMutatorFactory()
             ->create([
                 $mutatorClassName => ['settings' => $settings],
-            ], false)[MutatorName::getName($mutatorClassName)]
+            ], false)[$mutatorName]
         ;
+    }
+
+    protected function getTestedMutatorClassName(): string
+    {
+        return SourceTestClassNameScheme::getSourceClassName(static::class);
     }
 
     /**
@@ -189,7 +190,7 @@ abstract class BaseMutatorTestCase extends TestCase
             $returnCode,
             sprintf(
                 'Mutator %s produces invalid code',
-                $this->createMutator()->getName(),
+                $this->mutator->getName(),
             ),
         );
     }

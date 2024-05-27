@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Number;
 
 use Infection\Mutator\Number\IncrementInteger;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use const PHP_INT_MAX;
 use const PHP_INT_MIN;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -51,7 +51,7 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
     public static function mutationsProvider(): iterable
