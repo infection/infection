@@ -14,5 +14,10 @@
     },
     "require": {
         "infection/mutator": "^0.4.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "infection/extension-installer": true
+        }
     }
 }

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\MutatorParser;
+use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -43,10 +44,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MutatorParser::class)]
 final class MutatorParserTest extends TestCase
 {
-    /**
-     * @var MutatorParser
-     */
-    private $mutatorParser;
+    private MutatorParser $mutatorParser;
 
     protected function setUp(): void
     {
@@ -97,6 +95,16 @@ final class MutatorParserTest extends TestCase
                 'TrueValue',
                 'FalseValue',
                 '@boolean',
+            ],
+        ];
+
+        yield 'custom mutator class' => [
+            'Minus,@boolean,Infection\\Tests\\Fixtures\\Mutator\\FakeMutator,Minus',
+            [
+                'Minus',
+                '@boolean',
+                FakeMutator::class,
+                'Minus',
             ],
         ];
     }

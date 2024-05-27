@@ -86,6 +86,10 @@ final class MutatorParser
                 continue;
             }
 
+            if (MutatorResolver::isValidMutator($profileOrMutator)) {
+                continue;
+            }
+
             throw new UnexpectedValueException(
                 sprintf(
                     'Expected "%s" to be a known mutator or profile. See "%s" and "%s" for '
