@@ -319,7 +319,7 @@ final class StrykerHtmlReportBuilder
     {
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
-        /** @var Mutator<NodeAbstract> $mutatorClass */
+        /** @var class-string<Mutator<NodeAbstract>> $mutatorClass */
         $mutatorClass = ProfileList::ALL_MUTATORS[$mutatorName] ?? $mutatorClass;
 
         $definition = $mutatorClass::getDefinition();
