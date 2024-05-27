@@ -54,30 +54,30 @@ use function ucfirst;
  */
 final class MakeCustomMutatorCommand extends BaseCommand
 {
-    private const MUTATOT_NAME_ARGUMENT = 'Mutator name';
+    private const MUTATOR_NAME_ARGUMENT = 'Mutator name';
 
     protected function configure(): void
     {
         $this
             ->setName('make:mutator')
             ->setDescription('Creates a custom mutator')
-            ->addArgument(self::MUTATOT_NAME_ARGUMENT, InputArgument::REQUIRED);
+            ->addArgument(self::MUTATOR_NAME_ARGUMENT, InputArgument::REQUIRED);
     }
 
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        $mutatorName = $input->getArgument(self::MUTATOT_NAME_ARGUMENT);
+        $mutatorName = $input->getArgument(self::MUTATOR_NAME_ARGUMENT);
 
         if ($this->mutatorNameIsEmpty($mutatorName)) {
             $mutatorName = $this->askMutatorName();
 
-            $input->setArgument(self::MUTATOT_NAME_ARGUMENT, $mutatorName);
+            $input->setArgument(self::MUTATOR_NAME_ARGUMENT, $mutatorName);
         }
     }
 
     protected function executeCommand(IO $io): bool
     {
-        $mutatorName = ucfirst(trim((string) $io->getInput()->getArgument(self::MUTATOT_NAME_ARGUMENT)));
+        $mutatorName = ucfirst(trim((string) $io->getInput()->getArgument(self::MUTATOR_NAME_ARGUMENT)));
 
         $templateFilePaths = [
             __DIR__ . '/../CustomMutator/templates/__Name__.php',
