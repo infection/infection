@@ -53,7 +53,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
     {
         $app = new Application($this->createContainer());
 
-        $tester = new CommandTester($app->find('make:custom-mutator'));
+        $tester = new CommandTester($app->find('make:mutator'));
 
         $result = $tester->execute([
             'Mutator name' => 'CustomMutator',
@@ -71,7 +71,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
     {
         $app = new Application($this->createContainer());
 
-        $tester = new CommandTester($app->find('make:custom-mutator'));
+        $tester = new CommandTester($app->find('make:mutator'));
 
         $tester->setInputs(['NewMutator']);
 
@@ -90,7 +90,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
     {
         $app = new Application($this->createContainer());
 
-        $tester = new CommandTester($app->find('make:custom-mutator'));
+        $tester = new CommandTester($app->find('make:mutator'));
 
         $result = $tester->execute([
             'Mutator name' => ' CustomMutator ',
@@ -108,7 +108,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
     {
         $app = new Application($this->createContainer());
 
-        $tester = new CommandTester($app->find('make:custom-mutator'));
+        $tester = new CommandTester($app->find('make:mutator'));
 
         $tester->setInputs([' NewMutator ']);
 
@@ -127,7 +127,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
     {
         $app = new Application($this->createContainer());
 
-        $tester = new CommandTester($app->find('make:custom-mutator'));
+        $tester = new CommandTester($app->find('make:mutator'));
 
         $result = $tester->execute([
             'Mutator name' => ' customMutator ',
@@ -145,7 +145,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
     {
         $app = new Application($this->createContainer());
 
-        $tester = new CommandTester($app->find('make:custom-mutator'));
+        $tester = new CommandTester($app->find('make:mutator'));
 
         $tester->setInputs([' newMutator ']);
 

@@ -59,7 +59,7 @@ final class MakeCustomMutatorCommand extends BaseCommand
     protected function configure(): void
     {
         $this
-            ->setName('make:custom-mutator')
+            ->setName('make:mutator')
             ->setDescription('Creates a custom mutator')
             ->addArgument(self::MUTATOT_NAME_ARGUMENT, InputArgument::REQUIRED);
     }
