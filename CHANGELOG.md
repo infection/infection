@@ -1,5 +1,31 @@
 # Change Log
 
+## [0.29.0](https://github.com/infection/infection/tree/0.28.0) (2024-05-28)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.28.1...0.29.0)
+
+**Added:**
+
+* Support custom mutators by @vss414 in https://github.com/infection/infection/pull/1686
+* Custom mutator generator by @maks-rafalko in https://github.com/infection/infection/pull/1969
+
+Read about how to create custom mutators: https://infection.github.io/guide/custom-mutators.html
+
+**Changed:**
+
+* Move `Infection\Mutator\Mutator` to a separate package by @maks-rafalko in https://github.com/infection/infection/pull/1963
+* Make `Mutator::getDefinition` return type non-nullable by @maks-rafalko in https://github.com/infection/infection/pull/1958
+* Enable Rector's `AddCoversClassAttributeRector` rule by @maks-rafalko in https://github.com/infection/infection/pull/1962
+* Mention Discord instead of Slack in issue github template by @staabm in https://github.com/infection/infection/pull/1951
+* test: Force mutators to include remedies by @theofidry in https://github.com/infection/infection/pull/1954
+* Use the latest composer 2 to prevent issue with incompatibility for Box and composer 2.1 by @maks-rafalko in https://github.com/infection/infection/pull/1957
+* Use the latest v1 test checker action by @maks-rafalko in https://github.com/infection/infection/pull/1960
+* Upgrade Rector and fix new issues by @maks-rafalko in https://github.com/infection/infection/pull/1961
+* Use new PHP-CS-Fixer with parallelization by @maks-rafalko in https://github.com/infection/infection/pull/1964
+* Remove our own custom FQCN visitor as we already use php-parser's `NameResolver` visitor by @maks-rafalko in https://github.com/infection/infection/pull/1967
+* Replace deprecated constant `NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN` with `NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN` by @maks-rafalko in https://github.com/infection/infection/pull/1968
+* Remove our own `ParentConnectorVisitor` and use `nikic-phpparser`'s one by @maks-rafalko in https://github.com/infection/infection/pull/1970
+
 ## [0.28.0](https://github.com/infection/infection/tree/0.28.0) (2024-03-23)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.27.11...0.28.0)
