@@ -45,6 +45,7 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Removal\ArrayItemRemoval;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Tests\Mutator\MutatorName;
@@ -301,7 +302,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                              $this->inner('3');
                     DIFF,
                 '32f68ca331c9262cc97322271d88d06d',
-                PublicVisibility::class,
+                IgnoreMutator::class,
                 realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
                 13,
                 35,
@@ -312,6 +313,8 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                     // check that duplicate values are moved in the report
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
                 ],
+                'PHPUnit output. Tests: 1, Assertions: 3',
+                'PublicVisibility',
             ),
             // this tests diff on the one-line method call removal
             self::createMutantExecutionResult(
@@ -472,6 +475,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         int $originalEndFilePosition,
         array $testLocations,
         ?string $processOutput = 'PHPUnit output. Tests: 1, Assertions: 3',
+        ?string $mutatorName = null,
     ): MutantExecutionResult {
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
@@ -480,7 +484,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             now(normalize_trailing_spaces($diff)),
             $mutantHash,
             $mutatorClassName,
-            MutatorName::getName($mutatorClassName),
+            $mutatorName ?? MutatorName::getName($mutatorClassName),
             $originalFileRealPath,
             $originalStartingLine,
             $originalEndingLine,
