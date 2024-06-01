@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use function extension_loaded;
-use function file_exists;
 use function getenv;
 use function implode;
 use function in_array;
@@ -577,8 +576,6 @@ final class RunCommand extends BaseCommand
 
         $config = $container->getConfiguration();
 
-        $this->includeUserBootstrap($config);
-
         $container->getFileSystem()->mkdir($config->getTmpDir());
 
         LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
@@ -603,23 +600,6 @@ final class RunCommand extends BaseCommand
             $newInput->setInteractive($io->isInteractive());
             $configureCommand->run($newInput, $io->getOutput());
         }
-    }
-
-    private function includeUserBootstrap(Configuration $config): void
-    {
-        $bootstrap = $config->getBootstrap();
-
-        if ($bootstrap === null) {
-            return;
-        }
-
-        if (!file_exists($bootstrap)) {
-            throw FileOrDirectoryNotFound::fromFileName($bootstrap, [__DIR__]);
-        }
-
-        (static function (string $infectionBootstrapFile): void {
-            require_once $infectionBootstrapFile;
-        })($bootstrap);
     }
 
     private function logRunningWithDebugger(ConsoleOutput $consoleOutput): void
