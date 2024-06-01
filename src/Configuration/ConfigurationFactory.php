@@ -40,10 +40,12 @@ use function array_key_exists;
 use function array_unique;
 use function array_values;
 use function dirname;
+use function file_exists;
 use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\FileLogger;
@@ -128,6 +130,8 @@ class ConfigurationFactory
             $namespacedTmpDir,
         );
 
+        $this->includeUserBootstrap($schema->getBootstrap());
+
         $resolvedMutatorsArray = $this->resolveMutators($schema->getMutators(), $mutatorsInput);
 
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
@@ -170,6 +174,21 @@ class ConfigurationFactory
             $gitDiffBase,
             $mapSourceClassToTestStrategy,
         );
+    }
+
+    private function includeUserBootstrap(?string $bootstrap): void
+    {
+        if ($bootstrap === null) {
+            return;
+        }
+
+        if (!file_exists($bootstrap)) {
+            throw FileOrDirectoryNotFound::fromFileName($bootstrap, [__DIR__]);
+        }
+
+        (static function (string $infectionBootstrapFile): void {
+            require_once $infectionBootstrapFile;
+        })($bootstrap);
     }
 
     /**
