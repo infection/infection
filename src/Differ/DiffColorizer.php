@@ -35,11 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Differ;
 
-use Webmozart\Assert\Assert;
 use function explode;
 use function implode;
+use function mb_strlen;
+use function mb_strpos;
+use function mb_strrpos;
+use function mb_substr;
 use function sprintf;
 use function str_starts_with;
+use function substr;
+use function substr_replace;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -50,10 +56,13 @@ class DiffColorizer
     public function colorize(string $diff): string
     {
         $lines = explode("\n", $diff);
+
         foreach ($lines as $index => $line) {
-            if (! str_starts_with($line, '+')) {
+            if (!str_starts_with($line, '+')) {
                 continue;
             }
+
+            Assert::greaterThan($index, 0);
 
             $prevIndex = $index - 1;
             $prevLine = $lines[$prevIndex];
@@ -61,10 +70,10 @@ class DiffColorizer
             Assert::same($prevLine[0], '-');
 
             $lines[$prevIndex] = sprintf('<diff-del>-%s</diff-del>',
-                $this->inlineDiff(substr($prevLine, 1), substr($line, 1), '<diff-del-inline>', '</diff-del-inline>')
+                $this->inlineDiff(substr($prevLine, 1), substr($line, 1), '<diff-del-inline>', '</diff-del-inline>'),
             );
             $lines[$index] = sprintf('<diff-add>+%s</diff-add>',
-                $this->inlineDiff(substr($line, 1), substr($prevLine, 1), '<diff-add-inline>', '</diff-add-inline>')
+                $this->inlineDiff(substr($line, 1), substr($prevLine, 1), '<diff-add-inline>', '</diff-add-inline>'),
             );
         }
 
@@ -77,16 +86,19 @@ class DiffColorizer
         $nextLineLength = mb_strlen($nextLine);
 
         $start = $previousLineLength;
-        while ($start && 0 !== mb_strpos($nextLine, mb_substr($previousLine, 0, $start))) {
+
+        while ($start !== 0 && mb_strpos($nextLine, mb_substr($previousLine, 0, $start)) !== 0) {
             --$start;
         }
 
         $end = $start;
-        while ($end < $previousLineLength && mb_strrpos($nextLine, ($t = mb_substr($previousLine, $end)), $start) !== ($nextLineLength - mb_strlen($t))) {
+
+        while ($end < $previousLineLength && mb_strrpos($nextLine, $t = mb_substr($previousLine, $end), $start) !== ($nextLineLength - mb_strlen($t))) {
             ++$end;
         }
 
         $return = $previousLine;
+
         if ($start < $end) {
             $return = substr_replace($return, $rightAddition, $end, 0);
             $return = substr_replace($return, $leftAddition, $start, 0);

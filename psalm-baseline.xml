@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="5.11.0@c9b192ab8400fdaf04b2b13d110575adc879aa90">
+  <file src="src/Differ/DiffColorizer.php">
+    <InvalidArrayOffset>
+      <code>$lines[$prevIndex]</code>
+    </InvalidArrayOffset>
+  </file>
   <file src="src/Mutator/Extensions/BCMath.php">
     <ImpureFunctionCall>
       <code><![CDATA[$this->converters[$name->toLowerString()]($node)]]></code>

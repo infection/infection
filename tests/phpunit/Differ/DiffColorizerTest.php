@@ -56,85 +56,85 @@ final class DiffColorizerTest extends TestCase
     }
 
     /**
-     * @return list<list<non-empty-string>>
+     * @return array<non-empty-string, list<non-empty-string>>
      */
     public static function provideDiffs(): array
     {
         return [
             'full-deletion' => [
                 <<<'CODE'
-                     function ($a) {
-                -        exit();
-                +
-                     }
-                CODE,
+                         function ($a) {
+                    -        exit();
+                    +
+                         }
+                    CODE,
                 <<<'CODE'
-                <code>
-                     function ($a) {
-                <diff-del>-<diff-del-inline>        exit();</diff-del-inline></diff-del>
-                <diff-add>+</diff-add>
-                     }</code>
-                CODE,
+                    <code>
+                         function ($a) {
+                    <diff-del>-<diff-del-inline>        exit();</diff-del-inline></diff-del>
+                    <diff-add>+</diff-add>
+                         }</code>
+                    CODE,
             ],
             'full-addition' => [
                 <<<'CODE'
-                     function ($a) {
-                -
-                +        exit();
-                     }
-                CODE,
+                         function ($a) {
+                    -
+                    +        exit();
+                         }
+                    CODE,
                 <<<'CODE'
-                <code>
-                     function ($a) {
-                <diff-del>-</diff-del>
-                <diff-add>+<diff-add-inline>        exit();</diff-add-inline></diff-add>
-                     }</code>
-                CODE,
+                    <code>
+                         function ($a) {
+                    <diff-del>-</diff-del>
+                    <diff-add>+<diff-add-inline>        exit();</diff-add-inline></diff-add>
+                         }</code>
+                    CODE,
             ],
             'partial-deletion' => [
                 <<<'CODE'
-                     function ($a) {
-                -        return 'foo' . 'bar';
-                +        return 'foo';
-                     }
-                CODE,
+                         function ($a) {
+                    -        return 'foo' . 'bar';
+                    +        return 'foo';
+                         }
+                    CODE,
                 <<<'CODE'
-                <code>
-                     function ($a) {
-                <diff-del>-        return 'foo'<diff-del-inline> . 'bar'</diff-del-inline>;</diff-del>
-                <diff-add>+        return 'foo';</diff-add>
-                     }</code>
-                CODE,
+                    <code>
+                         function ($a) {
+                    <diff-del>-        return 'foo'<diff-del-inline> . 'bar'</diff-del-inline>;</diff-del>
+                    <diff-add>+        return 'foo';</diff-add>
+                         }</code>
+                    CODE,
             ],
             'partial-addition' => [
                 <<<'CODE'
-                     function ($a) {
-                -        return 'foo';
-                +        return 'foo' . 'bar';
-                     }
-                CODE,
+                         function ($a) {
+                    -        return 'foo';
+                    +        return 'foo' . 'bar';
+                         }
+                    CODE,
                 <<<'CODE'
-                <code>
-                     function ($a) {
-                <diff-del>-        return 'foo';</diff-del>
-                <diff-add>+        return 'foo'<diff-add-inline> . 'bar'</diff-add-inline>;</diff-add>
-                     }</code>
-                CODE,
+                    <code>
+                         function ($a) {
+                    <diff-del>-        return 'foo';</diff-del>
+                    <diff-add>+        return 'foo'<diff-add-inline> . 'bar'</diff-add-inline>;</diff-add>
+                         }</code>
+                    CODE,
             ],
             'deletion-and-addition' => [
                 <<<'CODE'
-                     function ($a, $b) {
-                -        return $a && $b;
-                +        return $a || $b;
-                     }
-                CODE,
+                         function ($a, $b) {
+                    -        return $a && $b;
+                    +        return $a || $b;
+                         }
+                    CODE,
                 <<<'CODE'
-                <code>
-                     function ($a, $b) {
-                <diff-del>-        return $a <diff-del-inline>&&</diff-del-inline> $b;</diff-del>
-                <diff-add>+        return $a <diff-add-inline>||</diff-add-inline> $b;</diff-add>
-                     }</code>
-                CODE,
+                    <code>
+                         function ($a, $b) {
+                    <diff-del>-        return $a <diff-del-inline>&&</diff-del-inline> $b;</diff-del>
+                    <diff-add>+        return $a <diff-add-inline>||</diff-add-inline> $b;</diff-add>
+                         }</code>
+                    CODE,
             ],
         ];
     }
