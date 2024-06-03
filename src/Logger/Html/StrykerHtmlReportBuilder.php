@@ -91,7 +91,7 @@ final class StrykerHtmlReportBuilder
     ];
 
     private const PLUS_LENGTH = 1;
-    private const DIFF_HEADERS_LINES_COUNT = 3;
+    private const DIFF_HEADERS_LINES_COUNT = 1;
 
     public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector)
     {
@@ -276,8 +276,6 @@ final class StrykerHtmlReportBuilder
             static fn (string $line): string => isset($line[0]) ? substr($line, self::PLUS_LENGTH) : $line,
             array_filter(
                 /*
-                --- Original
-                +++ New
                 @@ @@
                  */
                 array_slice($lines, self::DIFF_HEADERS_LINES_COUNT),
