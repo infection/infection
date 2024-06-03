@@ -71,8 +71,10 @@ final class OutputFormatterStyleConfigurator
 
     private static function configureDiffStyle(OutputFormatterInterface $formatter): void
     {
-        $formatter->setStyle('diff-add', new OutputFormatterStyle('green'));
-        $formatter->setStyle('diff-del', new OutputFormatterStyle('red'));
+        $formatter->setStyle('diff-add', new OutputFormatterStyle('green', null, ['bold']));
+        $formatter->setStyle('diff-add-inline', new OutputFormatterStyle('green', null, ['bold', 'reverse']));
+        $formatter->setStyle('diff-del', new OutputFormatterStyle('red', null, ['bold']));
+        $formatter->setStyle('diff-del-inline', new OutputFormatterStyle('red', null, ['bold', 'reverse']));
     }
 
     private static function configureMutationScoreStyle(OutputFormatterInterface $formatter): void

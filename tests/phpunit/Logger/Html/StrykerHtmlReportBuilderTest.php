@@ -289,8 +289,6 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
-                    --- Original
-                    +++ New
                     @@ @@
                      use function array_fill_keys;
                      final class ForHtmlReport
@@ -320,8 +318,6 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
-                    --- Original
-                    +++ New
                     @@ @@
                      {
                          public function add(int $a, int $b) : int
@@ -348,8 +344,6 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
-                    --- Original
-                    +++ New
                     @@ @@
                          public function add(int $a, int $b) : int
                          {
@@ -376,8 +370,6 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::ESCAPED,
                 <<<'DIFF'
-                    --- Original
-                    +++ New
                     @@ @@
                                  default:
                                      break;
@@ -406,8 +398,6 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
-                    --- Original
-                    +++ New
                     @@ @@
                      use function array_fill_keys;
                      final class ForHtmlReport2
@@ -434,8 +424,6 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             self::createMutantExecutionResult(
                 DetectionStatus::KILLED,
                 <<<'DIFF'
-                    --- Original
-                    +++ New
                     @@ @@
                      use function array_fill_keys;
                      final class ForHtmlReport2

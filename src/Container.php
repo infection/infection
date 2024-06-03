@@ -285,7 +285,7 @@ final class Container
                 $container->getPrinter(),
                 $container->getMutantCodeFactory(),
             ),
-            Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())),
+            Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfiguration()->getThreadCount()),
             DryProcessRunner::class => static fn (): DryProcessRunner => new DryProcessRunner(),
