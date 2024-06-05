@@ -10,6 +10,7 @@ Contributions are always welcome. Here are a few guidelines to be aware of:
 - Before implementing a new big feature, consider creating a new issue on Github. It will save your
   time when the core team is not going to accept it or has good recommendations about how to
   proceed.
+- Target `master` branch
 
 
 ## Tests
