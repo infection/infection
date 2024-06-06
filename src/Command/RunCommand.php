@@ -39,7 +39,6 @@ use function extension_loaded;
 use function getenv;
 use function implode;
 use function in_array;
-use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
@@ -66,7 +65,7 @@ use function is_numeric;
 use function max;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
-use function shell_exec;
+use function Safe\shell_exec;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -438,12 +437,13 @@ final class RunCommand extends BaseCommand
 
         // auto-detect project-root-directory on GitHub and GitLab if not manually set
         // default retrieve it using git rev-parse
-        if ($loggerProjectRootDirectory === null) {
+        if (empty($loggerProjectRootDirectory)) {
             if (($githubWorkspace = getenv('GITHUB_WORKSPACE')) !== false) {
                 $loggerProjectRootDirectory = $githubWorkspace;
             } elseif (($gitlabCiProjectDir = getenv('CI_PROJECT_DIR')) !== false) {
                 $loggerProjectRootDirectory = $gitlabCiProjectDir;
             } else {
+                /* @phpstan-ignore-next-line expects string, string|false|null given */
                 $loggerProjectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
             }
         }

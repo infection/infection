@@ -75,6 +75,7 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
             ];
 
             $lines[] = $this->buildAnnotation(
+                /* @phpstan-ignore-next-line expects string, string|null given */
                 Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->loggerProjectRootDirectory),
                 $error,
             );

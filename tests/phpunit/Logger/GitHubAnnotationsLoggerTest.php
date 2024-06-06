@@ -70,7 +70,7 @@ final class GitHubAnnotationsLoggerTest extends TestCase
         ResultsCollector $resultsCollector,
         array $expectedLines,
     ): void {
-        $logger = new GitHubAnnotationsLogger($resultsCollector);
+        $logger = new GitHubAnnotationsLogger($resultsCollector, null);
 
         $this->assertSame($expectedLines, $logger->getLogLines());
     }
@@ -98,7 +98,19 @@ final class GitHubAnnotationsLoggerTest extends TestCase
 
         $resultsCollector = self::createCompleteResultsCollector();
 
-        $logger = new GitHubAnnotationsLogger($resultsCollector);
+        $logger = new GitHubAnnotationsLogger($resultsCollector, null);
+
+        $this->assertStringContainsString('warning file=foo/bar', $logger->getLogLines()[0]);
+    }
+
+    public function test_it_logs_correctly_with_custom_github_workspace(): void
+    {
+        \Safe\putenv('GITHUB_WORKSPACE=/my/project/dir');
+        self::setOriginalFilePrefix('/custom/project/dir/');
+
+        $resultsCollector = self::createCompleteResultsCollector();
+
+        $logger = new GitHubAnnotationsLogger($resultsCollector, '/custom/project/dir/');
 
         $this->assertStringContainsString('warning file=foo/bar', $logger->getLogLines()[0]);
     }

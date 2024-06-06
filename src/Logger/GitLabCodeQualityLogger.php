@@ -72,6 +72,7 @@ final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
                 'content' => Str::convertToUtf8(Str::trimLineReturns($escapedExecutionResult->getMutantDiff())),
                 'categories' => ['Escaped Mutant'],
                 'location' => [
+                    /* @phpstan-ignore-next-line expects string, string|null given */
                     'path' => Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->loggerProjectRootDirectory),
                     'lines' => [
                         'begin' => $escapedExecutionResult->getOriginalStartingLine(),
