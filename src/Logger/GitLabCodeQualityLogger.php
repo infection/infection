@@ -51,7 +51,7 @@ final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
 {
     public function __construct(private readonly ResultsCollector $resultsCollector, private ?string $loggerProjectRootDirectory)
     {
-        if (null === $loggerProjectRootDirectory) {
+        if ($loggerProjectRootDirectory === null) {
             if (($projectRootDirectory = getenv('CI_PROJECT_DIR')) === false) {
                 $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
             }

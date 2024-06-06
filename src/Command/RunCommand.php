@@ -66,6 +66,7 @@ use function is_numeric;
 use function max;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
+use function shell_exec;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -437,7 +438,7 @@ final class RunCommand extends BaseCommand
 
         // auto-detect project-root-directory on GitHub and GitLab if not manually set
         // default retrieve it using git rev-parse
-        if (null === $loggerProjectRootDirectory) {
+        if ($loggerProjectRootDirectory === null) {
             if (($githubWorkspace = getenv('GITHUB_WORKSPACE')) !== false) {
                 $loggerProjectRootDirectory = $githubWorkspace;
             } elseif (($gitlabCiProjectDir = getenv('CI_PROJECT_DIR')) !== false) {
@@ -535,7 +536,7 @@ final class RunCommand extends BaseCommand
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             $this->getMapSourceClassToTest($input),
-            $loggerProjectRootDirectory
+            $loggerProjectRootDirectory,
         );
     }
 

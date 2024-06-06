@@ -105,17 +105,17 @@ class ConfigurationFactory
         ?string $testFrameworkExtraOptions,
         string $filter,
         int $threadCount,
-        bool    $dryRun,
+        bool $dryRun,
         ?string $gitDiffFilter,
-        bool    $isForGitDiffLines,
+        bool $isForGitDiffLines,
         ?string $gitDiffBase,
-        ?bool   $useGitHubLogger,
+        ?bool $useGitHubLogger,
         ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
-        bool    $useNoopMutators,
-        bool    $executeOnlyCoveringTestCases,
+        bool $useNoopMutators,
+        bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
-        ?string  $loggerProjectRootDirectory,
+        ?string $loggerProjectRootDirectory,
     ): Configuration {
         $configDir = dirname($schema->getFile());
 

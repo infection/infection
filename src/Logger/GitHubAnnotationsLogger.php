@@ -51,7 +51,7 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 
     public function __construct(private readonly ResultsCollector $resultsCollector, private ?string $loggerProjectRootDirectory)
     {
-        if (null === $loggerProjectRootDirectory) {
+        if ($loggerProjectRootDirectory === null) {
             if (($projectRootDirectory = getenv('GITHUB_WORKSPACE')) === false) {
                 $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
             }
