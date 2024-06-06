@@ -131,6 +131,8 @@ final class RunCommand extends BaseCommand
     /** @var string */
     private const OPTION_LOGGER_GITLAB = 'logger-gitlab';
 
+    private const OPTION_LOGGER_PROJECT_ROOT_DIRECTORY = 'logger-project-root-directory';
+
     private const OPTION_LOGGER_HTML = 'logger-html';
 
     private const OPTION_USE_NOOP_MUTATORS = 'noop';
@@ -294,6 +296,12 @@ final class RunCommand extends BaseCommand
                 'Path to log escaped Mutants in the GitLab (Code Climate) JSON format.',
             )
             ->addOption(
+                self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Custom path to project root directory used on the log report generation (auto-detected if not set).',
+            )
+            ->addOption(
                 self::OPTION_LOGGER_HTML,
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -425,6 +433,19 @@ final class RunCommand extends BaseCommand
         $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
         $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
+        $loggerProjectRootDirectory = trim((string) $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY));
+
+        // auto-detect project-root-directory on GitHub and GitLab if not manually set
+        // default retrieve it using git rev-parse
+        if (null === $loggerProjectRootDirectory) {
+            if (($githubWorkspace = getenv('GITHUB_WORKSPACE')) !== false) {
+                $loggerProjectRootDirectory = $githubWorkspace;
+            } elseif (($gitlabCiProjectDir = getenv('CI_PROJECT_DIR')) !== false) {
+                $loggerProjectRootDirectory = $gitlabCiProjectDir;
+            } else {
+                $loggerProjectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
+            }
+        }
 
         /** @var string|null $minMsi */
         $minMsi = $input->getOption(self::OPTION_MIN_MSI);
@@ -514,6 +535,7 @@ final class RunCommand extends BaseCommand
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             $this->getMapSourceClassToTest($input),
+            $loggerProjectRootDirectory
         );
     }
 

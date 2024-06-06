@@ -172,6 +172,7 @@ final class Container
     public const DEFAULT_GIT_DIFF_BASE = null;
     public const DEFAULT_USE_GITHUB_LOGGER = null;
     public const DEFAULT_GITLAB_LOGGER_PATH = null;
+    public const DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY = null;
     public const DEFAULT_HTML_LOGGER_PATH = null;
     public const DEFAULT_USE_NOOP_MUTATORS = false;
     public const DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
@@ -467,6 +468,7 @@ final class Container
                     $config->mutateOnlyCoveredCode(),
                     $container->getLogger(),
                     $container->getStrykerHtmlReportBuilder(),
+                    $config->getLoggerProjectRootDirectory(),
                 );
             },
             MutationTestingResultsLogger::class => static fn (self $container): MutationTestingResultsLogger => new FederatedLogger(...array_filter([
@@ -583,6 +585,7 @@ final class Container
             self::DEFAULT_USE_NOOP_MUTATORS,
             self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
             self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
+            self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         );
     }
 
@@ -609,16 +612,17 @@ final class Container
         ?string $testFrameworkExtraOptions,
         string $filter,
         int $threadCount,
-        bool $dryRun,
+        bool    $dryRun,
         ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
+        bool    $isForGitDiffLines,
         ?string $gitDiffBase,
-        ?bool $useGitHubLogger,
+        ?bool   $useGitHubLogger,
         ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
-        bool $useNoopMutators,
-        bool $executeOnlyCoveringTestCases,
+        bool    $useNoopMutators,
+        bool    $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
+        ?string  $loggerProjectRootDirectory,
     ): self {
         $clone = clone $this;
 
@@ -689,6 +693,7 @@ final class Container
                 $useNoopMutators,
                 $executeOnlyCoveringTestCases,
                 $mapSourceClassToTestStrategy,
+                $loggerProjectRootDirectory,
             ),
         );
 

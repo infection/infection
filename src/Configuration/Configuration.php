@@ -94,16 +94,17 @@ class Configuration
         private readonly bool $noProgress,
         private readonly bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
-        private readonly bool $showMutations,
-        private readonly ?float $minCoveredMsi,
-        private readonly int $msiPrecision,
-        int $threadCount,
-        private readonly bool $dryRun,
-        private readonly array $ignoreSourceCodeMutatorsMap,
-        private readonly bool $executeOnlyCoveringTestCases,
-        private readonly bool $isForGitDiffLines,
+        private readonly bool    $showMutations,
+        private readonly ?float  $minCoveredMsi,
+        private readonly int     $msiPrecision,
+        int                      $threadCount,
+        private readonly bool    $dryRun,
+        private readonly array   $ignoreSourceCodeMutatorsMap,
+        private readonly bool    $executeOnlyCoveringTestCases,
+        private readonly bool    $isForGitDiffLines,
         private readonly ?string $gitDiffBase,
         private readonly ?string $mapSourceClassToTestStrategy,
+        private readonly ?string  $loggerProjectRootDirectory,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
@@ -295,5 +296,10 @@ class Configuration
     public function getMapSourceClassToTestStrategy(): ?string
     {
         return $this->mapSourceClassToTestStrategy;
+    }
+
+    public function getLoggerProjectRootDirectory(): ?string
+    {
+        return $this->loggerProjectRootDirectory;
     }
 }

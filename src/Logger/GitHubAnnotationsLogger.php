@@ -49,17 +49,19 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 {
     public const DEFAULT_OUTPUT = 'php://stdout';
 
-    public function __construct(private readonly ResultsCollector $resultsCollector)
+    public function __construct(private readonly ResultsCollector $resultsCollector, private ?string $loggerProjectRootDirectory)
     {
+        if (null === $loggerProjectRootDirectory) {
+            if (($projectRootDirectory = getenv('GITHUB_WORKSPACE')) === false) {
+                $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
+            }
+            $this->loggerProjectRootDirectory = $projectRootDirectory;
+        }
     }
 
     public function getLogLines(): array
     {
         $lines = [];
-
-        if (($projectRootDirectory = getenv('GITHUB_WORKSPACE')) === false) {
-            $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
-        }
 
         foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
             $error = [
@@ -73,7 +75,7 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
             ];
 
             $lines[] = $this->buildAnnotation(
-                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $projectRootDirectory),
+                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->loggerProjectRootDirectory),
                 $error,
             );
         }
