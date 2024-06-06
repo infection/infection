@@ -433,17 +433,16 @@ final class RunCommand extends BaseCommand
         $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
         $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
-        $loggerProjectRootDirectory = trim((string) $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY));
+        $loggerProjectRootDirectory = $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY);
 
         // auto-detect project-root-directory on GitHub and GitLab if not manually set
         // default retrieve it using git rev-parse
-        if (empty($loggerProjectRootDirectory)) {
+        if ($loggerProjectRootDirectory === null) {
             if (($githubWorkspace = getenv('GITHUB_WORKSPACE')) !== false) {
                 $loggerProjectRootDirectory = $githubWorkspace;
             } elseif (($gitlabCiProjectDir = getenv('CI_PROJECT_DIR')) !== false) {
                 $loggerProjectRootDirectory = $gitlabCiProjectDir;
             } else {
-                /* @phpstan-ignore-next-line expects string, string|false|null given */
                 $loggerProjectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
             }
         }
