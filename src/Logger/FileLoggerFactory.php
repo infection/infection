@@ -50,7 +50,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class FileLoggerFactory
 {
-    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector, private readonly Filesystem $filesystem, private readonly string $logVerbosity, private readonly bool $debugMode, private readonly bool $onlyCoveredCode, private readonly LoggerInterface $logger, private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder)
+    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector, private readonly Filesystem $filesystem, private readonly string $logVerbosity, private readonly bool $debugMode, private readonly bool $onlyCoveredCode, private readonly LoggerInterface $logger, private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder, private readonly ?string $loggerProjectRootDirectory)
     {
     }
 
@@ -142,12 +142,12 @@ class FileLoggerFactory
 
     private function createGitlabLogger(): LineMutationTestingResultsLogger
     {
-        return new GitLabCodeQualityLogger($this->resultsCollector);
+        return new GitLabCodeQualityLogger($this->resultsCollector, $this->loggerProjectRootDirectory);
     }
 
     private function createGitHubAnnotationsLogger(): LineMutationTestingResultsLogger
     {
-        return new GitHubAnnotationsLogger($this->resultsCollector);
+        return new GitHubAnnotationsLogger($this->resultsCollector, $this->loggerProjectRootDirectory);
     }
 
     private function createDebugLogger(): LineMutationTestingResultsLogger

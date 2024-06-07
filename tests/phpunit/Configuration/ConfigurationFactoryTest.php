@@ -148,6 +148,7 @@ final class ConfigurationFactoryTest extends TestCase
         array $expectedIgnoreSourceCodeMutatorsMap,
         bool $inputExecuteOnlyCoveringTestCases,
         ?string $mapSourceClassToTest,
+        ?string $loggerProjectRootDirectory,
     ): void {
         $config = $this
             ->createConfigurationFactory($ciDetected, $githubActionsDetected)
@@ -180,6 +181,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputUseNoopMutators,
                 $inputExecuteOnlyCoveringTestCases,
                 $mapSourceClassToTest,
+                $loggerProjectRootDirectory,
             )
         ;
 
@@ -217,6 +219,7 @@ final class ConfigurationFactoryTest extends TestCase
             $inputIsForGitDiffLines,
             $inputGitDiffBase,
             $mapSourceClassToTest,
+            $loggerProjectRootDirectory,
         );
     }
 
@@ -296,6 +299,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             true,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
 
         yield 'null html file log path with existing path from config file' => self::createValueForHtmlLogFilePath(
@@ -847,6 +851,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
 
         yield 'complete' => [
@@ -953,6 +958,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
 
         yield 'custom mutator with bootstrap file' => [
@@ -1059,6 +1065,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1137,6 +1144,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1215,6 +1223,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1294,6 +1303,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1372,6 +1382,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1451,6 +1462,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1543,6 +1555,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1646,6 +1659,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             true,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1725,6 +1739,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1804,6 +1819,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1883,6 +1899,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             null, // MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -1963,6 +1980,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -2042,6 +2060,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -2122,6 +2141,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -2201,6 +2221,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -2284,6 +2305,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -2368,6 +2390,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedIgnoreSourceCodeMutatorsMap,
             false,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 
@@ -2468,6 +2491,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             true,
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 

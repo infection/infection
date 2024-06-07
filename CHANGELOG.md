@@ -1,6 +1,14 @@
 # Change Log
 
-## [0.29.0](https://github.com/infection/infection/tree/0.28.0) (2024-05-28)
+## [0.29.4](https://github.com/infection/infection/tree/0.29.4) (2024-06-08)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.29.0...0.29.4)
+
+**Added:**
+
+* Introduce `--logger-project-root-directory` by @vincentchalamon in https://github.com/infection/infection/pull/1978
+
+## [0.29.0](https://github.com/infection/infection/tree/0.29.0) (2024-05-28)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.28.1...0.29.0)
 

@@ -115,6 +115,7 @@ class ConfigurationFactory
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
+        ?string $loggerProjectRootDirectory,
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -173,6 +174,7 @@ class ConfigurationFactory
             $isForGitDiffLines,
             $gitDiffBase,
             $mapSourceClassToTestStrategy,
+            $loggerProjectRootDirectory,
         );
     }
 

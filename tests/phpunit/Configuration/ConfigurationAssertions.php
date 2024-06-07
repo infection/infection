@@ -88,6 +88,7 @@ trait ConfigurationAssertions
         bool $expectedIsForGitDiffLines,
         ?string $expectedGitDiffBase,
         ?string $expectedMapSourceClassToTest,
+        ?string $expectedLoggerProjectRootDirectory,
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
@@ -143,6 +144,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedIsForGitDiffLines, $configuration->isForGitDiffLines());
         $this->assertSame($expectedGitDiffBase, $configuration->getGitDiffBase());
         $this->assertSame($expectedMapSourceClassToTest, $configuration->getMapSourceClassToTestStrategy());
+        $this->assertSame($expectedLoggerProjectRootDirectory, $configuration->getLoggerProjectRootDirectory());
     }
 
     /**
