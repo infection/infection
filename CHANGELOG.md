@@ -2,7 +2,7 @@
 
 ## [0.29.4](https://github.com/infection/infection/tree/0.29.4) (2024-06-08)
 
-[Full Changelog](https://github.com/infection/infection/compare/0.29.0...0.29.1)
+[Full Changelog](https://github.com/infection/infection/compare/0.29.0...0.29.4)
 
 **Added:**
 
