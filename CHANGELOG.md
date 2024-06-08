@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.29.5](https://github.com/infection/infection/tree/0.29.5) (2024-06-08)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.29.4...0.29.5)
+
+**Added:**
+
+* Update GitHub actions used by @vincentchalamon in https://github.com/infection/infection/pull/1979
+* Introduce GitHub Actions Concurrency used by @vincentchalamon in https://github.com/infection/infection/pull/1979
+
 ## [0.29.4](https://github.com/infection/infection/tree/0.29.4) (2024-06-08)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.29.0...0.29.4)
