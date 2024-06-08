@@ -95,6 +95,7 @@ final class ConfigurationTest extends TestCase
         bool $isForGitDiffLines,
         ?string $gitDiffBase,
         ?string $mapSourceClassToTest,
+        ?string $loggerProjectRootDirectory,
     ): void {
         $config = new Configuration(
             $timeout,
@@ -129,6 +130,7 @@ final class ConfigurationTest extends TestCase
             $isForGitDiffLines,
             $gitDiffBase,
             $mapSourceClassToTest,
+            $loggerProjectRootDirectory,
         );
 
         $this->assertConfigurationStateIs(
@@ -165,6 +167,7 @@ final class ConfigurationTest extends TestCase
             $isForGitDiffLines,
             $gitDiffBase,
             $mapSourceClassToTest,
+            $loggerProjectRootDirectory,
         );
     }
 
@@ -202,6 +205,7 @@ final class ConfigurationTest extends TestCase
             false,
             false,
             'master',
+            null,
             null,
         ];
 
@@ -256,6 +260,7 @@ final class ConfigurationTest extends TestCase
             false,
             'master',
             MapSourceClassToTestStrategy::SIMPLE,
+            null,
         ];
     }
 }

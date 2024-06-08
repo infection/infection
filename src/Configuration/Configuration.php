@@ -104,6 +104,7 @@ class Configuration
         private readonly bool $isForGitDiffLines,
         private readonly ?string $gitDiffBase,
         private readonly ?string $mapSourceClassToTestStrategy,
+        private readonly ?string $loggerProjectRootDirectory,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
@@ -295,5 +296,10 @@ class Configuration
     public function getMapSourceClassToTestStrategy(): ?string
     {
         return $this->mapSourceClassToTestStrategy;
+    }
+
+    public function getLoggerProjectRootDirectory(): ?string
+    {
+        return $this->loggerProjectRootDirectory;
     }
 }

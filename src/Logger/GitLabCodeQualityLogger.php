@@ -49,17 +49,19 @@ use function trim;
  */
 final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
 {
-    public function __construct(private readonly ResultsCollector $resultsCollector)
+    public function __construct(private readonly ResultsCollector $resultsCollector, private ?string $loggerProjectRootDirectory)
     {
+        if ($loggerProjectRootDirectory === null) {
+            if (($projectRootDirectory = getenv('CI_PROJECT_DIR')) === false) {
+                $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
+            }
+            $this->loggerProjectRootDirectory = $projectRootDirectory;
+        }
     }
 
     public function getLogLines(): array
     {
         $lines = [];
-
-        if (($projectRootDirectory = getenv('CI_PROJECT_DIR')) === false) {
-            $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
-        }
 
         foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
             $lines[] = [
@@ -70,7 +72,8 @@ final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
                 'content' => Str::convertToUtf8(Str::trimLineReturns($escapedExecutionResult->getMutantDiff())),
                 'categories' => ['Escaped Mutant'],
                 'location' => [
-                    'path' => Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $projectRootDirectory),
+                    /* @phpstan-ignore-next-line expects string, string|null given */
+                    'path' => Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->loggerProjectRootDirectory),
                     'lines' => [
                         'begin' => $escapedExecutionResult->getOriginalStartingLine(),
                     ],

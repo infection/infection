@@ -77,7 +77,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         ResultsCollector $resultsCollector,
         array $expectedContents,
     ): void {
-        $logger = new GitLabCodeQualityLogger($resultsCollector);
+        $logger = new GitLabCodeQualityLogger($resultsCollector, null);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
@@ -154,7 +154,19 @@ final class GitLabCodeQualityLoggerTest extends TestCase
 
         $resultsCollector = self::createCompleteResultsCollector();
 
-        $logger = new GitLabCodeQualityLogger($resultsCollector);
+        $logger = new GitLabCodeQualityLogger($resultsCollector, null);
+
+        $this->assertStringContainsString('"path":"foo\/bar"', $logger->getLogLines()[0]);
+    }
+
+    public function test_it_logs_correctly_with_custom_project_dir(): void
+    {
+        \Safe\putenv('CI_PROJECT_DIR=/my/project/dir');
+        self::setOriginalFilePrefix('/custom/project/dir/');
+
+        $resultsCollector = self::createCompleteResultsCollector();
+
+        $logger = new GitLabCodeQualityLogger($resultsCollector, '/custom/project/dir/');
 
         $this->assertStringContainsString('"path":"foo\/bar"', $logger->getLogLines()[0]);
     }
