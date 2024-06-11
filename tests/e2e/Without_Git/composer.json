@@ -1,7 +1,7 @@
 {
     "require-dev": {
         "phpunit/phpunit": "^9.5.5",
-        "infection/infection": "*"
+        "infection/infection": "dev-master"
     },
     "autoload": {
         "psr-4": {
@@ -13,15 +13,6 @@
             "Without_Git\\Test\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../../../",
-            "options": {
-                "symlink": false
-            }
-        }
-    ],
     "minimum-stability": "dev",
     "config": {
         "allow-plugins": {
