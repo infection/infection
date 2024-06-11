@@ -59,10 +59,6 @@ class FileLoggerFactory
         $loggers = [];
 
         foreach ($this->createLineLoggers($logConfig) as $filePath => $lineLogger) {
-            if ($filePath === null) {
-                continue;
-            }
-
             $loggers[] = $this->wrapWithFileLogger($filePath, $lineLogger);
         }
 
@@ -70,7 +66,7 @@ class FileLoggerFactory
     }
 
     /**
-     * @return iterable<?string, LineMutationTestingResultsLogger>
+     * @return iterable<string, LineMutationTestingResultsLogger>
      */
     private function createLineLoggers(Logs $logConfig): iterable
     {
@@ -78,21 +74,37 @@ class FileLoggerFactory
             return;
         }
 
-        yield $logConfig->getTextLogFilePath() => $this->createTextLogger();
+        if ($logConfig->getTextLogFilePath() !== null) {
+            yield $logConfig->getTextLogFilePath() => $this->createTextLogger();
+        }
 
-        yield $logConfig->getHtmlLogFilePath() => $this->createHtmlLogger();
+        if ($logConfig->getHtmlLogFilePath() !== null) {
+            yield $logConfig->getHtmlLogFilePath() => $this->createHtmlLogger();
+        }
 
-        yield $logConfig->getSummaryLogFilePath() => $this->createSummaryLogger();
+        if ($logConfig->getSummaryLogFilePath() !== null) {
+            yield $logConfig->getSummaryLogFilePath() => $this->createSummaryLogger();
+        }
 
-        yield $logConfig->getJsonLogFilePath() => $this->createJsonLogger();
+        if ($logConfig->getJsonLogFilePath() !== null) {
+            yield $logConfig->getJsonLogFilePath() => $this->createJsonLogger();
+        }
 
-        yield $logConfig->getGitlabLogFilePath() => $this->createGitlabLogger();
+        if ($logConfig->getGitlabLogFilePath() !== null) {
+            yield $logConfig->getGitlabLogFilePath() => $this->createGitlabLogger();
+        }
 
-        yield $logConfig->getDebugLogFilePath() => $this->createDebugLogger();
+        if ($logConfig->getDebugLogFilePath() !== null) {
+            yield $logConfig->getDebugLogFilePath() => $this->createDebugLogger();
+        }
 
-        yield $logConfig->getPerMutatorFilePath() => $this->createPerMutatorLogger();
+        if ($logConfig->getPerMutatorFilePath() !== null) {
+            yield $logConfig->getPerMutatorFilePath() => $this->createPerMutatorLogger();
+        }
 
-        yield $logConfig->getSummaryJsonLogFilePath() => $this->createSummaryJsonLogger();
+        if ($logConfig->getSummaryJsonLogFilePath() !== null) {
+            yield $logConfig->getSummaryJsonLogFilePath() => $this->createSummaryJsonLogger();
+        }
 
         if ($logConfig->getUseGitHubAnnotationsLogger()) {
             yield GitHubAnnotationsLogger::DEFAULT_OUTPUT => $this->createGitHubAnnotationsLogger();
