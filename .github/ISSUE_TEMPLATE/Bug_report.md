@@ -27,6 +27,14 @@ labels: Bug, Not Confirmed
 
 <!-- Please past your phpunit.xml[.dist] if no Github link to the repo provided -->
 <details>
+ <summary>infection.json5</summary>
+
+ ```json5
+  %infection.json5 content%
+ ```
+</details>
+
+<details>
  <summary>phpunit.xml</summary>
 
  ```xml
