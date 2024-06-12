@@ -76,6 +76,7 @@ $container = Container::create()->withValues(
     true,
     Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
     Container::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
+    Container::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
 );
 
 $generateTraces = static function (?int $maxCount) use ($container): iterable {
