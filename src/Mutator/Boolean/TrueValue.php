@@ -101,6 +101,10 @@ final class TrueValue implements ConfigurableMutator
         $parentNode = ParentConnector::findParent($node);
         $grandParentNode = $parentNode !== null ? ParentConnector::findParent($parentNode) : null;
 
+        if ($parentNode instanceof Node\Stmt\Switch_) {
+            return false;
+        }
+
         if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
             return true;
         }

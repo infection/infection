@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -75,7 +76,9 @@ final class FalseValue implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\ConstFetch) {
+        $parentNode = ParentConnector::findParent($node);
+
+        if (!$node instanceof Node\Expr\ConstFetch || $parentNode instanceof Node\Stmt\Switch_) {
             return false;
         }
 

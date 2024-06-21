@@ -106,6 +106,14 @@ final class TrueValueTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It does not mutate switch true to false' => [
+            <<<'PHP'
+                <?php
+
+                switch (true) {}
+                PHP,
+        ];
+
         yield 'It mutates all caps true to false' => [
             <<<'PHP'
                 <?php
