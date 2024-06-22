@@ -38,6 +38,8 @@ declare(strict_types=1);
 
 use Infection\Console\Application;
 use Infection\Container;
+use Composer\InstalledVersions;
+use Composer\InstalledVersions as ProjectInstalledVersions;
 use function Safe\getcwd;
 
 if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
@@ -75,11 +77,28 @@ if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
     throw new RuntimeException('Unable to find the Composer autoloader.');
 })();
 
+$infectionPhpParserVersion = InstalledVersions::getVersion('nikic/php-parser');
+
 // Project (third-party) autoloading
 (static function (): void {
     if (\file_exists($autoload = getcwd() . '/vendor/autoload.php')) {
         include_once $autoload;
     }
 })();
+
+// The alias ProjectInstalledVersions is only relevant for the scoped PHAR, it is otherwise the
+// same InstalledVersions class.
+$projectPhpParserVersion = ProjectInstalledVersions::getVersion('nikic/php-parser');
+
+if (null !== $projectPhpParserVersion && $projectPhpParserVersion !== $infectionPhpParserVersion) {
+    \fwrite(
+        \STDERR,
+        <<<'ERROR'
+            Your project is using a different version of `nikic/php-parser`. This may result in
+            weird issues or runtime failures.
+
+            ERROR,
+    );
+}
 
 (new Application(Container::create()))->run();

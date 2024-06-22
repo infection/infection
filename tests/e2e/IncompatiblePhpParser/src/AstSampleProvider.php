@@ -4,6 +4,9 @@ namespace e2ePhpParserVersion;
 
 use PhpParser\ParserFactory;
 
+/**
+ * @infection-ignore-all
+ */
 class AstSampleProvider
 {
     public static function provideSample(): array
