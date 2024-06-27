@@ -71,21 +71,12 @@ final class JUnitTestCaseTimeAdder
 
         foreach ($this->tests as $testLocation) {
             $methodName = $testLocation->getMethod();
-            $methodSeparatorPos = strpos($methodName, '::');
 
-            if ($methodSeparatorPos === false) {
-                // Just for the off case where we have rubbish in the test method name
+            if (array_key_exists($methodName, $seenTestSuites)) {
                 continue;
             }
 
-            // For each test we discard method name, and return a single timing for an entire suite
-            $testSuiteName = substr($methodName, 0, $methodSeparatorPos);
-
-            if (array_key_exists($testSuiteName, $seenTestSuites)) {
-                continue;
-            }
-
-            $seenTestSuites[$testSuiteName] = $testLocation->getExecutionTime();
+            $seenTestSuites[$methodName] = $testLocation->getExecutionTime();
         }
 
         return $seenTestSuites;
