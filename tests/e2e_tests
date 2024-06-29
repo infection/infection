@@ -60,7 +60,7 @@ dirs=$(find . -maxdepth 1 -mindepth 1 -type d)
 # Export the function so xargs can use it
 export -f run_infection_for_dir
 
-# Use xargs to run the test_command function in parallel
+# Use xargs to run the run_infection_for_dir function in parallel
 echo "$dirs" | xargs -I {} -P 4 bash -c "run_infection_for_dir {} ${1:-bin/infection}"
 
 exitOnError $? "One of the e2e tests failed, check the logs \n\n$(cat error.log)"
