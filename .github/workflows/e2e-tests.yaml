@@ -98,8 +98,8 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ matrix.php-version }}" == '8.3' ]]; then
-            ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} composer --working-dir={} config platform.php 8.2.99
-            ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} composer --working-dir={} install --no-interaction --prefer-dist --no-progress
+            ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} -P 4 composer --working-dir={} config platform.php 8.2.99
+            ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress
           else
             ls tests/e2e/*/composer.json | xargs dirname |
                xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress
