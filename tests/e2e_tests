@@ -8,6 +8,7 @@ failure="false"
 
 run_infection_for_dir() {
     dir=$1
+    infection_executable=${2:-bin/infection}
 
     cd "$dir"
     echo -e "\n$dir\n";
@@ -19,9 +20,9 @@ run_infection_for_dir() {
 
     if [ -f "run_tests.bash" ]
     then
-        output="$(INFECTION_E2E_TESTS_ENV=1 bash run_tests.bash ${2:-bin/infection})"
+        output="$(INFECTION_E2E_TESTS_ENV=1 bash run_tests.bash $infection_executable)"
     else
-        output="$(INFECTION_E2E_TESTS_ENV=1 bash ../standard_script.bash ${2:-bin/infection})"
+        output="$(INFECTION_E2E_TESTS_ENV=1 bash ../standard_script.bash $infection_executable)"
     fi
 
     if [ $? != 0 ]
