@@ -38,7 +38,7 @@ run_infection_for_dir() {
     fi
     cd ..
 
-    if [ $failure = "true" ]
+    if [ "$failure" = "true" ]
     then
         exit 255
     fi
