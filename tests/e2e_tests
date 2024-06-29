@@ -11,8 +11,9 @@ fi
 
 touch error.log
 
-for dir in  */
-do
+run_infection_for_dir() {
+    dir=$1
+
     cd "$dir"
     echo -e "\n$dir\n";
 
@@ -23,9 +24,9 @@ do
 
     if [ -f "run_tests.bash" ]
     then
-        output="$(INFECTION_E2E_TESTS_ENV=1 bash run_tests.bash ${1:-bin/infection})"
+        output="$(INFECTION_E2E_TESTS_ENV=1 bash run_tests.bash ${2:-bin/infection})"
     else
-        output="$(INFECTION_E2E_TESTS_ENV=1 bash ../standard_script.bash ${1:-bin/infection})"
+        output="$(INFECTION_E2E_TESTS_ENV=1 bash ../standard_script.bash ${2:-bin/infection})"
     fi
 
     if [ $? != 0 ]
@@ -36,14 +37,33 @@ do
         echo "" >> ../error.log
     fi
     cd ..
-done
 
-if [ $failure = "true" ]
-then
-    echo "One of the e2e tests failed, check the logs";
-    cat error.log
-    exit 1
-fi
+    if [ $failure = "true" ]
+    then
+        exit 255
+    fi
+}
+
+exitOnError() {
+  exit_code=$1
+  msg=$2
+  if [ "$exit_code" -ne 0 ]; then
+    echo -e "\033[31mEXIT $exit_code $msg\033[0m" >&2
+    # If any invocation of the command exits with a status of 255, xargs will stop immediately without reading any further input.
+    # An error message is issued on stderr when this happens.
+    exit 255
+  fi
+}
+
+dirs=$(find . -maxdepth 1 -mindepth 1 -type d)
+
+# Export the function so xargs can use it
+export -f run_infection_for_dir
+
+# Use xargs to run the test_command function in parallel
+echo "$dirs" | xargs -I {} -P 4 bash -c "run_infection_for_dir {} ${1:-bin/infection}"
+
+exitOnError $? "One of the e2e tests failed, check the logs \n\n$(cat error.log)"
 
 echo -e "\nSuccess"
 exit 0
