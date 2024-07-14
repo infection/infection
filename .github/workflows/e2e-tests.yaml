@@ -32,6 +32,7 @@ jobs:
           - { operating-system: 'ubuntu-latest', php-version: '8.1', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
 
     name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
@@ -97,8 +98,8 @@ jobs:
       - name: Install Composer dependencies for E2E tests
         shell: bash
         run: |
-          if [[ "${{ matrix.php-version }}" == '8.3' ]]; then
-            ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} -P 4 composer --working-dir={} config platform.php 8.2.99
+          if [[ "${{ matrix.php-version }}" == '8.4' ]]; then
+            ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} -P 4 composer --working-dir={} config platform.php 8.3.99
             ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress
           else
             ls tests/e2e/*/composer.json | xargs dirname |
