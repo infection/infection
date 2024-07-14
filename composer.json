@@ -77,8 +77,6 @@
         "ext-simplexml": "*",
         "fidry/makefile": "^1.0",
         "helmich/phpunit-json-assert": "^3.0",
-        "phpspec/prophecy": "^1.15",
-        "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/extension-installer": "^1.1.0",
         "phpstan/phpstan": "^1.10.15",
         "phpstan/phpstan-phpunit": "^1.0.0",

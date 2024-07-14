@@ -62,9 +62,8 @@ use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 
@@ -73,7 +72,6 @@ use function sys_get_temp_dir;
 final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;
-    use ProphecyTrait;
 
     /**
      * @var array<string, Mutator>|null
@@ -151,7 +149,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $loggerProjectRootDirectory,
     ): void {
         $config = $this
-            ->createConfigurationFactory($ciDetected, $githubActionsDetected)
+            ->createConfigurationFactory($ciDetected, $githubActionsDetected, $schema)
             ->create(
                 $schema,
                 $inputExistingCoveragePath,
@@ -2515,22 +2513,29 @@ final class ConfigurationFactoryTest extends TestCase
         return self::$mutators;
     }
 
-    private function createConfigurationFactory(bool $ciDetected, bool $githubActionsDetected): ConfigurationFactory
-    {
-        /** @var SourceFileCollector&ObjectProphecy $sourceFilesCollectorProphecy */
-        $sourceFilesCollectorProphecy = $this->prophesize(SourceFileCollector::class);
+    private function createConfigurationFactory(
+        bool $ciDetected,
+        bool $githubActionsDetected,
+        SchemaConfiguration $schema,
+    ): ConfigurationFactory {
+        /** @var SourceFileCollector&MockObject $sourceFilesCollector */
+        $sourceFilesCollector = $this->createMock(SourceFileCollector::class);
 
-        $sourceFilesCollectorProphecy
-            ->collectFiles([], [])
-            ->willReturn([])
-        ;
-        $sourceFilesCollectorProphecy
-            ->collectFiles(['src/'], ['vendor/'])
-            ->willReturn([
-                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-            ])
-        ;
+        $sourceFilesCollector->expects($this->once())
+            ->method('collectFiles')
+            ->with($schema->getSource()->getDirectories(), $schema->getSource()->getExcludes())
+            ->willReturnCallback(
+                static function (array $source, array $excludes) {
+                    if ($source === ['src/'] && $excludes === ['vendor/']) {
+                        return [
+                            new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
+                            new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
+                        ];
+                    }
+
+                    return [];
+                },
+            );
 
         $gitDiffFilesProviderMock = $this->createMock(GitDiffFileProvider::class);
         $gitDiffFilesProviderMock->method('provide')->willReturn('src/a.php,src/b.php');
@@ -2540,7 +2545,7 @@ final class ConfigurationFactoryTest extends TestCase
             SingletonContainer::getContainer()->getMutatorResolver(),
             SingletonContainer::getContainer()->getMutatorFactory(),
             new MutatorParser(),
-            $sourceFilesCollectorProphecy->reveal(),
+            $sourceFilesCollector,
             new DummyCiDetector($ciDetected, $githubActionsDetected),
             $gitDiffFilesProviderMock,
         );
