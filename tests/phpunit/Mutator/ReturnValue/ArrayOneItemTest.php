@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
+use Composer\InstalledVersions;
 use Infection\Mutator\ReturnValue\ArrayOneItem;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use function version_compare;
 
 #[Group('integration')]
 #[CoversClass(ArrayOneItem::class)]
@@ -57,9 +59,10 @@ final class ArrayOneItemTest extends BaseMutatorTestCase
 
     public static function mutationsProvider(): iterable
     {
-        yield 'It mutates when return typehint is not nullable array' => [
-            MutatorFixturesProvider::getFixtureFileContent(self::class, 'mutates-not-nullable-array.php'),
-            <<<'PHP'
+        // PHP-Parser 5.0 brings inconsistent parens behaviour for ternary operator and this issue was fixed in PHP-Parser 5.1
+        // @see https://github.com/nikic/PHP-Parser/issues/1009
+        if (version_compare((string) InstalledVersions::getPrettyVersion('nikic/php-parser'), 'v5.1', '<')) {
+            $expected = <<<'PHP'
                 <?php
 
                 namespace ArrayOneItem_NotNullableArray;
@@ -72,7 +75,27 @@ final class ArrayOneItemTest extends BaseMutatorTestCase
                         return (count($collection) > 1) ? array_slice($collection, 0, 1, true) : $collection;
                     }
                 }
-                PHP,
+                PHP;
+        } else {
+            $expected = <<<'PHP'
+                <?php
+
+                namespace ArrayOneItem_NotNullableArray;
+
+                class Test
+                {
+                    public function getCollection(): array
+                    {
+                        $collection = [1, 2, 3];
+                        return count($collection) > 1 ? array_slice($collection, 0, 1, true) : $collection;
+                    }
+                }
+                PHP;
+        }
+
+        yield 'It mutates when return typehint is not nullable array' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'mutates-not-nullable-array.php'),
+            $expected,
         ];
 
         yield 'It does not mutate the method call' => [
