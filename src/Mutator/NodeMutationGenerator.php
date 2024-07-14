@@ -156,14 +156,12 @@ class NodeMutationGenerator
 
     private function isOnFunctionSignature(): bool
     {
-        return $this->isOnFunctionSignatureMemoized
-            ?? $this->isOnFunctionSignatureMemoized = $this->currentNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+        return $this->isOnFunctionSignatureMemoized ??= $this->currentNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
     }
 
     private function isInsideFunction(): bool
     {
-        return $this->isInsideFunctionMemoized
-            ?? $this->isInsideFunctionMemoized = $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
+        return $this->isInsideFunctionMemoized ??= $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
     }
 
     /**

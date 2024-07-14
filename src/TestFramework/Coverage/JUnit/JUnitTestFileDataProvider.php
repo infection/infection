@@ -109,7 +109,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
     private function getXPath(): SafeDOMXPath
     {
-        return $this->xPath ?? $this->xPath = self::createXPath($this->jUnitLocator->locate());
+        return $this->xPath ??= self::createXPath($this->jUnitLocator->locate());
     }
 
     private static function createXPath(string $jUnitPath): SafeDOMXPath

@@ -73,7 +73,7 @@ class MutantFactory
             $mutantFilePath,
             $mutation,
             $mutatedCode,
-            lazy($this->createMutantDiff($originalPrettyPrintedFile, $mutation, $mutatedCode)),
+            lazy($this->createMutantDiff($originalPrettyPrintedFile, $mutatedCode)),
             $originalPrettyPrintedFile,
         );
     }
@@ -90,7 +90,7 @@ class MutantFactory
      *
      * @return iterable<string>
      */
-    private function createMutantDiff(Deferred $originalPrettyPrintedFile, Mutation $mutation, Deferred $mutantCode): iterable
+    private function createMutantDiff(Deferred $originalPrettyPrintedFile, Deferred $mutantCode): iterable
     {
         yield $this->differ->diff($originalPrettyPrintedFile->get(), $mutantCode->get());
     }
@@ -103,7 +103,6 @@ class MutantFactory
     private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): iterable
     {
         // The same file may be mutated multiple times hence we can memoize that call
-        yield $this->printedFileCache[$originalFilePath]
-            ?? $this->printedFileCache[$originalFilePath] = $this->printer->prettyPrintFile($originalStatements);
+        yield $this->printedFileCache[$originalFilePath] ??= $this->printer->prettyPrintFile($originalStatements);
     }
 }

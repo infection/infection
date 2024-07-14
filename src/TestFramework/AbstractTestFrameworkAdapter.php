@@ -107,7 +107,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
     public function getVersion(): string
     {
-        return $this->version ?? $this->version = $this->retrieveVersion();
+        return $this->version ??= $this->retrieveVersion();
     }
 
     public function getInitialTestsFailRecommendations(string $commandLine): string

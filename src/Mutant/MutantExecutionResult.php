@@ -39,7 +39,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;
 use Later\Interfaces\Deferred;
 use RuntimeException;
-use function Safe\sprintf;
+use function sprintf;
 use function strlen;
 use function strrpos;
 use Webmozart\Assert\Assert;
