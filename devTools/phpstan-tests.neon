@@ -10,14 +10,12 @@ parameters:
     inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
         - '#Return type \((void|mixed)\) of method .*(Visitor|Traverser).* should be compatible with return type .* of method PhpParser\\Node.*#'
-        - '#^Cannot call method (willReturn|shouldBeCalledTimes)\(\) on iterable<Infection\\Mutation\\Mutation>\.$#'
         - '#Offset .*\\.* does not exist on array<class-string<.*>.*#'
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'
         - '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with SimpleXMLElement and ''Expected dumped…'' will always evaluate to true\.$#'
         - '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with string will always evaluate to true\.$#'
         - '#^Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with ''[a-zA-Z\\]+'' and [a-zA-Z\\]+ will always evaluate to (false|true)\.$#'
         - '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
-        - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
         - '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
         -
             message: "#^Variable method call on Infection\\\\Tests\\\\FileSystem\\\\Finder\\\\MockVendor\\.$#"

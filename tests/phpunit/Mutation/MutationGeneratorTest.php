@@ -52,23 +52,19 @@ use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\WithConsecutive;
 use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 
 #[CoversClass(MutationGenerator::class)]
 final class MutationGeneratorTest extends TestCase
 {
-    use ProphecyTrait;
-
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
         $fileInfo = new MockSplFileInfo([
             'file' => 'test.txt',
         ]);
 
-        // Prophecy compares arguments on equality, therefore these have to be somewhat unique
         $proxyTraceA = new ProxyTrace($fileInfo, now(1));
         $proxyTraceB = new ProxyTrace($fileInfo, now(2));
 
@@ -81,25 +77,18 @@ final class MutationGeneratorTest extends TestCase
         $mutation1 = $this->createMock(Mutation::class);
         $mutation2 = $this->createMock(Mutation::class);
 
-        /** @var FileMutationGenerator|ObjectProphecy $fileMutationGeneratorProphecy */
-        $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
-        $fileMutationGeneratorProphecy
-            ->generate($proxyTraceA, $onlyCovered, $mutators, $nodeIgnorers)
-            ->shouldBeCalledTimes(1)
-            ->willReturn([
-                $mutation0,
-                $mutation1,
-            ])
-        ;
-
-        $fileMutationGeneratorProphecy
-            ->generate($proxyTraceB, $onlyCovered, $mutators, $nodeIgnorers)
-            ->shouldBeCalledTimes(1)
-            ->willReturn([
-                $mutation1,
-                $mutation2,
-            ])
-        ;
+        /** @var FileMutationGenerator&MockObject $fileMutationGenerator */
+        $fileMutationGenerator = $this->createMock(FileMutationGenerator::class);
+        $fileMutationGenerator->expects($this->exactly(2))
+            ->method('generate')
+            ->with(...WithConsecutive::create(
+                [$proxyTraceA, $onlyCovered, $mutators, $nodeIgnorers],
+                [$proxyTraceB, $onlyCovered, $mutators, $nodeIgnorers],
+            ))
+            ->willReturnOnConsecutiveCalls(
+                [$mutation0, $mutation1],
+                [$mutation1, $mutation2],
+            );
 
         $expectedMutations = [
             $mutation0,
@@ -122,7 +111,7 @@ final class MutationGeneratorTest extends TestCase
             $traceProviderMock,
             $mutators,
             $eventDispatcherMock,
-            $fileMutationGeneratorProphecy->reveal(),
+            $fileMutationGenerator,
             false,
         );
 
