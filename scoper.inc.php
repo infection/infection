@@ -48,4 +48,18 @@ return [
         // Symfony global constants
         '/^SYMFONY\_[\p{L}_]+$/',
     ],
+
+    'patchers' => [
+        static function (string $filePath, string $prefix, string $contents): string {
+            if ('bin/infection' !== $filePath) {
+                return $contents;
+            }
+
+            return str_replace(
+                'use Infected\Composer\InstalledVersions as ProjectInstalledVersions;',
+                'use Composer\InstalledVersions as ProjectInstalledVersions;',
+                $contents,
+            );
+        },
+    ]
 ];
