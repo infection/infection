@@ -165,6 +165,6 @@ class MetricsCalculator implements Collector
 
     private function getCalculator(): Calculator
     {
-        return $this->calculator ?? $this->calculator = Calculator::fromMetrics($this);
+        return $this->calculator ??= Calculator::fromMetrics($this);
     }
 }

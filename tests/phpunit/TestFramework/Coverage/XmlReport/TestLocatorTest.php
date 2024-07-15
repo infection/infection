@@ -167,7 +167,7 @@ final class TestLocatorTest extends TestCase
 
     private function getTestsLocations(): array
     {
-        return self::$testsLocations ?? self::$testsLocations = [
+        return self::$testsLocations ??= [
             '/path/to/acme/Foo.php' => new TestLocations(
                 [
                     26 => [

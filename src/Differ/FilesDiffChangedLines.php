@@ -52,12 +52,11 @@ class FilesDiffChangedLines
 
     public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, ?string $gitDiffBase): bool
     {
-        $map = $this->memoizedFilesChangedLinesMap
-            ?? $this->memoizedFilesChangedLinesMap = $this->diffChangedLinesParser->parse(
-                $this->diffFileProvider->provideWithLines($gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE),
-            );
+        $this->memoizedFilesChangedLinesMap ??= $this->diffChangedLinesParser->parse(
+            $this->diffFileProvider->provideWithLines($gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE),
+        );
 
-        foreach ($map[$fileRealPath] ?? [] as $changedLinesRange) {
+        foreach ($this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [] as $changedLinesRange) {
             if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {
                 return true;
             }
