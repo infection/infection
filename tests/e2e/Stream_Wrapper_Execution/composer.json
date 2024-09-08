@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "phpunit/phpunit": "^9.5.5",
+        "phpunit/phpunit": "^9.6.20",
         "dg/bypass-finals": "^1.4.1"
     },
     "autoload": {
