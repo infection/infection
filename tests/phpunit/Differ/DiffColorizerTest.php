@@ -136,6 +136,27 @@ final class DiffColorizerTest extends TestCase
                          }</code>
                     CODE,
             ],
+            'bug-1999' => [
+                <<<'CODE'
+                         protected function name()
+                         {
+                    -        return strtolower(get_class($this));
+                    +        strtolower(get_class($this));
+                    +        return null;
+                         }
+                     }
+                    CODE,
+                <<<'CODE'
+                    <code>
+                         protected function name()
+                         {
+                    <diff-del>-        return strtolower(get_class($this));</diff-del>
+                    <diff-add>+        strtolower(get_class($this));</diff-add>
+                    <diff-add>+        return null;</diff-add>
+                         }
+                     }</code>
+                    CODE,
+            ],
         ];
     }
 }
