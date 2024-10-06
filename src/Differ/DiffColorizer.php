@@ -35,12 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Differ;
 
+use function array_map;
+use function count;
 use function explode;
 use function implode;
+use function is_array;
 use function mb_strlen;
 use function mb_strpos;
 use function mb_strrpos;
 use function mb_substr;
+use function Safe\preg_match_all;
 use function sprintf;
 use function str_starts_with;
 use function substr;
@@ -55,6 +59,11 @@ class DiffColorizer
 {
     public function colorize(string $diff): string
     {
+        // fallback for cases when diff has multiple added new lines
+        if ($this->isMultiLineDiff($diff)) {
+            return $this->simpleMultilineColorize($diff);
+        }
+
         $lines = explode("\n", $diff);
 
         foreach ($lines as $index => $line) {
@@ -105,5 +114,32 @@ class DiffColorizer
         }
 
         return $return;
+    }
+
+    private function simpleMultilineColorize(string $diff): string
+    {
+        $lines = array_map(
+            static function (string $line): string {
+                if (str_starts_with($line, '-')) {
+                    return sprintf('<diff-del>%s</diff-del>', $line);
+                }
+
+                if (str_starts_with($line, '+')) {
+                    return sprintf('<diff-add>%s</diff-add>', $line);
+                }
+
+                return $line;
+            },
+            explode("\n", $diff),
+        );
+
+        return sprintf('<code>%s%s</code>', "\n", implode("\n", $lines));
+    }
+
+    private function isMultiLineDiff(string $diff): bool
+    {
+        preg_match_all('/^\+.*$/m', $diff, $matches);
+
+        return is_array($matches) && count($matches[0] ?? []) > 1;
     }
 }
