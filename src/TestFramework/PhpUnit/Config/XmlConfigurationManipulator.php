@@ -95,8 +95,17 @@ final class XmlConfigurationManipulator
         $this->setAttributeValue($xPath, 'cacheResult', 'false');
     }
 
-    public function handleResultCacheAndExecutionOrder(string $version, SafeDOMXPath $xPath, string $mutationHash): void
+    public function handleResultCacheAndExecutionOrder(string $version, SafeDOMXPath $xPath, string $mutationHash, string $tmpDir): void
     {
+        // starting from PHPUnit 11.0 the cacheResultFile was removed, we now set cacheDirectory instead https://github.com/sebastianbergmann/phpunit/blob/11.0.0/phpunit.xsd
+        if (version_compare($version, '11.0', '>=')) {
+            $this->setAttributeValue($xPath, 'cacheResult', 'true');
+            $this->setAttributeValue($xPath, 'cacheDirectory', sprintf('%s/.phpunit.result.cache.%s', $tmpDir, $mutationHash));
+            $this->setAttributeValue($xPath, 'executionOrder', 'defects');
+
+            return;
+        }
+
         // starting from PHPUnit 7.3 we can set cache result and "defects" execution order https://github.com/sebastianbergmann/phpunit/blob/7.3.0/phpunit.xsd
         if (version_compare($version, '7.3', '>=')) {
             $this->setAttributeValue($xPath, 'cacheResult', 'true');
@@ -117,13 +126,16 @@ final class XmlConfigurationManipulator
         $this->setAttributeValue($xPath, 'stderr', 'false');
     }
 
-    public function setStopOnFailure(SafeDOMXPath $xPath): void
+    public function setStopOnFailure(string $version, SafeDOMXPath $xPath): void
     {
-        $this->setAttributeValue(
-            $xPath,
-            'stopOnFailure',
-            'true',
-        );
+        # with phpunit 10.0  we need to use stopOnDefect instead: https://github.com/sebastianbergmann/phpunit/blob/10.0.0/ChangeLog-10.0.md
+        if (version_compare($version, '10.0', '>=')) {
+            $this->setAttributeValue($xPath, 'stopOnDefect', 'true');
+
+            return;
+        }
+
+        $this->setAttributeValue($xPath, 'stopOnFailure', 'true');
     }
 
     public function deactivateColours(SafeDOMXPath $xPath): void
