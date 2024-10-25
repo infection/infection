@@ -128,7 +128,7 @@ final class XmlConfigurationManipulator
 
     public function setStopOnFailure(string $version, SafeDOMXPath $xPath): void
     {
-        # with phpunit 10.0  we need to use stopOnDefect instead: https://github.com/sebastianbergmann/phpunit/blob/10.0.0/ChangeLog-10.0.md
+        // with phpunit 10.0  we need to use stopOnDefect instead: https://github.com/sebastianbergmann/phpunit/blob/10.0.0/ChangeLog-10.0.md
         if (version_compare($version, '10.0', '>=')) {
             $this->setAttributeValue($xPath, 'stopOnDefect', 'true');
 
