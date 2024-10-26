@@ -49,6 +49,7 @@ if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
 // Infection autoloading
 (static function (): void {
     $autoload = $GLOBALS['_composer_autoload_path'] ?? '';
+
     if ($autoload && \file_exists($autoload)) {
         // Is installed via Composer
         include_once $autoload;
