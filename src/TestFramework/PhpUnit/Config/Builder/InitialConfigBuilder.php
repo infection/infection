@@ -90,7 +90,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
         $this->configManipulator->addFailOnAttributesIfNotSet($version, $xPath);
         $this->configManipulator->replaceWithAbsolutePaths($xPath);
-        $this->configManipulator->setStopOnFailure($xPath);
+        $this->configManipulator->setStopOnFailure($version, $xPath);
         $this->configManipulator->deactivateColours($xPath);
         $this->configManipulator->deactivateResultCaching($xPath);
         $this->configManipulator->deactivateStderrRedirection($xPath);
