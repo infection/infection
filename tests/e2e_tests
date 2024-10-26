@@ -51,6 +51,10 @@ exitOnError() {
     fi
 }
 
+echo "GITHUB_HEAD_REF=$GITHUB_HEAD_REF";
+echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY";
+echo "$(env)"
+
 e2e_tests_dirs=$(find . -maxdepth 1 -mindepth 1 -type d)
 
 # Export the function so xargs can use it
