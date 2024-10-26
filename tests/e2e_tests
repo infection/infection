@@ -51,28 +51,6 @@ exitOnError() {
     fi
 }
 
-echo "GITHUB_HEAD_REF=$GITHUB_HEAD_REF";
-echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY";
-cat "$GITHUB_EVENT_PATH"
-
-if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
-  # Extract the repo full names from the event payload
-  pr_repo_full_name=$(jq -r .pull_request.head.repo.full_name "$GITHUB_EVENT_PATH")
-  base_repo_full_name=$(jq -r .repository.full_name "$GITHUB_EVENT_PATH")
-
-  echo $pr_repo_full_name
-  echo base_repo_full_name
-
-  # Compare the two repositories
-  if [[ "$pr_repo_full_name" != "$base_repo_full_name" ]]; then
-    echo "This pull request is from a forked repository."
-  else
-    echo "This pull request is from the same repository."
-  fi
-else
-  echo "This is not a pull request event."
-fi
-
 e2e_tests_dirs=$(find . -maxdepth 1 -mindepth 1 -type d)
 
 # Export the function so xargs can use it
