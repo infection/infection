@@ -2,6 +2,10 @@
 
 set -e
 
+echo "GITHUB_HEAD_REF=$GITHUB_HEAD_REF";
+echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY";
+echo "$(env)"
+
 git_branch=$(echo "${GITHUB_HEAD_REF:-$(git rev-parse --abbrev-ref HEAD)}" | sed 's/\//\\\//g')
 
 echo "git_branch: ${git_branch}"
