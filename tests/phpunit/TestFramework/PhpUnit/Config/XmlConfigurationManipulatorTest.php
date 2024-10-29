@@ -332,7 +332,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
     {
         $this->assertItChangesPrePHPUnit93Configuration(
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->setStopOnFailure('9.3', $xPath);
+                $configManipulator->setStopOnFailureOrDefect('9.3', $xPath);
             },
             <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -389,7 +389,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->setStopOnFailure('9.3', $xPath);
+                $configManipulator->setStopOnFailureOrDefect('9.3', $xPath);
             },
             <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -432,7 +432,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->setStopOnFailure('10.0', $xPath);
+                $configManipulator->setStopOnFailureOrDefect('10.0', $xPath);
             },
             <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>

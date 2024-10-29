@@ -85,7 +85,7 @@ class MutationConfigBuilder extends ConfigBuilder
         // activate PHPUnit's result cache and order tests by running defects first, then sorted by fastest first
         $this->configManipulator->handleResultCacheAndExecutionOrder($version, $xPath, $mutationHash, $this->tmpDir);
         $this->configManipulator->addFailOnAttributesIfNotSet($version, $xPath);
-        $this->configManipulator->setStopOnFailure($version, $xPath);
+        $this->configManipulator->setStopOnFailureOrDefect($version, $xPath);
         $this->configManipulator->deactivateColours($xPath);
         $this->configManipulator->deactivateStderrRedirection($xPath);
         $this->configManipulator->removeExistingLoggers($xPath);
