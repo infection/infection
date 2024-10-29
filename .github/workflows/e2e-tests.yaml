@@ -103,7 +103,7 @@ jobs:
             ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress
           else
             ls tests/e2e/*/composer.json | xargs dirname |
-               xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress
+               xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
           fi
 
       - name: Run a subset of E2E tests

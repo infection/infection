@@ -332,7 +332,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
     {
         $this->assertItChangesPrePHPUnit93Configuration(
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->setStopOnFailure($xPath);
+                $configManipulator->setStopOnFailureOrDefect('9.3', $xPath);
             },
             <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -389,7 +389,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->setStopOnFailure($xPath);
+                $configManipulator->setStopOnFailureOrDefect('9.3', $xPath);
             },
             <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -404,6 +404,49 @@ final class XmlConfigurationManipulatorTest extends TestCase
                     printerClass="Fake\Printer\Class"
                     processIsolation="false"
                     stopOnFailure="true"
+                    syntaxCheck="false"
+                >
+                </phpunit>
+                XML,
+        );
+    }
+
+    public function test_it_sets_set_stop_on_defect_when_it_is_already_present_10_0(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit
+                backupGlobals="false"
+                backupStaticAttributes="false"
+                bootstrap="app/autoload2.php"
+                colors="true"
+                convertErrorsToExceptions="true"
+                convertNoticesToExceptions="true"
+                convertWarningsToExceptions="true"
+                printerClass="Fake\Printer\Class"
+                processIsolation="false"
+                stopOnDefect="false"
+                syntaxCheck="false"
+            >
+            </phpunit>
+            XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->setStopOnFailureOrDefect('10.0', $xPath);
+            },
+            <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit
+                    backupGlobals="false"
+                    backupStaticAttributes="false"
+                    bootstrap="app/autoload2.php"
+                    colors="true"
+                    convertErrorsToExceptions="true"
+                    convertNoticesToExceptions="true"
+                    convertWarningsToExceptions="true"
+                    printerClass="Fake\Printer\Class"
+                    processIsolation="false"
+                    stopOnDefect="true"
                     syntaxCheck="false"
                 >
                 </phpunit>
@@ -627,6 +670,32 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
     }
 
+    public function test_it_activates_result_cache_and_execution_order_defects_for_phpunit_11_0(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit
+                syntaxCheck="false"
+            >
+            </phpunit>
+            XML
+            ,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->handleResultCacheAndExecutionOrder('11.0', $xPath, 'a1b2c3', '/tmp');
+            },
+            <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit
+                    executionOrder="defects"
+                    cacheResult="true"
+                    cacheDirectory="/tmp/.phpunit.result.cache.a1b2c3"
+                    syntaxCheck="false"
+                >
+                </phpunit>
+                XML,
+        );
+    }
+
     public function test_it_activates_result_cache_and_execution_order_defects_for_phpunit_7_3(): void
     {
         $this->assertItChangesXML(<<<'XML'
@@ -638,7 +707,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->handleResultCacheAndExecutionOrder('7.3', $xPath, 'a1b2c3');
+                $configManipulator->handleResultCacheAndExecutionOrder('7.3', $xPath, 'a1b2c3', '/tmp');
             },
             <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -664,7 +733,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             XML
             ,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->handleResultCacheAndExecutionOrder('7.1', $xPath, 'a1b2c3');
+                $configManipulator->handleResultCacheAndExecutionOrder('7.1', $xPath, 'a1b2c3', '/tmp');
             },
             <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>
