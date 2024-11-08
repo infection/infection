@@ -47,6 +47,7 @@ final class ProfileList
 
     public const ALL_PROFILES = [
         '@arithmetic' => self::ARITHMETIC_PROFILE,
+        '@augmentation' => self::AUGMENTATION_PROFILE,
         '@boolean' => self::BOOLEAN_PROFILE,
         '@cast' => self::CAST_PROFILE,
         '@conditional_boundary' => self::CONDITIONAL_BOUNDARY_PROFILE,
@@ -90,6 +91,10 @@ final class ProfileList
         Arithmetic\RoundingFamily::class,
         Arithmetic\ShiftLeft::class,
         Arithmetic\ShiftRight::class,
+    ];
+
+    public const AUGMENTATION_PROFILE = [
+        Mutator\Augmentation\ExpressionRepeat::class,
     ];
 
     public const BOOLEAN_PROFILE = [
@@ -282,6 +287,7 @@ final class ProfileList
 
     public const DEFAULT_PROFILE = [
         '@arithmetic',
+        '@augmentation',
         '@boolean',
         '@cast',
         '@conditional_boundary',
@@ -323,6 +329,9 @@ final class ProfileList
         'RoundingFamily' => Arithmetic\RoundingFamily::class,
         'ShiftLeft' => Arithmetic\ShiftLeft::class,
         'ShiftRight' => Arithmetic\ShiftRight::class,
+
+        // Augmentation
+        'ExpressionRepeat' => Mutator\Augmentation\ExpressionRepeat::class,
 
         // Boolean
         'ArrayItem' => Boolean\ArrayItem::class,
