@@ -208,6 +208,7 @@
                 "ShiftLeft": { "$ref": "#/definitions/default-mutator-config" },
                 "ShiftRight": { "$ref": "#/definitions/default-mutator-config" },
                 "RoundingFamily": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayAll": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItem": { "$ref": "#/definitions/default-mutator-config" },
                 "EqualIdentical": { "$ref": "#/definitions/default-mutator-config" },
                 "FalseValue": { "$ref": "#/definitions/default-mutator-config" },
