@@ -94,6 +94,7 @@ final class ProfileList
 
     public const BOOLEAN_PROFILE = [
         Boolean\ArrayAll::class,
+        Boolean\ArrayAny::class,
         Boolean\ArrayItem::class,
         // EqualIdentical disabled from the default boolean profile
         Boolean\FalseValue::class,
@@ -327,6 +328,7 @@ final class ProfileList
 
         // Boolean
         'ArrayAll' => Boolean\ArrayAll::class,
+        'ArrayAny' => Boolean\ArrayAny::class,
         'ArrayItem' => Boolean\ArrayItem::class,
         'EqualIdentical' => Boolean\EqualIdentical::class,
         'FalseValue' => Boolean\FalseValue::class,
