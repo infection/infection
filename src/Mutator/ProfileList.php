@@ -93,6 +93,7 @@ final class ProfileList
     ];
 
     public const BOOLEAN_PROFILE = [
+        Boolean\ArrayAll::class,
         Boolean\ArrayItem::class,
         // EqualIdentical disabled from the default boolean profile
         Boolean\FalseValue::class,
@@ -325,6 +326,7 @@ final class ProfileList
         'ShiftRight' => Arithmetic\ShiftRight::class,
 
         // Boolean
+        'ArrayAll' => Boolean\ArrayAll::class,
         'ArrayItem' => Boolean\ArrayItem::class,
         'EqualIdentical' => Boolean\EqualIdentical::class,
         'FalseValue' => Boolean\FalseValue::class,
