@@ -40,7 +40,7 @@ use function in_array;
 use function is_array;
 use function is_string;
 use LogicException;
-use function Safe\array_walk_recursive;
+use function array_walk_recursive;
 use stdClass;
 use function trim;
 
