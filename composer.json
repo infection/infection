@@ -65,7 +65,7 @@
         "symfony/filesystem": "^5.4 || ^6.0 || ^7.0",
         "symfony/finder": "^5.4 || ^6.0 || ^7.0",
         "symfony/process": "^5.4 || ^6.0 || ^7.0",
-        "thecodingmachine/safe": "^2.1.2",
+        "thecodingmachine/safe": "dev-master as 2.5.0",
         "webmozart/assert": "^1.11"
     },
     "conflict": {

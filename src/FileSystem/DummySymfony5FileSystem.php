@@ -107,7 +107,7 @@ final class DummySymfony5FileSystem extends Filesystem
         return true;
     }
 
-    public function tempnam(string $dir, string $prefix/* , string $suffix = '' */): string
+    public function tempnam(string $dir, string $prefix, string $suffix = ''): string
     {
         return '';
     }
