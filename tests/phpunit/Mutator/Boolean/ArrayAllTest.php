@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\ArrayAll;
 use Infection\Testing\BaseMutatorTestCase;
+use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -201,5 +202,40 @@ final class ArrayAllTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        if (PHP_VERSION_ID >= 80400) {
+            yield 'It mutates correctly when provided inside getter PHP 8.4 syntax' => [
+                <<<'PHP'
+                    <?php
+
+                    new class
+                    {
+                        private array $numbers = [];
+                        public function __construct(array $numbers)
+                        {
+                            $this->numbers = $numbers;
+                        }
+
+                        public bool $allPositive { get => array_all(fn (int $number) => $number > 0); }
+                    };
+                    PHP
+                ,
+                <<<'PHP'
+                    <?php
+
+                    new class
+                    {
+                        private array $numbers = [];
+                        public function __construct(array $numbers)
+                        {
+                            $this->numbers = $numbers;
+                        }
+                        public bool $allPositive {
+                            get => true;
+                        }
+                    };
+                    PHP,
+            ];
+        }
     }
 }
