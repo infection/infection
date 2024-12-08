@@ -4031,25 +4031,26 @@
         },
         {
             "name": "sidz/phpstan-rules",
-            "version": "0.4.3",
+            "version": "0.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sidz/phpstan-rules.git",
-                "reference": "f3832cd58d6051ebb8b3f2a44aa8a9ade018d9f5"
+                "reference": "17bf97643b7b3d4557e0a0c1c2d958fcceade4fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/f3832cd58d6051ebb8b3f2a44aa8a9ade018d9f5",
-                "reference": "f3832cd58d6051ebb8b3f2a44aa8a9ade018d9f5",
+                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/17bf97643b7b3d4557e0a0c1c2d958fcceade4fd",
+                "reference": "17bf97643b7b3d4557e0a0c1c2d958fcceade4fd",
                 "shasum": ""
             },
             "require": {
-                "nikic/php-parser": "^4.14 || ^5.0",
-                "php": "^8.1, <8.4",
+                "php": "^8.1, <8.5",
                 "phpstan/phpstan": "^1.8"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.4",
+                "friendsofphp/php-cs-fixer": "^3.59",
+                "infection/infection": "^0.28.0",
+                "nikic/php-parser": "^4.14 || ^5.0",
                 "phpunit/phpunit": "^10.1"
             },
             "type": "phpstan-extension",
@@ -4087,7 +4088,7 @@
                 "issues": "https://github.com/sidz/phpstan-rules/issues",
                 "source": "https://github.com/sidz/phpstan-rules"
             },
-            "time": "2024-01-08T18:37:19+00:00"
+            "time": "2024-12-08T17:38:04+00:00"
         },
         {
             "name": "softcreatr/jsonpath",
