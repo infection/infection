@@ -45,6 +45,7 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
+use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
 /**
@@ -53,11 +54,11 @@ use Webmozart\Assert\Assert;
  */
 class MutationGenerator
 {
-    /** @var Mutator<\PhpParser\Node>[] */
+    /** @var Mutator<Node>[] */
     private readonly array $mutators;
 
     /**
-     * @param Mutator<\PhpParser\Node>[] $mutators
+     * @param Mutator<Node>[] $mutators
      */
     public function __construct(
         private readonly TraceProvider $traceProvider,

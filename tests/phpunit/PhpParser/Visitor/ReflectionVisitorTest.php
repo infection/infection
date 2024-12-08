@@ -282,7 +282,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
 
     private function getInsideFunctionSpyVisitor()
     {
-        return new class() extends NodeVisitorAbstract {
+        return new class extends NodeVisitorAbstract {
             public $isInsideFunction = false;
 
             public function enterNode(Node $node)
@@ -300,7 +300,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
 
     private function getReflectionClassSpyVisitor()
     {
-        return new class() extends NodeVisitorAbstract {
+        return new class extends NodeVisitorAbstract {
             /**
              * @var ReflectionClass
              */
@@ -321,7 +321,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
 
     private function getReflectionClassesSpyVisitor()
     {
-        return new class() extends NodeVisitorAbstract {
+        return new class extends NodeVisitorAbstract {
             public $fooReflectionClass;
             public $createAnonymousClassReflectionClass;
 

@@ -45,6 +45,7 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
+use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
 /**
@@ -58,7 +59,7 @@ class FileMutationGenerator
     }
 
     /**
-     * @param Mutator<\PhpParser\Node>[] $mutators
+     * @param Mutator<Node>[] $mutators
      * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws UnparsableFile

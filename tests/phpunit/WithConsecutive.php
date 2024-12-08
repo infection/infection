@@ -38,7 +38,6 @@ namespace Infection\Tests;
 use function array_shift;
 use function count;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
 use RuntimeException;
@@ -54,7 +53,7 @@ final class WithConsecutive
     /**
      * @param array<mixed> $parameterGroups
      *
-     * @return array<int, callback<mixed>>
+     * @return array<int, callable<mixed>>
      */
     public static function create(...$parameterGroups): array
     {

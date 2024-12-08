@@ -38,6 +38,7 @@ namespace Infection\Mutator;
 use function end;
 use function explode;
 use function is_a;
+use PhpParser\Node;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -47,9 +48,9 @@ use Webmozart\Assert\Assert;
 final class MutatorFactory
 {
     /**
-     * @param array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, mixed[]> $resolvedMutators
+     * @param array<class-string<Mutator<Node>&ConfigurableMutator<Node>>, mixed[]> $resolvedMutators
      *
-     * @return array<string, Mutator<\PhpParser\Node>>
+     * @return array<string, Mutator<Node>>
      */
     public function create(array $resolvedMutators, bool $useNoopMutators): array
     {
@@ -72,7 +73,7 @@ final class MutatorFactory
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
 
-            /** @var Mutator<\PhpParser\Node> $mutator */
+            /** @var Mutator<Node> $mutator */
             $mutator
                 = is_a($mutatorClassName, ConfigurableMutator::class, true)
                     ? self::getConfigurableMutator($mutatorClassName, $settings)
@@ -100,10 +101,10 @@ final class MutatorFactory
     }
 
     /**
-     * @param class-string<ConfigurableMutator<\PhpParser\Node>> $mutatorClassName
+     * @param class-string<ConfigurableMutator<Node>> $mutatorClassName
      * @param mixed[] $settings
      *
-     * @return ConfigurableMutator<\PhpParser\Node>
+     * @return ConfigurableMutator<Node>
      */
     private static function getConfigurableMutator(string $mutatorClassName, array $settings): ConfigurableMutator
     {

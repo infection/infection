@@ -108,7 +108,7 @@ return (new Config())
             ],
         ],
         'blank_line_between_import_groups' => false,
-        'compact_nullable_typehint' => true,
+        'compact_nullable_type_declaration' => true,
         'concat_space' => ['spacing' => 'one'],
         'fully_qualified_strict_types' => [
             'import_symbols' => true,
@@ -183,6 +183,7 @@ return (new Config())
             'identical' => false,
             'less_and_greater' => false,
         ],
+        'blank_line_after_opening_tag' => false,
     ])
     ->setFinder($finder)
 ;

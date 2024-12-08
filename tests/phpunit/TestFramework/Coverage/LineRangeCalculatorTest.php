@@ -157,7 +157,7 @@ final class LineRangeCalculatorTest extends TestCase
 
     private function createSpyTraverser()
     {
-        return new class() extends NodeVisitorAbstract {
+        return new class extends NodeVisitorAbstract {
             /**
              * @var int[]
              */
