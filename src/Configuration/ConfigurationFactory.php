@@ -59,6 +59,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
+use PhpParser\Node;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
@@ -196,7 +197,7 @@ class ConfigurationFactory
     /**
      * @param array<string, mixed> $schemaMutators
      *
-     * @return array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, mixed[]>
+     * @return array<class-string<Mutator<Node>&ConfigurableMutator<Node>>, mixed[]>
      */
     private function resolveMutators(array $schemaMutators, string $mutatorsInput): array
     {

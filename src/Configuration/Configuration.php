@@ -39,6 +39,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\TestFrameworkTypes;
+use PhpParser\Node;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -58,7 +59,7 @@ class Configuration
     /** @var string[] */
     private readonly array $sourceDirectories;
     private readonly string $logVerbosity;
-    /** @var array<string, Mutator<\PhpParser\Node>> */
+    /** @var array<string, Mutator<Node>> */
     private readonly array $mutators;
     private readonly string $testFramework;
     private ?float $minMsi = null;
@@ -68,7 +69,7 @@ class Configuration
      * @param string[] $sourceDirectories
      * @param string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
-     * @param array<string, Mutator<\PhpParser\Node>> $mutators
+     * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
@@ -178,7 +179,7 @@ class Configuration
     }
 
     /**
-     * @return array<string, Mutator<\PhpParser\Node>>
+     * @return array<string, Mutator<Node>>
      */
     public function getMutators(): array
     {

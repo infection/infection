@@ -71,7 +71,7 @@ final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
 
     private function getSpyVisitor()
     {
-        return new class() extends NodeVisitorAbstract {
+        return new class extends NodeVisitorAbstract {
             private $nodesVisitedCount = 0;
 
             public function leaveNode(Node $node): void
@@ -93,7 +93,7 @@ final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
         $this->traverse(
             $nodes,
             [
-                new NonMutableNodesIgnorerVisitor([new class() implements NodeIgnorer {
+                new NonMutableNodesIgnorerVisitor([new class implements NodeIgnorer {
                     public function ignores(Node $node): bool
                     {
                         return true;

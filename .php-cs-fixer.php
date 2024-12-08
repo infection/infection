@@ -183,6 +183,7 @@ return (new Config())
             'identical' => false,
             'less_and_greater' => false,
         ],
+        'blank_line_after_opening_tag' => false,
     ])
     ->setFinder($finder)
 ;

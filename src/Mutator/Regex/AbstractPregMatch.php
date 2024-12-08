@@ -56,7 +56,7 @@ abstract class AbstractPregMatch implements Mutator
      *
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Expr\FuncCall>
+     * @return iterable<FuncCall>
      */
     public function mutate(Node $node): iterable
     {

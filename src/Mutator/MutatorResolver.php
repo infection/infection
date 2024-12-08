@@ -43,6 +43,7 @@ use function class_exists;
 use function in_array;
 use InvalidArgumentException;
 use function is_subclass_of;
+use PhpParser\Node;
 use function sprintf;
 use stdClass;
 
@@ -64,7 +65,7 @@ final class MutatorResolver
      *
      * @param array<string, bool|stdClass> $mutatorSettings
      *
-     * @return array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, mixed[]>
+     * @return array<class-string<Mutator<Node>&ConfigurableMutator<Node>>, mixed[]>
      */
     public function resolve(array $mutatorSettings): array
     {
