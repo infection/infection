@@ -98,13 +98,8 @@ jobs:
       - name: Install Composer dependencies for E2E tests
         shell: bash
         run: |
-          if [[ "${{ matrix.php-version }}" == '8.4' ]]; then
-            ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} -P 4 composer --working-dir={} config platform.php 8.3.99
-            ls tests/e2e/*/composer.json | xargs dirname | xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress
-          else
-            ls tests/e2e/*/composer.json | xargs dirname |
-               xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
-          fi
+          ls tests/e2e/*/composer.json | xargs dirname |
+             xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
 
       - name: Run a subset of E2E tests
         if: runner.os == 'Windows'
