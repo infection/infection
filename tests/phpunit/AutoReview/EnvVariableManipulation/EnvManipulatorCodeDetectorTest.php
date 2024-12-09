@@ -105,6 +105,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
         yield 'putenv Safe function imported' => [
             <<<'PHP'
                 <?php
+                use function Safe\putenv;
                 PHP
             ,
             true,
