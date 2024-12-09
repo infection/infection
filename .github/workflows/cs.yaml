@@ -26,7 +26,7 @@ jobs:
           # Should use the lowest supported version to ensure the CS-Fixer does
           # not get confused and apply a rule that would break on lower supported
           # versions.
-          php-version: 8.1
+          php-version: 8.2
 
       - name: Restore PHP-CS-Fixer cache
         uses: actions/cache@v4
