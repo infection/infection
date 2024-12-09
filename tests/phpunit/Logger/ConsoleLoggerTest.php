@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use DateTimeImmutable as UnsafeDateTimeImmutable;
+use function fopen;
 use Infection\Console\IO;
 use Infection\Logger\ConsoleLogger;
 use function Infection\Tests\normalize_trailing_spaces;
@@ -46,8 +47,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
-use Safe\DateTime;
-use function Safe\fopen;
 use stdClass;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;

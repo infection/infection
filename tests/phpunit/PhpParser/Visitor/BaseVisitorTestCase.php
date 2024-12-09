@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use function file_get_contents;
 use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
 use function sprintf;
 
 abstract class BaseVisitorTestCase extends TestCase

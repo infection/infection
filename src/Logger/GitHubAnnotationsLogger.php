@@ -37,7 +37,7 @@ namespace Infection\Logger;
 
 use function getenv;
 use Infection\Metrics\ResultsCollector;
-use function Safe\shell_exec;
+use function shell_exec;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
 use function trim;

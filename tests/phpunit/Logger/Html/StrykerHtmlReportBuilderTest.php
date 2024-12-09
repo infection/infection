@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\Html;
 
 use function array_map;
+use function base64_decode;
+use function file_get_contents;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
@@ -50,6 +52,8 @@ use Infection\Mutator\Removal\ArrayItemRemoval;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Testing\MutatorName;
 use function Infection\Tests\normalize_trailing_spaces;
+use function json_decode;
+use function json_encode;
 use JsonSchema\Validator;
 use function Later\now;
 use const PHP_EOL;
@@ -57,11 +61,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\base64_decode;
-use function Safe\file_get_contents;
-use function Safe\json_decode;
-use function Safe\json_encode;
-use function Safe\realpath;
+use function realpath;
 use function sprintf;
 
 #[Group('integration')]

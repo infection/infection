@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder;
 
+use function getcwd;
 use Infection\FileSystem\Finder\Exception\FinderException;
-use function Safe\getcwd;
-use function Safe\realpath;
+use function realpath;
 use function sprintf;
 use function str_contains;
 use Symfony\Component\Process\ExecutableFinder;

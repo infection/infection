@@ -40,6 +40,7 @@ use function array_key_exists;
 use function array_shift;
 use function count;
 use function escapeshellarg;
+use function exec;
 use function implode;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
@@ -49,7 +50,6 @@ use Infection\PhpParser\Visitor\MutatorVisitor;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
-use function Safe\exec;
 use function sprintf;
 use Webmozart\Assert\Assert;
 

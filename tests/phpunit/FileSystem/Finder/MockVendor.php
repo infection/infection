@@ -37,9 +37,9 @@ namespace Infection\Tests\FileSystem\Finder;
 
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
+use function file_put_contents;
 use function implode;
 use const PHP_EOL;
-use function Safe\file_put_contents;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class MockVendor

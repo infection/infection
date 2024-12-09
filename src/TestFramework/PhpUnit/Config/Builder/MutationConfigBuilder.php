@@ -38,13 +38,13 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 use DOMDocument;
 use DOMNode;
 use DOMNodeList;
+use function file_put_contents;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
-use function Safe\file_put_contents;
 use function sprintf;
 use Webmozart\Assert\Assert;
 

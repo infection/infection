@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Safe\Exceptions\PcreException;
-use Safe\Exceptions\StringsException;
-use function Safe\preg_replace;
+use function preg_replace;
 use function sprintf;
 use function trim;
 use Webmozart\Assert\Assert;

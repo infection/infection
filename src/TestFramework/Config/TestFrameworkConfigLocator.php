@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Config;
 
 use function file_exists;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use function realpath;
 use function sprintf;
 
 /**

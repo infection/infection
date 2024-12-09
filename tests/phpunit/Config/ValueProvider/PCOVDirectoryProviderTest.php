@@ -37,10 +37,9 @@ namespace Infection\Tests\Config\ValueProvider;
 
 use function extension_loaded;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use function ini_get;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Safe\Exceptions\InfoException;
-use function Safe\ini_get;
 
 #[CoversClass(PCOVDirectoryProvider::class)]
 final class PCOVDirectoryProviderTest extends TestCase

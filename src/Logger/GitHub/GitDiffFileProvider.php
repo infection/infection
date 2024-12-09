@@ -41,7 +41,7 @@ use function explode;
 use function implode;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
-use function Safe\preg_match;
+use function preg_match;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**

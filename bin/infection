@@ -38,7 +38,6 @@ declare(strict_types=1);
 
 use Infection\Console\Application;
 use Infection\Container;
-use function Safe\getcwd;
 
 if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
     echo \PHP_EOL . 'Infection may only be invoked from a command line, got "' . \PHP_SAPI . '"' . \PHP_EOL;
@@ -86,7 +85,7 @@ if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
 
 // Project (third-party) autoloading
 (static function (): void {
-    if (\file_exists($autoload = getcwd() . '/vendor/autoload.php')) {
+    if (\file_exists($autoload = \getcwd() . '/vendor/autoload.php')) {
         include_once $autoload;
     }
 })();

@@ -39,8 +39,8 @@ use function array_values;
 use function count;
 use function explode;
 use function implode;
+use function mb_convert_encoding;
 use const PHP_EOL;
-use function Safe\mb_convert_encoding;
 use function str_replace;
 use function trim;
 

@@ -35,8 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
 
-use Safe\Exceptions\InfoException;
-use function Safe\ini_get;
+use function ini_get;
 
 /**
  * Provides value for pcov.directory configuration option. Can be injected with a configuration object to provide a better, precise, value.

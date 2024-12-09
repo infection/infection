@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
 use function array_keys;
+use function file_get_contents;
 use Infection\CannotBeInstantiated;
-use function Safe\file_get_contents;
-use function Safe\preg_match_all;
+use function preg_match_all;
 use function sprintf;
 use function str_contains;
 

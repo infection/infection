@@ -46,8 +46,8 @@ use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function realpath;
 use ReflectionClass;
-use function Safe\realpath;
 
 #[Group('integration')]
 #[CoversClass(SchemaConfigurationFileLoader::class)]

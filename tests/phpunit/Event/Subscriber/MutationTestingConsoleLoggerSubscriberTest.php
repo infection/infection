@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
+use function fopen;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
@@ -57,10 +58,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\fopen;
-use function Safe\rewind;
-use function Safe\stream_get_contents;
+use function rewind;
 use function str_replace;
+use function stream_get_contents;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Filesystem\Filesystem;

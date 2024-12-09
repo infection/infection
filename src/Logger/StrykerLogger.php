@@ -44,8 +44,8 @@ use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
+use function json_encode;
 use Psr\Log\LoggerInterface;
-use function Safe\json_encode;
 use function sprintf;
 
 /**

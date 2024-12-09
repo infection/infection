@@ -39,7 +39,7 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use Infection\TestFramework\SafeDOMXPath;
-use function Safe\preg_replace;
+use function preg_replace;
 use function sprintf;
 use Webmozart\Assert\Assert;
 

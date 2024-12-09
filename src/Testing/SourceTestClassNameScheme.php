@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Testing;
 
 use Infection\CannotBeInstantiated;
-use function Safe\preg_match;
-use function Safe\preg_replace;
+use function preg_match;
+use function preg_replace;
 use function str_contains;
 use function str_replace;
 

@@ -37,6 +37,7 @@ namespace Infection\Tests\AutoReview\Makefile;
 
 use function array_filter;
 use function array_map;
+use function array_replace;
 use function array_shift;
 use function array_unshift;
 use function array_values;
@@ -47,7 +48,6 @@ use function implode;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use function Safe\array_replace;
 use function sprintf;
 use function str_ends_with;
 use function str_starts_with;

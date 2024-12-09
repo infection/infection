@@ -38,6 +38,7 @@ namespace Infection\Tests\AutoReview\Mutator;
 use function array_diff;
 use function array_filter;
 use function array_map;
+use function class_implements;
 use function count;
 use function implode;
 use function in_array;
@@ -50,8 +51,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
-use function Safe\class_implements;
-use function Safe\sort;
+use function sort;
 use const SORT_STRING;
 use function sprintf;
 

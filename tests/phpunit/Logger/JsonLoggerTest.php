@@ -35,20 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use function base64_decode;
 use Infection\Logger\JsonLogger;
 use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
+use function json_decode;
 use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\base64_decode;
-use function Safe\json_decode;
 use function str_replace;
 
 #[Group('integration')]

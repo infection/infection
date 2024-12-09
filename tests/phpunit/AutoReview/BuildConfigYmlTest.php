@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use function file_get_contents;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function Safe\realpath;
+use function realpath;
 use function sprintf;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;

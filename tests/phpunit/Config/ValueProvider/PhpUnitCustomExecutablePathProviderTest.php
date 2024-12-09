@@ -45,7 +45,7 @@ use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
-use function Safe\realpath;
+use function realpath;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 use Symfony\Component\Console\Input\StringInput;
 

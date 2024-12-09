@@ -37,7 +37,7 @@ namespace Infection\Event\Subscriber;
 
 use function function_exists;
 use Infection\Event\MutantProcessWasFinished;
-use function Safe\pcntl_signal_dispatch;
+use function pcntl_signal_dispatch;
 
 /**
  * @internal

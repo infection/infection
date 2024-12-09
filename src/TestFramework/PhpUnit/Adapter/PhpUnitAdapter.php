@@ -46,7 +46,7 @@ use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\VersionParser;
-use function Safe\preg_match;
+use function preg_match;
 use function sprintf;
 use function trim;
 use function version_compare;

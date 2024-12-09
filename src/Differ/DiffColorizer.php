@@ -44,7 +44,7 @@ use function mb_strlen;
 use function mb_strpos;
 use function mb_strrpos;
 use function mb_substr;
-use function Safe\preg_match_all;
+use function preg_match_all;
 use function sprintf;
 use function str_starts_with;
 use function substr;

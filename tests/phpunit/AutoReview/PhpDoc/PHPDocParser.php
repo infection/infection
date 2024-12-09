@@ -37,8 +37,8 @@ namespace Infection\Tests\AutoReview\PhpDoc;
 
 use function array_unique;
 use function array_values;
-use function Safe\preg_match_all;
-use function Safe\preg_replace;
+use function preg_match_all;
+use function preg_replace;
 use const SORT_STRING;
 
 final class PHPDocParser

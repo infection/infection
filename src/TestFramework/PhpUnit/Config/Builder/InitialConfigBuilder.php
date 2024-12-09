@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use DOMDocument;
+use function file_put_contents;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\SafeDOMXPath;
-use function Safe\file_put_contents;
 use function sprintf;
 use function version_compare;
 use Webmozart\Assert\Assert;

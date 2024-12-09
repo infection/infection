@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Differ;
 
-use function Safe\preg_match;
+use function preg_match;
 use function str_contains;
 
 /**

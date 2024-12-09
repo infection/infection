@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Mutator;
 
 use function array_column;
+use function class_implements;
 use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Mutator\ConfigurableMutator;
@@ -44,7 +45,6 @@ use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tests\Mutator\ProfileListProvider;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversNothing;
-use function Safe\class_implements;
 
 /**
  * This class is responsible for testing that all Mutator classes adhere to certain rules e.g.

@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function dirname;
+use function file_get_contents;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
-use function Safe\file_get_contents;
 
 /**
  * Provides the traces based on the PHPUnit XML coverage collected.

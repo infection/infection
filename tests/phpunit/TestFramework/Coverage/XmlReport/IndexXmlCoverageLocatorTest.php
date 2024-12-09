@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use function chdir;
 use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
@@ -44,11 +45,10 @@ use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use function Safe\chdir;
-use function Safe\realpath;
-use function Safe\touch;
+use function realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
+use function touch;
 
 #[Group('integration')]
 #[CoversClass(IndexXmlCoverageLocator::class)]

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
+use function file_get_contents;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
@@ -48,7 +49,6 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\VersionParser;
-use function Safe\file_get_contents;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;

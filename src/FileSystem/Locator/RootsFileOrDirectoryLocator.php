@@ -38,7 +38,7 @@ namespace Infection\FileSystem\Locator;
 use function array_shift;
 use function current;
 use const DIRECTORY_SEPARATOR;
-use function Safe\realpath;
+use function realpath;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;

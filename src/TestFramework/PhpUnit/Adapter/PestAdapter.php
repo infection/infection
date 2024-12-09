@@ -39,7 +39,7 @@ use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
-use function Safe\preg_match;
+use function preg_match;
 use function sprintf;
 
 /**

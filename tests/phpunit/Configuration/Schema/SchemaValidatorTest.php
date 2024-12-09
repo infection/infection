@@ -39,12 +39,12 @@ use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
 use function Infection\Tests\normalizeLineReturn;
+use function json_decode;
 use function json_last_error_msg;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\json_decode;
 use Webmozart\Assert\Assert;
 
 #[CoversClass(SchemaValidator::class)]

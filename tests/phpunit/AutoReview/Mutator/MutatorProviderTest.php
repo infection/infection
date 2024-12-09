@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Mutator;
 
 use function class_exists;
+use function class_implements;
 use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
@@ -43,7 +44,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\class_implements;
 use function sprintf;
 
 #[CoversClass(MutatorProvider::class)]

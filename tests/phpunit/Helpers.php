@@ -40,7 +40,7 @@ use const DIRECTORY_SEPARATOR;
 use function explode;
 use function implode;
 use function random_int;
-use function Safe\realpath;
+use function realpath;
 use function str_replace;
 use function strrpos;
 use function substr;

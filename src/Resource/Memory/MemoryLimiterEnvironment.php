@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Resource\Memory;
 
 use Composer\XdebugHandler\XdebugHandler;
+use function ini_get;
 use const PHP_SAPI;
-use function Safe\ini_get;
 
 /**
  * @internal

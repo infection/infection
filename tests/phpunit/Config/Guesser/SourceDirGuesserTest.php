@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Config\Guesser;
 
 use Infection\Config\Guesser\SourceDirGuesser;
+use function json_decode;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function Safe\json_decode;
 
 #[CoversClass(SourceDirGuesser::class)]
 final class SourceDirGuesserTest extends TestCase

@@ -50,7 +50,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
-use function Safe\putenv;
+use function putenv;
 
 #[CoversClass(StrykerLogger::class)]
 final class StrykerLoggerTest extends TestCase

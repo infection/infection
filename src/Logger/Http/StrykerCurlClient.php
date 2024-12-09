@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Logger\Http;
 
+use function curl_exec;
+use function curl_getinfo;
+use function curl_init;
+use function curl_setopt;
 use const CURLINFO_HTTP_CODE;
 use const CURLOPT_CUSTOMREQUEST;
 use const CURLOPT_HEADER;
@@ -42,10 +46,6 @@ use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_URL;
-use function Safe\curl_exec;
-use function Safe\curl_getinfo;
-use function Safe\curl_init;
-use function Safe\curl_setopt;
 use function sprintf;
 
 /**

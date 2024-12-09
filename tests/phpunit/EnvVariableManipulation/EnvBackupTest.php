@@ -38,7 +38,7 @@ namespace Infection\Tests\EnvVariableManipulation;
 use function getenv;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function Safe\putenv;
+use function putenv;
 
 #[CoversClass(EnvBackup::class)]
 final class EnvBackupTest extends TestCase

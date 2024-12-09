@@ -37,7 +37,7 @@ namespace Infection\Tests\EnvVariableManipulation;
 
 use function array_key_exists;
 use function getenv;
-use function Safe\putenv;
+use function putenv;
 use function sprintf;
 use Webmozart\Assert\Assert;
 

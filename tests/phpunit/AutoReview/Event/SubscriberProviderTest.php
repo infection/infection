@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Event;
 
 use function class_exists;
+use function class_implements;
 use function in_array;
 use Infection\Event\Subscriber\EventSubscriber;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
-use function Safe\class_implements;
 use function sprintf;
 
 #[CoversClass(SubscriberProvider::class)]

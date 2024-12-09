@@ -38,7 +38,7 @@ namespace Infection\Mutator\Regex;
 use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
-use function Safe\preg_match;
+use function preg_match;
 
 /**
  * @internal

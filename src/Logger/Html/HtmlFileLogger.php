@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger\Html;
 
 use Infection\Logger\LineMutationTestingResultsLogger;
-use function Safe\json_encode;
+use function json_encode;
 
 /**
  * @internal

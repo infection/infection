@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
+use function file_put_contents;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use InvalidArgumentException;
@@ -43,9 +44,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_put_contents;
-use function Safe\tempnam;
-use function Safe\unlink;
+use function tempnam;
+use function unlink;
 
 #[Group('integration')]
 #[CoversClass(JUnitTestFileDataProvider::class)]

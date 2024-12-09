@@ -40,7 +40,7 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Str;
 use function json_encode;
 use const JSON_THROW_ON_ERROR;
-use function Safe\shell_exec;
+use function shell_exec;
 use Symfony\Component\Filesystem\Path;
 use function trim;
 

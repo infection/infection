@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use function file_put_contents;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
@@ -45,7 +46,6 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use function Safe\file_put_contents;
 
 #[Group('integration')]
 #[CoversClass(PhpUnitXmlCoverageTraceProvider::class)]

@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use function getcwd;
 use function getenv;
 use function Infection\Tests\make_tmp_dir;
 use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\TestCase;
-use function Safe\getcwd;
-use function Safe\realpath;
+use function realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
