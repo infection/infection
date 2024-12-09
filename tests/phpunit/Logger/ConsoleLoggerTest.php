@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use DateTime;
 use DateTimeImmutable as UnsafeDateTimeImmutable;
 use function fopen;
 use Infection\Console\IO;
@@ -195,7 +196,7 @@ final class ConsoleLoggerTest extends TestCase
         ];
 
         yield 'resource' => [
-            fopen('php://memory', 'rb'),
+            fopen('php://memory', 'r'),
             '[resource]',
         ];
 

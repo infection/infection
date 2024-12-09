@@ -48,6 +48,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function putenv;
 use function str_replace;
 
 #[Group('integration')]
@@ -149,7 +150,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
 
     public function test_it_logs_correctly_with_ci_project_dir(): void
     {
-        \putenv('CI_PROJECT_DIR=/my/project/dir');
+        putenv('CI_PROJECT_DIR=/my/project/dir');
         self::setOriginalFilePrefix('/my/project/dir/');
 
         $resultsCollector = self::createCompleteResultsCollector();
@@ -161,7 +162,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
 
     public function test_it_logs_correctly_with_custom_project_dir(): void
     {
-        \putenv('CI_PROJECT_DIR=/my/project/dir');
+        putenv('CI_PROJECT_DIR=/my/project/dir');
         self::setOriginalFilePrefix('/custom/project/dir/');
 
         $resultsCollector = self::createCompleteResultsCollector();
