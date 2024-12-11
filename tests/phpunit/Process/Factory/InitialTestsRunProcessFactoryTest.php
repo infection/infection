@@ -108,8 +108,9 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         );
 
         $this->assertContains($process->getCommandLine(), [
-            '"/usr/bin/php"',
             '\'/usr/bin/php\'',
+            // Windows variants
+            '"/usr/bin/php"',
             '/usr/bin/php',
         ]);
 
