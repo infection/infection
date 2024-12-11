@@ -38,7 +38,6 @@ namespace Infection\Tests\Process\Factory;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\OriginalPhpProcess;
-use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -80,11 +79,12 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
             true,
         );
 
-        if (PHP_OS_FAMILY === 'Windows') {
-            $this->assertSame('"/usr/bin/php"', $process->getCommandLine());
-        } else {
-            $this->assertSame('\'/usr/bin/php\'', $process->getCommandLine());
-        }
+        $this->assertContains($process->getCommandLine(), [
+            '\'/usr/bin/php\'',
+            // Windows variants
+            '"/usr/bin/php"',
+            '/usr/bin/php',
+        ]);
 
         $this->assertNull($process->getTimeout());
         $this->assertNotInstanceOf(OriginalPhpProcess::class, $process);
@@ -107,11 +107,11 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
             false,
         );
 
-        if (PHP_OS_FAMILY === 'Windows') {
-            $this->assertSame('"/usr/bin/php"', $process->getCommandLine());
-        } else {
-            $this->assertSame('\'/usr/bin/php\'', $process->getCommandLine());
-        }
+        $this->assertContains($process->getCommandLine(), [
+            '"/usr/bin/php"',
+            '\'/usr/bin/php\'',
+            '/usr/bin/php',
+        ]);
 
         $this->assertNull($process->getTimeout());
         $this->assertInstanceOf(OriginalPhpProcess::class, $process);

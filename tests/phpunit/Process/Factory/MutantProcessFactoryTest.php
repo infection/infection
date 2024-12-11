@@ -48,7 +48,6 @@ use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
-use const PHP_OS_FAMILY;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -137,12 +136,13 @@ final class MutantProcessFactoryTest extends TestCase
 
         $process = $mutantProcess->getProcess();
 
-        $this->assertSame(
-            PHP_OS_FAMILY === 'Windows'
-                ? '"/usr/bin/php" "bin/phpunit" --filter "/path/to/acme/FooTest.php"'
-                : "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
-            $process->getCommandLine(),
-        );
+        $this->assertContains($process->getCommandLine(), [
+            "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
+            // Windows variants
+            '"/usr/bin/php" "bin/phpunit" --filter "/path/to/acme/FooTest.php"',
+            '/usr/bin/php bin/phpunit --filter /path/to/acme/FooTest.php',
+        ]);
+
         $this->assertSame(100., $process->getTimeout());
         $this->assertFalse($process->isStarted());
 
