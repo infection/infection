@@ -43,7 +43,7 @@ return RectorConfig::configure()
         __DIR__ . '/src',
         __DIR__ . '/tests/phpunit',
     ])
-    ->withPhpSets(php81: true)
+    ->withPhpSets(php82: true)
     ->withRules([
         AddCoversClassAttributeRector::class,
     ])

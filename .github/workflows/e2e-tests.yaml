@@ -28,11 +28,13 @@ jobs:
         e2e-runner: [ 'bin/infection' ]
         include:
           - { operating-system: 'windows-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
 
     name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
@@ -119,7 +121,7 @@ jobs:
         run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
       - name: Run the whole set of E2E tests with prefixed PHAR
-        if: runner.os != 'Windows' && matrix.e2e-runner == 'build/infection.phar' && (matrix.php-version == '8.2')
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'build/infection.phar' && matrix.php-version == '8.2'
         env:
           TERM: xterm-256color
         run: |
