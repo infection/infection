@@ -55,11 +55,11 @@ use function strlen;
 /**
  * @internal
  */
-final class PerMutatorLogger implements LineMutationTestingResultsLogger
+final readonly class PerMutatorLogger implements LineMutationTestingResultsLogger
 {
     private const ROUND_PRECISION = 2;
 
-    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector)
+    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector)
     {
     }
 

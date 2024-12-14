@@ -49,9 +49,9 @@ use function strlen;
 /**
  * @internal
  */
-final class TextFileLogger implements LineMutationTestingResultsLogger
+final readonly class TextFileLogger implements LineMutationTestingResultsLogger
 {
-    public function __construct(private readonly ResultsCollector $resultsCollector, private readonly bool $debugVerbosity, private readonly bool $onlyCoveredMode, private readonly bool $debugMode)
+    public function __construct(private ResultsCollector $resultsCollector, private bool $debugVerbosity, private bool $onlyCoveredMode, private bool $debugMode)
     {
     }
 

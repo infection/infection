@@ -41,9 +41,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class SubscriberRegisterer
+final readonly class SubscriberRegisterer
 {
-    public function __construct(private readonly EventDispatcher $eventDispatcher, private readonly ChainSubscriberFactory $subscriberRegistry)
+    public function __construct(private EventDispatcher $eventDispatcher, private ChainSubscriberFactory $subscriberRegistry)
     {
     }
 

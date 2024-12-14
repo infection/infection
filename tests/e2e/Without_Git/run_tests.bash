@@ -29,6 +29,6 @@ set -e pipefail
 rm -f composer.lock
 composer install
 
-docker run -t -v "$PWD":/opt -w /opt php:8.1-alpine vendor/bin/infection --coverage=infection-coverage
+docker run -t -v "$PWD":/opt -w /opt php:8.2-alpine vendor/bin/infection --coverage=infection-coverage
 
 diff -w expected-output.txt infection.log

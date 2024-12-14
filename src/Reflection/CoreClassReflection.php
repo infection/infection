@@ -41,9 +41,9 @@ use ReflectionException;
 /**
  * @internal
  */
-final class CoreClassReflection implements ClassReflection
+final readonly class CoreClassReflection implements ClassReflection
 {
-    private function __construct(private readonly ReflectionClass $reflectionClass)
+    private function __construct(private ReflectionClass $reflectionClass)
     {
     }
 

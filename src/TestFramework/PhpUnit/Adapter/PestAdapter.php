@@ -45,11 +45,11 @@ use function sprintf;
 /**
  * @internal
  */
-final class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFrameworkAdapter
+final readonly class PestAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFrameworkAdapter
 {
     private const NAME = 'Pest';
 
-    public function __construct(private readonly PhpUnitAdapter $phpUnitAdapter)
+    public function __construct(private PhpUnitAdapter $phpUnitAdapter)
     {
     }
 

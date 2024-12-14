@@ -48,11 +48,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
+final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
 {
-    private readonly ProgressBar $progressBar;
+    private ProgressBar $progressBar;
 
-    public function __construct(private readonly OutputInterface $output, private readonly TestFrameworkAdapter $testFrameworkAdapter, private readonly bool $debug)
+    public function __construct(private OutputInterface $output, private TestFrameworkAdapter $testFrameworkAdapter, private bool $debug)
     {
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('verbose');

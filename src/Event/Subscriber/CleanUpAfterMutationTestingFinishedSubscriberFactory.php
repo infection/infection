@@ -41,9 +41,9 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @internal
  */
-final class CleanUpAfterMutationTestingFinishedSubscriberFactory implements SubscriberFactory
+final readonly class CleanUpAfterMutationTestingFinishedSubscriberFactory implements SubscriberFactory
 {
-    public function __construct(private readonly bool $debug, private readonly Filesystem $fileSystem, private readonly string $tmpDir)
+    public function __construct(private bool $debug, private Filesystem $fileSystem, private string $tmpDir)
     {
     }
 

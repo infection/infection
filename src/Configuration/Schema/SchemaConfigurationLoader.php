@@ -40,7 +40,7 @@ use Infection\FileSystem\Locator\Locator;
 /**
  * @internal
  */
-final class SchemaConfigurationLoader
+final readonly class SchemaConfigurationLoader
 {
     public const POSSIBLE_DEFAULT_CONFIG_FILES = [
         self::DEFAULT_JSON5_CONFIG_FILE,
@@ -54,7 +54,7 @@ final class SchemaConfigurationLoader
     private const DEFAULT_DIST_JSON_CONFIG_FILE = 'infection.json.dist';
     private const DEFAULT_JSON_CONFIG_FILE = 'infection.json';
 
-    public function __construct(private readonly Locator $locator, private readonly SchemaConfigurationFileLoader $fileLoader)
+    public function __construct(private Locator $locator, private SchemaConfigurationFileLoader $fileLoader)
     {
     }
 

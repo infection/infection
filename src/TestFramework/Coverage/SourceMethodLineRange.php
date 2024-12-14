@@ -38,9 +38,9 @@ namespace Infection\TestFramework\Coverage;
 /**
  * @internal
  */
-final class SourceMethodLineRange
+final readonly class SourceMethodLineRange
 {
-    public function __construct(private readonly int $startLine, private readonly int $endLine)
+    public function __construct(private int $startLine, private int $endLine)
     {
     }
 

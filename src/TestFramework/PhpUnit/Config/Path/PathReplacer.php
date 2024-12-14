@@ -46,9 +46,9 @@ use function trim;
 /**
  * @internal
  */
-final class PathReplacer
+final readonly class PathReplacer
 {
-    public function __construct(private readonly Filesystem $filesystem, private readonly ?string $phpUnitConfigDir = null)
+    public function __construct(private Filesystem $filesystem, private ?string $phpUnitConfigDir = null)
     {
     }
 

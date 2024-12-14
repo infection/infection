@@ -6,12 +6,12 @@ namespace Infection\Tests\Fixtures\Logger;
 
 use Infection\Logger\LineMutationTestingResultsLogger;
 
-final class DummyLineMutationTestingResultsLogger implements LineMutationTestingResultsLogger
+final readonly class DummyLineMutationTestingResultsLogger implements LineMutationTestingResultsLogger
 {
     /**
      * @param string[] $lines
      */
-    public function __construct(private readonly array $lines)
+    public function __construct(private array $lines)
     {
     }
 
