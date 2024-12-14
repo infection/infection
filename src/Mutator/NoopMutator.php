@@ -45,12 +45,12 @@ use function sprintf;
  * @template TNode of Node
  * @implements Mutator<TNode>
  */
-final class NoopMutator implements Mutator
+final readonly class NoopMutator implements Mutator
 {
     /**
      * @param Mutator<TNode> $mutator
      */
-    public function __construct(private readonly Mutator $mutator)
+    public function __construct(private Mutator $mutator)
     {
     }
 

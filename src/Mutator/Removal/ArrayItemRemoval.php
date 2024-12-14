@@ -52,12 +52,12 @@ use function range;
  *
  * @implements ConfigurableMutator<Node\Expr\Array_>
  */
-final class ArrayItemRemoval implements ConfigurableMutator
+final readonly class ArrayItemRemoval implements ConfigurableMutator
 {
     use GetConfigClassName;
     use GetMutatorName;
 
-    public function __construct(private readonly ArrayItemRemovalConfig $config)
+    public function __construct(private ArrayItemRemovalConfig $config)
     {
     }
 

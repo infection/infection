@@ -77,7 +77,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class StrykerHtmlReportBuilder
+final readonly class StrykerHtmlReportBuilder
 {
     private const DETECTION_STATUS_MAP = [
         DetectionStatus::KILLED => 'Killed',
@@ -93,7 +93,7 @@ final class StrykerHtmlReportBuilder
     private const PLUS_LENGTH = 1;
     private const DIFF_HEADERS_LINES_COUNT = 1;
 
-    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector)
+    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector)
     {
     }
 

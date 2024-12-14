@@ -19,10 +19,6 @@ parameters:
             message: '#^Method Infection\\Mutator\\MutatorResolver::resolveSettings\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
             count: 1
         -
-            path: ../src/TestFramework/Factory.php
-            message: '#^Parameter \#1 \$iterator of function iterator_to_array expects Traversable, iterable<Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo> given\.$#'
-            count: 1
-        -
             path: '../src/Container.php'
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
             count: 1

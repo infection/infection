@@ -53,12 +53,12 @@ use function trim;
 /**
  * @internal
  */
-final class PhpUnitCustomExecutablePathProvider
+final readonly class PhpUnitCustomExecutablePathProvider
 {
     public function __construct(
-        private readonly TestFrameworkFinder $phpUnitExecutableFinder,
-        private readonly ConsoleHelper $consoleHelper,
-        private readonly QuestionHelper $questionHelper,
+        private TestFrameworkFinder $phpUnitExecutableFinder,
+        private ConsoleHelper $consoleHelper,
+        private QuestionHelper $questionHelper,
     ) {
     }
 

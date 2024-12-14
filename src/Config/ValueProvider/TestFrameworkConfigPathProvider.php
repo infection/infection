@@ -55,12 +55,12 @@ use function trim;
 /**
  * @internal
  */
-final class TestFrameworkConfigPathProvider
+final readonly class TestFrameworkConfigPathProvider
 {
     public function __construct(
-        private readonly TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator,
-        private readonly ConsoleHelper $consoleHelper,
-        private readonly QuestionHelper $questionHelper,
+        private TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator,
+        private ConsoleHelper $consoleHelper,
+        private QuestionHelper $questionHelper,
     ) {
     }
 

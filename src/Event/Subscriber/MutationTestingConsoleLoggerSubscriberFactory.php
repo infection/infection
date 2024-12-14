@@ -45,15 +45,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
     public function __construct(
-        private readonly MetricsCalculator $metricsCalculator,
-        private readonly ResultsCollector $resultsCollector,
-        private readonly DiffColorizer $diffColorizer,
-        private readonly FederatedLogger $mutationTestingResultsLogger,
-        private readonly bool $showMutations,
-        private readonly OutputFormatter $formatter)
+        private MetricsCalculator $metricsCalculator,
+        private ResultsCollector $resultsCollector,
+        private DiffColorizer $diffColorizer,
+        private FederatedLogger $mutationTestingResultsLogger,
+        private bool $showMutations,
+        private OutputFormatter $formatter)
     {
     }
 

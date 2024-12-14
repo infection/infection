@@ -54,12 +54,12 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class Factory
+final readonly class Factory
 {
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
      */
-    public function __construct(private readonly string $tmpDir, private readonly string $projectDir, private readonly TestFrameworkConfigLocatorInterface $configLocator, private readonly TestFrameworkFinder $testFrameworkFinder, private readonly string $jUnitFilePath, private readonly Configuration $infectionConfig, private readonly SourceFileFilter $sourceFileFilter, private readonly array $installedExtensions)
+    public function __construct(private string $tmpDir, private string $projectDir, private TestFrameworkConfigLocatorInterface $configLocator, private TestFrameworkFinder $testFrameworkFinder, private string $jUnitFilePath, private Configuration $infectionConfig, private SourceFileFilter $sourceFileFilter, private array $installedExtensions)
     {
     }
 

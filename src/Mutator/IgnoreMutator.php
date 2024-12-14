@@ -56,12 +56,12 @@ use function sprintf;
  * @template TNode of Node
  * @implements Mutator<TNode>
  */
-final class IgnoreMutator implements Mutator
+final readonly class IgnoreMutator implements Mutator
 {
     /**
      * @param Mutator<TNode> $mutator
      */
-    public function __construct(private readonly IgnoreConfig $config, private readonly Mutator $mutator)
+    public function __construct(private IgnoreConfig $config, private Mutator $mutator)
     {
     }
 

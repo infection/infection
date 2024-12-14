@@ -38,9 +38,9 @@ namespace Infection\Event;
 /**
  * @internal
  */
-final class MutationGenerationWasStarted
+final readonly class MutationGenerationWasStarted
 {
-    public function __construct(private readonly int $mutableFilesCount)
+    public function __construct(private int $mutableFilesCount)
     {
     }
 

@@ -45,14 +45,14 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 /**
  * @internal
  */
-final class AdapterInstallationDecider
+final readonly class AdapterInstallationDecider
 {
     private const ADAPTER_NAME_TO_CLASS_MAP = [
         TestFrameworkTypes::CODECEPTION => 'Infection\TestFramework\Codeception\CodeceptionAdapter',
         TestFrameworkTypes::PHPSPEC => 'Infection\TestFramework\PhpSpec\PhpSpecAdapter',
     ];
 
-    public function __construct(private readonly QuestionHelper $questionHelper)
+    public function __construct(private QuestionHelper $questionHelper)
     {
     }
 

@@ -42,11 +42,11 @@ use function trim;
 /**
  * @internal
  */
-final class PhpUnitPathGuesser
+final readonly class PhpUnitPathGuesser
 {
     private const CURRENT_DIR_PATH = '.';
 
-    public function __construct(private readonly stdClass $composerJsonContent)
+    public function __construct(private stdClass $composerJsonContent)
     {
     }
 

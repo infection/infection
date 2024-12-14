@@ -43,7 +43,7 @@ use function sprintf;
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
 {
     private const DEFAULT_EXTENSIONS = [
         'xml',
@@ -54,7 +54,7 @@ final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInte
         'dist.yml',
     ];
 
-    public function __construct(private readonly string $configDir)
+    public function __construct(private string $configDir)
     {
     }
 

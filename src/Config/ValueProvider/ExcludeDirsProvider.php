@@ -56,14 +56,14 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @internal
  */
-final class ExcludeDirsProvider
+final readonly class ExcludeDirsProvider
 {
     public const EXCLUDED_ROOT_DIRS = ['vendor', 'tests', 'test'];
 
     public function __construct(
-        private readonly ConsoleHelper $consoleHelper,
-        private readonly QuestionHelper $questionHelper,
-        private readonly Filesystem $filesystem,
+        private ConsoleHelper $consoleHelper,
+        private QuestionHelper $questionHelper,
+        private Filesystem $filesystem,
     ) {
     }
 

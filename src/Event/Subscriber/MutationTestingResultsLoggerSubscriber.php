@@ -41,9 +41,9 @@ use Infection\Logger\MutationTestingResultsLogger;
 /**
  * @internal
  */
-final class MutationTestingResultsLoggerSubscriber implements EventSubscriber
+final readonly class MutationTestingResultsLoggerSubscriber implements EventSubscriber
 {
-    public function __construct(private readonly MutationTestingResultsLogger $logger)
+    public function __construct(private MutationTestingResultsLogger $logger)
     {
     }
 

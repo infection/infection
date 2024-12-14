@@ -56,7 +56,7 @@ use function version_compare;
 /**
  * @internal
  */
-final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
+final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
     private const MAX_EXPLODE_PARTS = 2;
 
@@ -64,9 +64,9 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
      * @param list<SplFileInfo> $filteredSourceFilesToMutate
      */
     public function __construct(
-        private readonly bool $executeOnlyCoveringTestCases,
-        private readonly array $filteredSourceFilesToMutate,
-        private readonly ?string $mapSourceClassToTestStrategy,
+        private bool $executeOnlyCoveringTestCases,
+        private array $filteredSourceFilesToMutate,
+        private ?string $mapSourceClassToTestStrategy,
     ) {
     }
 

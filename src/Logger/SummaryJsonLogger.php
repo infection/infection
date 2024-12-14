@@ -42,9 +42,9 @@ use const JSON_THROW_ON_ERROR;
 /**
  * @internal
  */
-final class SummaryJsonLogger implements LineMutationTestingResultsLogger
+final readonly class SummaryJsonLogger implements LineMutationTestingResultsLogger
 {
-    public function __construct(private readonly MetricsCalculator $metricsCalculator)
+    public function __construct(private MetricsCalculator $metricsCalculator)
     {
     }
 
