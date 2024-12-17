@@ -61,11 +61,11 @@
         "sanmai/later": "^0.1.1",
         "sanmai/pipeline": "^5.1 || ^6",
         "sebastian/diff": "^3.0.2 || ^4.0 || ^5.0 || ^6.0",
+        "shish/safe": "^2.6",
         "symfony/console": "^5.4 || ^6.0 || ^7.0",
         "symfony/filesystem": "^5.4 || ^6.0 || ^7.0",
         "symfony/finder": "^5.4 || ^6.0 || ^7.0",
         "symfony/process": "^5.4 || ^6.0 || ^7.0",
-        "thecodingmachine/safe": "dev-master as 2.5.0",
         "webmozart/assert": "^1.11"
     },
     "conflict": {
@@ -85,8 +85,7 @@
         "phpunit/phpunit": "^10.5",
         "rector/rector": "^1.0",
         "sidz/phpstan-rules": "^0.4",
-        "symfony/yaml": "^5.4 || ^6.0 || ^7.0",
-        "thecodingmachine/phpstan-safe-rule": "^1.2.0"
+        "symfony/yaml": "^5.4 || ^6.0 || ^7.0"
     },
     "config": {
         "platform": {
