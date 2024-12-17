@@ -136,8 +136,8 @@ final class IoCodeDetector
     ];
 
     private const SAFE_FILESYSTEM_FILES = [
-        __DIR__ . '/../../../../vendor/thecodingmachine/safe/generated/filesystem.php',
-        __DIR__ . '/../../../../vendor/thecodingmachine/safe/generated/dir.php',
+        __DIR__ . '/../../../../vendor/shish/safe/generated/filesystem.php',
+        __DIR__ . '/../../../../vendor/shish/safe/generated/dir.php',
     ];
 
     /**
