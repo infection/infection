@@ -85,8 +85,7 @@
         "phpunit/phpunit": "^10.5",
         "rector/rector": "^1.0",
         "sidz/phpstan-rules": "^0.4",
-        "symfony/yaml": "^5.4 || ^6.0 || ^7.0",
-        "thecodingmachine/phpstan-safe-rule": "^1.2.0"
+        "symfony/yaml": "^5.4 || ^6.0 || ^7.0"
     },
     "config": {
         "platform": {

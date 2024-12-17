@@ -76,6 +76,11 @@ parameters:
 			path: ../src/TestFramework/AdapterInstaller.php
 
 		-
+			message: "#^Generator expects value type string, array\\<string\\>\\|string given\\.$#"
+			count: 2
+			path: ../src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php
+
+		-
 			message: "#^Cannot access offset 1 on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
@@ -84,6 +89,16 @@ parameters:
 			message: "#^Cannot access offset 1 on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
+
+		-
+			message: "#^Method Infection\\\\TestFramework\\\\TestFrameworkExtraOptionsFilter\\:\\:filterForMutantProcess\\(\\) should return string but returns array\\<string\\>\\|string\\.$#"
+			count: 1
+			path: ../src/TestFramework/TestFrameworkExtraOptionsFilter.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function trim expects string, array\\<string\\>\\|string given\\.$#"
+			count: 1
+			path: ../src/TestFramework/TestFrameworkExtraOptionsFilter.php
 
 		-
 			message: "#^Cannot access offset 0 on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
@@ -164,6 +179,11 @@ parameters:
 			message: "#^Method Infection\\\\Testing\\\\SimpleMutation\\:\\:getMutator\\(\\) return type with generic interface Infection\\\\Mutator\\\\Mutator does not specify its types\\: TNode$#"
 			count: 1
 			path: ../src/Testing/SimpleMutation.php
+
+		-
+			message: "#^Binary operation \"\\.\" between array\\<string\\>\\|string and 'Test' results in an error\\.$#"
+			count: 1
+			path: ../src/Testing/SourceTestClassNameScheme.php
 
 		-
 			message: "#^Cannot access offset 1 on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
