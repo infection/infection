@@ -44,13 +44,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class PerformanceLoggerSubscriberFactory implements SubscriberFactory
+final readonly class PerformanceLoggerSubscriberFactory implements SubscriberFactory
 {
     public function __construct(
-        private readonly Stopwatch $stopwatch,
-        private readonly TimeFormatter $timeFormatter,
-        private readonly MemoryFormatter $memoryFormatter,
-        private readonly int $threadCount,
+        private Stopwatch $stopwatch,
+        private TimeFormatter $timeFormatter,
+        private MemoryFormatter $memoryFormatter,
+        private int $threadCount,
     ) {
     }
 

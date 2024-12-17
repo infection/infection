@@ -10,9 +10,9 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\Process\Process;
 
 
-final class DummyProcessBearer implements ProcessBearer
+final readonly class DummyProcessBearer implements ProcessBearer
 {
-    public function __construct(private readonly Process $process, private readonly bool $expectTimeOut, private readonly Closure $terminateCallback)
+    public function __construct(private Process $process, private bool $expectTimeOut, private Closure $terminateCallback)
     {
     }
 

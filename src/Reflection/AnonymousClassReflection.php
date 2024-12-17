@@ -40,9 +40,9 @@ use ReflectionClass;
 /**
  * @internal
  */
-final class AnonymousClassReflection implements ClassReflection
+final readonly class AnonymousClassReflection implements ClassReflection
 {
-    private function __construct(private readonly ReflectionClass $reflectionClass)
+    private function __construct(private ReflectionClass $reflectionClass)
     {
     }
 

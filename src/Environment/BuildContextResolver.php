@@ -42,9 +42,9 @@ use function trim;
 /**
  * @internal
  */
-final class BuildContextResolver
+final readonly class BuildContextResolver
 {
-    public function __construct(private readonly CiDetector $ciDetector)
+    public function __construct(private CiDetector $ciDetector)
     {
     }
 

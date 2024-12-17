@@ -44,12 +44,12 @@ use function substr;
 /**
  * @internal
  */
-final class JUnitTestCaseTimeAdder
+final readonly class JUnitTestCaseTimeAdder
 {
     /**
      * @param TestLocation[] $tests
      */
-    public function __construct(private readonly array $tests)
+    public function __construct(private array $tests)
     {
     }
 

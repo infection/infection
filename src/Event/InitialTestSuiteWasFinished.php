@@ -38,9 +38,9 @@ namespace Infection\Event;
 /**
  * @internal
  */
-final class InitialTestSuiteWasFinished
+final readonly class InitialTestSuiteWasFinished
 {
-    public function __construct(private readonly string $outputText)
+    public function __construct(private string $outputText)
     {
     }
 

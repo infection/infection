@@ -8,9 +8,9 @@ use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Event\Subscriber\SubscriberFactory;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class DummySubscriberFactory implements SubscriberFactory
+final readonly class DummySubscriberFactory implements SubscriberFactory
 {
-    public function __construct(private readonly EventSubscriber $subscriber)
+    public function __construct(private EventSubscriber $subscriber)
     {
     }
 

@@ -11,9 +11,9 @@ use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Env;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 
-final class DummyCiDetector implements CiDetectorInterface
+final readonly class DummyCiDetector implements CiDetectorInterface
 {
-    public function __construct(private readonly bool $ciDetected, private readonly bool $githubActionsDetected = false)
+    public function __construct(private bool $ciDetected, private bool $githubActionsDetected = false)
     {
     }
 

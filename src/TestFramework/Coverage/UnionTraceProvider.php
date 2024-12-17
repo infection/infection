@@ -41,9 +41,9 @@ namespace Infection\TestFramework\Coverage;
  *
  * @internal
  */
-final class UnionTraceProvider implements TraceProvider
+final readonly class UnionTraceProvider implements TraceProvider
 {
-    public function __construct(private readonly TraceProvider $coveredTraceProvider, private readonly TraceProvider $uncoveredTraceProvider, private readonly bool $onlyCovered)
+    public function __construct(private TraceProvider $coveredTraceProvider, private TraceProvider $uncoveredTraceProvider, private bool $onlyCovered)
     {
     }
 

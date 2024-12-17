@@ -46,11 +46,11 @@ use Webmozart\Assert\Assert;
  *
  * @property DOMDocument $document
  */
-final class SafeDOMXPath
+final readonly class SafeDOMXPath
 {
-    private readonly DOMXPath $xPath;
+    private DOMXPath $xPath;
 
-    public function __construct(private readonly DOMDocument $document)
+    public function __construct(private DOMDocument $document)
     {
         $this->xPath = new DOMXPath($document);
     }
