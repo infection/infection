@@ -2196,16 +2196,16 @@
         },
         {
             "name": "helmich/phpunit-json-assert",
-            "version": "v3.5.1",
+            "version": "v3.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/martin-helmich/phpunit-json-assert.git",
-                "reference": "5a3a53e46f4d1f1b324c5cc2e33d87ad2d37260c"
+                "reference": "f8958119e9e9ea1339d6b4d6fd2df24536261b50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/martin-helmich/phpunit-json-assert/zipball/5a3a53e46f4d1f1b324c5cc2e33d87ad2d37260c",
-                "reference": "5a3a53e46f4d1f1b324c5cc2e33d87ad2d37260c",
+                "url": "https://api.github.com/repos/martin-helmich/phpunit-json-assert/zipball/f8958119e9e9ea1339d6b4d6fd2df24536261b50",
+                "reference": "f8958119e9e9ea1339d6b4d6fd2df24536261b50",
                 "shasum": ""
             },
             "require": {
@@ -2214,10 +2214,10 @@
                 "softcreatr/jsonpath": "^0.8"
             },
             "conflict": {
-                "phpunit/phpunit": "<8.0 || >= 11.0"
+                "phpunit/phpunit": "<8.0 || >= 12.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^8.0 || ^9.0 || ^10.0"
+                "phpunit/phpunit": "^8.0 || ^9.0 || ^10.0 || ^11.0"
             },
             "type": "library",
             "autoload": {
@@ -2238,7 +2238,7 @@
             "description": "PHPUnit assertions for JSON documents",
             "support": {
                 "issues": "https://github.com/martin-helmich/phpunit-json-assert/issues",
-                "source": "https://github.com/martin-helmich/phpunit-json-assert/tree/v3.5.1"
+                "source": "https://github.com/martin-helmich/phpunit-json-assert/tree/v3.5.2"
             },
             "funding": [
                 {
@@ -2250,7 +2250,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-03-03T14:09:38+00:00"
+            "time": "2024-05-20T11:18:46+00:00"
         },
         {
             "name": "myclabs/deep-copy",
