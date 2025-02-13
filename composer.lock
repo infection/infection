@@ -233,16 +233,16 @@
         },
         {
             "name": "fidry/cpu-core-counter",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theofidry/cpu-core-counter.git",
-                "reference": "f92996c4d5c1a696a6a970e20f7c4216200fcc42"
+                "reference": "8520451a140d3f46ac33042715115e290cf5785f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theofidry/cpu-core-counter/zipball/f92996c4d5c1a696a6a970e20f7c4216200fcc42",
-                "reference": "f92996c4d5c1a696a6a970e20f7c4216200fcc42",
+                "url": "https://api.github.com/repos/theofidry/cpu-core-counter/zipball/8520451a140d3f46ac33042715115e290cf5785f",
+                "reference": "8520451a140d3f46ac33042715115e290cf5785f",
                 "shasum": ""
             },
             "require": {
@@ -282,7 +282,7 @@
             ],
             "support": {
                 "issues": "https://github.com/theofidry/cpu-core-counter/issues",
-                "source": "https://github.com/theofidry/cpu-core-counter/tree/1.1.0"
+                "source": "https://github.com/theofidry/cpu-core-counter/tree/1.2.0"
             },
             "funding": [
                 {
@@ -290,7 +290,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-02-07T09:43:46+00:00"
+            "time": "2024-08-06T10:04:20+00:00"
         },
         {
             "name": "infection/abstract-testframework-adapter",
@@ -2147,16 +2147,16 @@
     "packages-dev": [
         {
             "name": "fidry/makefile",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theofidry/makefile.git",
-                "reference": "be5a048dcc5648d04e924facce0f85b406d731e4"
+                "reference": "706e96078ea9ac87cc68c737d56510a68a1344e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theofidry/makefile/zipball/be5a048dcc5648d04e924facce0f85b406d731e4",
-                "reference": "be5a048dcc5648d04e924facce0f85b406d731e4",
+                "url": "https://api.github.com/repos/theofidry/makefile/zipball/706e96078ea9ac87cc68c737d56510a68a1344e4",
+                "reference": "706e96078ea9ac87cc68c737d56510a68a1344e4",
                 "shasum": ""
             },
             "require": {
@@ -2200,7 +2200,7 @@
             ],
             "support": {
                 "issues": "https://github.com/theofidry/makefile/issues",
-                "source": "https://github.com/theofidry/makefile/tree/1.0.1"
+                "source": "https://github.com/theofidry/makefile/tree/1.0.2"
             },
             "funding": [
                 {
@@ -2208,7 +2208,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-10-13T23:49:14+00:00"
+            "time": "2024-07-24T17:53:02+00:00"
         },
         {
             "name": "helmich/phpunit-json-assert",
