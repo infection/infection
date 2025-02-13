@@ -46,11 +46,6 @@ parameters:
 			path: ../src/Mutator/MutatorResolver.php
 
 		-
-			message: "#^Parameter \\#1 \\$items of class PhpParser\\\\Node\\\\Expr\\\\Array_ constructor expects array\\<PhpParser\\\\Node\\\\ArrayItem\\>, array\\<int, PhpParser\\\\Node\\\\Expr\\\\ArrayItem\\> given\\.$#"
-			count: 1
-			path: ../src/Mutator/Operator/SpreadOneItem.php
-
-		-
 			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\NonMutableNodesIgnorerVisitor\\:\\:enterNode\\(\\) never returns PhpParser\\\\Node so it can be removed from the return type\\.$#"
 			count: 1
 			path: ../src/PhpParser/Visitor/NonMutableNodesIgnorerVisitor.php
