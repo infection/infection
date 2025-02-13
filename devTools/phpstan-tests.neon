@@ -24,6 +24,9 @@ parameters:
             count: 1
             path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
         -
+            message: '#Function ini_get is unsafe to use#'
+            path: ../tests/phpunit/Process/OriginalPhpProcessTest.php
+        -
             message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertTrue\\(\\) with false will always evaluate to false\\.$#"
             count: 1
             path: ../tests/phpunit/Process/MutantProcessTest.php
