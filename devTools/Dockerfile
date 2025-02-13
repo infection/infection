@@ -4,6 +4,10 @@ FROM php:${PHP_VERSION}-cli-alpine
 
 ARG XDEBUG_VERSION
 
+RUN apk add --update --no-cache \
+		linux-headers \
+	;
+
 RUN set -eux; \
     apk add --no-cache --virtual .build-deps \
         ${PHPIZE_DEPS} \
@@ -24,7 +28,7 @@ RUN set -eux; \
             | sort -u \
             | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     )"; \
-    apk add --no-cache --virtual .phpexts-rundeps ${runDeps}; \
+    apk add --no-cache --virtual .app-phpexts-rundeps ${runDeps}; \
     apk del .build-deps
 
 RUN apk add --no-cache \
