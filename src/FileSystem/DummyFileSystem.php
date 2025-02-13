@@ -35,12 +35,88 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
-use function class_alias;
-use Composer\InstalledVersions;
-use function version_compare;
+use Symfony\Component\Filesystem\Filesystem;
+use Traversable;
 
-if (version_compare((string) InstalledVersions::getPrettyVersion('symfony/filesystem'), 'v6.0', '<')) {
-    class_alias(DummySymfony5FileSystem::class, DummyFileSystem::class);
-} else {
-    class_alias(DummySymfony6FileSystem::class, DummyFileSystem::class);
+/**
+ * @internal
+ */
+final class DummyFileSystem extends Filesystem
+{
+    public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false): void
+    {
+    }
+
+    public function mkdir($dirs, int $mode = 0777): void
+    {
+    }
+
+    public function exists(string|iterable $files): bool
+    {
+        return false;
+    }
+
+    public function touch($files, ?int $time = null, ?int $atime = null): void
+    {
+    }
+
+    public function remove($files): void
+    {
+    }
+
+    public function chmod($files, int $mode, int $umask = 0000, bool $recursive = false): void
+    {
+    }
+
+    public function chown($files, $user, bool $recursive = false): void
+    {
+    }
+
+    public function chgrp($files, $group, bool $recursive = false): void
+    {
+    }
+
+    public function rename(string $origin, string $target, bool $overwrite = false): void
+    {
+    }
+
+    public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false): void
+    {
+    }
+
+    public function hardlink(string $originFile, $targetFiles): void
+    {
+    }
+
+    public function readlink(string $path, bool $canonicalize = false): ?string
+    {
+        return '';
+    }
+
+    public function makePathRelative(string $endPath, string $startPath): string
+    {
+        return '';
+    }
+
+    public function mirror(string $originDir, string $targetDir, ?Traversable $iterator = null, array $options = []): void
+    {
+    }
+
+    public function isAbsolutePath(string $file): bool
+    {
+        return true;
+    }
+
+    public function tempnam(string $dir, string $prefix, string $suffix = ''): string
+    {
+        return '';
+    }
+
+    public function dumpFile(string $filename, $content): void
+    {
+    }
+
+    public function appendToFile(string $filename, $content, bool $lock = false): void
+    {
+    }
 }

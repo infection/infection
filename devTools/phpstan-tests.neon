@@ -28,10 +28,6 @@ parameters:
             count: 1
             path: ../tests/phpunit/Process/MutantProcessTest.php
         -
-            message: "#^Class Infection\\\\FileSystem\\\\DummyFileSystem not found\\.$#"
-            count: 1
-            path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
-        -
             message: '#Do not (use|return|assign) magic number (.)#'
             paths:
                 - ../tests/*

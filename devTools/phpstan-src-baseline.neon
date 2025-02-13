@@ -21,6 +21,11 @@ parameters:
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
+			message: "#^Parameter \\#1 \\$iterator of class Symfony\\\\Component\\\\Finder\\\\Iterator\\\\PathFilterIterator constructor expects Iterator\\<string, Symfony\\\\Component\\\\Finder\\\\SplFileInfo\\>, Iterator\\<mixed, Infection\\\\TestFramework\\\\Coverage\\\\Trace\\|SplFileInfo\\> given\\.$#"
+			count: 1
+			path: ../src/FileSystem/SourceFileFilter.php
+
+		-
 			message: "#^Cannot access offset 'name' on iterable\\<\\(int\\|string\\), string\\>\\|null\\.$#"
 			count: 1
 			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
