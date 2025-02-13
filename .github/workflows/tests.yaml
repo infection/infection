@@ -25,13 +25,13 @@ jobs:
         php-version: [ '8.2', '8.3', '8.4' ]
         dependencies: [ locked, lowest, highest ]
         coverage-driver: [ pcov, xdebug ]
-        symfony-version: [ '6.*.*', '7.*.*' ]
+        symfony-version: [ '6.4.*', '7.*.*' ]
         include:
           - operating-system: windows-latest
             php-version: '8.2'
             dependencies: locked
             coverage-driver: xdebug
-            symfony-version: '6.*.*'
+            symfony-version: '6.4.*'
         exclude:
           - dependencies: 'locked'
             symfony-version: '7.*.*'
