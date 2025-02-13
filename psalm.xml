@@ -32,18 +32,6 @@
             </errorLevel>
         </ImpureFunctionCall>
 
-        <InvalidReturnType>
-            <errorLevel type="suppress">
-                <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
-            </errorLevel>
-        </InvalidReturnType>
-
-        <MethodSignatureMismatch>
-            <errorLevel type="suppress">
-                <file name="src/FileSystem/DummySymfony6FileSystem.php"/>
-            </errorLevel>
-        </MethodSignatureMismatch>
-
         <UnusedConstructor>
             <errorLevel type="suppress">
                 <file name="src/CannotBeInstantiated.php" />
