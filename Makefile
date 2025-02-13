@@ -33,7 +33,7 @@ PARATEST=vendor/bin/paratest
 INFECTION=./build/infection.phar
 
 DOCKER_RUN=docker-compose run
-DOCKER_RUN_81=$(DOCKER_RUN) php81 $(FLOCK) Makefile
+DOCKER_RUN_82=$(DOCKER_RUN) php82 $(FLOCK) Makefile
 DOCKER_FILE_IMAGE=devTools/Dockerfile.json
 
 FLOCK=./devTools/flock
@@ -59,7 +59,7 @@ compile:
 .PHONY: compile-docker
 compile-docker:	 	## Bundles Infection into a PHAR using docker
 compile-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_81) make compile
+	$(DOCKER_RUN_82) make compile
 
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:
@@ -154,10 +154,10 @@ test-unit-parallel: $(PARATEST) vendor
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker: test-unit-81-docker
+test-unit-docker: test-unit-82-docker
 
-test-unit-81-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
-	$(DOCKER_RUN_81) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
+	$(DOCKER_RUN_82) $(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests
@@ -174,12 +174,12 @@ test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
 test-e2e-docker: test-e2e-xdebug-docker
 
 .PHONY: test-e2e-xdebug-docker
-test-e2e-xdebug-docker: test-e2e-xdebug-81-docker
+test-e2e-xdebug-docker: test-e2e-xdebug-82-docker
 
-.PHONY: test-e2e-xdebug-81-docker
-test-e2e-xdebug-81-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_81) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
-	$(DOCKER_RUN_81) ./tests/e2e_tests $(INFECTION)
+.PHONY: test-e2e-xdebug-82-docker
+test-e2e-xdebug-82-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_82) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
+	$(DOCKER_RUN_82) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself
@@ -191,11 +191,11 @@ test-infection-docker:	## Runs Infection against itself on the different Docker 
 test-infection-docker: test-infection-xdebug-docker
 
 .PHONY: test-infection-xdebug-docker
-test-infection-xdebug-docker: test-infection-xdebug-81-docker
+test-infection-xdebug-docker: test-infection-xdebug-82-docker
 
-.PHONY: test-infection-xdebug-81-docker
-test-infection-xdebug-81-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_81) ./bin/infection --threads=max
+.PHONY: test-infection-xdebug-82-docker
+test-infection-xdebug-82-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) ./bin/infection --threads=max
 
 #
 # Rules from files (non-phony targets)
