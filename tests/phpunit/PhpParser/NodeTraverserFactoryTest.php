@@ -41,6 +41,7 @@ use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\PhpParser\Visitor\ImpureExpressionVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
@@ -77,6 +78,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
+                ImpureExpressionVisitor::class,
                 FakeVisitor::class,
             ],
             $visitors,
@@ -104,6 +106,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
+                ImpureExpressionVisitor::class,
                 FakeVisitor::class,
             ],
             $visitorClasses,
