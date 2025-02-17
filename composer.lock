@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "85ca7b56ce3c65a1f9e17b59c9821161",
+    "content-hash": "b152803e73235533ea263e0235cc2a2a",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -1023,152 +1023,6 @@
             "time": "2024-03-02T07:15:17+00:00"
         },
         {
-            "name": "shish/safe",
-            "version": "v2.6.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/shish/safe.git",
-                "reference": "88c2cf506c6b497cd2a961c5e8116a18c5c272c0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/shish/safe/zipball/88c2cf506c6b497cd2a961c5e8116a18c5c272c0",
-                "reference": "88c2cf506c6b497cd2a961c5e8116a18c5c272c0",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">= 8.2"
-            },
-            "replace": {
-                "thecodingmachine/safe": "2.5.0"
-            },
-            "require-dev": {
-                "phpstan/phpstan": "^1",
-                "phpunit/phpunit": "^10.0 || ^11.0",
-                "squizlabs/php_codesniffer": "^3",
-                "thecodingmachine/phpstan-strict-rules": "^1.0"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "deprecated/apc.php",
-                    "deprecated/array.php",
-                    "deprecated/datetime.php",
-                    "deprecated/libevent.php",
-                    "deprecated/misc.php",
-                    "deprecated/password.php",
-                    "deprecated/mssql.php",
-                    "deprecated/stats.php",
-                    "deprecated/strings.php",
-                    "lib/special_cases.php",
-                    "deprecated/mysqli.php",
-                    "generated/apache.php",
-                    "generated/apcu.php",
-                    "generated/bzip2.php",
-                    "generated/calendar.php",
-                    "generated/classobj.php",
-                    "generated/com.php",
-                    "generated/cubrid.php",
-                    "generated/curl.php",
-                    "generated/datetime.php",
-                    "generated/dir.php",
-                    "generated/eio.php",
-                    "generated/errorfunc.php",
-                    "generated/exec.php",
-                    "generated/fileinfo.php",
-                    "generated/filesystem.php",
-                    "generated/filter.php",
-                    "generated/fpm.php",
-                    "generated/ftp.php",
-                    "generated/funchand.php",
-                    "generated/gettext.php",
-                    "generated/gnupg.php",
-                    "generated/hash.php",
-                    "generated/ibase.php",
-                    "generated/ibmDb2.php",
-                    "generated/iconv.php",
-                    "generated/image.php",
-                    "generated/imap.php",
-                    "generated/info.php",
-                    "generated/inotify.php",
-                    "generated/json.php",
-                    "generated/ldap.php",
-                    "generated/libxml.php",
-                    "generated/lzf.php",
-                    "generated/mailparse.php",
-                    "generated/mbstring.php",
-                    "generated/misc.php",
-                    "generated/mysql.php",
-                    "generated/network.php",
-                    "generated/oci8.php",
-                    "generated/opcache.php",
-                    "generated/openssl.php",
-                    "generated/outcontrol.php",
-                    "generated/pcntl.php",
-                    "generated/pcre.php",
-                    "generated/pgsql.php",
-                    "generated/posix.php",
-                    "generated/ps.php",
-                    "generated/pspell.php",
-                    "generated/readline.php",
-                    "generated/rnp.php",
-                    "generated/rpminfo.php",
-                    "generated/rrd.php",
-                    "generated/sem.php",
-                    "generated/session.php",
-                    "generated/shmop.php",
-                    "generated/sockets.php",
-                    "generated/sodium.php",
-                    "generated/solr.php",
-                    "generated/spl.php",
-                    "generated/sqlsrv.php",
-                    "generated/ssdeep.php",
-                    "generated/ssh2.php",
-                    "generated/stream.php",
-                    "generated/strings.php",
-                    "generated/swoole.php",
-                    "generated/uodbc.php",
-                    "generated/uopz.php",
-                    "generated/url.php",
-                    "generated/var.php",
-                    "generated/xdiff.php",
-                    "generated/xml.php",
-                    "generated/xmlrpc.php",
-                    "generated/yaml.php",
-                    "generated/yaz.php",
-                    "generated/zip.php",
-                    "generated/zlib.php"
-                ],
-                "classmap": [
-                    "lib/DateTime.php",
-                    "lib/DateTimeImmutable.php",
-                    "lib/Exceptions/",
-                    "deprecated/Exceptions/",
-                    "generated/Exceptions/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "PHP core functions that throw exceptions instead of returning FALSE on error (a less-abandoned fork of thecodingmachine/safe)",
-            "support": {
-                "issues": "https://github.com/shish/safe/issues",
-                "source": "https://github.com/shish/safe/tree/v2.6.3"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/shish",
-                    "type": "github"
-                },
-                {
-                    "url": "https://ko-fi.com/shish2k",
-                    "type": "ko_fi"
-                }
-            ],
-            "time": "2024-10-08T20:21:12+00:00"
-        },
-        {
             "name": "symfony/console",
             "version": "v7.2.1",
             "source": {
@@ -2007,6 +1861,145 @@
             "time": "2024-11-13T13:31:12+00:00"
         },
         {
+            "name": "thecodingmachine/safe",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thecodingmachine/safe.git",
+                "reference": "1b99e649415872997e43c771c55ba9b08d601329"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thecodingmachine/safe/zipball/1b99e649415872997e43c771c55ba9b08d601329",
+                "reference": "1b99e649415872997e43c771c55ba9b08d601329",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "php-parallel-lint/php-parallel-lint": "^1.4",
+                "phpstan/phpstan": "^2",
+                "phpunit/phpunit": "^10",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/special_cases.php",
+                    "generated/apache.php",
+                    "generated/apcu.php",
+                    "generated/array.php",
+                    "generated/bzip2.php",
+                    "generated/calendar.php",
+                    "generated/classobj.php",
+                    "generated/com.php",
+                    "generated/cubrid.php",
+                    "generated/curl.php",
+                    "generated/datetime.php",
+                    "generated/dir.php",
+                    "generated/eio.php",
+                    "generated/errorfunc.php",
+                    "generated/exec.php",
+                    "generated/fileinfo.php",
+                    "generated/filesystem.php",
+                    "generated/filter.php",
+                    "generated/fpm.php",
+                    "generated/ftp.php",
+                    "generated/funchand.php",
+                    "generated/gettext.php",
+                    "generated/gmp.php",
+                    "generated/gnupg.php",
+                    "generated/hash.php",
+                    "generated/ibase.php",
+                    "generated/ibmDb2.php",
+                    "generated/iconv.php",
+                    "generated/image.php",
+                    "generated/imap.php",
+                    "generated/info.php",
+                    "generated/inotify.php",
+                    "generated/json.php",
+                    "generated/ldap.php",
+                    "generated/libxml.php",
+                    "generated/lzf.php",
+                    "generated/mailparse.php",
+                    "generated/mbstring.php",
+                    "generated/misc.php",
+                    "generated/mysql.php",
+                    "generated/mysqli.php",
+                    "generated/network.php",
+                    "generated/oci8.php",
+                    "generated/opcache.php",
+                    "generated/openssl.php",
+                    "generated/outcontrol.php",
+                    "generated/pcntl.php",
+                    "generated/pcre.php",
+                    "generated/pgsql.php",
+                    "generated/posix.php",
+                    "generated/ps.php",
+                    "generated/pspell.php",
+                    "generated/readline.php",
+                    "generated/rnp.php",
+                    "generated/rpminfo.php",
+                    "generated/rrd.php",
+                    "generated/sem.php",
+                    "generated/session.php",
+                    "generated/shmop.php",
+                    "generated/sockets.php",
+                    "generated/sodium.php",
+                    "generated/solr.php",
+                    "generated/spl.php",
+                    "generated/sqlsrv.php",
+                    "generated/ssdeep.php",
+                    "generated/ssh2.php",
+                    "generated/stream.php",
+                    "generated/strings.php",
+                    "generated/swoole.php",
+                    "generated/uodbc.php",
+                    "generated/uopz.php",
+                    "generated/url.php",
+                    "generated/var.php",
+                    "generated/xdiff.php",
+                    "generated/xml.php",
+                    "generated/xmlrpc.php",
+                    "generated/yaml.php",
+                    "generated/yaz.php",
+                    "generated/zip.php",
+                    "generated/zlib.php"
+                ],
+                "classmap": [
+                    "lib/DateTime.php",
+                    "lib/DateTimeImmutable.php",
+                    "lib/Exceptions/",
+                    "generated/Exceptions/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP core functions that throw exceptions instead of returning FALSE on error",
+            "support": {
+                "issues": "https://github.com/thecodingmachine/safe/issues",
+                "source": "https://github.com/thecodingmachine/safe/tree/v3.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/OskarStark",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/shish",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/staabm",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-02-11T00:27:22+00:00"
+        },
+        {
             "name": "webmozart/assert",
             "version": "1.11.0",
             "source": {
@@ -2068,26 +2061,25 @@
     "packages-dev": [
         {
             "name": "fidry/makefile",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theofidry/makefile.git",
-                "reference": "706e96078ea9ac87cc68c737d56510a68a1344e4"
+                "reference": "3d0350840eeeda8127e014f0f7f86917c7f7b4f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theofidry/makefile/zipball/706e96078ea9ac87cc68c737d56510a68a1344e4",
-                "reference": "706e96078ea9ac87cc68c737d56510a68a1344e4",
+                "url": "https://api.github.com/repos/theofidry/makefile/zipball/3d0350840eeeda8127e014f0f7f86917c7f7b4f1",
+                "reference": "3d0350840eeeda8127e014f0f7f86917c7f7b4f1",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.1",
-                "thecodingmachine/safe": "^2.0"
+                "php": "^8.1"
             },
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.4",
                 "ergebnis/composer-normalize": "^2.28",
-                "infection/infection": "^0.26",
+                "infection/infection": "^0.29",
                 "phpunit/phpunit": "^10.3"
             },
             "type": "library",
@@ -2121,7 +2113,7 @@
             ],
             "support": {
                 "issues": "https://github.com/theofidry/makefile/issues",
-                "source": "https://github.com/theofidry/makefile/tree/1.0.2"
+                "source": "https://github.com/theofidry/makefile/tree/1.0.3"
             },
             "funding": [
                 {
@@ -2129,7 +2121,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-24T17:53:02+00:00"
+            "time": "2025-02-13T22:15:57+00:00"
         },
         {
             "name": "helmich/phpunit-json-assert",

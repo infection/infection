@@ -61,11 +61,11 @@
         "sanmai/later": "^0.1.1",
         "sanmai/pipeline": "^5.1 || ^6",
         "sebastian/diff": "^3.0.2 || ^4.0 || ^5.0 || ^6.0 || ^7.0",
-        "shish/safe": "^2.6",
         "symfony/console": "^6.4 || ^7.0",
         "symfony/filesystem": "^6.4 || ^7.0",
         "symfony/finder": "^6.4 || ^7.0",
         "symfony/process": "^6.4 || ^7.0",
+        "thecodingmachine/safe": "^v3.0",
         "webmozart/assert": "^1.11"
     },
     "conflict": {
