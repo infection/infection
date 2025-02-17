@@ -97,7 +97,7 @@ class DiffChangedLinesParser
                 // can be "523,12", meaning from 523 lines new 12 are added; or just "532"
                 $linesText = $matches[self::MATCH_INDEX];
 
-                $lineParts = array_map('\intval', explode(',', (string) $linesText));
+                $lineParts = array_map('\intval', explode(',', $linesText));
 
                 Assert::minCount($lineParts, 1);
 

@@ -95,7 +95,7 @@ final class CloneVisitorTest extends BaseVisitorTestCase
     private function createMutateStringValueVisitor(): NodeVisitor
     {
         return new class extends NodeVisitorAbstract {
-            public function enterNode(Node $node)
+            public function enterNode(Node $node): ?Node\Scalar\String_
             {
                 if ($node instanceof Node\Scalar\String_) {
                     return new Node\Scalar\String_('foo');

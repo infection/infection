@@ -285,7 +285,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
         return new class extends NodeVisitorAbstract {
             public $isInsideFunction = false;
 
-            public function enterNode(Node $node)
+            public function enterNode(Node $node): ?int
             {
                 if ($node->hasAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY)) {
                     $this->isInsideFunction = true;
@@ -306,7 +306,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
              */
             public $reflectionClass;
 
-            public function enterNode(Node $node)
+            public function enterNode(Node $node): ?int
             {
                 if ($node->hasAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY)) {
                     $this->reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
@@ -325,7 +325,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
             public $fooReflectionClass;
             public $createAnonymousClassReflectionClass;
 
-            public function enterNode(Node $node)
+            public function enterNode(Node $node): ?int
             {
                 $name = $node->getAttribute(ReflectionVisitor::FUNCTION_NAME);
 

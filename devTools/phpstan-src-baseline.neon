@@ -1,191 +1,259 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Anonymous function should return string but returns string\\|null\\.$#"
+			message: '#^Anonymous function should return string but returns string\|null\.$#'
+			identifier: return.type
 			count: 1
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
-			message: "#^Cannot call method askQuestion\\(\\) on Infection\\\\Console\\\\IO\\|null\\.$#"
+			message: '#^Cannot call method askQuestion\(\) on Infection\\Console\\IO\|null\.$#'
+			identifier: method.nonObject
 			count: 1
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
-			message: "#^Parameter \\#1 \\$array of static method Webmozart\\\\Assert\\\\Assert\\:\\:keyExists\\(\\) expects array, array\\<string\\>\\|null given\\.$#"
-			count: 2
-			path: ../src/Differ/DiffChangedLinesParser.php
+			message: '#^Function array_walk_recursive is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\array_walk_recursive;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: ../src/Config/Guesser/SourceDirGuesser.php
 
 		-
-			message: "#^Offset 1 might not exist on array\\<string\\>\\|null\\.$#"
+			message: '#^Call to function is_array\(\) with array\{list\<string\>\} will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../src/Differ/DiffColorizer.php
+
+		-
+			message: '#^Offset 0 on array\{list\<string\>\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../src/Differ/DiffColorizer.php
+
+		-
+			message: '#^Offset 1 might not exist on array\{0\?\: string, 1\?\: non\-empty\-string\}\.$#'
+			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
-			message: "#^Parameter \\#1 \\$iterator of class Symfony\\\\Component\\\\Finder\\\\Iterator\\\\PathFilterIterator constructor expects Iterator\\<string, Symfony\\\\Component\\\\Finder\\\\SplFileInfo\\>, Iterator\\<mixed, Infection\\\\TestFramework\\\\Coverage\\\\Trace\\|SplFileInfo\\> given\\.$#"
+			message: '#^Parameter \#1 \$iterator of class Symfony\\Component\\Finder\\Iterator\\PathFilterIterator constructor expects Iterator\<string, Symfony\\Component\\Finder\\SplFileInfo\>, Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\> given\.$#'
+			identifier: argument.type
 			count: 1
 			path: ../src/FileSystem/SourceFileFilter.php
 
 		-
-			message: "#^Offset 'name' might not exist on array\\<string\\>\\|null\\.$#"
+			message: '#^Offset ''name'' might not exist on array\{0\?\: string, name\?\: non\-falsy\-string, 1\?\: non\-falsy\-string, dataname\?\: non\-falsy\-string, 2\?\: non\-falsy\-string\}\.$#'
+			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
 
 		-
-			message: "#^Parameter \\#1 \\$array of static method Webmozart\\\\Assert\\\\Assert\\:\\:keyExists\\(\\) expects array, array\\<string\\>\\|null given\\.$#"
+			message: '#^Parameter \#1 \$array of function array_intersect expects an array of values castable to string, list\<PhpParser\\Node\\Expr\|string\> given\.$#'
+			identifier: argument.type
 			count: 1
-			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
+			path: ../src/Mutator/Boolean/LogicalOr.php
 
 		-
-			message: "#^Method Infection\\\\Mutator\\\\MutatorResolver\\:\\:resolve\\(\\) should return array\\<class\\-string\\<Infection\\\\Mutator\\\\ConfigurableMutator\\<PhpParser\\\\Node\\>\\>, array\\> but returns array\\<string, array\\<string\\>\\>\\.$#"
+			message: '#^Parameter \#2 \$arrays of function array_intersect expects an array of values castable to string, list\<PhpParser\\Node\\Expr\|string\> given\.$#'
+			identifier: argument.type
 			count: 1
-			path: ../src/Mutator/MutatorResolver.php
+			path: ../src/Mutator/Boolean/LogicalOr.php
 
 		-
-			message: "#^Parameter &\\$mutators by\\-ref type of method Infection\\\\Mutator\\\\MutatorResolver\\:\\:registerFromClass\\(\\) expects array\\<string, array\\<string, string\\>\\>, array\\<string, array\\<string, array\\<string\\>\\|string\\>\\> given\\.$#"
-			count: 1
-			path: ../src/Mutator/MutatorResolver.php
-
-		-
-			message: "#^Parameter &\\$mutators by\\-ref type of method Infection\\\\Mutator\\\\MutatorResolver\\:\\:registerFromClass\\(\\) expects array\\<string, array\\<string, string\\>\\>, array\\<string, array\\> given\\.$#"
+			message: '#^Method Infection\\Mutator\\MutatorResolver\:\:resolve\(\) should return array\<class\-string\<Infection\\Mutator\\ConfigurableMutator\<PhpParser\\Node\>\>, array\<mixed\>\> but returns array\<string, array\<string\>\>\.$#'
+			identifier: return.type
 			count: 1
 			path: ../src/Mutator/MutatorResolver.php
 
 		-
-			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\NonMutableNodesIgnorerVisitor\\:\\:enterNode\\(\\) never returns PhpParser\\\\Node so it can be removed from the return type\\.$#"
+			message: '#^PHPDoc tag @var with type array\<string\> is not subtype of type bool\|stdClass\.$#'
+			identifier: varTag.type
+			count: 2
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			message: '#^Parameter &\$mutators by\-ref type of method Infection\\Mutator\\MutatorResolver\:\:registerFromClass\(\) expects array\<string, array\<string, string\>\>, array\<string, array\<string, array\<string\>\|string\>\> given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			message: '#^Parameter &\$mutators by\-ref type of method Infection\\Mutator\\MutatorResolver\:\:registerFromClass\(\) expects array\<string, array\<string, string\>\>, array\<string, array\> given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			message: '#^Impure yield in pure method Infection\\Mutator\\Unwrap\\UnwrapArrayCombine\:\:getParameterIndexes\(\)\.$#'
+			identifier: impure.yield
+			count: 2
+			path: ../src/Mutator/Unwrap/UnwrapArrayCombine.php
+
+		-
+			message: '#^Impure yield in pure method Infection\\Mutator\\Unwrap\\UnwrapStrIreplace\:\:getParameterIndexes\(\)\.$#'
+			identifier: impure.yield
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrIreplace.php
+
+		-
+			message: '#^Impure yield in pure method Infection\\Mutator\\Unwrap\\UnwrapStrReplace\:\:getParameterIndexes\(\)\.$#'
+			identifier: impure.yield
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrReplace.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$namespacedName\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php
+
+		-
+			message: '#^Method Infection\\PhpParser\\Visitor\\NonMutableNodesIgnorerVisitor\:\:enterNode\(\) never returns PhpParser\\Node so it can be removed from the return type\.$#'
+			identifier: return.unusedType
 			count: 1
 			path: ../src/PhpParser/Visitor/NonMutableNodesIgnorerVisitor.php
 
 		-
-			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\NonMutableNodesIgnorerVisitor\\:\\:enterNode\\(\\) never returns array\\<PhpParser\\\\Node\\> so it can be removed from the return type\\.$#"
+			message: '#^Method Infection\\PhpParser\\Visitor\\NonMutableNodesIgnorerVisitor\:\:enterNode\(\) never returns array\<PhpParser\\Node\> so it can be removed from the return type\.$#'
+			identifier: return.unusedType
 			count: 1
 			path: ../src/PhpParser/Visitor/NonMutableNodesIgnorerVisitor.php
 
 		-
-			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\ReflectionVisitor\\:\\:enterNode\\(\\) never returns PhpParser\\\\Node so it can be removed from the return type\\.$#"
+			message: '#^Method Infection\\PhpParser\\Visitor\\ReflectionVisitor\:\:enterNode\(\) never returns PhpParser\\Node so it can be removed from the return type\.$#'
+			identifier: return.unusedType
 			count: 1
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 
 		-
-			message: "#^Method Infection\\\\PhpParser\\\\Visitor\\\\ReflectionVisitor\\:\\:enterNode\\(\\) never returns array\\<PhpParser\\\\Node\\> so it can be removed from the return type\\.$#"
+			message: '#^Method Infection\\PhpParser\\Visitor\\ReflectionVisitor\:\:enterNode\(\) never returns array\<PhpParser\\Node\> so it can be removed from the return type\.$#'
+			identifier: return.unusedType
 			count: 1
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 
 		-
-			message: "#^Parameter \\#2 \\$paths of method Composer\\\\Autoload\\\\ClassLoader\\:\\:setPsr4\\(\\) expects list\\<string\\>\\|string, array\\<string\\> given\\.$#"
+			message: '#^Parameter \#2 \$paths of method Composer\\Autoload\\ClassLoader\:\:setPsr4\(\) expects list\<string\>\|string, array\<string\> given\.$#'
+			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/AdapterInstaller.php
 
 		-
-			message: "#^Generator expects value type string, array\\<string\\>\\|string given\\.$#"
-			count: 2
-			path: ../src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php
+			message: '#^Function shell_exec is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\shell_exec;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: ../src/TestFramework/CommandLineBuilder.php
 
 		-
-			message: "#^Offset 1 might not exist on array\\<string\\>\\|null\\.$#"
+			message: '#^Function ini_get is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ini_get;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: ../src/TestFramework/Coverage/CoverageChecker.php
+
+		-
+			message: '#^Offset 1 might not exist on array\{0\?\: string, 1\?\: non\-falsy\-string\}\.$#'
+			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			message: "#^Offset 1 might not exist on array\\<string\\>\\|null\\.$#"
+			message: '#^Offset 1 might not exist on array\{0\?\: string, 1\?\: non\-falsy\-string, 2\?\: ''/phpunit''\}\.$#'
+			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
 
 		-
-			message: "#^Method Infection\\\\TestFramework\\\\TestFrameworkExtraOptionsFilter\\:\\:filterForMutantProcess\\(\\) should return string but returns array\\<string\\>\\|string\\.$#"
-			count: 1
-			path: ../src/TestFramework/TestFrameworkExtraOptionsFilter.php
-
-		-
-			message: "#^Parameter \\#1 \\$string of function trim expects string, array\\<string\\>\\|string given\\.$#"
-			count: 1
-			path: ../src/TestFramework/TestFrameworkExtraOptionsFilter.php
-
-		-
-			message: "#^Offset 0 might not exist on array\\<string\\>\\|null\\.$#"
-			count: 1
-			path: ../src/TestFramework/VersionParser.php
-
-		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertCount\\(\\)\\.$#"
+			message: '#^Dynamic call to static method PHPUnit\\Framework\\Assert\:\:assertCount\(\)\.$#'
+			identifier: staticMethod.dynamicCall
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\)\\.$#"
+			message: '#^Dynamic call to static method PHPUnit\\Framework\\Assert\:\:assertSame\(\)\.$#'
+			identifier: staticMethod.dynamicCall
 			count: 2
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Dynamic call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:fail\\(\\)\\.$#"
+			message: '#^Dynamic call to static method PHPUnit\\Framework\\Assert\:\:fail\(\)\.$#'
+			identifier: staticMethod.dynamicCall
 			count: 2
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Method Infection\\\\Testing\\\\BaseMutatorTestCase\\:\\:createMutator\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
+			message: '#^Method Infection\\Testing\\BaseMutatorTestCase\:\:createMutator\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Method Infection\\\\Testing\\\\BaseMutatorTestCase\\:\\:createMutator\\(\\) return type with generic interface Infection\\\\Mutator\\\\Mutator does not specify its types\\: TNode$#"
+			message: '#^Method Infection\\Testing\\BaseMutatorTestCase\:\:createMutator\(\) return type with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
+			identifier: missingType.generics
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Method Infection\\\\Testing\\\\BaseMutatorTestCase\\:\\:getMutationsFromCode\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
+			message: '#^Method Infection\\Testing\\BaseMutatorTestCase\:\:getMutationsFromCode\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Method Infection\\\\Testing\\\\BaseMutatorTestCase\\:\\:mutate\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
+			message: '#^Method Infection\\Testing\\BaseMutatorTestCase\:\:mutate\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Parameter \\#1 \\$nodes of method PhpParser\\\\NodeTraverserInterface\\:\\:traverse\\(\\) expects array\\<PhpParser\\\\Node\\>, array\\<PhpParser\\\\Node\\\\Stmt\\>\\|null given\\.$#"
+			message: '#^Parameter \#1 \$nodes of method PhpParser\\NodeTraverserInterface\:\:traverse\(\) expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
+			identifier: argument.type
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Parameter \\#1 \\$resolvedMutators of method Infection\\\\Mutator\\\\MutatorFactory\\:\\:create\\(\\) expects array\\<class\\-string\\<Infection\\\\Mutator\\\\ConfigurableMutator\\<PhpParser\\\\Node\\>\\>, array\\>, non\\-empty\\-array\\<string, array\\{settings\\: array\\}\\> given\\.$#"
+			message: '#^Parameter \#1 \$resolvedMutators of method Infection\\Mutator\\MutatorFactory\:\:create\(\) expects array\<class\-string\<Infection\\Mutator\\ConfigurableMutator\<PhpParser\\Node\>\>, array\<mixed\>\>, non\-empty\-array\<string, array\{settings\: array\}\> given\.$#'
+			identifier: argument.type
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Parameter \\#2 \\$fileAst of class Infection\\\\Testing\\\\SimpleMutationsCollectorVisitor constructor expects array\\<PhpParser\\\\Node\\>, array\\<PhpParser\\\\Node\\\\Stmt\\>\\|null given\\.$#"
+			message: '#^Parameter \#2 \$fileAst of class Infection\\Testing\\SimpleMutationsCollectorVisitor constructor expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
+			identifier: argument.type
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Property Infection\\\\Testing\\\\BaseMutatorTestCase\\:\\:\\$mutator with generic interface Infection\\\\Mutator\\\\Mutator does not specify its types\\: TNode$#"
+			message: '#^Property Infection\\Testing\\BaseMutatorTestCase\:\:\$mutator with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
+			identifier: missingType.generics
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: "#^Class Infection\\\\Testing\\\\SimpleMutation extends @final class Infection\\\\Mutation\\\\Mutation\\.$#"
+			message: '#^Class Infection\\Testing\\SimpleMutation extends @final class Infection\\Mutation\\Mutation\.$#'
+			identifier: class.extendsFinalByPhpDoc
 			count: 1
 			path: ../src/Testing/SimpleMutation.php
 
 		-
-			message: "#^Infection\\\\Testing\\\\SimpleMutation\\:\\:__construct\\(\\) does not call parent constructor from Infection\\\\Mutation\\\\Mutation\\.$#"
+			message: '#^Infection\\Testing\\SimpleMutation\:\:__construct\(\) does not call parent constructor from Infection\\Mutation\\Mutation\.$#'
+			identifier: constructor.missingParentCall
 			count: 1
 			path: ../src/Testing/SimpleMutation.php
 
 		-
-			message: "#^Method Infection\\\\Testing\\\\SimpleMutation\\:\\:__construct\\(\\) has parameter \\$mutator with generic interface Infection\\\\Mutator\\\\Mutator but does not specify its types\\: TNode$#"
+			message: '#^Method Infection\\Testing\\SimpleMutation\:\:__construct\(\) has parameter \$mutator with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
+			identifier: missingType.generics
 			count: 1
 			path: ../src/Testing/SimpleMutation.php
 
 		-
-			message: "#^Method Infection\\\\Testing\\\\SimpleMutation\\:\\:getMutator\\(\\) return type with generic interface Infection\\\\Mutator\\\\Mutator does not specify its types\\: TNode$#"
+			message: '#^Method Infection\\Testing\\SimpleMutation\:\:getMutator\(\) return type with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
+			identifier: missingType.generics
 			count: 1
 			path: ../src/Testing/SimpleMutation.php
 
 		-
-			message: "#^Binary operation \"\\.\" between array\\<string\\>\\|string and 'Test' results in an error\\.$#"
-			count: 1
-			path: ../src/Testing/SourceTestClassNameScheme.php
-
-		-
-			message: "#^Offset 1 might not exist on array\\<string\\>\\|null\\.$#"
+			message: '#^Offset 1 might not exist on array\{0\?\: string, 1\?\: non\-falsy\-string\}\.$#'
+			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/Testing/SourceTestClassNameScheme.php

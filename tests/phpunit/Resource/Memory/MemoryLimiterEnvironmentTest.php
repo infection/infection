@@ -51,7 +51,7 @@ use function Safe\ini_set;
 #[CoversClass(MemoryLimiterEnvironment::class)]
 final class MemoryLimiterEnvironmentTest extends TestCase
 {
-    private ?string $originalMemoryLimit;
+    private string $originalMemoryLimit;
 
     private MemoryLimiterEnvironment $environment;
 
