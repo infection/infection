@@ -91,7 +91,7 @@ use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
 use function ltrim;
 use ReflectionClass;
-use function Safe\sort;
+use function sort;
 use const SORT_STRING;
 use function sprintf;
 use function str_replace;

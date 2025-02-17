@@ -53,7 +53,7 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
     {
         if ($loggerProjectRootDirectory === null) {
             if (($projectRootDirectory = getenv('GITHUB_WORKSPACE')) === false) {
-                $projectRootDirectory = trim(shell_exec('git rev-parse --show-toplevel'));
+                $projectRootDirectory = trim((string) shell_exec('git rev-parse --show-toplevel'));
             }
             $this->loggerProjectRootDirectory = $projectRootDirectory;
         }

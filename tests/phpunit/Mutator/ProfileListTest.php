@@ -42,7 +42,7 @@ use Infection\Testing\MutatorName;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
-use function Safe\sort;
+use function sort;
 use const SORT_STRING;
 use function sprintf;
 
