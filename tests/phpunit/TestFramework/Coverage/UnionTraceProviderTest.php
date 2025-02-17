@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use function array_merge;
+use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\Coverage\UnionTraceProvider;
 use function iterator_to_array;
@@ -64,7 +65,7 @@ final class UnionTraceProviderTest extends TestCase
 
         $provider = new UnionTraceProvider($coveredTraceProvider, $uncoveredTraceProvider, true);
 
-        /** @var array<int> $traces */
+        /** @var array<Trace> $traces */
         $traces = iterator_to_array($provider->provideTraces(), false);
         $this->assertSame($canary, $traces);
     }
@@ -89,7 +90,7 @@ final class UnionTraceProviderTest extends TestCase
 
         $provider = new UnionTraceProvider($coveredTraceProvider, $uncoveredTraceProvider, false);
 
-        /** @var array<int> $traces */
+        /** @var array<Trace> $traces */
         $traces = iterator_to_array($provider->provideTraces(), false);
         $this->assertSame(array_merge($canary, $canary), $traces);
     }

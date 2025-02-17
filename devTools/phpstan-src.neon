@@ -9,7 +9,6 @@ parameters:
     sidzIgnoreNumericStrings: true
     ignoreErrors:
         - '#generic class ReflectionClass (but )?does not specify its types#'
-        - '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
         - '#^Parameter \#\d+ \$.+ \(.+\) of method .+ should be contravariant with parameter \$.+ \(.+\) of method .+$#'
         - '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
         - '#^Dead catch - InvalidArgumentException is never thrown in the try block\.$#'
@@ -62,14 +61,14 @@ parameters:
             message: "#Do not use magic number (.*)#"
             count: 8
             path: ../src/Mutator/Extensions/BCMath.php
+        -
+            identifier: arrayFilter.strict
 
     level: 8
     paths:
         - ../src
     excludePaths:
         - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
-        - %currentWorkingDirectory%/src/FileSystem/DummySymfony5FileSystem.php
-        - %currentWorkingDirectory%/src/FileSystem/DummySymfony6FileSystem.php
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__.php
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__Test.php
     stubFiles:

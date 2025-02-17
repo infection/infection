@@ -2,8 +2,6 @@ parameters:
     tmpDir: ../build/cache/phpstan-tests
     parallel:
         processTimeout: 120.0
-    checkGenericClassInNonGenericObjectType: false
-    checkMissingIterableValueType: false
     excludePaths:
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
@@ -19,6 +17,7 @@ parameters:
         - '#^Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with ''[a-zA-Z\\]+'' and [a-zA-Z\\]+ will always evaluate to (false|true)\.$#'
         - '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
         - '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
+        - '#^Comparison operation "\<" between int\<.*, .*\> and .* is always false\.$#'
         -
             message: "#^Variable method call on Infection\\\\Tests\\\\FileSystem\\\\Finder\\\\MockVendor\\.$#"
             count: 1
@@ -39,6 +38,17 @@ parameters:
             message: "#^PHPDoc tag @param for parameter \\$values contains unresolvable type\\.$#"
             count: 1
             path: ../tests/phpunit/MockedContainer.php
+        -
+            message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
+        -
+            message: '#^Function ini_get is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ini_get;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+            identifier: theCodingMachineSafe.function
+            count: 2
+            path: ../tests/phpunit/Process/OriginalPhpProcessTest.php
+        -
+            identifier: arrayFilter.strict
     level: 4
     paths:
         - ../tests/phpunit

@@ -104,8 +104,8 @@ final class PregMatchRemoveFlags extends AbstractPregMatch
         $regexBody = $matches[2] ?? '';
         $flags = $matches[4] ?? '';
 
-        foreach (str_split((string) $flags) as $flag) {
-            yield $delimiter . $regexBody . $delimiter . str_replace($flag, '', (string) $flags);
+        foreach (str_split($flags) as $flag) {
+            yield $delimiter . $regexBody . $delimiter . str_replace($flag, '', $flags);
         }
     }
 }
