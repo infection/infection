@@ -50,13 +50,11 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     /**
      * @var AbstractValueToNullReturnValue&MockObject
      */
-    private $testSubject;
+    private MockObject $testSubject;
 
     protected function setUp(): void
     {
-        $this->testSubject = $this->getMockBuilder(AbstractValueToNullReturnValue::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->testSubject = $this->createMock(AbstractValueToNullReturnValue::class);
     }
 
     public function test_attribute_not_found(): void
@@ -129,11 +127,8 @@ final class AbstractValueToNullReturnValueTest extends TestCase
 
     private function mockNode($returnValue): Node
     {
-        /** @var Node|MockObject $mockNode */
-        $mockNode = $this->getMockBuilder(Node::class)
-                         ->disableOriginalConstructor()
-                         ->onlyMethods(['getAttribute'])
-                         ->getMockForAbstractClass();
+        /** @var Node&MockObject $mockNode */
+        $mockNode = $this->createMock(Node::class);
 
         $mockNode->method('getAttribute')
                  ->willReturn($returnValue);
