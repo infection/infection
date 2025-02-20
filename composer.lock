@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "235afa8e5e9263ec45db8d4c004bcc1e",
+    "content-hash": "c67f4439e430e2485b7f8581e1172da9",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -293,6 +293,120 @@
             "time": "2024-08-06T10:04:20+00:00"
         },
         {
+            "name": "icecave/parity",
+            "version": "3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/icecave/parity.git",
+                "reference": "4fe835483e0f89f0f96763c47cb9fdca26c24bdc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/icecave/parity/zipball/4fe835483e0f89f0f96763c47cb9fdca26c24bdc",
+                "reference": "4fe835483e0f89f0f96763c47cb9fdca26c24bdc",
+                "shasum": ""
+            },
+            "require": {
+                "icecave/repr": "^4",
+                "php": ">=7.3"
+            },
+            "require-dev": {
+                "eloquent/liberator": "^2",
+                "eloquent/phony": "^5",
+                "eloquent/phony-phpunit": "^7",
+                "friendsofphp/php-cs-fixer": "^2",
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Icecave\\Parity\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "James Harris",
+                    "email": "mailjamesharris@gmail.com",
+                    "homepage": "https://github.com/jmalloc"
+                }
+            ],
+            "description": "A customizable deep comparison library.",
+            "homepage": "https://github.com/icecave/parity",
+            "keywords": [
+                "compare",
+                "comparison",
+                "equal",
+                "equality",
+                "greater",
+                "less",
+                "sort",
+                "sorting"
+            ],
+            "support": {
+                "issues": "https://github.com/icecave/parity/issues",
+                "source": "https://github.com/icecave/parity/tree/3.0.1"
+            },
+            "time": "2021-02-04T05:51:24+00:00"
+        },
+        {
+            "name": "icecave/repr",
+            "version": "4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/icecave/repr.git",
+                "reference": "3dad35ee43394404ae0f1926d754e7b7820da8e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/icecave/repr/zipball/3dad35ee43394404ae0f1926d754e7b7820da8e4",
+                "reference": "3dad35ee43394404ae0f1926d754e7b7820da8e4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "eloquent/phony-phpunit": "^6",
+                "friendsofphp/php-cs-fixer": "^2",
+                "phpunit/phpunit": "^8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Icecave\\Repr\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "James Harris",
+                    "email": "mailjamesharris@gmail.com",
+                    "homepage": "https://github.com/jmalloc"
+                }
+            ],
+            "description": "A library for generating string representations of any value, inspired by Python's reprlib library.",
+            "homepage": "https://github.com/icecave/repr",
+            "keywords": [
+                "human",
+                "readable",
+                "repr",
+                "representation",
+                "string"
+            ],
+            "support": {
+                "issues": "https://github.com/icecave/repr/issues",
+                "source": "https://github.com/icecave/repr/tree/4.0.0"
+            },
+            "time": "2020-08-25T02:05:11+00:00"
+        },
+        {
             "name": "infection/abstract-testframework-adapter",
             "version": "0.5.0",
             "source": {
@@ -524,30 +638,41 @@
         },
         {
             "name": "justinrainbow/json-schema",
-            "version": "5.3.0",
+            "version": "6.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jsonrainbow/json-schema.git",
-                "reference": "feb2ca6dd1cebdaf1ed60a4c8de2e53ce11c4fd8"
+                "reference": "f7d78c345d5f8954f32cef5381fb6f8748b60690"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/feb2ca6dd1cebdaf1ed60a4c8de2e53ce11c4fd8",
-                "reference": "feb2ca6dd1cebdaf1ed60a4c8de2e53ce11c4fd8",
+                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/f7d78c345d5f8954f32cef5381fb6f8748b60690",
+                "reference": "f7d78c345d5f8954f32cef5381fb6f8748b60690",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1"
+                "ext-json": "*",
+                "icecave/parity": "^3.0",
+                "marc-mabe/php-enum": "^4.0",
+                "php": "^7.2 || ^8.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "~2.2.20||~2.15.1",
+                "friendsofphp/php-cs-fixer": "~2.2.20 || ~2.19.0",
                 "json-schema/json-schema-test-suite": "1.2.0",
-                "phpunit/phpunit": "^4.8.35"
+                "marc-mabe/php-enum-phpstan": "^2.0",
+                "phpspec/prophecy": "^1.19",
+                "phpstan/phpstan": "^1.12",
+                "phpunit/phpunit": "^8.5"
             },
             "bin": [
                 "bin/validate-json"
             ],
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "6.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "JsonSchema\\": "src/JsonSchema/"
@@ -576,16 +701,89 @@
                 }
             ],
             "description": "A library to validate a json schema.",
-            "homepage": "https://github.com/justinrainbow/json-schema",
+            "homepage": "https://github.com/jsonrainbow/json-schema",
             "keywords": [
                 "json",
                 "schema"
             ],
             "support": {
                 "issues": "https://github.com/jsonrainbow/json-schema/issues",
-                "source": "https://github.com/jsonrainbow/json-schema/tree/5.3.0"
+                "source": "https://github.com/jsonrainbow/json-schema/tree/6.1.0"
             },
-            "time": "2024-07-06T21:00:26+00:00"
+            "time": "2025-02-04T11:13:26+00:00"
+        },
+        {
+            "name": "marc-mabe/php-enum",
+            "version": "v4.7.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/marc-mabe/php-enum.git",
+                "reference": "7159809e5cfa041dca28e61f7f7ae58063aae8ed"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/marc-mabe/php-enum/zipball/7159809e5cfa041dca28e61f7f7ae58063aae8ed",
+                "reference": "7159809e5cfa041dca28e61f7f7ae58063aae8ed",
+                "shasum": ""
+            },
+            "require": {
+                "ext-reflection": "*",
+                "php": "^7.1 | ^8.0"
+            },
+            "require-dev": {
+                "phpbench/phpbench": "^0.16.10 || ^1.0.4",
+                "phpstan/phpstan": "^1.3.1",
+                "phpunit/phpunit": "^7.5.20 | ^8.5.22 | ^9.5.11",
+                "vimeo/psalm": "^4.17.0 | ^5.26.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-3.x": "3.2-dev",
+                    "dev-master": "4.7-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "MabeEnum\\": "src/"
+                },
+                "classmap": [
+                    "stubs/Stringable.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Marc Bennewitz",
+                    "email": "dev@mabe.berlin",
+                    "homepage": "https://mabe.berlin/",
+                    "role": "Lead"
+                }
+            ],
+            "description": "Simple and fast implementation of enumerations with native PHP",
+            "homepage": "https://github.com/marc-mabe/php-enum",
+            "keywords": [
+                "enum",
+                "enum-map",
+                "enum-set",
+                "enumeration",
+                "enumerator",
+                "enummap",
+                "enumset",
+                "map",
+                "set",
+                "type",
+                "type-hint",
+                "typehint"
+            ],
+            "support": {
+                "issues": "https://github.com/marc-mabe/php-enum/issues",
+                "source": "https://github.com/marc-mabe/php-enum/tree/v4.7.1"
+            },
+            "time": "2024-11-28T04:54:44+00:00"
         },
         {
             "name": "nikic/php-parser",
