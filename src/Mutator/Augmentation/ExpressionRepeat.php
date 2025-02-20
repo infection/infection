@@ -33,56 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\Mutator\Augmentation;
 
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ImpureExpressionVisitor;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use SplObjectStorage;
+use PhpParser\Node;
 
 /**
  * @internal
- * @final
  */
-class NodeTraverserFactory
+final class ExpressionRepeat implements Mutator
 {
-    /**
-     * @param NodeIgnorer[] $nodeIgnorers
-     */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        $changingIgnorer = new ChangingIgnorer();
-        $nodeIgnorers[] = $changingIgnorer;
-
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
-
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                'replaceNodes' => false,
-            ]),
+        return new Definition(
+            'Duplicates an expression statement, provided it can have side-effects.',
+            MutatorCategory::SEMANTIC_ADDITION,
+            null
         );
-        $traverser->addVisitor(new ParentConnectingVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor(new ImpureExpressionVisitor());
-        $traverser->addVisitor($mutationVisitor);
+    }
 
-        return $traverser;
+    /**
+     * @param Node\Stmt\Expression $node
+     *
+     * @return iterable<array<Node\Stmt\Expression>>
+     */
+    public function mutate(Node $node): iterable
+    {
+        yield [$node, $node];
+    }
+
+    public function canMutate(Node $node): bool
+    {
+        if (!$node instanceof Node\Stmt\Expression) {
+            return false;
+        }
+
+        // Skip statements with almost no side effects.
+        return $node->getAttribute(ImpureExpressionVisitor::HAS_NODES_WITH_SIDE_EFFECTS_KEY);
     }
 }
