@@ -42,7 +42,6 @@ use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\PhpUnit\Adapter\PestAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
