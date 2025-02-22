@@ -88,28 +88,7 @@ final readonly class Factory
             );
         }
 
-        if ($adapterName === TestFrameworkTypes::PEST) {
-            $pestConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
-
-            return PestAdapterFactory::create(
-                $this->testFrameworkFinder->find(
-                    TestFrameworkTypes::PEST,
-                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
-                ),
-                $this->tmpDir,
-                $pestConfigPath,
-                (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
-                $this->jUnitFilePath,
-                $this->projectDir,
-                $this->infectionConfig->getSourceDirectories(),
-                $skipCoverage,
-                $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
-                $filteredSourceFilesToMutate,
-                $this->infectionConfig->getMapSourceClassToTestStrategy(),
-            );
-        }
-
-        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PEST];
+        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT];
 
         foreach ($this->installedExtensions as $installedExtension) {
             $factory = $installedExtension['extra']['class'];

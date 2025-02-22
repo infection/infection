@@ -47,7 +47,6 @@ use Webmozart\Assert\Assert;
 final class TestFrameworkTypes
 {
     public const PHPUNIT = 'phpunit';
-    public const PEST = 'pest';
     public const PHPSPEC = 'phpspec';
     public const CODECEPTION = 'codeception';
 
@@ -55,7 +54,6 @@ final class TestFrameworkTypes
      * @var string[]
      */
     private static array $defaultTypes = [
-        self::PEST,
         self::PHPUNIT,
         self::PHPSPEC,
         self::CODECEPTION,
