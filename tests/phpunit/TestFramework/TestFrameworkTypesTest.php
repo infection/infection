@@ -49,7 +49,6 @@ final class TestFrameworkTypesTest extends TestCase
 
         $this->assertSame(
             [
-                TestFrameworkTypes::PEST,
                 TestFrameworkTypes::PHPUNIT,
                 TestFrameworkTypes::PHPSPEC,
                 TestFrameworkTypes::CODECEPTION,
@@ -72,7 +71,6 @@ final class TestFrameworkTypesTest extends TestCase
 
         $this->assertSame(
             [
-                TestFrameworkTypes::PEST,
                 TestFrameworkTypes::PHPUNIT,
                 TestFrameworkTypes::PHPSPEC,
                 TestFrameworkTypes::CODECEPTION,
