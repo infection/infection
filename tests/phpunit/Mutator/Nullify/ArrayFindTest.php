@@ -33,16 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Boolean;
+namespace Infection\Tests\Mutator\Nullify;
 
-use Infection\Mutator\Boolean\ArrayAny;
+use Infection\Mutator\Nullify\ArrayFind;
 use Infection\Testing\BaseMutatorTestCase;
-use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(ArrayAny::class)]
-final class ArrayAnyTest extends BaseMutatorTestCase
+#[CoversClass(ArrayFind::class)]
+final class ArrayFindTest extends BaseMutatorTestCase
 {
     /**
      * @param string|string[] $expected
@@ -59,13 +58,13 @@ final class ArrayAnyTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                $anyPositive = array_any($numbers, fn ($number) => $number > 0);
+                $positive = array_find($numbers, fn ($number) => $number > 0);
                 PHP
             ,
             <<<'PHP'
                 <?php
 
-                $anyPositive = true;
+                $positive = null;
                 PHP
             ,
         ];
@@ -74,13 +73,13 @@ final class ArrayAnyTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                $anyPositive = array_any(['A', 1, 'C'], fn ($number) => $number > 0);
+                $positive = array_find(['A', 1, 'C'], fn ($number) => $number > 0);
                 PHP
             ,
             <<<'PHP'
                 <?php
 
-                $anyPositive = true;
+                $positive = null;
                 PHP,
         ];
 
@@ -88,27 +87,27 @@ final class ArrayAnyTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                $anyPositive = array_any(\Class_With_Const::Const, fn ($number) => $number > 0);
+                $positive = array_find(\Class_With_Const::Const, fn ($number) => $number > 0);
                 PHP
             ,
             <<<'PHP'
                 <?php
 
-                $anyPositive = true;
+                $positive = null;
                 PHP,
         ];
 
-        yield 'It mutates correctly when a backslash is in front of array_any' => [
+        yield 'It mutates correctly when a backslash is in front of array_find' => [
             <<<'PHP'
                 <?php
 
-                $anyPositive = \array_any(['A', 1, 'C'], fn ($number) => $number > 0);
+                $positive = \array_find(['A', 1, 'C'], fn ($number) => $number > 0);
                 PHP
             ,
             <<<'PHP'
                 <?php
 
-                $anyPositive = true;
+                $positive = null;
                 PHP,
         ];
 
@@ -120,11 +119,11 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not mutate functions named array_any' => [
+        yield 'It does not mutate functions named array_find' => [
             <<<'PHP'
                 <?php
 
-                function array_any($text, $other)
+                function array_find($text, $other)
                 {
                 }
                 PHP,
@@ -134,7 +133,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if (array_any(['A', 1, 'C'], fn ($number) => $number > 0)) {
+                if (array_find(['A', 1, 'C'], fn ($number) => $number > 0)) {
                     return true;
                 }
                 PHP
@@ -142,37 +141,37 @@ final class ArrayAnyTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if (true) {
+                if (null) {
                     return true;
                 }
                 PHP,
         ];
 
-        yield 'It mutates correctly when array_any is wrongly capitalized' => [
+        yield 'It mutates correctly when array_find is wrongly capitalized' => [
             <<<'PHP'
                 <?php
 
-                $a = arRay_aNy(['A', 1, 'C'], 'is_int');
+                $a = aRray_Find(['A', 1, 'C'], 'is_int');
                 PHP
             ,
             <<<'PHP'
                 <?php
 
-                $a = true;
+                $a = null;
                 PHP,
         ];
 
-        yield 'It mutates correctly when array_any uses another function as input' => [
+        yield 'It mutates correctly when array_find uses another function as input' => [
             <<<'PHP'
                 <?php
 
-                $a = array_any($foo->bar(), 'is_int');
+                $a = array_find($foo->bar(), 'is_int');
                 PHP
             ,
             <<<'PHP'
                 <?php
 
-                $a = true;
+                $a = null;
                 PHP,
         ];
 
@@ -180,7 +179,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                $a = array_any(array_filter(['A', 1, 'C'], function($char): bool {
+                $a = array_find(array_filter(['A', 1, 'C'], function($char): bool {
                     return !is_int($char);
                 }), 'is_int');
                 PHP
@@ -188,7 +187,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                $a = true;
+                $a = null;
                 PHP,
         ];
 
@@ -196,46 +195,11 @@ final class ArrayAnyTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                $a = 'array_any';
+                $a = 'array_find';
 
                 $b = $a([1, 2, 3], 'is_int');
                 PHP
             ,
         ];
-
-        if (PHP_VERSION_ID >= 80400) {
-            yield 'It mutates correctly when provided inside getter PHP 8.4 syntax' => [
-                <<<'PHP'
-                    <?php
-
-                    new class
-                    {
-                        private array $numbers = [];
-                        public function __construct(array $numbers)
-                        {
-                            $this->numbers = $numbers;
-                        }
-
-                        public bool $anyPositive { get => array_any(fn (int $number) => $number > 0); }
-                    };
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    new class
-                    {
-                        private array $numbers = [];
-                        public function __construct(array $numbers)
-                        {
-                            $this->numbers = $numbers;
-                        }
-                        public bool $anyPositive {
-                            get => true;
-                        }
-                    };
-                    PHP,
-            ];
-        }
     }
 }

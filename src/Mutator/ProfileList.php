@@ -57,6 +57,7 @@ final class ProfileList
         '@function_signature' => self::FUNCTION_SIGNATURE_PROFILE,
         '@identical' => self::IDENTICAL_PROFILE,
         '@loop' => self::LOOP_PROFILE,
+        '@nullify' => self::NULLIFY_PROFILE,
         '@number' => self::NUMBER_PROFILE,
         '@operator' => self::OPERATOR_PROFILE,
         '@regex' => self::REGEX_PROFILE,
@@ -148,6 +149,10 @@ final class ProfileList
     public const IDENTICAL_PROFILE = [
         Boolean\EqualIdentical::class,
         Boolean\NotEqualNotIdentical::class,
+    ];
+
+    public const NULLIFY_PROFILE = [
+        Nullify\ArrayFind::class,
     ];
 
     public const NUMBER_PROFILE = [
@@ -369,6 +374,9 @@ final class ProfileList
         // Function Signature
         'ProtectedVisibility' => FunctionSignature\ProtectedVisibility::class,
         'PublicVisibility' => FunctionSignature\PublicVisibility::class,
+
+        // Nullify
+        'ArrayFind' => Nullify\ArrayFind::class,
 
         // Number
         'DecrementInteger' => Number\DecrementInteger::class,
