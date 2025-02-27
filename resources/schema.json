@@ -210,6 +210,7 @@
                 "RoundingFamily": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayAll": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayAny": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayFind": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItem": { "$ref": "#/definitions/default-mutator-config" },
                 "EqualIdentical": { "$ref": "#/definitions/default-mutator-config" },
                 "FalseValue": { "$ref": "#/definitions/default-mutator-config" },
