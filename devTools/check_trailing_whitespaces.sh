@@ -31,6 +31,7 @@ files_with_trailing_whitespaces=$(
         -not -path "./.composer/*" \
         -not -path "./.cache/*" \
         -not -path "./.box_dump/*" \
+        -not -path "./.tools/*" \
         -not -path "./build/*" \
         -not -path "./.idea/*" \
         -not -path "./.git/*" \
@@ -42,6 +43,8 @@ files_with_trailing_whitespaces=$(
         -not -path "./tests/phpunit/Fixtures/Files/phpunit/format-whitespace/original-phpunit.xml" \
         -not -path "./tests/phpunit/StringNormalizerTest.php" \
         -not -path "./tests/phpunit/StrTest.php" \
+        -not -path "./tests/benchmark/Tracing/coverage.tar.gz" \
+        -not -path "./tests/benchmark/MutationGenerator/._sources" \
         -exec grep -EIHn "\\s$" {} \;
 )
 
