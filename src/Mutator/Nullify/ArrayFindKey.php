@@ -46,7 +46,7 @@ use PhpParser\Node;
  *
  * @implements Mutator<Node\Expr\FuncCall>
  */
-final class ArrayFind implements Mutator
+final class ArrayFindKey implements Mutator
 {
     use GetMutatorName;
 
@@ -54,16 +54,16 @@ final class ArrayFind implements Mutator
     {
         return new Definition(
             <<<'TXT'
-                Replaces a function call `array_find()` with boolean `null`.
+                Replaces a function call `array_find_key()` with boolean `null`.
                 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
                 To kill this mutant, provide different values for the array so that your tests check
-                both cases: when `array_find()` returns `null` and founds value.
+                both cases: when `array_find_key()` returns `null` and founds value.
                 TXT,
             <<<'DIFF'
-                - $positiveNumber = array_find($numbers, fn ($number) => $number > 0);
+                - $positiveNumber = array_find_key($numbers, fn ($number) => $number > 0);
                 + $positiveNumber = null;
                 DIFF,
         );
@@ -85,6 +85,6 @@ final class ArrayFind implements Mutator
             return false;
         }
 
-        return $node->name->toLowerString() === 'array_find';
+        return $node->name->toLowerString() === 'array_find_key';
     }
 }
