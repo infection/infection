@@ -19,18 +19,6 @@ parameters:
 			path: ../src/Config/Guesser/SourceDirGuesser.php
 
 		-
-			message: '#^Call to function is_array\(\) with array\{list\<string\>\} will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: ../src/Differ/DiffColorizer.php
-
-		-
-			message: '#^Offset 0 on array\{list\<string\>\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: ../src/Differ/DiffColorizer.php
-
-		-
 			message: '#^Offset 1 might not exist on array\{0\?\: string, 1\?\: non\-empty\-string\}\.$#'
 			identifier: offsetAccess.notFound
 			count: 1
