@@ -157,6 +157,24 @@ final class DiffColorizerTest extends TestCase
                      }</code>
                     CODE,
             ],
+            'unwrap-finally-correctly' => [
+                <<<'CODE'
+                             try {
+                                 $response = new Response();
+                             } catch (RateLimitExceededException) {
+                                 throw new TooManyRequestsHttpException();
+                    -        } finally {
+                    -            $limiter->reset();
+                             }
+                    +        $limiter->reset();
+                             return $response;
+                    CODE,
+                <<<'CODE'
+                    <code>
+                        TO BE ADDED
+                     }</code>
+                    CODE,
+            ],
         ];
     }
 }
