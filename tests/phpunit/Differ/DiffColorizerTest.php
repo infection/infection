@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Differ;
 
-use Generator;
 use Infection\Differ\DiffColorizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -57,9 +56,9 @@ final class DiffColorizerTest extends TestCase
     }
 
     /**
-     * @return Generator<non-empty-string, list<non-empty-string>>
+     * @return iterable<non-empty-string, list<non-empty-string>>
      */
-    public static function provideDiffs(): Generator
+    public static function provideDiffs(): iterable
     {
         yield 'full-deletion' => [
             <<<'CODE'
@@ -141,6 +140,7 @@ final class DiffColorizerTest extends TestCase
                 CODE,
         ];
 
+        // https://github.com/infection/infection/issues/1999
         yield 'bug-1999' => [
             <<<'CODE'
                      protected function name()
