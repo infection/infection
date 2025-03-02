@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Differ;
 
+use function array_filter;
 use function array_map;
 use function count;
 use function explode;
 use function implode;
-use function is_array;
 use function mb_strlen;
 use function mb_strpos;
 use function mb_strrpos;
@@ -138,8 +138,9 @@ class DiffColorizer
 
     private function isMultiLineDiff(string $diff): bool
     {
-        preg_match_all('/^\+.*$/m', $diff, $matches);
+        preg_match_all('/(^\+.*$)|(^-.*$)/m', $diff, $matches);
 
-        return is_array($matches) && count($matches[0] ?? []) > 1;
+        return count(array_filter($matches[1])) > 1
+            || count(array_filter($matches[2])) > 1;
     }
 }
