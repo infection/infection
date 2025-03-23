@@ -51,7 +51,7 @@ exitOnError() {
     fi
 }
 
-e2e_tests_dirs=$(find . -maxdepth 1 -mindepth 1 -type d)
+e2e_tests_dirs=$(find . -maxdepth 1 -mindepth 1 -type d | grep "${2:-}")
 
 # Export the function so xargs can use it
 export -f run_infection_for_dir
