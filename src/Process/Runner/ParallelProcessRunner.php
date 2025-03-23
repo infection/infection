@@ -102,7 +102,7 @@ final class ParallelProcessRunner implements ProcessRunner
         $this->availableThreadIndexes = range(1, $threadCount);
 
         // start the initial batch of processes
-        while ($process = array_shift($bucket)) {
+        while (($process = array_shift($bucket)) !== null) {
             if ($this->shouldStop) {
                 break;
             }
@@ -129,7 +129,7 @@ final class ParallelProcessRunner implements ProcessRunner
             usleep($this->poll);
             $this->freeTerminatedProcesses();
             // continue loop while there are processes being executed or waiting for execution
-        } while ($this->runningProcesses);
+        } while ($this->runningProcesses !== []);
     }
 
     private function freeTerminatedProcesses(): bool
