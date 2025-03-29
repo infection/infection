@@ -84,7 +84,6 @@ cs-check: $(PHP_CS_FIXER)
 	LC_ALL=C sort -c -u .gitignore
 	$(MAKE) check_trailing_whitespaces
 
-.PHONY: cs-check-docker
 cs-check-docker:	## Runs PHP-CS-Fixer in dry-run mode on Docker
 cs-check-docker: $(DOCKER_FILE_IMAGE)
 	$(DOCKER_RUN_82) make cs-check
@@ -158,7 +157,8 @@ autoreview: cs-check phpstan psalm validate test-autoreview rector-check
 
 .PHONY: autoreview-docker
 autoreview-docker:	## Runs various checks (static analysis & AutoReview test suite) on Docker
-autoreview-docker: cs-check-docker phpstan-docker psalm-docker validate-docker test-autoreview-docker rector-check-docker
+autoreview-docker:
+	$(DOCKER_RUN_82) make autoreview
 
 .PHONY: test
 test:		 	## Runs all the tests
