@@ -72,6 +72,11 @@ cs: $(PHP_CS_FIXER)
 	LC_ALL=C sort -u .gitignore -o .gitignore
 	$(MAKE) check_trailing_whitespaces
 
+.PHONY: cs-docker
+cs-docker:	  	 	## Runs PHP-CS-Fixer
+cs-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) make cs
+
 .PHONY: cs-check
 cs-check:		## Runs PHP-CS-Fixer in dry-run mode
 cs-check: $(PHP_CS_FIXER)
@@ -79,10 +84,19 @@ cs-check: $(PHP_CS_FIXER)
 	LC_ALL=C sort -c -u .gitignore
 	$(MAKE) check_trailing_whitespaces
 
+.PHONY: cs-check-docker
+cs-check-docker:	## Runs PHP-CS-Fixer in dry-run mode on Docker
+cs-check-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) make cs-check
+
 .PHONY: phpstan
 phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress
 	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress
+
+.PHONY: phpstan-docker
+phpstan-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) make phpstan
 
 .PHONY: phpstan-baseline
 phpstan-baseline: vendor $(PHPSTAN)
@@ -97,6 +111,10 @@ psalm-baseline: vendor
 psalm: vendor $(PSALM)
 	$(PSALM) --threads=max
 
+.PHONY: psalm-docker
+psalm-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) make psalm
+
 .PHONY: rector
 rector: vendor $(RECTOR)
 	$(RECTOR) process
@@ -105,9 +123,17 @@ rector: vendor $(RECTOR)
 rector-check: vendor $(RECTOR)
 	$(RECTOR) process --dry-run
 
+.PHONY: rector-check-docker
+rector-check-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) make rector-check
+
 .PHONY: validate
 validate:
 	composer validate --strict
+
+.PHONY: validate-docker
+validate-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) make validate
 
 .PHONY: profile
 profile: 	 	## Runs Blackfire
@@ -130,17 +156,25 @@ profile: vendor $(BENCHMARK_SOURCES)
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
 autoreview: cs-check phpstan psalm validate test-autoreview rector-check
 
+.PHONY: autoreview-docker
+autoreview-docker:	## Runs various checks (static analysis & AutoReview test suite) on Docker
+autoreview-docker: cs-check-docker phpstan-docker psalm-docker validate-docker test-autoreview-docker rector-check-docker
+
 .PHONY: test
 test:		 	## Runs all the tests
 test: autoreview test-unit test-e2e test-infection
 
 .PHONY: test-docker
-test-docker:		## Runs all the tests on the different Docker platforms
-test-docker: autoreview test-unit-docker test-e2e-docker test-infection-docker
+test-docker:		## Runs all the tests on Docker
+test-docker: autoreview-docker test-unit-docker test-e2e-docker test-infection-docker
 
 .PHONY: test-autoreview
 test-autoreview: $(PHPUNIT) vendor
 	$(PHPUNIT) --configuration=phpunit_autoreview.xml
+
+.PHONY: test-autoreview-docker
+test-autoreview-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) make test-autoreview
 
 .PHONY: test-unit
 test-unit:	 	## Runs the unit tests
@@ -154,10 +188,8 @@ test-unit-parallel: $(PARATEST) vendor
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker: test-unit-82-docker
-
-test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
-	$(DOCKER_RUN_82) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+test-unit-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) make test-unit
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests
@@ -171,15 +203,8 @@ test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES) vendor
 
 .PHONY: test-e2e-docker
 test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
-test-e2e-docker: test-e2e-xdebug-docker
-
-.PHONY: test-e2e-xdebug-docker
-test-e2e-xdebug-docker: test-e2e-xdebug-82-docker
-
-.PHONY: test-e2e-xdebug-82-docker
-test-e2e-xdebug-82-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_82) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
-	$(DOCKER_RUN_82) ./tests/e2e_tests $(INFECTION)
+test-e2e-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) make test-e2e
 
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself

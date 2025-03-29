@@ -28,6 +28,7 @@ files_with_trailing_whitespaces=$(
         -type f \
         -not -name "*.cache" \
         -not -name "*.log" \
+        -not -path "./.DS_Store" \
         -not -path "./.composer/*" \
         -not -path "./.cache/*" \
         -not -path "./.box_dump/*" \
