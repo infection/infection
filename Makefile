@@ -247,7 +247,8 @@ phpunit.xml.dist:
 	touch -c $@
 
 $(DOCKER_FILE_IMAGE): devTools/Dockerfile
-	docker-compose build
+	docker compose build php82
+	docker image inspect infection-php82 >> devTools/Dockerfile.json
 	touch -c $@
 
 tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
