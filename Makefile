@@ -32,7 +32,7 @@ PARATEST=vendor/bin/paratest
 
 INFECTION=./build/infection.phar
 
-DOCKER_RUN=docker-compose run
+DOCKER_RUN=docker-compose run --rm
 DOCKER_RUN_82=$(DOCKER_RUN) php82 $(FLOCK) Makefile
 DOCKER_FILE_IMAGE=devTools/Dockerfile.json
 
