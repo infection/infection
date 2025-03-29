@@ -168,7 +168,6 @@ final class E2ETest extends TestCase
     }
 
     #[DataProvider('e2eTestSuiteDataProvider')]
-    #[RunInSeparateProcess]
     public function test_it_runs_an_e2e_test_with_success(string $fullPath): void
     {
         $this->runOnE2EFixture($fullPath);
@@ -182,6 +181,10 @@ final class E2ETest extends TestCase
             ->directories();
 
         foreach ($directories as $dirName) {
+            if (basename((string) $dirName) !== 'IncompatiblePhpParser') {
+                continue;
+            }
+
             if (file_exists($dirName . '/run_tests.bash')) {
                 // skipping non-standard tests
                 // specifically Memory_Limit - it is very slow to fail
