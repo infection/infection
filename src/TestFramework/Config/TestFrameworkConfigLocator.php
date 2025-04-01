@@ -54,8 +54,9 @@ final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLo
         'dist.yml',
     ];
 
-    public function __construct(private string $configDir)
-    {
+    public function __construct(
+        private string $configDir,
+    ) {
     }
 
     public function locate(string $testFrameworkName, ?string $customDir = null): string

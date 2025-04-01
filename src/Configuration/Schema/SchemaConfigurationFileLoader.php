@@ -40,8 +40,10 @@ namespace Infection\Configuration\Schema;
  */
 class SchemaConfigurationFileLoader
 {
-    public function __construct(private readonly SchemaValidator $schemaValidator, private readonly SchemaConfigurationFactory $factory)
-    {
+    public function __construct(
+        private readonly SchemaValidator $schemaValidator,
+        private readonly SchemaConfigurationFactory $factory,
+    ) {
     }
 
     public function loadFile(string $file): SchemaConfiguration

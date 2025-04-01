@@ -55,8 +55,10 @@ final class StrykerConfig
      *
      * @throws InvalidArgumentException when the provided $branch looks like a regular expression, but is not a valid one
      */
-    private function __construct(string $branch, private readonly bool $isForFullReport)
-    {
+    private function __construct(
+        string $branch,
+        private readonly bool $isForFullReport,
+    ) {
         if (preg_match('#^/.+/$#', $branch) === 0) {
             $this->branchMatch = '/^' . preg_quote($branch, '/') . '$/';
 

@@ -40,7 +40,9 @@ namespace Infection\Process\Runner;
  */
 final class IndexedProcessBearer
 {
-    public function __construct(public int $threadIndex, public ProcessBearer $processBearer)
-    {
+    public function __construct(
+        public int $threadIndex,
+        public ProcessBearer $processBearer,
+    ) {
     }
 }

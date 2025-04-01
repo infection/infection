@@ -93,8 +93,10 @@ final readonly class StrykerHtmlReportBuilder
     private const PLUS_LENGTH = 1;
     private const DIFF_HEADERS_LINES_COUNT = 1;
 
-    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector)
-    {
+    public function __construct(
+        private MetricsCalculator $metricsCalculator,
+        private ResultsCollector $resultsCollector,
+    ) {
     }
 
     public function build(): array

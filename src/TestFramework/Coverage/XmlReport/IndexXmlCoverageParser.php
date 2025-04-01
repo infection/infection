@@ -44,8 +44,9 @@ use Infection\TestFramework\SafeDOMXPath;
  */
 class IndexXmlCoverageParser
 {
-    public function __construct(private readonly bool $isForGitDiffLines)
-    {
+    public function __construct(
+        private readonly bool $isForGitDiffLines,
+    ) {
     }
 
     /**

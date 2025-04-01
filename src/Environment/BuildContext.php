@@ -40,8 +40,10 @@ namespace Infection\Environment;
  */
 final readonly class BuildContext
 {
-    public function __construct(private string $repositorySlug, private string $branch)
-    {
+    public function __construct(
+        private string $repositorySlug,
+        private string $branch,
+    ) {
     }
 
     public function repositorySlug(): string

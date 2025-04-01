@@ -59,8 +59,10 @@ final readonly class PerMutatorLogger implements LineMutationTestingResultsLogge
 {
     private const ROUND_PRECISION = 2;
 
-    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector)
-    {
+    public function __construct(
+        private MetricsCalculator $metricsCalculator,
+        private ResultsCollector $resultsCollector,
+    ) {
     }
 
     public function getLogLines(): array

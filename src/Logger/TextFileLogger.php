@@ -51,8 +51,12 @@ use function strlen;
  */
 final readonly class TextFileLogger implements LineMutationTestingResultsLogger
 {
-    public function __construct(private ResultsCollector $resultsCollector, private bool $debugVerbosity, private bool $onlyCoveredMode, private bool $debugMode)
-    {
+    public function __construct(
+        private ResultsCollector $resultsCollector,
+        private bool $debugVerbosity,
+        private bool $onlyCoveredMode,
+        private bool $debugMode,
+    ) {
     }
 
     public function getLogLines(): array

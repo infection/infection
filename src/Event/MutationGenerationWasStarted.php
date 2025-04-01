@@ -40,8 +40,9 @@ namespace Infection\Event;
  */
 final readonly class MutationGenerationWasStarted
 {
-    public function __construct(private int $mutableFilesCount)
-    {
+    public function __construct(
+        private int $mutableFilesCount,
+    ) {
     }
 
     public function getMutableFilesCount(): int

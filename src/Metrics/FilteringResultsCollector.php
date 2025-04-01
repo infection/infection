@@ -48,8 +48,10 @@ class FilteringResultsCollector implements Collector
     /**
      * @param array<string, mixed> $targetDetectionStatuses
      */
-    public function __construct(private readonly Collector $targetCollector, private readonly array $targetDetectionStatuses)
-    {
+    public function __construct(
+        private readonly Collector $targetCollector,
+        private readonly array $targetDetectionStatuses,
+    ) {
     }
 
     public function collect(MutantExecutionResult ...$executionResults): void

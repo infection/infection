@@ -43,8 +43,11 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final readonly class CleanUpAfterMutationTestingFinishedSubscriberFactory implements SubscriberFactory
 {
-    public function __construct(private bool $debug, private Filesystem $fileSystem, private string $tmpDir)
-    {
+    public function __construct(
+        private bool $debug,
+        private Filesystem $fileSystem,
+        private string $tmpDir,
+    ) {
     }
 
     public function create(OutputInterface $output): EventSubscriber

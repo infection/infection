@@ -52,8 +52,11 @@ final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscri
 {
     private ProgressBar $progressBar;
 
-    public function __construct(private OutputInterface $output, private TestFrameworkAdapter $testFrameworkAdapter, private bool $debug)
-    {
+    public function __construct(
+        private OutputInterface $output,
+        private TestFrameworkAdapter $testFrameworkAdapter,
+        private bool $debug,
+    ) {
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('verbose');
     }

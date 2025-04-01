@@ -58,8 +58,12 @@ class SourceFileInfoProvider
 {
     private ?SafeDOMXPath $xPath = null;
 
-    public function __construct(private readonly string $coverageIndexPath, private readonly string $coverageDir, private readonly string $relativeCoverageFilePath, private readonly string $projectSource)
-    {
+    public function __construct(
+        private readonly string $coverageIndexPath,
+        private readonly string $coverageDir,
+        private readonly string $relativeCoverageFilePath,
+        private readonly string $projectSource,
+    ) {
     }
 
     /**

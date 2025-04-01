@@ -50,8 +50,10 @@ class JUnitTestExecutionInfoAdder
 {
     private const MAX_EXPLODE_PARTS = 2;
 
-    public function __construct(private readonly TestFrameworkAdapter $adapter, private readonly TestFileDataProvider $testFileDataProvider)
-    {
+    public function __construct(
+        private readonly TestFrameworkAdapter $adapter,
+        private readonly TestFileDataProvider $testFileDataProvider,
+    ) {
     }
 
     /**

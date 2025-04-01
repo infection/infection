@@ -58,8 +58,16 @@ final readonly class Factory
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
      */
-    public function __construct(private string $tmpDir, private string $projectDir, private TestFrameworkConfigLocatorInterface $configLocator, private TestFrameworkFinder $testFrameworkFinder, private string $jUnitFilePath, private Configuration $infectionConfig, private SourceFileFilter $sourceFileFilter, private array $installedExtensions)
-    {
+    public function __construct(
+        private string $tmpDir,
+        private string $projectDir,
+        private TestFrameworkConfigLocatorInterface $configLocator,
+        private TestFrameworkFinder $testFrameworkFinder,
+        private string $jUnitFilePath,
+        private Configuration $infectionConfig,
+        private SourceFileFilter $sourceFileFilter,
+        private array $installedExtensions,
+    ) {
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter

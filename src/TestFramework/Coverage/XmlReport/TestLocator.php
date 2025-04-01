@@ -48,8 +48,9 @@ use Webmozart\Assert\Assert;
  */
 class TestLocator
 {
-    public function __construct(private readonly TestLocations $testLocations)
-    {
+    public function __construct(
+        private readonly TestLocations $testLocations,
+    ) {
     }
 
     public function hasTests(): bool

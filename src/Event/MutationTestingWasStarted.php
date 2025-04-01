@@ -42,8 +42,10 @@ use Infection\Process\Runner\ProcessRunner;
  */
 final readonly class MutationTestingWasStarted
 {
-    public function __construct(private int $mutationCount, private ProcessRunner $processRunner)
-    {
+    public function __construct(
+        private int $mutationCount,
+        private ProcessRunner $processRunner,
+    ) {
     }
 
     public function getMutationCount(): int

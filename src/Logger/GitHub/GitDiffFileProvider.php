@@ -53,8 +53,9 @@ class GitDiffFileProvider
 {
     final public const DEFAULT_BASE = 'origin/master';
 
-    public function __construct(private readonly ShellCommandLineExecutor $shellCommandLineExecutor)
-    {
+    public function __construct(
+        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+    ) {
     }
 
     /**

@@ -46,8 +46,10 @@ class FilesDiffChangedLines
     /** @var array<string, ChangedLinesRange[]> */
     private ?array $memoizedFilesChangedLinesMap = null;
 
-    public function __construct(private readonly DiffChangedLinesParser $diffChangedLinesParser, private readonly GitDiffFileProvider $diffFileProvider)
-    {
+    public function __construct(
+        private readonly DiffChangedLinesParser $diffChangedLinesParser,
+        private readonly GitDiffFileProvider $diffFileProvider,
+    ) {
     }
 
     public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, ?string $gitDiffBase): bool

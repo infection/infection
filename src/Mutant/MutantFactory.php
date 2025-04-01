@@ -54,8 +54,12 @@ class MutantFactory
      */
     private array $printedFileCache = [];
 
-    public function __construct(private readonly string $tmpDir, private readonly Differ $differ, private readonly PrettyPrinterAbstract $printer, private readonly MutantCodeFactory $mutantCodeFactory)
-    {
+    public function __construct(
+        private readonly string $tmpDir,
+        private readonly Differ $differ,
+        private readonly PrettyPrinterAbstract $printer,
+        private readonly MutantCodeFactory $mutantCodeFactory,
+    ) {
     }
 
     public function create(Mutation $mutation): Mutant

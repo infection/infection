@@ -50,8 +50,13 @@ class Mutant
      * @param Deferred<string> $diff
      * @param Deferred<string> $prettyPrintedOriginalCode
      */
-    public function __construct(private readonly string $mutantFilePath, private readonly Mutation $mutation, private readonly Deferred $mutatedCode, private readonly Deferred $diff, private readonly Deferred $prettyPrintedOriginalCode)
-    {
+    public function __construct(
+        private readonly string $mutantFilePath,
+        private readonly Mutation $mutation,
+        private readonly Deferred $mutatedCode,
+        private readonly Deferred $diff,
+        private readonly Deferred $prettyPrintedOriginalCode,
+    ) {
     }
 
     public function getFilePath(): string

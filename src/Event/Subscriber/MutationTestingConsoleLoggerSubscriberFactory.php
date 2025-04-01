@@ -53,8 +53,8 @@ final readonly class MutationTestingConsoleLoggerSubscriberFactory implements Su
         private DiffColorizer $diffColorizer,
         private FederatedLogger $mutationTestingResultsLogger,
         private bool $showMutations,
-        private OutputFormatter $formatter)
-    {
+        private OutputFormatter $formatter,
+    ) {
     }
 
     public function create(OutputInterface $output): EventSubscriber

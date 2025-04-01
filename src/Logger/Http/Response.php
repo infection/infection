@@ -48,8 +48,10 @@ final class Response
 
     private readonly int $statusCode;
 
-    public function __construct(int $statusCode, private readonly string $body)
-    {
+    public function __construct(
+        int $statusCode,
+        private readonly string $body,
+    ) {
         Assert::range(
             $statusCode,
             self::HTTP_OK,
