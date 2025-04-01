@@ -47,8 +47,11 @@ use const JSON_THROW_ON_ERROR;
  */
 final readonly class JsonLogger implements LineMutationTestingResultsLogger
 {
-    public function __construct(private MetricsCalculator $metricsCalculator, private ResultsCollector $resultsCollector, private bool $onlyCoveredMode)
-    {
+    public function __construct(
+        private MetricsCalculator $metricsCalculator,
+        private ResultsCollector $resultsCollector,
+        private bool $onlyCoveredMode,
+    ) {
     }
 
     /**

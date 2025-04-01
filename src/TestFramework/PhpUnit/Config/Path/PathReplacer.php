@@ -48,8 +48,10 @@ use function trim;
  */
 final readonly class PathReplacer
 {
-    public function __construct(private Filesystem $filesystem, private ?string $phpUnitConfigDir = null)
-    {
+    public function __construct(
+        private Filesystem $filesystem,
+        private ?string $phpUnitConfigDir = null,
+    ) {
     }
 
     public function replaceInNode(DOMElement|DOMNode $domElement): void

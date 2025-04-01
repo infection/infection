@@ -55,8 +55,8 @@ final readonly class PerformanceLoggerSubscriber implements EventSubscriber
         private TimeFormatter $timeFormatter,
         private MemoryFormatter $memoryFormatter,
         private int $threadCount,
-        private OutputInterface $output)
-    {
+        private OutputInterface $output,
+    ) {
     }
 
     public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void

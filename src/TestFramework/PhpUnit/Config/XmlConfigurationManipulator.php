@@ -58,8 +58,10 @@ use Webmozart\Assert\Assert;
  */
 final readonly class XmlConfigurationManipulator
 {
-    public function __construct(private PathReplacer $pathReplacer, private string $phpUnitConfigDir)
-    {
+    public function __construct(
+        private PathReplacer $pathReplacer,
+        private string $phpUnitConfigDir,
+    ) {
     }
 
     public function replaceWithAbsolutePaths(SafeDOMXPath $xPath): void

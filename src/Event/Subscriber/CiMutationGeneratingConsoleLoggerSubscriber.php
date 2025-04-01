@@ -43,8 +43,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
 {
-    public function __construct(private OutputInterface $output)
-    {
+    public function __construct(
+        private OutputInterface $output,
+    ) {
     }
 
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void

@@ -72,8 +72,10 @@ final class MockVendor
      */
     private $vendorBinBat;
 
-    public function __construct(private readonly string $tmpDir, private readonly Filesystem $fileSystem)
-    {
+    public function __construct(
+        private readonly string $tmpDir,
+        private readonly Filesystem $fileSystem,
+    ) {
         $vendorDir = $this->tmpDir . '/vendor';
         $this->vendorBinDir = $vendorDir . '/bin';
 

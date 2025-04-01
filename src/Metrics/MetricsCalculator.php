@@ -55,8 +55,9 @@ class MetricsCalculator implements Collector
 
     private ?Calculator $calculator = null;
 
-    public function __construct(private readonly int $roundingPrecision)
-    {
+    public function __construct(
+        private readonly int $roundingPrecision,
+    ) {
         foreach (DetectionStatus::ALL as $status) {
             $this->countByStatus[$status] = 0;
         }

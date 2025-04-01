@@ -61,8 +61,10 @@ final readonly class IgnoreMutator implements Mutator
     /**
      * @param Mutator<TNode> $mutator
      */
-    public function __construct(private IgnoreConfig $config, private Mutator $mutator)
-    {
+    public function __construct(
+        private IgnoreConfig $config,
+        private Mutator $mutator,
+    ) {
     }
 
     public static function getDefinition(): Definition

@@ -46,8 +46,9 @@ final class EnvBackup
     /**
      * @param array<string, string> $environmentVariables
      */
-    private function __construct(private array $environmentVariables)
-    {
+    private function __construct(
+        private array $environmentVariables,
+    ) {
     }
 
     public static function createSnapshot(): self

@@ -49,8 +49,9 @@ final class SchemaConfigurationFile
 {
     private ?stdClass $decodedContents = null;
 
-    public function __construct(private readonly string $path)
-    {
+    public function __construct(
+        private readonly string $path,
+    ) {
     }
 
     public function getPath(): string

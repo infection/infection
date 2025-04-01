@@ -54,8 +54,10 @@ final class RootsFileOrDirectoryLocator implements Locator
     /**
      * @param string[] $roots
      */
-    public function __construct(array $roots, private readonly Filesystem $filesystem)
-    {
+    public function __construct(
+        array $roots,
+        private readonly Filesystem $filesystem,
+    ) {
         Assert::allString($roots);
 
         $this->roots = $roots;

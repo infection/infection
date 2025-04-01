@@ -46,8 +46,9 @@ use Throwable;
  */
 class FileParser
 {
-    public function __construct(private readonly Parser $parser)
-    {
+    public function __construct(
+        private readonly Parser $parser,
+    ) {
     }
 
     /**

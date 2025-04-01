@@ -53,8 +53,15 @@ use function sprintf;
  */
 final readonly class StrykerLogger implements MutationTestingResultsLogger
 {
-    public function __construct(private BuildContextResolver $buildContextResolver, private StrykerApiKeyResolver $strykerApiKeyResolver, private StrykerDashboardClient $strykerDashboardClient, private MetricsCalculator $metricsCalculator, private StrykerHtmlReportBuilder $strykerHtmlReportBuilder, private StrykerConfig $strykerConfig, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private BuildContextResolver $buildContextResolver,
+        private StrykerApiKeyResolver $strykerApiKeyResolver,
+        private StrykerDashboardClient $strykerDashboardClient,
+        private MetricsCalculator $metricsCalculator,
+        private StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
+        private StrykerConfig $strykerConfig,
+        private LoggerInterface $logger,
+    ) {
     }
 
     public function log(): void

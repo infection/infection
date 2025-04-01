@@ -52,8 +52,9 @@ class IgnoreConfig
     /**
      * @param string[] $patterns
      */
-    public function __construct(private readonly array $patterns)
-    {
+    public function __construct(
+        private readonly array $patterns,
+    ) {
         if ($patterns !== []) {
             $this->hashtable = array_flip($patterns);
         }

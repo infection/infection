@@ -48,8 +48,9 @@ final readonly class MutationGeneratingConsoleLoggerSubscriber implements EventS
 {
     private ProgressBar $progressBar;
 
-    public function __construct(private OutputInterface $output)
-    {
+    public function __construct(
+        private OutputInterface $output,
+    ) {
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }

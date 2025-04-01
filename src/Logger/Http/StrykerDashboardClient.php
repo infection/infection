@@ -44,8 +44,10 @@ use function sprintf;
  */
 class StrykerDashboardClient
 {
-    public function __construct(private readonly StrykerCurlClient $client, private readonly LoggerInterface $logger)
-    {
+    public function __construct(
+        private readonly StrykerCurlClient $client,
+        private readonly LoggerInterface $logger,
+    ) {
     }
 
     public function sendReport(

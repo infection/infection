@@ -49,8 +49,9 @@ use function trim;
  */
 class SourceDirGuesser
 {
-    public function __construct(private readonly stdClass $composerJsonContent)
-    {
+    public function __construct(
+        private readonly stdClass $composerJsonContent,
+    ) {
     }
 
     /**

@@ -49,8 +49,14 @@ final class Calculator
 
     private ?float $coveredMutationScoreIndicator = null;
 
-    public function __construct(private readonly int $roundingPrecision, private readonly int $killedCount, private readonly int $errorCount, private readonly int $timedOutCount, private readonly int $notTestedCount, private readonly int $totalCount)
-    {
+    public function __construct(
+        private readonly int $roundingPrecision,
+        private readonly int $killedCount,
+        private readonly int $errorCount,
+        private readonly int $timedOutCount,
+        private readonly int $notTestedCount,
+        private readonly int $totalCount,
+    ) {
     }
 
     public static function fromMetrics(MetricsCalculator $calculator): self

@@ -49,8 +49,10 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 {
     public const DEFAULT_OUTPUT = 'php://stdout';
 
-    public function __construct(private readonly ResultsCollector $resultsCollector, private ?string $loggerProjectRootDirectory)
-    {
+    public function __construct(
+        private readonly ResultsCollector $resultsCollector,
+        private ?string $loggerProjectRootDirectory,
+    ) {
         if ($loggerProjectRootDirectory === null) {
             if (($projectRootDirectory = getenv('GITHUB_WORKSPACE')) === false) {
                 $projectRootDirectory = trim((string) shell_exec('git rev-parse --show-toplevel'));

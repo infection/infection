@@ -50,8 +50,17 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class FileLoggerFactory
 {
-    public function __construct(private readonly MetricsCalculator $metricsCalculator, private readonly ResultsCollector $resultsCollector, private readonly Filesystem $filesystem, private readonly string $logVerbosity, private readonly bool $debugMode, private readonly bool $onlyCoveredCode, private readonly LoggerInterface $logger, private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder, private readonly ?string $loggerProjectRootDirectory)
-    {
+    public function __construct(
+        private readonly MetricsCalculator $metricsCalculator,
+        private readonly ResultsCollector $resultsCollector,
+        private readonly Filesystem $filesystem,
+        private readonly string $logVerbosity,
+        private readonly bool $debugMode,
+        private readonly bool $onlyCoveredCode,
+        private readonly LoggerInterface $logger,
+        private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
+        private readonly ?string $loggerProjectRootDirectory,
+    ) {
     }
 
     public function createFromLogEntries(Logs $logConfig): MutationTestingResultsLogger

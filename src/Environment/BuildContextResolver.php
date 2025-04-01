@@ -44,8 +44,9 @@ use function trim;
  */
 final readonly class BuildContextResolver
 {
-    public function __construct(private CiDetector $ciDetector)
-    {
+    public function __construct(
+        private CiDetector $ciDetector,
+    ) {
     }
 
     public function resolve(): BuildContext

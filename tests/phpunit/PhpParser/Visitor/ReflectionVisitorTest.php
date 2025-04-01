@@ -244,8 +244,9 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
         return new class($nodeClass) extends NodeVisitorAbstract {
             private $isPartOfSignature;
 
-            public function __construct(private readonly string $nodeClassUnderTest)
-            {
+            public function __construct(
+                private readonly string $nodeClassUnderTest,
+            ) {
             }
 
             public function leaveNode(Node $node): void
@@ -267,8 +268,9 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
         return new class($nodeClass) extends NodeVisitorAbstract {
             public $spyCalled = false;
 
-            public function __construct(private readonly string $nodeClassUnderTest)
-            {
+            public function __construct(
+                private readonly string $nodeClassUnderTest,
+            ) {
             }
 
             public function leaveNode(Node $node): void

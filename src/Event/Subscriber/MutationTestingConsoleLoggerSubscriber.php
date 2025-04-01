@@ -76,8 +76,8 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         private readonly ResultsCollector $resultsCollector,
         private readonly DiffColorizer $diffColorizer,
         private readonly FederatedLogger $mutationTestingResultsLogger,
-        private readonly bool $showMutations)
-    {
+        private readonly bool $showMutations,
+    ) {
     }
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void

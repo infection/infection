@@ -46,8 +46,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final readonly class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
 {
-    public function __construct(private OutputInterface $output, private TestFrameworkAdapter $testFrameworkAdapter)
-    {
+    public function __construct(
+        private OutputInterface $output,
+        private TestFrameworkAdapter $testFrameworkAdapter,
+    ) {
     }
 
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void

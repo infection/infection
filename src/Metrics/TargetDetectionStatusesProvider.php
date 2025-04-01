@@ -49,8 +49,12 @@ use function iterator_to_array;
  */
 class TargetDetectionStatusesProvider
 {
-    public function __construct(private readonly Logs $logConfig, private readonly string $logVerbosity, private readonly bool $onlyCoveredMode, private readonly bool $showMutations)
-    {
+    public function __construct(
+        private readonly Logs $logConfig,
+        private readonly string $logVerbosity,
+        private readonly bool $onlyCoveredMode,
+        private readonly bool $showMutations,
+    ) {
     }
 
     /**

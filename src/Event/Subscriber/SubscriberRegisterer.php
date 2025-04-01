@@ -43,8 +43,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final readonly class SubscriberRegisterer
 {
-    public function __construct(private EventDispatcher $eventDispatcher, private ChainSubscriberFactory $subscriberRegistry)
-    {
+    public function __construct(
+        private EventDispatcher $eventDispatcher,
+        private ChainSubscriberFactory $subscriberRegistry,
+    ) {
     }
 
     public function registerSubscribers(OutputInterface $output): void

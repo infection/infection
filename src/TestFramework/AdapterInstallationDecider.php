@@ -52,8 +52,9 @@ final readonly class AdapterInstallationDecider
         TestFrameworkTypes::PHPSPEC => 'Infection\TestFramework\PhpSpec\PhpSpecAdapter',
     ];
 
-    public function __construct(private QuestionHelper $questionHelper)
-    {
+    public function __construct(
+        private QuestionHelper $questionHelper,
+    ) {
     }
 
     public function shouldBeInstalled(string $adapterName, IO $io): bool

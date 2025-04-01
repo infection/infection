@@ -50,8 +50,9 @@ final readonly class SafeDOMXPath
 {
     private DOMXPath $xPath;
 
-    public function __construct(private DOMDocument $document)
-    {
+    public function __construct(
+        private DOMDocument $document,
+    ) {
         $this->xPath = new DOMXPath($document);
     }
 

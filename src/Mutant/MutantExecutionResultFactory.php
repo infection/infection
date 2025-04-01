@@ -50,8 +50,9 @@ class MutantExecutionResultFactory
 {
     private const PROCESS_MIN_ERROR_CODE = 100;
 
-    public function __construct(private readonly TestFrameworkAdapter $testFrameworkAdapter)
-    {
+    public function __construct(
+        private readonly TestFrameworkAdapter $testFrameworkAdapter,
+    ) {
     }
 
     public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult

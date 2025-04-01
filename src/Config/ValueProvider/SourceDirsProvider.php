@@ -53,8 +53,11 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
  */
 final readonly class SourceDirsProvider
 {
-    public function __construct(private ConsoleHelper $consoleHelper, private QuestionHelper $questionHelper, private SourceDirGuesser $sourceDirGuesser)
-    {
+    public function __construct(
+        private ConsoleHelper $consoleHelper,
+        private QuestionHelper $questionHelper,
+        private SourceDirGuesser $sourceDirGuesser,
+    ) {
     }
 
     /**

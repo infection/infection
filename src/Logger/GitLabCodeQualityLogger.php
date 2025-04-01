@@ -49,8 +49,10 @@ use function trim;
  */
 final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
 {
-    public function __construct(private readonly ResultsCollector $resultsCollector, private ?string $loggerProjectRootDirectory)
-    {
+    public function __construct(
+        private readonly ResultsCollector $resultsCollector,
+        private ?string $loggerProjectRootDirectory,
+    ) {
         if ($loggerProjectRootDirectory === null) {
             if (($projectRootDirectory = getenv('CI_PROJECT_DIR')) === false) {
                 $projectRootDirectory = trim((string) shell_exec('git rev-parse --show-toplevel'));

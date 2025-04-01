@@ -57,8 +57,10 @@ class JUnitReportLocator
 
     private ?string $jUnitPath = null;
 
-    public function __construct(private readonly string $coveragePath, string $defaultJUnitPath)
-    {
+    public function __construct(
+        private readonly string $coveragePath,
+        string $defaultJUnitPath,
+    ) {
         $this->defaultJUnitPath = Path::canonicalize($defaultJUnitPath);
     }
 

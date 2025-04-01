@@ -58,8 +58,10 @@ class SourceFileFilter implements FileFilter
     /**
      * @param string[] $excludeDirectories
      */
-    public function __construct(string $filter, private readonly array $excludeDirectories)
-    {
+    public function __construct(
+        string $filter,
+        private readonly array $excludeDirectories,
+    ) {
         $this->filters = array_filter(array_map(
             'trim',
             explode(',', $filter),
