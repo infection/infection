@@ -48,6 +48,7 @@
         "ext-libxml": "*",
         "ext-mbstring": "*",
         "composer-runtime-api": "^2.0",
+        "arokettu/json5-builder": "^1.0",
         "colinodell/json5": "^2.2 || ^3.0",
         "composer/xdebug-handler": "^2.0 || ^3.0",
         "fidry/cpu-core-counter": "^0.4.0 || ^0.5.0 || ^1.0",

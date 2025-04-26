@@ -4,8 +4,69 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c67f4439e430e2485b7f8581e1172da9",
+    "content-hash": "c53700ba142d2624c29a6e67acba3f47",
     "packages": [
+        {
+            "name": "arokettu/json5-builder",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/arokettu/json5-builder.git",
+                "reference": "1db9eea2da094e252a32498a408bc0fd505f1994"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/arokettu/json5-builder/zipball/1db9eea2da094e252a32498a408bc0fd505f1994",
+                "reference": "1db9eea2da094e252a32498a408bc0fd505f1994",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "arokettu/json": "^2.1",
+                "colinodell/json5": "^3.0",
+                "phpunit/phpunit": "^10.5",
+                "psy/psysh": "*",
+                "sandfox.dev/code-standard": "^1.2025.03.27",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Arokettu\\Json5\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anton Smirnov",
+                    "email": "sandfox+composer@sandfox.me",
+                    "homepage": "https://sandfox.me/",
+                    "role": "developer"
+                }
+            ],
+            "description": "JSON5 config builder/encoder",
+            "homepage": "https://sandfox.dev/php/json5-builder.html",
+            "keywords": [
+                "JSON5",
+                "builder",
+                "config",
+                "configuration",
+                "encode"
+            ],
+            "support": {
+                "chat": "https://gitter.im/arokettu/community",
+                "docs": "https://json5-builder.readthedocs.io/",
+                "issues": "https://gitlab.com/sandfox/json5-builder/-/issues",
+                "source": "https://gitlab.com/sandfox/json5-builder"
+            },
+            "time": "2025-04-26T20:15:26+00:00"
+        },
         {
             "name": "colinodell/json5",
             "version": "v3.0.0",

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Arokettu\Json5\Json5Encoder;
 use Composer\InstalledVersions;
 use function count;
 use function file_exists;
@@ -53,15 +54,12 @@ use Infection\Console\IO;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
-use const JSON_PRETTY_PRINT;
-use const JSON_UNESCAPED_SLASHES;
 use OutOfBoundsException;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\file_put_contents;
 use function Safe\glob;
 use function Safe\json_decode;
-use function Safe\json_encode;
 use function sprintf;
 use stdClass;
 use function str_starts_with;
@@ -230,7 +228,7 @@ final class ConfigureCommand extends BaseCommand
 
         file_put_contents(
             SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE,
-            json_encode($configObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+            Json5Encoder::encode($configObject),
         );
     }
 
