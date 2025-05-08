@@ -58,6 +58,7 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
+use Infection\TestFramework\Coverage\XmlReport\NoTestsInProject;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
@@ -403,7 +404,7 @@ final class RunCommand extends BaseCommand
             $engine->execute();
 
             return true;
-        } catch (NoFilesInDiffToMutate|NoLineExecutedInDiffLinesMode $e) {
+        } catch (NoFilesInDiffToMutate|NoLineExecutedInDiffLinesMode|NoTestsInProject $e) {
             $io->success($e->getMessage());
 
             return true;

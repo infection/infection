@@ -39,6 +39,7 @@ use function array_diff;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
+use Infection\TestFramework\Coverage\XmlReport\NoTestsInProject;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
@@ -153,6 +154,31 @@ final class IndexXmlCoverageParserTest extends TestCase
         $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::providePhpUnit6Fixtures(),
             $sourceFilesData,
+        );
+    }
+
+    public function test_it_errors_when_project_has_no_tests(): void
+    {
+        $xml = <<<'XML'
+            <?xml version="1.0"?>
+            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+              <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+                <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+                <driver name="xdebug" version="2.5.1"/>
+              </build>
+              <project source="/path/to/src">
+                <tests />
+              </project>
+              <!-- The rest of the file has been removed for this test-->
+            </phpunit>
+            XML;
+
+        $this->expectException(NoTestsInProject::class);
+
+        $this->parser->parse(
+            '/path/to/index.xml',
+            $xml,
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
     }
 

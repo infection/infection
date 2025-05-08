@@ -97,6 +97,12 @@ class IndexXmlCoverageParser
      */
     private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
     {
+        $testsNode = $xPath->query('/phpunit/project/tests')->item(0);
+
+        if ($testsNode !== null && !$testsNode->hasChildNodes()) {
+            throw NoTestsInProject::create();
+        }
+
         $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
 
         if (
