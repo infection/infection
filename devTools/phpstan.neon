@@ -79,6 +79,12 @@ parameters:
             identifier: shipmonk.deadMethod
             count: 1
             path: ../src/TestFramework/Coverage/Trace.php
+        # While it's not used yet, left for consistency as we have ending column passed and used
+        -
+            message: '#^Unused Infection\\Mutant\\MutantExecutionResult\:\:getOriginalStartingColumn$#'
+            identifier: shipmonk.deadMethod
+            count: 1
+            path: ../src/Mutant/MutantExecutionResult.php
 
         # tests
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'

@@ -37,12 +37,6 @@ parameters:
 			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
 
 		-
-			message: '#^Unused Infection\\Mutant\\MutantExecutionResult\:\:getOriginalStartingColumn$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/Mutant/MutantExecutionResult.php
-
-		-
 			message: '#^Parameter \#1 \$array of function array_intersect expects an array of values castable to string, list\<PhpParser\\Node\\Expr\|string\> given\.$#'
 			identifier: argument.type
 			count: 1
