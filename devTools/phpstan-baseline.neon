@@ -37,6 +37,12 @@ parameters:
 			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
 
 		-
+			message: '#^Unused Infection\\Mutant\\MutantExecutionResult\:\:getOriginalStartingColumn$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/Mutant/MutantExecutionResult.php
+
+		-
 			message: '#^Parameter \#1 \$array of function array_intersect expects an array of values castable to string, list\<PhpParser\\Node\\Expr\|string\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -137,6 +143,18 @@ parameters:
 			identifier: theCodingMachineSafe.function
 			count: 1
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
+
+		-
+			message: '#^Unused Infection\\TestFramework\\Coverage\\ProxyTrace\:\:getRelativePathname$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/Coverage/ProxyTrace.php
+
+		-
+			message: '#^Unused Infection\\TestFramework\\Coverage\\Trace\:\:getRelativePathname$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/Coverage/Trace.php
 
 		-
 			message: '#^Offset 1 might not exist on array\{0\?\: string, 1\?\: non\-falsy\-string\}\.$#'
@@ -265,8 +283,20 @@ parameters:
 			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
 
 		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\EnvVariableManipulation\\EnvTestCasesProvider\:\:envTestCaseTupleProvider$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
+
+		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
 			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/Event/SubscriberProvider.php
+
+		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\Event\\SubscriberProvider\:\:subscriberClassesProvider$#'
+			identifier: shipmonk.deadMethod
 			count: 1
 			path: ../tests/phpunit/AutoReview/Event/SubscriberProvider.php
 
@@ -319,6 +349,24 @@ parameters:
 			path: ../tests/phpunit/AutoReview/Makefile/MakefileTest.php
 
 		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\Mutator\\MutatorProvider\:\:concreteMutatorClassesProvider$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/AutoReview/Mutator/MutatorProvider.php
+
+		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\Mutator\\MutatorProvider\:\:configurableMutatorClassesProvider$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/AutoReview/Mutator/MutatorProvider.php
+
+		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\Mutator\\MutatorProvider\:\:mutatorClassesProvider$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/AutoReview/Mutator/MutatorProvider.php
+
+		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
 			identifier: argument.type
 			count: 2
@@ -345,6 +393,42 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
 			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
+
+		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\ProjectCode\\ProjectCodeProvider\:\:classesTestProvider$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
+
+		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\ProjectCode\\ProjectCodeProvider\:\:concreteSourceClassesProvider$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
+
+		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\ProjectCode\\ProjectCodeProvider\:\:nonFinalExtensionClasses$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
+
+		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\ProjectCode\\ProjectCodeProvider\:\:nonTestedConcreteClassesProvider$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
+
+		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\ProjectCode\\ProjectCodeProvider\:\:sourceClassesProvider$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
+
+		-
+			message: '#^Unused Infection\\Tests\\AutoReview\\ProjectCode\\ProjectCodeProvider\:\:sourceClassesToCheckForPublicPropertiesProvider$#'
+			identifier: shipmonk.deadMethod
 			count: 1
 			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
 
@@ -1477,6 +1561,12 @@ parameters:
 			path: ../tests/phpunit/Mutator/ProfileListProvider.php
 
 		-
+			message: '#^Unused Infection\\Tests\\Mutator\\ProfileListProvider\:\:profileProvider$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/Mutator/ProfileListProvider.php
+
+		-
 			message: '#^Method Infection\\Tests\\Mutator\\ProfileListTest\:\:test_all_mutator_profiles_are_sorted_lexicographically\(\) has parameter \$profileOrMutators with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1727,6 +1817,18 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Reflection/AnonymousClassReflectionTest.php
+
+		-
+			message: '#^Unused Infection\\Tests\\Reflection\\ProtChild\:\:foo$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
+
+		-
+			message: '#^Unused Infection\\Tests\\Reflection\\ProtParent\:\:foo$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
 
 		-
 			message: '#^Parameter \#1 \$className of static method Infection\\Reflection\\CoreClassReflection\:\:fromClassName\(\) expects class\-string, string given\.$#'

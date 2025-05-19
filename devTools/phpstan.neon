@@ -65,6 +65,9 @@ parameters:
             path: ../src/Mutator/Extensions/BCMath.php
         -
             identifier: arrayFilter.strict
+        -
+            identifier: shipmonk.deadMethod
+            path: ../src/Testing
 
         # tests
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'

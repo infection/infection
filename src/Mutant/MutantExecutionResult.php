@@ -148,6 +148,11 @@ class MutantExecutionResult
         return $this->originalEndingLine;
     }
 
+    public function getOriginalStartingColumn(string $originalCode): int
+    {
+        return $this->toColumn($originalCode, $this->originalStartFilePosition);
+    }
+
     public function getOriginalEndingColumn(string $originalCode): int
     {
         return $this->toColumn($originalCode, $this->originalEndFilePosition);
