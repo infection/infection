@@ -81,13 +81,11 @@ cs-check: $(PHP_CS_FIXER)
 
 .PHONY: phpstan
 phpstan: vendor $(PHPSTAN)
-	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress
-	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress
+	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress
 
 .PHONY: phpstan-baseline
 phpstan-baseline: vendor $(PHPSTAN)
-	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-src-baseline.neon || true
-	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-tests-baseline.neon || true
+	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-baseline.neon || true
 
 .PHONY: psalm-baseline
 psalm-baseline: vendor
