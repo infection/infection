@@ -68,6 +68,17 @@ parameters:
         -
             identifier: shipmonk.deadMethod
             path: ../src/Testing
+        # ProxyTrace::getRelativePathname() is used implicitly by PathFilterIterator
+        -
+            message: '#^Unused Infection\\TestFramework\\Coverage\\ProxyTrace\:\:getRelativePathname$#'
+            identifier: shipmonk.deadMethod
+            count: 1
+            path: ../src/TestFramework/Coverage/ProxyTrace.php
+        -
+            message: '#^Unused Infection\\TestFramework\\Coverage\\Trace\:\:getRelativePathname$#'
+            identifier: shipmonk.deadMethod
+            count: 1
+            path: ../src/TestFramework/Coverage/Trace.php
 
         # tests
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'

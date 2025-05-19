@@ -145,18 +145,6 @@ parameters:
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
 
 		-
-			message: '#^Unused Infection\\TestFramework\\Coverage\\ProxyTrace\:\:getRelativePathname$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Coverage/ProxyTrace.php
-
-		-
-			message: '#^Unused Infection\\TestFramework\\Coverage\\Trace\:\:getRelativePathname$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Coverage/Trace.php
-
-		-
 			message: '#^Offset 1 might not exist on array\{0\?\: string, 1\?\: non\-falsy\-string\}\.$#'
 			identifier: offsetAccess.notFound
 			count: 1
