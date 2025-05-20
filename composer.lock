@@ -3986,16 +3986,16 @@
         },
         {
             "name": "shipmonk/dead-code-detector",
-            "version": "0.12.0",
+            "version": "0.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shipmonk-rnd/dead-code-detector.git",
-                "reference": "1f0c70ec4e9868c785f6505592dfb01ef53af2ca"
+                "reference": "12af219888e245e9f16cd36ab5fe701f2e426a97"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shipmonk-rnd/dead-code-detector/zipball/1f0c70ec4e9868c785f6505592dfb01ef53af2ca",
-                "reference": "1f0c70ec4e9868c785f6505592dfb01ef53af2ca",
+                "url": "https://api.github.com/repos/shipmonk-rnd/dead-code-detector/zipball/12af219888e245e9f16cd36ab5fe701f2e426a97",
+                "reference": "12af219888e245e9f16cd36ab5fe701f2e426a97",
                 "shasum": ""
             },
             "require": {
@@ -4055,9 +4055,9 @@
             ],
             "support": {
                 "issues": "https://github.com/shipmonk-rnd/dead-code-detector/issues",
-                "source": "https://github.com/shipmonk-rnd/dead-code-detector/tree/0.12.0"
+                "source": "https://github.com/shipmonk-rnd/dead-code-detector/tree/0.12.1"
             },
-            "time": "2025-05-16T13:02:10+00:00"
+            "time": "2025-05-20T07:02:46+00:00"
         },
         {
             "name": "sidz/phpstan-rules",
@@ -4355,7 +4355,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
