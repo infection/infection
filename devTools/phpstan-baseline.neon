@@ -1729,6 +1729,18 @@ parameters:
 			path: ../tests/phpunit/Reflection/AnonymousClassReflectionTest.php
 
 		-
+			message: '#^Unused Infection\\Tests\\Reflection\\ProtChild\:\:foo$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
+
+		-
+			message: '#^Unused Infection\\Tests\\Reflection\\ProtParent\:\:foo$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
+
+		-
 			message: '#^Parameter \#1 \$className of static method Infection\\Reflection\\CoreClassReflection\:\:fromClassName\(\) expects class\-string, string given\.$#'
 			identifier: argument.type
 			count: 1
