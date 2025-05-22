@@ -186,6 +186,14 @@ final class ParallelProcessRunner implements ProcessRunner
 
                 unset($this->runningProcessContainers[$index]->mutantProcessContainer);
                 unset($this->runningProcessContainers[$index]);
+                //                // todo think about ProcessBearerPod and it's execution result
+                //
+                //                if ($processBearer->needsStaticAnalysisRun()) {
+                //                    // add one more process to Generator
+                //                } else {
+                //                    // dispatch somewhere
+                //                    $processBearer->terminateProcess();
+                //                }
 
                 if ($mutantProcessContainer->hasNext()) {
                     $mutantProcessContainer->createNext();

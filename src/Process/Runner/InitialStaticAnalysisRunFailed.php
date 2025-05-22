@@ -33,59 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder\Exception;
+namespace Infection\Process\Runner;
 
-use RuntimeException;
+use Exception;
+use function implode;
 use function sprintf;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class FinderException extends RuntimeException
+final class InitialStaticAnalysisRunFailed extends Exception
 {
-    public static function composerNotFound(): self
+    public static function fromProcessAndAdapter(Process $initialTestSuiteProcess, string $staticAnalysisTool): self
     {
-        return new self(
-            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.',
-        );
-    }
-
-    public static function phpExecutableNotFound(): self
-    {
-        return new self(
-            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.',
-        );
-    }
-
-    public static function testFrameworkNotFound(string $testFrameworkName): self
-    {
-        return new self(
+        $lines = [
+            'Project static analysis must be in a passing state before running Infection.',
             sprintf(
-                'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
+                '%s reported an exit code of %d.',
+                $staticAnalysisTool,
+                $initialTestSuiteProcess->getExitCode(),
             ),
-        );
-    }
-
-    public static function staticAnalysisToolNotFound(string $testFrameworkName): self
-    {
-        return new self(
             sprintf(
-                'Unable to locate a %s static analysis executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
+                'Refer to the %s\'s output below:',
+                $staticAnalysisTool,
             ),
-        );
-    }
+        ];
 
-    public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
-    {
-        return new self(
-            sprintf('The custom path to %s was set as "%s" but this file did not exist.',
-                $testFrameworkName,
-                $customPath,
-            ),
-        );
+        $stdOut = $initialTestSuiteProcess->getOutput();
+
+        if ($stdOut !== '') {
+            $lines[] = 'STDOUT:';
+            $lines[] = $stdOut;
+        }
+
+        $stdError = $initialTestSuiteProcess->getErrorOutput();
+
+        if ($stdError !== '') {
+            $lines[] = 'STDERR:';
+            $lines[] = $stdError;
+        }
+
+        return new self(implode("\n", $lines));
     }
 }

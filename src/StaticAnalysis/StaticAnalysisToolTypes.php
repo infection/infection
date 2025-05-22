@@ -33,59 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder\Exception;
+namespace Infection\StaticAnalysis;
 
-use RuntimeException;
-use function sprintf;
+use function count;
+use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
+use function is_a;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class FinderException extends RuntimeException
+final class StaticAnalysisToolTypes
 {
-    public static function composerNotFound(): self
-    {
-        return new self(
-            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.',
-        );
-    }
+    public const PHPSTAN = 'phpstan';
 
-    public static function phpExecutableNotFound(): self
-    {
-        return new self(
-            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.',
-        );
-    }
+    /**
+     * @var string[]
+     */
+    private static array $defaultTypes = [
+        self::PHPSTAN,
+    ];
 
-    public static function testFrameworkNotFound(string $testFrameworkName): self
-    {
-        return new self(
-            sprintf(
-                'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
-            ),
-        );
-    }
+    /**
+     * @param mixed[] $installedExtensions
+     *
+     * @return string[]
+     */
+    public static function getTypes(
+        array $installedExtensions = GeneratedExtensionsConfig::EXTENSIONS,
+    ): array {
+        $types = self::$defaultTypes;
 
-    public static function staticAnalysisToolNotFound(string $testFrameworkName): self
-    {
-        return new self(
-            sprintf(
-                'Unable to locate a %s static analysis executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
-            ),
-        );
-    }
+        // TODO
+        //        if (count($installedExtensions) > 0) {
+        //            foreach ($installedExtensions as $installedExtension) {
+        //                $factory = $installedExtension['extra']['class'];
+        //
+        //                Assert::classExists($factory);
+        //
+        //                if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
+        //                    continue;
+        //                }
+        //
+        //                $types[] = $factory::getAdapterName();
+        //            }
+        //        }
 
-    public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
-    {
-        return new self(
-            sprintf('The custom path to %s was set as "%s" but this file did not exist.',
-                $testFrameworkName,
-                $customPath,
-            ),
-        );
+        return $types;
     }
 }
