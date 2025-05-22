@@ -33,59 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder\Exception;
+namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
-use RuntimeException;
-use function sprintf;
+use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\CommandLineBuilder;
 
 /**
  * @internal
  */
-final class FinderException extends RuntimeException
+final class PHPStanAdapter implements StaticAnalysisToolAdapter
 {
-    public static function composerNotFound(): self
+    public function __construct(
+        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly string $staticAnalysisToolExecutable,
+        private readonly CommandLineBuilder $commandLineBuilder,
+    ) {
+    }
+
+    public function getName(): string
     {
-        return new self(
-            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.',
+        return 'PHPStan';
+    }
+
+    public function getInitialRunCommandLine(): array
+    {
+        // TODO add --stop-on-first-error. Talked to Ondrej - this is the only one way of stop
+        // we can't rely on stderr because it's used for other output (non-error)
+        // see https://github.com/phpstan/phpstan/issues/11352#issuecomment-2233403781
+
+        return $this->commandLineBuilder->build(
+            $this->staticAnalysisToolExecutable,
+            [],
+            [],
         );
     }
 
-    public static function phpExecutableNotFound(): self
+    public function createMutantProcessFactory(): LazyMutantProcessFactory
     {
-        return new self(
-            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.',
-        );
-    }
-
-    public static function testFrameworkNotFound(string $testFrameworkName): self
-    {
-        return new self(
-            sprintf(
-                'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
-            ),
-        );
-    }
-
-    public static function staticAnalysisToolNotFound(string $testFrameworkName): self
-    {
-        return new self(
-            sprintf(
-                'Unable to locate a %s static analysis executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
-            ),
-        );
-    }
-
-    public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
-    {
-        return new self(
-            sprintf('The custom path to %s was set as "%s" but this file did not exist.',
-                $testFrameworkName,
-                $customPath,
-            ),
+        return new PHPStanMutantProcessFactory(
+            $this->mutantExecutionResultFactory,
+            $this->staticAnalysisToolExecutable,
+            $this->commandLineBuilder,
         );
     }
 }

@@ -33,59 +33,56 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder\Exception;
+namespace Infection\StaticAnalysis\PHPStan\Process;
 
-use RuntimeException;
-use function sprintf;
+use Infection\Mutant\Mutant;
+use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Process\MutantProcess;
+use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Infection\TestFramework\CommandLineBuilder;
+use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
-final class FinderException extends RuntimeException
+final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
-    public static function composerNotFound(): self
-    {
-        return new self(
-            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.',
-        );
+    public function __construct(
+        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly string $staticAnalysisToolExecutable,
+        private readonly CommandLineBuilder $commandLineBuilder,
+    ) {
     }
 
-    public static function phpExecutableNotFound(): self
+    public function create(Mutant $mutant): MutantProcess
     {
-        return new self(
-            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.',
-        );
-    }
-
-    public static function testFrameworkNotFound(string $testFrameworkName): self
-    {
-        return new self(
-            sprintf(
-                'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
+        $process = new Process(
+            command: $this->getMutantCommandLine(
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getOriginalFilePath(),
             ),
+            timeout: 30, // todo get from config
+        );
+
+        return new MutantProcess(
+            $process,
+            $mutant,
+            $this->mutantExecutionResultFactory,
         );
     }
 
-    public static function staticAnalysisToolNotFound(string $testFrameworkName): self
-    {
-        return new self(
-            sprintf(
-                'Unable to locate a %s static analysis executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
-            ),
-        );
-    }
-
-    public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
-    {
-        return new self(
-            sprintf('The custom path to %s was set as "%s" but this file did not exist.',
-                $testFrameworkName,
-                $customPath,
-            ),
+    private function getMutantCommandLine(
+        string $mutatedFilePath,
+        string $mutationOriginalFilePath,
+    ): array {
+        return $this->commandLineBuilder->build(
+            $this->staticAnalysisToolExecutable,
+            [],
+            [
+                "--tmp-file=$mutatedFilePath",
+                "--instead-of=$mutationOriginalFilePath",
+                '--error-format=json',
+                '--no-progress',
+                '-vv',
+                // TODO --stop-on-first-error
+            ],
         );
     }
 }

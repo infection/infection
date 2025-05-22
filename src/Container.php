@@ -63,6 +63,7 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
+use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
@@ -74,6 +75,7 @@ use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
@@ -101,9 +103,11 @@ use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
+use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
@@ -114,6 +118,8 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CommandLineBuilder;
@@ -186,6 +192,7 @@ final class Container
     public const DEFAULT_MIN_COVERED_MSI = null;
     public const DEFAULT_MSI_PRECISION = MsiParser::DEFAULT_PRECISION;
     public const DEFAULT_TEST_FRAMEWORK = null;
+    public const DEFAULT_STATIC_ANALYSIS_TOOL = null;
     public const DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
     public const DEFAULT_FILTER = '';
     public const DEFAULT_THREAD_COUNT = 1;
@@ -276,6 +283,16 @@ final class Container
                     $container->getDefaultJUnitFilePath(),
                     $config,
                     $container->getSourceFileFilter(),
+                    GeneratedExtensionsConfig::EXTENSIONS,
+                );
+            },
+            StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
+                $config = $container->getConfiguration();
+
+                return new StaticAnalysisToolFactory(
+                    $config->getTmpDir(),
+                    $container->getProjectDir(),
+                    $container->getStaticAnalysisToolExecutableFinder(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
@@ -378,6 +395,7 @@ final class Container
                 $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                 $container->getStopInfectionOnSigintSignalSubscriberFactory(),
                 $container->getDispatchPcntlSignalSubscriberFactory(),
+                $container->getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory(),
             ),
             CleanUpAfterMutationTestingFinishedSubscriberFactory::class => static function (self $container): CleanUpAfterMutationTestingFinishedSubscriberFactory {
                 $config = $container->getConfiguration();
@@ -396,6 +414,14 @@ final class Container
                 return new InitialTestsConsoleLoggerSubscriberFactory(
                     $config->noProgress(),
                     $container->getTestFrameworkAdapter(),
+                    $config->isDebugEnabled(),
+                );
+            },
+            InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class => static function (self $container): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory {
+                $config = $container->getConfiguration();
+
+                return new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
+                    $config->noProgress(),
                     $config->isDebugEnabled(),
                 );
             },
@@ -499,6 +525,13 @@ final class Container
                     $config->shouldSkipCoverage(),
                 );
             },
+            StaticAnalysisToolAdapter::class => static function (self $container): StaticAnalysisToolAdapter {
+                $config = $container->getConfiguration();
+
+                return $container->getStaticAnalysisToolFactory()->create(
+                    $config->getStaticAnalysisTool(),
+                );
+            },
             InitialTestsRunProcessFactory::class => static fn (self $container): InitialTestsRunProcessFactory => new InitialTestsRunProcessFactory(
                 $container->getTestFrameworkAdapter(),
             ),
@@ -506,14 +539,29 @@ final class Container
                 $container->getInitialTestRunProcessFactory(),
                 $container->getEventDispatcher(),
             ),
-            MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(
-                $container->getTestFrameworkAdapter(),
-                $container->getConfiguration()->getProcessTimeout(),
-                $container->getMutantExecutionResultFactory(),
-                [
-                    // TODO here will be a factory to create Static Analysis MutantProcess to kill Mutant
-                ],
+            InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
+                $container->getStaticAnalysisToolAdapter(),
             ),
+            InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
+                $container->getInitialStaticAnalysisProcessFactory(),
+                $container->getEventDispatcher(),
+            ),
+            MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
+                $config = $container->getConfiguration();
+
+                $mutantProcessKillerFactories = [];
+
+                if ($config->isStaticAnalysisEnabled()) {
+                    $mutantProcessKillerFactories[] = $container->getStaticAnalysisToolAdapter()->createMutantProcessFactory();
+                }
+
+                return new MutantProcessContainerFactory(
+                    $container->getTestFrameworkAdapter(),
+                    $container->getConfiguration()->getProcessTimeout(),
+                    $container->getMutantExecutionResultFactory(),
+                    $mutantProcessKillerFactories,
+                );
+            },
             MutationGenerator::class => static function (self $container): MutationGenerator {
                 $config = $container->getConfiguration();
 
@@ -529,7 +577,7 @@ final class Container
                 $configuration = $container->getConfiguration();
 
                 return new MutationTestingRunner(
-                    $container->getMutantProcessFactory(),
+                    $container->getMutantProcessContainerFactory(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -543,6 +591,7 @@ final class Container
                 );
             },
             LineRangeCalculator::class => static fn (): LineRangeCalculator => new LineRangeCalculator(),
+            StaticAnalysisToolExecutableFinder::class => static fn (): StaticAnalysisToolExecutableFinder => new StaticAnalysisToolExecutableFinder(),
             TestFrameworkFinder::class => static fn (): TestFrameworkFinder => new TestFrameworkFinder(),
             TestFrameworkExtraOptionsFilter::class => static fn (): TestFrameworkExtraOptionsFilter => new TestFrameworkExtraOptionsFilter(),
             AdapterInstallationDecider::class => static fn (): AdapterInstallationDecider => new AdapterInstallationDecider(new QuestionHelper()),
@@ -588,6 +637,7 @@ final class Container
             self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
             self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
             self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
+            self::DEFAULT_STATIC_ANALYSIS_TOOL,
         );
     }
 
@@ -625,6 +675,7 @@ final class Container
         bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
         ?string $loggerProjectRootDirectory,
+        ?string $staticAnalysisTool,
     ): self {
         $clone = clone $this;
 
@@ -696,6 +747,7 @@ final class Container
                 $executeOnlyCoveringTestCases,
                 $mapSourceClassToTestStrategy,
                 $loggerProjectRootDirectory,
+                $staticAnalysisTool,
             ),
         );
 
@@ -792,6 +844,11 @@ final class Container
     public function getFactory(): Factory
     {
         return $this->get(Factory::class);
+    }
+
+    public function getStaticAnalysisToolFactory(): StaticAnalysisToolFactory
+    {
+        return $this->get(StaticAnalysisToolFactory::class);
     }
 
     public function getMutantCodeFactory(): MutantCodeFactory
@@ -969,6 +1026,11 @@ final class Container
         return $this->get(InitialTestsConsoleLoggerSubscriberFactory::class);
     }
 
+    public function getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory(): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory
+    {
+        return $this->get(InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class);
+    }
+
     public function getMutationGeneratingConsoleLoggerSubscriberFactory(): MutationGeneratingConsoleLoggerSubscriberFactory
     {
         return $this->get(MutationGeneratingConsoleLoggerSubscriberFactory::class);
@@ -1039,9 +1101,19 @@ final class Container
         return $this->get(TestFrameworkAdapter::class);
     }
 
+    public function getStaticAnalysisToolAdapter(): StaticAnalysisToolAdapter
+    {
+        return $this->get(StaticAnalysisToolAdapter::class);
+    }
+
     public function getInitialTestRunProcessFactory(): InitialTestsRunProcessFactory
     {
         return $this->get(InitialTestsRunProcessFactory::class);
+    }
+
+    public function getInitialStaticAnalysisProcessFactory(): InitialStaticAnalysisProcessFactory
+    {
+        return $this->get(InitialStaticAnalysisProcessFactory::class);
     }
 
     public function getInitialTestsRunner(): InitialTestsRunner
@@ -1049,7 +1121,12 @@ final class Container
         return $this->get(InitialTestsRunner::class);
     }
 
-    public function getMutantProcessFactory(): MutantProcessContainerFactory
+    public function getInitialStaticAnalysisRunner(): InitialStaticAnalysisRunner
+    {
+        return $this->get(InitialStaticAnalysisRunner::class);
+    }
+
+    public function getMutantProcessContainerFactory(): MutantProcessContainerFactory
     {
         return $this->get(MutantProcessContainerFactory::class);
     }
@@ -1092,6 +1169,11 @@ final class Container
     public function getTestFrameworkFinder(): TestFrameworkFinder
     {
         return $this->get(TestFrameworkFinder::class);
+    }
+
+    public function getStaticAnalysisToolExecutableFinder(): StaticAnalysisToolExecutableFinder
+    {
+        return $this->get(StaticAnalysisToolExecutableFinder::class);
     }
 
     public function getTestFrameworkExtraOptionsFilter(): TestFrameworkExtraOptionsFilter

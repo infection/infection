@@ -33,59 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder\Exception;
+namespace Infection\Event\Subscriber;
 
-use RuntimeException;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Event\InitialStaticAnalysisRunWasStarted;
+use InvalidArgumentException;
 use function sprintf;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class FinderException extends RuntimeException
+final readonly class CiInitialStaticAnalysisRunConsoleLoggerSubscriber implements EventSubscriber
 {
-    public static function composerNotFound(): self
-    {
-        return new self(
-            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.',
-        );
+    public function __construct(
+        private OutputInterface $output,
+    ) {
     }
 
-    public static function phpExecutableNotFound(): self
+    public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
     {
-        return new self(
-            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.',
-        );
-    }
+        try {
+            // todo            $version = $this->testFrameworkAdapter->getVersion();
+            $version = 'hardcoded version';
+        } catch (InvalidArgumentException) {
+            $version = 'unknown';
+        }
 
-    public static function testFrameworkNotFound(string $testFrameworkName): self
-    {
-        return new self(
+        $this->output->writeln([
+            '',
+            'Running initial Static Analysis...',
+            '',
             sprintf(
-                'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
+                '%s version: %s',
+                // todo                $this->testFrameworkAdapter->getName(),
+                'PHPStan',
+                $version,
             ),
-        );
-    }
-
-    public static function staticAnalysisToolNotFound(string $testFrameworkName): self
-    {
-        return new self(
-            sprintf(
-                'Unable to locate a %s static analysis executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
-            ),
-        );
-    }
-
-    public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
-    {
-        return new self(
-            sprintf('The custom path to %s was set as "%s" but this file did not exist.',
-                $testFrameworkName,
-                $customPath,
-            ),
-        );
+        ]);
     }
 }
