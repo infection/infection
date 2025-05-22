@@ -33,63 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Factory;
+namespace Infection\Process\Runner;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
-use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\MutantProcess;
+use Infection\Event\InitialStaticAnalysisRunWasFinished;
+use Infection\Event\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Symfony\Component\Process\Process;
+use function var_dump;
 
 /**
  * @internal
  * @final
  */
-class MutantProcessFactory
+readonly class InitialStaticAnalysisRunner
 {
-    // TODO: is it necessary for the timeout to be an int?
     public function __construct(
-        private readonly TestFrameworkAdapter $testFrameworkAdapter,
-        private readonly float $timeout,
-        private readonly EventDispatcher $eventDispatcher,
-        private readonly MutantExecutionResultFactory $resultFactory,
+        private InitialStaticAnalysisProcessFactory $initialStaticAnalysisProcessFactory,
+        private EventDispatcher $eventDispatcher,
     ) {
     }
 
-    public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    public function run(): Process
     {
-        $process = new Process(
-            command: $this->testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $testFrameworkExtraOptions,
-            ),
-            timeout: $this->timeout,
-        );
+        $process = $this->initialStaticAnalysisProcessFactory->createProcess();
 
-        $mutantProcess = new MutantProcess($process, $mutant);
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
 
-        $eventDispatcher = $this->eventDispatcher;
-        $resultFactory = $this->resultFactory;
-
-        // move this out from here, it doesn't fit in this class
-        $mutantProcess->registerTerminateProcessClosure(static function () use (
-            $mutantProcess,
-            $eventDispatcher,
-            $resultFactory
-        ): void {
-            // we first need to create result $resultFactory->createFromProcess($mutantProcess)
-            // and then decide if to dispatch or create another process
-
-            $eventDispatcher->dispatch(new MutantProcessWasFinished(
-                $resultFactory->createFromProcess($mutantProcess)),
-            );
+        $process->run(function (string $type) use ($process): void {
+            $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted());
         });
 
-        return $mutantProcess;
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->getOutput()));
+
+        return $process;
     }
 }

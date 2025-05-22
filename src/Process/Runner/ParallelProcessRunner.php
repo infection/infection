@@ -149,6 +149,14 @@ final class ParallelProcessRunner implements ProcessRunner
 
             if (!$process->isRunning()) {
                 $processBearer->terminateProcess();
+                //                // todo think about ProcessBearerPod and it's execution result
+                //
+                //                if ($processBearer->needsStaticAnalysisRun()) {
+                //                    // add one more process to Generator
+                //                } else {
+                //                    // dispatch somewhere
+                //                    $processBearer->terminateProcess();
+                //                }
 
                 $this->availableThreadIndexes[] = $indexedProcessBearer->threadIndex;
 

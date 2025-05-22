@@ -46,10 +46,13 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
@@ -73,6 +76,8 @@ final readonly class Engine
         private ConsoleOutput $consoleOutput,
         private MetricsCalculator $metricsCalculator,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
+        private ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
     ) {
     }
 
@@ -83,6 +88,7 @@ final readonly class Engine
     public function execute(): void
     {
         $this->runInitialTestSuite();
+        $this->runInitialStaticAnalysis();
         $this->runMutationAnalysis();
 
         try {
@@ -126,6 +132,44 @@ final readonly class Engine
          * used for the initial test run.
          */
         $this->memoryLimiter->limitMemory($initialTestSuiteProcess->getOutput(), $this->adapter);
+    }
+
+    /**
+     * This is needed for 2 purposes:
+     * 1. To warm up SA tool's cache
+     * 2. To make sure SA passes before using it inside Infection to kill Mutants
+     */
+    private function runInitialStaticAnalysis(): void
+    {
+        if (!$this->config->isStaticAnalysisEnabled()) {
+            return;
+        }
+
+        // --static-analysis-tool=phpstan|psalm
+        // --skip-initial-static-analysis-run=bool
+        // --static-analysis-cache='/path' - minor
+        // todo see $container->getCoverageChecker()->checkCoverageRequirements(); - make the same for --skip-initial-static-analysis-run and --static-analysis-cache
+
+        //        if ($this->config->shouldSkipInitialTests()) {
+        //            $this->consoleOutput->logSkippingInitialTests();
+        //            $this->coverageChecker->checkCoverageExists();
+        //
+        //            return;
+        //        }
+        $initialStaticAnalysisProcess = $this->initialStaticAnalysisRunner->run();
+
+        if (!$initialStaticAnalysisProcess->isSuccessful()) {
+            throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter(
+                $initialStaticAnalysisProcess,
+                $this->staticAnalysisToolAdapter->getName(),
+            );
+        }
+
+        // check cache has been generated
+        //        $this->coverageChecker->checkCoverageHasBeenGenerated(
+        //            $initialTestSuiteProcess->getCommandLine(),
+        //            $initialTestSuiteProcess->getOutput(),
+        //        );
     }
 
     /**

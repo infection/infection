@@ -33,59 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder\Exception;
+namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
-use RuntimeException;
-use function sprintf;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
+use Infection\TestFramework\CommandLineBuilder;
 
 /**
  * @internal
  */
-final class FinderException extends RuntimeException
+final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
 {
-    public static function composerNotFound(): self
+    public static function create(string $staticAnalysisToolExecutable): StaticAnalysisToolAdapter
     {
-        return new self(
-            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.',
+        return new PHPStanAdapter(
+            $staticAnalysisToolExecutable,
+            new CommandLineBuilder(),
         );
     }
 
-    public static function phpExecutableNotFound(): self
+    public static function getAdapterName(): string
     {
-        return new self(
-            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.',
-        );
+        return 'phpunit';
     }
 
-    public static function testFrameworkNotFound(string $testFrameworkName): self
+    public static function getExecutableName(): string
     {
-        return new self(
-            sprintf(
-                'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
-            ),
-        );
-    }
-
-    public static function staticAnalysisToolNotFound(string $testFrameworkName): self
-    {
-        return new self(
-            sprintf(
-                'Unable to locate a %s static analysis executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName,
-            ),
-        );
-    }
-
-    public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
-    {
-        return new self(
-            sprintf('The custom path to %s was set as "%s" but this file did not exist.',
-                $testFrameworkName,
-                $customPath,
-            ),
-        );
+        return 'phpunit';
     }
 }
