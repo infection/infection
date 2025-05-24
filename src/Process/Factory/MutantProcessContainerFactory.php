@@ -36,11 +36,14 @@ declare(strict_types=1);
 namespace Infection\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
 use Symfony\Component\Process\Process;
+use function var_dump;
 
 /**
  * @internal
@@ -56,6 +59,7 @@ class MutantProcessContainerFactory
          * @var list<LazyMutantProcessFactory>
          */
         private readonly array $lazyMutantProcessCreators,
+        private readonly ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
 
@@ -71,6 +75,67 @@ class MutantProcessContainerFactory
             ),
             timeout: $this->timeout,
         );
+
+//        $mutantProcess = new MutantProcess($process, $mutant);
+//
+//        $eventDispatcher = $this->eventDispatcher;
+//        $resultFactory = $this->resultFactory;
+//        $staticAnalysisToolAdapter = $this->staticAnalysisToolAdapter;
+//        $isStaticAnalysisEnabled = $this->staticAnalysisToolAdapter !== null;
+//        $timeout = $this->timeout;
+//
+//        // move this out from here, it doesn't fit in this class
+//        $mutantProcess->registerTerminateProcessClosure(static function () use (
+//            $mutantProcess,
+//            $eventDispatcher,
+//            $resultFactory,
+//            $mutant,
+//            $staticAnalysisToolAdapter,
+//            $isStaticAnalysisEnabled,
+//            $timeout
+//        ): void {
+//            $mutantProcessResult = $resultFactory->createFromProcess($mutantProcess);
+//
+//            if ($isStaticAnalysisEnabled && $mutantProcessResult->getDetectionStatus() === DetectionStatus::ESCAPED) {
+//                $process = new Process(
+//                    command: $staticAnalysisToolAdapter->getMutantCommandLine(
+//                        $mutant->getFilePath(),
+//                        $mutant->getMutation()->getOriginalFilePath()
+//                    ),
+//                    timeout: $timeout,
+//                );
+//
+////                var_dump($staticAnalysisToolAdapter->getMutantCommandLine(
+////                    $mutant->getFilePath(),
+////                    $mutant->getMutation()->getOriginalFilePath()
+////                ));
+//
+//                $process->run();
+//
+//                $mutation = $mutant->getMutation();
+//
+//                $mutantStaticAnalysisProcessResult = new MutantExecutionResult(
+//                    $process->getCommandLine(),
+//                    $process->getOutput() . "\n\n" . $process->getErrorOutput(),
+//                    $process->getExitCode() === 0 ? DetectionStatus::ESCAPED : DetectionStatus::KILLED,
+//                    $mutant->getDiff(),
+//                    $mutation->getHash(),
+//                    $mutation->getMutatorClass(),
+//                    $mutation->getMutatorName(),
+//                    $mutation->getOriginalFilePath(),
+//                    $mutation->getOriginalStartingLine(),
+//                    $mutation->getOriginalEndingLine(),
+//                    $mutation->getOriginalStartFilePosition(),
+//                    $mutation->getOriginalEndFilePosition(),
+//                    $mutant->getPrettyPrintedOriginalCode(),
+//                    $mutant->getMutatedCode(),
+//                    $mutant->getTests(),
+//                );
+//
+//                $eventDispatcher->dispatch(new MutantProcessWasFinished($mutantStaticAnalysisProcessResult));
+//            } else {
+//                $eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcessResult));
+//            }
 
         return new MutantProcessContainer(
             new MutantProcess(

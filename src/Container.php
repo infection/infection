@@ -546,15 +546,19 @@ final class Container
                 $container->getInitialStaticAnalysisProcessFactory(),
                 $container->getEventDispatcher(),
             ),
-            MutantProcessFactory::class => static fn (self $container): MutantProcessFactory => new MutantProcessFactory(
-            MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(
-                $container->getTestFrameworkAdapter(),
-                $container->getConfiguration()->getProcessTimeout(),
-                $container->getMutantExecutionResultFactory(),
-                [
+            MutantProcessFactory::class => function (self $container): MutantProcessFactory {
+                $config = $container->getConfiguration();
+
+                return new MutantProcessFactory(
+                MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(    $container->getTestFrameworkAdapter(),
+                    $container->getConfiguration()->getProcessTimeout(),
+                    $container->getMutantExecutionResultFactory(),
+                    [
                     // TODO here will be a factory to create Static Analysis MutantProcess to kill Mutant
                 ],
-            ),
+                    $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,
+                );
+            },
             MutationGenerator::class => static function (self $container): MutationGenerator {
                 $config = $container->getConfiguration();
 
