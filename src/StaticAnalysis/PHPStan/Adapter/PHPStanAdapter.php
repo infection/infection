@@ -60,12 +60,33 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         // we can't rely on stderr because it's used for other output (non-error)
         // see https://github.com/phpstan/phpstan/issues/11352#issuecomment-2233403781
 
+        // ../../../bin/infection --static-analysis-tool=phpstan -s --log-verbosity=all --debug -vvv
+        // cat infection.text.log
+
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
             [],
             [],
             // todo ['--error-output=json', '--no-progress'],
             // todo ['--debug', '-vvv', '--no-ansi'],
+        );
+    }
+
+    public function getMutantCommandLine(
+        string $mutatedFilePath,
+        string $mutationOriginalFilePath,
+    ): array {
+        return $this->commandLineBuilder->build(
+            $this->staticAnalysisToolExecutable,
+            [],
+            [
+                "--tmp-file=$mutatedFilePath",
+                "--instead-of=$mutationOriginalFilePath",
+                '--error-format=json',
+                '--no-progress',
+                '-vv',
+                // TODO --stop-on-first-error
+            ],
         );
     }
 }

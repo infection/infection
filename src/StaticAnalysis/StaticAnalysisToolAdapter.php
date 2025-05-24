@@ -40,4 +40,9 @@ interface StaticAnalysisToolAdapter
     public function getName(): string;
 
     public function getInitialRunCommandLine(): array;
+
+    public function getMutantCommandLine(
+        string $mutatedFilePath,
+        string $mutationOriginalFilePath,
+    );
 }
