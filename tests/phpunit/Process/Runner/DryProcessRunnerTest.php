@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\DryProcessRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -48,11 +48,11 @@ final class DryProcessRunnerTest extends TestCase
         $called = false;
 
         $processes = (function () use (&$called): iterable {
-            yield $this->createMock(MutantProcess::class);
+            yield $this->createMock(MutantProcessContainer::class);
 
             $called = true;
 
-            yield $this->createMock(MutantProcess::class);
+            yield $this->createMock(MutantProcessContainer::class);
         })();
 
         foreach ((new DryProcessRunner())->run($processes) as $item) {

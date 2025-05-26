@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Infection\Process\MutantProcess;
+use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
-use Infection\Tests\Fixtures\Process\DummyProcessBearer;
+use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -63,7 +65,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $processes = (function () use ($threadsCount): iterable {
             for ($i = 0; $i < 10; ++$i) {
-                yield $this->createMutantProcess(($i % $threadsCount) + 1);
+                yield $this->createMutantProcessContainer(($i % $threadsCount) + 1);
             }
         })();
 
@@ -78,7 +80,7 @@ final class ParallelProcessRunnerTest extends TestCase
     {
         $processes = (function (): iterable {
             for ($i = 0; $i < 10; ++$i) {
-                yield $this->createTimeOutMutantProcess();
+                yield $this->createTimeOutMutantProcessContainer();
             }
         })();
 
@@ -116,9 +118,9 @@ final class ParallelProcessRunnerTest extends TestCase
             for ($i = 0; $i < 5; ++$i) {
                 $threadIndex = $threadCount === 0 ? 1 : ($i * 2 % $threadCount) + 1;
 
-                yield $this->createMutantProcess($threadIndex);
+                yield $this->createMutantProcessContainer($threadIndex);
 
-                yield $this->createTimeOutMutantProcess();
+                yield $this->createTimeOutMutantProcessContainer();
             }
         })();
 
@@ -129,7 +131,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertCount(10, iterator_to_array($executedProcesses, true));
     }
 
-    private function createMutantProcess(int $threadIndex): MutantProcess
+    private function createMutantProcessContainer(int $threadIndex): MutantProcessContainer
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -150,13 +152,18 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
-        return new DummyProcessBearer(
-            $processMock,
-            false,
+        return new MutantProcessContainer(
+            new DummyMutantProcess(
+                $processMock,
+                $this->createMock(Mutant::class),
+                $this->createMock(MutantExecutionResultFactory::class),
+                false,
+            ),
+            [],
         );
     }
 
-    private function createTimeOutMutantProcess(): MutantProcess
+    private function createTimeOutMutantProcessContainer(): MutantProcessContainer
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -174,9 +181,14 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
-        return new DummyProcessBearer(
-            $processMock,
-            true,
+        return new MutantProcessContainer(
+            new DummyMutantProcess(
+                $processMock,
+                $this->createMock(Mutant::class),
+                $this->createMock(MutantExecutionResultFactory::class),
+                true,
+            ),
+            [],
         );
     }
 }

@@ -33,21 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Process\Factory;
 
-use Infection\Process\MutantProcessContainer;
+use Infection\Mutant\Mutant;
+use Infection\Process\MutantProcess;
 
 /**
  * @internal
  */
-interface ProcessRunner
+interface LazyMutantProcessCreator
 {
-    /**
-     * @param iterable<MutantProcessContainer> $processContainers
-     *
-     * @return iterable<MutantProcessContainer>
-     */
-    public function run(iterable $processContainers): iterable;
-
-    public function stop(): void;
+    public function createMutantProcess(Mutant $mutant): MutantProcess;
 }

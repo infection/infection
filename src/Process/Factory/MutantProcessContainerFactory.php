@@ -33,26 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner;
+namespace Infection\Process\Factory;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
-use Infection\Process\Runner\IndexedMutantProcess;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Process\MutantProcessContainer;
+use Symfony\Component\Process\Process;
 
-#[CoversClass(IndexedMutantProcess::class)]
-final class IndexedMutantProcessTest extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class MutantProcessContainerFactory
 {
-    public function test_it_creates_object(): void
-    {
-        $processBearer = $this->createMock(MutantProcess::class);
+    public function __construct(
+        private readonly TestFrameworkAdapter $testFrameworkAdapter,
+        private readonly float $timeout,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        /**
+         * @var list<LazyMutantProcessCreator>
+         */
+        private readonly array $lazyMutantProcessCreators,
+    ) {
+    }
 
-        $indexedProcessBearer = new IndexedMutantProcess(
-            3,
-            $processBearer,
+    public function createProcessContainerForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcessContainer
+    {
+        $process = new Process(
+            command: $this->testFrameworkAdapter->getMutantCommandLine(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                $testFrameworkExtraOptions,
+            ),
+            timeout: $this->timeout,
         );
 
-        $this->assertSame(3, $indexedProcessBearer->threadIndex);
-        $this->assertSame($processBearer, $indexedProcessBearer->mutantProcess);
+        return new MutantProcessContainer(
+            new MutantProcess(
+                $process,
+                $mutant,
+                $this->mutantExecutionResultFactory,
+            ),
+            $this->lazyMutantProcessCreators,
+        );
     }
 }

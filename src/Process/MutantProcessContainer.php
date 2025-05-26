@@ -33,38 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Factory;
+namespace Infection\Process;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Mutant\Mutant;
-use Infection\Process\MutantProcess;
-use Symfony\Component\Process\Process;
+use function count;
+use Infection\Process\Factory\LazyMutantProcessCreator;
 
 /**
  * @internal
  * @final
  */
-class MutantProcessFactory
+class MutantProcessContainer
 {
+    /**
+     * @var list<MutantProcess>
+     */
+    private array $processes = [];
+
+    private int $currentProcessIndex = 0;
+
     public function __construct(
-        private readonly TestFrameworkAdapter $testFrameworkAdapter,
-        private readonly float $timeout,
+        MutantProcess $phpUnitMutantProcess,
+        /**
+         * @var list<LazyMutantProcessCreator>
+         */
+        private readonly array $lazyMutantProcessCreators,
     ) {
+        $this->processes[] = $phpUnitMutantProcess;
     }
 
-    public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    public function getCurrentMutantProcessDetectionStatus(): string
     {
-        $process = new Process(
-            command: $this->testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $testFrameworkExtraOptions,
-            ),
-            timeout: $this->timeout,
+        return $this->getCurrentMutantProcess()->getMutantExecutionResult()->getDetectionStatus();
+    }
+
+    public function hasNextProcessToKillMutant(): bool
+    {
+        return $this->currentProcessIndex < count($this->processes) - 1;
+    }
+
+    public function buildNextProcessToKillMutant(): MutantProcess
+    {
+        $newMutantProcess = $this->lazyMutantProcessCreators[$this->currentProcessIndex]->createMutantProcess(
+            $this->processes[0]->getMutant(),
         );
 
-        return new MutantProcess($process, $mutant);
+        $this->processes[] = $newMutantProcess;
+
+        ++$this->currentProcessIndex;
+
+        return $newMutantProcess;
+    }
+
+    public function getCurrentMutantProcess(): MutantProcess
+    {
+        return $this->processes[$this->currentProcessIndex];
     }
 }

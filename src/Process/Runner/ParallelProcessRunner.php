@@ -36,9 +36,11 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function array_shift;
+use Composer\XdebugHandler\Process;
 use function count;
 use Generator;
-use Infection\Process\MutantProcess;
+use Infection\Mutant\DetectionStatus;
+use Infection\Process\MutantProcessContainer;
 use function max;
 use function microtime;
 use function range;
@@ -58,7 +60,7 @@ final class ParallelProcessRunner implements ProcessRunner
     private const NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
 
     /**
-     * @var array<int, IndexedMutantProcess>
+     * @var array<int, IndexedMutantProcessContainer>
      */
     private array $runningProcesses = [];
     /**
@@ -82,7 +84,7 @@ final class ParallelProcessRunner implements ProcessRunner
         $this->shouldStop = true;
     }
 
-    public function run(iterable $processes): iterable
+    public function run(iterable $processContainers): iterable
     {
         /*
          * It takes about 100000 ms for a mutated process to finish, where it takes
@@ -93,7 +95,7 @@ final class ParallelProcessRunner implements ProcessRunner
          * For our purposes we need to make sure we only see one process only once. Thus,
          * we use a generator here which is both non-rewindable, and will fail loudly if tried.
          */
-        $generator = self::toGenerator($processes);
+        $generator = self::toGenerator($processContainers);
 
         // Bucket for processes to be executed
         $bucket = [];
@@ -150,11 +152,12 @@ final class ParallelProcessRunner implements ProcessRunner
         } while ($this->runningProcesses !== []);
     }
 
-    private function tryToFreeNotRunningProcess(): ?MutantProcess
+    private function tryToFreeNotRunningProcess(): ?MutantProcessContainer
     {
         // remove any finished process from the stack
         foreach ($this->runningProcesses as $index => $indexedMutantProcess) {
-            $mutantProcess = $indexedMutantProcess->mutantProcess;
+            $mutantProcessContainer = $indexedMutantProcess->mutantProcessContainer;
+            $mutantProcess = $mutantProcessContainer->getCurrentMutantProcess();
             $process = $mutantProcess->getProcess();
 
             try {
@@ -164,31 +167,39 @@ final class ParallelProcessRunner implements ProcessRunner
             }
 
             if (!$process->isRunning()) {
+                $isMutantEscaped = $mutantProcessContainer->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
+
+                if ($isMutantEscaped && $mutantProcessContainer->hasNextProcessToKillMutant()) {
+                    $newMutantProcess = $mutantProcessContainer->buildNextProcessToKillMutant();
+
+                    // TODO add it to the $bucket and run new process; -> in the next PR
+                }
+
                 $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
 
-                unset($this->runningProcesses[$index]->mutantProcess);
+                unset($this->runningProcesses[$index]->mutantProcessContainer);
                 unset($this->runningProcesses[$index]);
 
-                return $mutantProcess;
+                return $mutantProcessContainer;
             }
         }
 
         return null;
     }
 
-    private function startProcess(MutantProcess $mutantProcess, int $threadIndex): void
+    private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
     {
-        $mutantProcess->getProcess()->start(null, [
+        $mutantProcessContainer->getCurrentMutantProcess()->getProcess()->start(null, [
             'INFECTION' => '1',
             'TEST_TOKEN' => $threadIndex,
         ]);
 
-        $this->runningProcesses[] = new IndexedMutantProcess($threadIndex, $mutantProcess);
+        $this->runningProcesses[] = new IndexedMutantProcessContainer($threadIndex, $mutantProcessContainer);
     }
 
     /**
-     * @param MutantProcess[] $bucket
-     * @param Generator<MutantProcess> $input
+     * @param MutantProcessContainer[] $bucket
+     * @param Generator<MutantProcessContainer> $input
      */
     private static function fillBucketOnce(array &$bucket, Generator $input, int $threadCount): int
     {
@@ -205,9 +216,9 @@ final class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
-     * @param iterable<MutantProcess> $input
+     * @param iterable<MutantProcessContainer> $input
      *
-     * @return Generator<MutantProcess>
+     * @return Generator<MutantProcessContainer>
      */
     private static function toGenerator(iterable &$input): Generator
     {

@@ -40,14 +40,11 @@ use Infection\Process\MutantProcessContainer;
 /**
  * @internal
  */
-interface ProcessRunner
+final class IndexedMutantProcessContainer
 {
-    /**
-     * @param iterable<MutantProcessContainer> $processContainers
-     *
-     * @return iterable<MutantProcessContainer>
-     */
-    public function run(iterable $processContainers): iterable;
-
-    public function stop(): void;
+    public function __construct(
+        public int $threadIndex,
+        public MutantProcessContainer $mutantProcessContainer,
+    ) {
+    }
 }
